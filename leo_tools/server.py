@@ -271,14 +271,36 @@ def log_interaction():
 def extract_file_text():
     """Extract text from an uploaded file. Used by n8n workflow.
 
-    Body JSON: {base64_data, original_filename, mime_type?}
-    Response:  {extracted_text, char_count, status, local_path, mime_type}
+    Accepts EITHER:
+      1. JSON body: {base64_data, original_filename, mime_type?}
+      2. multipart/form-data with 'file' (or 'data') field + optional 'original_filename'
+
+    Response: {extracted_text, char_count, status, local_path, mime_type}
     """
-    import subprocess as _sp, json as _json
-    try:
-        payload = request.get_json(force=True, silent=False) or {}
-    except Exception as e:
-        return jsonify({"status": "error", "error": f"json parse: {e}"}), 400
+    import subprocess as _sp, json as _json, base64 as _b64
+    payload = {}
+
+    # Path 1: multipart upload (n8n binary)
+    if request.files:
+        # n8n's binary param is typically 'file' or 'data'
+        f = request.files.get('file') or request.files.get('data')
+        if f is None:
+            # fall back to the first file
+            f = list(request.files.values())[0]
+        data = f.read()
+        original_filename = request.form.get('original_filename') or f.filename or 'uploaded_file'
+        mime_type = request.form.get('mime_type') or f.mimetype or ''
+        payload = {
+            "base64_data": _b64.b64encode(data).decode(),
+            "original_filename": original_filename,
+            "mime_type": mime_type,
+        }
+    else:
+        # Path 2: JSON body with base64
+        try:
+            payload = request.get_json(force=True, silent=False) or {}
+        except Exception as e:
+            return jsonify({"status": "error", "error": f"json parse: {e}"}), 400
 
     if not payload.get("base64_data"):
         return jsonify({"status": "error", "error": "base64_data required"}), 400
