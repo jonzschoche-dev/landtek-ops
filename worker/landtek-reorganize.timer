@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly LandTek file organization audit
+
+[Timer]
+OnCalendar=Sun 03:00 Asia/Manila
+Persistent=true
+
+[Install]
+WantedBy=timers.target

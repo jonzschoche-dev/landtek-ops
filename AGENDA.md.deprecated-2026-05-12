@@ -1,0 +1,58 @@
+# What you should do next (Claude Code on this VPS)
+
+You are running in a tmux session reachable from Jonathan's phone via Termius.
+Jonathan is offline. You are the project manager for the next 48 hours.
+
+## Read first
+
+1. `cat /root/landtek/CLAUDE.md`   — full project context
+2. `cat /root/landtek/notifications/pending.txt` — messages from desktop Claude
+3. `psql ... -c "SELECT status, COUNT(*) FROM heightened_ocr_queue WHERE case_file='MWK-001' GROUP BY status"` — work queue
+4. `tail -20 /var/log/tct-sweep.log` — what the autonomous sweep is doing
+
+## Your role
+
+The `tct-sweep` timer runs every 5 min and extracts one TCT per cycle via Gemini.
+It's deterministic OCR work. Let it run.
+
+You handle the LLM-judgment work that the timer can't:
+- **Verify entity extractions** — promote `inferred_strong` → `verified` when source_quote
+  appears verbatim in source doc (only for fields where the quote can be string-matched)
+- **Build daily evidence pack** — query verified-only data, write a docx to /root/landtek/evidence_packs/
+- **Triage extraction errors** — check `extraction_runs WHERE status='failed'` and decide
+  whether to retry / move to secondary review folder
+- **Civil Case 26-360 thread integration** — link Gmail messages to the case_thread,
+  extract PDF attachments, queue them for heightened OCR
+- **Generate hourly status notes** to /root/landtek/notifications/pending.txt so the
+  desktop Claude (or returning user) has a trail
+
+## Constraints (do NOT cross)
+
+- No emails sent
+- No Drive files deleted
+- No schema-breaking DDL
+- No spend > $10/day on Gemini
+- Anything destructive: write a draft, mark "PENDING USER", do not execute
+
+## Self-check every 30 min
+
+If you're idle, run:
+```
+python3 -c "import psycopg2; c=psycopg2.connect('postgresql://n8n:n8npassword@172.18.0.3:5432/n8n').cursor(); c.execute('SELECT COUNT(*) FROM extraction_runs WHERE completed_at > NOW() - INTERVAL %s', ('15 minutes',)); print(c.fetchone())"
+```
+
+If 0 runs in 15 min, check `systemctl status tct-sweep.timer`. Restart if needed.
+
+## Comms back to user
+
+Anything they should see when they return → append to:
+```
+/root/landtek/notifications/pending.txt
+```
+
+Anything that needs them to decide before the next step:
+```
+/root/landtek/notifications/blocked.txt
+```
+
+Done.

@@ -1,0 +1,17 @@
+[Unit]
+Description=LandTek Cowork-Drive Bridge daemon
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/landtek/worker
+EnvironmentFile=/root/landtek/.env
+ExecStart=/usr/bin/python3 /root/landtek/worker/cowork_bridge.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/root/landtek/cowork_bridge.log
+StandardError=append:/root/landtek/cowork_bridge.log
+
+[Install]
+WantedBy=multi-user.target

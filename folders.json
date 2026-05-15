@@ -1,0 +1,22 @@
+{
+  "Paracale-001": {
+    "root": "1AWqoEaWGI4_d-s3zOrAHnA9pOFTFgPCm",
+    "Legal": "1TKMNbNxnns0FdtEuvEPMLISnnmmy46jx",
+    "Finance": "1qbKEeoj9yv-OcxxodAH9ec_oAwPkps_r",
+    "Evidence": "1EHYKQJxOZTxDxB5BliyuC0fvq5M2Tmhe",
+    "Conversations": "1yFmnujrfrZtWiTVujlY-B5CuP8ZqWJyg",
+    "Projects": "1bhlugmGDjK7c6lBibn4-zoQ-w8Q_d5zA",
+    "default": "1AWqoEaWGI4_d-s3zOrAHnA9pOFTFgPCm"
+  },
+  "MWK-001": {
+    "root": "1S_FftmsxCJIZuKEUycHpJwzCbkxW0BGR",
+    "Legal": "1y3w8gIS8SG66J2npfKhKQibOUpqwUTUi",
+    "Finance": "1-LlWNPW7rzVYFsz_7gFl0cMjlA9kw1F0",
+    "Evidence": "176U9wV-8jsCtDp0hCuj-hff2J6h0BrEs",
+    "Conversations": "1roy5YlHJIHKbV8hYsxYu6ptonlM7Lmj2",
+    "Projects": "1QBnRnrlNtgjpb11Nlj4oKL8BMZ6HuyKo",
+    "default": "1S_FftmsxCJIZuKEUycHpJwzCbkxW0BGR"
+  },
+  "inbox": "1eDLECG_Lu9dXh-FLeCTvjI3fJclMid2b",
+  "unclassified": "15ERiG46BMWqL0maW7Vo-OnK68pen6htJ"
+}

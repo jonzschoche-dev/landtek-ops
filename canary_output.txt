@@ -1,0 +1,18 @@
+============================================================
+SAFE INGEST WRAPPER
+============================================================
+
+[preflight]
+  OpenAI: OpenAI OK
+  Gemini: Gemini HTTP 429
+  WARN: Gemini down, will run openai-only
+
+[launch] python3 -u /root/landtek/bulk_ingest_mwk.py --process --max 3
+  PID 28940
+
+INGEST OK (exit 0, 160s)
+  successes: 0
+  failures:  0
+[telegram skipped — no TELEGRAM_BOT_TOKEN] INGEST OK (exit 0, 160s)
+  successes: 0
+  failures:  0

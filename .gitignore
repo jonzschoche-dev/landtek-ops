@@ -1,0 +1,64 @@
+# Secrets — NEVER commit
+.env
+.env.*
+*.pem
+*.key
+*-credentials.json
+*-service-account*.json
+landtek-compute-sa.json
+google-creds*.json
+client_secret_*.json
+*sa.json
+
+# OAuth client configs and state — contain client_secret / code_verifier
+*oauth_client*.json
+*oauth_state*.json
+
+# Document/case content (binary, privileged) — keep in Drive, not git
+*.pdf
+*.docx
+*.doc
+inbox/
+reports/
+case_files/
+intake_out/
+memo_out/
+pass1_out/
+pass2_out/
+per_page_work/
+heightened_ocr/
+n8n_code_nodes/n8n_data_export*
+
+# Drive inventory snapshot (large, regenerable)
+drive_inventory.json
+
+# User uploads (private + large)
+uploads/
+
+# Backups (handled by rclone → Drive nightly)
+backups/
+*.sql.gz
+*.dump
+
+# Python crud
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Logs
+logs/
+*.log
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# n8n local data (mounted volume — not source)
+n8n_data/
+
+# Workflow snapshots — INCLUDED for full audit history (each ~70-90 KB, 1.2 MB total)
+# Uncomment to exclude:
+# snapshots/*.json

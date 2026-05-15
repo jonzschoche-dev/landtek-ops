@@ -1,0 +1,507 @@
+#!/usr/bin/env python3
+"""Mass-ingest MWK-001 (Heirs of Mary Worrick Keesey) Drive tree.
+
+Stack: Gemini Flash (classify + memo, free tier) + Document AI (OCR on scans)
+       + Gemini Embedding 001 (chunks) + Qdrant + Postgres documents.
+Resumable via content_hash dedup; rate-limited to free-tier (15 req/min).
+Memory-careful for 1GB VPS (one file at a time, immediate cleanup).
+
+Usage:
+  python3 bulk_ingest_mwk.py --inventory          # phase 0 only — count files, no spend
+  python3 bulk_ingest_mwk.py --process            # full process all new files
+  python3 bulk_ingest_mwk.py --process --max 30   # cap at 30 docs
+"""
+import os, sys, io, json, time, hashlib, base64, argparse
+from datetime import datetime
+from pathlib import Path
+import requests
+import fitz  # PyMuPDF
+import psycopg2
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+# ---- config ------------------------------------------------------------------
+LTC_002_FOLDER = os.getenv("MWK_DRIVE_ROOT", "1S_FftmsxCJIZuKEUycHpJwzCbkxW0BGR")
+LANDTEK_DRIVE_ROOT = "1BMnZL7LWoH9tWq0C9RdCTaAQBGhtL8CP"   # parent for fallback
+GOOGLE_CREDS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "/root/landtek/google-creds.json")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+QDRANT_URL = os.getenv("QDRANT_URL", "")
+QDRANT_KEY = os.getenv("QDRANT_KEY", "")
+DOCAI_URL = "https://us-documentai.googleapis.com/v1/projects/287898704764/locations/us/processors/29ccddeea977ef1f:process"
+PG_HOST = os.getenv("PGHOST", "172.18.0.3")
+PG_USER = os.getenv("PGUSER", "n8n")
+PG_PASSWORD = os.getenv("PGPASSWORD", "n8npassword")
+PG_DB = os.getenv("PGDATABASE", "n8n")
+
+QDRANT_COLL = "landtek_documents"
+EMBED_DIM = 768
+CHUNK_SIZE = 400
+CHUNK_OVERLAP = 50
+RATE_LIMIT_S = 4.5  # 15 req/min = 4 sec between calls; +0.5 buffer
+GEMINI_MODELS = []
+MAX_BYTES_PER_FILE = 30 * 1024 * 1024  # skip > 30MB to protect 1GB VPS RAM
+MIN_BYTES_PER_FILE = 5 * 1024            # skip < 5KB (probably junk)
+
+CASES_HINT = """\
+Case context:
+- MWK-001 / Heirs of Mary Worrick Keesey: estate matter in Mercedes Camarines Norte. Patricia Keesey Zschoche is attorney-in-fact (Jonathan Zschoche her principal). Active: ARTA filing CTN SL-2026-0423-1891, CART Resolutions 1-6 Series 2026, Mayor Pajarillo's LGU obstruction, Atty. Balane involvement. Historic: Mercedes Resolution 26-96 (1996).
+- Paracale-001 / Allan Inocalla: gold mining in Paracale, Camarines Norte. MPSA with DENR/MGB."""
+
+DOC_TYPES = (
+    "Court Filing | Complaint | Motion | Demand Letter | Deed | Title (TCT/OCT) | "
+    "Contract | Lease | Permit | Notice | Government Submission | Resolution | "
+    "Receipt | Invoice | Tax Document | Financial Statement | Bank Statement | "
+    "Evidence | Photo | Exhibit | Transcript | Email | Letter | Memo | "
+    "Correspondence | Plan | Working Draft | Other"
+)
+
+# ---- helpers -----------------------------------------------------------------
+def log(m): print(f"[{datetime.now().strftime('%H:%M:%S')}] {m}", flush=True)
+
+def get_drive_service():
+    creds = service_account.Credentials.from_service_account_file(
+        GOOGLE_CREDS, scopes=["https://www.googleapis.com/auth/drive"])
+    return build("drive", "v3", credentials=creds, cache_discovery=False)
+
+def docai_token():
+    creds = service_account.Credentials.from_service_account_file(
+        GOOGLE_CREDS, scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    import google.auth.transport.requests as gtr
+    creds.refresh(gtr.Request())
+    return creds.token
+
+def pg_conn():
+    return psycopg2.connect(host=PG_HOST, port=5432, dbname=PG_DB, user=PG_USER, password=PG_PASSWORD)
+
+# ---- Drive walk --------------------------------------------------------------
+def walk_drive(service, root_id, accept_mime=("application/pdf",)):
+    """BFS through the tree; yield candidate files (PDFs by default)."""
+    queue = [(root_id, "")]
+    out = []
+    seen = set()
+    while queue:
+        fid, path = queue.pop(0)
+        if fid in seen: continue
+        seen.add(fid)
+        page_token = None
+        while True:
+            try:
+                resp = service.files().list(
+                    q=f"'{fid}' in parents and trashed=false",
+                    fields="nextPageToken, files(id,name,mimeType,size,modifiedTime,parents)",
+                    pageSize=200, pageToken=page_token,
+                    supportsAllDrives=True, includeItemsFromAllDrives=True,
+                ).execute()
+            except HttpError as e:
+                log(f"  drive list failed at {path}: {e}"); break
+            for f in resp.get("files", []):
+                child_path = f"{path}/{f['name']}".lstrip("/")
+                if f.get("mimeType") == "application/vnd.google-apps.folder":
+                    queue.append((f["id"], child_path))
+                else:
+                    f["_path"] = child_path
+                    if accept_mime is None or f.get("mimeType") in accept_mime:
+                        out.append(f)
+            page_token = resp.get("nextPageToken")
+            if not page_token: break
+    return out
+
+def download(service, file_id):
+    return service.files().get_media(fileId=file_id, supportsAllDrives=True).execute()
+
+# ---- text extraction ---------------------------------------------------------
+def extract_text(file_bytes, filename):
+    """PyMuPDF; fallback to Document AI for scans."""
+    try:
+        with fitz.open(stream=file_bytes, filetype="pdf") as doc:
+            text = "".join(p.get_text() for p in doc)
+        if len(text) > 200 and sum(c.isalpha() for c in text) / max(len(text), 1) > 0.4:
+            return text, "pymupdf"
+    except Exception as e:
+        log(f"  PyMuPDF error: {e}")
+    # Fallback: Document AI OCR
+    try:
+        b64 = base64.b64encode(file_bytes).decode()
+        token = docai_token()
+        r = requests.post(DOCAI_URL,
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={"rawDocument": {"content": b64, "mimeType": "application/pdf"}},
+            timeout=180)
+        r.raise_for_status()
+        return r.json().get("document", {}).get("text", ""), "docai"
+    except Exception as e:
+        log(f"  DocAI error: {e}")
+    return "", "failed"
+
+# ---- gemini calls (with model fallback) --------------------------------------
+def gemini_call(prompt, json_mode=True, max_tokens=4000):
+    if os.environ.get("SKIP_GEMINI") == "1":
+        raise RuntimeError("SKIP_GEMINI=1 — going straight to OpenAI")
+    last_err = None
+    for model in GEMINI_MODELS:
+        time.sleep(6)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        body = {"contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.0, "maxOutputTokens": max_tokens}}
+        if json_mode:
+            body["generationConfig"]["responseMimeType"] = "application/json"
+        try:
+            r = requests.post(url, json=body, timeout=120)
+            if r.status_code == 404:
+                last_err = f"{model}: 404"; continue
+            if r.status_code == 429:
+                log(f"  rate-limited on {model}, sleeping 30s"); time.sleep(30)
+                continue
+            if r.status_code >= 400:
+                last_err = f"{model}: {r.status_code} {r.text[:200]}"; continue
+            txt = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+            if json_mode:
+                if "```" in txt:
+                    txt = txt.split("```")[1]
+                    if txt.startswith("json"): txt = txt[4:]
+                return json.loads(txt.strip())
+            return txt
+        except Exception as e:
+            last_err = f"{model}: {type(e).__name__}: {e}"
+            continue
+    raise RuntimeError(f"all gemini models failed; last={last_err}")
+
+
+# ---- openai (last-resort fallback only) ------------------------------------
+def openai_call(prompt, json_mode=True, max_tokens=4000):
+    _OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
+    if not _OPENAI_KEY:
+        raise RuntimeError('OPENAI_API_KEY not set')
+    import requests, json as _json
+    body = {
+        'model': 'gpt-4o-mini',
+        'messages': [{'role': 'user', 'content': prompt}],
+        'max_tokens': max_tokens,
+        'temperature': 0.2,
+    }
+    if json_mode:
+        body['response_format'] = {'type': 'json_object'}
+    r = requests.post(
+        'https://api.openai.com/v1/chat/completions',
+        headers={'Authorization': 'Bearer ' + _OPENAI_KEY,
+                 'Content-Type': 'application/json'},
+        json=body, timeout=60,
+    )
+    r.raise_for_status()
+    out = r.json()['choices'][0]['message']['content']
+    return _json.loads(out) if json_mode else out
+
+def llm_call(prompt, json_mode=True, max_tokens=4000):
+    try:
+        return gemini_call(prompt, json_mode=json_mode, max_tokens=max_tokens)
+    except Exception as e:
+        log('  all gemini failed, openai fallback: ' + str(e)[:80])
+        return openai_call(prompt, json_mode=json_mode, max_tokens=max_tokens)
+
+def gemini_classify(text, filename):
+    prompt = f"""You are a Philippine legal/property document classifier for LandTek.
+
+{CASES_HINT}
+
+Filename: {filename}
+Text (first 5000 chars):
+{text[:5000]}
+
+Return JSON ONLY:
+{{
+  "case_file": "<MWK-001 | Paracale-001 | unknown>",
+  "case_file_confidence": 0.0-1.0,
+  "case_file_reasoning": "1 sentence citing specific cues",
+  "document_type": "<{DOC_TYPES}>",
+  "document_date": "YYYY-MM-DD or null",
+  "parties": ["full names"],
+  "reference_numbers": ["case nums, CTN, MPSA, TCT/OCT, etc."],
+  "summary": "2-3 sentence factual summary",
+  "smart_filename": "YYYY-MM-DD_descriptive_name.pdf",
+  "strategic_relevance": "1-2 sentences why this matters"
+}}"""
+    return llm_call(prompt, json_mode=True, max_tokens=2000)
+
+def gemini_memo(text, classification, filename):
+    prompt = f"""You are a forensic legal analyst writing an analyst memo on a Philippine document.
+
+Document: {filename}
+Classification: {json.dumps(classification, default=str)[:1000]}
+Full text (first 8000 chars):
+{text[:8000]}
+
+Produce a structured analyst memo as JSON:
+{{
+  "headline": "1-line: what is this doc, what does it mean for the case",
+  "summary": "2-3 sentence factual summary",
+  "key_facts": ["fact (with [page N] or [section X] citation)"],
+  "novelty": ["facts new in this doc"],
+  "contradictions": ["anything that complicates prior context"],
+  "referenced_but_missing": ["annexes/exhibits/prior filings cited but not attached"],
+  "questions_raised": ["specific questions this doc raises"],
+  "procedural_dates": [
+    {{"date": "YYYY-MM-DD", "event": "...", "implication": "..."}}
+  ],
+  "strategic_implication": "1-2 sentences on what this means for case posture"
+}}
+
+Be precise. No hedging. Cite specific text where possible."""
+    return llm_call(prompt, json_mode=True, max_tokens=3000)
+
+def gemini_embed(text):
+    r = requests.post(
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={GEMINI_API_KEY}",
+        json={"model": "models/gemini-embedding-001",
+              "content": {"parts": [{"text": text[:8000]}]},
+              "outputDimensionality": EMBED_DIM},
+        timeout=60)
+    r.raise_for_status()
+    return r.json()["embedding"]["values"]
+
+# ---- chunking, qdrant, postgres ---------------------------------------------
+def chunk_text(text, size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
+    words = text.split()
+    out, i = [], 0
+    while i < len(words):
+        out.append(" ".join(words[i:i+size]))
+        i += size - overlap
+    return [c for c in out if len(c.strip()) > 50]
+
+def qdrant_upsert(pid, vec, payload):
+    requests.put(f"{QDRANT_URL}/collections/{QDRANT_COLL}/points",
+        headers={"api-key": QDRANT_KEY, "Content-Type": "application/json"},
+        json={"points": [{"id": pid, "vector": vec, "payload": payload}]},
+        timeout=30).raise_for_status()
+
+def pg_insert_doc(cls, memo, filename, full_text, content_hash, drive_file_id):
+    conn = pg_conn(); cur = conn.cursor()
+    cur.execute("""INSERT INTO documents
+        (case_file, original_filename, smart_filename, mime_type, extracted_text,
+         classification, strategic_relevance, document_title, content_hash,
+         confidence, analyst_memo, first_seen_at, last_seen_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,NOW(),NOW())
+        ON CONFLICT (content_hash) WHERE content_hash IS NOT NULL DO UPDATE SET
+            last_seen_at = NOW(), duplicate_count = documents.duplicate_count + 1
+        RETURNING id""",
+        (cls.get("case_file","unknown"), filename,
+         cls.get("smart_filename", filename), "application/pdf", full_text[:200000],
+         cls.get("document_type","Other"), cls.get("strategic_relevance",""),
+         cls.get("smart_filename", filename), content_hash,
+         float(cls.get("case_file_confidence", 0.0)), json.dumps(memo)))
+    doc_id = cur.fetchone()[0]
+    conn.commit(); cur.close(); conn.close()
+    return doc_id
+
+def already_processed(content_hash):
+    conn = pg_conn(); cur = conn.cursor()
+    cur.execute("SELECT id, smart_filename FROM documents WHERE content_hash = %s", (content_hash,))
+    row = cur.fetchone()
+    cur.close(); conn.close()
+    return row
+
+# ---- main passes -------------------------------------------------------------
+def inventory_pass():
+    log("=== Inventory pass: walking LTC-002 tree ===")
+    service = get_drive_service()
+    files = walk_drive(service, LTC_002_FOLDER, accept_mime=("application/pdf",))
+    log(f"  found {len(files)} PDF files")
+    total_size = sum(int(f.get("size", 0) or 0) for f in files)
+    log(f"  total size: {total_size/1024/1024:.1f} MB")
+    # Hash each file (download is required for reliable hash; but we can use Drive's md5 if available)
+    # For inventory speed: just use size + name as approx ID
+    log("  size buckets:")
+    buckets = {"<10KB":0, "10-100KB":0, "100KB-1MB":0, "1-10MB":0, ">10MB":0}
+    for f in files:
+        s = int(f.get("size", 0) or 0)
+        if s < 10*1024: buckets["<10KB"] += 1
+        elif s < 100*1024: buckets["10-100KB"] += 1
+        elif s < 1024*1024: buckets["100KB-1MB"] += 1
+        elif s < 10*1024*1024: buckets["1-10MB"] += 1
+        else: buckets[">10MB"] += 1
+    for k, v in buckets.items():
+        log(f"    {k}: {v}")
+    # Cost estimate
+    eligible = [f for f in files if MIN_BYTES_PER_FILE <= int(f.get("size",0) or 0) <= MAX_BYTES_PER_FILE]
+    log(f"  eligible (size-filtered): {len(eligible)}")
+    # Estimate scan rate: ~30%
+    est_classify = len(eligible) * 0.0008  # gemini flash ~$0.0008/call typical
+    est_memo = len(eligible) * 0.0015
+    est_docai = len(eligible) * 0.3 * 5 * 0.0015  # 30% scans avg 5 pages
+    est_embed = len(eligible) * 0.001
+    total = est_classify + est_memo + est_docai + est_embed
+    log(f"  cost estimate (rough): ${total:.2f}")
+    log(f"    classify (Gemini Flash, mostly free tier): ~${est_classify:.2f}")
+    log(f"    memo (Gemini Flash, mostly free tier): ~${est_memo:.2f}")
+    log(f"    Document AI OCR (30% scans): ~${est_docai:.2f}")
+    log(f"    embeddings: ~${est_embed:.2f}")
+    return files
+
+def process_pass(max_docs=None):
+    log("=== Process pass ===")
+    service = get_drive_service()
+    files = walk_drive(service, LTC_002_FOLDER, accept_mime=("application/pdf",))
+    log(f"  walking complete: {len(files)} files")
+    files.sort(key=lambda f: f.get("modifiedTime", ""))  # oldest first
+
+    counters = {"attempted":0,"completed":0,"dup_skipped":0,"size_skipped":0,
+                "extract_failed":0,"classify_failed":0,"memo_failed":0,"upsert_failed":0,
+                "chunks":0}
+    docs_processed = 0
+    for f in files:
+        if max_docs and docs_processed >= max_docs:
+            log(f"  hit max_docs={max_docs}, stopping")
+            break
+        size = int(f.get("size", 0) or 0)
+        if not (MIN_BYTES_PER_FILE <= size <= MAX_BYTES_PER_FILE):
+            counters["size_skipped"] += 1; continue
+
+        log(f"\n--- {f['_path']} ({size/1024:.1f} KB) ---")
+        counters["attempted"] += 1
+        try:
+            data = download(service, f["id"])
+        except Exception as e:
+            log(f"  download failed: {e}"); counters["extract_failed"] += 1; continue
+
+        chash = hashlib.sha256(data).hexdigest()
+        existing = already_processed(chash)
+        if existing:
+            log(f"  DUPLICATE: already in documents (id={existing[0]} {existing[1]})")
+            counters["dup_skipped"] += 1; continue
+
+        text, src = extract_text(data, f["name"])
+        log(f"  extracted {len(text)} chars via {src}")
+        if not text or len(text) < 50:
+            counters["extract_failed"] += 1; continue
+
+        try:
+            time.sleep(0)
+            cls = gemini_classify(text, f["name"])
+            time.sleep(RATE_LIMIT_S)
+        except Exception as e:
+            log(f"  classify failed: {e}"); counters["classify_failed"] += 1; continue
+        log(f"  classified case={cls.get('case_file')} type={cls.get('document_type')} conf={cls.get('case_file_confidence')}")
+
+        try:
+            memo = gemini_memo(text, cls, f["name"])
+            time.sleep(RATE_LIMIT_S)
+        except Exception as e:
+            log(f"  memo failed: {e}"); memo = {"error": str(e)}
+            counters["memo_failed"] += 1
+
+        try:
+            doc_id = pg_insert_doc(cls, memo, f["name"], text, chash, f["id"])
+            log(f"  Postgres id={doc_id}")
+        except Exception as e:
+            log(f"  pg insert failed: {e}"); counters["upsert_failed"] += 1; continue
+
+        # chunks + qdrant
+        chunks = chunk_text(text)
+        log(f"  chunks: {len(chunks)}")
+        fhash = hashlib.md5(f["name"].encode()).hexdigest()[:8]
+        for i, ch in enumerate(chunks):
+            try:
+                v = gemini_embed(ch)
+                pid = int(hashlib.md5(f"{fhash}_{i}".encode()).hexdigest()[:8], 16)
+                qdrant_upsert(pid, v, {
+                    "case_file": cls.get("case_file","unknown"),
+                    "document_type": cls.get("document_type","Other"),
+                    "filename": f["name"],
+                    "smart_filename": cls.get("smart_filename", f["name"]),
+                    "drive_id": f["id"], "drive_path": f["_path"],
+                    "doc_id_postgres": doc_id,
+                    "chunk_index": i, "total_chunks": len(chunks),
+                    "document_date": cls.get("document_date"),
+                    "parties": cls.get("parties", []),
+                    "reference_numbers": cls.get("reference_numbers", []),
+                    "summary": cls.get("summary", ""),
+                    "strategic_relevance": cls.get("strategic_relevance", ""),
+                    "text": ch,
+                    "ingested_at": datetime.now().isoformat()
+                })
+                counters["chunks"] += 1
+                time.sleep(RATE_LIMIT_S * 0.3)  # embed has higher rate limit
+            except Exception as e:
+                log(f"  chunk {i} failed: {e}")
+
+        counters["completed"] += 1
+        docs_processed += 1
+        if docs_processed % 5 == 0:
+            log(f"  progress: {docs_processed} done; counters={counters}")
+
+    log("\n=== process pass complete ===")
+    for k, v in counters.items():
+        log(f"  {k}: {v}")
+
+def case_intel_rebuild():
+    log("=== Rebuilding cases.intelligence_summary for MWK-001 ===")
+    conn = pg_conn(); cur = conn.cursor()
+    cur.execute("""SELECT id, smart_filename, document_type, document_title,
+                          analyst_memo->>'headline', analyst_memo->>'summary',
+                          analyst_memo->>'strategic_implication'
+                   FROM documents WHERE case_file = 'MWK-001' ORDER BY id""")
+    docs = cur.fetchall()
+    log(f"  {len(docs)} docs to summarize")
+    if not docs:
+        cur.close(); conn.close(); return
+
+    digest = "\n\n".join(
+        f"[Doc {d[0]}] {d[1]} ({d[2]}): headline={d[4]}\n  summary: {d[5]}\n  implication: {d[6]}"
+        for d in docs[:60]
+    )
+    prompt = f"""Synthesize a 4-paragraph case profile for MWK-001 (Heirs of Mary Worrick Keesey estate, Mercedes Camarines Norte) based on these document memos:
+
+{digest}
+
+Output JSON only:
+{{
+  "client_name": "Heirs of Mary Worrick Keesey (per Patricia Keesey Zschoche, attorney-in-fact)",
+  "case_type": "estate",
+  "key_parties": ["..."],
+  "key_locations": ["..."],
+  "key_agencies": ["..."],
+  "key_reference_numbers": ["..."],
+  "current_goals": "...",
+  "key_risks": "...",
+  "next_milestone": "...",
+  "intelligence_summary": "<4 paragraphs of substance>"
+}}"""
+    try:
+        intel = gemini_call(prompt, json_mode=True, max_tokens=4000)
+    except Exception as e:
+        log(f"  gemini error: {e}"); cur.close(); conn.close(); return
+    summary = intel.get("intelligence_summary", "")
+    if intel.get("key_parties"):
+        summary += f"\n\nKey parties: {', '.join(intel['key_parties'])}"
+    if intel.get("key_agencies"):
+        summary += f"\nKey agencies: {', '.join(intel['key_agencies'])}"
+    if intel.get("key_reference_numbers"):
+        summary += f"\nKey reference numbers: {', '.join(intel['key_reference_numbers'])}"
+    cur.execute("""UPDATE cases SET
+                   client_name = %s, current_goals = %s, key_risks = %s,
+                   next_milestone = %s, intelligence_summary = %s, updated_at = NOW()
+                   WHERE case_file = 'MWK-001'""",
+                (intel.get("client_name") or "", intel.get("current_goals") or "",
+                 intel.get("key_risks") or "", intel.get("next_milestone") or "", summary))
+    conn.commit(); cur.close(); conn.close()
+    log("  cases.MWK-001 updated with new profile")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--inventory", action="store_true", help="Inventory only, no spend")
+    parser.add_argument("--process", action="store_true", help="Run full ingestion")
+    parser.add_argument("--rebuild-intel", action="store_true", help="Rebuild cases.intelligence_summary")
+    parser.add_argument("--max", type=int, default=None, help="Cap number of docs processed")
+    args = parser.parse_args()
+    if not (args.inventory or args.process or args.rebuild_intel):
+        args.inventory = True
+
+    if args.inventory:
+        inventory_pass()
+    if args.process:
+        process_pass(max_docs=args.max)
+    if args.rebuild_intel:
+        case_intel_rebuild()
+
+if __name__ == "__main__":
+    main()

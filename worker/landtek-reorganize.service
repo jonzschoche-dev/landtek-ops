@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek reorganization audit (report-only)
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek/worker
+EnvironmentFile=/root/landtek/.env
+ExecStart=/usr/bin/python3 /root/landtek/worker/reorganize.py
+StandardOutput=append:/root/landtek/reorganize.log
+StandardError=append:/root/landtek/reorganize.log

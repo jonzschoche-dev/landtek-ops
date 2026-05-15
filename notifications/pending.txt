@@ -1,0 +1,356 @@
+[2026-05-12 05:14 UTC] Test ping from desktop Claude. Termius reachability confirmed.
+==========================================================
+🚀 LandTek autonomous mode is live. Bon voyage.
+
+What's running:
+  ✓ tct-sweep.timer every 5 min (Gemini OCR, capped 2 USD/day)
+  ✓ 7AM Manila daily digest (writes to /var/log/digest.log)
+  ✓ Watchdog every 15 min — Telegram alert + auto-restart
+  ✓ All critical services Restart=always
+  ✓ Leo disabled (poisoned-OCR risk removed)
+
+Current state:
+  - 89 TCTs queued (will extract ~12-30 over 48h, budget permitting)
+  - 56 RAG chunks live, 52 instruments_on_title, 6 fraud_indicators
+  - 40 case-relevant Gmail messages ingested
+  - Civil Case 26-360 thread visible
+
+If you need me while you are away:
+  - Termius -> landtek-vps -> tmux 'claude' (Opus 4.7) is THIS me
+  - Or push a deploy to the inbox/ folder on the github repo
+  - Or check /root/landtek/notifications/pending.txt
+
+Talk soon.
+==========================================================
+
+------------------------------------------------------------
+[2026-05-12 06:12 UTC] Desktop Claude here. Diagnosing pause.
+
+ROOT CAUSE: tct-sweep.service had invalid Restart=always on Type=oneshot.
+Fixed in deploy 114. Sweep timer restarted. Service unit corrected.
+
+Wrote /root/landtek/AGENDA.md to give VPS-Claude clear next tasks.
+
+If you're back: tell me one thing — "continue" or "what blocked".
+------------------------------------------------------------
+[2026-05-12 06:23 UTC] PHASE A re-queued 1 failed extractions for retry: [97]
+
+------------------------------------------------------------
+[2026-05-12] AGENDA.md deprecated → DIRECTIVE.md is the single playbook.
+When you connect via Termius, paste:
+  read /root/landtek/DIRECTIVE.md and tell me what is pending. then run "go".
+After that, single-word commands work: go, status, extract N, verify T-X, draft X, stop.
+------------------------------------------------------------
+[2026-05-12 06:36 UTC] PHASE A re-queued 2 failed extractions for retry: [97, 97]
+[2026-05-12 06:36 UTC] PHASE B verifier: scanned 56 chunks, promoted 5
+[2026-05-12 06:36 UTC] STATE: queued=89  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 06:36 UTC] STATE: queued=88  completed=3  verified=5/56  last_done=02:57:39
+
+------------------------------------------------------------
+[2026-05-12] Sweep now rotates between 2 Gemini keys + 3 model tiers.
+On 429: that specific key gets 4h cooldown, sweep tries the other key next run.
+Doc 97 marked requires_heightened_ocr (Gemini truncates its dense response).
+------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-12] Quality gate live. Every extraction now scored 0-1.
+  >=0.6 → accept (queue marked completed)
+  0.3-0.6 → re_extract_with_better_model (stays queued for next run)
+  <0.3 → manual_review (queued, flagged for hand-review)
+Sweep order: 2.5-flash → 2.0-flash → flash-lite, key rotation handles 429s.
+------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-12] Accuracy-first reset:
+  - Sweep now gemini-2.5-flash ONLY (no downgrade)
+  - Quality threshold 0.8 (was 0.6)
+  - 2-pass cross-validation on critical fields
+  - On quota: 4h cooldown, no model swap
+  - Field disagreements stored in `field_consensus` table for manual reconciliation
+Goal: every verified fact appears identically across two independent readings.
+------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-12] Wired DIRECTIVE.md banner at TOP of CLAUDE.md.
+When Claude Code starts in /root/landtek, it now auto-reads CLAUDE.md →
+sees "READ FIRST: DIRECTIVE.md" → reads the playbook → knows the commands.
+You should not need to paste anything when opening Termius — just type "go" or "status".
+------------------------------------------------------------
+[2026-05-12 07:06 UTC] STATE: queued=84  completed=3  verified=5/56  last_done=02:57:39
+
+------------------------------------------------------------
+[2026-05-12 07:15 UTC] Two important fixes:
+
+1. LEO HARD-DISABLED. workflow.active=false + isArchived=true + n8n restarted.
+   Today at 12:58 Manila Leo fabricated Mary Worrick Keesey's death date and made up
+   four TCT docs, lot numbers, and a fake person "Francisco Delfin Keesey."
+   Hallucination logged in hallucination_log table as evidence of why we replaced him.
+   DO NOT re-enable Leo. Use Claude Code on VPS via Termius for any case question.
+
+2. SWEEP RUNNER UPGRADED. Replaced 5-min timer with long-running sweep-loop.service.
+   Recognizes "queue empty" / "keys cooled" / "budget exhausted" with proper sleeps
+   (15min / 30min / 1hr). No more tight-spinning.
+
+Mary Worrick Keesey's REAL death date: NOT VERIFIED in our database. If you want to
+establish it, we need to:
+  - Find her death certificate (likely in Gmail or to be requested from Sacramento County
+    where Marcia Ellen Keesey lives, or the US Social Security Death Index)
+  - Add it as a verified document
+Do not state any date Leo said.
+------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-12 07:25 UTC] Fallback key (...gBfA0) is in project landtek-493511 (the one
+made for Gmail OAuth). The Generative Language API was never enabled there → 403.
+
+Disabled this key for sweep (indefinite cooldown). Only primary OCR key in use.
+
+TO FIX (whenever, optional): https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com?project=landtek-493511
+  → Enable
+Then in psql: UPDATE gemini_key_state SET cooldown_until=NULL
+                WHERE key_label='GEMINI_API_KEY_FALLBACK';
+
+Otherwise sweep will keep using the primary key only. Means when primary hits
+quota, sweep waits 4 hours. With $10/day budget that's fine for 48 hours.
+------------------------------------------------------------
+[2026-05-12 07:36 UTC] PHASE A re-queued 1 failed extractions for retry: [67]
+[2026-05-12 07:36 UTC] STATE: queued=82  completed=3  verified=5/56  last_done=02:57:39
+
+------------------------------------------------------------
+[2026-05-12] New Compute SA saved: 287898704764-compute@developer.gserviceaccount.com
+  - project: landtek
+  - file: /root/landtek/landtek-compute-sa.json
+  - SECURITY: this key's private material is in the Cowork chat history.
+    Rotate at console.cloud.google.com whenever convenient.
+
+If we want this SA to access Drive: share the LANDTEK folder with that email too.
+If we want this SA to make Gemini calls via Vertex (not API-key): that's automatic,
+  the SA already authenticates against generativelanguage.googleapis.com once enabled.
+------------------------------------------------------------
+
+[2026-05-12 07:58 UTC] Gemini cooldown work — non-blocking deliverable closed
+  - Pulled 70 attachments across 27 Civil Case 26-360 emails (zero failures)
+  - Saved to /root/landtek/case_files/MWK-001/civil_26-360_attachments/ (136 MB)
+  - Mix: 58 pdf, 8 docx, 2 jpg, 1 png, 1 untyped
+  - gmail_messages.attachment_refs populated for all 27
+  - NOT YET DONE: index in documents table, link to a Civil Case 26-360 case_thread, OCR
+  Gemini status: primary key cools until 11:24 UTC; fallback unusable (Gemini API
+  disabled in project 790571313389 — needs activation by Jonathan).
+  Loop alive (PID 117431) sleeping 30 min, will resume sweep when a key recovers.
+[2026-05-12 08:07 UTC] PHASE A re-queued 1 failed extractions for retry: [67]
+[2026-05-12 08:07 UTC] STATE: queued=82  completed=3  verified=5/56  last_done=02:57:39
+
+------------------------------------------------------------
+[2026-05-12] Added Gemini-paused worklist to DIRECTIVE.md.
+10 deterministic tasks the system can do without Gemini.
+From Termius: type "worklist" — VPS Claude will show pause state + tasks.
+Or run: bash /root/landtek/autonomous/worklist.sh
+------------------------------------------------------------
+[2026-05-12 08:14 UTC] STATE: queued=75  completed=3  verified=5/56  last_done=02:57:39
+
+[2026-05-12 08:30 UTC] Cross-thread entity correlation (PENDING — verify before relying)
+  Existing entity crosstab shows the following persons appear in 3+ threads:
+    - Cesar de la Fuente (the operative SPA-revoked AIF)
+    - Gloria Balane (the flagship defendant)
+    - Patricia Keesee Zschoche (plaintiff)
+    - Jonathan Paul Zschoche / Jonathan Zschoche (likely same person, dedup target)
+    - Gerry Hoppe, Joselito P. Panaligan Jr., Jose P. Sta. Ana Jr., Ida Buenaventura,
+      Maribol Panaligan (likely same as Maribol Panoual — dedup target)
+    - Benjamin Llamanzares
+  Locations: Mercedes / Mercedes, Camarines Norte / Daet / Quezon City all appear in
+  threads {3,4,5}. The newly-merged Thread 1 doesn't appear yet because its 67 docs
+  need entity extraction (separate pipeline from heightened OCR).
+  ACTION: declared shared_entity relationships 1↔3 and 1↔4. After Thread 1's docs
+  are entity-extracted, this overlap will be quantifiable; today it's grounded in
+  the names that already appear in Threads 3-5.
+
+[2026-05-12 08:25 UTC] Worklist drained — all non-Gemini deliverables banked
+  Drafts written to /root/landtek/drafts/:
+    - evidence_pack_civil_26-360_skeleton.md (verified-only skeleton, gaps flagged)
+    - evidence_gaps_2026-05-12.md (329 evidence gaps across 20 transferees,
+      strategic recap of how absence-of-evidence converts to evidence-of-absence via CNR)
+    - hallucination_review_2026-05-12.md (the 1 logged incident, 7 operational guardrails)
+    - entity_dedup_review_2026-05-12.md (proposed merges: 18 Mary Worrick Keesey
+      variants → 1, 11 Jonathan Zschoche variants → 1, plus TCT-identifier
+      misclassifications. SQL primitives included but NOT run, per "modify schemas"
+      guard. Awaits Jonathan review.)
+    - daily_digest_2026-05-12.md (morning digest snapshot)
+  Database changes (already applied):
+    - Civil Case 26-360 → existing Thread 1 enriched + 67 docs/40 emails linked
+      (my duplicate Thread 6 deleted, merged into Thread 1)
+    - thread_relationships 1↔3 and 1↔4 declared as shared_entity
+    - 55 PDFs from the case email attachments queued in heightened_ocr_queue
+      with priorities 5-9 (TCT-named highest, exhibits next, generic last)
+    - extraction_chunks columns verified_by + verified_at added (earlier round)
+    - tct_sweep.py patched: 403/PERMISSION_DENIED now triggers 24h key-cooldown
+      (was treating it as doc-level fault and burning fail_counts)
+  Sweep recovery: primary key recovers ~11:24 UTC; fallback locked 24h until
+  Jonathan enables Gemini API on project 790571313389 + manually clears its
+  gemini_key_state.cooldown_until.
+  Loop alive: PID 120908 (apparently restarted; will pick up on key recovery).
+[2026-05-12 08:44 UTC] STATE: queued=138  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 09:14 UTC] STATE: queued=138  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 09:44 UTC] STATE: queued=138  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 10:14 UTC] STATE: queued=138  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 10:44 UTC] STATE: queued=138  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 11:14 UTC] STATE: queued=138  completed=3  verified=5/56  last_done=02:57:39
+[2026-05-12 11:44 UTC] STATE: queued=137  completed=9  verified=5/57  last_done=11:26:17
+[2026-05-12 12:14 UTC] PHASE A re-queued 1 failed extractions for retry: [11]
+[2026-05-12 12:14 UTC] PHASE B verifier: scanned 70 chunks, promoted 1
+[2026-05-12 12:14 UTC] STATE: queued=137  completed=19  verified=6/78  last_done=12:11:26
+
+[2026-05-12 12:09 UTC] EXPECTED-fields fix applied + threshold-flip investigated and reverted
+  • tct_sweep.py: EXPECTED list rewritten to actual tct_v3_canonical paths (line 109+ + get_field()).
+    Critical-fields list updated to ['title_number','registered_owners','previous_title_numbers',
+    'area_sqm','lot_block_plan']. Old names were tct_number/registrant_full_name/predecessor_title/
+    etc. — never matched contract output.
+  • QUALITY_THRESHOLD briefly dropped 0.8 → 0.6, then reverted to 0.8 after discriminator query.
+    Reason: doc 10 hit 1.000 with corrected scoring; 0.8 IS reachable. The "all 0.111" cluster
+    earlier was stale scoring (pre-fix runs on full data). On re-extraction those will also hit
+    high scores.
+  • First doc into pass-2 pipeline: doc 10 (TCT/run 73, score 1.000, quality_decision=accept).
+    Queue keeps it queued so the next iteration picks it for pass 2 → cross-validation →
+    field_consensus rows.
+  • Sweep alive (PID 136842), key GEMINI_API_KEY_FALLBACK on standard tier, draining at ~2 min/doc.
+[2026-05-12 12:19 UTC] STATE: queued=137  completed=21  verified=6/78  last_done=12:17:58
+[2026-05-12 12:49 UTC] PHASE A re-queued 1 failed extractions for retry: [25]
+[2026-05-12 12:49 UTC] STATE: queued=137  completed=30  verified=6/78  last_done=12:38:08
+[2026-05-12 13:19 UTC] STATE: queued=136  completed=39  verified=6/78  last_done=13:16:06
+[2026-05-12 13:50 UTC] STATE: queued=136  completed=51  verified=6/78  last_done=13:48:53
+[2026-05-12 14:20 UTC] PHASE A re-queued 1 failed extractions for retry: [104]
+[2026-05-12 14:20 UTC] STATE: queued=135  completed=57  verified=6/78  last_done=14:14:51
+[2026-05-12 14:50 UTC] PHASE A re-queued 1 failed extractions for retry: [224]
+[2026-05-12 14:50 UTC] STATE: queued=134  completed=62  verified=6/78  last_done=14:40:26
+[2026-05-12 15:20 UTC] STATE: queued=132  completed=67  verified=6/78  last_done=15:19:39
+[2026-05-12 15:50 UTC] STATE: queued=131  completed=75  verified=6/78  last_done=15:48:42
+[2026-05-12 16:20 UTC] PHASE A re-queued 1 failed extractions for retry: [382]
+[2026-05-12 16:20 UTC] STATE: queued=130  completed=82  verified=6/78  last_done=16:15:20
+[2026-05-12 16:50 UTC] STATE: queued=120  completed=93  verified=6/78  last_done=16:50:32
+[2026-05-12 17:20 UTC] STATE: queued=111  completed=101  verified=6/78  last_done=17:16:19
+[2026-05-12 17:51 UTC] STATE: queued=102  completed=111  verified=6/78  last_done=17:45:45
+[2026-05-12 18:21 UTC] STATE: queued=94  completed=119  verified=6/78  last_done=18:18:57
+[2026-05-12 18:51 UTC] STATE: queued=79  completed=134  verified=6/78  last_done=18:50:11
+[2026-05-12 19:21 UTC] STATE: queued=70  completed=143  verified=6/78  last_done=19:13:47
+[2026-05-12 19:51 UTC] STATE: queued=58  completed=158  verified=6/78  last_done=19:51:04
+[2026-05-12 20:21 UTC] STATE: queued=58  completed=179  verified=6/78  last_done=20:20:48
+[2026-05-12 20:51 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-12 21:21 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-12 21:51 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-12 22:21 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-12 22:52 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-12 23:22 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-12 23:52 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 00:22 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 00:52 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 01:23 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 01:53 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 02:23 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 02:53 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 03:23 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 03:53 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 04:23 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 04:53 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 05:23 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 05:54 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 06:24 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 06:54 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 07:24 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 07:55 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 08:25 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 08:55 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 09:25 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 09:55 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 10:25 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 10:56 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 11:26 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 11:56 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 12:27 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 12:57 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 13:27 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 13:57 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 14:27 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 14:57 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 15:27 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 15:58 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 16:28 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 16:58 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 17:28 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 17:58 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 18:28 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 18:58 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 19:29 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 19:59 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 20:29 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 20:59 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 21:29 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 22:00 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 22:30 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 23:00 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-13 23:30 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-14 00:00 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-14 00:30 UTC] STATE: queued=57  completed=199  verified=6/78  last_done=20:49:38
+[2026-05-14 00:35 UTC] PHASE B-prime: promoted 35 new field_consensus rows into extraction_chunks
+[2026-05-14 00:35 UTC] STATE: queued=57  completed=199  verified=41/113  last_done=20:49:38
+[2026-05-14 00:38 UTC] PHASE B-prime: promoted 92 new field_consensus rows into extraction_chunks
+[2026-05-14 00:38 UTC] STATE: queued=57  completed=199  verified=98/170  last_done=20:49:38
+[2026-05-14 01:08 UTC] PHASE B-prime: promoted 92 new field_consensus rows into extraction_chunks
+[2026-05-14 01:08 UTC] STATE: queued=1  completed=199  verified=350/422  last_done=20:49:38
+[2026-05-14 01:38 UTC] PHASE B-prime: promoted 59 new field_consensus rows into extraction_chunks
+[2026-05-14 01:38 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 02:08 UTC] PHASE B-prime: promoted 59 new field_consensus rows into extraction_chunks
+[2026-05-14 02:08 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 02:38 UTC] PHASE B-prime: promoted 2 new field_consensus rows into extraction_chunks
+[2026-05-14 02:38 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 03:08 UTC] PHASE B-prime: promoted 2 new field_consensus rows into extraction_chunks
+[2026-05-14 03:08 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 03:38 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 04:08 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 04:12 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 04:42 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 05:13 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 05:43 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 06:13 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 06:43 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 07:13 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 07:44 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 08:14 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 08:44 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 09:14 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 09:44 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 10:15 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 10:45 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 11:15 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 11:45 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 12:15 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 12:45 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 13:15 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 13:45 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 14:16 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 14:46 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 15:16 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 15:46 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 16:16 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 16:46 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 17:17 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 17:47 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 18:17 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 18:47 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 19:17 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 19:47 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 20:17 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 20:47 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 21:17 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 21:48 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 22:18 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 22:48 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 23:18 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-14 23:48 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 00:18 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 00:48 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 01:18 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 01:49 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 02:19 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 02:49 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 03:19 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 03:50 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
+[2026-05-15 04:20 UTC] STATE: queued=1  completed=199  verified=354/426  last_done=20:49:38
