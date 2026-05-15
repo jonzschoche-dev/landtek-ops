@@ -1,0 +1,10 @@
+[Unit]
+Description=Leo health watchdog (auto-recovery for n8n + Telegram webhook)
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/landtek/leo_watchdog.py
+StandardOutput=append:/var/log/landtek_watchdog.log
+StandardError=append:/var/log/landtek_watchdog.log
