@@ -81,3 +81,36 @@ if __name__ == "__main__":
         print("Usage: deploy_helpers.py <deploy_id> <summary>", file=sys.stderr)
         sys.exit(2)
     commit_deploy(sys.argv[1], " ".join(sys.argv[2:]))
+
+
+
+def patch_workflow_dual(workflow_id: str, nodes=None, connections=None):
+    """Update workflow_entity AND workflow_history.latest in one transaction.
+
+    n8n's runtime reads from workflow_history.latest (per investigation in
+    deploy_057g). Updating only workflow_entity leaves the runtime on the
+    stale snapshot. ALL future workflow JSON changes should go through this.
+    """
+    import psycopg2, json as _json
+    conn = psycopg2.connect(host="172.18.0.3", dbname="n8n", user="n8n", password="n8npassword")
+    cur = conn.cursor()
+    if nodes is not None:
+        cur.execute('UPDATE workflow_entity SET nodes=%s::jsonb, "updatedAt"=now() WHERE id=%s',
+                    (_json.dumps(nodes), workflow_id))
+        cur.execute("""UPDATE workflow_history SET nodes=%s::jsonb
+                         WHERE "workflowId"=%s AND "createdAt"=(SELECT MAX("createdAt") FROM workflow_history WHERE "workflowId"=%s)""",
+                    (_json.dumps(nodes), workflow_id, workflow_id))
+    if connections is not None:
+        cur.execute('UPDATE workflow_entity SET connections=%s::jsonb, "updatedAt"=now() WHERE id=%s',
+                    (_json.dumps(connections), workflow_id))
+        cur.execute("""UPDATE workflow_history SET connections=%s::jsonb
+                         WHERE "workflowId"=%s AND "createdAt"=(SELECT MAX("createdAt") FROM workflow_history WHERE "workflowId"=%s)""",
+                    (_json.dumps(connections), workflow_id, workflow_id))
+    # Force reactivation so webhook re-registers
+    cur.execute('UPDATE workflow_entity SET active=false, "updatedAt"=now() WHERE id=%s', (workflow_id,))
+    conn.commit()
+    import time; time.sleep(1)
+    cur.execute('UPDATE workflow_entity SET active=true, "updatedAt"=now() WHERE id=%s', (workflow_id,))
+    conn.commit()
+    cur.close(); conn.close()
+    print(f"  patch_workflow_dual: workflow_entity + workflow_history.latest synced for {workflow_id}")
