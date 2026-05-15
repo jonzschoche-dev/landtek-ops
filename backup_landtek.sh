@@ -88,13 +88,22 @@ for kind in postgres code snapshots; do
   done
 done
 
-# ── 6. Off-site upload — STUB ─────────────────────────────────────────────
-# When you give me a Backblaze B2 / Drive / rsync.net destination, uncomment + fill:
+# ── 6. Off-site upload to Backblaze B2 ────────────────────────────────────
+# Remote 'landtek-b2' is configured in /root/.config/rclone/rclone.conf (chmod 600).
+# Bucket 'LeoLandtek' is scoped to a dedicated app key (no master credentials).
 #
-# rclone sync "$DEST/" "remote:landtek-backups/" --transfers 4 --checkers 8 2>>"$LOG"
-#
-# Until then, backups live on the same VPS — protects against data corruption /
-# accidental deletion, but NOT disk failure or VPS-provider outage.
+# Sync is idempotent: only changed files are re-uploaded. First run uploaded
+# ~818 MB; subsequent nightly runs upload only the new daily pg_dump, code
+# tarball, snapshot, plus any changed files under uploads/.
+log "starting B2 off-site sync..."
+if rclone sync "$DEST/" landtek-b2:LeoLandtek/landtek-vps/ \
+     --transfers 4 --checkers 8 \
+     --log-file "$LOG" --log-level NOTICE 2>>"$LOG"; then
+  REMOTE_SIZE=$(rclone size landtek-b2:LeoLandtek/landtek-vps/ --json 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin)['bytes'])" 2>/dev/null || echo "?")
+  log "B2 sync: ok (${REMOTE_SIZE} bytes in bucket)"
+else
+  log "ERROR: B2 sync failed — local backup is fine, off-site is stale until next run"
+fi
 
 # ── 7. Inventory summary ──────────────────────────────────────────────────
 log "=== inventory ==="
