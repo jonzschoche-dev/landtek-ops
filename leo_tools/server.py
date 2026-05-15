@@ -326,6 +326,80 @@ def extract_file_text():
         return jsonify({"status": f"server_error: {type(e).__name__}: {e}", "extracted_text": "", "char_count": 0}), 200
 
 
+
+@app.route('/api/upload_to_drive', methods=['POST'])
+def upload_to_drive():
+    """Upload a file to Google Drive using the service account.
+
+    Body:
+      - multipart/form-data: file=@... + folder_id + (optional) target_filename
+      OR
+      - JSON: {base64_data, folder_id, target_filename?, mime_type?}
+
+    Response: {ok, drive_file_id, drive_link, name, status}
+    """
+    import io as _io, base64 as _b64
+    try:
+        from google.oauth2 import service_account as _sa
+        from googleapiclient.discovery import build as _build
+        from googleapiclient.http import MediaIoBaseUpload as _MIO
+    except Exception as e:
+        return jsonify({"ok": False, "status": f"sdk_missing: {e}"}), 500
+
+    # Parse input
+    folder_id = ""
+    target_filename = "uploaded_file"
+    mime_type = "application/octet-stream"
+    raw = b""
+
+    if request.files:
+        f = request.files.get('file') or list(request.files.values())[0]
+        raw = f.read()
+        folder_id = request.form.get('folder_id') or ''
+        target_filename = request.form.get('target_filename') or f.filename or target_filename
+        mime_type = request.form.get('mime_type') or f.mimetype or mime_type
+    else:
+        try:
+            payload = request.get_json(force=True, silent=False) or {}
+        except Exception as e:
+            return jsonify({"ok": False, "status": f"json_parse: {e}"}), 400
+        b64 = payload.get('base64_data') or ''
+        if not b64:
+            return jsonify({"ok": False, "status": "base64_data or multipart file required"}), 400
+        raw = _b64.b64decode(b64)
+        folder_id = payload.get('folder_id') or ''
+        target_filename = payload.get('target_filename') or target_filename
+        mime_type = payload.get('mime_type') or mime_type
+
+    if not folder_id:
+        return jsonify({"ok": False, "status": "folder_id required"}), 400
+
+    try:
+        creds = _sa.Credentials.from_service_account_file(
+            "/root/landtek/landtek-compute-sa.json",
+            scopes=["https://www.googleapis.com/auth/drive.file",
+                    "https://www.googleapis.com/auth/drive"]
+        )
+        service = _build('drive', 'v3', credentials=creds)
+        media = _MIO(_io.BytesIO(raw), mimetype=mime_type, resumable=True)
+        meta = {"name": target_filename, "parents": [folder_id]}
+        result = service.files().create(
+            body=meta, media_body=media,
+            fields='id, name, webViewLink, parents, mimeType'
+        ).execute()
+        return jsonify({
+            "ok": True,
+            "drive_file_id": result.get('id'),
+            "drive_link": result.get('webViewLink'),
+            "name": result.get('name'),
+            "mime_type": result.get('mimeType'),
+            "parents": result.get('parents'),
+            "status": "ok",
+        }), 200
+    except Exception as e:
+        return jsonify({"ok": False, "status": f"upload_error: {type(e).__name__}: {e}"}), 500
+
+
 @app.route('/api/recent_interactions')
 def recent_interactions():
     """List recent interactions for rating. Default: unrated, last 50."""
