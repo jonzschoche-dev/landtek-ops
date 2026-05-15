@@ -35,21 +35,78 @@ def extract_pdf(path: Path) -> str:
 
 
 def extract_pdf_with_ocr_fallback(path: Path):
-    """PDF text-layer first; if <200 chars, fall back to Google Document AI OCR (uses SA).
+    """PDF extraction priority:
+       1. fitz text-layer (free, native PDFs)
+       2. Gemini 2.5 Flash PDF-native (cheap, layout-aware, ~10x cheaper than DocAI)
+       3. Document AI (last resort if Gemini fails)
 
     Returns (text, status).
     """
     text = extract_pdf(path)
     if len(text) >= 200:
         return text, "ok_text_layer"
-    # Fallback: Document AI (uses service account, no Gemini quota dependency)
+    # Primary fallback: Gemini PDF-native
+    try:
+        gem_text = ocr_via_gemini_pdf(path)
+        if gem_text and len(gem_text) > len(text):
+            return gem_text, "ok_gemini_pdf"
+    except Exception as e:
+        gem_err = f"{type(e).__name__}: {str(e)[:200]}"
+    else:
+        gem_err = "no_text_returned"
+    # Secondary fallback: Document AI
     try:
         ocr_text = ocr_via_document_ai(path)
         if ocr_text and len(ocr_text) > len(text):
-            return ocr_text, "ok_document_ai"
+            return ocr_text, f"ok_document_ai (gemini_failed: {gem_err})"
     except Exception as e:
-        return text, f"docai_error: {type(e).__name__}: {e}"
-    return text, "fallback_empty"
+        return text, f"both_failed (gemini: {gem_err}; docai: {type(e).__name__}: {e})"
+    return text, f"fallback_empty (gemini: {gem_err})"
+
+
+def ocr_via_gemini_pdf(pdf_path: Path) -> str:
+    """Gemini 2.5 Flash PDF-native extraction via Files API.
+
+    Uploads the PDF to Gemini Files API, lets it process, then asks for the
+    full text. Far cheaper than Document AI and preserves layout/structure.
+    Reuses the timeout-wrapped pattern from heightened_ocr/.
+    """
+    from dotenv import load_dotenv
+    load_dotenv("/root/landtek/.env")
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return ""
+    import google.generativeai as genai
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    # Upload the PDF
+    uploaded = genai.upload_file(str(pdf_path), mime_type="application/pdf")
+    # Wait for it to finish processing (up to 60s for large files)
+    import time as _time
+    for _ in range(60):
+        f = genai.get_file(uploaded.name)
+        if f.state.name == "ACTIVE":
+            break
+        if f.state.name == "FAILED":
+            raise RuntimeError(f"gemini file processing failed: {f.state}")
+        _time.sleep(1)
+    else:
+        raise TimeoutError("gemini file processing did not become ACTIVE in 60s")
+    # Generate
+    resp = model.generate_content([
+        "Extract ALL text from this PDF document, preserving structure: headings, "
+        "paragraphs, tables, page numbers, signatures, and any annotations. "
+        "Return text only — no commentary, no markdown fences. "
+        "For each page boundary, insert '\n--- Page N ---\n' as a separator.",
+        uploaded,
+    ], generation_config={"temperature": 0.0, "max_output_tokens": 65536})
+    text = resp.text.strip() if resp and resp.text else ""
+    # Cleanup uploaded file
+    try:
+        genai.delete_file(uploaded.name)
+    except Exception:
+        pass
+    return text
 
 
 def ocr_via_document_ai(pdf_path: Path) -> str:
