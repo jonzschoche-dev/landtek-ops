@@ -6,6 +6,12 @@ import psycopg2
 
 PG_DSN = os.getenv("LEO_TOOLS_PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 app = Flask(__name__)
+try:
+    from files_dashboard import bp as _files_bp
+    app.register_blueprint(_files_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: files dashboard not registered: {_e}", file=_sys.stderr)
 
 def db():
     return psycopg2.connect(PG_DSN)
