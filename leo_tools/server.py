@@ -266,6 +266,44 @@ def log_interaction():
 
 
 
+
+@app.route('/api/extract_file_text', methods=['POST'])
+def extract_file_text():
+    """Extract text from an uploaded file. Used by n8n workflow.
+
+    Body JSON: {base64_data, original_filename, mime_type?}
+    Response:  {extracted_text, char_count, status, local_path, mime_type}
+    """
+    import subprocess as _sp, json as _json
+    try:
+        payload = request.get_json(force=True, silent=False) or {}
+    except Exception as e:
+        return jsonify({"status": "error", "error": f"json parse: {e}"}), 400
+
+    if not payload.get("base64_data"):
+        return jsonify({"status": "error", "error": "base64_data required"}), 400
+
+    try:
+        result = _sp.run(
+            ["python3", "/root/landtek/extract_uploaded_file.py"],
+            input=_json.dumps(payload),
+            capture_output=True, text=True, timeout=120,
+        )
+        if result.returncode != 0:
+            return jsonify({
+                "status": f"extract_error_rc{result.returncode}",
+                "stderr": result.stderr[:500],
+                "extracted_text": "",
+                "char_count": 0,
+            }), 200
+        data = _json.loads(result.stdout)
+        return jsonify(data), 200
+    except _sp.TimeoutExpired:
+        return jsonify({"status": "timeout", "extracted_text": "", "char_count": 0}), 200
+    except Exception as e:
+        return jsonify({"status": f"server_error: {type(e).__name__}: {e}", "extracted_text": "", "char_count": 0}), 200
+
+
 @app.route('/api/recent_interactions')
 def recent_interactions():
     """List recent interactions for rating. Default: unrated, last 50."""
