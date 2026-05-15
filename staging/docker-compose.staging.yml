@@ -1,0 +1,70 @@
+# LandTek staging stack — on-demand n8n + Postgres clone of prod.
+#
+# Lives on the same VPS as prod. Different ports, different volumes,
+# but SAME N8N_ENCRYPTION_KEY (required so restored credentials in
+# the pg_dump can be decrypted).
+#
+# Bring up with start-staging.sh (restores latest prod pg_dump).
+# Bring down with stop-staging.sh.
+#
+# Network: joins the same n8n_default network as prod so the staging
+# stack can reach the leo-tools Flask service on the host. n8n itself
+# is isolated by container name + DB.
+
+services:
+  postgres-staging:
+    image: pgvector/pgvector:pg15
+    container_name: n8n-postgres-staging
+    restart: "no"
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=n8n
+    ports:
+      - "127.0.0.1:5433:5432"   # bind to loopback only
+    volumes:
+      - postgres_data_staging:/var/lib/postgresql/data
+    networks:
+      - n8n_default
+
+  n8n-staging:
+    image: n8nio/n8n
+    container_name: n8n-staging
+    restart: "no"
+    ports:
+      - "127.0.0.1:5679:5678"   # loopback only; nginx fronts external access
+    environment:
+      - N8N_WEBHOOK_URL=https://staging.leo.hayuma.org
+      - WEBHOOK_URL=https://staging.leo.hayuma.org
+      - N8N_HOST=staging.leo.hayuma.org
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - N8N_SECURE_COOKIE=true
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+      - N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN=true
+      - N8N_ENDPOINT_REST=rest
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres-staging
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
+      # Staging marker — workflows can branch on this to avoid sending real
+      # Telegram messages, hitting real Drive folders, etc.
+      - LANDTEK_ENV=staging
+    volumes:
+      - n8n_data_staging:/home/node/.n8n
+    depends_on:
+      - postgres-staging
+    user: root
+    networks:
+      - n8n_default
+
+volumes:
+  postgres_data_staging:
+  n8n_data_staging:
+
+networks:
+  n8n_default:
+    external: true

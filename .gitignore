@@ -62,3 +62,4 @@ n8n_data/
 # Workflow snapshots — INCLUDED for full audit history (each ~70-90 KB, 1.2 MB total)
 # Uncomment to exclude:
 # snapshots/*.json
+staging/.env
