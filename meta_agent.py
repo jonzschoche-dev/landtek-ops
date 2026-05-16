@@ -244,6 +244,25 @@ INVARIANTS = [
          """,
          msg="{n} matter(s) have gmail attachments still unextracted into documents. Run extract_email_attachments."),
 
+    # ─── LEGAL-ACT VALIDITY (per feedback_legal_act_validity_scrutiny) ───
+    dict(id="UNAUDITED_LEGAL_ACT", severity="P1",
+         name="Doc titled as a legal act (deed/donation/spa/revocation) has no validity audit",
+         sql=r"""
+            SELECT id, smart_filename, classification
+              FROM documents
+             WHERE (classification ILIKE '%deed%' OR classification ILIKE '%donation%'
+                    OR classification ILIKE '%power of attorney%' OR classification ILIKE '%spa%'
+                    OR classification ILIKE '%revocation%' OR smart_filename ILIKE '%deed%'
+                    OR smart_filename ILIKE '%donation%' OR smart_filename ILIKE '%spa%')
+               AND execution_status IN ('executed_filed','executed_notarized','government_issued')
+               AND NOT EXISTS (
+                 SELECT 1 FROM extraction_chunks ec
+                  WHERE ec.doc_id = documents.id
+                    AND (ec.chunk_type = 'validity_audit' OR ec.field_name = 'validity_components')
+               )
+         """,
+         msg="{n} legal-act doc(s) lack a validity_audit chunk. Should NOT be cited as proof of the act until audited."),
+
     dict(id="ACTIVE_MATTER_TIMELINE_SPARSE", severity="P3",
          name="Active matter has fewer than 3 events in scoped timeline",
          sql=r"""
