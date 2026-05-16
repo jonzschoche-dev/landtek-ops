@@ -1,0 +1,8 @@
+[Unit]
+Description=LandTek conflict detector
+After=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/landtek/conflict_detector.py
+StandardOutput=append:/var/log/landtek_conflict.log
+StandardError=append:/var/log/landtek_conflict.log

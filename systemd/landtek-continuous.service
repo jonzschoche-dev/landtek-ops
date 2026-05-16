@@ -1,0 +1,8 @@
+[Unit]
+Description=LandTek continuous learning (case knowledge refresh)
+After=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/landtek/continuous_learning.py
+StandardOutput=append:/var/log/landtek_continuous.log
+StandardError=append:/var/log/landtek_continuous.log
