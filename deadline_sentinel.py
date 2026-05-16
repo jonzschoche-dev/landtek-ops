@@ -93,6 +93,62 @@ def event_already_occurred(cur, deadline):
     return False, None, ""
 
 
+def maybe_fire_intake(cur, deadline, timing, days_until=None, token=None):
+    """Fire a pre- or post-event stage intake checklist via Telegram.
+
+    timing='pre' fires at the template's fire_days_before; only once per (deadline, timing).
+    timing='post' fires immediately upon auto-complete; only once per (deadline, timing).
+    Records in stage_intake_response so re-runs are idempotent.
+    """
+    if not deadline.get("stage_key"):
+        return False, "no_stage_key"
+    cur.execute("""
+        SELECT id, title, checklist, fire_days_before, notes
+          FROM stage_intake_template
+         WHERE stage_key = %s AND timing = %s
+    """, (deadline["stage_key"], timing))
+    tpl = cur.fetchone()
+    if not tpl:
+        return False, "no_template"
+    # Don't re-fire
+    cur.execute("""
+        SELECT id FROM stage_intake_response
+         WHERE deadline_id = %s AND timing = %s
+         LIMIT 1
+    """, (deadline["id"], timing))
+    if cur.fetchone():
+        return False, "already_fired"
+    # If pre, gate by days_until <= fire_days_before
+    if timing == "pre" and tpl.get("fire_days_before") is not None:
+        if days_until is None or days_until > tpl["fire_days_before"] or days_until < 0:
+            return False, "not_yet_or_past"
+
+    # Compose checklist message
+    when = deadline["due_date"].strftime("%a %b %d, %Y")
+    icon = "🔔" if timing == "pre" else "📋"
+    header = f"{icon} <b>{tpl['title']}</b>"
+    sub = (f"Case: <b>{deadline['case_file']}</b> · {deadline['title'][:70]}\n"
+           f"{'Due' if timing=='pre' else 'Was due'}: {when}")
+    items = "\n".join(f"  {i+1}. {item}" for i, item in enumerate(tpl["checklist"]))
+    note = f"\n\n<i>{tpl['notes']}</i>" if tpl.get("notes") else ""
+    reply_help = ("\n\nReply with the doc directly to ingest, or "
+                  "<code>/skip &lt;n&gt;</code> if item N doesn't apply.")
+    text = f"{header}\n{sub}\n\n{items}{note}{reply_help}"
+
+    if token:
+        ok, info = tg_send(text, token)
+    else:
+        ok, info = True, "dry"
+
+    if ok:
+        cur.execute("""
+            INSERT INTO stage_intake_response (deadline_id, template_id, timing, items_total, status, notes)
+            VALUES (%s, %s, %s, %s, 'open', %s)
+        """, (deadline["id"], tpl["id"], timing, len(tpl["checklist"]),
+              f"fired via deadline_sentinel" + ("" if ok else f" — tg failed: {info[:100]}")))
+    return ok, info
+
+
 def load_env_token():
     env = {}
     with open("/root/landtek/.env") as f:
@@ -155,7 +211,7 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("""
         SELECT id, case_file, title, description, due_date, deadline_type, status,
-               source_doc_id,
+               source_doc_id, stage_key,
                reminder_t14_sent_at, reminder_t7_sent_at, reminder_t3_sent_at,
                reminder_t1_sent_at, reminder_t0_sent_at, reminder_dayof_sent_at,
                (SELECT max(sent_at) FROM deadline_alerts a
@@ -169,9 +225,19 @@ def main():
 
     sent_count = 0
     auto_completed = 0
+    intakes_fired = 0
     for d in deadlines:
         days = (d["due_date"] - today).days
         tier = args.force_tier or pick_tier(days)
+
+        # Pre-event intake: fires once per deadline, gated by template's fire_days_before
+        if d.get("stage_key") and days >= 0 and tier is not None:
+            if not args.dry_run:
+                ok, info = maybe_fire_intake(cur, d, "pre", days_until=days, token=token)
+                if ok and info != "dry":
+                    intakes_fired += 1
+                    print(f"  📨 PRE-INTAKE fired for deadline #{d['id']} ({d['stage_key']}, T-{days}d)")
+
         if tier is None:
             continue
 
@@ -198,6 +264,12 @@ def main():
                 """, (d["id"], evidence_id, evidence_summary))
                 auto_completed += 1
                 print(f"  ⏭ AUTO-COMPLETED deadline #{d['id']} ({d['title'][:50]}) — evidence: {evidence_summary}")
+                # Fire the post-event intake checklist
+                if d.get("stage_key") and not args.dry_run:
+                    ok, info = maybe_fire_intake(cur, d, "post", token=token)
+                    if ok:
+                        intakes_fired += 1
+                        print(f"  📋 POST-INTAKE fired for deadline #{d['id']} ({d['stage_key']})")
                 continue
 
             # Pulse every OVERDUE_PULSE_HOURS hours
@@ -252,7 +324,7 @@ def main():
                     (json.dumps({"sent": sent_count, "scanned": len(deadlines)}),))
     except Exception: pass
 
-    print(f"\n  sent {sent_count} reminder(s), auto-completed {auto_completed} stale deadline(s)")
+    print(f"\n  sent {sent_count} reminder(s), auto-completed {auto_completed} stale deadline(s), fired {intakes_fired} intake(s)")
     cur.close(); conn.close()
 
 
