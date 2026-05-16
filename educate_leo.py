@@ -93,12 +93,15 @@ def load_corpus(cur, case_file):
     return [dict(r) for r in cur.fetchall()]
 
 
-def chunk_corpus_by_tokens(docs, max_chars=600_000):
-    """Pack docs into chunks under max_chars (approx 150K tokens at 4 chars/token)."""
+def chunk_corpus_by_tokens(docs, max_chars=40_000):
+    """Pack docs into chunks under max_chars. 40K = ~10K tokens input,
+    leaves room for Gemini's output budget so JSON isn't truncated."""
     chunks = []
     cur, cur_len = [], 0
     for d in docs:
-        text = f"\n--- DOC {d['id']} ({d['doc_date']}) {d['original_filename'] or d['smart_filename'] or 'unnamed'} ---\n{d['body'][:30_000]}\n"
+        # Cap individual doc bodies to 4K chars (was 8K — caused JSON truncation)
+        body_snip = d['body'][:4_000]
+        text = f"\n--- DOC {d['id']} ({d['doc_date']}) {d['original_filename'] or d['smart_filename'] or 'unnamed'} ---\n{body_snip}\n"
         if cur_len + len(text) > max_chars and cur:
             chunks.append(cur)
             cur, cur_len = [text], len(text)
@@ -168,8 +171,10 @@ Output ONLY the JSON, no prose before or after.
 """
 
 
-def call_gemini(prompt, max_output=8192):
-    """Call Gemini 2.5 Flash. Returns parsed JSON or raises."""
+def call_gemini(prompt, max_output=32768, timeout_s=120):
+    """Call Gemini 2.5 Flash with timeout. Returns parsed JSON or raises.
+
+    max_output bumped to 32K (was 8K) — JSON was truncating mid-string."""
     from dotenv import load_dotenv
     load_dotenv("/root/landtek/.env")
     import google.generativeai as genai
@@ -181,11 +186,49 @@ def call_gemini(prompt, max_output=8192):
     resp = model.generate_content(
         prompt,
         generation_config={"temperature": 0.0, "max_output_tokens": max_output, "response_mime_type": "application/json"},
+        request_options={"timeout": timeout_s},
     )
     raw = resp.text if resp and resp.text else ""
-    # Strip code fences if any
     raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.MULTILINE)
-    return json.loads(raw)
+    # First try clean parse
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        # Fallback: salvage what we can — find the per_doc array and parse complete entries
+        m = re.search(r'"per_doc"\s*:\s*\[', raw)
+        if not m:
+            raise
+        salvaged = []
+        # Walk forward parsing one balanced { ... } at a time
+        i = m.end()
+        depth = 0
+        start = None
+        in_str = False
+        esc = False
+        while i < len(raw):
+            c = raw[i]
+            if esc:
+                esc = False
+            elif c == "\\":
+                esc = True
+            elif c == '"':
+                in_str = not in_str
+            elif not in_str:
+                if c == "{":
+                    if depth == 0:
+                        start = i
+                    depth += 1
+                elif c == "}":
+                    depth -= 1
+                    if depth == 0 and start is not None:
+                        snippet = raw[start:i+1]
+                        try:
+                            salvaged.append(json.loads(snippet))
+                        except json.JSONDecodeError:
+                            pass
+                        start = None
+            i += 1
+        return {"per_doc": salvaged}
 
 
 def upsert_entity(cur, etype, name, role, doc_id):
@@ -228,8 +271,8 @@ def main():
     print(f"        loaded {len(docs)} docs (total chars: {sum(len(d['body']) for d in docs):,})")
 
     # ── 3. Batch ─────────────────────────────────────────────────────────
-    chunks = chunk_corpus_by_tokens(docs, max_chars=400_000)
-    print(f"  [3/8] {len(chunks)} batches (max ~400K chars each)")
+    chunks = chunk_corpus_by_tokens(docs, max_chars=40_000)
+    print(f"  [3/8] {len(chunks)} batches (max ~40K chars each, ~30-60s per batch)", flush=True)
 
     # ── 4-5. Per-batch extraction + observation telegram to Jonathan ─────
     tg_send(f"🎓 Educating Leo about {args.case} — {len(docs)} docs in {len(chunks)} batches. I'll post observations as I learn.")
