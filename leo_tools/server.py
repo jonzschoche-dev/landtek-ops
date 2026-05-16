@@ -13,6 +13,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: files dashboard not registered: {_e}", file=_sys.stderr)
 
+try:
+    from unified_search import bp as _search_bp
+    app.register_blueprint(_search_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: unified search not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 
