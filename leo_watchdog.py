@@ -191,15 +191,48 @@ def check_health(env):
 
 # ── Recovery actions ──────────────────────────────────────────────────────
 def recover_webhook(env):
-    """Try to re-register Telegram webhook. Returns (success, message)."""
+    """Re-register Telegram webhook via n8n REST API (deactivate+activate cycle).
+
+    CRITICAL: never call Telegram's setWebhook directly — that wipes the
+    secret_token that n8n's Telegram Trigger validates. Use n8n's own
+    activation path so the secret stays in sync. (Incident 2026-05-16:
+    direct setWebhook caused 'Provided secret is not valid' 403s for ~10
+    min until we re-activated through n8n's API.)
+    """
+    api_key = env.get("N8N_API_KEY", "")
+    if not api_key:
+        return False, "N8N_API_KEY missing in env"
+    base = f"http://localhost:5678/api/v1/workflows/{WORKFLOW_ID}"
+    # Deactivate
+    req = urllib.request.Request(
+        f"{base}/deactivate",
+        method="POST",
+        headers={"X-N8N-API-KEY": api_key},
+    )
+    try:
+        urllib.request.urlopen(req, timeout=10).read()
+    except Exception as e:
+        return False, f"deactivate failed: {type(e).__name__}: {e}"
+    time.sleep(2)
+    # Activate
+    req = urllib.request.Request(
+        f"{base}/activate",
+        method="POST",
+        headers={"X-N8N-API-KEY": api_key},
+    )
+    try:
+        urllib.request.urlopen(req, timeout=15).read()
+    except Exception as e:
+        return False, f"activate failed: {type(e).__name__}: {e}"
+    time.sleep(2)
+    # Verify
     token = env.get("TELEGRAM_BOT_TOKEN", "")
+    info = tg_get_webhook_info(token)
+    actual = info.get("result", {}).get("url", "") if info.get("ok") else ""
     expected = get_expected_webhook_url()
-    if not expected:
-        return False, "no expected URL available"
-    r = tg_set_webhook(token, expected)
-    if r.get("ok"):
-        return True, f"setWebhook -> {expected}"
-    return False, f"setWebhook failed: {r}"
+    if actual == expected:
+        return True, f"deactivate+activate via n8n API (secret re-synced)"
+    return False, f"after n8n cycle, webhook still wrong: '{actual}' vs '{expected}'"
 
 
 def recover_workflow_activation():
