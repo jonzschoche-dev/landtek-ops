@@ -65,6 +65,34 @@ def pick_tier(days_until):
     return None
 
 
+def event_already_occurred(cur, deadline):
+    """Stage-awareness guard per [[feedback_legal_status_awareness]].
+
+    If there's at least one executed_filed / executed_notarized / government_issued doc
+    for the same case dated AFTER the deadline.due_date, the event the deadline tracks
+    has already happened — auto-complete the deadline, don't alert.
+
+    Returns: (event_occurred: bool, evidence_doc_id: int|None, evidence_summary: str)
+    """
+    cur.execute("""
+        SELECT id, smart_filename, classification, execution_status, doc_date
+          FROM documents
+         WHERE case_file = %s
+           AND doc_date IS NOT NULL
+           AND doc_date > %s
+           AND execution_status IN ('executed_filed', 'executed_notarized',
+                                    'government_issued', 'executed_signed_only')
+         ORDER BY doc_date ASC
+         LIMIT 1
+    """, (deadline["case_file"], deadline["due_date"]))
+    row = cur.fetchone()
+    if row:
+        summary = (f"{row['classification'] or '?'} dated {row['doc_date']} "
+                   f"({(row['smart_filename'] or '')[:60]})")
+        return True, row["id"], summary
+    return False, None, ""
+
+
 def load_env_token():
     env = {}
     with open("/root/landtek/.env") as f:
@@ -140,13 +168,38 @@ def main():
     print(f"  scanning {len(deadlines)} active deadlines (today={today})")
 
     sent_count = 0
+    auto_completed = 0
     for d in deadlines:
         days = (d["due_date"] - today).days
         tier = args.force_tier or pick_tier(days)
         if tier is None:
             continue
 
+        # STAGE-AWARENESS GUARD (per feedback_legal_status_awareness):
+        # If a court/filed doc dated after this deadline exists, the event has
+        # already happened. Auto-complete and suppress alert.
         if tier == "overdue":
+            occurred, evidence_id, evidence_summary = event_already_occurred(cur, d)
+            if occurred:
+                cur.execute("""
+                    UPDATE case_deadlines
+                       SET status = 'completed',
+                           updated_at = NOW(),
+                           notes = COALESCE(notes,'') ||
+                                   ' | AUTO-COMPLETED ' || %s ||
+                                   ' by sentinel (post-deadline evidence: doc#' || %s || ': ' || %s || ')'
+                     WHERE id = %s
+                """, (today.isoformat(), evidence_id, evidence_summary, d["id"]))
+                cur.execute("""
+                    INSERT INTO deadline_alerts (deadline_id, tier, channel, message_text, delivery_ok)
+                    VALUES (%s, 'auto_completed', 'system',
+                            'Stage-awareness: post-deadline executed_filed doc#' || %s || ' (' || %s || ') exists. Marked completed.',
+                            true)
+                """, (d["id"], evidence_id, evidence_summary))
+                auto_completed += 1
+                print(f"  ⏭ AUTO-COMPLETED deadline #{d['id']} ({d['title'][:50]}) — evidence: {evidence_summary}")
+                continue
+
             # Pulse every OVERDUE_PULSE_HOURS hours
             last = d.get("last_overdue_alert")
             if last and (datetime.now(timezone.utc) - last) < timedelta(hours=OVERDUE_PULSE_HOURS):
@@ -199,7 +252,7 @@ def main():
                     (json.dumps({"sent": sent_count, "scanned": len(deadlines)}),))
     except Exception: pass
 
-    print(f"\n  sent {sent_count} reminder(s)")
+    print(f"\n  sent {sent_count} reminder(s), auto-completed {auto_completed} stale deadline(s)")
     cur.close(); conn.close()
 
 

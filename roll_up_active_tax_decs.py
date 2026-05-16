@@ -65,10 +65,13 @@ def main():
 
     # Print summary
     print(f"\n  Case: {args.case}")
-    print(f"  Active tax declarations: {len(active)}")
-    print(f"  Total assessed value:    ₱{total_assessed:,.0f}")
-    print(f"  Total market value:      ₱{total_market:,.0f}")
-    print(f"  Annual RPT estimate:     ₱{annual_rpt_est:,.0f} (assessed × {RPT_RATE*100:.0f}%)")
+    print(f"  Active tax declarations: {len(active)}  ⚠️ PROVISIONAL — overcounts (target ~20 for MWK)")
+    print(f"  → True canonical MWK count is ~20 (T-4497 + T-32916 + T-32917 + T-31298 + 17 sub-derivs).")
+    print(f"  → Distortion: tax decs of conveyed-away lots (Iligan, Santiago, Pascual et al.) + adjacent")
+    print(f"    parcels still tagged MWK-001. Fix requires title_chain linkage (Phase 2).")
+    print(f"  Total assessed value (PROVISIONAL): ₱{total_assessed:,.0f}")
+    print(f"  Total market value (PROVISIONAL):   ₱{total_market:,.0f}")
+    print(f"  Annual RPT estimate (PROVISIONAL):  ₱{annual_rpt_est:,.0f} (assessed × {RPT_RATE*100:.0f}%)")
     print(f"  Payments recorded:       {len(payments)} totaling ₱{total_paid:,.0f}")
     print(f"\n  Active tax decs (top 25):")
     for a in active[:25]:
@@ -97,7 +100,7 @@ def main():
                 %s, %s)
         ON CONFLICT DO NOTHING
     """, (args.case, args.case,
-          f"Annual RPT across {len(active)} active tax decs (Mercedes assessor) — assessed × 3% ÷ 12; total annual obligation ≈ ₱{annual_rpt_est:,.0f}",
+          f"[PROVISIONAL — overcounts] Annual RPT across {len(active)} tagged tax decs (target ~20 for MWK); fix requires Phase 2 title_chain linkage. assessed×3%÷12. Provisional annual: ₱{annual_rpt_est:,.0f}",
           monthly_est, date.today().replace(day=1)))
     print(f"  ✓ updated monthly_overhead.rpt = ₱{monthly_est:,.0f}/mo (₱{annual_rpt_est:,.0f}/yr)")
 

@@ -117,23 +117,33 @@ def job_a_recover_unhashed(service):
 
 
 def job_b_index_unseen_drive(service):
-    """Find Drive PDFs not yet in documents and create rows + download."""
+    """Find Drive PDFs not yet in documents and create rows + download.
+
+    Optimization (deploy_122): query Drive's md5Checksum in metadata (free, no
+    download). Skip any Drive file whose md5 is already known to be a duplicate
+    OR matches an existing doc's drive_md5_checksum. Only the truly-novel
+    md5-checksums require downloading + SHA256 hashing + INSERT.
+    """
     conn = psycopg2.connect(**DSN); conn.autocommit = True
     cur = conn.cursor()
 
-    # Get all known drive_file_ids in DB
+    # Sets we can short-circuit on:
     cur.execute("SELECT drive_file_id FROM documents WHERE drive_file_id IS NOT NULL AND drive_file_id != ''")
-    known = set(r[0] for r in cur.fetchall())
-    print(f"\n[B] currently-indexed Drive file IDs: {len(known)}")
+    known_drive_ids = set(r[0] for r in cur.fetchall())
+    cur.execute("SELECT drive_file_id FROM drive_duplicates")
+    known_dupe_ids = set(r[0] for r in cur.fetchall())
+    cur.execute("SELECT drive_md5_checksum FROM documents WHERE drive_md5_checksum IS NOT NULL")
+    known_md5s = set(r[0] for r in cur.fetchall())
+    print(f"\n[B] indexed_drive_ids={len(known_drive_ids)} known_dupes={len(known_dupe_ids)} known_md5s={len(known_md5s)}")
 
-    # List ALL Drive PDFs accessible
-    print("  listing Drive PDFs...")
+    # List ALL Drive PDFs accessible — request md5Checksum in metadata (free).
+    print("  listing Drive PDFs (with md5Checksum)...")
     page_token = None
     drive_pdfs = []
     while True:
         r = service.files().list(
             q="mimeType='application/pdf' and trashed=false",
-            fields="nextPageToken, files(id, name, parents, size)",
+            fields="nextPageToken, files(id, name, parents, size, md5Checksum)",
             pageSize=1000, pageToken=page_token,
             corpora="allDrives", includeItemsFromAllDrives=True, supportsAllDrives=True,
         ).execute()
@@ -142,20 +152,38 @@ def job_b_index_unseen_drive(service):
         if not page_token: break
     print(f"  Drive PDFs total: {len(drive_pdfs)}")
 
-    new = [f for f in drive_pdfs if f["id"] not in known]
-    print(f"  unindexed Drive PDFs: {len(new)}")
-    if not new:
+    # Filter: skip Drive IDs already indexed AND skip IDs already proven duplicates.
+    candidates = [f for f in drive_pdfs
+                  if f["id"] not in known_drive_ids
+                  and f["id"] not in known_dupe_ids]
+    print(f"  candidates needing examination: {len(candidates)}")
+    if not candidates:
         cur.close(); conn.close()
         return
 
     inserted = 0
-    skipped_dup = 0
+    md5_dup_recorded = 0  # md5 matched an existing doc's drive_md5 — recorded as known dupe, NO download
+    download_dup = 0      # md5 unknown, downloaded, SHA256 matched existing → dupe
     failed = 0
-    for f in new:
+    for f in candidates:
         drive_id = f["id"]
         name = f.get("name", "unnamed")
+        md5 = f.get("md5Checksum")
+
+        # Fast path: md5 matches a doc we already track → record as known dupe, skip download
+        if md5 and md5 in known_md5s:
+            cur.execute("SELECT id FROM documents WHERE drive_md5_checksum=%s LIMIT 1", (md5,))
+            canonical = cur.fetchone()
+            if canonical:
+                cur.execute("""
+                    INSERT INTO drive_duplicates (drive_file_id, canonical_doc_id, drive_md5, drive_filename)
+                    VALUES (%s,%s,%s,%s) ON CONFLICT (drive_file_id) DO NOTHING
+                """, (drive_id, canonical[0], md5, name))
+                md5_dup_recorded += 1
+                continue
+
+        # Slow path: have to download and SHA256 to know.
         local = os.path.join(UPLOADS, f"drive_new_{safe_name(name)}")
-        # Skip if local already exists with same name
         try:
             download_to(service, drive_id, local)
             h = sha256_file(local)
@@ -163,33 +191,41 @@ def job_b_index_unseen_drive(service):
             print(f"  [B] {name[:50]} FAILED download: {type(e).__name__}: {str(e)[:120]}")
             failed += 1
             continue
-        # Check if hash already exists
+        # Check if SHA256 already exists
         cur.execute("SELECT id FROM documents WHERE content_hash=%s LIMIT 1", (h,))
         existing = cur.fetchone()
         if existing:
-            # Existing doc has same content — just link drive_file_id
+            existing_id = existing[0]
+            # Backfill drive_md5 on the canonical doc (next run will use fast path).
+            if md5:
+                cur.execute("UPDATE documents SET drive_md5_checksum=%s WHERE id=%s AND drive_md5_checksum IS NULL",
+                            (md5, existing_id))
+            # Record the duplicate Drive ID
             cur.execute("""
-                UPDATE documents SET drive_file_id=%s WHERE id=%s AND (drive_file_id IS NULL OR drive_file_id='')
-            """, (drive_id, existing[0]))
-            skipped_dup += 1
+                INSERT INTO drive_duplicates (drive_file_id, canonical_doc_id, drive_md5, drive_filename)
+                VALUES (%s,%s,%s,%s) ON CONFLICT (drive_file_id) DO NOTHING
+            """, (drive_id, existing_id, md5, name))
+            download_dup += 1
             os.remove(local)
             continue
         try:
             cur.execute("""
                 INSERT INTO documents (case_file, original_filename, mime_type, content_hash, file_path,
-                                       drive_file_id, drive_link, timestamp)
-                VALUES (NULL, %s, 'application/pdf', %s, %s, %s, %s, now())
+                                       drive_file_id, drive_md5_checksum, drive_link, timestamp)
+                VALUES (NULL, %s, 'application/pdf', %s, %s, %s, %s, %s, now())
                 RETURNING id;
-            """, (name, h, local, drive_id, f"https://drive.google.com/file/d/{drive_id}/view"))
+            """, (name, h, local, drive_id, md5, f"https://drive.google.com/file/d/{drive_id}/view"))
             new_id = cur.fetchone()[0]
             inserted += 1
+            if md5:
+                known_md5s.add(md5)
             if inserted % 10 == 0:
-                print(f"  [B] progress: inserted={inserted}, dupes={skipped_dup}, failed={failed}")
+                print(f"  [B] progress: inserted={inserted}, md5_dup={md5_dup_recorded}, dl_dup={download_dup}, failed={failed}")
         except psycopg2.errors.UniqueViolation as e:
-            skipped_dup += 1
+            download_dup += 1
             os.remove(local)
 
-    print(f"\n  [B] done: inserted={inserted} new rows, dupes_linked={skipped_dup}, failed={failed}")
+    print(f"\n  [B] done: inserted={inserted} new rows, md5_dup_recorded={md5_dup_recorded}, download_dup={download_dup}, failed={failed}")
     cur.close(); conn.close()
 
 

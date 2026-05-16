@@ -82,15 +82,22 @@ def main():
 
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    # Pick up: (a) low-confidence third_party/ambiguous cases, AND
+    # (b) high-confidence cases where filename strongly suggests a different party
+    # (e.g., "Exhibit X" filed by complaint plaintiff but text-scored as agency/respondent;
+    #        "ORDER Civil Case ..." should be court, not respondent)
     cur.execute("""
         SELECT cpf.id AS cpf_id, cpf.doc_id, cpf.filing_party, cpf.confidence,
                d.smart_filename, LEFT(d.extracted_text, 8000) AS text
           FROM case_party_filings cpf JOIN documents d ON d.id = cpf.doc_id
-         WHERE cpf.filing_party IN ('third_party', 'ambiguous')
-           AND cpf.confidence < 0.6
-           AND d.extracted_text IS NOT NULL AND length(d.extracted_text) >= 300
+         WHERE d.extracted_text IS NOT NULL AND length(d.extracted_text) >= 300
+           AND (
+              (cpf.filing_party IN ('third_party','ambiguous') AND cpf.confidence < 0.6)
+              OR (d.smart_filename ILIKE %s AND cpf.filing_party != 'plaintiff')
+              OR (d.smart_filename ILIKE %s AND cpf.filing_party NOT IN ('court','plaintiff'))
+           )
          ORDER BY cpf.id LIMIT %s
-    """, (args.limit,))
+    """, ('%exhibit%', '%order%civil%case%', args.limit))
     rows = cur.fetchall()
     print(f"  {len(rows)} ambiguous filings to disambiguate")
 
@@ -107,6 +114,11 @@ def main():
         if new_party == r["filing_party"]:
             same += 1
         else:
+            # Resolve any existing collision: another row with same (doc_id, new_party)
+            # from a prior haiku run or v1 leftover. Drop it before updating.
+            cur.execute("""DELETE FROM case_party_filings
+                            WHERE doc_id = %s AND filing_party = %s AND id != %s""",
+                        (r["doc_id"], new_party, r["cpf_id"]))
             cur.execute("""UPDATE case_party_filings
                               SET filing_party = %s, confidence = %s,
                                   detection_method = 'haiku_disambig_v1',
