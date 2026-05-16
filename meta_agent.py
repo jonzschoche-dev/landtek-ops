@@ -31,7 +31,7 @@ INVARIANTS = [
     # ─── DEADLINE / STAGE INTEGRITY ──────────────────────────────────────
     dict(id="DEADLINE_STAGE_CONTRADICTION", severity="P0",
          name="Pending deadline contradicted by post-deadline filing",
-         sql="""
+         sql=r"""
             SELECT cd.id, cd.case_file, cd.title, cd.due_date,
                    COUNT(d.id) FILTER (WHERE d.doc_date_norm > cd.due_date) AS post_deadline_filings
               FROM case_deadlines cd
@@ -46,7 +46,7 @@ INVARIANTS = [
 
     dict(id="OVERDUE_NO_AUTO_COMPLETE_ATTEMPT", severity="P1",
          name="Deadline overdue >7 days without auto-complete attempt",
-         sql="""
+         sql=r"""
             SELECT cd.id, cd.title FROM case_deadlines cd
              WHERE cd.status = 'pending' AND cd.due_date < CURRENT_DATE - INTERVAL '7 days'
          """,
@@ -54,7 +54,7 @@ INVARIANTS = [
 
     dict(id="DEADLINE_NULL_SOURCE", severity="P2",
          name="Active deadline with NULL source_doc_id",
-         sql="""
+         sql=r"""
             SELECT id, title FROM case_deadlines
              WHERE status='pending' AND source_doc_id IS NULL AND created_by != 'jonathan'
          """,
@@ -63,7 +63,7 @@ INVARIANTS = [
     # ─── MATTER COMPLETENESS ─────────────────────────────────────────────
     dict(id="ORPHAN_CASE_FILE", severity="P1",
          name="case_file in documents but no matter row",
-         sql="""
+         sql=r"""
             SELECT DISTINCT d.case_file, COUNT(*) AS n_docs
               FROM documents d
              WHERE d.case_file IS NOT NULL
@@ -75,7 +75,7 @@ INVARIANTS = [
 
     dict(id="MATTER_NO_STAGE", severity="P2",
          name="Active matter with NULL current_stage",
-         sql="""
+         sql=r"""
             SELECT matter_code, title FROM matters
              WHERE status='active' AND (current_stage IS NULL OR current_stage = '')
          """,
@@ -83,7 +83,7 @@ INVARIANTS = [
 
     dict(id="MATTER_STALE_STAGE", severity="P3",
          name="Active matter stage not updated in 14 days",
-         sql="""
+         sql=r"""
             SELECT matter_code FROM matters
              WHERE status='active' AND stage_updated_at < NOW() - INTERVAL '14 days'
          """,
@@ -91,7 +91,7 @@ INVARIANTS = [
 
     dict(id="MATTER_NO_DOCS", severity="P3",
          name="Active matter referenced by zero documents",
-         sql="""
+         sql=r"""
             SELECT m.matter_code FROM matters m
              WHERE m.status='active'
                AND m.case_file IS NOT NULL
@@ -105,7 +105,7 @@ INVARIANTS = [
     # ─── CASE NUMBER DETECTION ───────────────────────────────────────────
     dict(id="ARTA_CASE_UNTRACKED", severity="P1",
          name="ARTA case number in corpus not in matters",
-         sql="""
+         sql=r"""
             WITH found AS (
               SELECT DISTINCT regexp_replace(
                        (regexp_matches(extracted_text, 'CTN\s*SL[\s\-]*\d{4}[\s\-]*\d{4}[\s\-]*\d{4}', 'g'))[1],
@@ -125,7 +125,7 @@ INVARIANTS = [
     # ─── INTAKE COMPLETENESS ─────────────────────────────────────────────
     dict(id="INTAKE_STALE", severity="P2",
          name="Open intake aged >7 days without response",
-         sql="""
+         sql=r"""
             SELECT id FROM stage_intake_response
              WHERE status IN ('open','partial') AND fired_at < NOW() - INTERVAL '7 days'
          """,
@@ -139,7 +139,7 @@ INVARIANTS = [
 
     dict(id="EXECUTED_FILED_NO_DATE", severity="P2",
          name="executed_filed doc with no parseable date",
-         sql="""
+         sql=r"""
             SELECT id, smart_filename FROM documents
              WHERE execution_status = 'executed_filed' AND doc_date_norm IS NULL
          """,
@@ -147,7 +147,7 @@ INVARIANTS = [
 
     dict(id="DUPLICATE_DOCKET", severity="P1",
          name="Multiple matters with same docket_number",
-         sql="""
+         sql=r"""
             SELECT docket_number, COUNT(*) FROM matters
              WHERE docket_number IS NOT NULL AND docket_number != ''
              GROUP BY docket_number HAVING COUNT(*) > 1
@@ -168,7 +168,7 @@ INVARIANTS = [
     # ─── EXTRACTION INFRASTRUCTURE ───────────────────────────────────────
     dict(id="ALL_GEMINI_COOLED_LONG", severity="P2",
          name="All Gemini keys cooled >12h",
-         sql="""
+         sql=r"""
             SELECT key_label FROM gemini_key_state
              WHERE cooldown_until > NOW() + INTERVAL '12 hours'
          """,
@@ -176,7 +176,7 @@ INVARIANTS = [
 
     dict(id="HEARTBEAT_MISSING", severity="P1",
          name="A critical cron stopped emitting heartbeat",
-         sql="""
+         sql=r"""
             WITH expected AS (
               SELECT unnest(ARRAY['deadline-sentinel','drive-sync','gmail-watcher','tct-sweep']) AS src
             )
@@ -189,7 +189,7 @@ INVARIANTS = [
     # ─── COST ────────────────────────────────────────────────────────────
     dict(id="DAILY_COST_THRESHOLD", severity="P2",
          name="Today's LLM cost > $5",
-         sql="""
+         sql=r"""
             SELECT 1 WHERE (
               SELECT COALESCE(SUM(cost_usd),0) FROM llm_calls
                WHERE called_at >= date_trunc('day', NOW())
@@ -206,11 +206,66 @@ INVARIANTS = [
     # ─── BACKTEST REGRESSIONS ────────────────────────────────────────────
     dict(id="BACKTEST_REGRESSION", severity="P1",
          name="Back-test failed in last 24h",
-         sql="""
+         sql=r"""
             SELECT test_id FROM back_test_runs
              WHERE passed = false AND run_at > NOW() - INTERVAL '24 hours'
          """,
          msg="{n} back-test failure(s) in last 24h. Truth-negotiator may have regressed."),
+
+    # ─── TIMELINE INTEGRITY (per directive 2026-05-16: timelines are the system-health test) ──
+    dict(id="MATTER_DOCS_NO_DATE", severity="P1",
+         name="Matter has docs but their doc_date_norm is NULL — invisible in timeline",
+         sql=r"""
+            SELECT m.matter_code, COUNT(d.id) AS docs_undated
+              FROM matters m
+              JOIN documents d ON d.case_file = m.case_file
+             WHERE m.status='active'
+               AND d.doc_date_norm IS NULL
+               AND d.execution_status IN ('executed_filed','executed_notarized','government_issued')
+               AND (m.docket_number IS NULL OR d.extracted_text ILIKE '%' || m.docket_number || '%')
+             GROUP BY m.matter_code
+            HAVING COUNT(d.id) > 0
+         """,
+         msg="{n} matter(s) have executed_filed docs invisible in their timeline (no parseable date)."),
+
+    dict(id="MATTER_GMAIL_NO_DOC", severity="P2",
+         name="Matter has gmail correspondences with attachments but matching docs not yet extracted",
+         sql=r"""
+            SELECT m.matter_code, COUNT(gm.id) AS unextracted_attachments
+              FROM matters m
+              JOIN gmail_messages gm ON gm.case_file = m.case_file
+             WHERE m.status='active'
+               AND gm.has_attachments = true
+               AND gm.document_id IS NULL
+               AND m.docket_number IS NOT NULL
+               AND (gm.subject ILIKE '%' || m.docket_number || '%' OR gm.body_plain ILIKE '%' || m.docket_number || '%')
+             GROUP BY m.matter_code
+            HAVING COUNT(gm.id) > 0
+         """,
+         msg="{n} matter(s) have gmail attachments still unextracted into documents. Run extract_email_attachments."),
+
+    dict(id="ACTIVE_MATTER_TIMELINE_SPARSE", severity="P3",
+         name="Active matter has fewer than 3 events in scoped timeline",
+         sql=r"""
+            WITH event_counts AS (
+              SELECT m.matter_code,
+                     (SELECT COUNT(*) FROM documents d
+                       WHERE d.case_file = m.case_file
+                         AND d.doc_date_norm IS NOT NULL
+                         AND (m.docket_number IS NULL
+                              OR d.extracted_text ILIKE '%' || m.docket_number || '%'))
+                   + (SELECT COUNT(*) FROM gmail_messages gm
+                       WHERE gm.case_file = m.case_file
+                         AND m.docket_number IS NOT NULL
+                         AND (gm.subject ILIKE '%' || m.docket_number || '%'
+                              OR gm.body_plain ILIKE '%' || m.docket_number || '%'))
+                  AS n_events
+                FROM matters m
+               WHERE m.status = 'active'
+            )
+            SELECT matter_code, n_events FROM event_counts WHERE n_events < 3
+         """,
+         msg="{n} active matter(s) have sparse timelines (<3 events scoped). Either docket-mismatch or genuinely empty."),
 ]
 
 
