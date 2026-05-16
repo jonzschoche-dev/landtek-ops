@@ -32,6 +32,7 @@ Zero LLM cost. Pure SQL. Output: markdown to stdout (or json).
 """
 import argparse
 import json
+import re
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -117,17 +118,22 @@ def fetch_events(cur, m, since=None, until=None):
 
     events = []
 
-    # ─── 1. DOCUMENTS — scoped to docket variants if available, else case_file
+    # ─── 1. DOCUMENTS — scoped to docket variants if available, else case_file.
+    # Use BOTH ILIKE (fast) and regex (OCR-line-break tolerant). Build a single
+    # whitespace-tolerant regex from the LAST docket pattern (most specific suffix).
     if docket_pats:
         ilike_clauses = " OR ".join(["extracted_text ILIKE %s"] * len(docket_pats))
+        # Whitespace-tolerant regex: e.g., "0218-1378" → "0218[\s\-]*1378"
+        suffix = sorted(docket_pats, key=len)[0]  # shortest variant = most specific suffix
+        regex_pat = "[\\s\\-]*".join(re.escape(c) for c in suffix.replace("-", "").replace(" ", ""))
         params = (case_file,) + since_params + (m.get("first_verified_doc_id"),) \
-                 + tuple(f"%{p}%" for p in docket_pats)
+                 + tuple(f"%{p}%" for p in docket_pats) + (regex_pat,)
         cur.execute(f"""
             SELECT id, doc_date_norm, classification, execution_status,
                    smart_filename, original_filename
               FROM documents
              WHERE case_file = %s AND doc_date_norm IS NOT NULL {since_clause}
-               AND (id = %s OR {ilike_clauses})
+               AND (id = %s OR {ilike_clauses} OR extracted_text ~ %s)
              ORDER BY doc_date_norm
         """, params)
     else:
