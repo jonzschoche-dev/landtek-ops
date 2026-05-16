@@ -74,7 +74,15 @@ try:
             time.sleep(2); gf = genai.get_file(gf.name)
         prompt = PAGE_PROMPT_PREFIX.format(page_n=page_n, total=total) + BASE_PROMPT
         try:
-            resp = model.generate_content([prompt, gf],
+            import sys as _sys; _sys.path.insert(0, '/root/landtek')
+            from llm_billing import gemini_call
+            resp = gemini_call(
+                model,
+                called_from='per_page_ocr',
+                purpose='page_ocr',
+                case_file='MWK-001',
+                model_name=MODEL,
+                contents=[prompt, gf],
                 generation_config={'temperature': 0, 'max_output_tokens': 32768})
         except Exception as e:
             print(f'  page {page_n}: API exception — {str(e)[:120]}')

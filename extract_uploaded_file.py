@@ -93,13 +93,22 @@ def ocr_via_gemini_pdf(pdf_path: Path) -> str:
     else:
         raise TimeoutError("gemini file processing did not become ACTIVE in 60s")
     # Generate
-    resp = model.generate_content([
-        "Extract ALL text from this PDF document, preserving structure: headings, "
-        "paragraphs, tables, page numbers, signatures, and any annotations. "
-        "Return text only — no commentary, no markdown fences. "
-        "For each page boundary, insert '\n--- Page N ---\n' as a separator.",
-        uploaded,
-    ], generation_config={"temperature": 0.0, "max_output_tokens": 65536})
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
+    from llm_billing import gemini_call
+    resp = gemini_call(
+        model,
+        called_from="extract_uploaded_file",
+        purpose="upload_text_extract",
+        case_file="MWK-001",
+        model_name="gemini-2.5-flash",
+        contents=[
+            "Extract ALL text from this PDF document, preserving structure: headings, "
+            "paragraphs, tables, page numbers, signatures, and any annotations. "
+            "Return text only — no commentary, no markdown fences. "
+            "For each page boundary, insert '\n--- Page N ---\n' as a separator.",
+            uploaded,
+        ],
+        generation_config={"temperature": 0.0, "max_output_tokens": 65536})
     text = resp.text.strip() if resp and resp.text else ""
     # Cleanup uploaded file
     try:
@@ -170,10 +179,18 @@ def extract_image_gemini_from_bytes(data: bytes, mime: str) -> str:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.5-flash")
     img = {"mime_type": mime, "data": data}
-    resp = model.generate_content([
-        "Extract ALL visible text from this document image, preserving structure (headings, paragraphs, tables). Return text only, no commentary.",
-        img,
-    ])
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
+    from llm_billing import gemini_call
+    resp = gemini_call(
+        model,
+        called_from="extract_uploaded_file",
+        purpose="image_bytes_ocr",
+        case_file="MWK-001",
+        model_name="gemini-2.5-flash",
+        contents=[
+            "Extract ALL visible text from this document image, preserving structure (headings, paragraphs, tables). Return text only, no commentary.",
+            img,
+        ])
     return resp.text.strip() if resp and resp.text else ""
 
 
@@ -203,10 +220,18 @@ def extract_image_gemini(path: Path) -> str:
         data = f.read()
     img = {"mime_type": "image/jpeg" if str(path).lower().endswith(("jpg", "jpeg")) else "image/png",
            "data": data}
-    resp = model.generate_content([
-        "Extract ALL visible text from this image, preserving structure. Return text only, no commentary.",
-        img,
-    ])
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
+    from llm_billing import gemini_call
+    resp = gemini_call(
+        model,
+        called_from="extract_uploaded_file",
+        purpose="image_path_ocr",
+        case_file="MWK-001",
+        model_name="gemini-2.5-flash",
+        contents=[
+            "Extract ALL visible text from this image, preserving structure. Return text only, no commentary.",
+            img,
+        ])
     return resp.text.strip() if resp and resp.text else ""
 
 

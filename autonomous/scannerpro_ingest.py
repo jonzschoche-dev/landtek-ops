@@ -154,8 +154,15 @@ def main():
         # Classify via Gemini fallback
         try:
             uploaded = genai.upload_file(str(local))
-            resp = model.generate_content(
-                [uploaded, CLASSIFY_PROMPT],
+            import sys as _sys; _sys.path.insert(0, "/root/landtek")
+            from llm_billing import gemini_call
+            resp = gemini_call(
+                model,
+                called_from="scannerpro_ingest",
+                purpose="classify_scan",
+                case_file="MWK-001",
+                model_name="gemini-2.5-flash",
+                contents=[uploaded, CLASSIFY_PROMPT],
                 generation_config={
                     "temperature": 0.0,
                     "max_output_tokens": 1024,

@@ -95,7 +95,16 @@ try:
     gf = genai.upload_file(io.BytesIO(buf.read()), display_name=fname, mime_type='application/pdf')
     while gf.state.name == 'PROCESSING':
         time.sleep(2); gf = genai.get_file(gf.name)
-    resp = model.generate_content([PROMPT, gf],
+    import sys as _sys
+    _sys.path.insert(0, '/root/landtek')
+    from llm_billing import gemini_call
+    resp = gemini_call(
+        model,
+        called_from="tct_sweep",
+        purpose="extract_title",
+        case_file="MWK-001",
+        model_name=MODEL,
+        contents=[PROMPT, gf],
         generation_config={'temperature':0,'max_output_tokens':65536})
     text = ''.join(p.text for p in resp.candidates[0].content.parts if hasattr(p,'text'))
     text = text.strip()
