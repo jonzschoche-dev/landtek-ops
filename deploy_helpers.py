@@ -121,19 +121,40 @@ def patch_workflow_dual(workflow_id: str, nodes=None, connections=None):
     conn.commit()
     cur.close(); conn.close()
 
-    # Reload via n8n REST API (NOT DB-level active toggle — see docstring)
+    # Reload via n8n REST API (NOT DB-level active toggle — see docstring).
+    # Retry activate up to 3 times because right after a connection-graph
+    # update n8n sometimes returns 400 on the first activate attempt
+    # (workflow validation race condition).
     api_key = _read_n8n_api_key()
     base = f"http://localhost:5678/api/v1/workflows/{workflow_id}"
-    for action in ("deactivate", "activate"):
-        req = urllib.request.Request(
-            f"{base}/{action}", method="POST",
-            headers={"X-N8N-API-KEY": api_key},
-        )
+    # Deactivate (idempotent: 400 means already deactivated)
+    req = urllib.request.Request(f"{base}/deactivate", method="POST",
+                                  headers={"X-N8N-API-KEY": api_key})
+    try:
+        urllib.request.urlopen(req, timeout=15).read()
+    except urllib.error.HTTPError as e:
+        if e.code != 400:
+            raise RuntimeError(f"n8n REST API deactivate failed: HTTP {e.code} {e.reason}")
+    _time.sleep(2)
+    # Activate with retry
+    last_err = None
+    for attempt in range(3):
+        if attempt > 0:
+            _time.sleep(3)  # back off between attempts
+        req = urllib.request.Request(f"{base}/activate", method="POST",
+                                      headers={"X-N8N-API-KEY": api_key})
         try:
             urllib.request.urlopen(req, timeout=15).read()
+            last_err = None
+            break
         except urllib.error.HTTPError as e:
-            raise RuntimeError(f"n8n REST API {action} failed: HTTP {e.code} {e.reason}")
-        _time.sleep(2)
+            last_err = f"HTTP {e.code} {e.reason}"
+            try:
+                last_err += " — body: " + e.read().decode()[:300]
+            except Exception:
+                pass
+    if last_err:
+        raise RuntimeError(f"n8n REST API activate failed after 3 attempts: {last_err}")
 
     print(f"  patch_workflow_dual: workflow_entity + workflow_history.latest synced + reloaded via n8n REST API for {workflow_id}")
 

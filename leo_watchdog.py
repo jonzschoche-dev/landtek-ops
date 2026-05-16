@@ -235,14 +235,36 @@ def recover_webhook(env):
 
 
 def recover_workflow_activation():
-    """Toggle workflow active off/on to force re-registration."""
-    try:
-        psql_exec(f"UPDATE workflow_entity SET active=false, \"updatedAt\"=now() WHERE id='{WORKFLOW_ID}';")
-        time.sleep(1)
-        psql_exec(f"UPDATE workflow_entity SET active=true, \"updatedAt\"=now() WHERE id='{WORKFLOW_ID}';")
-        return True, "workflow toggled active off/on"
-    except Exception as e:
-        return False, f"reactivation failed: {e}"
+    """Re-activate workflow via n8n REST API.
+
+    CRITICAL: Do NOT use DB-level UPDATE workflow_entity SET active=true
+    on its own — that flips the DB column but n8n's runtime doesn't pick
+    up the change. Webhook stays unregistered in n8n's internal registry,
+    and Telegram POSTs hit 404 'webhook not registered' (incident
+    2026-05-16 00:21). Use the API endpoints instead so n8n reloads.
+    """
+    env = load_env()
+    api_key = env.get("N8N_API_KEY", "")
+    if not api_key:
+        return False, "N8N_API_KEY missing"
+    base = f"http://localhost:5678/api/v1/workflows/{WORKFLOW_ID}"
+    # Deactivate (idempotent)
+    for action in ("deactivate", "activate"):
+        req = urllib.request.Request(
+            f"{base}/{action}", method="POST",
+            headers={"X-N8N-API-KEY": api_key},
+        )
+        try:
+            urllib.request.urlopen(req, timeout=15).read()
+        except urllib.error.HTTPError as e:
+            if action == "deactivate" and e.code == 400:
+                # Already deactivated, fine
+                continue
+            return False, f"{action} failed: HTTP {e.code} {e.reason}"
+        except Exception as e:
+            return False, f"{action} failed: {type(e).__name__}: {e}"
+        time.sleep(2)
+    return True, "reactivated via n8n REST API"
 
 
 def recover_n8n_restart():
