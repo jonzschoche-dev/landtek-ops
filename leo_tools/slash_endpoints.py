@@ -94,6 +94,29 @@ def api_status():
     return jsonify({"text": text, "sent": send})
 
 
+@bp.route("/api/pdf_report", methods=["POST", "GET"])
+def api_pdf_report():
+    """Generate + DM a PDF brief for a case."""
+    if request.method == "POST":
+        payload = request.get_json(silent=True) or {}
+        case = payload.get("case", "MWK-001").strip()
+    else:
+        case = request.args.get("case", "MWK-001").strip()
+    import subprocess
+    try:
+        r = subprocess.run(
+            ["python3", "/root/landtek/pdf_reports.py", "--case", case],
+            capture_output=True, text=True, timeout=120,
+        )
+        ok = r.returncode == 0
+        return jsonify({
+            "case": case, "ok": ok,
+            "stdout": r.stdout[-500:], "stderr": r.stderr[-200:] if r.stderr else "",
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @bp.route("/api/report", methods=["POST", "GET"])
 def api_report():
     """Per-case intelligence brief from clients table (populated by educate_leo)."""
