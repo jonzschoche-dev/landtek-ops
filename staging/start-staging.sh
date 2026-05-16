@@ -62,6 +62,22 @@ if $RESTORE; then
     # Sanity check: workflow count
     WF_COUNT=$(docker exec n8n-postgres-staging psql -U n8n -d n8n -tAc "SELECT count(*) FROM workflow_entity;")
     log "  workflows in staging DB: $WF_COUNT"
+
+    # ── Isolate staging from prod Telegram bot (task #52) ───────────────────
+    # Telegram allows ONE webhook URL per bot. Without this, staging n8n
+    # registers its own webhook URL on activate -> clobbers prod's webhook.
+    # Solution: delete Telegram credentials on staging DB right after restore.
+    # n8n will deactivate the Telegram Trigger node automatically and won't
+    # touch the shared bot's webhook config.
+    log "  isolating staging from prod Telegram (deleting Telegram credentials)..."
+    docker exec n8n-postgres-staging psql -U n8n -d n8n -tAc "
+      DELETE FROM credentials_entity WHERE type = 'telegramApi';
+      UPDATE workflow_entity SET active = false WHERE id IN (
+        SELECT DISTINCT we.id FROM workflow_entity we, jsonb_array_elements(we.nodes::jsonb) n
+        WHERE n->>'type' IN ('n8n-nodes-base.telegramTrigger', 'n8n-nodes-base.telegram')
+      );
+    " >/dev/null
+    log "  Telegram credentials removed; Leos Workflow deactivated on staging"
   fi
 fi
 
