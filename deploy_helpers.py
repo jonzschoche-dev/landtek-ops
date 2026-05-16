@@ -85,13 +85,25 @@ if __name__ == "__main__":
 
 
 def patch_workflow_dual(workflow_id: str, nodes=None, connections=None):
-    """Update workflow_entity AND workflow_history.latest in one transaction.
+    """Update workflow_entity AND workflow_history.latest, then reload via n8n REST API.
 
-    n8n's runtime reads from workflow_history.latest (per investigation in
-    deploy_057g). Updating only workflow_entity leaves the runtime on the
-    stale snapshot. ALL future workflow JSON changes should go through this.
+    n8n's runtime reads from workflow_history.latest (per deploy_057g). Updating
+    only workflow_entity leaves the runtime on the stale snapshot.
+
+    Reload mechanism (HARDENED 2026-05-16 — incident report below):
+    Uses n8n's REST API deactivate+activate cycle, NOT a DB-level active=on/off
+    toggle. The DB-toggle path silently strips the Telegram webhook's secret_token,
+    causing every incoming Telegram POST to return 403 'Provided secret is not
+    valid' — Leo appears alive (URL set) but rejects all messages. The REST API
+    path re-registers the webhook WITH a fresh secret that n8n then validates.
+
+    Incident 2026-05-16 ~00:00 UTC: deploy_074 used the DB-toggle path. Watchdog
+    saw empty URL, called Telegram setWebhook directly, restored URL but wiped
+    secret. Leo silently dead for ~10 min until manual deactivate+activate via
+    n8n REST API. Both that hole (watchdog) and this one (patch_workflow_dual)
+    are now closed.
     """
-    import psycopg2, json as _json
+    import psycopg2, json as _json, urllib.request, urllib.error, time as _time
     conn = psycopg2.connect(host="172.18.0.3", dbname="n8n", user="n8n", password="n8npassword")
     cur = conn.cursor()
     if nodes is not None:
@@ -106,11 +118,30 @@ def patch_workflow_dual(workflow_id: str, nodes=None, connections=None):
         cur.execute("""UPDATE workflow_history SET connections=%s::jsonb
                          WHERE "workflowId"=%s AND "createdAt"=(SELECT MAX("createdAt") FROM workflow_history WHERE "workflowId"=%s)""",
                     (_json.dumps(connections), workflow_id, workflow_id))
-    # Force reactivation so webhook re-registers
-    cur.execute('UPDATE workflow_entity SET active=false, "updatedAt"=now() WHERE id=%s', (workflow_id,))
-    conn.commit()
-    import time; time.sleep(1)
-    cur.execute('UPDATE workflow_entity SET active=true, "updatedAt"=now() WHERE id=%s', (workflow_id,))
     conn.commit()
     cur.close(); conn.close()
-    print(f"  patch_workflow_dual: workflow_entity + workflow_history.latest synced for {workflow_id}")
+
+    # Reload via n8n REST API (NOT DB-level active toggle — see docstring)
+    api_key = _read_n8n_api_key()
+    base = f"http://localhost:5678/api/v1/workflows/{workflow_id}"
+    for action in ("deactivate", "activate"):
+        req = urllib.request.Request(
+            f"{base}/{action}", method="POST",
+            headers={"X-N8N-API-KEY": api_key},
+        )
+        try:
+            urllib.request.urlopen(req, timeout=15).read()
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(f"n8n REST API {action} failed: HTTP {e.code} {e.reason}")
+        _time.sleep(2)
+
+    print(f"  patch_workflow_dual: workflow_entity + workflow_history.latest synced + reloaded via n8n REST API for {workflow_id}")
+
+
+def _read_n8n_api_key():
+    """Read N8N_API_KEY from /root/landtek/.env (chmod 600)."""
+    with open("/root/landtek/.env") as f:
+        for line in f:
+            if line.startswith("N8N_API_KEY="):
+                return line.split("=", 1)[1].strip()
+    raise RuntimeError("N8N_API_KEY not found in /root/landtek/.env")
