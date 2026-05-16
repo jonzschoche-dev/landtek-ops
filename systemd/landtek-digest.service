@@ -1,0 +1,9 @@
+[Unit]
+Description=LandTek daily digest to Jonathan
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/landtek/build_digest.py
+StandardOutput=append:/var/log/landtek_digest.log
+StandardError=append:/var/log/landtek_digest.log

@@ -27,6 +27,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: file access not registered: {_e}", file=_sys.stderr)
 
+try:
+    from slash_endpoints import bp as _slash_bp
+    app.register_blueprint(_slash_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: slash endpoints not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 
