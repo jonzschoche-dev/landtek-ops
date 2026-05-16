@@ -181,16 +181,34 @@ def main():
         cur.execute("SELECT max(received_at) AS m FROM gmail_messages")
         m = cur.fetchone()["m"]
         since = (m - timedelta(days=1)).strftime("%Y/%m/%d") if m else "2025/01/01"
-    # Build query
-    q = args.query or ""
+    # Build base query
+    base_q = args.query or ""
     if since:
-        q = f"after:{since.replace('-', '/')} " + q if q else f"after:{since.replace('-', '/')}"
-    print(f"  query: {q!r}  max: {args.max}")
+        base_q = f"after:{since.replace('-', '/')} " + base_q if base_q else f"after:{since.replace('-', '/')}"
 
-    # Pull message IDs
-    resp = svc.users().messages().list(userId="me", q=q, maxResults=min(500, args.max)).execute()
-    msgs = resp.get("messages", [])
-    print(f"  matched: {len(msgs)} messages")
+    # TWO-STREAM PULL per architecture review 2026-05-16:
+    # Default `q=after:DATE` returns newest first across all labels — with a 500 cap
+    # SENT items can fall off the bottom. Do an explicit `in:sent` pull as well so
+    # we never miss outbound case correspondence.
+    streams = [
+        ("default", base_q),
+        ("sent",    f"in:sent {base_q}".strip()),
+    ]
+    print(f"  base query: {base_q!r}  max per stream: {args.max}")
+
+    msgs = []
+    seen_ids = set()
+    for label, q in streams:
+        try:
+            resp = svc.users().messages().list(userId="me", q=q, maxResults=min(500, args.max)).execute()
+            stream_msgs = resp.get("messages", [])
+            new = [m for m in stream_msgs if m["id"] not in seen_ids]
+            seen_ids.update(m["id"] for m in stream_msgs)
+            msgs.extend(new)
+            print(f"  [{label}] matched: {len(stream_msgs)} ({len(new)} new this stream)")
+        except Exception as e:
+            print(f"  [{label}] FAILED: {e!r}")
+    print(f"  total unique: {len(msgs)} messages")
 
     by_case = get_case_keywords(cur)
     stats = {}
