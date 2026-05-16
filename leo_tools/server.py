@@ -20,6 +20,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: unified search not registered: {_e}", file=_sys.stderr)
 
+try:
+    from file_access import bp as _access_bp
+    app.register_blueprint(_access_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: file access not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 
