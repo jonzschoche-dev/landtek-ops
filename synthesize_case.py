@@ -156,8 +156,15 @@ def call_claude(prompt, max_output=8000):
         if l.startswith("ANTHROPIC_API_KEY="):
             api_key = l.split("=", 1)[1].strip()
     client = anthropic.Anthropic(api_key=api_key, timeout=120)
-    resp = client.messages.create(
-        model="claude-sonnet-4-5",  # better quality for synthesis (200K context)
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
+    from llm_billing import anthropic_call
+    # Upgraded to sonnet-4-6 (was 4-5). Sonnet allowed per cost-rule #2: high-level synthesis.
+    resp = anthropic_call(
+        client,
+        called_from="synthesize_case",
+        purpose="case_synthesis",
+        case_file="MWK-001",
+        model="claude-sonnet-4-6",
         max_tokens=max_output,
         messages=[{"role": "user", "content": prompt + "\n\nIMPORTANT: respond with ONLY the JSON, no prose."}],
     )

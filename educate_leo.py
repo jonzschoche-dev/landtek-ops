@@ -181,7 +181,13 @@ def call_claude(prompt, max_output=8000, timeout_s=180):
     if not api_key:
         raise RuntimeError("ANTHROPIC_API_KEY missing")
     client = anthropic.Anthropic(api_key=api_key, timeout=timeout_s)
-    resp = client.messages.create(
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
+    from llm_billing import anthropic_call
+    resp = anthropic_call(
+        client,
+        called_from="educate_leo",
+        purpose="knowledge_consolidation",
+        case_file="MWK-001",
         model="claude-haiku-4-5",
         max_tokens=max_output,
         messages=[{

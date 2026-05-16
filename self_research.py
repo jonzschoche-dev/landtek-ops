@@ -127,7 +127,13 @@ Based ONLY on these excerpts, can you answer the question? Return JSON:
 If excerpts don't contain enough information, return confidence < 0.4 and empty answer.
 Output ONLY the JSON. No prose."""
 
-    resp = client.messages.create(
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
+    from llm_billing import anthropic_call
+    resp = anthropic_call(
+        client,
+        called_from="self_research",
+        purpose="research_query",
+        case_file="MWK-001",
         model="claude-haiku-4-5",
         max_tokens=2000,
         messages=[{"role": "user", "content": prompt}],
