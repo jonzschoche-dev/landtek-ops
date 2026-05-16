@@ -141,9 +141,11 @@ def cleanup_stale_inquiries(dsn):
     row = cur.fetchone()
     if row:
         chat_note_id, content = row
+        # Note: pending_inquiries.status enum is {open, answered, closed, expired}
+        # — not 'resolved'. Use 'answered' to match the schema's CHECK constraint.
         cur.execute("""
             UPDATE pending_inquiries
-               SET status = 'resolved',
+               SET status = 'answered',
                    response_text = %s,
                    responded_at = now(),
                    ai_match_confidence = 0.85,

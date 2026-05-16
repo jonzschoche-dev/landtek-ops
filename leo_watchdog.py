@@ -202,35 +202,42 @@ def recover_webhook(env):
     if not api_key:
         return False, "N8N_API_KEY missing in env"
     base = f"http://localhost:5678/api/v1/workflows/{WORKFLOW_ID}"
-    # Deactivate
-    req = urllib.request.Request(
-        f"{base}/deactivate",
-        method="POST",
-        headers={"X-N8N-API-KEY": api_key},
-    )
+    # Deactivate (idempotent: 400 if already off, ignore)
+    req = urllib.request.Request(f"{base}/deactivate", method="POST",
+                                  headers={"X-N8N-API-KEY": api_key})
     try:
         urllib.request.urlopen(req, timeout=10).read()
+    except urllib.error.HTTPError as e:
+        if e.code != 400:
+            return False, f"deactivate failed: HTTP {e.code} {e.reason}"
     except Exception as e:
         return False, f"deactivate failed: {type(e).__name__}: {e}"
     time.sleep(2)
-    # Activate
-    req = urllib.request.Request(
-        f"{base}/activate",
-        method="POST",
-        headers={"X-N8N-API-KEY": api_key},
-    )
-    try:
-        urllib.request.urlopen(req, timeout=15).read()
-    except Exception as e:
-        return False, f"activate failed: {type(e).__name__}: {e}"
+    # Activate with up to 3 attempts (n8n returns transient 400 right after
+    # a graph change — matches the retry logic in deploy_helpers.patch_workflow_dual)
+    last_err = None
+    for attempt in range(3):
+        if attempt > 0:
+            time.sleep(3)
+        req = urllib.request.Request(f"{base}/activate", method="POST",
+                                      headers={"X-N8N-API-KEY": api_key})
+        try:
+            urllib.request.urlopen(req, timeout=15).read()
+            last_err = None
+            break
+        except urllib.error.HTTPError as e:
+            last_err = f"HTTP {e.code} {e.reason}"
+        except Exception as e:
+            last_err = f"{type(e).__name__}: {e}"
+    if last_err:
+        return False, f"activate failed after 3 attempts: {last_err}"
     time.sleep(2)
-    # Verify
     token = env.get("TELEGRAM_BOT_TOKEN", "")
     info = tg_get_webhook_info(token)
     actual = info.get("result", {}).get("url", "") if info.get("ok") else ""
     expected = get_expected_webhook_url()
     if actual == expected:
-        return True, f"deactivate+activate via n8n API (secret re-synced)"
+        return True, "deactivate+activate via n8n API (secret re-synced)"
     return False, f"after n8n cycle, webhook still wrong: '{actual}' vs '{expected}'"
 
 
