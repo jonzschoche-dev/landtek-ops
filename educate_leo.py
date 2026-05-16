@@ -171,24 +171,25 @@ Output ONLY the JSON, no prose before or after.
 """
 
 
-def call_gemini(prompt, max_output=32768, timeout_s=120):
-    """Call Gemini 2.5 Flash with timeout. Returns parsed JSON or raises.
-
-    max_output bumped to 32K (was 8K) — JSON was truncating mid-string."""
+def call_claude(prompt, max_output=8000, timeout_s=180):
+    """Call Claude Haiku 4.5 — paid tier, no free quota constraints.
+    Switched from Gemini after hitting 20-request/day free limit 2026-05-16."""
     from dotenv import load_dotenv
     load_dotenv("/root/landtek/.env")
-    import google.generativeai as genai
-    api_key = os.environ.get("GEMINI_API_KEY")
+    import anthropic
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        raise RuntimeError("GEMINI_API_KEY missing")
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    resp = model.generate_content(
-        prompt,
-        generation_config={"temperature": 0.0, "max_output_tokens": max_output, "response_mime_type": "application/json"},
-        request_options={"timeout": timeout_s},
+        raise RuntimeError("ANTHROPIC_API_KEY missing")
+    client = anthropic.Anthropic(api_key=api_key, timeout=timeout_s)
+    resp = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=max_output,
+        messages=[{
+            "role": "user",
+            "content": prompt + "\n\nIMPORTANT: respond with ONLY the JSON object — no prose before or after, no markdown fences."
+        }],
     )
-    raw = resp.text if resp and resp.text else ""
+    raw = "".join(b.text for b in resp.content if hasattr(b, "text"))
     raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.MULTILINE)
     # First try clean parse
     try:
@@ -282,7 +283,7 @@ def main():
         prompt = EXTRACTION_PROMPT_TMPL.format(case_file=args.case, batch_text="".join(batch))
         try:
             t0 = time.time()
-            out = call_gemini(prompt, max_output=16_000)
+            out = call_claude(prompt, max_output=16_000)
             dt = time.time() - t0
             per_doc = out.get("per_doc", [])
             all_per_doc.extend(per_doc)
@@ -337,7 +338,7 @@ def main():
         n_docs=len(all_per_doc), case_file=args.case, inventory_json=inv_json
     )
     try:
-        synthesis = call_gemini(syn_prompt, max_output=8000)
+        synthesis = call_claude(syn_prompt, max_output=8000)
     except Exception as e:
         print(f"        synthesis FAILED: {e}")
         synthesis = {}
