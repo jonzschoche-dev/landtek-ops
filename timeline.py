@@ -413,6 +413,60 @@ def main():
     since = date.fromisoformat(args.since) if args.since else None
     all_output = []
     all_health = []
+
+    # When multiple matters match (typical for --case), produce ONE unified
+    # cross-matter timeline rather than overwriting --out N times.
+    unified_mode = len(matters) > 1 and not args.matter
+
+    if unified_mode:
+        # Use a synthetic "matter" representing the case_file aggregate
+        agg_events = []
+        per_matter_health = []
+        for m in matters:
+            evs = fetch_events(cur, m, since=since)
+            for e in evs:
+                e["_matter"] = m["matter_code"]
+            agg_events.extend(evs)
+            per_matter_health.extend([(m["matter_code"], h) for h in health_check(evs, m)])
+
+        # Dedup by ref + when (same gmail/doc appears under multiple matters)
+        seen = set()
+        deduped = []
+        for e in agg_events:
+            key = (e["ref"], str(e.get("when")))
+            if key in seen: continue
+            seen.add(key)
+            deduped.append(e)
+
+        case_file = matters[0]["case_file"]
+        synth = {
+            "matter_code": f"ALL [{case_file}]",
+            "case_file": case_file,
+            "docket_number": None,
+            "title": f"Unified timeline across {len(matters)} matters under {case_file}",
+            "current_stage": "(aggregate)",
+            "status": "active",
+        }
+        if args.json:
+            all_output.append({"matter": synth, "events": deduped,
+                               "matters_in_scope": [m["matter_code"] for m in matters],
+                               "per_matter_health": per_matter_health})
+        elif args.health:
+            print(f"\n=== Aggregate health across {len(matters)} matters in {case_file} ===")
+            print(f"  {len(deduped)} unique events")
+            for mc, h in per_matter_health:
+                print(f"  [{mc}] {h}")
+        else:
+            md = render_md(synth, deduped, since=args.since, health_issues=[h for _, h in per_matter_health])
+            if args.out:
+                Path(args.out).write_text(md)
+                print(f"Written: {args.out} ({len(md):,} chars, {len(deduped)} events, "
+                      f"{len(matters)} matters)")
+            else:
+                print(md)
+        # Skip the per-matter loop
+        matters = []
+
     for m in matters:
         events = fetch_events(cur, m, since=since)
         health = health_check(events, m)
