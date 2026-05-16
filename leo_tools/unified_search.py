@@ -96,15 +96,16 @@ def api_search():
             "score": score + (2 if cf == case else 0),
         })
 
-    # 2) chat_notes
+    # 2) chat_notes  (column is related_case not case_file)
+    notes_case_clause = "AND related_case = %s" if case else ""
     cur.execute(f"""
-        SELECT id, case_file, topic, importance, summary, content, created_at
+        SELECT id, related_case, topic, importance, summary, content, created_at
           FROM chat_notes
          WHERE (coalesce(content,'') ILIKE %s OR coalesce(summary,'') ILIKE %s)
-           {case_clause.replace('case_file', 'related_case') if case else ''}
+           {notes_case_clause}
          ORDER BY id DESC
          LIMIT %s;
-    """, [like, like, *(args_case if case else []), per_kind_cap])
+    """, [like, like, *args_case, per_kind_cap])
     for r in cur.fetchall():
         (nid, cf, topic, imp, summary, content, ts) = r
         results.append({

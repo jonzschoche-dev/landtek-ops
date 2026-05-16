@@ -34,6 +34,20 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: slash endpoints not registered: {_e}", file=_sys.stderr)
 
+try:
+    from onboarding_endpoints import bp as _onb_bp
+    app.register_blueprint(_onb_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: onboarding endpoints not registered: {_e}", file=_sys.stderr)
+
+try:
+    from channel_adapters import bp as _ch_bp
+    app.register_blueprint(_ch_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: channel adapters not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 

@@ -1,0 +1,374 @@
+"""Multi-channel adapters (deploy_117-A).
+
+Inbound webhook endpoints (normalize → route through onboarding/AI Agent):
+  POST /api/channel/whatsapp        — Meta/360dialog WhatsApp Business webhook
+  POST /api/channel/web             — web chat widget message
+  POST /api/channel/email           — email-reply webhook
+  POST /api/channel/sms             — Twilio SMS webhook
+
+Public REST API (licensable product surface):
+  POST /api/v1/leo/chat             — send a message, get Leo's response
+  POST /api/v1/leo/verify           — run truth_negotiator on a claim
+  GET  /api/v1/leo/status           — system status
+  GET  /api/v1/leo/version          — capability + version snapshot
+
+Outbound senders:
+  channel_send(channel, recipient_id, text) → unified send across all channels
+
+Each inbound adapter:
+  1. Normalize payload to {channel, channel_user_id, display_name, username, message}
+  2. Look up channel_users; if state != approved → POST to /api/onboard
+  3. If state == approved → push into n8n via Trigger webhook (acts like Telegram)
+  4. Log to channel_messages for audit
+"""
+import os
+import sys
+import json
+import secrets
+from datetime import datetime, timezone
+from flask import Blueprint, request, jsonify
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+PG_DSN = os.getenv("LEO_TOOLS_PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+JONATHAN_TG_ID = "6513067717"
+
+bp = Blueprint("channel_adapters", __name__)
+
+
+def _db():
+    return psycopg2.connect(PG_DSN)
+
+
+def _env(key, default=None):
+    try:
+        with open("/root/landtek/.env") as f:
+            for line in f:
+                if line.startswith(f"{key}="):
+                    return line.strip().split("=", 1)[1]
+    except: pass
+    return os.getenv(key, default)
+
+
+def _log_inbound(channel, channel_user_id, text, raw_payload=None):
+    conn = _db(); conn.autocommit = True; cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name=%s), %s, 'inbound', %s, now(), 'received',
+                    COALESCE(%s::jsonb, '{}'::jsonb))
+        """, (channel, str(channel_user_id), text,
+              json.dumps(raw_payload) if raw_payload else None))
+    finally:
+        cur.close(); conn.close()
+
+
+def _route_to_onboard_or_agent(channel, channel_user_id, display_name, username, message):
+    """Returns (reply, state, passthrough). If passthrough=True, the channel
+    adapter should forward to the AI Agent pathway (currently the n8n workflow)."""
+    import requests
+    r = requests.post("http://localhost:8765/api/onboard", json={
+        "channel": channel, "channel_user_id": channel_user_id,
+        "display_name": display_name, "username": username,
+        "message": message,
+    }, timeout=30)
+    if r.status_code != 200:
+        return ("⚠ Internal error processing your message. Please try again shortly.", "error", False)
+    j = r.json()
+    return (j.get("reply"), j.get("state_after"), j.get("passthrough", False))
+
+
+# ════════════════════════════════════════════════════════════════
+# WhatsApp Business (Meta / 360dialog) — inbound webhook
+# ════════════════════════════════════════════════════════════════
+
+@bp.route("/api/channel/whatsapp", methods=["GET", "POST"])
+def whatsapp_webhook():
+    # Meta verification (GET) — return the challenge
+    if request.method == "GET":
+        verify_token = _env("WHATSAPP_VERIFY_TOKEN", "")
+        if request.args.get("hub.verify_token") == verify_token and verify_token:
+            return request.args.get("hub.challenge", ""), 200
+        return "verification_failed", 403
+
+    payload = request.get_json(silent=True) or {}
+    # Meta payload structure: entry[].changes[].value.messages[]
+    try:
+        entries = payload.get("entry", [])
+        results = []
+        for entry in entries:
+            for change in entry.get("changes", []):
+                value = change.get("value", {})
+                contacts = {c["wa_id"]: c.get("profile", {}).get("name", "")
+                            for c in value.get("contacts", [])}
+                for msg in value.get("messages", []):
+                    wa_id = msg.get("from", "")
+                    text = (msg.get("text", {}).get("body") or "").strip()
+                    display = contacts.get(wa_id, wa_id)
+                    if not text or not wa_id: continue
+                    _log_inbound("whatsapp", wa_id, text, raw_payload=msg)
+                    reply, state, passthrough = _route_to_onboard_or_agent(
+                        "whatsapp", wa_id, display, None, text)
+                    if reply:
+                        _whatsapp_send(wa_id, reply)
+                    elif passthrough:
+                        # TODO: when WhatsApp adapter is live, push to n8n AI Agent path
+                        # For now, just acknowledge
+                        _whatsapp_send(wa_id, "Thank you — Atty. Jonathan has been notified.")
+                    results.append({"wa_id": wa_id, "state": state, "replied": bool(reply)})
+        return jsonify({"ok": True, "processed": results}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def _whatsapp_send(to_wa_id, text):
+    """Send a WhatsApp message via 360dialog/Meta Cloud API."""
+    import requests
+    token = _env("WHATSAPP_API_TOKEN")
+    phone_id = _env("WHATSAPP_PHONE_NUMBER_ID")
+    if not token or not phone_id:
+        # No credentials yet — log to channel_messages as 'pending_send'
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name='whatsapp'), %s, 'outbound', %s, now(),
+                    'pending_no_credentials', '{"reason":"WHATSAPP_API_TOKEN not configured"}'::jsonb)
+        """, (to_wa_id, text))
+        cur.close(); conn.close()
+        return False
+    try:
+        r = requests.post(
+            f"https://graph.facebook.com/v18.0/{phone_id}/messages",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={"messaging_product": "whatsapp", "to": to_wa_id,
+                  "type": "text", "text": {"body": text}},
+            timeout=15,
+        )
+        ok = r.status_code in (200, 201)
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, external_msg_id)
+            VALUES ((SELECT id FROM channels WHERE name='whatsapp'), %s, 'outbound', %s, now(),
+                    %s, %s)
+        """, (to_wa_id, text, "sent" if ok else "failed",
+              r.json().get("messages", [{}])[0].get("id") if ok else None))
+        cur.close(); conn.close()
+        return ok
+    except Exception:
+        return False
+
+
+# ════════════════════════════════════════════════════════════════
+# Web chat widget — inbound + outbound (HTTP polling or SSE)
+# ════════════════════════════════════════════════════════════════
+
+@bp.route("/api/channel/web", methods=["POST"])
+def web_widget_inbound():
+    payload = request.get_json(silent=True) or {}
+    session_id = (payload.get("session_id") or "").strip()
+    display = (payload.get("name") or "").strip() or None
+    email = (payload.get("email") or "").strip() or None
+    text = (payload.get("message") or "").strip()
+    if not session_id or not text:
+        return jsonify({"error": "session_id and message required"}), 400
+
+    chuid = f"web:{session_id}"
+    _log_inbound("web", chuid, text, raw_payload={"name": display, "email": email})
+    reply, state, passthrough = _route_to_onboard_or_agent("web", chuid, display, email, text)
+    return jsonify({"reply": reply or "Thank you — Atty. Jonathan has been notified.",
+                    "state": state, "session_id": session_id})
+
+
+# ════════════════════════════════════════════════════════════════
+# Email reply bot — receives webhook from Gmail watcher
+# ════════════════════════════════════════════════════════════════
+
+@bp.route("/api/channel/email", methods=["POST"])
+def email_webhook():
+    payload = request.get_json(silent=True) or {}
+    from_addr = (payload.get("from") or "").strip()
+    subject = (payload.get("subject") or "").strip()
+    body = (payload.get("body") or "").strip()
+    msg_id = (payload.get("message_id") or "").strip()
+    if not from_addr or not body:
+        return jsonify({"error": "from + body required"}), 400
+
+    text = f"Subject: {subject}\n\n{body}"
+    _log_inbound("email", from_addr, text, raw_payload={"subject": subject, "message_id": msg_id})
+    reply, state, passthrough = _route_to_onboard_or_agent(
+        "email", from_addr, None, from_addr, text)
+    # Email replies are sent via Gmail integration (out of scope here);
+    # log as pending until Gmail send adapter wired.
+    if reply:
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name='email'), %s, 'outbound', %s, now(),
+                    'pending_gmail_send', %s::jsonb)
+        """, (from_addr, reply, json.dumps({"in_reply_to": msg_id, "subject": f"Re: {subject}"})))
+        cur.close(); conn.close()
+    return jsonify({"ok": True, "state": state, "queued_reply": bool(reply)})
+
+
+# ════════════════════════════════════════════════════════════════
+# SMS (Twilio) — inbound webhook
+# ════════════════════════════════════════════════════════════════
+
+@bp.route("/api/channel/sms", methods=["POST"])
+def sms_webhook():
+    # Twilio sends application/x-www-form-urlencoded
+    from_num = request.form.get("From") or request.values.get("From")
+    body = request.form.get("Body") or request.values.get("Body")
+    if not from_num or not body:
+        return jsonify({"error": "missing From or Body"}), 400
+    _log_inbound("sms", from_num, body)
+    reply, state, passthrough = _route_to_onboard_or_agent("sms", from_num, None, from_num, body)
+    if reply:
+        # Twilio expects TwiML
+        from flask import Response
+        twiml = f'<?xml version="1.0" encoding="UTF-8"?><Response><Message>{reply}</Message></Response>'
+        return Response(twiml, mimetype="text/xml")
+    return jsonify({"ok": True, "state": state})
+
+
+# ════════════════════════════════════════════════════════════════
+# Public REST API (the licensable product surface)
+# ════════════════════════════════════════════════════════════════
+
+def _check_api_key():
+    """Validate the X-API-Key header against api_keys table (if it exists)."""
+    api_key = request.headers.get("X-API-Key") or request.args.get("api_key")
+    if not api_key:
+        return None, ("missing X-API-Key header", 401)
+    conn = _db(); cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT id, name, scope, rate_limit_per_min, active
+          FROM api_keys WHERE key_hash = encode(digest(%s, 'sha256'), 'hex') AND active
+        LIMIT 1
+    """, (api_key,))
+    row = cur.fetchone()
+    cur.close(); conn.close()
+    if not row:
+        return None, ("invalid api key", 403)
+    return row, None
+
+
+@bp.route("/api/v1/leo/chat", methods=["POST"])
+def v1_chat():
+    auth, err = _check_api_key()
+    if err: return jsonify({"error": err[0]}), err[1]
+    payload = request.get_json(silent=True) or {}
+    session_id = (payload.get("session_id") or "").strip() or secrets.token_hex(8)
+    message = (payload.get("message") or "").strip()
+    if not message:
+        return jsonify({"error": "message required"}), 400
+    chuid = f"api:{auth['name']}:{session_id}"
+    _log_inbound("api", chuid, message, raw_payload={"api_consumer": auth["name"]})
+    reply, state, passthrough = _route_to_onboard_or_agent(
+        "api", chuid, payload.get("user_name"), auth["name"], message)
+    return jsonify({"reply": reply, "state": state, "session_id": session_id,
+                    "consumer": auth["name"]})
+
+
+@bp.route("/api/v1/leo/verify", methods=["POST"])
+def v1_verify():
+    auth, err = _check_api_key()
+    if err: return jsonify({"error": err[0]}), err[1]
+    payload = request.get_json(silent=True) or {}
+    claim = (payload.get("claim") or "").strip()
+    case = (payload.get("case") or "").strip() or None
+    if not claim:
+        return jsonify({"error": "claim required"}), 400
+    sys.path.insert(0, "/root/landtek")
+    from truth_negotiator import negotiate
+    r = negotiate(claim, case_file=case, asked_by=f"api:{auth['name']}")
+    return jsonify({
+        "verdict": r["verdict"], "citation_tag": r["citation_tag"],
+        "evidence_count": r["evidence_count"],
+        "fact_backers": r["fact_backers"][:10],
+        "challenger_disagrees": r["challenger_disagrees"],
+        "challenger_reason": r["challenger_reason"],
+        "negotiation_id": r["id"],
+    })
+
+
+@bp.route("/api/v1/leo/status", methods=["GET"])
+def v1_status():
+    auth, err = _check_api_key()
+    if err: return jsonify({"error": err[0]}), err[1]
+    conn = _db(); cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT (SELECT count(*) FROM documents) AS docs,
+               (SELECT count(*) FROM truth_negotiations) AS verifications,
+               (SELECT count(*) FROM channel_users WHERE onboarding_state='approved') AS users,
+               (SELECT count(*) FROM matters WHERE status='active') AS active_matters
+    """)
+    s = cur.fetchone()
+    cur.close(); conn.close()
+    return jsonify({
+        "service": "leo-platform", "version": "0.116",
+        "consumer": auth["name"],
+        **{k: int(v) for k, v in s.items()}
+    })
+
+
+@bp.route("/api/v1/leo/version", methods=["GET"])
+def v1_version():
+    return jsonify({
+        "name": "Leo Platform",
+        "version": "0.116",
+        "capabilities": [
+            "truth-graded retrieval (bilingual EN+TL)",
+            "case-stage classification (PH civil procedure)",
+            "execution-status classification (notarized/filed/email/draft/gov-issued)",
+            "asset valuation + risk profile + intrinsic value",
+            "agency loop (deadline sentinel + goal accelerator)",
+            "multi-channel adapters (telegram, whatsapp*, web*, email*, sms*, api)",
+            "onboarding state machine for unknown senders",
+        ],
+        "note": "* indicates adapter present, awaiting provider credentials",
+    })
+
+
+# ════════════════════════════════════════════════════════════════
+# Unified outbound send
+# ════════════════════════════════════════════════════════════════
+
+@bp.route("/api/channel/send", methods=["POST"])
+def channel_send():
+    """Send a message via any channel. Auth: operator-only (Jonathan check via param)."""
+    payload = request.get_json(silent=True) or {}
+    channel = payload.get("channel")
+    recipient = str(payload.get("recipient_id") or "")
+    text = (payload.get("text") or "").strip()
+    operator = str(payload.get("operator_id") or "")
+    if operator != JONATHAN_TG_ID:
+        return jsonify({"error": "operator-only"}), 403
+    if not channel or not recipient or not text:
+        return jsonify({"error": "channel, recipient_id, text required"}), 400
+
+    if channel == "telegram":
+        import requests
+        token = _env("TELEGRAM_BOT_TOKEN")
+        r = requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
+                          json={"chat_id": recipient, "text": text, "parse_mode": "HTML"})
+        ok = r.status_code == 200
+    elif channel == "whatsapp":
+        ok = _whatsapp_send(recipient, text)
+    else:
+        # Web/Email/SMS handled by polling consumers
+        ok = True
+
+    conn = _db(); conn.autocommit = True; cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO channel_messages
+          (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+        VALUES ((SELECT id FROM channels WHERE name=%s), %s, 'outbound', %s, now(), %s,
+                jsonb_build_object('initiated_by', 'jonathan'))
+    """, (channel, recipient, text, "sent" if ok else "failed"))
+    cur.close(); conn.close()
+    return jsonify({"ok": ok, "channel": channel, "recipient": recipient})
