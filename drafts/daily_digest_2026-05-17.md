@@ -1,5 +1,5 @@
 # Daily Strategic Digest — Sunday, May 17, 2026
-_Generated 05:06 UTC · LLM spend today: $0.5126 across 38 calls · Open inquiries: 3_
+_Generated 10:10 UTC · LLM spend today: $0.8671 across 120 calls · Open inquiries: 5_
 
 ---
 
@@ -63,10 +63,37 @@ _Generated 05:06 UTC · LLM spend today: $0.5126 across 38 calls · Open inquiri
   · Venue: Registry of Deeds · Docket: `T-4497`
 
 ### 👤 Allan V. Inocalla  _(client_code: `Paracale-001`)_
-**1 active matter(s)**
+**8 active matter(s)**
 
 **AUTO-PARACALE_001** — AUTO-PROMOTED: Paracale-001 for client Allan V. Inocalla (48 docs, no matter row
   · Stage: `needs_context_from_user`
+
+**PAR-CAPACUAN** — Capacuan dispute
+  · Stage: `pending_context`
+  · Venue: unknown · Docket: `—`
+
+**PAR-CASE-88750** — Case No. 88750 — Francisco vs Allan (Omnibus Resolution on file)
+  · Stage: `pending_context`
+  · Venue: unknown (admin or DARAB) · Docket: `Case No. 88750`
+
+**PAR-COMPLAINT-ACE** — Complaint against Ace
+  · Stage: `pending_context`
+  · Venue: unknown · Docket: `—`
+
+**PAR-CV13-131220** — Civil Case No. 13-131220 (Order on file)
+  · Stage: `pending_context`
+  · Venue: RTC Camarines Norte (presumed) · Docket: `Civil Case No. 13-131220`
+
+**PAR-GOLDEN-SAND** — Golden Sand Beach Resort — asset matter
+  · Stage: `pending_context`
+
+**PAR-TCT1616** — TCT/OCT 1616 — title chain verification (Inocalla estate)
+  · Stage: `pending_context`
+  · Venue: Registry of Deeds Camarines Norte · Docket: `T-1616`
+
+**PAR-VITO-CRUZ** — Vito Cruz Case
+  · Stage: `pending_context`
+  · Venue: unknown · Docket: `—`
 
 ### 📨 Open intakes awaiting your input
 
@@ -76,6 +103,7 @@ _Generated 05:06 UTC · LLM spend today: $0.5126 across 38 calls · Open inquiri
 
 | When | Case | Deadline |
 |---|---|---|
+| 2026-06-02 🟢 T-16d | `MWK-001` | Mediation / Settlement Conference — Civil Case 26-360 |
 | 2026-05-18 🟠 T-1d | `MWK-001` | Send demand letter to RD Camarines Norte (title history update) |
 
 ---
@@ -98,11 +126,11 @@ _Goal: world's greatest executive assistant for Filipino land + property._
 | Pillar | Metric |
 |---|---|
 | Active clients | 2 |
-| Active matters | 10 |
-| LLM cost today | $0.5126 (7d avg $0.6616) |
-| Truth-negotiator back-test today | 97/150 pass |
+| Active matters | 17 |
+| LLM cost today | $0.8671 (7d avg $0.8388) |
+| Truth-negotiator back-test today | 96/120 pass |
 | Validity audits (corpus) | PARTIALLY_PRESENT_internal_com=100, INTERNALLY_VERIFIED=57, ASSERTED_BUT_INCOMPLETE_majori=29 |
-| Open inquiry queue | 3 |
+| Open inquiry queue | 5 |
 
 ### Trajectory pillars — where we stand on each
 
@@ -119,7 +147,7 @@ _Goal: world's greatest executive assistant for Filipino land + property._
 
 ## III. Today's highest-leverage move
 
-**Deadline T-1d**: `MWK-001` — Send demand letter to RD Camarines Norte (title history update).
+**[P0] Mediation / Settlement Conference — Civil Case 26-360** (MWK-001) — due 2026-06-02 (T+16d). Consensus state: `full_consensus`.
 
 ---
 

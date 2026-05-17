@@ -82,13 +82,23 @@ def fetch(cur):
     """)
     out["matters"] = cur.fetchall()
 
-    # Pending deadlines next 30 days
+    # Pending deadlines next 30 days — ranked by GOAL-WEIGHTED priority
+    # Per [[feedback_priority_is_goal_weighted_not_date]] +
+    # [[feedback_priority_consensus_required]]: rank by tier (P0 = case-defining
+    # wins over P4 admin) then by date. Consensus state surfaced in output.
     cur.execute("""
         SELECT cd.id, cd.case_file, cd.title, cd.due_date, cd.stage_key,
-               cd.description, cd.notes
+               cd.description, cd.notes,
+               cd.priority_tier, cd.priority_leo, cd.priority_jonathan,
+               cd.priority_client, cd.priority_consensus_state,
+               -- rank = tier_int × 1000 + days_until_due (lower wins)
+               (CASE COALESCE(cd.priority_tier,'P3')
+                  WHEN 'P0' THEN 0 WHEN 'P1' THEN 1 WHEN 'P2' THEN 2
+                  WHEN 'P3' THEN 3 WHEN 'P4' THEN 4 WHEN 'P5' THEN 5
+                  ELSE 3 END * 1000 + (cd.due_date - CURRENT_DATE)) AS leverage_rank
           FROM case_deadlines cd
-         WHERE cd.status = 'pending' AND cd.due_date <= CURRENT_DATE + INTERVAL '30 days'
-         ORDER BY cd.due_date
+         WHERE cd.status = 'pending' AND cd.due_date <= CURRENT_DATE + INTERVAL '60 days'
+         ORDER BY leverage_rank
     """)
     out["deadlines"] = cur.fetchall()
 
@@ -297,13 +307,22 @@ def render_md(d):
     lines.append("")
     lines.append("## III. Today's highest-leverage move")
     lines.append("")
-    # Heuristic: nearest deadline OR oldest open intake
+    # Per consensus + goal-weight rules: pick the top-ranked deadline by tier (not date).
+    # Surface the consensus state — never act on `leo_only` without flagging it.
     leverage = None
     if d["deadlines"]:
-        nearest = d["deadlines"][0]
-        days_left = days_to(nearest["due_date"])
-        if days_left is not None and days_left <= 7:
-            leverage = (f"**Deadline T-{days_left}d**: `{nearest['case_file']}` — {nearest['title'][:100]}.")
+        top = d["deadlines"][0]
+        days_left = days_to(top["due_date"])
+        tier = top.get("priority_tier", "?")
+        state = top.get("priority_consensus_state", "leo_only")
+        leverage = (
+            f"**[{tier}] {top['title'][:100]}** ({top['case_file']}) — "
+            f"due {top['due_date']} (T{'+' if (days_left or 0) >= 0 else ''}{days_left}d). "
+            f"Consensus state: `{state}`."
+        )
+        if state == "leo_only":
+            leverage += (" ⚠️ Leo-only inference — Jonathan + client consensus not yet established. "
+                         "Leo should enqueue a consensus-ask before acting.")
     if not leverage and d["open_intakes"]:
         oldest = d["open_intakes"][-1]
         leverage = (f"**Close the oldest open intake**: `{oldest['case_file']}` — {oldest['template_title']} "
