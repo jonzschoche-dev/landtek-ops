@@ -103,13 +103,30 @@ def score_ocr_quality(text, classification):
     return "CLEAN", "passes_all_heuristics"
 
 
-def build_source_link(source_table, source_id, drive_link=None, drive_file_id=None):
-    """Best clickable link to the original document."""
+def build_source_link(*, drive_link=None, drive_file_id=None, file_path=None,
+                       memo_local_path=None, gmail_message_id=None,
+                       source_table=None, source_id=None):
+    """Walk the locator chain to produce a CLICKABLE link. No internal refs
+    masquerading as links — if no real file exists, return an honest marker.
+
+    Priority: drive_link → drive_file_id → file_path → memo.local_path → gmail URL → honest marker
+    """
     if drive_link:
         return drive_link
     if drive_file_id:
         return f"https://drive.google.com/file/d/{drive_file_id}/view"
-    return f"{source_table}#{source_id}"
+    if file_path:
+        # Local filesystem path → file:// URL (works when opened on the VPS or
+        # via Tailscale-mounted access).
+        return f"file://{file_path}" if not file_path.startswith("file://") else file_path
+    if memo_local_path:
+        return f"file://{memo_local_path}" if not memo_local_path.startswith("file://") else memo_local_path
+    if gmail_message_id:
+        # Gmail web URL — requires user to be signed into Gmail; opens the
+        # message in the browser.
+        return f"https://mail.google.com/mail/u/0/#all/{gmail_message_id}"
+    # Honest fallback — NO fake link
+    return f"[DB record only — no source file · {source_table}#{source_id}]"
 
 
 def extract_parties(event):
@@ -159,24 +176,50 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     limit_clause = f"LIMIT {int(args.limit)}" if args.limit else ""
+    # Deep query: pulls every file-locator field, plus source_doc_id fallbacks
+    # so transactions/title_transfers can inherit their backing document's link.
     cur.execute(f"""
         SELECT
           h.id, h.matter_codes, h.title_refs,
           COALESCE(h.event_date, h.date_executed, h.date_filed, h.date_received) AS dt,
           h.event_kind, h.event_kind_canonical, h.what_summary,
           h.source_table, h.source_id,
+          -- documents (direct)
           d.classification, d.smart_filename, d.original_filename,
           d.document_title, d.execution_status, d.extracted_text,
-          d.drive_link, d.drive_file_id,
+          d.drive_link AS d_drive_link, d.drive_file_id AS d_drive_file_id,
+          d.file_path AS d_file_path,
+          (d.analyst_memo->>'local_path') AS d_memo_local_path,
+          -- transactions
           t.amount, t.direction, t.category, t.counterparty AS tx_counterparty,
+          t.source_doc_id AS tx_source_doc_id,
+          tx_d.drive_link AS tx_d_drive_link, tx_d.drive_file_id AS tx_d_drive_file_id,
+          tx_d.file_path AS tx_d_file_path,
+          -- gmail
           g.subject AS gmail_subject, g.from_addr, g.from_name AS gmail_from_name,
+          g.message_id AS gmail_message_id,
+          -- title_transfers (no source_doc_id column; uses cnr_received_doc_id /
+          -- cancelled_by_doc_id, plus the transfer_documents join table)
           tt.instrument_type, tt.parent_title, tt.derivative_title,
-          tt.transferor AS tt_transferor, tt.transferee_name AS tt_transferee_name
+          tt.transferor AS tt_transferor, tt.transferee_name AS tt_transferee_name,
+          COALESCE(tt.cnr_received_doc_id, tt.cancelled_by_doc_id,
+                   (SELECT doc_id FROM transfer_documents td
+                      WHERE td.transfer_id = tt.id
+                      ORDER BY (td.role = 'primary') DESC, td.confidence DESC NULLS LAST
+                      LIMIT 1)) AS tt_doc_id,
+          tt_d.drive_link AS tt_d_drive_link, tt_d.drive_file_id AS tt_d_drive_file_id,
+          tt_d.file_path AS tt_d_file_path
         FROM client_history h
         LEFT JOIN documents d ON h.source_table='documents' AND h.source_id=d.id::text
         LEFT JOIN transactions t ON h.source_table='transactions' AND h.source_id=t.id::text
+        LEFT JOIN documents tx_d ON tx_d.id = t.source_doc_id
         LEFT JOIN gmail_messages g ON h.source_table='gmail_messages' AND h.source_id=g.id::text
         LEFT JOIN title_transfers tt ON h.source_table='title_transfers' AND h.source_id=tt.id::text
+        LEFT JOIN documents tt_d ON tt_d.id = COALESCE(tt.cnr_received_doc_id, tt.cancelled_by_doc_id,
+                   (SELECT doc_id FROM transfer_documents td
+                      WHERE td.transfer_id = tt.id
+                      ORDER BY (td.role = 'primary') DESC, td.confidence DESC NULLS LAST
+                      LIMIT 1))
         WHERE h.case_file = %s
         ORDER BY dt NULLS LAST, h.id
         {limit_clause}
@@ -201,11 +244,42 @@ def main():
         # POOR_OCR rows do NOT print parties (no hallucinated names from garbage)
         parties = extract_parties(e) if status == "CLEAN" else ""
 
-        source_link = build_source_link(
-            e["source_table"], e["source_id"],
-            drive_link=e.get("drive_link"),
-            drive_file_id=e.get("drive_file_id"),
-        )
+        # Resolve the locator chain — try fields appropriate to the source_table,
+        # then fall through to source_doc_id-backed documents for tx/title_transfers.
+        st = e["source_table"]
+        if st == "documents":
+            source_link = build_source_link(
+                drive_link=e.get("d_drive_link"),
+                drive_file_id=e.get("d_drive_file_id"),
+                file_path=e.get("d_file_path"),
+                memo_local_path=e.get("d_memo_local_path"),
+                source_table=st, source_id=e["source_id"],
+            )
+        elif st == "transactions":
+            # First try the backing doc, then fall to honest marker
+            source_link = build_source_link(
+                drive_link=e.get("tx_d_drive_link"),
+                drive_file_id=e.get("tx_d_drive_file_id"),
+                file_path=e.get("tx_d_file_path"),
+                source_table=st, source_id=e["source_id"],
+            )
+        elif st == "gmail_messages":
+            source_link = build_source_link(
+                gmail_message_id=e.get("gmail_message_id"),
+                source_table=st, source_id=e["source_id"],
+            )
+        elif st == "title_transfers":
+            source_link = build_source_link(
+                drive_link=e.get("tt_d_drive_link"),
+                drive_file_id=e.get("tt_d_drive_file_id"),
+                file_path=e.get("tt_d_file_path"),
+                source_table=st, source_id=e["source_id"],
+            )
+        else:
+            # calendar_events, case_deadlines, stage_intake_response, manual_anchor — no file
+            source_link = build_source_link(
+                source_table=st, source_id=e["source_id"],
+            )
 
         rows.append({
             "date": date_str, "matter": matter, "event_type": event_type,
@@ -243,8 +317,12 @@ def main():
         "|------|--------|------------|------------------|--------|--------|",
     ]
     for r in rows:
-        link = (f"[open]({r['source_link']})" if r['source_link'].startswith("http")
-                else f"`{r['source_link']}`")
+        sl = r['source_link']
+        if sl.startswith(("http://", "https://", "file://")):
+            link = f"[open]({sl})"
+        else:
+            # Honest no-link marker — render as code, not as a clickable
+            link = f"`{sl}`"
         # Escape pipe chars in cell content
         parties_cell = (r['parties'] or '—').replace("|", "\\|")[:120]
         et_cell      = r['event_type'].replace("|", "\\|")[:80]
