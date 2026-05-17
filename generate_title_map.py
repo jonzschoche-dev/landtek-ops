@@ -117,35 +117,47 @@ def main():
 
     G = nx.DiGraph()
 
-    # 1. Pull title_chain edges (the structural backbone)
+    # 1. Pull title_chain edges (the structural backbone).
+    # Filter: only attach metadata from CANONICAL documents (related_to_doc_id IS NULL).
+    # If a title_chain row cites a doc that's been linked as a verified_copy, the
+    # canonical_doc's metadata will be pulled instead via the COALESCE chain.
     cur.execute("""
         SELECT tc.parent_title, tc.child_title, tc.relationship,
                tc.provenance_level, tc.source_doc_id,
-               d.lot_number, d.subdivision_plan, d.area_sqm,
-               d.consideration_price, d.consideration_currency,
-               d.grantor_seller, d.grantee_buyer,
-               d.doc_date_norm AS transfer_date,
-               d.classification AS instrument_type
+               COALESCE(canon.lot_number, d.lot_number)               AS lot_number,
+               COALESCE(canon.subdivision_plan, d.subdivision_plan)   AS subdivision_plan,
+               COALESCE(canon.area_sqm, d.area_sqm)                   AS area_sqm,
+               COALESCE(canon.consideration_price, d.consideration_price)       AS consideration_price,
+               COALESCE(canon.consideration_currency, d.consideration_currency) AS consideration_currency,
+               COALESCE(canon.grantor_seller, d.grantor_seller)       AS grantor_seller,
+               COALESCE(canon.grantee_buyer,  d.grantee_buyer)        AS grantee_buyer,
+               COALESCE(canon.doc_date_norm, d.doc_date_norm)         AS transfer_date,
+               COALESCE(canon.classification, d.classification)       AS instrument_type
           FROM title_chain tc
           LEFT JOIN documents d ON d.id = tc.source_doc_id
+          LEFT JOIN documents canon ON canon.id = d.related_to_doc_id
          WHERE tc.case_file = 'MWK-001'
     """)
     chain_edges = cur.fetchall()
 
-    # 2. Pull title_transfers (richer terms when present)
+    # 2. Pull title_transfers — same canonical-resolution pattern
     cur.execute("""
         SELECT tt.parent_title, tt.derivative_title AS child_title,
                'derivative' AS relationship,
                'verified' AS provenance_level,
                tt.transfer_date,
                tt.instrument_type,
-               COALESCE(tt.transferor, d.grantor_seller) AS grantor_seller,
-               COALESCE(tt.transferee_name, d.grantee_buyer) AS grantee_buyer,
-               d.lot_number, d.subdivision_plan, d.area_sqm,
-               d.consideration_price, d.consideration_currency,
+               COALESCE(tt.transferor, canon.grantor_seller, d.grantor_seller)         AS grantor_seller,
+               COALESCE(tt.transferee_name, canon.grantee_buyer, d.grantee_buyer)      AS grantee_buyer,
+               COALESCE(canon.lot_number, d.lot_number)               AS lot_number,
+               COALESCE(canon.subdivision_plan, d.subdivision_plan)   AS subdivision_plan,
+               COALESCE(canon.area_sqm, d.area_sqm)                   AS area_sqm,
+               COALESCE(canon.consideration_price, d.consideration_price)       AS consideration_price,
+               COALESCE(canon.consideration_currency, d.consideration_currency) AS consideration_currency,
                COALESCE(tt.cnr_received_doc_id, tt.cancelled_by_doc_id) AS source_doc_id
           FROM title_transfers tt
-          LEFT JOIN documents d ON d.id = COALESCE(tt.cnr_received_doc_id, tt.cancelled_by_doc_id)
+          LEFT JOIN documents d     ON d.id = COALESCE(tt.cnr_received_doc_id, tt.cancelled_by_doc_id)
+          LEFT JOIN documents canon ON canon.id = d.related_to_doc_id
          WHERE tt.case_file = 'MWK-001'
     """)
     transfer_edges = cur.fetchall()

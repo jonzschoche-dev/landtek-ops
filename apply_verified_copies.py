@@ -22,9 +22,11 @@ import psycopg2.extras
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 CSV_PATH = "/root/landtek/drafts/consolidation_candidates_MWK-001_2026-05-17.csv"
 
-# The 14 reviewed-and-safe clusters from the prior analysis.
+# The 14 reviewed-and-safe clusters from the prior analysis + cluster 5
+# (TIER3 Cesar→Balane deed, added 2026-05-17 per Jonathan).
 # Identified by specific filename signatures, NOT generic LGU batch patterns.
 TARGET_CLUSTERS = {
+    5:  "Cesar→Balane Deed of Absolute Sale (5 ingest paths, TIER3)",
     12: "intestate_estate_of_mary_worrick (2023-02-22 letter)",
     13: "Reply - Civil Case No. 26-360 (2026-04-06)",
     14: "2005-08-15 special_power_of_attorney",
