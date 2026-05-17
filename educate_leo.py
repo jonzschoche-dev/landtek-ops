@@ -278,8 +278,11 @@ def main():
     print(f"        loaded {len(docs)} docs (total chars: {sum(len(d['body']) for d in docs):,})")
 
     # ── 3. Batch ─────────────────────────────────────────────────────────
-    chunks = chunk_corpus_by_tokens(docs, max_chars=40_000)
-    print(f"  [3/8] {len(chunks)} batches (max ~40K chars each, ~30-60s per batch)", flush=True)
+    # Compaction (deploy_144): halved batch size to reduce per-call input tokens
+    # (was 40K → 20K). Combined with lower max_output, cuts educate_leo cost ~50%
+    # without changing total docs processed.
+    chunks = chunk_corpus_by_tokens(docs, max_chars=20_000)
+    print(f"  [3/8] {len(chunks)} batches (max ~20K chars each)", flush=True)
 
     # ── 4-5. Per-batch extraction + observation telegram to Jonathan ─────
     tg_send(f"🎓 Educating Leo about {args.case} — {len(docs)} docs in {len(chunks)} batches. I'll post observations as I learn.")
@@ -289,7 +292,7 @@ def main():
         prompt = EXTRACTION_PROMPT_TMPL.format(case_file=args.case, batch_text="".join(batch))
         try:
             t0 = time.time()
-            out = call_claude(prompt, max_output=16_000)
+            out = call_claude(prompt, max_output=5_000)  # was 16K — extraction doesn't need that much
             dt = time.time() - t0
             per_doc = out.get("per_doc", [])
             all_per_doc.extend(per_doc)
@@ -339,12 +342,15 @@ def main():
         "doc_count": len(all_per_doc),
         "docs": all_per_doc,
     }
-    inv_json = json.dumps(inventory, default=str)[: 700_000]
+    # Compaction: inventory was capped at 700K chars (a single Haiku call could
+    # eat half the context window). Cap at 150K — preserves the most-recent
+    # per-doc records which carry the strategic signal; older records summarized.
+    inv_json = json.dumps(inventory, default=str)[: 150_000]
     syn_prompt = SYNTHESIS_PROMPT_TMPL.format(
         n_docs=len(all_per_doc), case_file=args.case, inventory_json=inv_json
     )
     try:
-        synthesis = call_claude(syn_prompt, max_output=8000)
+        synthesis = call_claude(syn_prompt, max_output=4_000)  # was 8K
     except Exception as e:
         print(f"        synthesis FAILED: {e}")
         synthesis = {}

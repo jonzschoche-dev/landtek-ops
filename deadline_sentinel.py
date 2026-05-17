@@ -65,6 +65,50 @@ def pick_tier(days_until):
     return None
 
 
+def maybe_fire_consensus_ask(cur, deadline):
+    """If deadline is in leo_only state and within 21 days, enqueue ONE atomic
+    consensus-ask to Jonathan. Per [[feedback_priority_consensus_required]]:
+    Leo's inference cannot drive action until Jonathan + client weigh in.
+
+    Idempotent — only fires once per (deadline_id, 'consensus_ask').
+    """
+    if (deadline.get("priority_consensus_state") or "leo_only") != "leo_only":
+        return False, "not_leo_only"
+    # Already asked?
+    cur.execute("""
+        SELECT id FROM tg_inquiry_queue
+         WHERE source_table = 'consensus_ask' AND source_id = %s
+           AND status IN ('queued','active','answered')
+         LIMIT 1
+    """, (str(deadline["id"]),))
+    if cur.fetchone():
+        return False, "already_asked"
+    days_until = (deadline["due_date"] - __import__("datetime").date.today()).days
+    if days_until is None or days_until < 0 or days_until > 21:
+        return False, "out_of_window"
+
+    title = deadline.get("title") or "(untitled deadline)"
+    leo_tier = deadline.get("priority_leo") or "P3"
+    html = (
+        f"🎯 <b>Consensus check — priority tier</b>\n\n"
+        f"Deadline #{deadline['id']}: <i>{title[:200]}</i>\n"
+        f"Case: <code>{deadline.get('case_file') or '—'}</code> · "
+        f"Due: {deadline['due_date']} (T+{days_until}d)\n\n"
+        f"Leo's inference: <b>{leo_tier}</b>\n\n"
+        f"Reply <code>/priority {deadline['id']} P0</code> (or P1..P5) to confirm or override. "
+        f"<code>/skip</code> if not applicable. Per memory: Leo cannot drive action on this "
+        f"deadline until Jonathan + client signal priority."
+    )
+    cur.execute("""
+        INSERT INTO tg_inquiry_queue
+          (kind, priority, source_table, source_id, composed_html, notes)
+        VALUES ('clarification', 8, 'consensus_ask', %s, %s,
+                'auto-fired by deadline_sentinel — consensus state was leo_only')
+        RETURNING id
+    """, (str(deadline["id"]), html))
+    return True, f"consensus_ask_enqueued #{cur.fetchone()[0]}"
+
+
 def event_already_occurred(cur, deadline):
     """Stage-awareness guard per [[feedback_legal_status_awareness]].
 
@@ -243,7 +287,8 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("""
         SELECT id, case_file, title, description, due_date, deadline_type, status,
-               source_doc_id, stage_key,
+               source_doc_id, stage_key, priority_tier, priority_leo,
+               priority_jonathan, priority_client, priority_consensus_state,
                reminder_t14_sent_at, reminder_t7_sent_at, reminder_t3_sent_at,
                reminder_t1_sent_at, reminder_t0_sent_at, reminder_dayof_sent_at,
                (SELECT max(sent_at) FROM deadline_alerts a
@@ -258,9 +303,22 @@ def main():
     sent_count = 0
     auto_completed = 0
     intakes_fired = 0
+    consensus_asks = 0
     for d in deadlines:
         days = (d["due_date"] - today).days
         tier = args.force_tier or pick_tier(days)
+
+        # Consensus-ask gate: if deadline is leo_only, fire an atomic consensus
+        # question first (per feedback_priority_consensus_required). Don't fire
+        # intakes / escalations until Jonathan has weighed in on priority.
+        consensus_state = d.get("priority_consensus_state") or "leo_only"
+        if consensus_state == "leo_only" and not args.dry_run:
+            ok_c, info_c = maybe_fire_consensus_ask(cur, d)
+            if ok_c:
+                consensus_asks += 1
+                print(f"  🎯 CONSENSUS-ASK fired for deadline #{d['id']} (leo_only) — {info_c}")
+            # Skip intake firing — wait for Jonathan to confirm priority first
+            continue
 
         # Pre-event intake: fires once per deadline, gated by template's fire_days_before
         if d.get("stage_key") and days >= 0 and tier is not None:
@@ -356,7 +414,8 @@ def main():
                     (json.dumps({"sent": sent_count, "scanned": len(deadlines)}),))
     except Exception: pass
 
-    print(f"\n  sent {sent_count} reminder(s), auto-completed {auto_completed} stale deadline(s), fired {intakes_fired} intake(s)")
+    print(f"\n  sent {sent_count} reminder(s), auto-completed {auto_completed} stale deadline(s), "
+          f"fired {intakes_fired} intake(s), {consensus_asks} consensus-ask(s)")
     cur.close(); conn.close()
 
 

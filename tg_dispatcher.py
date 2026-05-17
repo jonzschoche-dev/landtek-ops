@@ -129,6 +129,79 @@ def evaluate_and_followup(cur, answered_row, answer_text, token, verbose=False):
             print(f"  enqueued follow-up for intake#{answered_row['intake_response_id']} item {answered_row['item_index']}")
 
 
+def handle_priority_command(text, token, reply_to=None):
+    """Parse `/priority <deadline_id> <P0|P1|P2|P3|P4|P5>` and update Jonathan's
+    priority signal. Recomputes consensus state.
+
+    Per [[feedback_priority_consensus_required]]: Jonathan's signal moves
+    consensus from leo_only → jonathan_confirmed (if matches Leo's) or
+    disputed (if differs).
+    """
+    import psycopg2 as _pg
+    import re as _re
+    m = _re.match(r"/priority\s+(\d+)\s+(P[0-5])\s*$", text.strip(), _re.IGNORECASE)
+    if not m:
+        tg_send(
+            "⚠️ Usage: <code>/priority &lt;deadline_id&gt; &lt;P0..P5&gt;</code>\n"
+            "Example: <code>/priority 2 P4</code> (mark deadline #2 as P4)\n\n"
+            "Find deadline IDs in the daily digest or via <code>/status</code>.",
+            token, reply_to=reply_to)
+        return
+    dl_id = int(m.group(1))
+    tier = m.group(2).upper()
+
+    conn = _pg.connect(DSN); conn.autocommit = True
+    c = conn.cursor()
+    c.execute("""
+        SELECT id, title, priority_leo, priority_jonathan, priority_client, priority_consensus_state
+          FROM case_deadlines WHERE id = %s
+    """, (dl_id,))
+    r = c.fetchone()
+    if not r:
+        tg_send(f"❌ No deadline with id {dl_id}.", token, reply_to=reply_to)
+        c.close(); conn.close()
+        return
+    _, title, p_leo, p_jon_prev, p_client, state_prev = r
+
+    # Compute new consensus state
+    signals = {"leo": p_leo, "jonathan": tier, "client": p_client}
+    distinct = {v for v in signals.values() if v}
+    if len(distinct) == 1 and len([v for v in signals.values() if v]) >= 2:
+        new_state = "full_consensus" if all(signals.values()) else (
+            "jonathan_confirmed" if not p_client else "client_confirmed")
+    elif len(distinct) == 1:
+        new_state = "jonathan_confirmed"
+    else:
+        # Multiple distinct signals → disputed
+        new_state = "disputed"
+
+    import json as _json
+    audit_entry = _json.dumps({
+        "source": "jonathan_via_tg_slash",
+        "at": _re.sub(r"\..*$", "", str(__import__("datetime").datetime.now().isoformat())),
+        "old": {"leo": p_leo, "jonathan": p_jon_prev, "client": p_client, "state": state_prev},
+        "new": {"jonathan": tier, "state": new_state},
+    })
+    c.execute("""
+        UPDATE case_deadlines
+           SET priority_jonathan = %s,
+               priority_consensus_state = %s,
+               priority_history = priority_history || %s::jsonb
+         WHERE id = %s
+    """, (tier, new_state, "[" + audit_entry + "]", dl_id))
+    c.close(); conn.close()
+
+    msg = (f"✓ Priority updated for deadline #{dl_id}\n\n"
+           f"<b>{title[:80]}</b>\n"
+           f"Leo: <code>{p_leo or '—'}</code>  ·  "
+           f"You: <code>{tier}</code>  ·  "
+           f"Client: <code>{p_client or '—'}</code>\n"
+           f"Consensus state: <code>{new_state}</code>")
+    if new_state == "disputed":
+        msg += "\n\n⚠️ Disagreement detected — Leo will surface a consensus-ask to resolve."
+    tg_send(msg, token, reply_to=reply_to)
+
+
 def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
     """Pull a Telegram photo/document, OCR via Gemini, ingest into documents +
     bind to the currently-active inquiry if any.
@@ -451,6 +524,12 @@ def cycle(cur, token, verbose=False):
             handle_matters_command(token, msg.get("message_id"))
             if verbose:
                 print(f"  handled /matters")
+            continue
+        # /priority <deadline_id> <P0-P5> — set Jonathan's priority signal on a deadline
+        if text.startswith("/priority"):
+            handle_priority_command(text, token, msg.get("message_id"))
+            if verbose:
+                print(f"  handled /priority")
             continue
         # Any other text from Jonathan = answer to current active inquiry
         if text.startswith("/"):
