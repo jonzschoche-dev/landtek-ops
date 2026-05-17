@@ -220,6 +220,51 @@ def scan_instruments_on_title(cur):
     return n
 
 
+def scan_title_transfers(cur):
+    """Every title transfer with a date → one event (deploy_153).
+
+    Coverage gap surfaced by coverage_auditor: MWK title_transfers was 0/41 in bible
+    because this scanner didn't exist. Transfers carry the lineage backbone — every
+    transfer is a legal_act event on the title chain.
+    """
+    cur.execute("""
+        SELECT id, case_file, parent_title, derivative_title,
+               transferor, transferee_name, transfer_date,
+               instrument_type, entry_pe_number, annotation_date, status
+          FROM title_transfers
+         WHERE case_file IS NOT NULL
+           AND transfer_date IS NOT NULL
+    """)
+    n = 0
+    for r in cur.fetchall():
+        client_code = resolve_client_for_case(cur, r["case_file"])
+        if not client_code:
+            continue
+        upsert_event(cur, {
+            "client_code": client_code,
+            "case_file": r["case_file"],
+            "matter_code": None,
+            "event_date": r["transfer_date"],
+            "event_datetime": None,
+            # Use instrument_type when present (deed_of_sale, donation, etc.); the
+            # taxonomy already maps those raw kinds to canonical 'legal_act'.
+            "event_kind": (r["instrument_type"] or "title_transfer").lower().replace(" ", "_")[:60],
+            "source_table": "title_transfers",
+            "source_id": str(r["id"]),
+            "who_from": r["transferor"] or "—",
+            "who_to": r["transferee_name"] or "—",
+            "what_summary": (f"📜 {r['instrument_type'] or 'transfer'}: "
+                              f"{r['parent_title']} → {r['derivative_title']} "
+                              f"({r['transferor'] or '?'} → {r['transferee_name'] or '?'})"
+                              f"{' [PE ' + r['entry_pe_number'] + ']' if r['entry_pe_number'] else ''}"),
+            "citation_ref": f"title_transfer#{r['id']}",
+            "attachments": None,
+            "provenance": "verified" if r["status"] == "verified" else "inferred_strong",
+        })
+        n += 1
+    return n
+
+
 def scan_intakes(cur):
     cur.execute("""
         SELECT sir.id, sir.deadline_id, sir.timing, sir.fired_at, sir.status,
@@ -269,6 +314,7 @@ def run_scan():
             "transactions":        scan_transactions(cur),
             "deadlines":           scan_deadlines(cur),
             "instruments_on_title":scan_instruments_on_title(cur),
+            "title_transfers":     scan_title_transfers(cur),
             "intakes":             scan_intakes(cur),
         }
 

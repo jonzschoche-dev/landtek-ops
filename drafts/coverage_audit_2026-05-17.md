@@ -19,34 +19,34 @@ _Bible architecture, Layer C. Source-row → client_history coverage._
 - **gmail_messages**: 285/285 in bible (100%) · no_date=0 · no_case_file=0 · **scanner_skipped=0**
 - **transactions**: 151/151 in bible (100%) · no_date=0 · no_case_file=0 · **scanner_skipped=0**
 - **case_deadlines**: 3/3 in bible (100%) · no_date=0 · no_case_file=0 · **scanner_skipped=0**
-- **title_transfers**: 0/41 in bible (0%) · no_date=31 · no_case_file=0 · **scanner_skipped=10**
+- **title_transfers**: 10/41 in bible (24%) · no_date=31 · no_case_file=0 · **scanner_skipped=0**
 
 ---
 ## Summary
-- **Total missing rows:** 354
+- **Total missing rows:** 344
 - **Upstream gaps** (no date / no case_file — extraction backlog): 344
-- **Scanner-skipped** (real gaps — all upstream OK but bible empty): 10
+- **Scanner-skipped** (real gaps — all upstream OK but bible empty): 0
 
-⚠️ **10 scanner-skipped rows need investigation.** Run `SELECT * FROM coverage_audit_findings WHERE reason='scanner_skipped' ORDER BY audit_run_at DESC LIMIT 30` to inspect.
+✅ **No real scanner gaps.** All missing rows are upstream backlog (date or case_file extraction needed).
 
 ## Top backlog items (run date-extraction or case-file backfill next)
   - `MWK-001/documents#72` (upstream_no_date) — 1991_special_power_of_attorney.pdf
+  - `MWK-001/documents#72` (upstream_no_date) — 1991_special_power_of_attorney.pdf
+  - `MWK-001/documents#73` (upstream_no_date) — YYYY-MM-DD_heirs_of_mary_worrick_keesey_petition.pdf
   - `MWK-001/documents#73` (upstream_no_date) — YYYY-MM-DD_heirs_of_mary_worrick_keesey_petition.pdf
   - `MWK-001/documents#78` (upstream_no_date) — unknown_document.pdf
+  - `MWK-001/documents#78` (upstream_no_date) — unknown_document.pdf
+  - `MWK-001/documents#82` (upstream_no_date) — 1991-08-33_special_power_of_attorney.pdf
   - `MWK-001/documents#82` (upstream_no_date) — 1991-08-33_special_power_of_attorney.pdf
   - `MWK-001/documents#88` (upstream_no_date) — YYYY-MM-DD_TCT-4544_San_Vicente.pdf
+  - `MWK-001/documents#88` (upstream_no_date) — YYYY-MM-DD_TCT-4544_San_Vicente.pdf
+  - `MWK-001/documents#103` (upstream_no_date) — YYYY-MM-DD_TCT-4454_San_Vicente.pdf
   - `MWK-001/documents#103` (upstream_no_date) — YYYY-MM-DD_TCT-4454_San_Vicente.pdf
   - `MWK-001/documents#201` (upstream_no_date) — YYYY-MM-DD_deed_of_donation_mercedes_roads.pdf
+  - `MWK-001/documents#201` (upstream_no_date) — YYYY-MM-DD_deed_of_donation_mercedes_roads.pdf
+  - `MWK-001/documents#215` (upstream_no_date) — null_receipt.pdf
   - `MWK-001/documents#215` (upstream_no_date) — null_receipt.pdf
   - `MWK-001/documents#226` (upstream_no_date) — 2024_tax_declaration_Mary_Worrick_Keesey.pdf
+  - `MWK-001/documents#226` (upstream_no_date) — 2024_tax_declaration_Mary_Worrick_Keesey.pdf
   - `MWK-001/documents#247` (upstream_no_date) — null_information_request_form.pdf
-  - `MWK-001/documents#248` (upstream_no_date) — null_request_for_supporting_documents.pdf
-  - `MWK-001/documents#250` (upstream_no_date) — YYYY-MM-DD_request_for_supporting_documents.pdf
-  - `MWK-001/documents#251` (upstream_no_date) — YYYY-MM-DD_information_request_form.pdf
-  - `MWK-001/documents#253` (upstream_no_date) — null_information_request_form.pdf
-  - `MWK-001/documents#254` (upstream_no_date) — null_information_request_form.pdf
-  - `MWK-001/documents#256` (upstream_no_date) — null_information_request_form.pdf
-  - `MWK-001/documents#257` (upstream_no_date) — null_information_request_form.pdf
-  - `MWK-001/documents#258` (upstream_no_date) — null_request_for_supporting_documents.pdf
-  - `MWK-001/documents#259` (upstream_no_date) — null_information_request_form.pdf
-  - `MWK-001/documents#260` (upstream_no_date) — null_information_request_form.pdf
+  - `MWK-001/documents#247` (upstream_no_date) — null_information_request_form.pdf
