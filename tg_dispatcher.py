@@ -48,6 +48,103 @@ def tg_send(text, token, reply_to=None):
     return True, "ok", j["result"]["message_id"]
 
 
+def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
+    """Pull a Telegram photo/document, OCR via Gemini, ingest into documents +
+    bind to the currently-active inquiry if any.
+
+    Per Jonathan 2026-05-17: must scan screenshots and pull text + context.
+    """
+    import os, requests, hashlib, time, psycopg2
+    from datetime import datetime
+
+    # 1. Get the file_path from Telegram
+    r = requests.get(f"https://api.telegram.org/bot{token}/getFile",
+                     params={"file_id": file_id}, timeout=20)
+    j = r.json()
+    if not j.get("ok"):
+        tg_send(f"⚠️ getFile failed: {j.get('description','?')[:200]}", token, reply_to=reply_to)
+        return None
+    file_path = j["result"]["file_path"]
+    # 2. Download
+    bin_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    binr = requests.get(bin_url, timeout=60)
+    binr.raise_for_status()
+    blob = binr.content
+    content_hash = hashlib.sha256(blob).hexdigest()
+    # 3. Save locally
+    os.makedirs("/root/landtek/uploads/telegram", exist_ok=True)
+    ext = ".jpg" if file_kind == "photo" else "." + (file_kind.split("/")[-1] if "/" in file_kind else "bin")
+    fname = f"tg_{int(time.time())}_{content_hash[:12]}{ext}"
+    local_path = f"/root/landtek/uploads/telegram/{fname}"
+    with open(local_path, "wb") as fh:
+        fh.write(blob)
+    # 4. OCR via Gemini Vision (cost-logged via wrapper)
+    extracted_text = ""
+    try:
+        import sys as _sys; _sys.path.insert(0, "/root/landtek")
+        import google.generativeai as genai
+        from llm_billing import gemini_call
+        from landtek_core import get
+        genai.configure(api_key=get("GEMINI_API_KEY"))
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        mime = "image/jpeg" if file_kind == "photo" else file_kind
+        resp = gemini_call(
+            model,
+            called_from="tg_dispatcher_image",
+            purpose="screenshot_ocr",
+            case_file="MWK-001",
+            model_name="gemini-2.5-flash",
+            contents=[
+                "Extract ALL visible text from this image. Also describe what kind of document this appears to be (receipt / court order / letter / TCT / tax declaration / screenshot of an email / etc.) and identify any case numbers, dates, names, amounts visible. Output as: TEXT:\n<all text>\n\nCONTEXT:\n<one paragraph about what this doc is>",
+                {"mime_type": mime, "data": blob},
+            ],
+        )
+        extracted_text = (resp.text or "").strip()
+    except Exception as e:
+        extracted_text = f"OCR_FAILED: {str(e)[:200]}"
+
+    # 5. Try to bind to the currently-active inquiry (if any) — append response
+    conn = psycopg2.connect(DSN); conn.autocommit = True
+    c = conn.cursor()
+    c.execute("SELECT id, source_table, source_id FROM tg_inquiry_queue WHERE status='active' LIMIT 1")
+    active = c.fetchone()
+    bind_note = ""
+    if active:
+        active_id = active[0]
+        c.execute("""
+            UPDATE tg_inquiry_queue
+               SET status='answered',
+                   response_text = COALESCE(response_text,'') || %s,
+                   responded_at = NOW(),
+                   notes = COALESCE(notes,'') || %s
+             WHERE id = %s
+        """, (f"\n[image uploaded: {fname}]\n" + extracted_text[:2000],
+              f" | image bound: {fname}", active_id))
+        bind_note = f" + bound to active inquiry #{active_id}"
+
+    # 6. Insert into documents
+    c.execute("""
+        INSERT INTO documents (case_file, original_filename, smart_filename, mime_type,
+                               content_hash, file_path, extracted_text, status,
+                               text_length, timestamp, doc_date_norm, doc_date_quality)
+        VALUES ('MWK-001', %s, %s, %s, %s, %s, %s, 'ingested_from_telegram',
+                %s, NOW(), CURRENT_DATE, 'parsed_by_telegram_upload')
+        ON CONFLICT (content_hash) DO UPDATE SET file_path = EXCLUDED.file_path
+        RETURNING id
+    """, (fname, fname, "image/jpeg" if file_kind == "photo" else file_kind,
+          content_hash, local_path, extracted_text, len(extracted_text)))
+    doc_id = c.fetchone()[0]
+    c.close(); conn.close()
+
+    # 7. Reply with confirmation + text preview
+    text_preview = extracted_text[:600] if extracted_text else "(no text extracted)"
+    tg_send(
+        f"📷 <b>Image ingested as doc#{doc_id}</b>{bind_note}\n\n"
+        f"<b>OCR preview:</b>\n<code>{text_preview.replace('<','&lt;').replace('>','&gt;')}</code>",
+        token, reply_to=reply_to)
+    return doc_id
+
+
 def handle_timeline_command(token, matter_code, reply_to=None):
     """Generate timeline + send as Telegram message. Inline (not queued)."""
     import subprocess, psycopg2 as _pg
@@ -186,6 +283,31 @@ def cycle(cur, token, verbose=False):
         chat = msg.get("chat", {})
         if str(chat.get("id")) != str(JONATHAN_TG):
             continue
+
+        # ─── IMAGE / PHOTO / DOCUMENT handler ─────────────────────────────
+        # Per Jonathan 2026-05-17: must "scan a screenshot for text and context".
+        # Telegram photos arrive as msg['photo'][] (multiple sizes); generic uploads
+        # arrive as msg['document']. Pick the largest representation.
+        if msg.get("photo") or (msg.get("document") and (msg["document"].get("mime_type","").startswith("image") or msg["document"].get("mime_type") == "application/pdf")):
+            try:
+                file_id = None
+                caption = msg.get("caption", "")
+                if msg.get("photo"):
+                    # Take the largest photo (last entry typically)
+                    file_id = msg["photo"][-1]["file_id"]
+                    file_kind = "photo"
+                else:
+                    file_id = msg["document"]["file_id"]
+                    file_kind = msg["document"].get("mime_type","unknown")
+                ingest_id = handle_uploaded_image(token, file_id, file_kind, caption, msg.get("message_id"))
+                if verbose:
+                    print(f"  handled {file_kind} upload → uploaded_files#{ingest_id}")
+            except Exception as e:
+                tg_send(f"⚠️ Image handler error: {str(e)[:200]}", token, reply_to=msg.get("message_id"))
+                if verbose:
+                    print(f"  image error: {e}")
+            continue
+
         text = (msg.get("text") or "").strip()
         if not text:
             continue
