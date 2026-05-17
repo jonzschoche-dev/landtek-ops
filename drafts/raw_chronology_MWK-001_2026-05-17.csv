@@ -1,0 +1,1036 @@
+date,matter,event_type,parties,data_status,source_link,ocr_reason,source_table,source_id
+1912-01-01,MWK-ESTATE,title_event,,CLEAN,manual_anchor#T-111_1912,structured_db_data,manual_anchor,T-111_1912
+1912-05-10,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-33776, T-91",CLEAN,https://drive.google.com/file/d/1oZbUy6Lk-M-nQu89bfxonQFl_Rft2CM9/view,passes_all_heuristics,documents,609
+1912-05-10,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-32917, T-33415, T-33416",CLEAN,https://drive.google.com/file/d/1ozxG9OahbldBNw4aGm3ICA2eBKXt5g55/view,passes_all_heuristics,documents,610
+1912-05-20,"MWK-CV26360,MWK-TCT4497",Plan,titles: T-4497,CLEAN,https://drive.google.com/file/d/1rJePCaOl-hmug_P7KXqePPIBqtKH1YJz/view,passes_all_heuristics,documents,572
+1922-05-10,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-3100, T-41, T-48, T-48335, T-55",CLEAN,https://drive.google.com/file/d/1NZf0nzIr7wtu_Kuuu0d-yUdTQ7C9m8_x/view,passes_all_heuristics,documents,616
+1947-03-11,MWK-ESTATE,Other,,CLEAN,https://drive.google.com/file/d/1ix5k5wpwqu4W2SH_RTBAl_Glr4FYVKrs/view,passes_all_heuristics,documents,361
+1953-07-12,MWK-TCT4497,Deed,"titles: T-111, T-1111",CLEAN,https://drive.google.com/file/d/1sonHc3ehyQg4yWjbxlTOONZBCvKigzr4/view,passes_all_heuristics,documents,279
+1963-07-13,MWK-ESTATE,Deed,,CLEAN,https://drive.google.com/file/d/1wug1jKQE-jtGcVAc3ccr0aeaXIz8o1_d/view,passes_all_heuristics,documents,291
+1964-06-02,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-125, T-41, T-4110, T-4497, T-5143-237",CLEAN,https://drive.google.com/file/d/1aoS8OznriePiDx1FTvRt-8H_pP_iC7JM/view,passes_all_heuristics,documents,382
+1964-09-01,MWK-CV26360,Complaint,,CLEAN,documents#436,passes_all_heuristics,documents,436
+1975-05-15,MWK-ESTATE,Transaction — DEBIT P49.57 (registration_fee),cp: Land Registration Commission,CLEAN,transactions#135,structured_db_data,transactions,135
+1975-05-30,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-20, T-25, T-440, T-4497",CLEAN,https://drive.google.com/file/d/1D3xX4wIL_6rdqig1gCqijHWsfIS2_F-k/view,passes_all_heuristics,documents,104
+1976-11-09,MWK-TCT4497,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1LSpYM-pacLY40va2BBD6FgCLArDJxhPi/view,classification_missing,documents,562
+1976-11-22,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#1,structured_db_data,instruments_on_title,1
+1979-06-05,MWK-CV26360,Complaint,,CLEAN,documents#435,passes_all_heuristics,documents,435
+1981-01-27,MWK-ESTATE,Tax Document,titles: T-4927,CLEAN,https://drive.google.com/file/d/1IMazGSavZ2CTDW3muLpto3RzvV2p20gA/view,passes_all_heuristics,documents,550
+1988-10-19,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#2,structured_db_data,instruments_on_title,2
+1988-12-07,MWK-TCT4497,Court Filing,,CLEAN,https://drive.google.com/file/d/1TTg9T-2pa9bzeFtBbq4diyBdiFPDlQP4/view,passes_all_heuristics,documents,73
+1990-01-01,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-003-0080, T-4497",CLEAN,https://drive.google.com/file/d/1JFOgLhrqGS8C0GXYie1ArUtmj_h3doW2/view,passes_all_heuristics,documents,97
+1990-03-09,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#3,structured_db_data,instruments_on_title,3
+1991-01-01,"MWK-CV26360,MWK-TCT4497",Power of Attorney,,CLEAN,https://drive.google.com/file/d/1qLYJaNm1B0II1eF-g0xQlgBfPKAPXP1g/view,passes_all_heuristics,documents,35
+1991-01-01,MWK-CV26360,Power of Attorney,"titles: T-1035055, T-20802, T-4814, T-6019",CLEAN,https://drive.google.com/file/d/13Sn_H9QoClPvBeDKmksegXc8JNXagEeF/view,passes_all_heuristics,documents,369
+1991-01-01,"MWK-CV26360,MWK-TCT4497",Contract,"titles: T-20802, T-4814, T-6019",CLEAN,https://drive.google.com/file/d/1rCGKgEeAghstaH-sH2Cii5x_jQRgmC9c/view,passes_all_heuristics,documents,72
+1991-06-26,MWK-ESTATE,Notice,"titles: T-12, T-4503",CLEAN,https://drive.google.com/file/d/1jaZfV8kPO8kz6T5JUdIg11PzzqWgEJ1U/view,passes_all_heuristics,documents,371
+1991-08-01,"MWK-CV26360,MWK-TCT4497",Contract,"titles: T-1991, T-20802, T-4814, T-6019",CLEAN,https://drive.google.com/file/d/1L2F8NEby7BpVNhcj_Rb0yhfeJ4bptCjy/view,passes_all_heuristics,documents,82
+1991-08-17,MWK-ESTATE,Title (TCT/OCT),titles: T-23796,CLEAN,https://drive.google.com/file/d/1T8bvZQbR1BShlXPLWaUGjpvWz7pmUh10/view,passes_all_heuristics,documents,102
+1991-08-20,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-11, T-12, T-4502",CLEAN,https://drive.google.com/file/d/1SoyE8cTaj7bdye40sZhTbxsShO5Nv_94/view,passes_all_heuristics,documents,86
+1991-08-22,"MWK-CV26360,MWK-TCT4497",Deed,"titles: T-22, T-49061",CLEAN,documents#413,passes_all_heuristics,documents,413
+1992-01-01,MWK-ESTATE,Special Power of Attorney,,CLEAN,documents#416,passes_all_heuristics,documents,416
+1992-03-16,"MWK-CV26360,MWK-TCT4497",Affidavit,"titles: T-15, T-52540",CLEAN,documents#441,passes_all_heuristics,documents,441
+1992-03-16,MWK-CV26360,Deed,,CLEAN,documents#432,passes_all_heuristics,documents,432
+1992-03-19,MWK-ESTATE,Special Power of Attorney,,CLEAN,https://drive.google.com/file/d/1QFDQVkdSPtn8dU71mbaqRYpgHfgtc8NQ/view,passes_all_heuristics,documents,329
+1992-05-25,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1hTG3sO0IqVz37Nf8KhRTgzbTvem9Gj8r/view,window_1_consonant_clusters=11/123,documents,108
+1992-05-26,MWK-TCT4497,Tax Document,"titles: T-15, T-72, T-819, T-882",CLEAN,https://drive.google.com/file/d/1fYhms7MEB852AgOdnkmwHK2zyYCYL36b/view,passes_all_heuristics,documents,658
+1992-05-26,MWK-ESTATE,Tax Document,"titles: T-15, T-72, T-819, T-882",CLEAN,https://drive.google.com/file/d/1rXd_dIvQL2l4x3-zXkezKnBX3reY9Efu/view,passes_all_heuristics,documents,636
+1992-11-09,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-10145, T-12, T-14, T-15",CLEAN,https://drive.google.com/file/d/1UlkfCx_i_fBj60nvajcuutxaEw6WJp-L/view,passes_all_heuristics,documents,314
+1993-06-17,"MWK-CV26360,MWK-TCT4497",Request (T-31298→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-31298,CLEAN,title_transfers#9,structured_db_data,title_transfers,9
+1993-06-29,"MWK-TCT4497,MWK-CV26360",Title (TCT/OCT),"titles: T-10, T-30682, T-32478, T-34",CLEAN,https://drive.google.com/file/d/19qUGwmNYtx6kYIFVsezC4akvUFmSXdX6/view,passes_all_heuristics,documents,347
+1993-08-20,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#4,structured_db_data,instruments_on_title,4
+1993-11-12,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#5,structured_db_data,instruments_on_title,5
+1993-11-12,"MWK-CV26360,MWK-TCT4497",Affidavit of Confirmation (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-32917,CLEAN,title_transfers#1,structured_db_data,title_transfers,1
+1993-11-26,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#6,structured_db_data,instruments_on_title,6
+1993-11-26,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#7,structured_db_data,instruments_on_title,7
+1993-11-26,"MWK-CV26360,MWK-TCT4497",Affidavit of Confirmation (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-32917,CLEAN,title_transfers#3,structured_db_data,title_transfers,3
+1993-11-26,"MWK-CV26360,MWK-TCT4497",Deed of Absolute Sale (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | to: Edgardo Santiago | titles: T-32917,CLEAN,title_transfers#2,structured_db_data,title_transfers,2
+1993-11-26,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32917, T-33415-6, T-4497, T-47656, T-48335",CLEAN,https://drive.google.com/file/d/1Mjpi8rtbe2lMrYVW_7dLPxwuQXidbotz/view,passes_all_heuristics,documents,251
+1994-02-11,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32917, T-33686, T-4497, T-47656, T-48335",CLEAN,https://drive.google.com/file/d/19iFIUuttrxFf1skoYZNpaj9yZUcDrIn2/view,passes_all_heuristics,documents,252
+1994-02-11,MWK-ESTATE,title_annotation,,CLEAN,instruments_on_title#8,structured_db_data,instruments_on_title,8
+1994-02-11,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#17,structured_db_data,instruments_on_title,17
+1994-02-11,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#18,structured_db_data,instruments_on_title,18
+1994-02-11,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#19,structured_db_data,instruments_on_title,19
+1994-02-11,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32917, T-34243, T-4497",CLEAN,https://drive.google.com/file/d/1mKsUJV2mhJRUJXnKl5SSgHWsLIVBaj3J/view,passes_all_heuristics,documents,253
+1994-02-15,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-21-6, T-32917, T-3368, T-33686",CLEAN,https://drive.google.com/file/d/1PdcfHe-zLmJ21CsF0an-WCNVfz8eU4Mb/view,passes_all_heuristics,documents,316
+1994-02-28,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#25,structured_db_data,instruments_on_title,25
+1994-02-28,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#26,structured_db_data,instruments_on_title,26
+1994-02-28,"MWK-CV26360,MWK-TCT4497",Deed of Absolute Sale (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | to: Roscoe Leaño | titles: T-32917,CLEAN,title_transfers#4,structured_db_data,title_transfers,4
+1994-06-30,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#27,structured_db_data,instruments_on_title,27
+1994-07-06,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#20,structured_db_data,instruments_on_title,20
+1994-07-06,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#28,structured_db_data,instruments_on_title,28
+1994-09-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-21, T-33350",CLEAN,https://drive.google.com/file/d/1BbNJadK8d3utpxyAtizW_ZIgzHMpmhTK/view,passes_all_heuristics,documents,312
+1995-04-10,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-21, T-306, T-36668, T-51",CLEAN,https://drive.google.com/file/d/1-ItBtu32ljjaVnSFf2MuBQiH8EsOCxaA/view,passes_all_heuristics,documents,319
+1995-04-17,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#21,structured_db_data,instruments_on_title,21
+1995-04-17,"MWK-CV26360,MWK-TCT4497",Affidavit of Confirmation of Sale (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-32917,CLEAN,title_transfers#5,structured_db_data,title_transfers,5
+1995-09-08,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#22,structured_db_data,instruments_on_title,22
+1995-09-08,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#23,structured_db_data,instruments_on_title,23
+1995-09-08,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#24,structured_db_data,instruments_on_title,24
+1996-03-13,MWK-ESTATE,Resolution,,CLEAN,https://drive.google.com/file/d/1LltAPGfrjjA6vLbkDssXkWaeGbvhIz-v/view,passes_all_heuristics,documents,389
+1996-03-13,MWK-ESTATE,Resolution,titles: T-19,CLEAN,https://drive.google.com/file/d/1iLyMt9x80L5UZI7u3lsOYMupGIN7bvc-/view,passes_all_heuristics,documents,577
+1996-04-11,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#29,structured_db_data,instruments_on_title,29
+1996-04-11,"MWK-CV26360,MWK-TCT4497",Request (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-32917,CLEAN,title_transfers#6,structured_db_data,title_transfers,6
+1996-04-21,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#37,structured_db_data,instruments_on_title,37
+1996-05-24,MWK-CV6839,Title (TCT/OCT),titles: T-39630,CLEAN,https://drive.google.com/file/d/1Cl4dS1i8RbM21jyY3tPYbAS401l0KcVn/view,passes_all_heuristics,documents,42
+1996-06-21,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#47,structured_db_data,instruments_on_title,47
+1996-06-21,MWK-CV6839,Government Submission,"titles: T-38838, T-47656, T-48335",CLEAN,https://drive.google.com/file/d/1X6tfxWcDaFWAxrD9046LE4oBRoAJVXiI/view,passes_all_heuristics,documents,256
+1996-09-24,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-24, T-38838",CLEAN,https://drive.google.com/file/d/1DT6uw0AIYyYwuL-E7I7Fa9XRcQUjFIPu/view,passes_all_heuristics,documents,255
+1997-11-26,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#30,structured_db_data,instruments_on_title,30
+1997-11-26,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32917, T-4497",CLEAN,https://drive.google.com/file/d/1oD6i3cQuiJFPz4aoaqFz9zUOZYNAiWvC/view,passes_all_heuristics,documents,254
+1998-01-15,MWK-CV6839,Complaint,"titles: T-319, T-4494",CLEAN,https://drive.google.com/file/d/1jn68S1Wk8v5mO9u0VcL00Ud28PiJOZat/view,passes_all_heuristics,documents,352
+1998-06-05,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#31,structured_db_data,instruments_on_title,31
+1998-10-01,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-48334, T-48335",CLEAN,https://drive.google.com/file/d/1aK56uilPHjSpi0lWWCLDcJI8qf-rWPif/view,passes_all_heuristics,documents,242
+1998-10-02,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-00, T-20, T-20802, T-4497, T-481",CLEAN,https://drive.google.com/file/d/12bHOEsaBuVRiW-4BvFH_dk1nyyUfR_ih/view,passes_all_heuristics,documents,15
+1998-10-07,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-47656, T-48335",CLEAN,https://drive.google.com/file/d/1MbwqTW7sZDOEhFRG_XODuHC8FBrH2Ojb/view,passes_all_heuristics,documents,247
+1998-10-23,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-3100, T-41, T-48, T-48335, T-55",CLEAN,https://drive.google.com/file/d/1YD3yr3XVZyk-rkK-OQfsI5LQCW6-bA43/view,passes_all_heuristics,documents,308
+1999-02-24,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#32,structured_db_data,instruments_on_title,32
+1999-02-24,"MWK-CV26360,MWK-TCT4497",Request (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-32917,CLEAN,title_transfers#7,structured_db_data,title_transfers,7
+1999-03-29,MWK-ESTATE,title_annotation,titles: T-12916,CLEAN,instruments_on_title#67,structured_db_data,instruments_on_title,67
+1999-05-21,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-47656, T-48335, T-49060, T-49736",CLEAN,https://drive.google.com/file/d/1XnSIddcriMlk--dKtNOChMDn4Dt4rmlz/view,passes_all_heuristics,documents,248
+1999-06-02,MWK-ESTATE,Title (TCT/OCT),"titles: T-14, T-51639, T-93",CLEAN,https://drive.google.com/file/d/1yQhu3Fk-buVuBL4BTnqXmaYaI7KM56rp/view,passes_all_heuristics,documents,311
+1999-07-24,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-23, T-30618, T-32619",CLEAN,https://drive.google.com/file/d/1MFikqJ7hzwZ3dweJb2RwfGH6tO3k97IO/view,passes_all_heuristics,documents,111
+1999-08-13,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-13, T-38838, T-49061, T-50792",CLEAN,https://drive.google.com/file/d/1sR5czXK06yr7IqxUEjBsV9qWyCk6mhgB/view,passes_all_heuristics,documents,258
+1999-08-15,MWK-ESTATE,Title,"titles: T-10, T-11, T-12, T-50, T-50192",CLEAN,documents#412,passes_all_heuristics,documents,412
+1999-09-26,MWK-ESTATE,Title (TCT/OCT),"titles: T-33, T-40718",CLEAN,https://drive.google.com/file/d/1HB4jAADUHEm4NKECUoS4e9NI1XjAa5iO/view,passes_all_heuristics,documents,67
+1999-12-08,MWK-CV6839,Court Filing,"titles: T-30681, T-30682, T-30683, T-4494, T-4501",CLEAN,https://drive.google.com/file/d/10ftwHeCYUyBvwXPtMSQJm53bjFXZ8sFo/view,passes_all_heuristics,documents,351
+1999-12-08,MWK-CV6839,Court Filing,"titles: T-30681, T-30682, T-30683, T-4494, T-4501",CLEAN,https://drive.google.com/file/d/1J6rFbeo6PAholZv_DDpR-i6HOlSjUrM6/view,passes_all_heuristics,documents,681
+2000-01-03,MWK-CV6839,Transcript,"titles: T-19, T-20, T-21, T-23, T-24",CLEAN,https://drive.google.com/file/d/1CY40_3HOY7fB-L39Mi0agS7Ot1WbKdtP/view,passes_all_heuristics,documents,359
+2000-01-26,MWK-ESTATE,title_annotation,titles: T-12916,CLEAN,instruments_on_title#68,structured_db_data,instruments_on_title,68
+2000-03-08,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#33,structured_db_data,instruments_on_title,33
+2000-03-08,"MWK-CV26360,MWK-TCT4497",Request (T-32917→?),from: Heirs of Mary Worrick Keesey (or representative) | titles: T-32917,CLEAN,title_transfers#8,structured_db_data,title_transfers,8
+2000-03-21,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-38838, T-49061, T-52416",CLEAN,https://drive.google.com/file/d/1l7RHRR_ESd6fDzKR06rmFgzJQykage5g/view,passes_all_heuristics,documents,260
+2000-04-24,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#34,structured_db_data,instruments_on_title,34
+2000-04-24,MWK-ESTATE,title_annotation,titles: T-12916,CLEAN,instruments_on_title#69,structured_db_data,instruments_on_title,69
+2000-11-13,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-52539, T-53602",CLEAN,https://drive.google.com/file/d/1OTpKjVPhjwwekjMHQqiqS1sUd2vcKeG8/view,passes_all_heuristics,documents,266
+2002-04-06,"MWK-CV26360,MWK-TCT4497",Deed,"titles: T-32917, T-4497, T-52354",CLEAN,https://drive.google.com/file/d/1MmZ72RrxblXhbI-lEiqGqsC3_XrWT7jJ/view,passes_all_heuristics,documents,590
+2003-01-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#35,structured_db_data,instruments_on_title,35
+2003-01-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-32917,CLEAN,instruments_on_title#36,structured_db_data,instruments_on_title,36
+2004-08-16,MWK-TCT4497,Special Power of Attorney,titles: T-2004,CLEAN,https://drive.google.com/file/d/1qs6oiMPk-XBZCx9nsEpf95CrJ2_J32vu/view,passes_all_heuristics,documents,605
+2004-08-16,MWK-CV26360,Special Power of Attorney,"titles: T-2004, T-20902, T-4814",CLEAN,https://drive.google.com/file/d/1-qhb42YmBbmwL7r9bmd3-Q8SdOnfNkfW/view,passes_all_heuristics,documents,676
+2004-09-17,MWK-CV6839,Financial Statement,titles: T-3844,CLEAN,https://drive.google.com/file/d/1jkOd2weJ7rKz60v0N7RWNuZc_rGH-Miu/view,passes_all_heuristics,documents,80
+2005-01-01,MWK-ESTATE,Contract,titles: T-2005-00,CLEAN,https://drive.google.com/file/d/106KBUzeQFONDXDlAAIAiPAvx7tig71d7/view,passes_all_heuristics,documents,85
+2005-05-16,MWK-ESTATE,Email,titles: T-498-1258,CLEAN,https://drive.google.com/file/d/15WUOA3Ras5IbT2uBOZ725ovP51jVmHk2/view,passes_all_heuristics,documents,92
+2005-06-04,MWK-ESTATE,Email,,CLEAN,https://drive.google.com/file/d/1dys7016Am8VV5Fluqp-B5yVk4wsu3JZP/view,passes_all_heuristics,documents,74
+2005-06-05,MWK-ESTATE,Letter,,CLEAN,https://drive.google.com/file/d/1O-Cr57jZ7YJUdqIb9CtRjl-gqh9w1rFd/view,passes_all_heuristics,documents,100
+2005-07-22,MWK-ESTATE,Correspondence,"titles: T-20, T-498-1258",CLEAN,https://drive.google.com/file/d/1b4Epa-KFBLOsNjl1eeiBp1ACiB62mSxh/view,passes_all_heuristics,documents,98
+2005-08-01,MWK-ESTATE,Special Power of Attorney,"titles: T-03, T-04, T-4494",CLEAN,https://drive.google.com/file/d/14ADJ9IC9w-STuUfXlXk0ob_GUvN0vJT0/view,passes_all_heuristics,documents,91
+2005-08-03,MWK-ESTATE,Email,"titles: T-03, T-4494, T-498-1258",CLEAN,https://drive.google.com/file/d/1Tw6kkyZoZKatJvPP8xeo4V21mJPg_bCQ/view,passes_all_heuristics,documents,84
+2005-08-10,MWK-ESTATE,Email,titles: T-10,CLEAN,https://drive.google.com/file/d/1nBPfKrl1FVmd8YQFcsf_RotBjD8gOd2o/view,passes_all_heuristics,documents,77
+2005-08-10,MWK-TCT4497,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1t4y3GJ9T1cnaeUqOvKMLdrNne6UIYvKh/view,window_4_low_lang_density=1/103=0.010,documents,90
+2005-08-10,MWK-TCT4497,Email,"titles: T-10, T-498-1258",CLEAN,https://drive.google.com/file/d/1QpuRSCozxS2lq_C5hYVu-GpOhaS32_kq/view,passes_all_heuristics,documents,83
+2005-08-15,"MWK-CV26360,MWK-TCT4497",Contract,"titles: T-2005, T-4814",CLEAN,https://drive.google.com/file/d/1jYomg2I1nGbRlNWHgnvWecVBhBbv2n8t/view,passes_all_heuristics,documents,281
+2005-08-15,MWK-TCT4497,Contract,titles: T-4814,CLEAN,https://drive.google.com/file/d/1zdz2MAOCmJGiZP0Va9wdjuT1M4cZzZHG/view,passes_all_heuristics,documents,292
+2005-08-15,MWK-ESTATE,Power of Attorney,titles: T-2005,CLEAN,https://drive.google.com/file/d/1aXJrj1w0AF3fZmEvM68oFm6yZU6jT4e8/view,passes_all_heuristics,documents,225
+2005-08-15,MWK-CV26360,Special Power of Attorney,"titles: T-2005, T-4814",CLEAN,documents#430,passes_all_heuristics,documents,430
+2005-09-15,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#38,structured_db_data,instruments_on_title,38
+2005-09-15,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#48,structured_db_data,instruments_on_title,48
+2005-09-15,"MWK-CV26360,MWK-TCT4497",Government Submission,titles: T-52540,CLEAN,https://drive.google.com/file/d/11mrXwPxFepJOWQK2SPUygxzMIkZdT_zX/view,passes_all_heuristics,documents,257
+2005-10-06,MWK-ESTATE,Demand Letter,,CLEAN,https://drive.google.com/file/d/1V_7RpYlcYyFmHaLyN6jvHiqByq-F05SF/view,passes_all_heuristics,documents,94
+2005-10-06,MWK-ESTATE,Tax Document,titles: T-88888,CLEAN,https://drive.google.com/file/d/1fpLQf1HrOciz1NqOWEb6SlDdnkHXRBei/view,passes_all_heuristics,documents,81
+2007-06-20,"MWK-CV26360,MWK-TCT4497",Government Submission,titles: T-47657,CLEAN,https://drive.google.com/file/d/1k1f8HGI5yjfyUsNsOCOMfPQyhZSdD3cV/view,passes_all_heuristics,documents,250
+2009-12-09,MWK-ESTATE,Memorandum,,CLEAN,https://drive.google.com/file/d/1CCnkhzYCEa9uuRIOFAgZjcLrcVJLipZ3/view,passes_all_heuristics,documents,492
+2010-09-16,MWK-TCT4497,Title (TCT/OCT),"titles: T-02, T-106, T-2010000",CLEAN,https://drive.google.com/file/d/1F_5RFpKVVcHmQA1iaZiBvOoh42J8cfUX/view,passes_all_heuristics,documents,27
+2011-03-29,MWK-ESTATE,"Transaction — DEBIT P1,857.32 (rpt)",,CLEAN,transactions#29,structured_db_data,transactions,29
+2011-12-12,MWK-CV6839,Court Filing,,CLEAN,https://drive.google.com/file/d/1kC33gHhy5mONWVSqrOmBp1DUKAaLVMgJ/view,passes_all_heuristics,documents,673
+2012-02-20,MWK-ESTATE,Contract,,CLEAN,https://drive.google.com/file/d/1MEY7Te-0Kd8rNbdBnCtbxGxTSYusPNkQ/view,passes_all_heuristics,documents,38
+2014-06-23,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1SbbAhTgfyLMBXUzx-8WB1fp8EF8FVj1j/view,passes_all_heuristics,documents,467
+2014-06-23,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1UKrHNxc7txh952YHWydoD5faoJRE-Y-N/view,passes_all_heuristics,documents,151
+2014-06-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1s460VBKhXVJzkllO_jglM2Q9zyuodF6t/view,window_2_too_few_words=12,documents,136
+2014-06-23,MWK-ESTATE,Tax Document,titles: T-51641,CLEAN,https://drive.google.com/file/d/141ATaxkUZukNATKZQJCvsZf90VYr6Wti/view,passes_all_heuristics,documents,30
+2014-06-23,MWK-ESTATE,Tax Document,"titles: T-12, T-431",CLEAN,https://drive.google.com/file/d/1KIRWQ5nnx6T5mb6U4y9Mj9UQcGBIA5bH/view,passes_all_heuristics,documents,36
+2014-06-23,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1XTkAXlFZ2aLkkAojWsAgxqhn9uUIbyj5/view,passes_all_heuristics,documents,37
+2014-06-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1Kpe5NWaaKRt-amV-kdAu5db3tpHrC0Dq/view,window_2_too_few_words=6,documents,105
+2014-06-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1Cspu0AKhTvCvAEXQrpUkyDRWhw2jEu6k/view,window_2_too_few_words=18,documents,128
+2014-06-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1KvdGlkB95h-zsdLWlzkuLpU3VXYvFD0Z/view,window_2_too_few_words=18,documents,131
+2014-06-23,"MWK-CV26360,MWK-TCT4497",Tax Document,titles: T-52537,CLEAN,https://drive.google.com/file/d/1M_tIXe3EGm1jxH-38ZtFKb2rhESBFdjt/view,passes_all_heuristics,documents,130
+2014-06-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1yxdazQAT7CfLiMdU7hSbI8es8oxzV375/view,window_2_too_few_words=9,documents,134
+2014-06-23,"MWK-CV26360,MWK-TCT4497",[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/13mt7sJRqqLBPNPkmekzcBBqY6RDlc6A1/view,classification_missing,documents,468
+2014-06-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1zvdkWMNe-1Dl2lC0HOH6nQKOLKb0jf2J/view,classification_missing,documents,469
+2015-09-04,MWK-ESTATE,Newspaper,"titles: T-24, T-26",CLEAN,https://drive.google.com/file/d/1JbALDSR9-cvADpHOeKdILYaKKerKBjc6/view,passes_all_heuristics,documents,651
+2015-11-18,MWK-CV6839,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1J-20tckkYCKGc5Nv4Rzb9vdq13DBzUB7/view,window_4_low_lang_density=7/186=0.038,documents,675
+2015-11-18,MWK-CV6839,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1yCbVrUMPD2KhF60h8rAztrxVTqhFwJHG/view,window_4_low_lang_density=7/185=0.038,documents,683
+2016-01-01,"MWK-CV26360,MWK-TCT4497",Deed of Absolute Sale (alleged 2016) (T-52540→T-079-2021002126),"from: Cesar de la Fuente (under revoked SPA, per Doc 388) | to: Gloria Balane | titles: T-52540, T-079-2021002126",CLEAN,title_transfers#36,structured_db_data,title_transfers,36
+2016-02-07,MWK-CV26360,Deed,,CLEAN,https://drive.google.com/file/d/1VX4tR5dHjEwqlFLIVElaZwalmkECTIdH/view,passes_all_heuristics,documents,239
+2016-03-30,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1ZifZvtoKNe-htq_ORMfHqWNgp6yTfuIg/view,passes_all_heuristics,documents,70
+2016-03-30,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1UbdJR5cJ7kCctJfNmvQUbfd2y91ncFPd/view,passes_all_heuristics,documents,125
+2016-03-31,MWK-ESTATE,"Transaction — DEBIT P8,977.82 (rpt)",,CLEAN,transactions#1,structured_db_data,transactions,1
+2016-03-31,MWK-ESTATE,"Transaction — DEBIT P8,978.82 (rpt)",,CLEAN,transactions#2,structured_db_data,transactions,2
+2016-04-14,MWK-CV26360,Deed,,CLEAN,https://drive.google.com/file/d/1cUH--wq4XL2hhMrwZ6H48G0s_zlODkgm/view,passes_all_heuristics,documents,366
+2016-08-12,MWK-ESTATE,Transaction — DEBIT P759.54 (registration_fee),cp: Land Registration Authority,CLEAN,transactions#38,structured_db_data,transactions,38
+2016-09-24,"MWK-CV26360,MWK-TCT4497",Deed,"titles: T-06, T-11, T-38838, T-525240, T-52540",CLEAN,documents#415,passes_all_heuristics,documents,415
+2016-09-29,"MWK-CV26360,MWK-TCT4497",Deed,titles: T-52540,CLEAN,https://drive.google.com/file/d/1R7XvmmO6OF-wOiVGjs6dsbBREPVxMXPr/view,passes_all_heuristics,documents,233
+2016-09-29,MWK-ESTATE,Judicial Affidavit,titles: T-15,CLEAN,https://drive.google.com/file/d/1KcMnUuTBuv9wvJEwQcvKNvLjcL3t2r87/view,passes_all_heuristics,documents,584
+2016-10-10,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#39,structured_db_data,instruments_on_title,39
+2016-10-10,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#40,structured_db_data,instruments_on_title,40
+2016-10-10,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#49,structured_db_data,instruments_on_title,49
+2016-10-10,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#50,structured_db_data,instruments_on_title,50
+2016-10-20,MWK-ESTATE,"Transaction — DEBIT P2,025.00 (filing_fee)","cp: Regional Trial Court, Branch 41, Daet, Camarines Norte",CLEAN,transactions#36,structured_db_data,transactions,36
+2016-10-20,"MWK-CV26360,MWK-TCT4497",Petition,"titles: T-38838, T-46460, T-47655, T-48336, T-49062",CLEAN,https://drive.google.com/file/d/1XRy8vTEpdpxCmNhpaMXvwEJubKi_LTb5/view,passes_all_heuristics,documents,677
+2017-03-13,MWK-CV6839,Transcript,,CLEAN,https://drive.google.com/file/d/15Fbv46w3Rg3oxCls5DE94LJmGsHlwwLJ/view,passes_all_heuristics,documents,679
+2017-03-13,MWK-CV6839,Transcript,titles: T-6839,CLEAN,https://drive.google.com/file/d/1sosHpRHuOALgNKR8E448opDFlAyQZh90/view,passes_all_heuristics,documents,682
+2017-03-16,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#41,structured_db_data,instruments_on_title,41
+2017-03-16,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#51,structured_db_data,instruments_on_title,51
+2017-03-28,"MWK-CV26360,MWK-TCT4497",Deed,titles: T-52540,CLEAN,https://drive.google.com/file/d/12iPhMakwhaQ9_Eo0zKMSwQuxbb7Q0AnW/view,passes_all_heuristics,documents,240
+2017-06-21,MWK-CV6839,vital_record,,CLEAN,manual_anchor#cesar_dela_fuente_death_2017,structured_db_data,manual_anchor,cesar_dela_fuente_death_2017
+2017-07-28,MWK-ESTATE,Affidavit,"titles: T-11, T-12, T-13, T-14, T-15",CLEAN,https://drive.google.com/file/d/11zXsw44IZZ3T-rOx2eAEFx9VjVzoWt9m/view,passes_all_heuristics,documents,525
+2017-08-02,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1PAhx8z9BGuhFPXt75uEqig0yyxcOWIEa/view,window_2_too_few_words=18,documents,129
+2017-08-15,MWK-ESTATE,"Transaction — DEBIT P5,264.02 (rpt)",,CLEAN,transactions#3,structured_db_data,transactions,3
+2017-09-11,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1J9QjhjrSKXel1HRKCZfSueoUwU_yk3Pa/view,classification_missing,documents,654
+2018-05-17,MWK-CV6839,Court Filing,,CLEAN,https://drive.google.com/file/d/1RPvVBYAFEDMyLr9LOq6n2nEwzmil-hAm/view,passes_all_heuristics,documents,364
+2018-08-02,"MWK-CV26360,MWK-TCT4497",Title (TCT),"titles: T-079-2018001329, T-106, T-12, T-2018, T-2018001",CLEAN,https://drive.google.com/file/d/1oBU3G1qajU-pCH2DUa_ohVYnJyiJ2lVv/view,passes_all_heuristics,documents,322
+2018-08-02,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-106, T-12, T-2018, T-2018001, T-52536",CLEAN,https://drive.google.com/file/d/1TkV1LrsQsZprmgEWlBPaTOnAXE6ci_q2/view,passes_all_heuristics,documents,607
+2018-08-02,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32917, T-52536",CLEAN,https://drive.google.com/file/d/18Fu95Y4nluRrOh18MG7jio-PHNG1EnJo/view,passes_all_heuristics,documents,261
+2018-09-18,MWK-ESTATE,Tax Document,titles: T-402,CLEAN,https://drive.google.com/file/d/1rB21i48_z7D9ziQeAU-u00NvmXxNKmTd/view,passes_all_heuristics,documents,150
+2018-10-30,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1kewZDk92IyDwol3gkQm31XKAh_LSjkrA/view,passes_all_heuristics,documents,66
+2019-02-15,MWK-ESTATE,Resolution,,CLEAN,https://drive.google.com/file/d/104t-ZT6s4DgPbDtJBgMv3p1tdLqvC_aP/view,passes_all_heuristics,documents,513
+2019-02-20,"MWK-CV26360,MWK-TCT4497",Complaint,"titles: T-52540, T-8216",CLEAN,documents#444,passes_all_heuristics,documents,444
+2019-06-04,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1rAcFeamWLGIlZXJ1MC2u3UhaM4mkMhAb/view,window_3_too_few_words=23,documents,138
+2019-07-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1tsvyjDRDCivWC_b9z3mTxTrJK_rmszx2/view,window_1_too_few_words=7,documents,32
+2019-08-15,MWK-CV6839,Correspondence,"titles: T-2005, T-2019, T-4600",CLEAN,https://drive.google.com/file/d/1xwKokv9KRyqIQfVEsgPFTyCeGrE8eH6J/view,passes_all_heuristics,documents,299
+2019-09-03,MWK-ESTATE,Transaction — DEBIT P273.35 (registration_fee),cp: Land Registration Authority,CLEAN,transactions#39,structured_db_data,transactions,39
+2019-09-03,MWK-ESTATE,Title (TCT/OCT),"titles: T-101855, T-1960, T-2836",CLEAN,https://drive.google.com/file/d/1K-spWRuDJvyE6GSzQs5A9PekAn1630qC/view,passes_all_heuristics,documents,659
+2020-01-22,MWK-TCT4497,Title (TCT/OCT),"titles: T-01, T-2140, T-22, T-4502",CLEAN,https://drive.google.com/file/d/1jyG4WuKVy1D02z8CnxDM8CcaNC0y_S7s/view,passes_all_heuristics,documents,9
+2020-01-22,MWK-TCT4497,Title (TCT/OCT),"titles: T-13331, T-241, T-24163",CLEAN,https://drive.google.com/file/d/1FecmnAV3NOJ0rePGd5zvzvF70sAvinNo/view,passes_all_heuristics,documents,33
+2020-01-22,MWK-TCT4497,Title (TCT/OCT),"titles: T-102, T-1989, T-320, T-4501, T-603",CLEAN,https://drive.google.com/file/d/1FDlOzqLZp1kmEE8Gut-x_WPxX9Gh58JQ/view,passes_all_heuristics,documents,11
+2020-01-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-13, T-25, T-30681, T-4814",CLEAN,https://drive.google.com/file/d/1SJUKA6rsKiND3vRGTJvwWgI4zFPBali1/view,passes_all_heuristics,documents,12
+2020-01-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-1970, T-23796",CLEAN,https://drive.google.com/file/d/1wJKn1HIFehHkOrnyf7IrsM08YG_T4cIq/view,passes_all_heuristics,documents,26
+2020-01-22,MWK-ESTATE,Title (TCT/OCT),titles: T-4503,CLEAN,https://drive.google.com/file/d/1AuXC6yuzeaEiChTIsmzVsm4NFjWdj24c/view,passes_all_heuristics,documents,14
+2020-01-22,MWK-ESTATE,Title (TCT/OCT),titles: T-4492,CLEAN,https://drive.google.com/file/d/1vxlq2ES00s1OaJOvNW95eFWGdchVCMvx/view,passes_all_heuristics,documents,146
+2020-01-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-051, T-772",CLEAN,https://drive.google.com/file/d/13cYvnNstauBnX4XDC-H3BxCROq2ZMaSg/view,passes_all_heuristics,documents,282
+2020-01-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-13, T-25, T-30681, T-4814",CLEAN,https://drive.google.com/file/d/1-3oniDB5YhhYQNk2diO63NbxUzpJJuK-/view,passes_all_heuristics,documents,346
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#80,structured_db_data,transactions,80
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#102,structured_db_data,transactions,102
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#119,structured_db_data,transactions,119
+2020-01-22,MWK-TCT4497,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#125,structured_db_data,transactions,125
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#155,structured_db_data,transactions,155
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#160,structured_db_data,transactions,160
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#171,structured_db_data,transactions,171
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#172,structured_db_data,transactions,172
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#173,structured_db_data,transactions,173
+2020-01-22,MWK-ESTATE,"Transaction — DEBIT P5,454.96 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#174,structured_db_data,transactions,174
+2020-01-27,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-12, T-13, T-15, T-20",CLEAN,https://drive.google.com/file/d/1kHqRyiGCCfcBlPn1bLkSIw95KK8LfSa8/view,passes_all_heuristics,documents,10
+2020-01-27,MWK-TCT4497,Title (TCT/OCT),"titles: T-13, T-16, T-22, T-23, T-30",CLEAN,https://drive.google.com/file/d/138cFUXDEfgxNFKN1NyEdwzb2airw2Yks/view,passes_all_heuristics,documents,230
+2020-05-29,MWK-ESTATE,Demand Letter,,CLEAN,https://drive.google.com/file/d/1byjvjYl0QXPySmyLkyjqoq-KE57gx1UE/view,passes_all_heuristics,documents,231
+2020-06-24,MWK-CV26360,Receipt,,CLEAN,https://drive.google.com/file/d/1Ome2G2pjLL_gLMidok4qSggbDpplQ4W-/view,passes_all_heuristics,documents,237
+2020-06-24,MWK-ESTATE,"Transaction — DEBIT P27,276.00 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#116,structured_db_data,transactions,116
+2020-09-25,"MWK-CV26360,MWK-TCT4497",Notice,"titles: T-2005, T-4497",CLEAN,https://drive.google.com/file/d/1Smvj3C6BAD6V-2kbBW-4vCLzR1NQUfRV/view,passes_all_heuristics,documents,76
+2020-09-30,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-079-2018001329, T-2021002, T-4497, T-52540",CLEAN,https://drive.google.com/file/d/1pwzK2eJMzXggI6fj5tLE6e9kR-MgBXZb/view,passes_all_heuristics,documents,358
+2020-09-30,"MWK-CV26360,MWK-TCT4497",Correspondence,titles: T-4497,CLEAN,https://drive.google.com/file/d/1cJIer9BLN9fHJFW0-L-OE6lDq6nzYQmy/view,passes_all_heuristics,documents,79
+2020-10-15,"MWK-CV26360,MWK-TCT4497",Affidavit,"titles: T-15, T-2005, T-4497",CLEAN,documents#431,passes_all_heuristics,documents,431
+2021-05-20,"MWK-CV26360,MWK-TCT4497",Plan,"titles: T-23, T-440, T-4497",CLEAN,https://drive.google.com/file/d/1C_T4uuEDkApuIWu67JkNfkomgLDMTfca/view,passes_all_heuristics,documents,287
+2021-08-13,MWK-CV26360,Receipt,titles: T-2021-08,CLEAN,https://drive.google.com/file/d/1vWcAiBI1oLaySmOmy6JglfFdKqgyaBqe/view,passes_all_heuristics,documents,236
+2021-08-13,MWK-ESTATE,Transaction — DEBIT P100.00 (rpt),"cp: Municipal Treasurer, Municipality of Mercedes, Camarines Norte",CLEAN,transactions#117,structured_db_data,transactions,117
+2021-09-21,"MWK-CV26360,MWK-TCT4497",Tax Document,titles: T-52540,CLEAN,https://drive.google.com/file/d/1QQVt-TE01eGoJQ290kbOBLb_YtPCTKWP/view,passes_all_heuristics,documents,238
+2021-11-18,MWK-ESTATE,Title (TCT/OCT),,CLEAN,https://drive.google.com/file/d/1duxUgvDPXR8AUwIyH0-Hn6sG8JaE8wwu/view,passes_all_heuristics,documents,587
+2021-11-23,"MWK-CV26360,MWK-TCT4497",Title,"titles: T-106, T-12, T-2021, T-2021002, T-52540",CLEAN,documents#427,passes_all_heuristics,documents,427
+2021-11-23,"MWK-CV26360,MWK-TCT4497",Title,"titles: T-106, T-12, T-2021002, T-52540",CLEAN,documents#410,passes_all_heuristics,documents,410
+2021-11-23,"MWK-CV26360,MWK-TCT4497",[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1WJv4DDAx1XWElnEVWxCXeBQ2kdLiPC3E/view,window_3_low_lang_density=0/80=0.000,documents,20
+2021-11-23,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-1035055, T-106, T-12, T-2021002, T-52540",CLEAN,https://drive.google.com/file/d/1t9ZoWBJmUtNYuHtVEPxY2y_ZrV9Tct_j/view,passes_all_heuristics,documents,368
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#42,structured_db_data,instruments_on_title,42
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#43,structured_db_data,instruments_on_title,43
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#44,structured_db_data,instruments_on_title,44
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#46,structured_db_data,instruments_on_title,46
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#52,structured_db_data,instruments_on_title,52
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#53,structured_db_data,instruments_on_title,53
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#55,structured_db_data,instruments_on_title,55
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#56,structured_db_data,instruments_on_title,56
+2021-11-23,"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#57,structured_db_data,instruments_on_title,57
+2022-05-17,MWK-ESTATE,Tax Document,"titles: T-401, T-402, T-404",CLEAN,https://drive.google.com/file/d/18CoC2CLKLHIJENVRu5hDgTytFyBDjAaK/view,passes_all_heuristics,documents,152
+2022-11-25,MWK-ESTATE,Receipt,"titles: T-196, T-2022-11",CLEAN,https://drive.google.com/file/d/11Pj0rHYH4M7-Biw_ZjizGB-DjkbJcTff/view,passes_all_heuristics,documents,147
+2022-11-25,MWK-ESTATE,Receipt,"titles: T-196, T-2022-11",CLEAN,documents#157,passes_all_heuristics,documents,157
+2022-12-02,MWK-ESTATE,Receipt,"titles: T-2022-12, T-28279",CLEAN,https://drive.google.com/file/d/1Ch4p9kr1EFLamKKXZSukxlpMwoXgoLCu/view,passes_all_heuristics,documents,145
+2022-12-02,MWK-ESTATE,"Transaction — DEBIT P2,827.94 (rpt)",,CLEAN,transactions#30,structured_db_data,transactions,30
+2022-12-02,"MWK-CV26360,MWK-TCT4497","Transaction — DEBIT P2,827.94 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#118,structured_db_data,transactions,118
+2022-12-05,MWK-ESTATE,Transaction — DEBIT P623.08 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#146,structured_db_data,transactions,146
+2022-12-05,MWK-ESTATE,Transaction — DEBIT P623.08 (registration_fee),cp: Registry of Deeds for Province of Camarines Norte,CLEAN,transactions#166,structured_db_data,transactions,166
+2022-12-06,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-208, T-2399, T-476, T-47655, T-4814",CLEAN,https://drive.google.com/file/d/1_2g37hIJY2tIyQNJRR93CRCEOFecr4VD/view,passes_all_heuristics,documents,144
+2022-12-06,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-05, T-10, T-12, T-15, T-17",CLEAN,https://drive.google.com/file/d/1dGCz2Um8O82hMIfTqGp8oGYeWWb6yAU4/view,passes_all_heuristics,documents,48
+2022-12-06,MWK-ESTATE,"Transaction — DEBIT P1,907.43 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#113,structured_db_data,transactions,113
+2022-12-06,MWK-ESTATE,"Transaction — DEBIT P1,907.43 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#126,structured_db_data,transactions,126
+2022-12-06,MWK-ESTATE,"Transaction — DEBIT P1,907.43 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#148,structured_db_data,transactions,148
+2022-12-06,MWK-ESTATE,"Transaction — DEBIT P1,907.43 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#157,structured_db_data,transactions,157
+2022-12-06,MWK-ESTATE,"Transaction — DEBIT P1,907.43 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#168,structured_db_data,transactions,168
+2022-12-07,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-034-20, T-11, T-20, T-5253, T-52536",CLEAN,https://drive.google.com/file/d/1v05q2SATmH6CSuFNKPtiR74JRMaF-o4O/view,passes_all_heuristics,documents,46
+2022-12-07,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-20, T-20802, T-2399, T-4814, T-48336",CLEAN,https://drive.google.com/file/d/1JcpwMDSNHHH7jYOwfHqplrlCQwqE00L0/view,passes_all_heuristics,documents,18
+2022-12-07,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-22, T-49062",CLEAN,https://drive.google.com/file/d/1CUntis-wLkCk2IwHVOQKKxYR1rTLJCsc/view,passes_all_heuristics,documents,29
+2022-12-20,MWK-ESTATE,Title (TCT/OCT),"titles: T-01, T-12, T-13, T-15, T-20",CLEAN,https://drive.google.com/file/d/1xtqqDabDFLOEaZB2rdF1dohIDvieXy6m/view,passes_all_heuristics,documents,135
+2022-12-20,MWK-ESTATE,"Transaction — DEBIT P1,246.16 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#144,structured_db_data,transactions,144
+2022-12-21,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-20, T-20302, T-23, T-4497, T-47656",CLEAN,https://drive.google.com/file/d/1O9WTiI8KtOryUPTvoHI0PhI-2d9uttYQ/view,passes_all_heuristics,documents,52
+2022-12-27,MWK-CV6839,Title (TCT/OCT),"titles: T-20, T-20802, T-2399, T-32914, T-4497",CLEAN,https://drive.google.com/file/d/1ISgdVpqp913eaOcWHogqignAAG6vvK2J/view,passes_all_heuristics,documents,107
+2022-12-27,MWK-ESTATE,Title (TCT/OCT),"titles: T-12, T-20, T-317, T-32912, T-4814",CLEAN,https://drive.google.com/file/d/15MbcpYS1O6dgUkOimNsGIQA4VglmouS6/view,passes_all_heuristics,documents,142
+2022-12-27,"MWK-CV26360,MWK-TCT4497",Receipt,"titles: T-2022-12, T-32911, T-32912, T-32913, T-32914",CLEAN,documents#156,passes_all_heuristics,documents,156
+2022-12-27,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-1996, T-203, T-49, T-49060",CLEAN,https://drive.google.com/file/d/1nd39rvqhF0k6B0D9hshmYaXRoNSA9zrz/view,passes_all_heuristics,documents,241
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#115,structured_db_data,transactions,115
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#123,structured_db_data,transactions,123
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#128,structured_db_data,transactions,128
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#129,structured_db_data,transactions,129
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#130,structured_db_data,transactions,130
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#134,structured_db_data,transactions,134
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds for the Province of Camarines Norte,CLEAN,transactions#143,structured_db_data,transactions,143
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#145,structured_db_data,transactions,145
+2022-12-27,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#150,structured_db_data,transactions,150
+2022-12-28,MWK-TCT4497,Title (TCT/OCT),"titles: T-0012, T-450, T-4501",CLEAN,https://drive.google.com/file/d/1lUk-wXJhqh6jrrr3dWCZcGr4wvuLFT11/view,passes_all_heuristics,documents,171
+2022-12-28,MWK-TCT4497,Title (TCT/OCT),"titles: T-20, T-221361, T-33365",CLEAN,https://drive.google.com/file/d/15gfrfCVJcjHpl86MtTXsbMK425ellUNA/view,passes_all_heuristics,documents,124
+2022-12-28,MWK-TCT4497,Title (TCT/OCT),"titles: T-11, T-20, T-20802, T-2399, T-32913",CLEAN,https://drive.google.com/file/d/18pKLXnoi9k5lgCQSCm8NFzRQHxwg5rHQ/view,passes_all_heuristics,documents,45
+2022-12-28,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-13, T-21, T-31, T-4010, T-49061",CLEAN,https://drive.google.com/file/d/1Oh10bzBjn1th8pdGjAfcm268nXbBbTFr/view,passes_all_heuristics,documents,50
+2022-12-28,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-31, T-4497, T-49037",CLEAN,https://drive.google.com/file/d/1HBgMZjitHiIT5KjMT1_uHFnCgdMa_p-E/view,passes_all_heuristics,documents,120
+2022-12-28,MWK-ESTATE,"Transaction — DEBIT P4,602.74 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#114,structured_db_data,transactions,114
+2023-01-01,MWK-ESTATE,Tax Document,"titles: T-2023, T-2023-01, T-590",CLEAN,https://drive.google.com/file/d/1A6yeTAUqLJhvTj8x_dkqp6M58ZKUrfAa/view,passes_all_heuristics,documents,139
+2023-01-03,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-12, T-13, T-38838, T-4814, T-48336",CLEAN,https://drive.google.com/file/d/1PQCBIB_Pz5Qhx48eBt2k8i19sI5T_vyK/view,passes_all_heuristics,documents,249
+2023-01-03,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-12, T-13, T-38838, T-4814",CLEAN,https://drive.google.com/file/d/1t62-BvpJX0aix-F0XWiE0-Ap3o5ScKyH/view,passes_all_heuristics,documents,23
+2023-01-03,"MWK-CV26360,MWK-TCT4497",Receipt,"titles: T-10236, T-11798, T-12800, T-12873, T-13343",CLEAN,https://drive.google.com/file/d/1KWtEizdOOLquffjXLhS-sgwMupjXnRwr/view,passes_all_heuristics,documents,179
+2023-01-03,MWK-CV26360,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds for the Province of Camarines Norte,CLEAN,transactions#68,structured_db_data,transactions,68
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#75,structured_db_data,transactions,75
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#105,structured_db_data,transactions,105
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#131,structured_db_data,transactions,131
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#132,structured_db_data,transactions,132
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#137,structured_db_data,transactions,137
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#138,structured_db_data,transactions,138
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (cnr)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#141,structured_db_data,transactions,141
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (cnr)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#152,structured_db_data,transactions,152
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#163,structured_db_data,transactions,163
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#165,structured_db_data,transactions,165
+2023-01-03,MWK-ESTATE,"Transaction — DEBIT P5,099.21 (registration_fee)",cp: Registry of Deeds for the Province of Camarines Norte,CLEAN,transactions#169,structured_db_data,transactions,169
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-15, T-20802, T-47061, T-4814, T-51",CLEAN,https://drive.google.com/file/d/1xWRB774modbx7YBsMjj6PKxt6N6uOWS0/view,passes_all_heuristics,documents,272
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-051607-1971, T-10, T-20802, T-31, T-47051",CLEAN,https://drive.google.com/file/d/1BGK_yZRqtT21gEd1VNP8t45ryfUxqFY_/view,passes_all_heuristics,documents,96
+2023-01-04,MWK-ESTATE,Title (TCT/OCT),"titles: T-12873, T-13, T-49, T-51",CLEAN,https://drive.google.com/file/d/1DpZAYzkkZk7rPWv-hdBs9NtlpX0g6ZdJ/view,passes_all_heuristics,documents,69
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-13343, T-4344, T-4497, T-56, T-7393",CLEAN,https://drive.google.com/file/d/1D6Pefzs1vSpAATw12_DkWkNMOq6NDCEg/view,passes_all_heuristics,documents,95
+2023-01-04,MWK-ESTATE,Title (TCT/OCT),"titles: T-12800, T-1509",CLEAN,https://drive.google.com/file/d/17DvQnfQmDppzCIU-QGqURj8WMOD2ogRw/view,passes_all_heuristics,documents,112
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title,"titles: T-051007, T-19051, T-20002, T-24, T-4614",CLEAN,documents#426,passes_all_heuristics,documents,426
+2023-01-04,MWK-ESTATE,Title (TCT/OCT),"titles: T-2082, T-23, T-2399, T-32911, T-4914",CLEAN,https://drive.google.com/file/d/1BfuLlGr4quBjY9ChLwjzutZTEiaAq7kc/view,passes_all_heuristics,documents,17
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-12, T-13, T-20802, T-2399",CLEAN,https://drive.google.com/file/d/1NAYVlTup3mnPsUeXwVbB2KZ-mlQkTOiC/view,passes_all_heuristics,documents,21
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-109, T-25, T-305, T-31",CLEAN,https://drive.google.com/file/d/1OZp_ZVDTsZHNwelsIw9bfEMDEc_w8bOb/view,passes_all_heuristics,documents,39
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-4014, T-49062",CLEAN,https://drive.google.com/file/d/1JAe8LJnNRVGtMIavJpDnCxg033w6s8P0/view,passes_all_heuristics,documents,40
+2023-01-04,MWK-TCT4497,Title (TCT/OCT),"titles: T-20, T-2379, T-23796, T-539",CLEAN,https://drive.google.com/file/d/1o6p5G3awlhhdOsaLz-e8rsVjDZw5DKQJ/view,passes_all_heuristics,documents,44
+2023-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-12, T-25, T-41, T-49061",CLEAN,https://drive.google.com/file/d/1PO-blIRJVWzd1fVXSkRGFEcsncvyZ5gH/view,passes_all_heuristics,documents,117
+2023-01-04,MWK-TCT4497,"Transaction — DEBIT P1,049.19 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#153,structured_db_data,transactions,153
+2023-01-04,MWK-ESTATE,"Transaction — DEBIT P1,049.19 (registration_fee)",cp: Registry of Deeds for Province of Camarines Norte,CLEAN,transactions#159,structured_db_data,transactions,159
+2023-02-17,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-15, T-2023-02, T-4497, T-8216",CLEAN,https://drive.google.com/file/d/1D2qRRYGH6e8L64g6xZGF3XUwZw5jFLcs/view,passes_all_heuristics,documents,165
+2023-02-21,MWK-CV6839,Receipt,"titles: T-106, T-111, T-140, T-2023-02, T-32917",CLEAN,documents#153,passes_all_heuristics,documents,153
+2023-02-21,MWK-ESTATE,Receipt,"titles: T-2023-02, T-45616, T-69404",CLEAN,documents#160,passes_all_heuristics,documents,160
+2023-02-22,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-12, T-15, T-4497, T-52540, T-8216",CLEAN,https://drive.google.com/file/d/1K_7zszwL_-mtSkPU9QJUzuuNZOUnBEqK/view,passes_all_heuristics,documents,176
+2023-02-22,"MWK-CV26360,MWK-TCT4497",Affidavit,"titles: T-079-202, T-15, T-32917, T-38838, T-39211",CLEAN,https://drive.google.com/file/d/1gJfey1o7knHkqooItjtHMHLmJGhkCpsi/view,passes_all_heuristics,documents,284
+2023-02-22,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-15, T-4497",CLEAN,https://drive.google.com/file/d/1ULH-MXL49QNO3XIFqU9mh27aqmx7LwpA/view,passes_all_heuristics,documents,294
+2023-02-22,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-15, T-4497",CLEAN,https://drive.google.com/file/d/1eG9k3NNdOfBXa2vdRuD_6WfhqTY0m0Es/view,passes_all_heuristics,documents,183
+2023-02-22,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-11, T-12, T-15, T-2399",CLEAN,https://drive.google.com/file/d/1EIGxMFpfXZZHGj4D4vns-P2MCqKPmZky/view,passes_all_heuristics,documents,47
+2023-02-22,MWK-TCT4497,Title (TCT/OCT),"titles: T-21, T-23, T-2399, T-31, T-46460",CLEAN,https://drive.google.com/file/d/1Isno7be86N5DbKmf7DFrf2gaicFmeLei/view,passes_all_heuristics,documents,143
+2023-02-22,"MWK-CV26360,MWK-TCT4497",Affidavit,"titles: T-079-202, T-15, T-32917, T-38838, T-39211",CLEAN,https://drive.google.com/file/d/1ex48kphOBfps1OHl4budhXzOXXPui51g/view,passes_all_heuristics,documents,187
+2023-02-22,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-15, T-4497",CLEAN,https://drive.google.com/file/d/1UXDuCgsk6gYSBAteoZp9JV3sVLIv4Ump/view,passes_all_heuristics,documents,298
+2023-02-22,MWK-ESTATE,Transaction — DEBIT P858.24 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#127,structured_db_data,transactions,127
+2023-02-22,MWK-ESTATE,Transaction — DEBIT P546.70 (registration_fee),"cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#147,structured_db_data,transactions,147
+2023-02-22,MWK-ESTATE,Transaction — DEBIT P858.24 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#151,structured_db_data,transactions,151
+2023-02-22,MWK-ESTATE,Transaction — DEBIT P858.24 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#154,structured_db_data,transactions,154
+2023-02-22,MWK-ESTATE,Transaction — DEBIT P858.24 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#156,structured_db_data,transactions,156
+2023-02-22,MWK-ESTATE,Transaction — DEBIT P546.70 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#164,structured_db_data,transactions,164
+2023-02-23,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-12, T-15, T-16, T-17, T-20",CLEAN,https://drive.google.com/file/d/1AJfxoid6-upDzR8wm4gmQ1XcAyrZyzDL/view,passes_all_heuristics,documents,31
+2023-02-23,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-11, T-12, T-13, T-14",CLEAN,https://drive.google.com/file/d/1KNuBebuQSs8KyG7LfLsOy_oqsO3xMa9B/view,passes_all_heuristics,documents,22
+2023-02-23,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-01, T-10, T-14, T-15, T-16",CLEAN,https://drive.google.com/file/d/164ZBaP_ctRyYOJeWQ9DqiKu4mc6fCn1q/view,passes_all_heuristics,documents,34
+2023-02-23,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-12, T-13, T-14, T-15",CLEAN,https://drive.google.com/file/d/1fvCxEZaNb9zqmVyFaae5qr9MpLQ-GBuv/view,passes_all_heuristics,documents,41
+2023-05-17,MWK-ESTATE,Petition for Certiorari,,CLEAN,https://drive.google.com/file/d/1Sgj7UaeAcNjONHWetzbuq-F1_B4rHsZl/view,passes_all_heuristics,documents,581
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1QSkVZ0bX5Q6CtOF5ZSox5R48183NrOvs/view,window_4_too_few_words=0,documents,123
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1p-y6qtyR7dOobSp4FKnfmdsKcHhyydrB/view,window_4_too_few_words=23,documents,133
+2023-05-31,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1j7RiG0dZjn_ffxQYW1VoZl5z-6noVaQJ/view,passes_all_heuristics,documents,59
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1tGeuzVnMZp7YwvQzsm5Y-XzSj7d_1aox/view,window_1_too_few_words=9,documents,141
+2023-05-31,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1VarPTCBF7a3EuEWuzLzyQmu7CD94PZ4j/view,passes_all_heuristics,documents,122
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1LJSDrFhvRMCU_CaoJTwX_a_a54RmKpCR/view,window_4_too_few_words=1,documents,61
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1SbnLoVwtSoN63HqL71cCS1uJZKCMUA68/view,window_1_too_few_words=1,documents,49
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1msipo22uNw9ryr-gW64yWRNjBXv9CsQj/view,window_4_too_few_words=0,documents,53
+2023-05-31,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1NGlHyR04TjyQWeW9yp-ANChqVvCZYgPw/view,passes_all_heuristics,documents,57
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/134q0guC_etc85wIfFT8RKWo--hYQWUmZ/view,window_1_too_few_words=22,documents,118
+2023-05-31,MWK-ESTATE,Tax Document,titles: T-51641,CLEAN,https://drive.google.com/file/d/1ThME9OLrqSa-b6jBCwa4H2m78pnWkQBt/view,passes_all_heuristics,documents,54
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1jZ1fT6_JK84CTD-gG6gpC71XaF9Nz2zt/view,window_4_too_few_words=28,documents,56
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1HzGQXzQJFZ5CaN3PpTQt1t9nLy31HVbQ/view,window_1_too_few_words=28,documents,51
+2023-05-31,MWK-ESTATE,Tax Document,titles: T-30,CLEAN,https://drive.google.com/file/d/11dz-FGZ-Q6hwbt3rnXGscM4nz3Cb2cCA/view,passes_all_heuristics,documents,55
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/19tL-cUzJU-Sa7tmoov_gLf-SQGF0aWnH/view,window_3_too_few_words=18,documents,58
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1ksP2TvfvnzQ3EJcadwpSQkH2HcsLiKVe/view,window_4_too_few_words=3,documents,60
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1GJ8uqi2Owa00gnLhLiiMcpCt69t13hp_/view,window_1_too_few_words=17,documents,65
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1oj7SNKeUm13QyTF6Jy70hfHy5urPaaXq/view,window_4_too_few_words=24,documents,99
+2023-05-31,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1QjV853TRxgPaMEouz_91Bw8CAzFw3zEj/view,passes_all_heuristics,documents,106
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1ZzS4UktwTfBgN4TQa0OObuNxJIDjWefz/view,window_3_too_few_words=24,documents,132
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/12VLSn9kADGby08vXqrM1wPt5TkxL097n/view,window_1_too_few_words=13,documents,119
+2023-05-31,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1RuHPnB0fXedG_XERgYWPCUz8yc-VESMy/view,window_2_too_few_words=0,documents,121
+2023-05-31,MWK-CV6839,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1-VCI2Wij5x76MhrDqENePeoS8aXmeFV1/view,window_4_too_few_words=5,documents,140
+2023-07-02,MWK-CV6839,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1vFn0vHqb-09fEOx3JsESEBy7mVQD9nkb/view,window_4_low_lang_density=4/103=0.039,documents,345
+2023-07-27,MWK-CV26360,Tax Document,,CLEAN,documents#428,passes_all_heuristics,documents,428
+2023-07-27,MWK-ESTATE,Deed,titles: T-403,CLEAN,https://drive.google.com/file/d/16oDTp9_oMbJSgH54fSr5sMog25VZdmob/view,passes_all_heuristics,documents,527
+2023-07-27,MWK-ESTATE,Deed,titles: T-403,CLEAN,https://drive.google.com/file/d/1_JHAQALPLUqIgLexAroXqwkCAuNHI2pX/view,passes_all_heuristics,documents,528
+2023-08-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-04, T-11038, T-129, T-15, T-25",CLEAN,https://drive.google.com/file/d/1hmNt2eLhBZSrLz_pDbCWLnVDFREzwzWm/view,passes_all_heuristics,documents,348
+2023-08-04,MWK-ESTATE,Transaction — DEBIT P617.06 (registration_fee),cp: Land Registration Authority / Registry of Deeds of Camarines Norte,CLEAN,transactions#35,structured_db_data,transactions,35
+2023-08-04,MWK-TCT4497,Transaction — DEBIT P617.06 (registration_fee),cp: Land Registration Authority,CLEAN,transactions#79,structured_db_data,transactions,79
+2023-08-04,MWK-TCT4497,Transaction — DEBIT P617.06 (registration_fee),cp: Land Registration Authority,CLEAN,transactions#161,structured_db_data,transactions,161
+2023-08-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-04, T-11038, T-129, T-15, T-25",CLEAN,https://drive.google.com/file/d/1xIqnzKHR7tY1emeYKo54FoynZaacfVg5/view,passes_all_heuristics,documents,684
+2023-08-07,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-04, T-11038, T-129, T-15, T-25",CLEAN,https://drive.google.com/file/d/1NN4vlFKS2JFomCQnJvymxWEWaXCuOg5t/view,passes_all_heuristics,documents,25
+2023-08-29,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-2023, T-26, T-4497",CLEAN,https://drive.google.com/file/d/1s2MDwYpzPLSV-K_uuJDGzWvzBZUffXF0/view,passes_all_heuristics,documents,277
+2023-08-29,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-2023, T-26, T-4497",CLEAN,https://drive.google.com/file/d/1PaYmASQhaZTMJcIv89_o0uOC9gpkvdrQ/view,passes_all_heuristics,documents,228
+2023-08-29,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-2023, T-26, T-32911, T-32917, T-4497",CLEAN,https://drive.google.com/file/d/1ebkOKuUKRN0sM_jxMWQa24gfrCPZRhjA/view,passes_all_heuristics,documents,678
+2023-09-01,MWK-ESTATE,Other,titles: T-2023-09,CLEAN,https://drive.google.com/file/d/1CreKZ3wLEm2ZM9q7sFfrYjLZunjrxv1P/view,passes_all_heuristics,documents,235
+2023-09-01,MWK-ESTATE,Tax Document,titles: T-270,CLEAN,https://drive.google.com/file/d/1iTxiiFxqlLdkMpNUDt01d-ui0HGPzdTu/view,passes_all_heuristics,documents,290
+2023-09-12,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1qk5_l4U-Pokt7E-3v9YLAwcskWm2buvq/view,window_2_low_lang_density=7/184=0.038,documents,652
+2023-09-18,MWK-ESTATE,Transaction — DEBIT P667.29 (registration_fee),cp: Registry of Deeds for the Province of Camarines Norte,CLEAN,transactions#149,structured_db_data,transactions,149
+2023-09-19,MWK-ESTATE,Title (TCT/OCT),"titles: T-21, T-27, T-30, T-3064",CLEAN,https://drive.google.com/file/d/19p3rCr0bJ5oLkbeiQwaD0vU3OiU0mo7q/view,passes_all_heuristics,documents,43
+2023-09-21,MWK-ESTATE,Title (TCT/OCT),"titles: T-11750, T-40, T-51",CLEAN,https://drive.google.com/file/d/1ZSy7oZFok7X3qDJyFCszYsIHVH9q_UxP/view,passes_all_heuristics,documents,71
+2023-09-21,MWK-ESTATE,Transaction — DEBIT P896.43 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#133,structured_db_data,transactions,133
+2023-09-21,MWK-ESTATE,Transaction — DEBIT P896.43 (cnr),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#139,structured_db_data,transactions,139
+2023-09-21,MWK-ESTATE,Transaction — DEBIT P896.43 (registration_fee),cp: Land Registration Authority,CLEAN,transactions#140,structured_db_data,transactions,140
+2023-09-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-11752, T-51",CLEAN,https://drive.google.com/file/d/1z4JjBArI1fwoJsQnpdXp5oe88jPHAhLw/view,passes_all_heuristics,documents,110
+2023-09-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-110, T-11753, T-21, T-41",CLEAN,https://drive.google.com/file/d/1m_OtrRzDRpNRHAl21EwaUKjcrg04Bgzi/view,passes_all_heuristics,documents,93
+2023-09-25,MWK-ESTATE,Decision,,CLEAN,https://drive.google.com/file/d/18tNkEYzVo2jKFKSxp6IAGzq6WyN7gMGv/view,passes_all_heuristics,documents,585
+2023-09-25,MWK-ESTATE,Motion,,CLEAN,https://drive.google.com/file/d/1jaOAeJ514bz-9PdSgCgoZhVPeAtz7ORC/view,passes_all_heuristics,documents,582
+2023-09-26,MWK-CV26360,Receipt,,CLEAN,https://drive.google.com/file/d/1uTDMwB2_repgfSLhFmr22XedD8R1t2_P/view,passes_all_heuristics,documents,64
+2023-09-29,MWK-ESTATE,Tax Document,"titles: T-1512210, T-22, T-701",CLEAN,https://drive.google.com/file/d/1NHbYcmT4dGEFR5i7xab_JLkrYKkTFa_2/view,passes_all_heuristics,documents,218
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P6,038.00 (rpt)",,CLEAN,transactions#4,structured_db_data,transactions,4
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P168,437.44 (rpt)",,CLEAN,transactions#5,structured_db_data,transactions,5
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P73,922.08 (rpt)",,CLEAN,transactions#6,structured_db_data,transactions,6
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P168,100.00 (rpt)",,CLEAN,transactions#7,structured_db_data,transactions,7
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P21,163.00 (rpt)",,CLEAN,transactions#8,structured_db_data,transactions,8
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P79,411.68 (rpt)",,CLEAN,transactions#9,structured_db_data,transactions,9
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P48,886.48 (rpt)",,CLEAN,transactions#10,structured_db_data,transactions,10
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P1,038.40 (rpt)",,CLEAN,transactions#11,structured_db_data,transactions,11
+2023-09-29,MWK-ESTATE,Transaction — DEBIT P505.34 (rpt),,CLEAN,transactions#12,structured_db_data,transactions,12
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P1,581.46 (rpt)",,CLEAN,transactions#13,structured_db_data,transactions,13
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P1,267.96 (rpt)",,CLEAN,transactions#14,structured_db_data,transactions,14
+2023-09-29,MWK-ESTATE,Transaction — DEBIT P435.70 (rpt),,CLEAN,transactions#15,structured_db_data,transactions,15
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P2,732.16 (rpt)",,CLEAN,transactions#16,structured_db_data,transactions,16
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P1,501.66 (rpt)",,CLEAN,transactions#17,structured_db_data,transactions,17
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P3,612.18 (rpt)",,CLEAN,transactions#18,structured_db_data,transactions,18
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P1,240.02 (rpt)",,CLEAN,transactions#19,structured_db_data,transactions,19
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P2,121.78 (rpt)",,CLEAN,transactions#20,structured_db_data,transactions,20
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P8,943.82 (rpt)",,CLEAN,transactions#21,structured_db_data,transactions,21
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P12,418.94 (rpt)",,CLEAN,transactions#22,structured_db_data,transactions,22
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P107,144.85 (rpt)",,CLEAN,transactions#23,structured_db_data,transactions,23
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P7,460.05 (rpt)",,CLEAN,transactions#24,structured_db_data,transactions,24
+2023-09-29,MWK-ESTATE,Transaction — DEBIT P18.41 (rpt),,CLEAN,transactions#25,structured_db_data,transactions,25
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P44,251.86 (rpt)",,CLEAN,transactions#26,structured_db_data,transactions,26
+2023-09-29,MWK-ESTATE,"Transaction — DEBIT P6,018.00 (rpt)",,CLEAN,transactions#28,structured_db_data,transactions,28
+2023-09-30,MWK-CV6839,Tax Document,titles: T-2023-09,CLEAN,https://drive.google.com/file/d/1qqI-gMpvueYhgA8Wlj-rWFkGAAuLj7FR/view,passes_all_heuristics,documents,126
+2023-09-30,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1EPkqPqy336FrWXa-EchtPvPGVu1mJp8Z/view,window_1_too_few_words=15,documents,63
+2023-09-30,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1I8M2r7VScTHpXGDD2CRWTeie5opH0Fv3/view,window_1_too_few_words=8,documents,62
+2023-09-30,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1lMKsoluTYFcAQ367w_vUw-1hoxkMHx3f/view,window_1_too_few_words=6,documents,127
+2023-09-30,MWK-ESTATE,Tax Document,titles: T-152,CLEAN,https://drive.google.com/file/d/1cdWw9yE3IE7aPHV0Z40c27URcLSYRvnh/view,passes_all_heuristics,documents,137
+2023-10-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/14bsuPCVW3lVPn05zihE-Dog2fBhdvV_N/view,window_2_too_few_words=26,documents,191
+2023-10-01,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-079, T-1484, T-2021002, T-32, T-3241",CLEAN,https://drive.google.com/file/d/17eMGLJg2jqEY0RCZIyjSsUkE-xunYGE8/view,passes_all_heuristics,documents,288
+2023-10-01,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32916, T-37868, T-52202",CLEAN,https://drive.google.com/file/d/1fpWzzz3d2Ge7QH02BcGON8eSO2BYAy9o/view,passes_all_heuristics,documents,268
+2023-10-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1tjZ2obdFacVRFShg0410xImLyoS36kbp/view,window_1_vowel_ratio=0.28,documents,116
+2023-10-01,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-32917, T-33776, T-4497, T-47656, T-48335",CLEAN,https://drive.google.com/file/d/1wCWZ1hEfkwg_fSIZgdpqHbsTJZfPKWby/view,passes_all_heuristics,documents,283
+2023-10-01,MWK-ESTATE,Power of Attorney,,CLEAN,https://drive.google.com/file/d/1TsqOmxPuKBTfrqKLIGjTd-sEHRwhacnI/view,passes_all_heuristics,documents,246
+2023-10-01,MWK-TCT4497,Title (TCT/OCT),"titles: T-00467, T-11, T-1146, T-12, T-4503",CLEAN,https://drive.google.com/file/d/1TE87aPUq2XhZ0RjGuFtCYxRadIi2vza2/view,passes_all_heuristics,documents,87
+2023-10-01,MWK-ESTATE,Tax Document,"titles: T-020-01, T-10, T-1115, T-12, T-13",CLEAN,https://drive.google.com/file/d/1KzXod2Ey2GSU686gB7wuxI86rZH_87Mq/view,passes_all_heuristics,documents,75
+2023-10-01,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1NcpaaH-DfjFjDEoUVeV78O_xr4EQsa4N/view,passes_all_heuristics,documents,295
+2023-10-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1ayt5odXWWvqaR9fP4iGvAEvciNZB3y4P/view,window_2_too_few_words=26,documents,192
+2023-10-01,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-30682, T-32478, T-34",CLEAN,https://drive.google.com/file/d/1iIWP9OtH-leKEYBK2g7YXkCxf2yMXJW3/view,passes_all_heuristics,documents,13
+2023-10-01,MWK-ESTATE,Tax Document,titles: T-2023,CLEAN,https://drive.google.com/file/d/1b20DDBF3NVeMJE0uFYqj6nsgzzC8P41p/view,passes_all_heuristics,documents,223
+2023-10-01,"MWK-CV26360,MWK-TCT4497",Other,"titles: T-01444, T-023457, T-32, T-322, T-3241",CLEAN,https://drive.google.com/file/d/12k3c2PhePYrBhDRso2x3bBPCYcH3ktPL/view,passes_all_heuristics,documents,234
+2023-10-01,MWK-ESTATE,Deed,,CLEAN,https://drive.google.com/file/d/1rGbwO-jwQMu9guKwZp-QmVJvyJGhTscn/view,passes_all_heuristics,documents,278
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00030,CLEAN,https://drive.google.com/file/d/1sDm3JPgQ5I41DyP441pdPvOd9-OpfskD/view,passes_all_heuristics,documents,155
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/18Kl39xDjhPl1SY9s9u-8hhef0xH7CK4j/view,passes_all_heuristics,documents,161
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-003-00243,CLEAN,https://drive.google.com/file/d/1nvGX_wrvU4ETv6QD5wT3xcOAv6-whfqP/view,passes_all_heuristics,documents,186
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00270,CLEAN,https://drive.google.com/file/d/1oVAAnKBZTO9RhajpdPCKQPngg5GXCgei/view,passes_all_heuristics,documents,178
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1vRozXpuBol7IRpMjvcmnTpvEbNEVk-TW/view,passes_all_heuristics,documents,174
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00258,CLEAN,https://drive.google.com/file/d/1h1EMW_uAFz2vQwz5wko0U4i3ZgaJzIVI/view,passes_all_heuristics,documents,177
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1heY87MQLBBf5RI8dyttrvy8OiXlx3TZ2/view,passes_all_heuristics,documents,163
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00187,CLEAN,https://drive.google.com/file/d/1dJZLcxAMFOSYlpDt38ngmeOmb1lR12yP/view,passes_all_heuristics,documents,166
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-14,CLEAN,https://drive.google.com/file/d/1jc38knN8KrawKMrkELuK1bzK5FJz1L-h/view,passes_all_heuristics,documents,169
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00252,CLEAN,https://drive.google.com/file/d/1lDsQSnTSS7UtDJVQggrHP4iMXCc_ej-d/view,passes_all_heuristics,documents,158
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-003-00035,CLEAN,https://drive.google.com/file/d/1radSZ18nGUXG5itvqDvIrq9zJGR6793O/view,passes_all_heuristics,documents,181
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1XkPh4sZd5OdVQF9zfVEzllA_N5YiO2rD/view,passes_all_heuristics,documents,172
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00045,CLEAN,https://drive.google.com/file/d/1PyRVfkf_xZkW3eQhCFDYJZ6i1U9AoiOR/view,passes_all_heuristics,documents,159
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1tJTa4Q00202lcbztXL177n5-jB8SoPKc/view,passes_all_heuristics,documents,162
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1QWBpQIzkW9lBmssv1O7fWu71uw80wiPz/view,passes_all_heuristics,documents,164
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00223,CLEAN,https://drive.google.com/file/d/1RcBWLmIRMxVG5ImExJkXsQnvJO4tI-Yd/view,passes_all_heuristics,documents,167
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-001-00227,CLEAN,https://drive.google.com/file/d/1giUfk6jd2vAQQvBbNt13ot3_yBxKFNV-/view,passes_all_heuristics,documents,170
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-36,CLEAN,https://drive.google.com/file/d/1eiWt_CUKPzTn_UkTGB4Ov9G_XkfDeBWs/view,passes_all_heuristics,documents,175
+2023-10-02,MWK-CV6839,Tax Document,titles: T-001-00230,CLEAN,https://drive.google.com/file/d/1goPCyxjxX8iG82RVIoU4KJ12If4sY19C/view,passes_all_heuristics,documents,173
+2023-10-02,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1vTQhTHWrF4vkbnRJO17PlwIq6M7EpUAj/view,passes_all_heuristics,documents,180
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-003-00145,CLEAN,https://drive.google.com/file/d/107mpiLQqsCeNAnJ2RDdQdinsKqKxdSQH/view,passes_all_heuristics,documents,185
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-003-00265,CLEAN,https://drive.google.com/file/d/18XyC42EZye0qvLzzHqDoum2s1du935uw/view,passes_all_heuristics,documents,182
+2023-10-02,MWK-ESTATE,Tax Document,titles: T-003-00051,CLEAN,https://drive.google.com/file/d/1cF-nMMGZf48Y-EKRIxA2xjFHvWJP2WHe/view,passes_all_heuristics,documents,184
+2023-10-05,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-21, T-45616, T-46459",CLEAN,https://drive.google.com/file/d/1YfUw_tQCj1Fipj2zCTlNJO8bWP5arGhy/view,passes_all_heuristics,documents,262
+2023-10-13,"MWK-CV26360,MWK-TCT4497",Summary,"titles: T-106, T-22, T-30681, T-30683, T-30862",CLEAN,https://drive.google.com/file/d/12TwCe-fm8rwwieqysACconcaZhqX9Ugj/view,passes_all_heuristics,documents,335
+2023-10-23,MWK-ESTATE,Demand Letter,"titles: T-10, T-25",CLEAN,https://drive.google.com/file/d/17t4O9-IKR1sBF4m9Va0-E1y0XimmHSQg/view,passes_all_heuristics,documents,109
+2023-11-07,MWK-CV26360,Affidavit,,CLEAN,documents#408,passes_all_heuristics,documents,408
+2024-01-01,MWK-ESTATE,Tax Document,"titles: T-025-07, T-2024",CLEAN,https://drive.google.com/file/d/1w_XvV_-zlfpEslX_hW60MpD3iY7zNj6G/view,passes_all_heuristics,documents,189
+2024-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1iqNfgG8QT8E3yAxNWSae-TWbyPYsqWwW/view,window_1_low_lang_density=1/120=0.008,documents,226
+2024-03-07,MWK-ESTATE,Reply,,CLEAN,https://drive.google.com/file/d/1FHa2NZO3QecVtqnCSbbyC81_FXB_qgUF/view,passes_all_heuristics,documents,583
+2024-04-10,MWK-ESTATE,"Transaction — DEBIT P28,427.69 (rpt)",,CLEAN,transactions#27,structured_db_data,transactions,27
+2024-04-10,MWK-ESTATE,"Transaction — DEBIT P28,427.69 (rpt)",,CLEAN,transactions#33,structured_db_data,transactions,33
+2024-04-26,MWK-ESTATE,Affidavit,,CLEAN,https://drive.google.com/file/d/1oeQPMbpmhqYlJX7XDOsx18VG7bIZPecl/view,passes_all_heuristics,documents,637
+2024-05-15,MWK-ESTATE,Court Filing,,CLEAN,https://drive.google.com/file/d/1buuXda7eAMpTR62EFbDCc0-cNCnSEhrC/view,passes_all_heuristics,documents,580
+2024-06-28,MWK-ESTATE,Tax Document,"titles: T-819, T-822",CLEAN,https://drive.google.com/file/d/1ypVPUdmpeFSYpTakc15AcDi5JXufu0Vj/view,passes_all_heuristics,documents,635
+2024-09-28,MWK-ESTATE,Receipt,"titles: T-1034115, T-221861, T-32911",CLEAN,https://drive.google.com/file/d/1oHPwvLqh-aHd3P72wQVHDdvVDM6vxDz_/view,passes_all_heuristics,documents,275
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1JNwVhk-CPrW0wR79n-ZGVXZyDALESjll/view,passes_all_heuristics,documents,217
+2024-10-07,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1jEx4iggwCwWpueKTEaZeSPWPwgF2kVz6/view,window_1_too_few_words=18,documents,221
+2024-10-07,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1MQ9rE3UScpqgKRHAWwnChKD6VbLgYfJf/view,window_1_too_few_words=0,documents,196
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/14Oauk3tUobz5y_2jvJ_5AJOE4ZXc14sV/view,passes_all_heuristics,documents,200
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1Ug-edrtYCheB9n9TzSCDSHiawHxd4RrM/view,passes_all_heuristics,documents,203
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1ums4H242AL_XAzguHY-EnJKFmbcnU2Su/view,passes_all_heuristics,documents,208
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1xixmfgQKHnFt_KJ7Nqy_88cPcAcCrmF-/view,passes_all_heuristics,documents,198
+2024-10-07,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1WY8iOo86OBrayAEquKQoOVGgvOpWPb_8/view,window_1_too_few_words=22,documents,213
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/15gmezWXB7BPzz2eIBliNjIXPTFzMf_A8/view,passes_all_heuristics,documents,202
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1UXk9oN-e_Dg0s__wjdSSADuwwo7l5KRR/view,passes_all_heuristics,documents,212
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1_NNwUOu8qptjys6kUvH5qF6EHxT_4ppm/view,passes_all_heuristics,documents,193
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1nFaRee-tYMf-tJvs_g1nPwWYRYQjn7ho/view,passes_all_heuristics,documents,197
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1o_WyFem89TDF8LMh0Emiz-nB1pReEkC4/view,passes_all_heuristics,documents,199
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1UEaBGamG0sBGY8EmjapIQzhh6JFyTNhy/view,passes_all_heuristics,documents,206
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1w7uKOQX0oFNAcR0t3ufGTG0wTyLdwbov/view,passes_all_heuristics,documents,207
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1kjbNTm_PoZmp2S8GTdbMJocosM-Af3JX/view,passes_all_heuristics,documents,204
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1uTv8d4-q4YdvFsZJ2_VrqZX8x8a9BBdS/view,passes_all_heuristics,documents,205
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1wzoPKZIzlBJipRZgMAMUCtFz6rdldYxO/view,passes_all_heuristics,documents,210
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/19fK262eiOkaGWFYkN4pQficPDXHjL75m/view,passes_all_heuristics,documents,211
+2024-10-07,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1dEDuM_5IXHyZaBkz4JDwbSRTSZeEslxY/view,passes_all_heuristics,documents,209
+2024-10-07,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1C75NCG5uv05-pEIDVldVUdyXtXPwHz4o/view,window_1_too_few_words=15,documents,219
+2024-10-07,MWK-CV6839,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1N7T6bSYjF6iLDsaCAoBMe9C14Fr9o4qT/view,window_1_too_few_words=7,documents,214
+2024-10-07,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/16GgVq3ZBDxGhB7jWahFo9USfAb0Q1t7X/view,window_1_too_few_words=6,documents,220
+2024-10-11,MWK-ESTATE,Tax Document,"titles: T-2024, T-2178, T-41",CLEAN,https://drive.google.com/file/d/1v0426XwUWON2BFZOTmVBtttTZV8-0kCF/view,passes_all_heuristics,documents,190
+2024-10-31,MWK-ESTATE,Tax Document,,CLEAN,https://drive.google.com/file/d/1ci3tguHJ4j2Aplqzo6K1bVQY0fssnk_O/view,passes_all_heuristics,documents,195
+2024-11-28,MWK-ESTATE,Receipt,titles: T-1034115,CLEAN,https://drive.google.com/file/d/1dkII7ymY4w200Rnr-Lzv89hO0V5Z8yg7/view,passes_all_heuristics,documents,222
+2024-11-28,MWK-ESTATE,Transaction — DEBIT P311.54 (registration_fee),cp: Land Registration Authority / Registry of Deeds for Province of Camarines Norte,CLEAN,transactions#103,structured_db_data,transactions,103
+2024-11-28,MWK-ESTATE,Transaction — DEBIT P781.86 (registration_fee),cp: Land Registration Authority (Register of Deeds for Province of Camarines Norte),CLEAN,transactions#120,structured_db_data,transactions,120
+2025-01-01,MWK-ESTATE,Tax Document,titles: T-2025,CLEAN,https://drive.google.com/file/d/1CjeQam-eS0MRMIiglHOuk3B1fpfhvDto/view,passes_all_heuristics,documents,194
+2025-01-01,MWK-ARTA-0792,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#706,classification_missing,documents,706
+2025-01-01,MWK-ARTA-0792,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#707,classification_missing,documents,707
+2025-01-01,MWK-ARTA-0747,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#782,classification_missing,documents,782
+2025-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#814,classification_missing,documents,814
+2025-01-01,MWK-ARTA-0747,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#828,classification_missing,documents,828
+2025-01-01,MWK-ARTA-0792,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#839,classification_missing,documents,839
+2025-01-01,MWK-ARTA-0747,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#881,classification_missing,documents,881
+2025-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1_ItQMUCd3c2q2x4ltshbI3uSPwmKKk9-/view,window_1_too_few_words=24,documents,685
+2025-01-01,MWK-ARTA-0747,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#882,classification_missing,documents,882
+2025-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#906,classification_missing,documents,906
+2025-01-04,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-04, T-10, T-12030, T-2240, T-410",CLEAN,https://drive.google.com/file/d/1Nf-YytnEPi0E7_S9wRqapVSjqBVHUoa9/view,passes_all_heuristics,documents,224
+2025-01-04,"MWK-CV26360,MWK-TCT4497",Tax Document,"titles: T-100, T-52537, T-920",CLEAN,https://drive.google.com/file/d/1h3LeTlwdnxmMWxvnVZxoO6yHaWu2wj7F/view,passes_all_heuristics,documents,232
+2025-01-08,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-20802, T-4497, T-48",CLEAN,https://drive.google.com/file/d/1qnUOEgNTTXl017FUJLsLx-7Q115gUil4/view,passes_all_heuristics,documents,270
+2025-01-08,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-20802, T-400, T-4501, T-4814, T-52539",CLEAN,https://drive.google.com/file/d/1kF6vJnz0zbVT6YD3y2JIfwMhbc2vLQxD/view,passes_all_heuristics,documents,264
+2025-01-08,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-20802, T-400, T-4501, T-4814, T-52539",CLEAN,https://drive.google.com/file/d/1CXcOcxRHkytJAWyJHegESSRLXTu1G989/view,passes_all_heuristics,documents,263
+2025-01-08,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-20802, T-4497, T-48",CLEAN,https://drive.google.com/file/d/1veODfKdpq8XL-3ZXzJdmm5LbCTI8UiLY/view,passes_all_heuristics,documents,271
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#101,structured_db_data,transactions,101
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)",cp: Land Registration Authority / Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#104,structured_db_data,transactions,104
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#106,structured_db_data,transactions,106
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#107,structured_db_data,transactions,107
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#110,structured_db_data,transactions,110
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#111,structured_db_data,transactions,111
+2025-01-08,MWK-ESTATE,"Transaction — DEBIT P5,231.84 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#112,structured_db_data,transactions,112
+2025-01-09,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-15, T-20, T-2537, T-4814",CLEAN,https://drive.google.com/file/d/117FUGPkbhIhN0LhUhBH9v0RC3_X_NGV5/view,passes_all_heuristics,documents,274
+2025-01-09,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-11, T-12, T-13, T-14",CLEAN,https://drive.google.com/file/d/1RrOgvtjNPtrGMOhJ-F_CH1t1GmcmxAbH/view,passes_all_heuristics,documents,265
+2025-01-09,MWK-ESTATE,Title (TCT/OCT),"titles: T-203, T-2399, T-30, T-4314, T-45964",CLEAN,https://drive.google.com/file/d/1bD08ij8gl6hUH1JilhfNy2fqXCuDvQlP/view,passes_all_heuristics,documents,273
+2025-01-09,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-11, T-12, T-13, T-14",CLEAN,https://drive.google.com/file/d/1-vwdGhPhRCLDYzRIZYuQzr2VX5dpJGBg/view,passes_all_heuristics,documents,286
+2025-01-10,MWK-CV26360,Email — Fwd: draft campaign plan,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4489,structured_db_data,gmail_messages,4489
+2025-01-19,MWK-ESTATE,"Email — Fwd: Unconnected and USAID: Community Network in Caringo, Camarines Norte",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4484,structured_db_data,gmail_messages,4484
+2025-02-07,MWK-ESTATE,Email — Re: Update on your USAID Project site,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4470,structured_db_data,gmail_messages,4470
+2025-02-10,MWK-ESTATE,Email — Re: Update on your USAID Project site,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4465,structured_db_data,gmail_messages,4465
+2025-02-11,MWK-ESTATE,Title (TCT/OCT),"titles: T-10040, T-15, T-21, T-33681",CLEAN,https://drive.google.com/file/d/1B9ga52MYsK_91h_Yd0QChPho7-anIE7N/view,passes_all_heuristics,documents,317
+2025-02-17,MWK-CV26360,Email — Re: my letter-first draft,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4461,structured_db_data,gmail_messages,4461
+2025-02-25,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-079-2018001329, T-0966698, T-2021002, T-52540",CLEAN,https://drive.google.com/file/d/1N4Eiv5mbBNIvI3ZuBzhLvYP2MmEZ_R3h/view,passes_all_heuristics,documents,357
+2025-02-25,MWK-CV26360,Receipt,"titles: T-1035055, T-96",CLEAN,https://drive.google.com/file/d/1EhUUitLYXjEIaQpZuUqWDI4gDfaMUzQt/view,passes_all_heuristics,documents,367
+2025-02-25,MWK-CV26360,"Transaction — DEBIT P2,319.43 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#65,structured_db_data,transactions,65
+2025-02-25,MWK-CV26360,"Transaction — DEBIT P2,319.43 (cnr)","cp: Land Registration Authority (Registry of Deeds, Province of Camarines Norte)",CLEAN,transactions#66,structured_db_data,transactions,66
+2025-02-25,MWK-CV26360,Transaction — DEBIT P546.70 (registration_fee),"cp: Land Registration Authority, Registry of Deeds for Province of Camarines Norte",CLEAN,transactions#67,structured_db_data,transactions,67
+2025-02-25,MWK-ESTATE,"Transaction — DEBIT P2,319.43 (registration_fee)",cp: Land Registration Authority,CLEAN,transactions#76,structured_db_data,transactions,76
+2025-02-25,MWK-TCT4497,Transaction — DEBIT P546.70 (registration_fee),"cp: Land Registration Authority / Registry of Deeds, Camarines Norte",CLEAN,transactions#77,structured_db_data,transactions,77
+2025-02-25,MWK-ESTATE,Transaction — DEBIT P705.48 (registration_fee),cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#78,structured_db_data,transactions,78
+2025-02-26,MWK-CV26360,Complaint,titles: T-05,CLEAN,documents#429,passes_all_heuristics,documents,429
+2025-03-06,MWK-ESTATE,Government Submission,,CLEAN,https://drive.google.com/file/d/1D533kaRrW8DGayksT1N0yDDJYCaZ-OJP/view,passes_all_heuristics,documents,360
+2025-03-06,MWK-ESTATE,Correspondence,,CLEAN,https://drive.google.com/file/d/1gXOU5_Z2KQUb4Ot53n1Z_f8tzQ7pzxlx/view,passes_all_heuristics,documents,356
+2025-03-13,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1d5r4p0mXsiEI96is8mKX-YPs3Sazrn9-/view,window_1_low_lang_density=2/178=0.011,documents,285
+2025-03-13,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1K4sUf-oWsEYi07Qwe9rm-4C0gRs0928a/view,window_1_low_lang_density=2/176=0.011,documents,280
+2025-04-08,MWK-ESTATE,Government Submission,titles: T-48375,CLEAN,documents#245,passes_all_heuristics,documents,245
+2025-04-28,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-0966-698, T-32911, T-4497",CLEAN,https://drive.google.com/file/d/1ExUUXtqkaf5FWoVAZKgpzBR4Z7xC0m0p/view,passes_all_heuristics,documents,303
+2025-04-28,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-0966-698, T-32911, T-4497",CLEAN,https://drive.google.com/file/d/1GYNnyual9I9MkKoppiGcMAdRhuTHZMO3/view,passes_all_heuristics,documents,296
+2025-04-28,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-0966-698, T-32911, T-4497",CLEAN,https://drive.google.com/file/d/1KxyqFIvvXI3MDSfqjJ-Cjo6rEVC2Tfav/view,passes_all_heuristics,documents,297
+2025-05-15,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-2023, T-26, T-32911, T-32917, T-4497",CLEAN,https://drive.google.com/file/d/1KJOvx7Xt8JE6FvD6VdVBXDrnhLhlDC9x/view,passes_all_heuristics,documents,365
+2025-05-15,MWK-ARTA-1378,Letter,"titles: T-111, T-32911",CLEAN,https://drive.google.com/file/d/1oKTKoD0T9wm5gAsOyy0b53kVVM-UY6aQ/view,passes_all_heuristics,documents,305
+2025-05-21,MWK-ARTA-0747,Letter,,CLEAN,https://drive.google.com/file/d/1kEsa7NYD1SfBxjmWUpLwSFThpDxEMGbR/view,passes_all_heuristics,documents,304
+2025-05-21,MWK-ARTA-1319,Receipt,"titles: T-1035932, T-2758048, T-52917",CLEAN,https://drive.google.com/file/d/1Gdb5HfRYYX5gkpJjQuJQucKKVxU2pJJj/view,passes_all_heuristics,documents,328
+2025-05-21,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-20, T-203, T-2399, T-31, T-47655",CLEAN,https://drive.google.com/file/d/15wvY35TMI7HVk60W0D-h3aSAiyDYLOwu/view,passes_all_heuristics,documents,16
+2025-05-21,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-32917, T-33415, T-33416",CLEAN,https://drive.google.com/file/d/1Y9mPiRBA_prrdMmVqrYYKU_3wGx2cpPH/view,passes_all_heuristics,documents,315
+2025-05-21,MWK-ESTATE,Title (TCT/OCT),"titles: T-232, T-34243, T-34245",CLEAN,https://drive.google.com/file/d/1cL3-ZI6o-ZTCXNg6VNS9MTJlyRdcosuS/view,passes_all_heuristics,documents,321
+2025-05-21,MWK-ESTATE,Receipt,titles: T-1035932,CLEAN,https://drive.google.com/file/d/1HNe-G-7gYKI5nUxBdBkPEt29p6Z3dVyg/view,passes_all_heuristics,documents,327
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P698,049.00 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#43,structured_db_data,transactions,43
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#44,structured_db_data,transactions,44
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#45,structured_db_data,transactions,45
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#46,structured_db_data,transactions,46
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#47,structured_db_data,transactions,47
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds for Province of Camarines Norte,CLEAN,transactions#49,structured_db_data,transactions,49
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#50,structured_db_data,transactions,50
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P1,613.95 (filing_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#51,structured_db_data,transactions,51
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P1,613.95 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#82,structured_db_data,transactions,82
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P1,613.95 (registration_fee)",cp: Land Registration Authority / Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#83,structured_db_data,transactions,83
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#86,structured_db_data,transactions,86
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#87,structured_db_data,transactions,87
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#88,structured_db_data,transactions,88
+2025-05-21,"MWK-CV26360,MWK-TCT4497","Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds for Province of Camarines Norte,CLEAN,transactions#89,structured_db_data,transactions,89
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#90,structured_db_data,transactions,90
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#91,structured_db_data,transactions,91
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#92,structured_db_data,transactions,92
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#93,structured_db_data,transactions,93
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#94,structured_db_data,transactions,94
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds for the Province of Camarines Norte,CLEAN,transactions#95,structured_db_data,transactions,95
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P698,049.00 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#96,structured_db_data,transactions,96
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#97,structured_db_data,transactions,97
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#98,structured_db_data,transactions,98
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#99,structured_db_data,transactions,99
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#100,structured_db_data,transactions,100
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)","cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#162,structured_db_data,transactions,162
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P6,980.49 (registration_fee)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#167,structured_db_data,transactions,167
+2025-05-21,MWK-ESTATE,"Transaction — DEBIT P698,049.00 (registration_fee)",cp: Registry of Deeds for the Province of Camarines Norte,CLEAN,transactions#170,structured_db_data,transactions,170
+2025-05-21,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-3253, T-52536",CLEAN,https://drive.google.com/file/d/1Jybvgk7FRCckD7Pxy9KOTsltfsDjjWxe/view,passes_all_heuristics,documents,606
+2025-05-21,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-00, T-20, T-20802, T-4497, T-481",CLEAN,https://drive.google.com/file/d/1JFtysuGFCz7uRqkCl3v-ors1IjWrJONU/view,passes_all_heuristics,documents,614
+2025-05-21,MWK-ESTATE,Special Power of Attorney,titles: T-1993,CLEAN,https://drive.google.com/file/d/1lhYnKYRjQNXANdoNH37BEIDimW8OCjCI/view,passes_all_heuristics,documents,589
+2025-05-21,MWK-TCT4497,Title (TCT/OCT),"titles: T-10, T-10145, T-12, T-14, T-15",CLEAN,https://drive.google.com/file/d/1BIBUYldJjgDp_TycOASHj-8lJhStC19i/view,passes_all_heuristics,documents,611
+2025-05-21,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-21, T-2399, T-31",CLEAN,https://drive.google.com/file/d/1XphFFFOx-n12CFUqzaSf9fgfpquxbizq/view,passes_all_heuristics,documents,613
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-12, T-13, T-14, T-15",CLEAN,https://drive.google.com/file/d/18AyFN2P2ZtGvb9NgN4RSnwPixkCwQFRX/view,passes_all_heuristics,documents,309
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-21, T-2399, T-31",CLEAN,https://drive.google.com/file/d/1ASfRwmLZfmGhttQctYvHycwrEn8rhwB0/view,passes_all_heuristics,documents,24
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-106, T-12, T-13, T-14, T-16",CLEAN,https://drive.google.com/file/d/13zeZvgBESy5lk0TGlq38YGt0yuXhwe-r/view,passes_all_heuristics,documents,19
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-10, T-12, T-15, T-2132, T-263",CLEAN,https://drive.google.com/file/d/1KmmTmJ-AWnyT0H2J-bcTXs8Vz5zaeH3c/view,passes_all_heuristics,documents,325
+2025-05-22,MWK-ESTATE,Title (TCT/OCT),titles: T-46038,CLEAN,https://drive.google.com/file/d/1RNGTlzWbjxOFsfAsPsVk8cg7oYmW5VbS/view,passes_all_heuristics,documents,324
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Letter,titles: T-0966698,CLEAN,https://drive.google.com/file/d/1wR_jjNrYS8K658gCaJ10sI7AW9PMwAs9/view,passes_all_heuristics,documents,344
+2025-05-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-33776, T-91",CLEAN,https://drive.google.com/file/d/1kINbH0AkrwuKZ_O_UnbPW7G2YYJ0EnIl/view,passes_all_heuristics,documents,318
+2025-05-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-10, T-33776, T-91",CLEAN,https://drive.google.com/file/d/1WEOyIYGK09iy1xp0Os9v7O5_Nr05Wg6Y/view,passes_all_heuristics,documents,320
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-20, T-3253, T-52536",CLEAN,https://drive.google.com/file/d/1eWzsHmd8au8KkDGCmIGuiIuWtyk0c3rO/view,passes_all_heuristics,documents,323
+2025-05-22,"MWK-TCT4497,MWK-ARTA-0747",Letter,titles: T-0966698,CLEAN,https://drive.google.com/file/d/1rqPwgaFoi3atI_rnCQrDGATIXECBps5i/view,passes_all_heuristics,documents,302
+2025-05-22,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-16, T-20, T-259, T-34321",CLEAN,https://drive.google.com/file/d/1ksl34fxUW-gaFEpi31Kc8l1vTQaG7Roh/view,passes_all_heuristics,documents,310
+2025-05-22,MWK-ESTATE,Title (TCT/OCT),"titles: T-51, T-51640, T-990",CLEAN,https://drive.google.com/file/d/1xAhTiihkfzlKWpXkf85pdP-yy8muhrjx/view,passes_all_heuristics,documents,313
+2025-05-22,MWK-ESTATE,"Transaction — DEBIT P2,046.08 (registration_fee)",cp: Land Registration Authority / Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#84,structured_db_data,transactions,84
+2025-05-23,"MWK-ARTA-1378,MWK-TCT4497",Letter,titles: T-32911,CLEAN,https://drive.google.com/file/d/1hOr5D0RuCJiuWwinbqDQGRMBQIaQaK56/view,passes_all_heuristics,documents,341
+2025-05-25,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-11, T-1132, T-20, T-20902, T-2399",CLEAN,https://drive.google.com/file/d/19V8X78X0of_vyM1NgGDf_0Jwt9RINbYd/view,passes_all_heuristics,documents,307
+2025-05-25,"MWK-CV26360,MWK-TCT4497",Title (TCT/OCT),"titles: T-3100, T-41, T-48, T-48335, T-55",CLEAN,https://drive.google.com/file/d/18pKMFU94GtdMLmyGzlXDIha1x_jHA-mf/view,passes_all_heuristics,documents,306
+2025-05-26,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-111, T-4497, T-4934",CLEAN,https://drive.google.com/file/d/1bz694eBeXljSgMCBKothFPPZ9Y7YYuow/view,passes_all_heuristics,documents,333
+2025-05-26,"MWK-CV26360,MWK-TCT4497",Correspondence,"titles: T-111, T-4497, T-4934",CLEAN,https://drive.google.com/file/d/1VTie_-X-TItD9WC3z33aKMcfpvbTwclT/view,passes_all_heuristics,documents,355
+2025-05-27,MWK-ESTATE,Government Submission,"titles: T-30681, T-30683, T-32478, T-32911",CLEAN,https://drive.google.com/file/d/15rE_3kUrD0tuP0e7kmwrTAjdbgmdFL0j/view,passes_all_heuristics,documents,330
+2025-05-27,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1jl7zzOL_qXdOYV3n6nBjR_ucS61fAd6v/view,window_1_too_few_words=27,documents,332
+2025-05-27,MWK-ESTATE,Government Submission,"titles: T-30681, T-30683, T-32478, T-32911",CLEAN,https://drive.google.com/file/d/1kbJ3l6dUdnGKIDtWddOH1FCp4iCr0VmU/view,passes_all_heuristics,documents,338
+2025-05-27,MWK-ARTA-0747,Letter,,CLEAN,https://drive.google.com/file/d/1trp6h0BVg61b2CtWwmd8qefZsezGX1Vs/view,passes_all_heuristics,documents,342
+2025-05-27,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-0966698, T-10, T-32917, T-38838, T-4497",CLEAN,https://drive.google.com/file/d/1EwmJjBI28zpJoacFgo4XN-_XxoE0L1ye/view,passes_all_heuristics,documents,591
+2025-05-28,MWK-CV26360,Letter,,CLEAN,https://drive.google.com/file/d/11vyzdsnwQOGTzCz_EupsKHhnYAqID8Rn/view,passes_all_heuristics,documents,340
+2025-05-28,MWK-CV6839,Correspondence,titles: T-32911,CLEAN,https://drive.google.com/file/d/1KWWS3sGSHTjM8hxOWjMVjaaLDT8P7jcm/view,passes_all_heuristics,documents,343
+2025-05-28,MWK-ESTATE,Government Submission,"titles: T-0966698, T-30681, T-30683, T-32478, T-32911",CLEAN,https://drive.google.com/file/d/1StszcVzECewbqvcV5dMUrRgbB9bujtpb/view,passes_all_heuristics,documents,331
+2025-05-28,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-30681, T-30683, T-32478, T-32911, T-4497",CLEAN,https://drive.google.com/file/d/1dba1-4niUumNBleGivkB3d1Cq8yO02Gq/view,passes_all_heuristics,documents,337
+2025-05-29,MWK-ARTA-1378,Letter,"titles: T-0966698, T-32911",CLEAN,https://drive.google.com/file/d/15DFEhMJFV_2h8aTag0us98TDk5wWX9xI/view,passes_all_heuristics,documents,339
+2025-06-03,"MWK-CV26360,MWK-TCT4497",Receipt,"titles: T-1035933, T-1981, T-412, T-511, T-590",CLEAN,https://drive.google.com/file/d/1qufdtHz58ceUC8byyN2HTU4LUYCuYA0z/view,passes_all_heuristics,documents,336
+2025-06-03,"MWK-CV26360,MWK-TCT4497",Receipt,"titles: T-1035933, T-111",CLEAN,https://drive.google.com/file/d/1AlQnPcMsAzzl7Ln-5UqVXRYg_lkMV69L/view,passes_all_heuristics,documents,383
+2025-06-03,MWK-ESTATE,Transaction — DEBIT P349.73 (registration_fee),"cp: Registry of Deeds, Province of Camarines Norte",CLEAN,transactions#74,structured_db_data,transactions,74
+2025-06-03,MWK-ESTATE,Transaction — DEBIT P590.91 (registration_fee),cp: Land Registration Authority / Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#81,structured_db_data,transactions,81
+2025-06-06,"MWK-TCT4497,MWK-CV26360",Letter,,CLEAN,https://drive.google.com/file/d/1stZW41_m-akPfMHSkjeY37b-8hkkzNrd/view,passes_all_heuristics,documents,334
+2025-06-10,MWK-CV6839,Email — Fwd: Cesar de la Fuente/Just copensation,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4427,structured_db_data,gmail_messages,4427
+2025-06-17,MWK-CV26360,Email — Re: Reply to Letter Request,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4426,structured_db_data,gmail_messages,4426
+2025-06-18,MWK-ARTA-1378,Email — Re: LGU Mercedes Letter of Invitation for a Dialogue,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4424,structured_db_data,gmail_messages,4424
+2025-06-19,MWK-CV26360,Email — Re: Reply to Letter Request,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4422,structured_db_data,gmail_messages,4422
+2025-06-20,MWK-ARTA-1378,Transaction — DEBIT P300.00 (filing_fee),"cp: Municipal Assessor, Mercedes, Camarines Norte",CLEAN,transactions#63,structured_db_data,transactions,63
+2025-06-23,"MWK-CV26360,MWK-TCT4497",Correspondence,"titles: T-31298, T-32917",CLEAN,https://drive.google.com/file/d/1Q3H-Wys_-WiniUyA5DM-sxNCkM_BnTql/view,passes_all_heuristics,documents,353
+2025-06-27,MWK-ARTA-1378,Correspondence,,CLEAN,https://drive.google.com/file/d/15nNkLcDeJrRL0NvD11lKVVti4LBcIoK3/view,passes_all_heuristics,documents,354
+2025-07-01,MWK-CV6839,Government Submission,"titles: T-0966698, T-4494, T-4501, T-4503",CLEAN,https://drive.google.com/file/d/1hjU6qBnQDO0wdISqrjxLeHyhuE8Z-1cS/view,passes_all_heuristics,documents,362
+2025-07-04,MWK-ESTATE,Email — Register of Deeds  Issue (Heirs of Mary Worrick),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4417,structured_db_data,gmail_messages,4417
+2025-07-07,MWK-CV6839,Email — Request for Records Relating to Landholdings (4 titles in total) under CARP – For Reference and Docu,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4414,structured_db_data,gmail_messages,4414
+2025-07-08,MWK-ESTATE,Email — Re: Register of Deeds Issue (Heirs of Mary Worrick),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4411,structured_db_data,gmail_messages,4411
+2025-07-08,MWK-CV6839,Email — Confirmation for Heirs of Mary Worrick,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4412,structured_db_data,gmail_messages,4412
+2025-07-08,MWK-ESTATE,Email — Re: Register of Deeds Issue (Heirs of Mary Worrick),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4410,structured_db_data,gmail_messages,4410
+2025-07-09,MWK-CV6839,Correspondence,"titles: T-10, T-11, T-30681, T-30683, T-32478",CLEAN,https://drive.google.com/file/d/1owRGytXqi4WBWTjenuNNHpvG9nUqLhAi/view,passes_all_heuristics,documents,363
+2025-07-09,MWK-CV6839,Email — Re: Confirmation for Heirs of Mary Worrick,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4403,structured_db_data,gmail_messages,4403
+2025-07-09,MWK-ESTATE,Email — Re: Heirs of Mary Worrick,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4408,structured_db_data,gmail_messages,4408
+2025-07-09,MWK-CV6839,Email — Re: Request for Records Relating to Landholdings (4 titles in total) under CARP – For Reference and ,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4407,structured_db_data,gmail_messages,4407
+2025-07-09,MWK-CV6839,Email — Re: Request for Records Relating to Landholdings (4 titles in total) under CARP – For Reference and ,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4406,structured_db_data,gmail_messages,4406
+2025-07-11,MWK-CV6839,Correspondence,"titles: T-22, T-30681, T-30683, T-32478, T-4494",CLEAN,https://drive.google.com/file/d/1xTpLwqR04msmlT6o9736e48p6K61fZ3K/view,passes_all_heuristics,documents,374
+2025-07-11,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#451,classification_missing,documents,451
+2025-07-14,MWK-CV26360,Email — Re: Balane (Annulment of Title) Follow Up,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#464,structured_db_data,gmail_messages,464
+2025-07-14,MWK-CV26360,Email — Balane (Annulment of Title) Follow Up,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#465,structured_db_data,gmail_messages,465
+2025-07-14,MWK-ESTATE,Email — Re: Confirmation for Heirs of Mary Worrick,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4401,structured_db_data,gmail_messages,4401
+2025-07-15,MWK-ESTATE,Transaction — DEBIT P100.00 (filing_fee),"cp: City of Manila, Office of the City Treasurer",CLEAN,transactions#54,structured_db_data,transactions,54
+2025-07-23,MWK-ESTATE,Email — Re: Register of Deeds Issue (Heirs of Mary Worrick),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4398,structured_db_data,gmail_messages,4398
+2025-07-23,MWK-ESTATE,Email — Re: Confirmation for Heirs of Mary Worrick,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4397,structured_db_data,gmail_messages,4397
+2025-07-23,MWK-ESTATE,Email — Re: Register of Deeds Issue (Heirs of Mary Worrick),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4399,structured_db_data,gmail_messages,4399
+2025-07-24,MWK-ESTATE,Email — Re: Confirmation for Heirs of Mary Worrick,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4396,structured_db_data,gmail_messages,4396
+2025-08-12,MWK-CV6839,Notice,titles: T-122025,CLEAN,https://drive.google.com/file/d/17LTvR9lCsIQ_ovBji5eBd-aDoyz5i_9N/view,passes_all_heuristics,documents,370
+2025-08-12,MWK-ESTATE,Email — Re: Fw: Confirmation of Sale / T-30683,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4388,structured_db_data,gmail_messages,4388
+2025-08-18,"MWK-CV26360,MWK-TCT4497",Demand Letter,"titles: T-2025, T-52540",CLEAN,documents#420,passes_all_heuristics,documents,420
+2025-08-18,MWK-CV26360,Demand Letter,"titles: T-2025, T-5254",CLEAN,https://drive.google.com/file/d/1QuzJebrTpl4XLnXML5YpWBdL8j0HRzHK/view,passes_all_heuristics,documents,388
+2025-08-29,"MWK-CV26360,MWK-TCT4497",Government Submission,"titles: T-0966, T-29",CLEAN,https://drive.google.com/file/d/13JTtBcrDpgoq3wghK-0B68HE49NhFQWU/view,passes_all_heuristics,documents,380
+2025-08-29,MWK-ESTATE,Email — Fwd: Fw: Confirmation of Sale / T-30683,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4383,structured_db_data,gmail_messages,4383
+2025-09-01,MWK-ESTATE,Email — Fwd: Reply to Letter Request,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4381,structured_db_data,gmail_messages,4381
+2025-09-01,MWK-ESTATE,Email — Fwd: Reply to Letter Request,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4382,structured_db_data,gmail_messages,4382
+2025-09-03,"MWK-TCT4497,MWK-CV26360",Letter,,CLEAN,https://drive.google.com/file/d/1y9mHvJ7hbnDUYIkvGY6aAWxvti0zhH_X/view,passes_all_heuristics,documents,375
+2025-09-03,"MWK-ARTA-1210,MWK-TCT4497",Correspondence,"titles: T-14, T-20",CLEAN,https://drive.google.com/file/d/1DdyDbRqwkXVZweiV7UctAlpgO_u7be6C/view,passes_all_heuristics,documents,378
+2025-09-03,"MWK-CV26360,MWK-TCT4497","Email — Fwd: Request for Certified Copy of Subdivision Survey Plan (Psd-221861), Clarification on Government",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4377,structured_db_data,gmail_messages,4377
+2025-09-03,MWK-ARTA-1319,"Email — Request for Certified Copy of Subdivision Survey Plan (Psd-221861), Clarification on Government Occu",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4378,structured_db_data,gmail_messages,4378
+2025-09-05,MWK-CV6839,Legal Memorandum,titles: T-2005,CLEAN,https://drive.google.com/file/d/1k8kW07SFO4tKDLOB1FrltmHOQlqtkdxK/view,passes_all_heuristics,documents,376
+2025-09-10,MWK-ARTA-1378,Email — Fwd: LGU Mercedes Letter of Invitation for a Dialogue,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4371,structured_db_data,gmail_messages,4371
+2025-09-15,MWK-ARTA-0747,Letter,titles: T-4814,CLEAN,https://drive.google.com/file/d/16-sB1cSKhqPzDrgn9hY4_-m3cLFwdwcH/view,passes_all_heuristics,documents,379
+2025-09-17,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1mtGyU0EuSe-wglHnpEn34K3hYd3cU3AN/view,window_3_low_lang_density=2/175=0.011,documents,567
+2025-09-18,MWK-ESTATE,Email — Baptism Record  1909,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4364,structured_db_data,gmail_messages,4364
+2025-09-19,MWK-ESTATE,Transaction — DEBIT P200.07 (registration_fee),cp: Land Registration Authority,CLEAN,transactions#53,structured_db_data,transactions,53
+2025-09-23,MWK-ESTATE,"Email — Re: LETTER DATED SEPTEMBER 16, 2025 RE: REQUEST FOR A CERTIFIED COPY OF APPROVED SUBDIVISION PLAN PS",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4363,structured_db_data,gmail_messages,4363
+2025-09-25,MWK-CV26360,Email — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#459,structured_db_data,gmail_messages,459
+2025-09-25,MWK-CV26360,Email — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#460,structured_db_data,gmail_messages,460
+2025-09-25,MWK-CV26360,Email — Update on the Demand Letter Sent to Mrs. Gloria Balane et al.,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#461,structured_db_data,gmail_messages,461
+2025-09-29,MWK-CV26360,Email — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#457,structured_db_data,gmail_messages,457
+2025-09-29,MWK-CV26360,Email — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#458,structured_db_data,gmail_messages,458
+2025-09-29,MWK-ESTATE,Email — Clarification on Real Property Tax Records – Heirs of Mary Worrick Keesey,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4360,structured_db_data,gmail_messages,4360
+2025-09-29,MWK-ESTATE,Email — Signature Verification (Heirs of Mary Worrick),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#456,structured_db_data,gmail_messages,456
+2025-09-29,MWK-ESTATE,Email — Fwd: Clarification on Real Property Tax Records – Heirs of Mary Worrick Keesey,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4359,structured_db_data,gmail_messages,4359
+2025-09-29,MWK-CV26360,Contract,,CLEAN,https://drive.google.com/file/d/1TJJktEua1x9BL1DnPcCnSZFvBSQB23BO/view,passes_all_heuristics,documents,598
+2025-09-30,MWK-CV26360,Email — Requested Docs for your Files,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#454,structured_db_data,gmail_messages,454
+2025-10-01,MWK-ARTA-0747,Complaint,titles: T-24,CLEAN,https://drive.google.com/file/d/1-sjHGf6DB42Cc7rrOV3fks-Q_0cq8FFh/view,passes_all_heuristics,documents,384
+2025-10-01,MWK-ESTATE,Email — Re: Requested Docs for your Files,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#452,structured_db_data,gmail_messages,452
+2025-10-01,MWK-ARTA-0747,Reply,,CLEAN,https://drive.google.com/file/d/1yiRmtGIpTF5MOpEpilaNYv4Da5NCFlB2/view,passes_all_heuristics,documents,532
+2025-10-01,MWK-ARTA-0747,Complaint,,CLEAN,https://drive.google.com/file/d/1EmoOBL4E7VwloKMmdrnnfGYjUf3XRkhY/view,passes_all_heuristics,documents,576
+2025-10-01,"MWK-CV26360,MWK-TCT4497",Letter,titles: T-4497,CLEAN,https://drive.google.com/file/d/1PzLAsY_2v-w3MoQRty3b_t_u2WwFYoJ9/view,passes_all_heuristics,documents,597
+2025-10-01,"MWK-CV26360,MWK-TCT4497",Correspondence,,CLEAN,https://drive.google.com/file/d/13HZQ_T5eCzcFOOdTVwtHnjMPKnHCepgi/view,passes_all_heuristics,documents,595
+2025-10-03,"MWK-CV26360,MWK-TCT4497",[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1lunZXTnRj3ZxVkdZW9aMyIQTlZ28sHWa/view,window_1_low_lang_density=1/176=0.006,documents,381
+2025-10-07,"MWK-CV26360,MWK-TCT4497",Letter,"titles: T-111, T-4497",CLEAN,https://drive.google.com/file/d/1Wa5_8vLAZFeBfvNV3qdp9OX_JesN1hCV/view,passes_all_heuristics,documents,596
+2025-10-07,MWK-CV26360,Complaint,,CLEAN,https://drive.google.com/file/d/1qRKkdU0HF59bbEWaK3doMMDTNV7Pg9n1/view,passes_all_heuristics,documents,570
+2025-10-13,MWK-ESTATE,"Email — Re: LETTER DATED SEPTEMBER 16, 2025 RE: REQUEST FOR A CERTIFIED COPY OF APPROVED SUBDIVISION PLAN PS",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4351,structured_db_data,gmail_messages,4351
+2025-10-16,"MWK-CV26360,MWK-TCT4497",Contract,,CLEAN,https://drive.google.com/file/d/1z6hOMit0NAzbuBjQoyL3iQzq-xWkOhCH/view,passes_all_heuristics,documents,594
+2025-10-18,MWK-ESTATE,Certificate,titles: T-18,CLEAN,https://drive.google.com/file/d/1JwCQ_2aW4v0GJbH1TU3DauMkd5CcZjEP/view,passes_all_heuristics,documents,592
+2025-10-19,MWK-CV26360,Email — Review OCR Data - Low Confidence Fields Detected,sender: jonzschoche@gmail.com,CLEAN,gmail_messages#4340,structured_db_data,gmail_messages,4340
+2025-10-20,MWK-CV6839,Letter,"titles: T-4494, T-4501",CLEAN,https://drive.google.com/file/d/1E1UL67fYZNi7pIBmqHhRvJQHfNzsBO7_/view,passes_all_heuristics,documents,593
+2025-10-29,MWK-CV26360,Email — Re: Initial Draft of the Complaint,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#448,structured_db_data,gmail_messages,448
+2025-10-29,MWK-CV26360,Email — Re: Initial Draft of the Complaint,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#447,structured_db_data,gmail_messages,447
+2025-10-29,MWK-CV26360,Email — Re: Initial Draft of the Complaint,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#449,structured_db_data,gmail_messages,449
+2025-10-29,MWK-CV26360,Email — Re: Initial Draft of the Complaint,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#450,structured_db_data,gmail_messages,450
+2025-10-30,"MWK-CV26360,MWK-TCT4497",Email — Re: Soft Copies of the Special Power of Attorney,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#443,structured_db_data,gmail_messages,443
+2025-10-30,MWK-CV26360,Email — Re: Documentary Exhibits to be Attached to the Complaint,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#445,structured_db_data,gmail_messages,445
+2025-10-30,"MWK-TCT4497,MWK-CV26360",Email — Soft Copies of the Special Power of Attorney,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#444,structured_db_data,gmail_messages,444
+2025-10-30,MWK-ESTATE,Email — Documentary Exhibits to be Attached to the Complaint,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#446,structured_db_data,gmail_messages,446
+2025-11-07,"MWK-CV26360,MWK-TCT4497",Affidavit,"titles: T-15, T-52540",CLEAN,documents#445,passes_all_heuristics,documents,445
+2025-11-07,"MWK-CV26360,MWK-TCT4497",Complaint,"titles: T-15, T-52540",CLEAN,documents#421,passes_all_heuristics,documents,421
+2025-11-07,MWK-CV26360,Email — Gloria Balane Complaint,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#442,structured_db_data,gmail_messages,442
+2025-11-07,"MWK-CV26360,MWK-TCT4497",Email — Fwd: SPA,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4326,structured_db_data,gmail_messages,4326
+2025-11-08,"MWK-CV26360,MWK-TCT4497",Email — Re: Soft Copies of the Special Power of Attorney,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#441,structured_db_data,gmail_messages,441
+2025-11-12,MWK-CV26360,Complaint,,CLEAN,documents#425,passes_all_heuristics,documents,425
+2025-11-15,MWK-CV26360,Email — (no subject),"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#440,structured_db_data,gmail_messages,440
+2025-11-15,MWK-CV26360,Email — Re:,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#439,structured_db_data,gmail_messages,439
+2025-11-16,MWK-CV26360,Email — Re:,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#438,structured_db_data,gmail_messages,438
+2025-11-21,MWK-CV26360,"Email — Latest Draft of Complaint Against Balane, et al.","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#437,structured_db_data,gmail_messages,437
+2025-11-24,MWK-CV26360,"Email — Re: Latest Draft of Complaint Against Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#436,structured_db_data,gmail_messages,436
+2025-11-25,MWK-ESTATE,"Transaction — DEBIT P1,575.18 (registration_fee)","cp: Land Transportation Office (LTO), Daet District Office",CLEAN,transactions#52,structured_db_data,transactions,52
+2025-11-25,MWK-ESTATE,Receipt,"titles: T-197, T-337, T-400",CLEAN,https://drive.google.com/file/d/14vdfUFYgvlEgcbdQ_RmghxIhIqJkcFud/view,passes_all_heuristics,documents,579
+2025-11-25,MWK-ESTATE,Letter,,CLEAN,https://drive.google.com/file/d/1v6sZJxs1G7YC41mjXGSAjWh6XnllZNJH/view,passes_all_heuristics,documents,578
+2025-11-26,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4322,structured_db_data,gmail_messages,4322
+2025-11-28,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4320,structured_db_data,gmail_messages,4320
+2025-12-02,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4317,structured_db_data,gmail_messages,4317
+2025-12-03,"MWK-CV6839,MWK-ESTATE",Letter,,CLEAN,https://drive.google.com/file/d/1AMzDOKFQaodSDbQYbcIuDUNV4l51-ibL/view,passes_all_heuristics,documents,575
+2025-12-04,"MWK-CV26360,MWK-TCT4497","Email — Re: LETTER DATED NOVEMBER 26, 2025 RE: LOT 2-A, (LRA) PSD-221861",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4316,structured_db_data,gmail_messages,4316
+2025-12-05,MWK-CV26360,"Email — Latest Draft of Complaint Against Balane, et al.","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#434,structured_db_data,gmail_messages,434
+2025-12-05,MWK-ARTA-0747,Email — Fwd: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#433,structured_db_data,gmail_messages,433
+2025-12-05,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4315,structured_db_data,gmail_messages,4315
+2025-12-05,MWK-CV26360,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/12p2bfeWkzT8WtvWkPQMPPPrFtavcoQjU/view,window_0_low_lang_density=5/140=0.036,documents,573
+2025-12-07,MWK-ARTA-1378,Correspondence,titles: T-0966-698,CLEAN,https://drive.google.com/file/d/1VV7uhxlmYjZLNCMDqFcwlk2NL09Gf7dZ/view,passes_all_heuristics,documents,385
+2025-12-07,MWK-ESTATE,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4313,structured_db_data,gmail_messages,4313
+2025-12-08,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4311,structured_db_data,gmail_messages,4311
+2025-12-09,MWK-ARTA-0747,Email — ID Submission #2 (Passport)Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4309,structured_db_data,gmail_messages,4309
+2025-12-09,MWK-CV26360,"Email — Re: Latest Draft of Complaint Against Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#432,structured_db_data,gmail_messages,432
+2025-12-10,MWK-ARTA-DILG,Letter,,CLEAN,https://drive.google.com/file/d/1xvms3XxInmG37iOiCEaJpYHYvK419VH_/view,passes_all_heuristics,documents,386
+2025-12-10,MWK-ARTA-1378,Correspondence,,CLEAN,https://drive.google.com/file/d/12E9I3fyPPapZwkiQ-uLQ4Bo3LeneMdrO/view,passes_all_heuristics,documents,387
+2025-12-10,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#429,structured_db_data,gmail_messages,429
+2025-12-10,MWK-ESTATE,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4302,structured_db_data,gmail_messages,4302
+2025-12-10,MWK-ESTATE,Email — Heirs of Mary Worrick Tax Asessment,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4304,structured_db_data,gmail_messages,4304
+2025-12-10,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#430,structured_db_data,gmail_messages,430
+2025-12-10,MWK-ARTA-0747,Email — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: pat zschoche <swisslassie@hotmail.com>,CLEAN,gmail_messages#431,structured_db_data,gmail_messages,431
+2025-12-11,MWK-ARTA-0747,Email — Re: ID Submission #2 (Passport)Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4300,structured_db_data,gmail_messages,4300
+2025-12-13,MWK-ESTATE,Affidavit,,CLEAN,https://drive.google.com/file/d/14wnd3JOs8gYuvW9kzzfLNQvzUDwCOMWg/view,passes_all_heuristics,documents,569
+2025-12-15,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4299,structured_db_data,gmail_messages,4299
+2025-12-15,MWK-CV26360,"Email — Re: Latest Draft of Complaint Against Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#428,structured_db_data,gmail_messages,428
+2025-12-15,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4297,structured_db_data,gmail_messages,4297
+2025-12-15,MWK-ESTATE,Email — Re: Heirs of Mary Worrick Tax Asessment,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4298,structured_db_data,gmail_messages,4298
+2025-12-16,MWK-CV26360,"Email — Latest Draft of the Complaint Against Gloria Balane, et al.","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#427,structured_db_data,gmail_messages,427
+2025-12-16,MWK-ESTATE,Email — Fwd: Tax History,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4293,structured_db_data,gmail_messages,4293
+2025-12-16,MWK-ESTATE,Email — Fwd: Heirs of Mary Worrick Tax Asessment,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4294,structured_db_data,gmail_messages,4294
+2025-12-16,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4295,structured_db_data,gmail_messages,4295
+2025-12-17,MWK-CV26360,"Email — Re: Latest Draft of the Complaint Against Gloria Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#426,structured_db_data,gmail_messages,426
+2025-12-17,MWK-CV26360,"Email — Re: Latest Draft of the Complaint Against Gloria Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#425,structured_db_data,gmail_messages,425
+2025-12-19,MWK-ESTATE,Email — Re: LTC of Mary Worrick Keesey,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4290,structured_db_data,gmail_messages,4290
+2025-12-20,MWK-ESTATE,Email — Re: Heirs of Mary Worrick Tax Asessment,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4288,structured_db_data,gmail_messages,4288
+2025-12-20,MWK-ESTATE,Email — Re: Heirs of Mary Worrick Tax Asessment,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4289,structured_db_data,gmail_messages,4289
+2025-12-21,MWK-ESTATE,Email — Onward and Upward,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4287,structured_db_data,gmail_messages,4287
+2025-12-25,MWK-ESTATE,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4286,structured_db_data,gmail_messages,4286
+2025-12-29,MWK-ESTATE,Email — Re: 2023 bills tax payment receipts,sender: colen ibasco <colenacious@yahoo.com>,CLEAN,gmail_messages#424,structured_db_data,gmail_messages,424
+2025-12-29,MWK-ESTATE,Email — DETAILED STATEMENT OF EXPENSES,sender: colen ibasco <colenacious@yahoo.com>,CLEAN,gmail_messages#422,structured_db_data,gmail_messages,422
+2025-12-29,MWK-ESTATE,Email — Re: 2023 bills tax payment receipts,sender: colen ibasco <colenacious@yahoo.com>,CLEAN,gmail_messages#423,structured_db_data,gmail_messages,423
+2025-12-29,MWK-ESTATE,Email — Re: Heirs of Mary Worrick Tax Asessment,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4284,structured_db_data,gmail_messages,4284
+2026-01-01,MWK-ARTA-1378,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#695,classification_missing,documents,695
+2026-01-01,MWK-ARTA-1378,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#696,classification_missing,documents,696
+2026-01-01,MWK-ARTA-1321,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#697,classification_missing,documents,697
+2026-01-01,MWK-ARTA-1321,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#698,classification_missing,documents,698
+2026-01-01,MWK-ARTA-1378,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#709,classification_missing,documents,709
+2026-01-01,MWK-ARTA-1378,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#733,classification_missing,documents,733
+2026-01-01,MWK-ARTA-1319,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#741,classification_missing,documents,741
+2026-01-01,MWK-ARTA-1321,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#743,classification_missing,documents,743
+2026-01-01,MWK-ARTA-1212,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#763,classification_missing,documents,763
+2026-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#765,classification_missing,documents,765
+2026-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/1xxt2x7JB8ejjxeX-k3493IVJ2n9Oooe6/view,classification_missing,documents,662
+2026-01-01,MWK-ESTATE,Government Submission,titles: T-1001611,CLEAN,https://drive.google.com/file/d/1_Mr6z58LFE0LFWGR20G_fBpfXhR9HFkn/view,passes_all_heuristics,documents,664
+2026-01-01,MWK-ESTATE,Title (TCT/OCT),titles: T-722,CLEAN,https://drive.google.com/file/d/1755ZwPzDjUhL0hNujmfD-mQQE4BiIYyt/view,passes_all_heuristics,documents,665
+2026-01-01,MWK-TCT4497,Title (TCT/OCT),"titles: T-07, T-408, T-415, T-430, T-69",CLEAN,https://drive.google.com/file/d/11mJjKKZRD2rXPrUophKi8i7Nr-RC4PVn/view,passes_all_heuristics,documents,666
+2026-01-01,MWK-ARTA-1210,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#812,classification_missing,documents,812
+2026-01-01,MWK-ARTA-1212,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#817,classification_missing,documents,817
+2026-01-01,MWK-ARTA-1210,Resolution,,CLEAN,documents#624,passes_all_heuristics,documents,624
+2026-01-01,MWK-ARTA-1891,Complaint,,CLEAN,documents#687,passes_all_heuristics,documents,687
+2026-01-01,MWK-ESTATE,Affidavit,,CLEAN,https://drive.google.com/file/d/1OPUZqxXfOgGaQyeMNr6NzXq_rQ23cgdz/view,passes_all_heuristics,documents,661
+2026-01-01,MWK-CV26360,Affidavit,,CLEAN,documents#395,passes_all_heuristics,documents,395
+2026-01-01,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#452,classification_missing,documents,452
+2026-01-01,MWK-CV26360,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#446,classification_missing,documents,446
+2026-01-01,"MWK-ARTA-1891,MWK-ARTA-DILG",Notice,,CLEAN,documents#689,passes_all_heuristics,documents,689
+2026-01-01,MWK-ARTA-1891,Complaint,,CLEAN,documents#690,passes_all_heuristics,documents,690
+2026-01-01,MWK-ARTA-1212,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#829,classification_missing,documents,829
+2026-01-01,MWK-ARTA-1891,Correspondence,titles: T-10,CLEAN,documents#691,passes_all_heuristics,documents,691
+2026-01-05,MWK-ESTATE,Email — Re: updated expense statement,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4283,structured_db_data,gmail_messages,4283
+2026-01-06,MWK-ESTATE,Email — (no subject),"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#30,structured_db_data,gmail_messages,30
+2026-01-06,MWK-ESTATE,Email — Re: Re:,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#28,structured_db_data,gmail_messages,28
+2026-01-06,MWK-CV26360,Email — Re: Re:,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#415,structured_db_data,gmail_messages,415
+2026-01-06,MWK-CV26360,Email — Re: Re:,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#29,structured_db_data,gmail_messages,29
+2026-01-06,MWK-ESTATE,Email — updated,sender: colen ibasco <colenacious@yahoo.com>,CLEAN,gmail_messages#420,structured_db_data,gmail_messages,420
+2026-01-06,MWK-CV26360,Email — Re:,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#418,structured_db_data,gmail_messages,418
+2026-01-06,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#447,classification_missing,documents,447
+2026-01-06,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#448,classification_missing,documents,448
+2026-01-06,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#449,classification_missing,documents,449
+2026-01-06,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#450,classification_missing,documents,450
+2026-01-08,MWK-ESTATE,Email — Updated Draft of the Complaint and Judicial Affidavit,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#27,structured_db_data,gmail_messages,27
+2026-01-08,MWK-CV26360,Email — Re: Updated Draft of the Complaint and Judicial Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#413,structured_db_data,gmail_messages,413
+2026-01-09,MWK-CV26360,Email — Fwd: Re:,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#412,structured_db_data,gmail_messages,412
+2026-01-09,MWK-ESTATE,Email — Re: REQUEST FOR COPIES OF REQUIREMENTS AND RECORDS,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4125,structured_db_data,gmail_messages,4125
+2026-01-10,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4123,structured_db_data,gmail_messages,4123
+2026-01-10,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4124,structured_db_data,gmail_messages,4124
+2026-01-12,MWK-ESTATE,Email — Re: Updated Draft of the Complaint and Judicial Affidavit,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#26,structured_db_data,gmail_messages,26
+2026-01-12,MWK-ESTATE,Email — RE: DELAYED REGISTRATION OF BIRTH FOR PATRICIA ANN KEESEY,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4121,structured_db_data,gmail_messages,4121
+2026-01-12,MWK-CV26360,Email — Re: Updated Draft of the Complaint and Judicial Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#410,structured_db_data,gmail_messages,410
+2026-01-12,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4122,structured_db_data,gmail_messages,4122
+2026-01-20,MWK-ESTATE,Email — Re: DELAYED REGISTRATION OF BIRTH FOR PATRICIA ANN KEESEY,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4118,structured_db_data,gmail_messages,4118
+2026-01-21,MWK-ARTA-1378,Email — Fwd: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4116,structured_db_data,gmail_messages,4116
+2026-01-21,MWK-ESTATE,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4117,structured_db_data,gmail_messages,4117
+2026-01-23,MWK-CV26360,Complaint,,CLEAN,documents#422,passes_all_heuristics,documents,422
+2026-01-23,MWK-CV26360,"Email — Complaint against Balane, et al.","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#24,structured_db_data,gmail_messages,24
+2026-01-23,"MWK-ARTA-0792,MWK-CV26360",Email — Fwd: Fw: [OSCA] CTN SL-2025-1104-0792 (PATRICIA KEESEY ZSCHOCHE represented by Jonathan Paul Zschoch,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4114,structured_db_data,gmail_messages,4114
+2026-01-23,MWK-CV26360,"Email — Re: Complaint against Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#407,structured_db_data,gmail_messages,407
+2026-01-24,MWK-CV26360,Government Submission,,CLEAN,https://drive.google.com/file/d/1loHr9jxZa49-FiwgIZk3a4vP928t-mHE/view,passes_all_heuristics,documents,565
+2026-01-25,MWK-CV26360,Email — Re: Subject: URGENT: Formal Request for Information (FOI) - Zschoche / Heirs of Keesey,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4112,structured_db_data,gmail_messages,4112
+2026-01-25,MWK-CV26360,Email — Subject: URGENT: Formal Request for Information (FOI) - Zschoche / Heirs of Keesey,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4113,structured_db_data,gmail_messages,4113
+2026-01-26,MWK-ARTA-1378,Email — Re: Road Donation Implementation and Inquiry Mercedes,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4111,structured_db_data,gmail_messages,4111
+2026-01-27,MWK-ARTA-1378,"Email — Fwd: FORMAL COMPLAINT: R.A. 11032 Violations – Municipal Government of Mercedes, Camarines Norte",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4108,structured_db_data,gmail_messages,4108
+2026-01-27,MWK-ARTA-1378,"Email — FORMAL COMPLAINT: R.A. 11032 Violations – Municipal Government of Mercedes, Camarines Norte",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4109,structured_db_data,gmail_messages,4109
+2026-01-27,MWK-ARTA-1378,"Email — FORMAL COMPLAINT: Violation of RA 11032 - LGU Mercedes, Camarines Norte (SB Member Francisco Noel Y.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4110,structured_db_data,gmail_messages,4110
+2026-01-27,MWK-CV26360,Complaint-Affidavit,titles: T-05,CLEAN,https://drive.google.com/file/d/1L0HlOV8lrPvsTNEF9ddEFQscE0c7U6m0/view,passes_all_heuristics,documents,531
+2026-01-28,MWK-ESTATE,Email — Caringo High School Camarines Norte,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4104,structured_db_data,gmail_messages,4104
+2026-02-03,MWK-CV26360,Email — Re: Draft of the Complaint and Judicial Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#398,structured_db_data,gmail_messages,398
+2026-02-03,MWK-CV26360,Email — Re: Draft of the Complaint and Judicial Affidavit,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#21,structured_db_data,gmail_messages,21
+2026-02-03,MWK-ESTATE,Email — Re: Draft of the Complaint and Judicial Affidavit,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#22,structured_db_data,gmail_messages,22
+2026-02-03,MWK-CV26360,Email — Re: Draft of the Complaint and Judicial Affidavit,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#23,structured_db_data,gmail_messages,23
+2026-02-03,MWK-ESTATE,Email — Re: Draft of the Complaint and Judicial Affidavit,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#20,structured_db_data,gmail_messages,20
+2026-02-03,MWK-CV26360,Email — Re: Draft of the Complaint and Judicial Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#400,structured_db_data,gmail_messages,400
+2026-02-03,MWK-CV26360,Email — Re: Draft of the Complaint and Judicial Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#402,structured_db_data,gmail_messages,402
+2026-02-03,MWK-CV26360,Email — Re: Draft of the Complaint and Judicial Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#404,structured_db_data,gmail_messages,404
+2026-02-03,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#439,classification_missing,documents,439
+2026-02-03,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#440,classification_missing,documents,440
+2026-02-03,MWK-CV26360,Affidavit,,CLEAN,documents#442,passes_all_heuristics,documents,442
+2026-02-04,MWK-CV26360,Notice,,CLEAN,documents#437,passes_all_heuristics,documents,437
+2026-02-04,MWK-ESTATE,Email — Re: Caringo High School Camarines Norte,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4096,structured_db_data,gmail_messages,4096
+2026-02-04,MWK-ESTATE,Email — Re: Caringo High School Camarines Norte,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4097,structured_db_data,gmail_messages,4097
+2026-02-04,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#795,classification_missing,documents,795
+2026-02-05,MWK-ARTA-0747,Email — URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Members o,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4095,structured_db_data,gmail_messages,4095
+2026-02-06,MWK-CV26360,Order,,CLEAN,documents#423,passes_all_heuristics,documents,423
+2026-02-06,MWK-ESTATE,Receipt,,CLEAN,https://drive.google.com/file/d/1nStOCvHmo82Xl4FE3zkeBfiTWVTsG8iU/view,passes_all_heuristics,documents,475
+2026-02-06,MWK-ESTATE,Transaction — DEBIT P80.00 (filing_fee),"cp: Municipality of Daet, Barangay VIII",CLEAN,transactions#64,structured_db_data,transactions,64
+2026-02-06,MWK-ESTATE,Contract,,CLEAN,https://drive.google.com/file/d/1e6svOFYGnHTzWTugijAT0BuUsyoLzQy1/view,passes_all_heuristics,documents,476
+2026-02-08,MWK-ARTA-1319,Email — Subject: FORMAL ADMINISTRATIVE COMPLAINT - Jonathan Zschoche vs. Nestor Fortuno & Leonora Remoto (DE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4091,structured_db_data,gmail_messages,4091
+2026-02-08,MWK-ARTA-1378,"Email — Formal Complaint vs. Ms. Gemma Abla, Municipal Assessor, Mercedes, Camarines Norte – Violations of R",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4090,structured_db_data,gmail_messages,4090
+2026-02-09,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jonat","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#16,structured_db_data,gmail_messages,16
+2026-02-09,"MWK-CV26360,MWK-TCT4497","Email — Re: LETTER DATED NOVEMBER 26, 2025 RE: LOT 2-A, (LRA) PSD-221861",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4088,structured_db_data,gmail_messages,4088
+2026-02-09,MWK-CV26360,"Email — Order dated February 6, 2026","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#17,structured_db_data,gmail_messages,17
+2026-02-09,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jonat","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#19,structured_db_data,gmail_messages,19
+2026-02-09,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jonat","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#18,structured_db_data,gmail_messages,18
+2026-02-09,"MWK-ARTA-1319,MWK-ARTA-1321",Email — Urgent Demand for Immediate Release of Withheld Tax Records – No Meeting Required; Reference ARTA Co,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4087,structured_db_data,gmail_messages,4087
+2026-02-09,MWK-ARTA-1319,Email — Re: New RFO-Referred Complaint  - Jonathan Zschoche vs. Nestor Fortuno & Leonora Remoto (DENR-PENRO ,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4089,structured_db_data,gmail_messages,4089
+2026-02-09,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#424,classification_missing,documents,424
+2026-02-09,MWK-CV26360,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#419,classification_missing,documents,419
+2026-02-09,MWK-CV26360,Complaint,,CLEAN,documents#433,passes_all_heuristics,documents,433
+2026-02-09,MWK-CV26360,Affidavit,,CLEAN,documents#438,passes_all_heuristics,documents,438
+2026-02-09,MWK-CV26360,Complaint,,CLEAN,documents#434,passes_all_heuristics,documents,434
+2026-02-10,MWK-CV26360,"Email — Supervisory Intervention Needed – Engineer’s Response to FOI Request Dated January 24, 2026",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4085,structured_db_data,gmail_messages,4085
+2026-02-10,MWK-CV26360,"Email — Threats from defendant Erwin Balane. Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein ",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#393,structured_db_data,gmail_messages,393
+2026-02-11,MWK-ARTA-0747,Email — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Membe,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4084,structured_db_data,gmail_messages,4084
+2026-02-16,MWK-ARTA-1321,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4083,structured_db_data,gmail_messages,4083
+2026-02-17,MWK-ESTATE,Email — Fwd: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4080,structured_db_data,gmail_messages,4080
+2026-02-17,MWK-CV26360,Email — NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4081,structured_db_data,gmail_messages,4081
+2026-02-18,MWK-ARTA-1378,Email — Executive Briefing for Gov. Ascutia/Mayor Alex Meeting / Keesey Estate Settlement Framework,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#40,structured_db_data,gmail_messages,40
+2026-02-18,MWK-ARTA-1378,Memorandum,,CLEAN,documents#456,passes_all_heuristics,documents,456
+2026-02-21,MWK-ARTA-1321,Email — Re: Reply to the Complaint against the officials of PENRO Camarines Norte due to alleged violations ,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4075,structured_db_data,gmail_messages,4075
+2026-02-22,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4074,structured_db_data,gmail_messages,4074
+2026-02-23,MWK-ARTA-0747,Email — Fwd: [OSCA] CTN SL-2025-1021-0747 (Jonathan Paul Zschoche vs. Hon. Alexander Pajarillo of the Munici,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4072,structured_db_data,gmail_messages,4072
+2026-02-23,MWK-ARTA-1319,Email — Re: Reply to the Complaint against the officials of PENRO Camarines Norte due to alleged violations ,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4073,structured_db_data,gmail_messages,4073
+2026-02-23,MWK-CV26360,Reply,,CLEAN,https://drive.google.com/file/d/18_ORmfHqva3TUkcpx36ibdFqzqPWT2xS/view,passes_all_heuristics,documents,533
+2026-02-26,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4070,structured_db_data,gmail_messages,4070
+2026-03-03,MWK-ESTATE,Email — Re: Caringo High School Camarines Norte,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4069,structured_db_data,gmail_messages,4069
+2026-03-04,MWK-ARTA-1321,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4065,structured_db_data,gmail_messages,4065
+2026-03-04,MWK-ESTATE,Email — Re: Caringo High School Camarines Norte,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4068,structured_db_data,gmail_messages,4068
+2026-03-04,MWK-ARTA-1319,Complaint-Affidavit,,CLEAN,https://drive.google.com/file/d/1N5MyMP4tZWu94JVIAPd0wnzfS0x8PJde/view,passes_all_heuristics,documents,529
+2026-03-05,MWK-ARTA-1378,Email — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Membe,sender: Sangguniang Bayan <sangguniangbayan@mercedes.gov.ph>,CLEAN,gmail_messages#137,structured_db_data,gmail_messages,137
+2026-03-05,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4064,structured_db_data,gmail_messages,4064
+2026-03-05,MWK-ESTATE,Email — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Membe,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#136,structured_db_data,gmail_messages,136
+2026-03-06,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#134,structured_db_data,gmail_messages,134
+2026-03-06,"MWK-ARTA-1891,MWK-ARTA-DILG",Email — LETTER RESPONSE OF THE DILG CAMNORTE RE: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL,sender: DILG CAMARINES NORTE <dilgcamarinesnorte2020@gmail.com>,CLEAN,gmail_messages#135,structured_db_data,gmail_messages,135
+2026-03-07,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#133,structured_db_data,gmail_messages,133
+2026-03-09,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#131,structured_db_data,gmail_messages,131
+2026-03-09,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4059,structured_db_data,gmail_messages,4059
+2026-03-09,MWK-CV6839,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4060,structured_db_data,gmail_messages,4060
+2026-03-09,MWK-CV6839,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4061,structured_db_data,gmail_messages,4061
+2026-03-10,MWK-CV26360,Email — (no subject),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#124,structured_db_data,gmail_messages,124
+2026-03-10,MWK-ARTA-1210,Email — Omnibus Plea for Full Compliance - Outstanding RPT Inquiries [ARTA Case No. CTN SL-2026-0128-1210],sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#123,structured_db_data,gmail_messages,123
+2026-03-10,MWK-ESTATE,Email — Please ask Aunt Gerry,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4057,structured_db_data,gmail_messages,4057
+2026-03-10,MWK-CV6839,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4056,structured_db_data,gmail_messages,4056
+2026-03-11,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4053,structured_db_data,gmail_messages,4053
+2026-03-11,MWK-CV6839,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4054,structured_db_data,gmail_messages,4054
+2026-03-11,MWK-ARTA-1319,Email — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND EN,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#121,structured_db_data,gmail_messages,121
+2026-03-11,MWK-ARTA-1319,Complaint,,CLEAN,https://drive.google.com/file/d/1w4eaqwSKrnZUNz-TYjUTay8FKmnzz17X/view,passes_all_heuristics,documents,530
+2026-03-12,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#116,structured_db_data,gmail_messages,116
+2026-03-12,MWK-ARTA-1210,Email — Re: RESPONSE OF MUNICIPAL MAYOR & MS. LOIDA E. MACALE FOR CART CTN SL 2026-0128-1210,sender: Bayan Ng Mercedes <mercedesmunicipality@gmail.com>,CLEAN,gmail_messages#118,structured_db_data,gmail_messages,118
+2026-03-12,MWK-ARTA-1378,Email — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Membe,sender: Sangguniang Bayan <sangguniangbayan@mercedes.gov.ph>,CLEAN,gmail_messages#114,structured_db_data,gmail_messages,114
+2026-03-12,MWK-ARTA-1319,Email — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND EN,sender: R5 PENRO Camarines Norte <penrocamarinesnorte@denr.gov.ph>,CLEAN,gmail_messages#119,structured_db_data,gmail_messages,119
+2026-03-12,"MWK-ARTA-DILG,MWK-ARTA-1891",Email — Re: LETTER RESPONSE OF THE DILG CAMNORTE RE: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCED,sender: DILG CAMARINES NORTE <dilgcamarinesnorte2020@gmail.com>,CLEAN,gmail_messages#115,structured_db_data,gmail_messages,115
+2026-03-12,MWK-ARTA-1210,Email — Re: RESPONSE OF MUNICIPAL MAYOR & MS. LOIDA E. MACALE FOR CART CTN SL 2026-0128-1210,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#120,structured_db_data,gmail_messages,120
+2026-03-12,MWK-ARTA-DILG,Email — Re: LETTER RESPONSE OF THE DILG CAMNORTE RE: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCED,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#117,structured_db_data,gmail_messages,117
+2026-03-13,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#112,structured_db_data,gmail_messages,112
+2026-03-13,MWK-ARTA-1210,Email — Re: RESPONSE OF MUNICIPAL MAYOR & MS. LOIDA E. MACALE FOR CART CTN SL 2026-0128-1210,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#111,structured_db_data,gmail_messages,111
+2026-03-13,MWK-ARTA-1319,Email — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND EN,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#113,structured_db_data,gmail_messages,113
+2026-03-14,MWK-ESTATE,Email — Fwd: Please ask Aunt Gerry,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#110,structured_db_data,gmail_messages,110
+2026-03-15,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4047,structured_db_data,gmail_messages,4047
+2026-03-15,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4046,structured_db_data,gmail_messages,4046
+2026-03-16,MWK-CV26360,Email — Re: REFERRAL OF REQUESTS/ISSUES RAISED BY MR JONATHAN ZSCHOCHE,sender: Bayan Ng Mercedes <mercedesmunicipality@gmail.com>,CLEAN,gmail_messages#106,structured_db_data,gmail_messages,106
+2026-03-16,MWK-CV26360,"Email — Updates on Civil Case against Gloria Balane, et al.",sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#15,structured_db_data,gmail_messages,15
+2026-03-16,MWK-ARTA-1319,Email — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND EN,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#105,structured_db_data,gmail_messages,105
+2026-03-16,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#417,classification_missing,documents,417
+2026-03-16,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#418,classification_missing,documents,418
+2026-03-17,MWK-ARTA-1210,Email — Reply to email Re: Omnibus Plea for Full Compliance - Outstanding RPT Inquiries [ARTA Case No. CTN S,sender: Loida Macale <loidamacale@mercedes.gov.ph>,CLEAN,gmail_messages#100,structured_db_data,gmail_messages,100
+2026-03-17,MWK-CV26360,Email — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST,sender: Bayan Ng Mercedes <mercedesmunicipality@gmail.com>,CLEAN,gmail_messages#101,structured_db_data,gmail_messages,101
+2026-03-17,"MWK-ARTA-0690,MWK-ARTA-0792",Email — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#102,structured_db_data,gmail_messages,102
+2026-03-17,MWK-CV26360,Email — Re: ABLAW_LEGAL PROPOSAL,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4044,structured_db_data,gmail_messages,4044
+2026-03-18,MWK-ARTA-1210,Email — Re: Reply to email Re: Omnibus Plea for Full Compliance - Outstanding RPT Inquiries [ARTA Case No. C,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#99,structured_db_data,gmail_messages,99
+2026-03-19,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#95,structured_db_data,gmail_messages,95
+2026-03-19,MWK-ARTA-1210,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#96,structured_db_data,gmail_messages,96
+2026-03-19,MWK-ARTA-1321,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#97,structured_db_data,gmail_messages,97
+2026-03-19,MWK-ESTATE,"Transaction — DEBIT P3,394.77 (cnr)",cp: Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#69,structured_db_data,transactions,69
+2026-03-19,MWK-ESTATE,"Transaction — DEBIT P3,394.77 (registration_fee)",cp: Land Registration Authority,CLEAN,transactions#70,structured_db_data,transactions,70
+2026-03-19,MWK-ESTATE,"Transaction — DEBIT P2,339.56 (registration_fee)","cp: Land Registration Authority / Registry of Deeds, Camarines Norte",CLEAN,transactions#72,structured_db_data,transactions,72
+2026-03-19,"MWK-CV26360,MWK-TCT4497","Transaction — DEBIT P2,339.56 (cnr)",cp: Registry of Deeds for Province of Camarines Norte,CLEAN,transactions#73,structured_db_data,transactions,73
+2026-03-24,MWK-CV26360,Email — Re: ABLAW_LEGAL PROPOSAL,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4042,structured_db_data,gmail_messages,4042
+2026-03-24,MWK-CV26360,Email — Re: ABLAW_LEGAL PROPOSAL,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4039,structured_db_data,gmail_messages,4039
+2026-03-25,MWK-ARTA-1319,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#91,structured_db_data,gmail_messages,91
+2026-03-25,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4033,structured_db_data,gmail_messages,4033
+2026-03-25,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4034,structured_db_data,gmail_messages,4034
+2026-03-25,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4035,structured_db_data,gmail_messages,4035
+2026-03-25,MWK-CV26360,Email — Re: AB Law_Initial Meeting,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4036,structured_db_data,gmail_messages,4036
+2026-03-26,MWK-ARTA-1321,Affidavit,"titles: T-1321, T-2025",CLEAN,https://drive.google.com/file/d/1Hz29qMJFLcm1KF3PznFm0CMkyP9OMVSF/view,passes_all_heuristics,documents,480
+2026-03-26,MWK-ARTA-1378,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0218-1378,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#88,structured_db_data,gmail_messages,88
+2026-03-26,MWK-ARTA-1319,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#90,structured_db_data,gmail_messages,90
+2026-03-26,MWK-ARTA-1321,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#87,structured_db_data,gmail_messages,87
+2026-03-26,MWK-ARTA-1319,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#89,structured_db_data,gmail_messages,89
+2026-03-26,MWK-CV26360,Email — Re: ABLAW_LEGAL PROPOSAL,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4028,structured_db_data,gmail_messages,4028
+2026-03-27,MWK-ARTA-1321,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#86,structured_db_data,gmail_messages,86
+2026-03-30,MWK-ESTATE,Transaction — DEBIT P196.97 (cnr),cp: Land Registration Authority / Registry of Deeds of Province of Camarines Norte,CLEAN,transactions#71,structured_db_data,transactions,71
+2026-03-31,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4024,structured_db_data,gmail_messages,4024
+2026-03-31,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4025,structured_db_data,gmail_messages,4025
+2026-03-31,"MWK-ARTA-0690,MWK-ARTA-0792",Email — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST,sender: DILG CAMARINES NORTE <dilgcamarinesnorte2020@gmail.com>,CLEAN,gmail_messages#84,structured_db_data,gmail_messages,84
+2026-03-31,MWK-CV26360,Email — Re: ABLAW_LEGAL PROPOSAL,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4026,structured_db_data,gmail_messages,4026
+2026-04-01,MWK-ARTA-1319,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#83,structured_db_data,gmail_messages,83
+2026-04-01,MWK-ARTA-1321,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#82,structured_db_data,gmail_messages,82
+2026-04-05,MWK-CV26360,"Email — Re: Updates on Civil Case against Gloria Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#391,structured_db_data,gmail_messages,391
+2026-04-06,MWK-CV26360,Court Filing,,CLEAN,documents#404,passes_all_heuristics,documents,404
+2026-04-06,MWK-CV26360,Email — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#78,structured_db_data,gmail_messages,78
+2026-04-06,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#81,structured_db_data,gmail_messages,81
+2026-04-06,MWK-CV26360,Court Filing,"titles: T-1992, T-50192",CLEAN,https://drive.google.com/file/d/1NPwBb0LylMB_uh8eYb5giKWE5pr-SbY4/view,passes_all_heuristics,documents,470
+2026-04-06,MWK-CV26360,Court Filing,"titles: T-1992, T-50192",CLEAN,documents#402,passes_all_heuristics,documents,402
+2026-04-06,MWK-CV26360,Reply,"titles: T-1992, T-50192",CLEAN,documents#399,passes_all_heuristics,documents,399
+2026-04-06,MWK-CV26360,Motion,,CLEAN,documents#393,passes_all_heuristics,documents,393
+2026-04-06,MWK-CV26360,Motion,,CLEAN,documents#396,passes_all_heuristics,documents,396
+2026-04-06,MWK-CV26360,Court Filing,"titles: T-1992, T-50192",CLEAN,documents#398,passes_all_heuristics,documents,398
+2026-04-06,MWK-CV26360,Reply,"titles: T-1992, T-50192",CLEAN,documents#401,passes_all_heuristics,documents,401
+2026-04-06,MWK-CV26360,Affidavit,,CLEAN,documents#397,passes_all_heuristics,documents,397
+2026-04-06,MWK-ARTA-1378,Complaint,,CLEAN,https://drive.google.com/file/d/1Cs8KfRmk0KGQgk6SUmao38y1GHYWDh9g/view,passes_all_heuristics,documents,625
+2026-04-07,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact ",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#38,structured_db_data,gmail_messages,38
+2026-04-07,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4018,structured_db_data,gmail_messages,4018
+2026-04-07,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jona","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#14,structured_db_data,gmail_messages,14
+2026-04-07,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jona","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#13,structured_db_data,gmail_messages,13
+2026-04-07,MWK-CV26360,Affidavit,,CLEAN,documents#407,passes_all_heuristics,documents,407
+2026-04-07,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#414,classification_missing,documents,414
+2026-04-07,"MWK-CV26360,MWK-TCT4497",Answer,titles: T-52540,CLEAN,documents#405,passes_all_heuristics,documents,405
+2026-04-07,MWK-CV26360,Affidavit,,CLEAN,documents#409,passes_all_heuristics,documents,409
+2026-04-08,"MWK-ARTA-1378,MWK-CV26360",Email — COMPLAINT AFFIDAVIT (ENGINEER ERWIN BALANE) CTN SL-2026-0218-1378,sender: Jonathan Z <jonpeezee@hotmail.com>,CLEAN,gmail_messages#76,structured_db_data,gmail_messages,76
+2026-04-08,MWK-ESTATE,Email — Guardianship_Documents_Combined,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#77,structured_db_data,gmail_messages,77
+2026-04-08,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact ",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#37,structured_db_data,gmail_messages,37
+2026-04-08,MWK-CV26360,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#453,classification_missing,documents,453
+2026-04-10,"MWK-ARTA-1378,MWK-CV26360",Email — Re: COMPLAINT AFFIDAVIT (ENGINEER ERWIN BALANE) CTN SL-2026-0218-1378,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#75,structured_db_data,gmail_messages,75
+2026-04-10,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact ",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#36,structured_db_data,gmail_messages,36
+2026-04-10,MWK-CV26360,"Email — Re: Updates on Civil Case against Gloria Balane, et al.",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#385,structured_db_data,gmail_messages,385
+2026-04-11,MWK-CV26360,Email — Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane),sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#12,structured_db_data,gmail_messages,12
+2026-04-11,MWK-CV26360,Email — Re: Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#383,structured_db_data,gmail_messages,383
+2026-04-11,MWK-CV26360,Affidavit,,CLEAN,documents#403,passes_all_heuristics,documents,403
+2026-04-13,MWK-CV26360,"Email — Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zs","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#8,structured_db_data,gmail_messages,8
+2026-04-13,MWK-ESTATE,Email — Re: reply and verification,sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#9,structured_db_data,gmail_messages,9
+2026-04-13,MWK-CV26360,Email — Re: Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane),sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#11,structured_db_data,gmail_messages,11
+2026-04-13,MWK-CV26360,Email — Re: Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane),sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#10,structured_db_data,gmail_messages,10
+2026-04-13,MWK-CV26360,Affidavit,,CLEAN,documents#400,passes_all_heuristics,documents,400
+2026-04-14,MWK-CV26360,Email — Re: Draft of Judicial Affidavit of Jonathan Zschocha,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4009,structured_db_data,gmail_messages,4009
+2026-04-14,MWK-ESTATE,Email — Subject: Professional Mandate for Due Diligence and Partnership Procurement (EXPA No. 000322-V),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4010,structured_db_data,gmail_messages,4010
+2026-04-14,MWK-CV26360,Email — Re: Draft of Judicial Affidavit of Jonathan Zschocha,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#74,structured_db_data,gmail_messages,74
+2026-04-15,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4007,structured_db_data,gmail_messages,4007
+2026-04-16,MWK-ARTA-1378,Email — Re: ARTA CART INDORSEMENT - CTN SL-2026-0218-1378,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#73,structured_db_data,gmail_messages,73
+2026-04-20,"MWK-ARTA-0690,MWK-ARTA-0747,MWK-ARTA-0792",Letter,,CLEAN,https://drive.google.com/file/d/1Y44nY6HuhrT1rlHKhKsa4nbp1zB52JLO/view,passes_all_heuristics,documents,465
+2026-04-20,"MWK-ARTA-0690,MWK-ARTA-0792","Email — Re: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#71,structured_db_data,gmail_messages,71
+2026-04-20,"MWK-ARTA-0690,MWK-ARTA-0792,MWK-CV26360","Email — Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025-100",sender: Litigation Division - ARTA <litigationdivision@arta.gov.ph>,CLEAN,gmail_messages#72,structured_db_data,gmail_messages,72
+2026-04-20,MWK-CV26360,Email — Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit,sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#7,structured_db_data,gmail_messages,7
+2026-04-21,MWK-CV26360,Email — Re: Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#374,structured_db_data,gmail_messages,374
+2026-04-22,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4001,structured_db_data,gmail_messages,4001
+2026-04-22,MWK-ESTATE,Email — Re: Caringo High School Camarines Norte/Resuming at New School,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4002,structured_db_data,gmail_messages,4002
+2026-04-22,"MWK-ARTA-0690,MWK-ARTA-0792","Email — Fwd: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-202",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#67,structured_db_data,gmail_messages,67
+2026-04-22,MWK-ESTATE,Email — Re: ABLAW_BILLING INVOICE,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#4003,structured_db_data,gmail_messages,4003
+2026-04-22,"MWK-ARTA-0690,MWK-ARTA-0792","Email — Re: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025",sender: Litigation Division - ARTA <litigationdivision@arta.gov.ph>,CLEAN,gmail_messages#69,structured_db_data,gmail_messages,69
+2026-04-23,MWK-CV26360,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/e964c42c35be1453c09c31897bb5202d/view,text_missing_or_too_short,documents,5
+2026-04-23,MWK-ARTA-1891,Email — Re: Submission of Standalone Complaint with Manifestation for Supervisory Review of CART Process,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#64,structured_db_data,gmail_messages,64
+2026-04-23,MWK-ARTA-1891,Email — Re: Submission of Standalone Complaint with Manifestation for Supervisory Review of CART Process,sender: Southern Luzon - Complaints Handling <complaints.southernluzon@arta.gov.ph>,CLEAN,gmail_messages#65,structured_db_data,gmail_messages,65
+2026-04-23,MWK-ARTA-1891,Email — Submission of Standalone Complaint with Manifestation for Supervisory Review of CART Process,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#66,structured_db_data,gmail_messages,66
+2026-04-23,MWK-ESTATE,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,documents#799,classification_missing,documents,799
+2026-04-24,MWK-CV26360,Affidavit,,CLEAN,https://drive.google.com/file/d/1IlGaHawSmUNYk8E8qGG_OA-YGP1LlMOW/view,passes_all_heuristics,documents,462
+2026-04-24,MWK-CV26360,Affidavit,,CLEAN,https://drive.google.com/file/d/1GWJCqf904h_3a9TpEYtt1eb3yAivdwlb/view,passes_all_heuristics,documents,464
+2026-04-24,MWK-CV26360,Affidavit,,CLEAN,https://drive.google.com/file/d/1K7Y2O-2QihNTXwW9EHIfzz_XqXNSJmto/view,passes_all_heuristics,documents,463
+2026-04-24,MWK-CV26360,Affidavit,,CLEAN,documents#394,passes_all_heuristics,documents,394
+2026-04-24,MWK-CV26360,Notice,,CLEAN,documents#392,passes_all_heuristics,documents,392
+2026-04-24,MWK-ESTATE,Email — Re: Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit,sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#6,structured_db_data,gmail_messages,6
+2026-04-24,MWK-CV26360,Email — Re: Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#372,structured_db_data,gmail_messages,372
+2026-04-26,"MWK-ARTA-0690,MWK-ARTA-0792,MWK-ARTA-1378,MWK-CV26360",Complaint,titles: T-12,CLEAN,https://drive.google.com/file/d/1QE_JtPJFzL10Xy-66Epgi392lnV8ubVZ/view,passes_all_heuristics,documents,472
+2026-04-27,MWK-CV26360,Motion,,CLEAN,documents#391,passes_all_heuristics,documents,391
+2026-04-28,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#35,structured_db_data,gmail_messages,35
+2026-04-28,"MWK-ARTA-0690,MWK-ARTA-0792","Email — Re: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025",sender: Litigation Division - ARTA <litigationdivision@arta.gov.ph>,CLEAN,gmail_messages#63,structured_db_data,gmail_messages,63
+2026-04-28,MWK-CV26360,Email — Fw: Notice of Pre-Trial Conference for Civil Case No. 26-360,"sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#4,structured_db_data,gmail_messages,4
+2026-04-28,MWK-CV26360,Email — Re: Fw: Notice of Pre-Trial Conference for Civil Case No. 26-360,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#368,structured_db_data,gmail_messages,368
+2026-04-28,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Pau","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#5,structured_db_data,gmail_messages,5
+2026-04-30,"MWK-ARTA-0690,MWK-ARTA-0792,MWK-CV26360",Email — Endorsement of Resolution and Annexes CTN SL-2025-1008-0690 and CTN SL-2025-1104-0792,sender: Litigation Proper Unit <litigationproper@arta.gov.ph>,CLEAN,gmail_messages#62,structured_db_data,gmail_messages,62
+2026-05-04,MWK-ARTA-DILG,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/06ef649975e623d3b9cbc44872addd6e/view,text_missing_or_too_short,documents,3
+2026-05-04,MWK-ARTA-DILG,[MANUAL REVIEW REQUIRED - POOR OCR],,POOR_OCR,https://drive.google.com/file/d/9965777f7d3ba682c7a7c48091e4ca87/view,text_missing_or_too_short,documents,4
+2026-05-04,MWK-ARTA-1891,Email — Re: NOTICE OF REFERRAL - CTN SL-2026-0423-1891 (CSC),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#56,structured_db_data,gmail_messages,56
+2026-05-05,"MWK-ARTA-0690,MWK-ARTA-0792",Petition,,CLEAN,https://drive.google.com/file/d/1WfqNjnaYd6Muma0TK0ph8mb-IEiho2PE/view,passes_all_heuristics,documents,457
+2026-05-05,MWK-ARTA-DILG,Government Submission,,CLEAN,https://drive.google.com/file/d/1R-34xMApHxtdINwZlKKXlKJPEUDD3n5C/view,passes_all_heuristics,documents,458
+2026-05-05,"MWK-ARTA-0690,MWK-ARTA-0792,MWK-CV26360,MWK-TCT4497",Court Filing,"titles: T-14, T-48336",CLEAN,https://drive.google.com/file/d/1sAkgfW9EUwjLuZ6rjetYm_9FIO3ARwkH/view,passes_all_heuristics,documents,459
+2026-05-06,MWK-ESTATE,Email — Re: URGENT — Petition for Supervisory Review — Filed 05 May 2026,sender: Malacanang Records Office <mro@op.gov.ph>,CLEAN,gmail_messages#53,structured_db_data,gmail_messages,53
+2026-05-06,MWK-CV26360,"Email — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Pau","sender: ""BONIFACIO, JR. BARANDON"" <barandon_lawoffice@yahoo.com>",CLEAN,gmail_messages#3,structured_db_data,gmail_messages,3
+2026-05-06,"MWK-ARTA-0690,MWK-ARTA-0792,MWK-CV26360",Email — Notice of Filing at the Office of the President — Zschoche v. Balane — ARTA CTN SL-2025-1008-0690 & ,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#52,structured_db_data,gmail_messages,52
+2026-05-06,MWK-CV26360,Email — URGENT — Petition for Supervisory Review — Filed 05 May 2026,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#54,structured_db_data,gmail_messages,54
+2026-05-08,MWK-ESTATE,Email — Re: Caringo High School Camarines Norte/Resuming at New School,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#3987,structured_db_data,gmail_messages,3987
+2026-05-08,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#34,structured_db_data,gmail_messages,34
+2026-05-11,MWK-CV26360,Reply,,CLEAN,documents#390,passes_all_heuristics,documents,390
+2026-05-11,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan",sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#2,structured_db_data,gmail_messages,2
+2026-05-11,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#32,structured_db_data,gmail_messages,32
+2026-05-11,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#33,structured_db_data,gmail_messages,33
+2026-05-11,MWK-CV26360,"Email — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan",sender: Barandon Law Offices Records <barandonlawoffice.records@gmail.com>,CLEAN,gmail_messages#1,structured_db_data,gmail_messages,1
+2026-05-12,"MWK-ARTA-1891,MWK-ARTA-DILG",Email — Re: NOTICE OF REFERRAL - CTN SL-2026-0423-1891 (DILG),sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#48,structured_db_data,gmail_messages,48
+2026-05-12,MWK-ARTA-DILG,Email — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST,sender: DILG CAMARINES NORTE <dilgcamarinesnorte2020@gmail.com>,CLEAN,gmail_messages#47,structured_db_data,gmail_messages,47
+2026-05-13,MWK-ARTA-1378,"Email — [OSCA] CTN SL-2026-0218-1378 Jonathan Paul Zschoche v. Municipal Engineer's Office - Mercedes, Camar",sender: Litigation Division - ARTA <litigationdivision@arta.gov.ph>,CLEAN,gmail_messages#43,structured_db_data,gmail_messages,43
+2026-05-13,MWK-CV26360,Email — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST,sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#46,structured_db_data,gmail_messages,46
+2026-05-13,MWK-ARTA-1321,"Email — [OSCA] CTN SL-2026-0209-1321 Jonathan Paul Zschoche v. Municipal Assessor's Office, Mercedes, Camari",sender: Litigation Division - ARTA <litigationdivision@arta.gov.ph>,CLEAN,gmail_messages#44,structured_db_data,gmail_messages,44
+2026-05-13,MWK-CV26360,judicial_event,,CLEAN,case_deadlines#1,structured_db_data,case_deadlines,1
+2026-05-15,MWK-ARTA-1210,"Email — [RESOLUTION - NOC] CTN SL-2026-0128-1210 Jonathan Paul Zschoche v LGU Mercedes, Camarines Norte",sender: Litigation Division - ARTA <litigationdivision@arta.gov.ph>,CLEAN,gmail_messages#42,structured_db_data,gmail_messages,42
+2026-05-15,MWK-ARTA-1210,"Email — Re: [RESOLUTION - NOC] CTN SL-2026-0128-1210 Jonathan Paul Zschoche v LGU Mercedes, Camarines Norte",sender: Jonathan Zschoche <jonzschoche@gmail.com>,CLEAN,gmail_messages#41,structured_db_data,gmail_messages,41
+2026-05-16,MWK-ESTATE,procedural_intake,,CLEAN,stage_intake_response#1,structured_db_data,stage_intake_response,1
+2026-05-17,MWK-ESTATE,procedural_intake,,CLEAN,stage_intake_response#3,structured_db_data,stage_intake_response,3
+2026-05-17,MWK-ESTATE,procedural_intake,,CLEAN,stage_intake_response#4,structured_db_data,stage_intake_response,4
+2026-05-18,MWK-TCT4497,judicial_event,,CLEAN,case_deadlines#2,structured_db_data,case_deadlines,2
+2026-06-02,MWK-CV26360,judicial_event,,CLEAN,manual_anchor#cv26360_mediation_2026_06_02,structured_db_data,manual_anchor,cv26360_mediation_2026_06_02
+2026-06-02,MWK-CV26360,judicial_event,,CLEAN,case_deadlines#3,structured_db_data,case_deadlines,3
+2028-12-01,MWK-ESTATE,Transaction — DEBIT P195.00 (rpt),,CLEAN,transactions#32,structured_db_data,transactions,32
+2029-10-23,MWK-ESTATE,"Transaction — DEBIT P1,000.00 (other)",cp: Republic of the Philippines,CLEAN,transactions#121,structured_db_data,transactions,121
+(undated),"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#45,structured_db_data,instruments_on_title,45
+(undated),"MWK-CV26360,MWK-TCT4497",title_annotation,titles: T-52540,CLEAN,instruments_on_title#54,structured_db_data,instruments_on_title,54
