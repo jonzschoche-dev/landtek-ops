@@ -135,32 +135,263 @@ def resolve_matter(cur, matter_code=None, case_file=None):
 
 
 def fetch_events(cur, matter_code, case_file):
-    """Pull events: prefer matter-attributed, fall back to case_file."""
-    if matter_code:
-        cur.execute("""
-            SELECT id, COALESCE(event_date, date_executed, date_filed, date_received) AS primary_date,
-                   event_date, event_datetime, event_kind, event_kind_canonical,
-                   date_executed, date_filed, date_received,
-                   who_from, who_to, what_summary, citation_ref,
-                   provenance, source_table, source_id,
-                   matter_codes, title_refs, party_refs
-              FROM client_history
-             WHERE %s = ANY(matter_codes) OR case_file = %s
-             ORDER BY primary_date NULLS LAST, event_datetime NULLS LAST, id
-        """, (matter_code, case_file))
-    else:
-        cur.execute("""
-            SELECT id, COALESCE(event_date, date_executed, date_filed, date_received) AS primary_date,
-                   event_date, event_datetime, event_kind, event_kind_canonical,
-                   date_executed, date_filed, date_received,
-                   who_from, who_to, what_summary, citation_ref,
-                   provenance, source_table, source_id,
-                   matter_codes, title_refs, party_refs
-              FROM client_history
-             WHERE case_file = %s
-             ORDER BY primary_date NULLS LAST, event_datetime NULLS LAST, id
-        """, (case_file,))
+    """Enriched event fetch (deploy_157) — JOINs to documents/transactions/gmail/calendar
+    to pull substantive payload, not just metadata tags.
+
+    For every event row, we have:
+      - the bible-level metadata (date, kind, parties, provenance)
+      - the SOURCE-LEVEL substance:
+        * documents:  classification, smart_filename, document_title,
+                      first 600 chars of extracted_text, analyst_memo JSON,
+                      execution_status
+        * transactions: amount, counterparty, category, payment_method,
+                      description, direction (in/out)
+        * gmail:    subject, from_addr, first 400 chars of body_plain
+        * calendar: title, description, location, attendees
+        * title_transfers: instrument_type, parent/derivative, transferor/transferee, status
+    """
+    where_clause = ("(%s = ANY(h.matter_codes) OR h.case_file = %s)"
+                    if matter_code else "h.case_file = %s")
+    params = (matter_code, case_file) if matter_code else (case_file,)
+
+    cur.execute(f"""
+        SELECT
+          h.id,
+          COALESCE(h.event_date, h.date_executed, h.date_filed, h.date_received) AS primary_date,
+          h.event_date, h.event_datetime, h.event_kind, h.event_kind_canonical,
+          h.date_executed, h.date_filed, h.date_received,
+          h.who_from, h.who_to, h.what_summary, h.citation_ref,
+          h.provenance, h.source_table, h.source_id,
+          h.matter_codes, h.title_refs, h.party_refs,
+
+          d.classification     AS doc_classification,
+          d.smart_filename     AS doc_smart_filename,
+          d.original_filename  AS doc_original_filename,
+          d.document_title     AS doc_title,
+          d.execution_status   AS doc_execution_status,
+          LEFT(d.extracted_text, 600) AS doc_text_snippet,
+          d.analyst_memo       AS doc_analyst_memo,
+
+          t.amount             AS tx_amount,
+          t.direction          AS tx_direction,
+          t.category           AS tx_category,
+          t.counterparty       AS tx_counterparty,
+          t.payment_method     AS tx_payment_method,
+          t.description        AS tx_description,
+
+          g.subject            AS gmail_subject,
+          g.from_addr          AS gmail_from,
+          g.from_name          AS gmail_from_name,
+          LEFT(g.body_plain, 400) AS gmail_body_snippet,
+
+          ce.title             AS cal_title,
+          ce.description       AS cal_description,
+          ce.location          AS cal_location,
+          ce.attendees         AS cal_attendees,
+
+          tt.instrument_type   AS tt_instrument_type,
+          tt.parent_title      AS tt_parent_title,
+          tt.derivative_title  AS tt_derivative_title,
+          tt.transferor        AS tt_transferor,
+          tt.transferee_name   AS tt_transferee_name,
+          tt.entry_pe_number   AS tt_pe_number,
+          tt.status            AS tt_status
+        FROM client_history h
+        LEFT JOIN documents d
+          ON h.source_table = 'documents'      AND h.source_id = d.id::text
+        LEFT JOIN transactions t
+          ON h.source_table = 'transactions'   AND h.source_id = t.id::text
+        LEFT JOIN gmail_messages g
+          ON h.source_table = 'gmail_messages' AND h.source_id = g.id::text
+        LEFT JOIN calendar_events ce
+          ON h.source_table = 'calendar_events' AND h.source_id = ce.id::text
+        LEFT JOIN title_transfers tt
+          ON h.source_table = 'title_transfers' AND h.source_id = tt.id::text
+        WHERE {where_clause}
+        ORDER BY primary_date NULLS LAST, event_datetime NULLS LAST, h.id
+    """, params)
     return cur.fetchall()
+
+
+# ── Classification → human Action translation ──────────────────────────
+# Avoids per-event LLM cost (1034 events would cost too much). The
+# classification field is the canonical source of "what kind of doc this is";
+# we lift it into verb-form action.
+CLASSIFICATION_TO_ACTION = {
+    "deed":                          "Execution of Deed",
+    "deed_of_sale":                  "Execution of Deed of Sale",
+    "deed_of_absolute_sale":         "Execution of Deed of Absolute Sale",
+    "deed_of_donation":              "Execution of Deed of Donation",
+    "deed_of_confirmation":          "Execution of Deed of Confirmation",
+    "special_power_of_attorney":     "Execution of Special Power of Attorney",
+    "power_of_attorney":             "Execution of Power of Attorney",
+    "affidavit":                     "Execution of Affidavit",
+    "judicial_affidavit":            "Execution of Judicial Affidavit",
+    "affidavit_of_confirmation":     "Execution of Affidavit of Confirmation",
+    "affidavit_of_loss":             "Execution of Affidavit of Loss",
+    "complaint":                     "Filing of Complaint",
+    "complaint-affidavit":           "Filing of Complaint-Affidavit",
+    "motion":                        "Filing of Motion",
+    "petition":                      "Filing of Petition",
+    "petition_for_certiorari":       "Filing of Petition for Certiorari",
+    "reply":                         "Filing of Reply",
+    "answer":                        "Filing of Answer",
+    "court_filing":                  "Court Filing",
+    "court_order":                   "Issuance of Court Order",
+    "order":                         "Issuance of Court Order",
+    "decision":                      "Court Decision Issued",
+    "resolution":                    "Resolution Issued",
+    "notice":                        "Notice Issued",
+    "letter":                        "Correspondence (Letter)",
+    "demand_letter":                 "Demand Letter Sent",
+    "transcript":                    "Hearing Transcript",
+    "tax_document":                  "Tax Declaration / Tax Document",
+    "receipt":                       "Payment Receipt",
+    "title":                         "Title Document",
+    "title_(tct/oct)":               "Title (TCT/OCT) — Issuance or Certification",
+    "title_(tct)":                   "Title (TCT) — Issuance or Certification",
+    "title_issued":                  "Title Issued",
+    "certificate":                   "Certificate Issued",
+    "death_certificate":             "Death Certificate",
+    "government_submission":         "Government Submission",
+    "request":                       "Formal Request Submitted",
+    "legal_memorandum":              "Legal Memorandum",
+    "memorandum":                    "Memorandum",
+    "contract":                      "Contract Executed",
+    "plan":                          "Survey / Subdivision Plan",
+    "financial_statement":           "Financial Statement",
+    "newspaper":                     "Newspaper Publication / Notice",
+}
+
+
+def translate_action(event):
+    """Map a row's classification/event_kind to a human verb-phrase. No LLM."""
+    raw = (event.get("doc_classification") or event.get("event_kind") or "").strip().lower().replace(" ", "_")
+    raw = raw.replace("(tct/oct)", "(tct/oct)")  # normalize
+    if raw in CLASSIFICATION_TO_ACTION:
+        return CLASSIFICATION_TO_ACTION[raw]
+    # Try prefix match for annotation_*
+    if raw.startswith("annotation_"):
+        sub = raw.replace("annotation_", "").replace("_", " ").strip()
+        return f"Annotation on Title — {sub.title()[:60]}"
+    if raw.startswith("tx_"):
+        return "Transaction"
+    if raw.startswith("intake_"):
+        return f"System Intake ({raw.replace('intake_','').replace('_', ' ')})"
+    if raw.startswith("deadline_"):
+        return f"Deadline ({raw.replace('deadline_','')})"
+    # Fall back to source_table verbs
+    st = (event.get("source_table") or "").lower()
+    if st == "gmail_messages":
+        # direction inferred from event_kind raw
+        if "sent" in (event.get("event_kind") or "").lower():
+            return "Outbound Email"
+        return "Inbound Email"
+    if st == "transactions":
+        d = event.get("tx_direction") or ""
+        return f"Money {'Outflow' if d=='out' else 'Inflow' if d=='in' else 'Transaction'}"
+    if st == "title_transfers":
+        return "Title Transfer / Lineage Event"
+    return "Event"
+
+
+def build_substantive_context(event):
+    """Compose the rich context line. NEVER 'unknown' — either substance or
+    explicit '[Context Missing in DB]' marker.
+    """
+    parts = []
+
+    # Document substance
+    if event.get("doc_text_snippet"):
+        snippet = event["doc_text_snippet"].strip()
+        # Filter obvious OCR noise (mostly non-ascii / short tokens)
+        if len(snippet) >= 30 and sum(c.isalpha() for c in snippet) / max(len(snippet), 1) > 0.5:
+            # Drop leading garbage like "rtEstsoONO64460..." — take first sentence
+            import re
+            sentences = re.split(r'(?<=[.!?:])\s+', snippet)
+            keep = " ".join(s for s in sentences if len(s) > 12 and
+                            sum(c.isalpha() for c in s) / max(len(s), 1) > 0.55)[:500]
+            if keep:
+                parts.append(keep)
+    # Document title (often a manual one-liner)
+    if event.get("doc_title") and event["doc_title"] != event.get("doc_smart_filename"):
+        parts.append(f"Title: {event['doc_title']}")
+    # Analyst memo (JSON — pull useful fields)
+    memo = event.get("doc_analyst_memo")
+    if memo and isinstance(memo, dict):
+        for key in ("summary", "subject_brief", "key_facts"):
+            if memo.get(key):
+                parts.append(f"{key}: {str(memo[key])[:300]}")
+                break
+
+    # Transaction substance
+    if event.get("tx_amount") is not None:
+        d = event.get("tx_direction") or "?"
+        cat = event.get("tx_category") or "transaction"
+        cp = event.get("tx_counterparty") or "(counterparty unknown)"
+        method = event.get("tx_payment_method") or ""
+        amt = float(event["tx_amount"])
+        verb = "Paid" if d == "out" else "Received" if d == "in" else "Movement of"
+        parts.append(f"{verb} P{amt:,.2f} for {cat} to/from {cp}"
+                     + (f" via {method}" if method else ""))
+        if event.get("tx_description"):
+            parts.append(f"  Description: {event['tx_description'][:300]}")
+
+    # Gmail substance
+    if event.get("gmail_subject"):
+        sender = event.get("gmail_from_name") or event.get("gmail_from") or "?"
+        parts.append(f"Subject: {event['gmail_subject'][:200]} (from: {sender})")
+    if event.get("gmail_body_snippet"):
+        body = event["gmail_body_snippet"].strip().replace("\n", " ")
+        if len(body) > 20:
+            parts.append(f"Body: {body[:400]}")
+
+    # Calendar substance
+    if event.get("cal_title"):
+        parts.append(f"Event: {event['cal_title']}"
+                     + (f" @ {event['cal_location']}" if event.get("cal_location") else ""))
+        if event.get("cal_description"):
+            parts.append(f"  {event['cal_description'][:300]}")
+
+    # Title transfer substance
+    if event.get("tt_instrument_type"):
+        ext = (f"{event['tt_instrument_type']}: "
+               f"{event['tt_parent_title']} → {event['tt_derivative_title']} "
+               f"(transferor: {event['tt_transferor'] or '?'} → "
+               f"transferee: {event['tt_transferee_name'] or '?'})")
+        if event.get("tt_pe_number"):
+            ext += f" [PE# {event['tt_pe_number']}]"
+        parts.append(ext)
+
+    if parts:
+        return " · ".join(parts)
+    # Fall back to bible-level what_summary
+    if event.get("what_summary") and not event["what_summary"].startswith("doc — "):
+        return event["what_summary"]
+    return "[Context Missing in DB]"
+
+
+def collect_entities_titles(event):
+    """Combine title_refs[] + key parties (transferees + email senders + transaction
+    counterparties) into a single list for the Key Entities/Titles line."""
+    parts = []
+    if event.get("title_refs"):
+        parts.append("Titles: " + ", ".join(event["title_refs"][:8]))
+    persons = []
+    for k in ("tt_transferor", "tt_transferee_name", "tx_counterparty",
+               "gmail_from_name", "who_from", "who_to"):
+        v = event.get(k)
+        if v and v not in ("—", "?", "unknown", ""):
+            persons.append(v)
+    if persons:
+        parts.append("Persons: " + ", ".join(dict.fromkeys(persons[:6])))  # dedup, preserve order
+    if event.get("tx_amount") is not None:
+        parts.append(f"Amount: P{float(event['tx_amount']):,.2f}")
+    if event.get("party_refs"):
+        parts.append("party_ids: " + ", ".join(str(p) for p in event["party_refs"][:5]))
+    if not parts:
+        return "[No entities/titles linked]"
+    return " · ".join(parts)
 
 
 def fetch_critical_deadlines(cur, case_file):
@@ -345,6 +576,288 @@ CLIENT_DISPLAY_NAMES = {
 }
 
 
+# ── LLM narrative synthesis (Layer D narrative weaving) ────────────────
+def synthesize_year_narratives(events):
+    """Group events by year, send each year's enriched events to Haiku for a
+    paragraph narrative. Returns {year: narrative_text}.
+
+    Cost-disciplined per [[feedback_cost_discipline]]:
+      - Haiku only (no Sonnet/Opus)
+      - Skip years with < 2 events (no narrative needed)
+      - Cap events per year at 50 in the prompt
+      - Cache nothing in this run; per-year calls
+    Estimated cost for 1034-event corpus: $0.10-0.20.
+    """
+    import os
+    from itertools import groupby
+    if os.environ.get("BIBLE_SKIP_LLM"):
+        return {}
+    try:
+        import anthropic
+        from landtek_core import get
+        from llm_billing import anthropic_call
+    except Exception as e:
+        print(f"  ⚠ LLM unavailable for narratives: {e}")
+        return {}
+    api_key = get("ANTHROPIC_API_KEY") if 'get' in dir() else None
+    if not api_key:
+        try:
+            for l in open("/root/landtek/.env"):
+                if l.startswith("ANTHROPIC_API_KEY="):
+                    api_key = l.split("=", 1)[1].strip(); break
+        except Exception:
+            pass
+    if not api_key:
+        print("  ⚠ no ANTHROPIC_API_KEY — narratives skipped")
+        return {}
+    client = anthropic.Anthropic(api_key=api_key)
+
+    narratives = {}
+    by_year = {y: list(g) for y, g in
+                groupby(sorted(events, key=lambda e: e["primary_date"]),
+                        key=lambda e: e["primary_date"].year)}
+    # Importance tiers for stratified sampling. Critical legal acts and judicial
+    # events always included; transactions/tax_documents subsampled.
+    PRIORITY_KINDS = {
+        # Always include
+        "legal_act": 0, "judicial_event": 0, "title_event": 0, "title_annotation": 0,
+        "vital_record": 0, "procedural_intake": 0, "legal_memo": 0,
+        # Cap-limited
+        "correspondence": 2, "government_submission": 2, "survey_plan": 2,
+        "tax_document": 3, "transaction": 3, "uncategorized": 4,
+    }
+    total_cost_estimate = 0.0
+    for year, year_events in by_year.items():
+        if len(year_events) < 2:
+            continue  # single-event years are self-explanatory
+        # Stratified sampling: cap = 50 per year, but always include high-tier kinds.
+        # Group by tier; fill tier-0 entirely, then sample from tier-1/2/3 by count.
+        from collections import defaultdict as _dd
+        buckets = _dd(list)
+        for ev in year_events:
+            tier = PRIORITY_KINDS.get(ev.get("event_kind_canonical") or "", 5)
+            buckets[tier].append(ev)
+        sample = []
+        for tier in sorted(buckets.keys()):
+            tier_events = buckets[tier]
+            if tier == 0:
+                sample.extend(tier_events)  # always all
+            else:
+                # Stride-sample uniformly across the year
+                remaining = max(0, 50 - len(sample))
+                if remaining <= 0:
+                    break
+                if len(tier_events) <= remaining:
+                    sample.extend(tier_events)
+                else:
+                    stride = max(1, len(tier_events) // remaining)
+                    sample.extend(tier_events[::stride][:remaining])
+        sample.sort(key=lambda e: e["primary_date"])
+        sample = sample[:60]  # hard cap (tier-0 can blow past 50)
+        lines = []
+        for e in sample:
+            mcodes = ", ".join(shorten_matter_tag(mc) for mc in (e.get("matter_codes") or [])[:2]) or "GENERAL"
+            action = translate_action(e)
+            # Brief substance for the LLM (smaller than the event-log version)
+            substance_bits = []
+            if e.get("doc_text_snippet"):
+                t = e["doc_text_snippet"].strip()[:200].replace("\n", " ")
+                if sum(c.isalpha() for c in t)/max(len(t),1) > 0.4:
+                    substance_bits.append(t)
+            if e.get("tx_amount") is not None:
+                substance_bits.append(f"P{float(e['tx_amount']):,.0f} {e.get('tx_direction','?')} "
+                                       f"{e.get('tx_category','')} "
+                                       f"to/from {e.get('tx_counterparty','?')}")
+            if e.get("gmail_subject"):
+                substance_bits.append(f"email subj: {e['gmail_subject'][:120]}")
+            if e.get("tt_instrument_type"):
+                substance_bits.append(f"{e['tt_instrument_type']}: "
+                                       f"{e.get('tt_parent_title','?')}→"
+                                       f"{e.get('tt_derivative_title','?')}")
+            substance = " | ".join(substance_bits)[:300]
+            titles = ",".join((e.get("title_refs") or [])[:4])
+            prov = e.get("citation_ref") or f"{e['source_table']}#{e['source_id']}"
+            lines.append(f"{e['primary_date'].isoformat()} [{mcodes}] {action}"
+                          + (f" — {substance}" if substance else "")
+                          + (f" ({titles})" if titles else "")
+                          + f" [prov: {prov}]")
+
+        prompt = (
+            f"You are a senior paralegal writing a Master Case Bible for the heirs "
+            f"of Mary Worrick Keesey (MWK-001), a Philippine property estate.\n\n"
+            f"## CRITICAL FACTS — these MUST be respected (Opus audit gate enforced)\n\n"
+            f"- **MWK-001 / MWK-ESTATE is the TOP-LEVEL parent.** CV-26360, CV-6839, "
+            f"TCT-4497 chain verification, ARTA matters, and tax/title administration "
+            f"are SIBLING subtracks. Do NOT collapse estate work into CV-26360.\n"
+            f"- **Cesar N. dela Fuente died 21 June 2017** (cited in LandBank's filing "
+            f"in CV-6839, doc#364). ANY narrative attributing legal action to Cesar after "
+            f"21 June 2017 is IMPOSSIBLE and a data error. Omit him from 2018+ attribution; "
+            f"attribute to Patricia/Jonathan/Atty. Barandon or the holding office instead.\n"
+            f"- **Civil Case 26-360 venue: RTC Camarines Norte BRANCH 64** (never MTC "
+            f"Mercedes; MTC reference is residue from a draft caption). Mediation set for "
+            f"2 June 2026 at RTC Daet 1 PM.\n"
+            f"- **CV-6839 (just-compensation vs LandBank)** is its own track, applying "
+            f"ONLY to the agrarian/CARP title set {{T-30681, T-30682, T-30683, T-4494, "
+            f"T-4501, T-4502, T-4503, T-14}}. Do NOT mix with T-4497 chain.\n"
+            f"- **TCT-4497 chain** is the contested-Balane chain "
+            f"(T-4497 → T-32916/32917/31298 → T-079-2021002126). Title-chain certification "
+            f"work is ESTATE administration, NOT Balane litigation, unless a pleading cites it.\n"
+            f"- **Patricia Keesee Zschoche** (caption spelling — KEESEE for the plaintiff "
+            f"caption; KEESEY also appears in family-name usage. Use KEESEE for the case caption).\n"
+            f"- **Two distinct Pajarillos:** Alexander L. Pajarillo (Mayor of Mercedes, "
+            f"ARTA-0747 respondent — our matter) and Amado V. Pajarillo (deceased "
+            f"landowner in parallel CV-6922 — NOT our matter). Do not conflate.\n"
+            f"- **Parallel-tracking matters CV-6922 (Pajarillo Heirs vs DAR) and Crim-9221 "
+            f"(People vs Eduardo Ibana)** are observed, not litigated by MWK. Do not "
+            f"narrate them as MWK actions. Only mention if a doc# directly references them.\n"
+            f"- **ARTA dockets:** 0690, 0747, 0792, 1210, 1212, 1319, 1321, 1378, 1891, DILG. "
+            f"All 10 exist. Do not invent dockets or assume typos.\n\n"
+            f"## TASK\n\n"
+            f"Below are all events recorded in {year}"
+            + (f" (showing first {len(sample)} of {len(year_events)})" if len(year_events) > 50 else "")
+            + ". Write a SINGLE paragraph (5-9 sentences max) summarizing this year:\n"
+            f"  - What happened (concrete legal acts, not 'a document was filed').\n"
+            f"  - Who was involved (named persons/entities — Patricia Keesee Zschoche, "
+            f"Jonathan Zschoche, Atty. Barandon, Gloria Balane, LBP, RTC Br. 64, ARTA, etc.).\n"
+            f"  - How administrative ARTA cases, civil filings, and property "
+            f"transactions interconnect — but DO NOT manufacture causal chains where "
+            f"the docs only co-exist temporally.\n"
+            f"  - Embed provenance citations inline like [doc#123].\n\n"
+            f"DO NOT use filenames. DO NOT mention .pdf. Describe LEGAL ACTIONS.\n"
+            f"DO NOT soften a claim by using hedge words instead of citing the evidence — "
+            f"either cite a doc# or omit the claim.\n"
+            f"If the year is genuinely uneventful, say so in 1-2 sentences. Do not pad.\n\n"
+            f"Events:\n" + "\n".join(lines)
+        )
+
+        try:
+            msg = anthropic_call(
+                client, called_from="generate_case_bible", purpose="year_narrative",
+                case_file="MWK-001",
+                model="claude-haiku-4-5-20251001",
+                max_tokens=600,
+                system="You are a senior paralegal. Concise, evidence-cited, no fluff.",
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = msg.content[0].text.strip()
+            narratives[year] = text
+            in_tok = msg.usage.input_tokens
+            out_tok = msg.usage.output_tokens
+            total_cost_estimate += (in_tok * 0.8 + out_tok * 4.0) / 1_000_000
+            print(f"  narrative for {year}: {in_tok}in/{out_tok}out tok ({len(year_events)} events)")
+        except Exception as e:
+            print(f"  ⚠ narrative error for {year}: {str(e)[:120]}")
+
+    print(f"  ── LLM narratives: ~${total_cost_estimate:.3f} spent on {len(narratives)} years ──")
+    return narratives
+
+
+# ── Cross-reference index builder (Layer D appendix) ───────────────────
+def build_cross_reference_index(events):
+    """Aggregate every title_ref, every named person, and every matter_code
+    into a relational index. Returns dict with three sub-dicts:
+      by_title  -> {tct_number: [(date, event_id, summary), ...]}
+      by_person -> {person_name: [(date, event_id, summary), ...]}
+      by_matter -> {matter_code: [(date, event_id, summary), ...]}
+    """
+    from collections import defaultdict
+    by_title = defaultdict(list)
+    by_person = defaultdict(list)
+    by_matter = defaultdict(list)
+
+    def short_summary(e):
+        # Best-effort one-line summary for the index
+        act = translate_action(e)
+        if e.get("tx_amount") is not None:
+            return f"{act} P{float(e['tx_amount']):,.0f} ({e.get('tx_category','')})"
+        if e.get("gmail_subject"):
+            return f"{act}: {e['gmail_subject'][:80]}"
+        if e.get("tt_instrument_type"):
+            return f"{act} ({e['tt_instrument_type']})"
+        if e.get("doc_classification"):
+            return f"{act}"
+        return act
+
+    for e in events:
+        if not e.get("primary_date"):
+            continue
+        d = e["primary_date"]
+        eid = e["id"]
+        prov = e.get("citation_ref") or f"{e['source_table']}#{e['source_id']}"
+        summ = short_summary(e)
+        # Titles
+        for t in (e.get("title_refs") or []):
+            by_title[t].append((d, eid, summ, prov))
+        # Persons — combine multiple sources
+        persons = set()
+        for k in ("tt_transferor", "tt_transferee_name", "tx_counterparty",
+                   "gmail_from_name", "who_from", "who_to"):
+            v = e.get(k)
+            if v and v not in ("—", "?", "unknown", "", "system"):
+                persons.add(v.strip())
+        for p in persons:
+            by_person[p].append((d, eid, summ, prov))
+        # Matters
+        for mc in (e.get("matter_codes") or []):
+            by_matter[mc].append((d, eid, summ, prov))
+    return {"by_title": by_title, "by_person": by_person, "by_matter": by_matter}
+
+
+def render_cross_reference_index(index):
+    out = ["", "# 5. CROSS-REFERENCE INDEX", "",
+           "_Relational appendix. Every title, person, and matter mapped to every "
+           "event it appears in. Use this when opposing counsel raises a specific TCT "
+           "or actor — flip here, see every chronological touch._", ""]
+
+    # By Title
+    out.append("## 5.1 By Title (TCT / OCT)")
+    out.append("")
+    titles = sorted(index["by_title"].items(), key=lambda kv: -len(kv[1]))
+    for t, entries in titles:
+        if len(entries) < 1: continue
+        sorted_entries = sorted(entries, key=lambda x: x[0])
+        out.append(f"### {t} _({len(sorted_entries)} touches)_")
+        for d, eid, summ, prov in sorted_entries:
+            out.append(f"- **{d}** — {md_escape(summ)} _[event#{eid} · {prov}]_")
+        out.append("")
+
+    # By Key Person
+    out.append("## 5.2 By Key Person / Entity")
+    out.append("")
+    persons = sorted(index["by_person"].items(), key=lambda kv: -len(kv[1]))
+    # Filter noise: skip persons appearing only once unless their name is clearly substantive
+    for p, entries in persons:
+        if len(entries) < 2 and len(p) < 12:
+            continue  # likely OCR artifact
+        sorted_entries = sorted(entries, key=lambda x: x[0])[:25]  # cap per-person to 25 most recent
+        out.append(f"### {md_escape(p)} _({len(entries)} touches)_")
+        for d, eid, summ, prov in sorted_entries:
+            out.append(f"- **{d}** — {md_escape(summ)} _[event#{eid} · {prov}]_")
+        if len(entries) > 25:
+            out.append(f"  _… and {len(entries)-25} earlier events suppressed._")
+        out.append("")
+
+    # By Matter
+    out.append("## 5.3 By Matter")
+    out.append("")
+    matters = sorted(index["by_matter"].items(), key=lambda kv: -len(kv[1]))
+    for mc, entries in matters:
+        sorted_entries = sorted(entries, key=lambda x: x[0])
+        out.append(f"### {shorten_matter_tag(mc)} _(full code: {mc} · {len(sorted_entries)} touches)_")
+        # For matters with >30 events, show first + last 15 of each instead of all
+        if len(sorted_entries) > 30:
+            for d, eid, summ, prov in sorted_entries[:15]:
+                out.append(f"- **{d}** — {md_escape(summ)} _[event#{eid}]_")
+            out.append(f"  _… {len(sorted_entries)-30} middle events suppressed (see Section 3 timeline) …_")
+            for d, eid, summ, prov in sorted_entries[-15:]:
+                out.append(f"- **{d}** — {md_escape(summ)} _[event#{eid}]_")
+        else:
+            for d, eid, summ, prov in sorted_entries:
+                out.append(f"- **{d}** — {md_escape(summ)} _[event#{eid}]_")
+        out.append("")
+    return "\n".join(out)
+
+
 # ── Markdown renderer ───────────────────────────────────────────────────
 def render_markdown(matter, events, deadlines, coverage, projected, gaps,
                     omnibus_mode=False, all_matters=None):
@@ -425,36 +938,88 @@ def render_markdown(matter, events, deadlines, coverage, projected, gaps,
     undated = [e for e in events if not e["primary_date"]]
     dated.sort(key=lambda e: (e["primary_date"], e["id"]))
 
-    for year, year_events in groupby(dated, key=lambda e: e["primary_date"].year):
-        out.append(f"### {year}")
+    # Pre-compute LLM narratives for each year (cached/deduped at year level)
+    year_narratives = synthesize_year_narratives(dated)
+
+    for year, year_events_iter in groupby(dated, key=lambda e: e["primary_date"].year):
+        year_events = list(year_events_iter)
+        out.append(f"### {year} — Annual Narrative Summary")
         out.append("")
-        for e in year_events:
+        narr = year_narratives.get(year)
+        if narr:
+            out.append(f"*{narr}*")
+        else:
+            out.append(f"*{len(year_events)} events recorded in {year} "
+                       "— narrative synthesis unavailable (likely <2 events or LLM error).*")
+        out.append("")
+        out.append("**Detailed Event Log:**")
+        out.append("")
+        # Empty-event collapse: detect runs of consecutive events on the same date
+        # that have BOTH no substantive context AND no title_refs/party_refs/persons.
+        # These are typically docs backfilled to YYYY-01-01 with no extracted text.
+        rendered_events = list(year_events)
+        i = 0
+        while i < len(rendered_events):
+            e = rendered_events[i]
+            ctx = build_substantive_context(e)
+            entities = collect_entities_titles(e)
+            is_empty = (ctx == "[Context Missing in DB]"
+                         and entities == "[No entities/titles linked]")
+            # Collapse run
+            if is_empty:
+                same_day = e["primary_date"]
+                run_ids = [e["id"]]
+                run_provs = [e.get("citation_ref") or f"{e['source_table']}#{e['source_id']}"]
+                j = i + 1
+                while j < len(rendered_events):
+                    e2 = rendered_events[j]
+                    ctx2 = build_substantive_context(e2)
+                    entities2 = collect_entities_titles(e2)
+                    if (e2["primary_date"] == same_day and
+                        ctx2 == "[Context Missing in DB]" and
+                        entities2 == "[No entities/titles linked]"):
+                        run_ids.append(e2["id"])
+                        run_provs.append(e2.get("citation_ref") or f"{e2['source_table']}#{e2['source_id']}")
+                        j += 1
+                    else:
+                        break
+                if len(run_ids) >= 3:
+                    out.append(f"* **{same_day.isoformat()} | [collapsed] | "
+                               f"{len(run_ids)} undocumented entries** "
+                               f"_(no extracted text, no entities/titles — likely pending OCR)_")
+                    out.append(f"  - **event_ids:** {', '.join(str(x) for x in run_ids[:30])}"
+                                + (f" (+{len(run_ids)-30} more)" if len(run_ids) > 30 else ""))
+                    out.append(f"  - **Provenance:** {md_escape(', '.join(run_provs[:8]))}"
+                                + (f", … ({len(run_provs)-8} more)" if len(run_provs) > 8 else ""))
+                    out.append("")
+                    i = j
+                    continue
+            # Otherwise render normally
             kind = e.get("event_kind_canonical") or e.get("event_kind") or "event"
             d = e["primary_date"].isoformat()
-            # Build matter-tag prefix from matter_codes[] (omnibus-critical)
             mcodes = e.get("matter_codes") or []
-            if mcodes:
-                tags = [shorten_matter_tag(mc) for mc in mcodes[:3]]  # cap at 3
-                tag_prefix = "[" + "|".join(tags) + "]"
-            else:
-                tag_prefix = "[GENERAL]"
-            out.append(f"* **{d} | {kind}**")
-            summary = (e["what_summary"] or "").strip()
-            out.append(f"  - **Description:** {tag_prefix} {md_escape(summary)}")
-            parties = []
+            tags = [shorten_matter_tag(mc) for mc in mcodes[:3]] if mcodes else ["GENERAL"]
+            tag_str = "|".join(tags)
+            action = translate_action(e)
+            out.append(f"* **{d} | [{tag_str}] | {action}**")
+            out.append(f"  - **Context:** {md_escape(ctx)[:1500]}")
+            out.append(f"  - **Key Entities/Titles:** {md_escape(entities)}")
+            # Cross-references: matter codes + title refs + party refs
+            xrefs = []
+            if mcodes and len(mcodes) > 1:
+                xrefs.append("matters: " + ", ".join(shorten_matter_tag(mc) for mc in mcodes))
+            elif mcodes:
+                xrefs.append("matter: " + shorten_matter_tag(mcodes[0]))
             if e.get("title_refs"):
-                parties.extend(e["title_refs"])
-            if e.get("who_from") and e["who_from"] != "—":
-                parties.append(f"from: {e['who_from']}")
-            if e.get("who_to") and e["who_to"] != "—":
-                parties.append(f"to: {e['who_to']}")
+                xrefs.append("titles: " + ", ".join(e["title_refs"][:5]))
             if e.get("party_refs"):
-                parties.append(f"party_ids: {','.join(str(p) for p in e['party_refs'])}")
-            out.append(f"  - **Parties/Titles:** {md_escape('; '.join(parties)) if parties else '—'}")
+                xrefs.append("party_ids: " + ", ".join(str(p) for p in e["party_refs"][:3]))
+            out.append(f"  - **Cross-References:** {md_escape('; '.join(xrefs)) if xrefs else '—'}")
             prov = e.get("citation_ref") or f"{e['source_table']}#{e['source_id']}"
             prov_level = e.get("provenance") or "?"
             out.append(f"  - **Provenance:** {md_escape(prov)} _[{prov_level}]_")
             out.append("")
+            i += 1
 
     if undated:
         out.append("### (Undated)")
@@ -479,9 +1044,15 @@ def render_markdown(matter, events, deadlines, coverage, projected, gaps,
             out.append(f"- {sev_emoji} **[{g['severity'].upper()}] {g['kind']}** — {md_escape(g['detail'])}")
     out.append("")
 
+    # ── 5. Cross-Reference Index (Appendix) ──
+    index = build_cross_reference_index(dated)
+    out.append(render_cross_reference_index(index))
+
     out.append("---")
-    out.append(f"_Generated by generate_case_bible.py (deploy_156) from client_history "
-               f"with multi-attribution + canonical event vocabulary._")
+    out.append(f"_Generated by generate_case_bible.py (deploy_157 — Bible v2 with deep "
+               f"data enrichment, Haiku per-year narrative synthesis, and cross-reference "
+               f"index) from client_history JOINED to documents/transactions/gmail/calendar/"
+               f"title_transfers._")
     return "\n".join(out)
 
 
@@ -647,6 +1218,19 @@ def main():
     md_path = out_dir / f"bible_{slug}_{today}.md"
     md_path.write_text(md)
     print(f"  [5/6] wrote Markdown to {md_path} ({len(md):,} chars, {md.count(chr(10))+1} lines)")
+
+    # Apply deterministic narrative post-processor (deploy_163-164).
+    # The Haiku narrator is faithful to source-doc OCR (which contains
+    # 'MTC Mercedes' draft captions, etc.), so prompt hardening alone isn't
+    # enough. Regex corrections fix venue/spelling/editorializing/header artifacts.
+    try:
+        from narrative_postprocess import patch_narrative_blocks
+        new_md, applied = patch_narrative_blocks(md_path.read_text())
+        if applied:
+            md_path.write_text(new_md)
+            print(f"  [5/6.5] post-processor applied {sum(a['n'] for a in applied)} narrative correction(s)")
+    except Exception as e:
+        print(f"  ⚠ post-processor skipped: {e}")
 
     if args.md_only:
         print("\n  MD-only mode — skipping PDF + delivery. Verify layout, then re-run without --md-only.")
