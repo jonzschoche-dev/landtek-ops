@@ -53,10 +53,12 @@ def _price(model: str):
     return PRICES.get(base, (0, 0, 0))
 
 def _cost(model: str, in_tok: int, out_tok: int, cached_tok: int = 0,
-          cache_write_tok: int = 0) -> float:
-    """Compute cost. Anthropic cache writes cost 1.25× input rate; reads cost 10% of input rate."""
+          cache_write_tok: int = 0, ttl_1h: bool = False) -> float:
+    """Compute cost. Anthropic cache writes cost 1.25× input rate (5-min ephemeral)
+    or 2× input rate (1h ephemeral); reads cost 10% of input rate regardless."""
     in_per_M, out_per_M, cached_per_M = _price(model)
-    cache_write_per_M = in_per_M * 1.25  # Anthropic ephemeral cache write surcharge
+    # 5-min ephemeral: 1.25×, 1h ephemeral: 2×
+    cache_write_per_M = in_per_M * (2.0 if ttl_1h else 1.25)
     return (in_tok * in_per_M
             + out_tok * out_per_M
             + cached_tok * cached_per_M
@@ -136,9 +138,17 @@ def anthropic_call(client, *, called_from, purpose=None, case_file=None, **kwarg
     finally:
         duration_ms = int((time.time() - t0) * 1000)
         cache_write_tok = metadata.pop("_cache_write_tok", 0) if metadata else 0
-        # Treat cached_tok separately; in_tok per Anthropic API already excludes cache reads.
-        # Cache writes are billed at 1.25× input rate.
-        cost = _cost(model, in_tok, out_tok, cached_tok, cache_write_tok)
+        # Detect 1h TTL caching from system prompt (passed in kwargs)
+        system = kwargs.get("system")
+        ttl_1h = False
+        if isinstance(system, list):
+            for blk in system:
+                if isinstance(blk, dict):
+                    cc = blk.get("cache_control") or {}
+                    if cc.get("ttl") == "1h":
+                        ttl_1h = True
+                        break
+        cost = _cost(model, in_tok, out_tok, cached_tok, cache_write_tok, ttl_1h=ttl_1h)
         _log_call("anthropic", model, called_from, purpose,
                   in_tok, cached_tok, out_tok, cost, duration_ms, success,
                   prompt_hash, metadata or None, case_file)

@@ -282,11 +282,13 @@ def call_challenger(claim_text, evidence_summaries):
             model="claude-sonnet-4-6",
             max_tokens=400,
             # Prompt caching: the system prompt is ~2K tokens of static instructions.
-            # Mark it cacheable so subsequent calls within Anthropic's 5-min TTL pay
-            # cache-read rate (10% of input rate) instead of full input rate.
+            # Use EXTENDED 1h TTL (was 5-min ephemeral). Truth-negotiator runs in
+            # bursts throughout the day; 1h cache amortizes the write cost across
+            # ~130 calls/day with ~1 write/h instead of 12+ writes/h. Net: ~30%
+            # additional savings on top of the ~42% already realized at 5-min TTL.
             system=[{
                 "type": "text",
-                "cache_control": {"type": "ephemeral"},
+                "cache_control": {"type": "ephemeral", "ttl": "1h"},
                 "text": (
                 "You are a fact-checker for a Philippine property-law firm's RAG.\n"
                 "You receive a CLAIM and EVIDENCE EXCERPTS that already passed retrieval.\n"
