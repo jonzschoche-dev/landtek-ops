@@ -285,6 +285,33 @@ def main():
 
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    # Backstop: any deadline marked completed without a post-intake gets one fired.
+    # Catches manual completions and any code path that bypassed maybe_fire_intake(post).
+    cur.execute("""
+        SELECT cd.id, cd.case_file, cd.title, cd.due_date, cd.deadline_type, cd.stage_key
+          FROM case_deadlines cd
+          LEFT JOIN stage_intake_response r
+            ON r.deadline_id = cd.id AND r.timing = 'post'
+         WHERE cd.status = 'completed'
+           AND cd.stage_key IS NOT NULL
+           AND r.id IS NULL
+           AND EXISTS (SELECT 1 FROM stage_intake_template t
+                        WHERE t.stage_key = cd.stage_key AND t.timing = 'post')
+    """)
+    missed = cur.fetchall()
+    post_backfilled = 0
+    for d in missed:
+        if args.dry_run:
+            print(f"  ↳ DRY: would backfill post-intake for #{d['id']} ({d['stage_key']})")
+            continue
+        ok, info = maybe_fire_intake(cur, d, "post", token=None)
+        if ok:
+            post_backfilled += 1
+            print(f"  📋 POST-INTAKE BACKFILLED for completed deadline #{d['id']} ({d['stage_key']}) — {info}")
+    if missed and not args.dry_run:
+        print(f"  backfilled {post_backfilled}/{len(missed)} missed post-intakes")
+
     cur.execute("""
         SELECT id, case_file, title, description, due_date, deadline_type, status,
                source_doc_id, stage_key, priority_tier, priority_leo,
