@@ -62,22 +62,38 @@ def is_tax_pin(t):
     return bool(RE_TAX_PIN.match((t or "").strip()))
 
 
-# Explicit OCR-typo normalizations — small, auditable map.
-# Anything not in this map AND not is_real_title() is dropped.
+# Explicit alias normalizations — per Jonathan: early-era titles were
+# written in composite form (volume-folio or with non-T prefixes) and ARE
+# the same titles as their modern T- equivalents. Composites merge to
+# canonical form. Anything not here AND not is_real_title() is dropped.
 NORMALIZATIONS = {
+    # OCT T-106 aliases (the foundational 1934 original certificate)
     "1-106":          "OCT T-106",
     "F-106":          "OCT T-106",
     "7-106":          "OCT T-106",
-    "T-106":          "OCT T-106",   # T-106 is the OCT, prefer canonical OCT form
+    "T-106":          "OCT T-106",
+    # T-32917 aliases (OCR typos of the same title)
     "7-32917":        "T-32917",
     "-32917":         "T-32917",
+    # Volume/folio composites — same convention pre-modern
     "No.1-33365":     "T-33365",
-    "1-184":          "T-184",       # only kept if T-184 itself is real
+    "1-184":          "T-184",
     "1-24":           "T-24",
-    "210-23":         None,           # garbage, drop
-    "2010000663":     None,           # truncated long-format Balane-era — drop without context
-    "079-2010000694": None,           # ditto
+    "1-25":           "T-25",
+    # TCT 45616 with periods (T.C.T. punctuation variant)
+    "T.C.T.45616":    "T-45616",
+    # Range notation (handled separately — keep as descriptive)
+    "T-32912-14":     "T-32912",       # primary of range; sibs T-32913, T-32914 already in graph
+    # Patent (different title type but still a real title — keep as-is)
+    "P-2218":         "P-2218",
+    # Composite "T-7-136" likely Vol 7 / Folio 136 — keep but flag
+    "T-7-136":        "T-136",
+    # Garbage (truncated long-format Balane-era, etc.) — drop
+    "210-23":         None,
+    "2010000663":     None,
+    "079-2010000694": None,
     "4770981":        None,
+    "T-1130650":      None,           # 7-digit, no dash — likely OCR garbage
 }
 
 

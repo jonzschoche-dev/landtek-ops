@@ -1,6 +1,6 @@
 # Title Tree — MWK-001 (clean, phantom-filtered)
 
-_90 normalized edges across 68 unique titles. Phantom T-YYYY (years) and T-NNN-NN... (tax PINs) filtered. Contested titles flagged inline._
+_94 normalized edges across 71 unique titles. Phantom T-YYYY (years) and T-NNN-NN... (tax PINs) filtered. Contested titles flagged inline._
 
 ## TRACK A — T-4497 / OCT T-106 Lineage (CV-26-360 theatre)
 
@@ -38,6 +38,7 @@ OCT T-106
     │   ├── T-31298
     │   ├── T-32911 _(cycle detected, skipping)_
     │   ├── T-32912
+    │   │   └── T-15616 _(cycle detected, skipping)_
     │   ├── T-32913 _(cycle detected, skipping)_
     │   ├── T-32914 _(cycle detected, skipping)_
     │   ├── T-32917
@@ -128,25 +129,23 @@ _Titles that appear as derivatives (children) elsewhere but have NO parent in th
 - T-33416
 - T-33681
 - T-4504
-- T-45616
 - T-46460
 - T-49060
-- T-49062
 - T-772
 
 ## DATA COVERAGE
 
-- **331** distinct title-IDs pass the real-title filter
-- **78** distinct phantom/tax-PIN/typo IDs rejected (see top below)
+- **334** distinct title-IDs pass the real-title filter
+- **49** distinct phantom/tax-PIN/typo IDs rejected (see top below)
 
 **Top 10 phantom IDs (rejected):**
-  - `T-2023` (×9) — year-pattern or unrecognized format
   - `T-0966698` (×8) — year-pattern or unrecognized format
-  - `T-2005` (×7) — year-pattern or unrecognized format
   - `T-2021002` (×7) — year-pattern or unrecognized format
-  - `T-1992` (×5) — year-pattern or unrecognized format
-  - `T-498-1258` (×4) — tax PIN
   - `T-0966-698` (×4) — year-pattern or unrecognized format
-  - `T-2025` (×4) — year-pattern or unrecognized format
+  - `T-2023-02` (×3) — year-pattern or unrecognized format
   - `T-1035055` (×3) — year-pattern or unrecognized format
   - `T-2023-05` (×3) — year-pattern or unrecognized format
+  - `T-2022-12` (×2) — year-pattern or unrecognized format
+  - `T-2018001` (×2) — year-pattern or unrecognized format
+  - `T-1035932` (×2) — year-pattern or unrecognized format
+  - `T-2022-11` (×2) — year-pattern or unrecognized format
