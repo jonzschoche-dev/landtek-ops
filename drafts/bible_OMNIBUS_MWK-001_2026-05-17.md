@@ -1,0 +1,5325 @@
+# 1. DOCUMENT HEADER
+
+- **Report Title:** Client: Heirs of Mary Worrick Keesey (MWK-001) — Omnibus Master Bible
+- **Generated On:** 2026-05-17 11:16 UTC
+- **Total Logged Events:** 1034
+- **Case File:** MWK-001
+- **Client Code:** MWK-001
+- **Matters Under This Client:** 15
+
+  - **[ARTA-0690]** ARTA SL-2025-1008-0690 — records-request complaint (RESOLVED) _(stage: resolved_no_merit)_
+  - **[ARTA-0747]** ARTA SL-2025-1021-0747 — Mayor Pajarillo R.A. 11032 §21(b)(d)(e) _(stage: complaint_filed_awaiting_response)_
+  - **[ARTA-0792]** ARTA SL-2025-1104-0792 (RESOLVED — bundled with -0690) _(stage: resolved_no_merit)_
+  - **[ARTA-1210]** ARTA SL-2026-0128-1210 — Sec. 21 RA 11032 (OP Bagong Pilipinas) _(stage: complaint_filed_awaiting_response)_
+  - **[ARTA-1319]** ARTA SL-2026-0209-1319 — vs. Nestor Franz... (CART Southern Luzon) _(stage: complaint_filed_awaiting_response)_
+  - **[ARTA-1321]** ARTA SL-2026-0209-1321 — Heirs MWK R.A. 11032 _(stage: complaint_filed_awaiting_response)_
+  - **[ARTA-1378]** ARTA SL-2026-0218-1378 — Mun. Engineer Mercedes (3rd Count R.A. 11032) _(stage: complaint_filed_awaiting_response)_
+  - **[ARTA-1891]** ARTA SL-2026-0423-1891 — Notice of Referral to CSC / DILG _(stage: referred_to_csc_dilg_awaiting)_
+  - **[ARTA-DILG]** ARTA Referral to DILG _(stage: arta_referral_filed_awaiting_response)_
+  - **[CV26360]** Accion Reinvindicatoria vs Gloria Balane _(stage: post_pretrial_pending_trial_schedule)_
+  - **[CV6839]** Civil Case 6839 — Just Compensation vs Landbank (Mary Worrick Keesey, rep. by Cesar) _(stage: just_compensation_halted_pending_substitution)_
+  - **[ESTATE]** Estate Administration — Heirs of Mary Worrick Keesey _(stage: estate_administration_active_no_immediate_deadline)_
+  - **[PAR-CRIM9221]** Crim. Case 9221 — People vs Eduardo IBANA _(stage: unknown_relationship_to_mwk)_
+  - **[PAR-CV6922]** Civil Case 6922 — HRS. of late Amado V. Pajarillo vs DAR (parallel proceeding, MWK relatio _(stage: unknown_relationship_to_mwk)_
+  - **[TCT4497]** TCT T-4497 Chain Verification _(stage: demand_letter_pending_send)_
+
+# 2. EXECUTIVE SUMMARY & FORWARD PROJECTION
+
+## Next Projected Events (stage-rule projection — Layer E)
+- **2026-05-19** (in ~2 days) — **[TCT4497]** Send demand letter (currently in draft / pending dispatch)  _[correspondence]_
+- **2026-05-31** (in ~14 days) — **[ARTA-0747]** ARTA agency response deadline (RA 11032 §10: 3-day acknowledgement, 7-day action)  _[agency_response]_
+- **2026-05-31** (in ~14 days) — **[ARTA-1210]** ARTA agency response deadline (RA 11032 §10: 3-day acknowledgement, 7-day action)  _[agency_response]_
+- **2026-05-31** (in ~14 days) — **[ARTA-1319]** ARTA agency response deadline (RA 11032 §10: 3-day acknowledgement, 7-day action)  _[agency_response]_
+- **2026-05-31** (in ~14 days) — **[ARTA-1321]** ARTA agency response deadline (RA 11032 §10: 3-day acknowledgement, 7-day action)  _[agency_response]_
+- **2026-05-31** (in ~14 days) — **[ARTA-1378]** ARTA agency response deadline (RA 11032 §10: 3-day acknowledgement, 7-day action)  _[agency_response]_
+- **2026-05-31** (in ~14 days) — **[ARTA-DILG]** ARTA referral acknowledgement window  _[agency_response]_
+- **2026-06-01** (in ~15 days) — **[CV6839]** File Motion for Substitution of Party (substitute heirs for deceased MWK)  _[court_filing]_
+- **2026-06-05** (in ~19 days) — **[TCT4497]** Recipient response window (typical 15-day demand-letter cycle)  _[correspondence]_
+- **2026-06-15** (in ~29 days) — **[ARTA-0747]** If no response: file referral / escalation to next-level agency  _[court_filing]_
+
+_Projection basis: stage rules applied across every active matter under the client. Not a substitute for actual court / agency schedules._
+
+## Critical Open Deadlines
+- **2026-05-18** (in 1d) — Send demand letter to RD Camarines Norte (title history update) _[P4, pending]_
+- **2026-06-02** (in 16d) — Mediation / Settlement Conference — Civil Case 26-360 _[P0, pending]_
+
+## Coverage Audit Warnings (last 7 days)
+- **upstream_no_date**: 1 rows flagged
+
+# 3. THE MASTER TIMELINE
+
+### 1912
+
+* **1912-01-01 | title_event**
+  - **Description:** [PAR-CRIM9221] 🏷 TCT T-111 issued 1912 (Jonathan-asserted; predates OCT T-106 1934 — primary doc not in corpus)
+  - **Parties/Titles:** from: Registry of Deeds Camarines Norte (asserted)
+  - **Provenance:** doc#279 references T-111; Jonathan asserts 1912 origin _[asserted_pending_primary_evidence]_
+
+* **1912-05-10 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-10; T-33776; T-91; from: government_issued
+  - **Provenance:** doc#609 status=government_issued _[verified]_
+
+* **1912-05-10 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-32917; T-33415; T-33416; from: government_issued
+  - **Provenance:** doc#610 status=government_issued _[verified]_
+
+* **1912-05-20 | survey_plan**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-4497; from: government_issued
+  - **Provenance:** doc#572 status=government_issued _[verified]_
+
+### 1922
+
+* **1922-05-10 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-3100; T-41; T-48; T-48335; T-55; from: government_issued
+  - **Provenance:** doc#616 status=government_issued _[verified]_
+
+### 1947
+
+* **1947-03-11 | uncategorized**
+  - **Description:** [PAR-CRIM9221] Other — 1947-03-11_birth_certificate_Patricia_Anne_KEESEY.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#361 status=government_issued _[verified]_
+
+### 1953
+
+* **1953-07-12 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 1953-07-12_deed_of_donation_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-111; T-1111; from: executed_notarized
+  - **Provenance:** doc#279 status=executed_notarized _[verified]_
+
+### 1963
+
+* **1963-07-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — null_Deed_of_Donation.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#291 status=unknown _[inferred_strong]_
+
+### 1964
+
+* **1964-06-02 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1964-06-02_Mary_Worrick_Keesey_TCT.pdf
+  - **Parties/Titles:** T-125; T-41; T-4110; T-4497; T-5143-237; from: government_issued
+  - **Provenance:** doc#382 status=government_issued _[verified]_
+
+* **1964-09-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c4172f621d143f__Exhibit Q - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#436 status=unknown _[inferred_strong]_
+
+### 1975
+
+* **1975-05-15 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱49.57 — registration_fee payment per OR — 1975-05-30_Mary_Worrick_Keesey_Title_Plan.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#135 doc#104 _[verified]_
+
+* **1975-05-30 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1975-05-30_Mary_Worrick_Keesey_Title_Plan.pdf
+  - **Parties/Titles:** T-20; T-25; T-440; T-4497; from: government_issued
+  - **Provenance:** doc#104 status=government_issued _[verified]_
+
+### 1976
+
+* **1976-11-09 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-1892; T-202023; from: unknown
+  - **Provenance:** doc#562 status=unknown _[inferred_strong]_
+
+* **1976-11-22 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 KASUNDUAN SA PAGBIBILIHAN NG BAHAGI NG ISANG PALATAY NA LUPAIN on None (PE PE-61228); notary Marciano C. Dating, Jr.
+  - **Parties/Titles:** —
+  - **Provenance:** instruments_on_title#1 doc#21 _[verified]_
+
+### 1979
+
+* **1979-06-05 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c4172f621d143f__Exhibit P - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#435 status=government_issued _[verified]_
+
+### 1981
+
+* **1981-01-27 | tax_document**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-4927; from: government_issued
+  - **Provenance:** doc#550 status=government_issued _[verified]_
+
+### 1988
+
+* **1988-10-19 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on None (PE PE-133582-53-15); notary —
+  - **Parties/Titles:** —
+  - **Provenance:** instruments_on_title#2 doc#21 _[verified]_
+
+* **1988-12-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — YYYY-MM-DD_heirs_of_mary_worrick_keesey_petition.pdf
+  - **Parties/Titles:** from: executed_signed_only
+  - **Provenance:** doc#73 status=executed_signed_only _[inferred_strong]_
+
+### 1990
+
+* **1990-01-01 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1990-01-01_TCT_4497_Llamanzares.pdf
+  - **Parties/Titles:** T-003-0080; T-4497; from: unknown
+  - **Provenance:** doc#97 status=unknown _[inferred_strong]_
+
+* **1990-03-09 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF SALE on None (PE PE-143553-83-16); notary Antonio Mago
+  - **Parties/Titles:** —
+  - **Provenance:** instruments_on_title#3 doc#21 _[verified]_
+
+### 1991
+
+* **1991-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Power of Attorney — 1991-00-00_power_of_attorney_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: draft_unsigned
+  - **Provenance:** doc#35 status=draft_unsigned _[inferred_strong]_
+
+* **1991-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Power of Attorney — 1991-00-00_power_of_attorney_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-1035055; T-20802; T-4814; T-6019; from: executed_filed
+  - **Provenance:** doc#369 status=executed_filed _[verified]_
+
+* **1991-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 1991_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-20802; T-4814; T-6019; from: draft_unsigned
+  - **Provenance:** doc#72 status=draft_unsigned _[inferred_strong]_
+
+* **1991-06-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] Notice — 1991-06-26_land_valuation_notice.pdf
+  - **Parties/Titles:** T-12; T-4503; from: government_issued
+  - **Provenance:** doc#371 status=government_issued _[verified]_
+
+* **1991-08-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 1991-08-33_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-1991; T-20802; T-4814; T-6019; from: draft_unsigned
+  - **Provenance:** doc#82 status=draft_unsigned _[inferred_strong]_
+
+* **1991-08-17 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1991-08-17_Mary_Worrick_Keesey_TCT_23796.pdf
+  - **Parties/Titles:** T-23796; from: government_issued
+  - **Provenance:** doc#102 status=government_issued _[verified]_
+
+* **1991-08-20 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1991-08-20_TCT-4502.pdf
+  - **Parties/Titles:** T-10; T-11; T-12; T-4502; from: government_issued
+  - **Provenance:** doc#86 status=government_issued _[verified]_
+
+* **1991-08-22 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 19d65cb30b6c58e2__Exhibit 4 - Deed of Absolute Sale.pdf
+  - **Parties/Titles:** T-22; T-49061; from: government_issued
+  - **Provenance:** doc#413 status=government_issued _[verified]_
+
+### 1992
+
+* **1992-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Special Power of Attorney — 19d65cb30b6c58e2__Exhibit 7 - Special Power of Attorney dated March 16, 1992.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#416 status=government_issued _[verified]_
+
+* **1992-03-16 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19c22b7bf1fdf845__JUDICIAL AFFIDAVIT JONATHAN PAUL ZSCHOCHE.pdf
+  - **Parties/Titles:** T-15; T-52540; from: executed_filed
+  - **Provenance:** doc#441 status=executed_filed _[verified]_
+
+* **1992-03-16 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 19c41731f96632d9__Exhibit H - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#432 status=government_issued _[verified]_
+
+* **1992-03-19 | legal_act**
+  - **Description:** [PAR-CRIM9221] Special Power of Attorney — 1992-03-19_special_power_of_attorney.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#329 status=government_issued _[verified]_
+
+* **1992-05-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 1992-05-25_correspondence_tax_obligations.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#108 status=unknown _[inferred_strong]_
+
+* **1992-05-26 | tax_document**
+  - **Description:** [PAR-CRIM9221] doc — CIVIL CASE 4992.pdf
+  - **Parties/Titles:** T-15; T-72; T-819; T-882; from: government_issued
+  - **Provenance:** doc#658 status=government_issued _[verified]_
+
+* **1992-05-26 | tax_document**
+  - **Description:** [PAR-CRIM9221] doc — LABO Civil Case 4992.pdf
+  - **Parties/Titles:** T-15; T-72; T-819; T-882; from: government_issued
+  - **Provenance:** doc#636 status=government_issued _[verified]_
+
+* **1992-11-09 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1992-11-09_TCT_33416_Edgardo_Santiago.pdf
+  - **Parties/Titles:** T-10; T-10145; T-12; T-14; T-15; T-33416; T-3415; from: government_issued
+  - **Provenance:** doc#314 status=government_issued _[verified]_
+
+### 1993
+
+* **1993-06-17 | government_submission**
+  - **Description:** [PAR-CRIM9221] 📜 Request: T-31298 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-168589-243-18]
+  - **Parties/Titles:** T-31298; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#9 _[inferred_strong]_
+
+* **1993-06-29 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1993-06-29_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-30682; T-32478; T-34; from: government_issued
+  - **Provenance:** doc#347 status=government_issued _[verified]_
+
+* **1993-08-20 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on None (PE PE-170453-42-16); notary Ramon C. Munda
+  - **Parties/Titles:** from: GERALDINE K. HOPPS, PATRICIA K. ZSCHOCHE and MARCIA ELLEN KEESEY
+  - **Provenance:** instruments_on_title#4 doc#21 _[verified]_
+
+* **1993-11-12 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF CONFIRMATION on None (PE PE-172070-86-19); notary Ernesto M. de Jesus
+  - **Parties/Titles:** —
+  - **Provenance:** instruments_on_title#5 doc#21 _[verified]_
+
+* **1993-11-12 | legal_act**
+  - **Description:** [PAR-CRIM9221] 📜 Affidavit of Confirmation: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-172070-86-19]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#1 _[inferred_strong]_
+
+* **1993-11-26 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on None (PE PE-172432-96-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** —
+  - **Provenance:** instruments_on_title#6 doc#21 _[verified]_
+
+* **1993-11-26 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF CONFIRMATION on None (PE PE-172433-96-19); notary Ernesto D. de Jesus
+  - **Parties/Titles:** from: CESAR N. DELA PIENTE
+  - **Provenance:** instruments_on_title#7 doc#21 _[verified]_
+
+* **1993-11-26 | legal_act**
+  - **Description:** [PAR-CRIM9221] 📜 Affidavit of Confirmation: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-172433-96-19]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#3 _[inferred_strong]_
+
+* **1993-11-26 | legal_act**
+  - **Description:** [PAR-CRIM9221] 📜 Deed of Absolute Sale: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → Edgardo Santiago) [PE PE-172432-96-19]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative); to: Edgardo Santiago; party_ids: 8
+  - **Provenance:** title_transfer#2 _[inferred_strong]_
+
+* **1993-11-26 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — YYYY-MM-DD_information_request_form.pdf
+  - **Parties/Titles:** T-32917; T-33415-6; T-4497; T-47656; T-48335; from: government_issued
+  - **Provenance:** doc#251 status=government_issued _[verified]_
+
+### 1994
+
+* **1994-02-11 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 1994-02-11_information_request_form.pdf
+  - **Parties/Titles:** T-32917; T-33686; T-4497; T-47656; T-48335; from: government_issued
+  - **Provenance:** doc#252 status=government_issued _[verified]_
+
+* **1994-02-11 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on None (PE PE-175640-124-17); notary Ernesto B. de Jesus
+  - **Parties/Titles:** —
+  - **Provenance:** instruments_on_title#8 doc#21 _[verified]_
+
+* **1994-02-11 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 CONFIRMATION OF SALE on T-32917 (PE PE-175609-104-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#17 doc#21 _[verified]_
+
+* **1994-02-11 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on T-32917 (PE PE-173856-135-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#18 doc#21 _[verified]_
+
+* **1994-02-11 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 CONFIRMATION OF SALE on T-32917 (PE PE-173857-135-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917; from: CESAR DE LA FUENTE
+  - **Provenance:** instruments_on_title#19 doc#21 _[verified]_
+
+* **1994-02-11 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-32917; T-34243; T-4497; from: government_issued
+  - **Provenance:** doc#253 status=government_issued _[verified]_
+
+* **1994-02-15 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1994-02-15_TCT_33686_Jose_Pascual_Jr.pdf
+  - **Parties/Titles:** T-21-6; T-32917; T-3368; T-33686; from: government_issued
+  - **Provenance:** doc#316 status=government_issued _[verified]_
+
+* **1994-02-28 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on T-32917 (PE PE-174242-145-19); notary Juanito S. Subia
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#25 doc#21 _[verified]_
+
+* **1994-02-28 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 CONFIRMATION OF SALE on T-32917 (PE PE-174243-145-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917; from: CESAR M. DE LA FUENTE
+  - **Provenance:** instruments_on_title#26 doc#21 _[verified]_
+
+* **1994-02-28 | legal_act**
+  - **Description:** [PAR-CRIM9221] 📜 Deed of Absolute Sale: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → Roscoe Leaño) [PE PE-174242-145-19]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative); to: Roscoe Leaño; party_ids: 17
+  - **Provenance:** title_transfer#4 _[inferred_strong]_
+
+* **1994-06-30 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 PETITION on T-32917 (PE PE-176851-216-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#27 doc#21 _[verified]_
+
+* **1994-07-06 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF CONFIRMATION on T-32917 (PE PE-176987-219-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917; from: CESAR N. DE LA PUENTE
+  - **Provenance:** instruments_on_title#20 doc#21 _[verified]_
+
+* **1994-07-06 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on T-32917 (PE PE-176986-219-19); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#28 doc#21 _[verified]_
+
+* **1994-09-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1994-09-22_TCT_33350_Elena_Vergara.pdf
+  - **Parties/Titles:** T-21; T-33350; from: government_issued
+  - **Provenance:** doc#312 status=government_issued _[verified]_
+
+### 1995
+
+* **1995-04-10 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1995-04-10_TCT_T-36668.pdf
+  - **Parties/Titles:** T-10; T-21; T-306; T-36668; T-51; from: government_issued
+  - **Provenance:** doc#319 status=government_issued _[verified]_
+
+* **1995-04-17 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF CONFIRMATION OF SALE on T-32917 (PE PE-184535-167-20); notary B. de Jesus
+  - **Parties/Titles:** T-32917; from: CESAR N. DELA FUENTE
+  - **Provenance:** instruments_on_title#21 doc#21 _[verified]_
+
+* **1995-04-17 | legal_act**
+  - **Description:** [PAR-CRIM9221] 📜 Affidavit of Confirmation of Sale: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-184535-167-20]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#5 _[inferred_strong]_
+
+* **1995-09-08 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF DONATION on T-32917 (PE PE-188451-23-21); notary Antonio Mago
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#22 doc#21 _[verified]_
+
+* **1995-09-08 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 RESOLUTION on T-32917 (PE PE-188452-23-21); notary —
+  - **Parties/Titles:** T-32917; from: Municipal Secretary Christy Ratay
+  - **Provenance:** instruments_on_title#23 doc#21 _[verified]_
+
+* **1995-09-08 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF CONFIRMATION on T-32917 (PE PE-188453-23-21); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#24 doc#21 _[verified]_
+
+### 1996
+
+* **1996-03-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] Resolution — 1996-03-13_resolution_ad_hoc_committee_MWK_estate.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#389 status=unknown _[inferred_strong]_
+
+* **1996-03-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-19; from: unknown
+  - **Provenance:** doc#577 status=unknown _[inferred_strong]_
+
+* **1996-04-11 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-32917 (PE PE-193914-166-21); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#29 doc#21 _[verified]_
+
+* **1996-04-11 | government_submission**
+  - **Description:** [PAR-CRIM9221] 📜 Request: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-193914-166-21]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#6 _[inferred_strong]_
+
+* **1996-04-21 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on T-52540 (PE PR-196220-227-21); notary Ramon C. Manda
+  - **Parties/Titles:** T-52540; from: GERALDINE K. HOPPE ET AL.
+  - **Provenance:** instruments_on_title#37 doc#48 _[verified]_
+
+* **1996-05-24 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1996-05-24_TCT_39630.pdf
+  - **Parties/Titles:** T-39630; from: government_issued
+  - **Provenance:** doc#42 status=government_issued _[verified]_
+
+* **1996-06-21 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on T-52540 (PE PE-196220-227-21); notary Ramon C. Munda
+  - **Parties/Titles:** T-52540; from: GERALDINE K. HOPPE ET AL.
+  - **Provenance:** instruments_on_title#47 doc#96 _[verified]_
+
+* **1996-06-21 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-38838; T-47656; T-48335; from: government_issued
+  - **Provenance:** doc#256 status=government_issued _[verified]_
+
+* **1996-09-24 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 1996-09-24_information_request_Cesar_Ramirez.pdf
+  - **Parties/Titles:** T-24; T-38838; from: government_issued
+  - **Provenance:** doc#255 status=government_issued _[verified]_
+
+### 1997
+
+* **1997-11-26 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on T-32917 (PE PE-214781-214-23); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#30 doc#21 _[verified]_
+
+* **1997-11-26 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-32917; T-4497; from: government_issued
+  - **Provenance:** doc#254 status=government_issued _[verified]_
+
+### 1998
+
+* **1998-01-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 1998-XX_complaint_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-319; T-4494; from: executed_filed
+  - **Provenance:** doc#352 status=executed_filed _[verified]_
+
+* **1998-06-05 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-32917 (PE PE-220402-109-24); notary Ernesto B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#31 doc#21 _[verified]_
+
+* **1998-10-01 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1998-10-01_TCT_T-48335_Jose_Pascual_JR.pdf
+  - **Parties/Titles:** T-48334; T-48335; from: government_issued
+  - **Provenance:** doc#242 status=government_issued _[verified]_
+
+* **1998-10-02 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1998-10-02_transfer_certificate_of_title.pdf
+  - **Parties/Titles:** T-00; T-20; T-20802; T-4497; T-481; T-48336; from: government_issued
+  - **Provenance:** doc#15 status=government_issued _[verified]_
+
+* **1998-10-07 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-47656; T-48335; from: government_issued
+  - **Provenance:** doc#247 status=government_issued _[verified]_
+
+* **1998-10-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1998-10-23_TCT_48335_Jose_Pascual.pdf
+  - **Parties/Titles:** T-3100; T-41; T-48; T-48335; T-55; from: government_issued
+  - **Provenance:** doc#308 status=government_issued _[verified]_
+
+### 1999
+
+* **1999-02-24 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-32917 (PE PE-225568-21-25); notary B. de Jesus
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#32 doc#21 _[verified]_
+
+* **1999-02-24 | government_submission**
+  - **Description:** [PAR-CRIM9221] 📜 Request: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-226568-21-25]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#7 _[inferred_strong]_
+
+* **1999-03-29 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-12916 (PE PE-226716-25-25); notary —
+  - **Parties/Titles:** T-12916; from: Cesar dela Fuenta
+  - **Provenance:** instruments_on_title#67 doc#265 _[verified]_
+
+* **1999-05-21 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_request_for_supporting_documents.pdf
+  - **Parties/Titles:** T-47656; T-48335; T-49060; T-49736; from: government_issued
+  - **Provenance:** doc#248 status=government_issued _[verified]_
+
+* **1999-06-02 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1999-06-02_transfer_certificate_title_Maria_Cereza.pdf
+  - **Parties/Titles:** T-14; T-51639; T-93; from: government_issued
+  - **Provenance:** doc#311 status=government_issued _[verified]_
+
+* **1999-07-24 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1999-07-24_TCT_30618.pdf
+  - **Parties/Titles:** T-10; T-23; T-30618; T-32619; from: government_issued
+  - **Provenance:** doc#111 status=government_issued _[verified]_
+
+* **1999-08-13 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_request_for_supporting_documents.pdf
+  - **Parties/Titles:** T-13; T-38838; T-49061; T-50792; from: government_issued
+  - **Provenance:** doc#258 status=government_issued _[verified]_
+
+* **1999-08-15 | title_event**
+  - **Description:** [PAR-CRIM9221] Title — 19d65cb30b6c58e2__Exhibit 3 - TCT No. T-50192.pdf
+  - **Parties/Titles:** T-10; T-11; T-12; T-50; T-50192; from: government_issued
+  - **Provenance:** doc#412 status=government_issued _[verified]_
+
+* **1999-09-26 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 1999-09-26_TCT_40718_Cesar_Ramirez.pdf
+  - **Parties/Titles:** T-33; T-40718; from: government_issued
+  - **Provenance:** doc#67 status=government_issued _[verified]_
+
+* **1999-12-08 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — 1999-12-08_amended_pre_trial_brief.pdf
+  - **Parties/Titles:** T-30681; T-30682; T-30683; T-4494; T-4501; T-4502; T-4503; from: executed_filed
+  - **Provenance:** doc#351 status=executed_filed _[verified]_
+
+* **1999-12-08 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — Just compensation Volume 1b.pdf
+  - **Parties/Titles:** T-30681; T-30682; T-30683; T-4494; T-4501; T-4502; T-4503; from: executed_filed
+  - **Provenance:** doc#681 status=executed_filed _[verified]_
+
+### 2000
+
+* **2000-01-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] Transcript — 2000-01-03_case_no_6839_transcript.pdf
+  - **Parties/Titles:** T-19; T-20; T-21; T-23; T-24; T-28; from: executed_filed
+  - **Provenance:** doc#359 status=executed_filed _[verified]_
+
+* **2000-01-26 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-12916 (PE P-236479-33-26); notary Liborting A. Roman
+  - **Parties/Titles:** T-12916
+  - **Provenance:** instruments_on_title#68 doc#265 _[verified]_
+
+* **2000-03-08 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-32917 (PE PE-237387-56-26); notary Libertine A. Ramos
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#33 doc#21 _[verified]_
+
+* **2000-03-08 | government_submission**
+  - **Description:** [PAR-CRIM9221] 📜 Request: T-32917 → None (Heirs of Mary Worrick Keesey (or representative) → ?) [PE PE-237387-56-26]
+  - **Parties/Titles:** T-32917; from: Heirs of Mary Worrick Keesey (or representative)
+  - **Provenance:** title_transfer#8 _[inferred_strong]_
+
+* **2000-03-21 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-38838; T-49061; T-52416; from: government_issued
+  - **Provenance:** doc#260 status=government_issued _[verified]_
+
+* **2000-04-24 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-32917 (PE PE-238420-84-26); notary L. Ramos
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#34 doc#21 _[verified]_
+
+* **2000-04-24 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 REQUEST on T-12916 (PE PZ-238420-84-26); notary Libertino A. Ramos
+  - **Parties/Titles:** T-12916; from: Cesar M. dela Fuente
+  - **Provenance:** instruments_on_title#69 doc#265 _[verified]_
+
+* **2000-11-13 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — YYYY-MM-DD_information_request_Arnel_Mabeza.pdf
+  - **Parties/Titles:** T-52539; T-53602; from: government_issued
+  - **Provenance:** doc#266 status=government_issued _[verified]_
+
+### 2002
+
+* **2002-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-32917; T-4497; T-52354; from: unknown
+  - **Provenance:** doc#590 status=unknown _[inferred_strong]_
+
+### 2003
+
+* **2003-01-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF SALE on T-32917 (PE PE-261974-200-23); notary Antonio D. Kpop
+  - **Parties/Titles:** T-32917
+  - **Provenance:** instruments_on_title#35 doc#21 _[verified]_
+
+* **2003-01-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 CONFIRMATION OF SALE on T-32917 (PE PE-261975-200-20); notary Jaime R. Alegre
+  - **Parties/Titles:** T-32917; from: CESAR DELA FUENTE
+  - **Provenance:** instruments_on_title#36 doc#21 _[verified]_
+
+### 2004
+
+* **2004-08-16 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-2004; from: unknown
+  - **Provenance:** doc#605 status=unknown _[inferred_strong]_
+
+* **2004-08-16 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — Balane Case Annexes (Incomplete).pdf
+  - **Parties/Titles:** T-2004; T-20902; T-4814; from: draft_unsigned
+  - **Provenance:** doc#676 status=draft_unsigned _[inferred_strong]_
+
+* **2004-09-17 | transaction**
+  - **Description:** [PAR-CRIM9221] Financial Statement — 2004-09-17_bond_redemption_voucher.pdf
+  - **Parties/Titles:** T-3844; from: executed_signed_only
+  - **Provenance:** doc#80 status=executed_signed_only _[inferred_strong]_
+
+### 2005
+
+* **2005-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 2005-00-00_special_power_of_attorney_MWK-001.pdf
+  - **Parties/Titles:** T-2005-00; from: draft_unsigned
+  - **Provenance:** doc#85 status=draft_unsigned _[inferred_strong]_
+
+* **2005-05-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2005-05-16_keseey_property_discussion.pdf
+  - **Parties/Titles:** T-498-1258; from: email_received
+  - **Provenance:** doc#92 status=email_received _[inferred_strong]_
+
+* **2005-06-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2005-06-04_email_correspondence.pdf
+  - **Parties/Titles:** from: email_received
+  - **Provenance:** doc#74 status=email_received _[inferred_strong]_
+
+* **2005-06-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2005-06-05_property_advice_letter.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#100 status=government_issued _[verified]_
+
+* **2005-07-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2005-07-22_mercedes_property_division_correspondence.pdf
+  - **Parties/Titles:** T-20; T-498-1258; from: email_received
+  - **Provenance:** doc#98 status=email_received _[inferred_strong]_
+
+* **2005-08-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Special Power of Attorney — 2005-08-01_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-03; T-04; T-4494; from: government_issued
+  - **Provenance:** doc#91 status=government_issued _[verified]_
+
+* **2005-08-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2005-08-03_special_power_of_attorney_discussion.pdf
+  - **Parties/Titles:** T-03; T-4494; T-498-1258; from: email_received
+  - **Provenance:** doc#84 status=email_received _[inferred_strong]_
+
+* **2005-08-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2005-08-10_agcaoili_fraud_email.pdf
+  - **Parties/Titles:** T-10; from: email_received
+  - **Provenance:** doc#77 status=email_received _[inferred_strong]_
+
+* **2005-08-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2005-08-10_property_holdings_report.pdf
+  - **Parties/Titles:** T-10; T-4503; T-4562; from: email_received
+  - **Provenance:** doc#90 status=email_received _[inferred_strong]_
+
+* **2005-08-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2005-08-10_special_power_of_attorney_discussion.pdf
+  - **Parties/Titles:** T-10; T-498-1258; from: email_received
+  - **Provenance:** doc#83 status=email_received _[inferred_strong]_
+
+* **2005-08-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 2005-08-15_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-2005; T-4814; from: draft_unsigned
+  - **Provenance:** doc#281 status=draft_unsigned _[inferred_strong]_
+
+* **2005-08-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 2005-08-15_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-4814; from: draft_unsigned
+  - **Provenance:** doc#292 status=draft_unsigned _[inferred_strong]_
+
+* **2005-08-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] Power of Attorney — 2005-08-15_power_of_attorney.pdf
+  - **Parties/Titles:** T-2005; from: unknown
+  - **Provenance:** doc#225 status=unknown _[inferred_strong]_
+
+* **2005-08-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] Special Power of Attorney — 19c41731f96632d9__Exhibit F - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-2005; T-4814; from: draft_unsigned
+  - **Provenance:** doc#430 status=draft_unsigned _[inferred_strong]_
+
+* **2005-09-15 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on T-52540 (PE PE-290350-190-31); notary Andres RC de Jesus
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#38 doc#48 _[verified]_
+
+* **2005-09-15 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF ABSOLUTE SALE on T-52540 (PE PE-290350-190-31); notary Andres RC de Jesus
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#48 doc#96 _[verified]_
+
+* **2005-09-15 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-52540; from: government_issued
+  - **Provenance:** doc#257 status=government_issued _[verified]_
+
+* **2005-10-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] Demand Letter — 2005-10-06_demand_letter.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#94 status=unknown _[inferred_strong]_
+
+* **2005-10-06 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2005-10-06_tax_demand_letter.pdf
+  - **Parties/Titles:** T-88888; from: unknown
+  - **Provenance:** doc#81 status=unknown _[inferred_strong]_
+
+### 2007
+
+* **2007-06-20 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — YYYY-MM-DD_request_for_supporting_documents.pdf
+  - **Parties/Titles:** T-47657; from: government_issued
+  - **Provenance:** doc#250 status=government_issued _[verified]_
+
+### 2009
+
+* **2009-12-09 | legal_memo**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#492 status=unknown _[inferred_strong]_
+
+### 2010
+
+* **2010-09-16 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2010-09-16_TCT_2010000694.pdf
+  - **Parties/Titles:** T-02; T-106; T-2010000; from: government_issued
+  - **Provenance:** doc#27 status=government_issued _[verified]_
+
+### 2011
+
+* **2011-03-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱1,857.32 — RPT payment per OR #3131662 (Provincial Assessor)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#29 doc#232 _[verified]_
+
+* **2011-12-12 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — 1Just compensation vol 3.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#673 status=executed_filed _[verified]_
+
+### 2012
+
+* **2012-02-20 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 2012-02-20_special_power_of_attorney.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#38 status=government_issued _[verified]_
+
+### 2014
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#467 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_real_property_assessment.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#151 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-30; from: government_issued
+  - **Provenance:** doc#136 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declarations_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-51641; from: government_issued
+  - **Provenance:** doc#30 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_property_tax_declaration.pdf
+  - **Parties/Titles:** T-12; T-431; from: government_issued
+  - **Provenance:** doc#36 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_Elmer_Worrick.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#37 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#105 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#128 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#131 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-52537; from: government_issued
+  - **Provenance:** doc#130 status=government_issued _[verified]_
+
+* **2014-06-23 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2014-06-23_tax_declaration_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#134 status=government_issued _[verified]_
+
+* **2014-06-23 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-52537; from: government_issued
+  - **Provenance:** doc#468 status=government_issued _[verified]_
+
+* **2014-06-23 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#469 status=government_issued _[verified]_
+
+### 2015
+
+* **2015-09-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — Inocalla Murder Docs.pdf
+  - **Parties/Titles:** T-24; T-26; from: executed_filed
+  - **Provenance:** doc#651 status=executed_filed _[verified]_
+
+* **2015-11-18 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — Just Compensation Volume  2.pdf
+  - **Parties/Titles:** T-14; T-4494; T-4501; T-4502; T-4503; from: executed_filed
+  - **Provenance:** doc#675 status=executed_filed _[verified]_
+
+* **2015-11-18 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — 6839.pdf
+  - **Parties/Titles:** T-14; T-4494; T-4501; T-4502; T-4503; from: executed_filed
+  - **Provenance:** doc#683 status=executed_filed _[verified]_
+
+### 2016
+
+* **2016-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] 📜 Deed of Absolute Sale (alleged 2016): T-52540 → T-079-2021002126 (Cesar de la Fuente (under revoked SPA, per Doc 388) → Gloria Balane)
+  - **Parties/Titles:** T-52540; T-079-2021002126; from: Cesar de la Fuente (under revoked SPA, per Doc 388); to: Gloria Balane; party_ids: 20
+  - **Provenance:** title_transfer#36 _[inferred_strong]_
+
+* **2016-02-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 2016-02-07_absolute_sale_deed.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#239 status=unknown _[inferred_strong]_
+
+* **2016-03-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2016-03-30_tax_declaration_MWK-001.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#70 status=government_issued _[verified]_
+
+* **2016-03-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2016-03-30_property_assessment_MWK-001.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#125 status=government_issued _[verified]_
+
+* **2016-03-31 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱8,977.82 — RPT payment per OR #0033340; 0033341; 0033342 (None)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#1 doc#70 _[verified]_
+
+* **2016-03-31 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱8,978.82 — RPT payment per OR #0033340; 0033341; 0033342 (Municipal Assessor: GEMMAP. ABLA, REA; Provincial Assessor: VIRGILIO S. T
+  - **Parties/Titles:** —
+  - **Provenance:** tx#2 doc#70 _[verified]_
+
+* **2016-04-14 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 2016-04-14_deed_of_absolute_sale.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#366 status=unknown _[inferred_strong]_
+
+* **2016-08-12 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱759.54 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#38 doc#666 _[verified]_
+
+* **2016-09-24 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 19d65cb30b6c58e2__Exhibit 6 - Deed of Absolute Sale.pdf
+  - **Parties/Titles:** T-06; T-11; T-38838; T-525240; T-52540; from: executed_notarized
+  - **Provenance:** doc#415 status=executed_notarized _[verified]_
+
+* **2016-09-29 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 2016-09-29_deed_of_absolute_sale.pdf
+  - **Parties/Titles:** T-52540; from: unknown
+  - **Provenance:** doc#233 status=unknown _[inferred_strong]_
+
+* **2016-09-29 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-15; from: executed_filed
+  - **Provenance:** doc#584 status=executed_filed _[verified]_
+
+* **2016-10-10 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF LOSS on T-52540 (PE 2016002312); notary Atty. Elaine Gay R. Belen
+  - **Parties/Titles:** T-52540; from: CESAR M. DE LA FUENTE
+  - **Provenance:** instruments_on_title#39 doc#48 _[verified]_
+
+* **2016-10-10 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on T-52540 (PE 2016002312); notary Atty. Agcaoili
+  - **Parties/Titles:** T-52540; from: GERALDINE K. HOPPE, PATRICIA K. ZSCHOCHE AND MARCIA ELLEN KEESEY
+  - **Provenance:** instruments_on_title#40 doc#48 _[verified]_
+
+* **2016-10-10 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 AFFIDAVIT OF LOSS on T-52540 (PE 2016002312); notary Atty. Elaine Gay R. Belen
+  - **Parties/Titles:** T-52540; from: CESAR M. DE LA FUENTE
+  - **Provenance:** instruments_on_title#49 doc#96 _[verified]_
+
+* **2016-10-10 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on T-52540 (PE 2016002312); notary Atty. Agcaoili
+  - **Parties/Titles:** T-52540; from: GERALDINE K. HOPPE, PATRICIA K. ZSCHOCHE AND MARCIA ELLEN KEESEY
+  - **Provenance:** instruments_on_title#50 doc#96 _[verified]_
+
+* **2016-10-20 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 filing_fee ₱2,025.00 — filing_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#36 doc#677 _[verified]_
+
+* **2016-10-20 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — Owners Duplicate Petition.pdf
+  - **Parties/Titles:** T-38838; T-46460; T-47655; T-48336; T-49062; T-52536; T-52540; from: executed_filed
+  - **Provenance:** doc#677 status=executed_filed _[verified]_
+
+### 2017
+
+* **2017-03-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — Just Compensation  Transcript.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#679 status=executed_filed _[verified]_
+
+* **2017-03-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — Transcript 6839.pdf
+  - **Parties/Titles:** T-6839; from: executed_filed
+  - **Provenance:** doc#682 status=executed_filed _[verified]_
+
+* **2017-03-16 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 ISSUANCE OF NEW OWNER'S DUPLICATE COPY OF TITLE on T-52540 (PE 2017000693); notary —
+  - **Parties/Titles:** T-52540; from: Hon. Carmela A. Dating
+  - **Provenance:** instruments_on_title#41 doc#48 _[verified]_
+
+* **2017-03-16 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 ISSUANCE OF NEW OWNER'S DUPLICATE COPY OF TITLE on T-52540 (PE 2017000693); notary Hon. Arniel A. Dating
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#51 doc#96 _[verified]_
+
+* **2017-03-28 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 2017-03-28_deed_of_confirmation.pdf
+  - **Parties/Titles:** T-52540; from: government_issued
+  - **Provenance:** doc#240 status=government_issued _[verified]_
+
+* **2017-06-21 | vital_record**
+  - **Description:** [PAR-CRIM9221] 💀 Cesar N. dela Fuente died (administrator of MWK estate) — established by Landbank Comment in Civil Case 6839 quoting Atty. Belen
+  - **Parties/Titles:** from: LandBank filing in Civil Case 6839 (doc#364)
+  - **Provenance:** doc#364 LandBank comment 2018-05-17 in Civil Case 6839; opposing-party admission _[verified]_
+
+* **2017-07-28 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-11; T-12; T-13; T-14; T-15; T-16; T-17; T-18; from: unknown
+  - **Provenance:** doc#525 status=unknown _[inferred_strong]_
+
+* **2017-08-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2017-08-02_tax_declaration_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#129 status=government_issued _[verified]_
+
+* **2017-08-15 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱5,264.02 — RPT payment per OR #0042102, 0042103 (OFFICE OF THE MUNICIPAL TREASURER, MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#3 doc#99 _[verified]_
+
+* **2017-09-11 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Vicente Jr. Murder.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#654 status=government_issued _[verified]_
+
+### 2018
+
+* **2018-05-17 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — 2018-05-17_landbank_comment_civil_case_6839.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#364 status=executed_filed _[verified]_
+
+* **2018-08-02 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT) — 2018-08-02_TCT_079-2018001329.pdf
+  - **Parties/Titles:** T-079-2018001329; T-106; T-12; T-2018; T-2018001; T-52536; from: government_issued
+  - **Provenance:** doc#322 status=government_issued _[verified]_
+
+* **2018-08-02 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — (no name)
+  - **Parties/Titles:** T-106; T-12; T-2018; T-2018001; T-52536; from: government_issued
+  - **Provenance:** doc#607 status=government_issued _[verified]_
+
+* **2018-08-02 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — null_information_request_form.pdf
+  - **Parties/Titles:** T-32917; T-52536; from: government_issued
+  - **Provenance:** doc#261 status=government_issued _[verified]_
+
+* **2018-09-18 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2018-09-18_real_property_assessment.pdf
+  - **Parties/Titles:** T-402; from: government_issued
+  - **Provenance:** doc#150 status=government_issued _[verified]_
+
+* **2018-10-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2018-10-30_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#66 status=government_issued _[verified]_
+
+### 2019
+
+* **2019-02-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#513 status=government_issued _[verified]_
+
+* **2019-02-20 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19b9b7672d6e6132__[DRAFT] Complaint vs. Gloria Balane et al.pdf
+  - **Parties/Titles:** T-52540; T-8216; from: executed_filed
+  - **Provenance:** doc#444 status=executed_filed _[verified]_
+
+* **2019-06-04 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2019-06-04_tax_declaration_real_property.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#138 status=government_issued _[verified]_
+
+* **2019-07-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2019-07-31_property_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#32 status=unknown _[inferred_strong]_
+
+* **2019-08-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2019-08-15_reply_to_JDavis_re_CDelaFuente.pdf
+  - **Parties/Titles:** T-2005; T-2019; T-4600; from: unknown
+  - **Provenance:** doc#299 status=unknown _[inferred_strong]_
+
+* **2019-09-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱273.35 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#39 doc#659 _[verified]_
+
+* **2019-09-03 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — TCT LABO.pdf
+  - **Parties/Titles:** T-101855; T-1960; T-2836; from: government_issued
+  - **Provenance:** doc#659 status=government_issued _[verified]_
+
+### 2020
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-01; T-2140; T-22; T-4502; from: government_issued
+  - **Provenance:** doc#9 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT_T-24163.pdf
+  - **Parties/Titles:** T-13331; T-241; T-24163; from: government_issued
+  - **Provenance:** doc#33 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-102; T-1989; T-320; T-4501; T-603; from: government_issued
+  - **Provenance:** doc#11 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-13; T-25; T-30681; T-4814; from: government_issued
+  - **Provenance:** doc#12 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-1970; T-23796; from: government_issued
+  - **Provenance:** doc#26 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT-4503_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-4503; from: government_issued
+  - **Provenance:** doc#14 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_Certified_True_Copy_TCT_T-4492.pdf
+  - **Parties/Titles:** T-4492; from: government_issued
+  - **Provenance:** doc#146 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT_772_Cabanbanan_San_Vicente.pdf
+  - **Parties/Titles:** T-051; T-772; from: government_issued
+  - **Provenance:** doc#282 status=government_issued _[verified]_
+
+* **2020-01-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-22_TCT-30681_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-13; T-25; T-30681; T-4814; from: government_issued
+  - **Provenance:** doc#346 status=government_issued _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT-30681_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#80 doc#346 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT_772_Cabanbanan_San_Vicente.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#102 doc#282 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-27_TCT_T-4504.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#119 doc#230 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_Certified_True_Copy_TCT_T-4492.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#125 doc#146 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT_T-24163.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#155 doc#33 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#160 doc#26 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT-4503_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#171 doc#14 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#172 doc#12 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-27_TCT_30683_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#173 doc#10 _[verified]_
+
+* **2020-01-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,454.96 — registration_fee payment per OR — 2020-01-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#174 doc#9 _[verified]_
+
+* **2020-01-27 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-27_TCT_30683_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-12; T-13; T-15; T-20; T-30683; T-4814; from: government_issued
+  - **Provenance:** doc#10 status=government_issued _[verified]_
+
+* **2020-01-27 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2020-01-27_TCT_T-4504.pdf
+  - **Parties/Titles:** T-13; T-16; T-22; T-23; T-30; T-4504; from: government_issued
+  - **Provenance:** doc#230 status=government_issued _[verified]_
+
+* **2020-05-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] Demand Letter — 2020-05-29_demand_letter_intrusion.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#231 status=unknown _[inferred_strong]_
+
+* **2020-06-24 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2020-06-24_land_registration_receipt.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#237 status=government_issued _[verified]_
+
+* **2020-06-24 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱27,276.00 — registration_fee payment per OR — 2020-06-24_land_registration_receipt.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#116 doc#237 _[verified]_
+
+* **2020-09-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] Notice — 2020-09-25_notice_of_revocation_de_la_fuente.pdf
+  - **Parties/Titles:** T-2005; T-4497; from: unknown
+  - **Provenance:** doc#76 status=unknown _[inferred_strong]_
+
+* **2020-09-30 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2020-09-30_Request_for_Records_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-079-2018001329; T-2021002; T-4497; T-52540; from: government_issued
+  - **Provenance:** doc#358 status=government_issued _[verified]_
+
+* **2020-09-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2020-09-30_special_power_of_attorney_revocation_reply.pdf
+  - **Parties/Titles:** T-4497; from: government_issued
+  - **Provenance:** doc#79 status=government_issued _[verified]_
+
+* **2020-10-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19c41731f96632d9__Exhibit G to G-1 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-15; T-2005; T-4497; from: government_issued
+  - **Provenance:** doc#431 status=government_issued _[verified]_
+
+### 2021
+
+* **2021-05-20 | survey_plan**
+  - **Description:** [PAR-CRIM9221] Plan — 2021-05-20_subdivision_plan_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-23; T-440; T-4497; from: unknown
+  - **Provenance:** doc#287 status=unknown _[inferred_strong]_
+
+* **2021-08-13 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2021-08-13_property_tax_receipt.pdf
+  - **Parties/Titles:** T-2021-08; from: unknown
+  - **Provenance:** doc#236 status=unknown _[inferred_strong]_
+
+* **2021-08-13 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱100.00 — rpt payment per OR — 2021-08-13_property_tax_receipt.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#117 doc#236 _[verified]_
+
+* **2021-09-21 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2021-09-21_property_declaration_tax_assessment.pdf
+  - **Parties/Titles:** T-52540; from: government_issued
+  - **Provenance:** doc#238 status=government_issued _[verified]_
+
+* **2021-11-18 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#587 status=unknown _[inferred_strong]_
+
+* **2021-11-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title — 19c41731f96632d9__Exhibit C to C-1 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-106; T-12; T-2021; T-2021002; T-52540; from: government_issued
+  - **Provenance:** doc#427 status=government_issued _[verified]_
+
+* **2021-11-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title — 19d65cb30b6c58e2__Exhibit 1 - Transfer Certificate of Title No. 079-202100216.pdf
+  - **Parties/Titles:** T-106; T-12; T-2021002; T-52540; from: government_issued
+  - **Provenance:** doc#410 status=government_issued _[verified]_
+
+* **2021-11-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2021-11-23_heirs_of_mary_worrick_keesey_tct.pdf
+  - **Parties/Titles:** T-079-2021002127; T-106; T-12; T-2021002; T-52540; from: government_issued
+  - **Provenance:** doc#20 status=government_issued _[verified]_
+
+* **2021-11-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2021-11-23_TCT_2021002127.pdf
+  - **Parties/Titles:** T-1035055; T-106; T-12; T-2021002; T-52540; from: government_issued
+  - **Provenance:** doc#368 status=government_issued _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on T-52540 (PE 2021003235); notary Flo Y. Pascual
+  - **Parties/Titles:** T-52540; from: GERALDINE K. HOPPE, PATRICIA K. ZSCHOCHE AND MARCIA ELLEN KEESEY
+  - **Provenance:** instruments_on_title#42 doc#48 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF CONFIRMATION on T-52540 (PE 2021003235); notary —
+  - **Parties/Titles:** T-52540; from: CESAR M. DELA FUENTE
+  - **Provenance:** instruments_on_title#43 doc#48 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SALE (BIR CERTIFICATE AUTHORIZING REGISTRATION) on T-52540 (PE 2021003235); notary —
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#44 doc#48 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 PARTITION SUBDIVISION AGREEMENT on T-52540 (PE 2021003236); notary Donald E. Asis
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#46 doc#48 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SPECIAL POWER OF ATTORNEY on T-52540 (PE 2021003235); notary Flo Y. Pascual, Ramon C. Munda
+  - **Parties/Titles:** T-52540; from: GERALDINE K. HOPPE, PATRICIA K. ZSCHOCHE AND MARCIA ELLEN KEESEY
+  - **Provenance:** instruments_on_title#52 doc#96 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 DEED OF CONFIRMATION on T-52540 (PE 2021003235); notary —
+  - **Parties/Titles:** T-52540; from: CESAR M. DELA FUENTE
+  - **Provenance:** instruments_on_title#53 doc#96 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SALE : BIR - CERTIFICATE AUTHORIZING REGISTRATION on T-52540 (PE 2021003235); notary —
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#55 doc#96 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 SALE on T-52540 (PE &lt;no_pe_9&gt;); notary Donald E. Asis
+  - **Parties/Titles:** T-52540; from: CESAR M. DELA FUENTE
+  - **Provenance:** instruments_on_title#56 doc#96 _[verified]_
+
+* **2021-11-23 | title_annotation**
+  - **Description:** [PAR-CRIM9221] 🏷 PARTITION - SUBDIVISION AGREEMENT on T-52540 (PE 2021003236); notary Donald E. Asis
+  - **Parties/Titles:** T-52540
+  - **Provenance:** instruments_on_title#57 doc#96 _[verified]_
+
+### 2022
+
+* **2022-05-17 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2022-05-17_property_assessment_declaration.pdf
+  - **Parties/Titles:** T-401; T-402; T-404; from: government_issued
+  - **Provenance:** doc#152 status=government_issued _[verified]_
+
+* **2022-11-25 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2022-11-25_receipt.pdf
+  - **Parties/Titles:** T-196; T-2022-11; from: unknown
+  - **Provenance:** doc#147 status=unknown _[inferred_strong]_
+
+* **2022-11-25 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2022-11-25_receipt.pdf
+  - **Parties/Titles:** T-196; T-2022-11; from: unknown
+  - **Provenance:** doc#157 status=unknown _[inferred_strong]_
+
+* **2022-12-02 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2022-12-02_receipt.pdf
+  - **Parties/Titles:** T-2022-12; T-28279; from: unknown
+  - **Provenance:** doc#145 status=unknown _[inferred_strong]_
+
+* **2022-12-02 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱2,827.94 — RPT payment per OR #1027485980 (Registry of Deeds of Province of Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#30 doc#238 _[verified]_
+
+* **2022-12-02 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱2,827.94 — registration_fee payment per OR — 2016-09-29_deed_of_absolute_sale.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#118 doc#233 _[verified]_
+
+* **2022-12-05 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱623.08 — registration_fee payment per OR — 2022-12-06_TCT_52540_Cancelled_Fraud.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#146 doc#48 _[verified]_
+
+* **2022-12-05 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱623.08 — registration_fee payment per OR — 2021-11-23_heirs_of_mary_worrick_keesey_tct.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#166 doc#20 _[verified]_
+
+* **2022-12-06 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-06_TCT-47655.pdf
+  - **Parties/Titles:** T-208; T-2399; T-476; T-47655; T-4814; from: government_issued
+  - **Provenance:** doc#144 status=government_issued _[verified]_
+
+* **2022-12-06 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-06_TCT_52540_Cancelled_Fraud.pdf
+  - **Parties/Titles:** T-05; T-10; T-12; T-15; T-17; T-18; T-19; T-20; T-20902; T-22; T-24; T-25; T-26; T-4814; T-51; T-52540; from: government_issued
+  - **Provenance:** doc#48 status=government_issued _[verified]_
+
+* **2022-12-06 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,907.43 — registration_fee payment per OR — 2023-01-03_TCT_38838_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#113 doc#249 _[verified]_
+
+* **2022-12-06 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,907.43 — registration_fee payment per OR — 2022-12-06_TCT-47655.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#126 doc#144 _[verified]_
+
+* **2022-12-06 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,907.43 — registration_fee payment per OR — 2022-12-07_TCT_52536_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#148 doc#46 _[verified]_
+
+* **2022-12-06 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,907.43 — registration_fee payment per OR — 2022-12-07_heirs_of_mary_worrick_keesey_title.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#157 doc#29 _[verified]_
+
+* **2022-12-06 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,907.43 — registration_fee payment per OR — 2022-12-07_TCT_T48336_heirs.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#168 doc#18 _[verified]_
+
+* **2022-12-07 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-07_TCT_52536_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-034-20; T-11; T-20; T-5253; T-52536; T-526; from: government_issued
+  - **Provenance:** doc#46 status=government_issued _[verified]_
+
+* **2022-12-07 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-07_TCT_T48336_heirs.pdf
+  - **Parties/Titles:** T-20; T-20802; T-2399; T-4814; T-48336; T-51; from: government_issued
+  - **Provenance:** doc#18 status=government_issued _[verified]_
+
+* **2022-12-07 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-07_heirs_of_mary_worrick_keesey_title.pdf
+  - **Parties/Titles:** T-11; T-20; T-22; T-49062; from: government_issued
+  - **Provenance:** doc#29 status=government_issued _[verified]_
+
+* **2022-12-20 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-20_TCT_45616.pdf
+  - **Parties/Titles:** T-01; T-12; T-13; T-15; T-20; T-2399; T-4314; T-45616; T-91; from: government_issued
+  - **Provenance:** doc#135 status=government_issued _[verified]_
+
+* **2022-12-20 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,246.16 — registration_fee payment per OR — 2022-12-21_TCT_47656_cancellation_fraud.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#144 doc#52 _[verified]_
+
+* **2022-12-21 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-21_TCT_47656_cancellation_fraud.pdf
+  - **Parties/Titles:** T-20; T-20302; T-23; T-4497; T-47656; T-4914; T-60; from: government_issued
+  - **Provenance:** doc#52 status=government_issued _[verified]_
+
+* **2022-12-27 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-27_TCT_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-20; T-20802; T-2399; T-32914; T-4497; T-4814; T-99; from: government_issued
+  - **Provenance:** doc#107 status=government_issued _[verified]_
+
+* **2022-12-27 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-27_TCT-32912_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-12; T-20; T-317; T-32912; T-4814; from: government_issued
+  - **Provenance:** doc#142 status=government_issued _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2022-12-27_receipt.pdf
+  - **Parties/Titles:** T-2022-12; T-32911; T-32912; T-32913; T-32914; T-32916; T-33365; T-39630; T-40718; T-4501; T-47657; T-48335; T-48336; T-49037; T-49060; T-49061; T-52536; from: government_issued
+  - **Provenance:** doc#156 status=government_issued _[verified]_
+
+* **2022-12-27 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-27_TCT_49060_Heirs_Mary_Worrick.pdf
+  - **Parties/Titles:** T-1996; T-203; T-49; T-49060; from: government_issued
+  - **Provenance:** doc#241 status=government_issued _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-27_TCT_49060_Heirs_Mary_Worrick.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#115 doc#241 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-28_TCT-4501.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#123 doc#171 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-27_TCT-32912_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#128 doc#142 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-28_TCT-33365_Mary_Worrick_Keesey_Estate.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#129 doc#124 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-28_TCT_49037.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#130 doc#120 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-27_TCT_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#134 doc#107 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 1999-09-26_TCT_40718_Cesar_Ramirez.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#143 doc#67 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 2022-12-28_TCT_49061_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#145 doc#50 _[verified]_
+
+* **2022-12-27 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 1996-05-24_TCT_39630.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#150 doc#42 _[verified]_
+
+* **2022-12-28 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-28_TCT-4501.pdf
+  - **Parties/Titles:** T-0012; T-450; T-4501; from: government_issued
+  - **Provenance:** doc#171 status=government_issued _[verified]_
+
+* **2022-12-28 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-28_TCT-33365_Mary_Worrick_Keesey_Estate.pdf
+  - **Parties/Titles:** T-20; T-221361; T-33365; from: government_issued
+  - **Provenance:** doc#124 status=government_issued _[verified]_
+
+* **2022-12-28 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-28_TCT_32913.pdf
+  - **Parties/Titles:** T-11; T-20; T-20802; T-2399; T-32913; T-4814; from: government_issued
+  - **Provenance:** doc#45 status=government_issued _[verified]_
+
+* **2022-12-28 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-28_TCT_49061_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-13; T-21; T-31; T-4010; T-49061; from: government_issued
+  - **Provenance:** doc#50 status=government_issued _[verified]_
+
+* **2022-12-28 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2022-12-28_TCT_49037.pdf
+  - **Parties/Titles:** T-11; T-20; T-31; T-4497; T-49037; T-71; from: government_issued
+  - **Provenance:** doc#120 status=government_issued _[verified]_
+
+* **2022-12-28 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱4,602.74 — registration_fee payment per OR — 1998-10-01_TCT_T-48335_Jose_Pascual_JR.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#114 doc#242 _[verified]_
+
+### 2023
+
+* **2023-01-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-01-01_real_property_tax_assessment.pdf
+  - **Parties/Titles:** T-2023; T-2023-01; T-590; from: unknown
+  - **Provenance:** doc#139 status=unknown _[inferred_strong]_
+
+* **2023-01-03 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-03_TCT_38838_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-12; T-13; T-38838; T-4814; T-48336; from: government_issued
+  - **Provenance:** doc#249 status=government_issued _[verified]_
+
+* **2023-01-03 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-03_TCT-38838_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-12; T-13; T-38838; T-4814; from: government_issued
+  - **Provenance:** doc#23 status=government_issued _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2023-01-03_receipt_land_title_registration.pdf
+  - **Parties/Titles:** T-10236; T-11798; T-12800; T-12873; T-13343; T-2023-01; T-23796; T-30618; T-32911; T-32917; T-38838; T-4497; T-47655; T-48336; T-49061; T-49062; T-52540; from: government_issued
+  - **Provenance:** doc#179 status=government_issued _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 19c41731f96632d9__Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#68 doc#426 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2025-09-15_Mayor_Alex_roads_combined.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#75 doc#379 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-04_TCT_52540.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#105 doc#272 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-04_TCT_MWK-001.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#131 doc#117 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 1999-07-24_TCT_30618.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#132 doc#111 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-04_TCT-52540_certified_copy.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#137 doc#96 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-04_TCT-13343_certificate.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#138 doc#95 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱5,099.21 — cnr payment per OR — 2023-01-04_TCT_T-12873.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#141 doc#69 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱5,099.21 — cnr payment per OR — 2023-01-04_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#152 doc#40 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-03_TCT-38838_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#163 doc#23 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-04_TCT-32917_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#165 doc#21 _[verified]_
+
+* **2023-01-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,099.21 — registration_fee payment per OR — 2023-01-04_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#169 doc#17 _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_52540.pdf
+  - **Parties/Titles:** T-15; T-20802; T-47061; T-4814; T-51; T-52540; from: government_issued
+  - **Provenance:** doc#272 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT-52540_certified_copy.pdf
+  - **Parties/Titles:** T-051607-1971; T-10; T-20802; T-31; T-47051; T-4814; T-5254; T-52540; from: government_issued
+  - **Provenance:** doc#96 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_T-12873.pdf
+  - **Parties/Titles:** T-12873; T-13; T-49; T-51; from: government_issued
+  - **Provenance:** doc#69 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT-13343_certificate.pdf
+  - **Parties/Titles:** T-13343; T-4344; T-4497; T-56; T-7393; from: government_issued
+  - **Provenance:** doc#95 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_T-12800.pdf
+  - **Parties/Titles:** T-12800; T-1509; from: government_issued
+  - **Provenance:** doc#112 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title — 19c41731f96632d9__Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-051007; T-19051; T-20002; T-24; T-4614; T-52540; T-771; from: government_issued
+  - **Provenance:** doc#426 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-2082; T-23; T-2399; T-32911; T-4914; from: government_issued
+  - **Provenance:** doc#17 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT-32917_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-12; T-13; T-20802; T-2399; T-32917; T-4814; from: government_issued
+  - **Provenance:** doc#21 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_T-4497.pdf
+  - **Parties/Titles:** T-10; T-109; T-25; T-305; T-31; T-4110; T-4497; T-959; from: government_issued
+  - **Provenance:** doc#39 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-11; T-4014; T-49062; from: government_issued
+  - **Provenance:** doc#40 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-20; T-2379; T-23796; T-539; from: government_issued
+  - **Provenance:** doc#44 status=government_issued _[verified]_
+
+* **2023-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-01-04_TCT_MWK-001.pdf
+  - **Parties/Titles:** T-12; T-25; T-41; T-49061; from: government_issued
+  - **Provenance:** doc#117 status=government_issued _[verified]_
+
+* **2023-01-04 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,049.19 — registration_fee payment per OR — 2023-01-04_TCT_T-4497.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#153 doc#39 _[verified]_
+
+* **2023-01-04 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,049.19 — registration_fee payment per OR — 2010-09-16_TCT_2010000694.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#159 doc#27 _[verified]_
+
+* **2023-02-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2023-02-17_intestate_estate_of_mary_worrick_keesey_letter.pdf
+  - **Parties/Titles:** T-15; T-2023-02; T-4497; T-8216; from: unknown
+  - **Provenance:** doc#165 status=unknown _[inferred_strong]_
+
+* **2023-02-21 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2023-02-21_receipt.pdf
+  - **Parties/Titles:** T-106; T-111; T-140; T-2023-02; T-32917; T-4493; T-4497; T-47657; T-69404; from: government_issued
+  - **Provenance:** doc#153 status=government_issued _[verified]_
+
+* **2023-02-21 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2023-02-21_receipt.pdf
+  - **Parties/Titles:** T-2023-02; T-45616; T-69404; from: government_issued
+  - **Provenance:** doc#160 status=government_issued _[verified]_
+
+* **2023-02-22 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2023-02-22_affidavit_of_adverse_claim.pdf
+  - **Parties/Titles:** T-12; T-15; T-4497; T-52540; T-8216; from: government_issued
+  - **Provenance:** doc#176 status=government_issued _[verified]_
+
+* **2023-02-22 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 2023-02-22_affidavit_of_loss_P_Zschoche.pdf
+  - **Parties/Titles:** T-079-202; T-15; T-32917; T-38838; T-39211; T-4497; T-47555; T-48336; T-52540; T-674; T-8216; from: unknown
+  - **Provenance:** doc#284 status=unknown _[inferred_strong]_
+
+* **2023-02-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2023-02-22_intestate_estate_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-15; T-4497; from: government_issued
+  - **Provenance:** doc#294 status=government_issued _[verified]_
+
+* **2023-02-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2023-02-22_intestate_estate_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-15; T-4497; from: unknown
+  - **Provenance:** doc#183 status=unknown _[inferred_strong]_
+
+* **2023-02-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-02-22_TCT_T-45616_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-11; T-12; T-15; T-2399; T-4314; T-45; T-45616; from: government_issued
+  - **Provenance:** doc#47 status=government_issued _[verified]_
+
+* **2023-02-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-02-22_TCT_46460_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-21; T-23; T-2399; T-31; T-46460; T-51; from: government_issued
+  - **Provenance:** doc#143 status=government_issued _[verified]_
+
+* **2023-02-22 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 2023-02-22_affidavit_of_loss.pdf
+  - **Parties/Titles:** T-079-202; T-15; T-32917; T-38838; T-39211; T-4497; T-46460; T-47655; T-48336; T-49062; T-52540; T-67404; T-8216; from: unknown
+  - **Provenance:** doc#187 status=unknown _[inferred_strong]_
+
+* **2023-02-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2023-02-22_intestate_estate_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-15; T-4497; from: draft_unsigned
+  - **Provenance:** doc#298 status=draft_unsigned _[inferred_strong]_
+
+* **2023-02-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱858.24 — registration_fee payment per OR — 2023-02-22_TCT_46460_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#127 doc#143 _[verified]_
+
+* **2023-02-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱546.70 — registration_fee payment per OR — 2023-02-22_TCT_T-45616_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#147 doc#47 _[verified]_
+
+* **2023-02-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱858.24 — registration_fee payment per OR — 2023-02-23_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#151 doc#41 _[verified]_
+
+* **2023-02-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱858.24 — registration_fee payment per OR — 2023-02-23_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#154 doc#34 _[verified]_
+
+* **2023-02-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱858.24 — registration_fee payment per OR — 2023-02-23_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#156 doc#31 _[verified]_
+
+* **2023-02-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱546.70 — registration_fee payment per OR — 2023-02-23_TCT_Heirs_of_Mary_Worrick.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#164 doc#22 _[verified]_
+
+* **2023-02-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-02-23_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-12; T-15; T-16; T-17; T-20; T-2032; T-21; T-22; T-23; T-2399; T-4314141; T-47657; T-9516; from: government_issued
+  - **Provenance:** doc#31 status=government_issued _[verified]_
+
+* **2023-02-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-02-23_TCT_Heirs_of_Mary_Worrick.pdf
+  - **Parties/Titles:** T-10; T-11; T-12; T-13; T-14; T-15; T-16; T-17; T-18; T-19; T-20; T-21; T-22; T-23; T-25; T-26; T-4814; T-67404; T-69404; from: government_issued
+  - **Provenance:** doc#22 status=government_issued _[verified]_
+
+* **2023-02-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-02-23_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-01; T-10; T-14; T-15; T-16; T-18; T-20902; T-21; T-22; T-2399; T-29; T-4103; T-4314; T-47657; from: government_issued
+  - **Provenance:** doc#34 status=government_issued _[verified]_
+
+* **2023-02-23 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-02-23_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-12; T-13; T-14; T-15; T-16; T-17; T-18; T-19; T-21; T-22; T-27-6; T-32217; T-4314; T-476; T-47657; from: government_issued
+  - **Provenance:** doc#41 status=government_issued _[verified]_
+
+* **2023-05-17 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: draft_unsigned
+  - **Provenance:** doc#581 status=draft_unsigned _[inferred_strong]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#123 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#133 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_document_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#59 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account.pdf
+  - **Parties/Titles:** T-2023-05; from: government_issued
+  - **Provenance:** doc#141 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#122 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#61 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account_keesey.pdf
+  - **Parties/Titles:** T-2023; from: government_issued
+  - **Provenance:** doc#49 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#53 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#57 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#118 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-51641; from: government_issued
+  - **Provenance:** doc#54 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#56 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account_kesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#51 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account_MWK-001.pdf
+  - **Parties/Titles:** T-30; from: government_issued
+  - **Provenance:** doc#55 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_declaration_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#58 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#60 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_property_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#65 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_declaration_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-15; from: government_issued
+  - **Provenance:** doc#99 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_declaration_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#106 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_statement_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-2023-05; T-30; from: government_issued
+  - **Provenance:** doc#132 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#119 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account.pdf
+  - **Parties/Titles:** T-2023-05; from: government_issued
+  - **Provenance:** doc#121 status=government_issued _[verified]_
+
+* **2023-05-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-05-31_statement_of_account_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#140 status=government_issued _[verified]_
+
+* **2023-07-02 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — 2023-07-02_just_compensation.pdf
+  - **Parties/Titles:** T-1145; T-14; T-22; T-24; T-830; from: government_issued
+  - **Provenance:** doc#345 status=government_issued _[verified]_
+
+* **2023-07-27 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 19c41731f96632d9__Exhibit D to D-1 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#428 status=government_issued _[verified]_
+
+* **2023-07-27 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-403; from: government_issued
+  - **Provenance:** doc#527 status=government_issued _[verified]_
+
+* **2023-07-27 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-403; from: government_issued
+  - **Provenance:** doc#528 status=government_issued _[verified]_
+
+* **2023-08-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-08-04_Certified_True_Copy_TCT_T-4497.pdf
+  - **Parties/Titles:** T-04; T-11038; T-129; T-15; T-25; T-4120; T-442; T-4497; T-617; from: government_issued
+  - **Provenance:** doc#348 status=government_issued _[verified]_
+
+* **2023-08-04 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱617.06 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#35 doc#684 _[verified]_
+
+* **2023-08-04 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱617.06 — registration_fee payment per OR — 2023-08-04_Certified_True_Copy_TCT_T-4497.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#79 doc#348 _[verified]_
+
+* **2023-08-04 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱617.06 — registration_fee payment per OR — 2023-08-07_TCT_T-4497_heirs.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#161 doc#25 _[verified]_
+
+* **2023-08-04 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — Titles'.pdf
+  - **Parties/Titles:** T-04; T-11038; T-129; T-15; T-25; T-4120; T-442; T-4497; T-617; from: government_issued
+  - **Provenance:** doc#684 status=government_issued _[verified]_
+
+* **2023-08-07 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-08-07_TCT_T-4497_heirs.pdf
+  - **Parties/Titles:** T-04; T-11038; T-129; T-15; T-25; T-4120; T-442; T-4497; T-617; from: government_issued
+  - **Provenance:** doc#25 status=government_issued _[verified]_
+
+* **2023-08-29 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2023-08-29_tax_amnesty_request.pdf
+  - **Parties/Titles:** T-2023; T-26; T-4497; from: unknown
+  - **Provenance:** doc#277 status=unknown _[inferred_strong]_
+
+* **2023-08-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2023-08-29_realty_tax_letter_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-2023; T-26; T-4497; from: unknown
+  - **Provenance:** doc#228 status=unknown _[inferred_strong]_
+
+* **2023-08-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — Compiled records Aug 30.pdf
+  - **Parties/Titles:** T-2023; T-26; T-32911; T-32917; T-4497; from: executed_filed
+  - **Provenance:** doc#678 status=executed_filed _[verified]_
+
+* **2023-09-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] Other — 2023-09-01_local_government_initiatives.pdf
+  - **Parties/Titles:** T-2023-09; from: executed_notarized
+  - **Provenance:** doc#235 status=executed_notarized _[verified]_
+
+* **2023-09-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-01_tax_amnesty_proposal.pdf
+  - **Parties/Titles:** T-270; from: unknown
+  - **Provenance:** doc#290 status=unknown _[inferred_strong]_
+
+* **2023-09-12 | government_submission**
+  - **Description:** [PAR-CRIM9221] doc — NBI Report Inocalla Murders.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#652 status=government_issued _[verified]_
+
+* **2023-09-18 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱667.29 — registration_fee payment per OR — 2023-09-19_TCT_T-3064.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#149 doc#43 _[verified]_
+
+* **2023-09-19 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-09-19_TCT_T-3064.pdf
+  - **Parties/Titles:** T-21; T-27; T-30; T-3064; from: government_issued
+  - **Provenance:** doc#43 status=government_issued _[verified]_
+
+* **2023-09-21 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-09-21_TCT-11750.pdf
+  - **Parties/Titles:** T-11750; T-40; T-51; from: government_issued
+  - **Provenance:** doc#71 status=government_issued _[verified]_
+
+* **2023-09-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱896.43 — registration_fee payment per OR — 2023-09-22_certified_true_copy_TCT_T-11752.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#133 doc#110 _[verified]_
+
+* **2023-09-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱896.43 — cnr payment per OR — 2023-09-22_TCT-11753_Teofilo_Sison.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#139 doc#93 _[verified]_
+
+* **2023-09-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱896.43 — registration_fee payment per OR — 2023-09-21_TCT-11750.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#140 doc#71 _[verified]_
+
+* **2023-09-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-09-22_certified_true_copy_TCT_T-11752.pdf
+  - **Parties/Titles:** T-11752; T-51; from: government_issued
+  - **Provenance:** doc#110 status=government_issued _[verified]_
+
+* **2023-09-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-09-22_TCT-11753_Teofilo_Sison.pdf
+  - **Parties/Titles:** T-110; T-11753; T-21; T-41; from: government_issued
+  - **Provenance:** doc#93 status=government_issued _[verified]_
+
+* **2023-09-25 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#585 status=executed_filed _[verified]_
+
+* **2023-09-25 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#582 status=executed_filed _[verified]_
+
+* **2023-09-26 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2023-09-26_remittance_transfer_receipt.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#64 status=unknown _[inferred_strong]_
+
+* **2023-09-29 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-29_tax_receipts_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-1512210; T-22; T-701; from: government_issued
+  - **Provenance:** doc#218 status=government_issued _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱6,038.00 — RPT payment per OR #9072494 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#4 doc#155 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱168,437.44 — RPT payment per OR #9072490 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#5 doc#158 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱73,922.08 — RPT payment per OR #9072491 (Office of the Municipal Treasurer, Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#6 doc#159 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱168,100.00 — RPT payment per OR #9072495 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#7 doc#161 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱21,163.00 — RPT payment per OR #9072492 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#8 doc#162 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱79,411.68 — RPT payment per OR #9072493 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#9 doc#163 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱48,886.48 — RPT payment per OR #9072496 (OFFICE OF THE MUNICIPAL TREASURER, Municipality of Mercedes)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#10 doc#164 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱1,038.40 — RPT payment per OR #9072497 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#11 doc#166 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱505.34 — RPT payment per OR #9072498 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#12 doc#167 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱1,581.46 — RPT payment per OR #9072499 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#13 doc#169 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱1,267.96 — RPT payment per OR #9072500 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#14 doc#170 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱435.70 — RPT payment per OR #9073101 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#15 doc#172 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱2,732.16 — RPT payment per OR #9073102 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#16 doc#173 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱1,501.66 — RPT payment per OR #9073103 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#17 doc#174 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱3,612.18 — RPT payment per OR #9073104 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#18 doc#175 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱1,240.02 — RPT payment per OR #9073105 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#19 doc#177 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱2,121.78 — RPT payment per OR #9073106 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#20 doc#178 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱8,943.82 — RPT payment per OR #9073107 (Office of the Municipal Treasurer, Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#21 doc#180 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱12,418.94 — RPT payment per OR #9073108 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#22 doc#181 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱107,144.85 — RPT payment per OR #9073109 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#23 doc#182 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱7,460.05 — RPT payment per OR #9073110 (Office of the Municipal Treasurer, Municipality of Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#24 doc#184 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱18.41 — RPT payment per OR #9073111 (Office of the Municipal Treasurer, Mercedes, Camarines Norte)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#25 doc#185 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱44,251.86 — RPT payment per OR #9073112 (OFFICE OF THE MUNICIPAL TREASURER, MUNICIPALITY OF MERCEDES)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#26 doc#186 _[verified]_
+
+* **2023-09-29 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱6,018.00 — RPT payment per OR #9072494 (Provincial or City Treasurer)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#28 doc#218 _[verified]_
+
+* **2023-09-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-30_statement_of_account.pdf
+  - **Parties/Titles:** T-2023-09; from: government_issued
+  - **Provenance:** doc#126 status=government_issued _[verified]_
+
+* **2023-09-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-30_statement_of_account.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#63 status=government_issued _[verified]_
+
+* **2023-09-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-30_statement_of_account_elmer_worrick.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#62 status=government_issued _[verified]_
+
+* **2023-09-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-30_statement_of_account_KEESEY.pdf
+  - **Parties/Titles:** T-01-021; from: government_issued
+  - **Provenance:** doc#127 status=government_issued _[verified]_
+
+* **2023-09-30 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-09-30_statement_of_account_MWK-001.pdf
+  - **Parties/Titles:** T-152; from: government_issued
+  - **Provenance:** doc#137 status=government_issued _[verified]_
+
+* **2023-10-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-01_real_property_tax_assessment.pdf
+  - **Parties/Titles:** T-2023; T-590; from: unknown
+  - **Provenance:** doc#191 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-10-01_property_tree_of_titles.pdf
+  - **Parties/Titles:** T-079; T-1484; T-2021002; T-32; T-3241; T-32414; T-32417; T-32916; T-32917; T-340; T-38; T-38838; T-39630; T-40718; T-41-523; T-44602; T-4497; T-45; T-46412; T-46595; T-47; T-47655; T-47656; T-47657; T-49061; T-52540; T-67404; T-9241; from: unknown
+  - **Provenance:** doc#288 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2023-10-01_information_request_form.pdf
+  - **Parties/Titles:** T-32916; T-37868; T-52202; from: government_issued
+  - **Provenance:** doc#268 status=government_issued _[verified]_
+
+* **2023-10-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] Other — 2023-10-01_history_of_transactions_barangay_1.pdf
+  - **Parties/Titles:** T-01; from: unknown
+  - **Provenance:** doc#116 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2023-10-01_information_request_form.pdf
+  - **Parties/Titles:** T-32917; T-33776; T-4497; T-47656; T-48335; from: government_issued
+  - **Provenance:** doc#283 status=government_issued _[verified]_
+
+* **2023-10-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Power of Attorney — 2023-10-01_power_of_attorney_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#246 status=government_issued _[verified]_
+
+* **2023-10-01 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-10-01_Mary_Worrick_Keesey_TCT.pdf
+  - **Parties/Titles:** T-00467; T-11; T-1146; T-12; T-4503; from: government_issued
+  - **Provenance:** doc#87 status=government_issued _[verified]_
+
+* **2023-10-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-01_tax_declaration_Mambungalon.pdf
+  - **Parties/Titles:** T-020-01; T-10; T-1115; T-12; T-13; T-14; T-15; from: government_issued
+  - **Provenance:** doc#75 status=government_issued _[verified]_
+
+* **2023-10-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-01_property_list_heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#295 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-01_property_tax_assessment_KEESEY.pdf
+  - **Parties/Titles:** T-025-07; T-2023; from: unknown
+  - **Provenance:** doc#192 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2023-10-01_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-30682; T-32478; T-34; from: government_issued
+  - **Provenance:** doc#13 status=government_issued _[verified]_
+
+* **2023-10-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-01_property_tax_assessment.pdf
+  - **Parties/Titles:** T-2023; from: unknown
+  - **Provenance:** doc#223 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] Other — 2023-10-01_land_lot_notes.pdf
+  - **Parties/Titles:** T-01444; T-023457; T-32; T-322; T-3241; T-32412; T-32417; T-32913; T-32916; T-440; T-446; T-4497; T-46595; T-47655; T-47656; T-483; T-48335; T-48336; T-49037; T-49062; T-525; T-52540; T-92417; from: unknown
+  - **Provenance:** doc#234 status=unknown _[inferred_strong]_
+
+* **2023-10-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Deed — 2023-10-01_deed_of_donation.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#278 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certification_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-001-00030; from: unknown
+  - **Provenance:** doc#155 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#161 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate.pdf
+  - **Parties/Titles:** T-003-00243; from: unknown
+  - **Provenance:** doc#186 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-001-00270; from: unknown
+  - **Provenance:** doc#178 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#174 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-001-00258; from: unknown
+  - **Provenance:** doc#177 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#163 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-001-00187; from: unknown
+  - **Provenance:** doc#166 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-14; from: unknown
+  - **Provenance:** doc#169 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-001-00252; from: unknown
+  - **Provenance:** doc#158 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-003-00035; from: unknown
+  - **Provenance:** doc#181 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#172 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-001-00045; from: unknown
+  - **Provenance:** doc#159 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#162 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#164 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate.pdf
+  - **Parties/Titles:** T-001-00223; from: unknown
+  - **Provenance:** doc#167 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-001-00227; from: unknown
+  - **Provenance:** doc#170 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-36; from: unknown
+  - **Provenance:** doc#175 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-001-00230; from: unknown
+  - **Provenance:** doc#173 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#180 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-003-00145; from: unknown
+  - **Provenance:** doc#185 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-003-00265; from: unknown
+  - **Provenance:** doc#182 status=unknown _[inferred_strong]_
+
+* **2023-10-02 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2023-10-02_tax_certificate_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-003-00051; from: unknown
+  - **Provenance:** doc#184 status=unknown _[inferred_strong]_
+
+* **2023-10-05 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2023-10-05_information_request_form.pdf
+  - **Parties/Titles:** T-21; T-45616; T-46459; from: government_issued
+  - **Provenance:** doc#262 status=government_issued _[verified]_
+
+* **2023-10-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] Summary — 2023-10-13_MWK_case_summary.pdf
+  - **Parties/Titles:** T-106; T-22; T-30681; T-30683; T-30862; T-32478; T-32917; T-42; T-4497; T-4502; T-48334; T-5340; T-772; from: unknown
+  - **Provenance:** doc#335 status=unknown _[inferred_strong]_
+
+* **2023-10-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] Demand Letter — 2023-10-23_demand_letter_estate_tax_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-25; from: unknown
+  - **Provenance:** doc#109 status=unknown _[inferred_strong]_
+
+* **2023-11-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19d6611a605bead6__Judicial Affidavit of Princess Balane Torralba.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#408 status=executed_filed _[verified]_
+
+### 2024
+
+* **2024-01-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-01-01_real_property_tax_assessment.pdf
+  - **Parties/Titles:** T-025-07; T-2024; from: unknown
+  - **Provenance:** doc#189 status=unknown _[inferred_strong]_
+
+* **2024-01-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024_tax_declaration_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-001-0021; T-00223; T-00942; T-03-00; T-07-001; from: unknown
+  - **Provenance:** doc#226 status=unknown _[inferred_strong]_
+
+* **2024-03-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#583 status=executed_filed _[verified]_
+
+* **2024-04-10 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱28,427.69 — RPT payment per OR #3603191 (MUNICIPALITY OF MERCEDES, OFFICE OF THE MUNICIPAL TREASURER, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#27 doc#190 _[verified]_
+
+* **2024-04-10 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱28,427.69 — RPT payment per OR #3603191 (MUNICIPALITY OF MERCEDES, OFFICE OF THE MUNICIPAL TREASURER, CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#33 doc#190 _[verified]_
+
+* **2024-04-26 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — Affidavit Of Loss 1616.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#637 status=government_issued _[verified]_
+
+* **2024-05-15 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#580 status=executed_filed _[verified]_
+
+* **2024-06-28 | tax_document**
+  - **Description:** [PAR-CRIM9221] doc — Labo Tax Decs.pdf
+  - **Parties/Titles:** T-819; T-822; from: unknown
+  - **Provenance:** doc#635 status=unknown _[inferred_strong]_
+
+* **2024-09-28 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2024-09-28_receipt_TCT-32911.pdf
+  - **Parties/Titles:** T-1034115; T-221861; T-32911; from: government_issued
+  - **Provenance:** doc#275 status=government_issued _[verified]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#217 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#221 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#196 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#200 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#203 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#208 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#198 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#213 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#202 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#212 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#193 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#197 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#199 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#206 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#207 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#204 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#205 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#210 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#211 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#209 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#219 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#214 status=unknown _[inferred_strong]_
+
+* **2024-10-07 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-07_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#220 status=unknown _[inferred_strong]_
+
+* **2024-10-11 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-11_tax_receipt_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-2024; T-2178; T-41; from: government_issued
+  - **Provenance:** doc#190 status=government_issued _[verified]_
+
+* **2024-10-31 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2024-10-31_statement_of_account.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#195 status=unknown _[inferred_strong]_
+
+* **2024-11-28 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2024-11-28_receipt_land_registration.pdf
+  - **Parties/Titles:** T-1034115; from: government_issued
+  - **Provenance:** doc#222 status=government_issued _[verified]_
+
+* **2024-11-28 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱311.54 — registration_fee payment per OR — 2024-09-28_receipt_TCT-32911.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#103 doc#275 _[verified]_
+
+* **2024-11-28 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱781.86 — registration_fee payment per OR — 2024-11-28_receipt_land_registration.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#120 doc#222 _[verified]_
+
+### 2025
+
+* **2025-01-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2025-01-01_real_property_tax_assessment.pdf
+  - **Parties/Titles:** T-2025; from: unknown
+  - **Provenance:** doc#194 status=unknown _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — CTN SL 2025-1104-0792.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#706 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Response - Zschoche v. MEO-Mercedes, Camarines Norte - SL-2025-1104-0792.PDF
+  - **Parties/Titles:** —
+  - **Provenance:** doc#707 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — ARTA Case No. CTN SL-2025-1021-0747 Mayor Alex L Pajarillo (Complete) .pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#782 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Treasurer Responses 2025.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#814 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Signed OSCA - CTN SL-2025-1021-0747 (Jonathan Paul Zschoche vs. Hon. Alexander Pajarillo of the Municipal Government of Mercedes, Camarines
+  - **Parties/Titles:** —
+  - **Provenance:** doc#828 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 01.20.25 Signed OSCA CTN SL-2025-1104-0792 (PATRICIA KEESEY ZSCHOCHE represented by Jonathan Paul Zschoche vs. MUNICIPAL ENGINEERING O.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#839 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — CTN SL-2025-1021-0747.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#881 status=None _[inferred_strong]_
+
+* **2025-01-01 | tax_document**
+  - **Description:** [PAR-CRIM9221] doc — Scan Jan 4, 2025 at 5.28 PM.pdf
+  - **Parties/Titles:** T-2024; T-38; from: unknown
+  - **Provenance:** doc#685 status=unknown _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — CART-CTN SL-2025-1021-0747  (1).pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#882 status=None _[inferred_strong]_
+
+* **2025-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — D ROD 06.03.2025-2.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#906 status=None _[inferred_strong]_
+
+* **2025-01-04 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-04_TCT_T-4497.pdf
+  - **Parties/Titles:** T-04; T-10; T-12030; T-2240; T-410; T-4497; T-47; from: government_issued
+  - **Provenance:** doc#224 status=government_issued _[verified]_
+
+* **2025-01-04 | tax_document**
+  - **Description:** [PAR-CRIM9221] Tax Document — 2025-01-04_property_assessment_summary.pdf
+  - **Parties/Titles:** T-100; T-52537; T-920; from: unknown
+  - **Provenance:** doc#232 status=unknown _[inferred_strong]_
+
+* **2025-01-08 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-08_TCT_52538.pdf
+  - **Parties/Titles:** T-11; T-20; T-20802; T-4497; T-48; T-5253; T-52538; from: government_issued
+  - **Provenance:** doc#270 status=government_issued _[verified]_
+
+* **2025-01-08 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-08_TCT-52539.pdf
+  - **Parties/Titles:** T-20802; T-400; T-4501; T-4814; T-52539; from: government_issued
+  - **Provenance:** doc#264 status=government_issued _[verified]_
+
+* **2025-01-08 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-08_TCT-52539.pdf
+  - **Parties/Titles:** T-20802; T-400; T-4501; T-4814; T-52539; from: government_issued
+  - **Provenance:** doc#263 status=government_issued _[verified]_
+
+* **2025-01-08 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-08_TCT_52538.pdf
+  - **Parties/Titles:** T-11; T-20; T-20802; T-4497; T-48; T-5253; T-52538; from: government_issued
+  - **Provenance:** doc#271 status=government_issued _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-09_TCT-32916_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#101 doc#286 _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-09_TCT-52537.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#104 doc#274 _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-08_TCT_52538.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#106 doc#271 _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-08_TCT_52538.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#107 doc#270 _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-09_TCT-32916_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#110 doc#265 _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-08_TCT-52539.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#111 doc#264 _[verified]_
+
+* **2025-01-08 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱5,231.84 — registration_fee payment per OR — 2025-01-08_TCT-52539.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#112 doc#263 _[verified]_
+
+* **2025-01-09 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-09_TCT-52537.pdf
+  - **Parties/Titles:** T-11; T-15; T-20; T-2537; T-4814; T-52537; from: government_issued
+  - **Provenance:** doc#274 status=government_issued _[verified]_
+
+* **2025-01-09 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-09_TCT-32916_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-11; T-12; T-13; T-14; T-15; T-16; T-17; T-18; T-19; T-3291; T-32916; T-41; T-4814; from: government_issued
+  - **Provenance:** doc#265 status=government_issued _[verified]_
+
+* **2025-01-09 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-09_TCT_T-45964.pdf
+  - **Parties/Titles:** T-203; T-2399; T-30; T-4314; T-45964; T-9130; from: government_issued
+  - **Provenance:** doc#273 status=government_issued _[verified]_
+
+* **2025-01-09 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-01-09_TCT-32916_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-11; T-12; T-13; T-14; T-15; T-16; T-17; T-18; T-19; T-3291; T-32916; T-41; T-4814; from: government_issued
+  - **Provenance:** doc#286 status=government_issued _[verified]_
+
+* **2025-01-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: draft campaign plan
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "jonathan@hayuma.org" &lt;jonathan@hayuma.org&gt;
+  - **Provenance:** gmail#4489 labels=SENT _[verified]_
+
+* **2025-01-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Unconnected and USAID: Community Network in Caringo, Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: jonathan@hayuma.org
+  - **Provenance:** gmail#4484 labels=SENT _[verified]_
+
+* **2025-02-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Update on your USAID Project site
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Benjz Gerard Sevilla &lt;bgsevilla@unconnected.org&gt;
+  - **Provenance:** gmail#4470 labels=SENT _[verified]_
+
+* **2025-02-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Update on your USAID Project site
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Benjz Gerard Sevilla &lt;bgsevilla@unconnected.org&gt;
+  - **Provenance:** gmail#4465 labels=SENT _[verified]_
+
+* **2025-02-11 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-02-11_TCT-33681.pdf
+  - **Parties/Titles:** T-10040; T-15; T-21; T-33681; from: government_issued
+  - **Provenance:** doc#317 status=government_issued _[verified]_
+
+* **2025-02-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: my letter-first draft
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: pat zschoche &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#4461 labels=SENT _[verified]_
+
+* **2025-02-25 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-02-25_request_for_records_Mary_Worrick.pdf
+  - **Parties/Titles:** T-079-2018001329; T-0966698; T-2021002; T-52540; from: government_issued
+  - **Provenance:** doc#357 status=government_issued _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2025-02-25_receipt_registry_deeds.pdf
+  - **Parties/Titles:** T-1035055; T-96; from: government_issued
+  - **Provenance:** doc#367 status=government_issued _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱2,319.43 — registration_fee payment per OR — 19c41731f96632d9__Exhibit H - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#65 doc#432 _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱2,319.43 — cnr payment per OR — 19c41731f96632d9__Exhibit E - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#66 doc#429 _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱546.70 — registration_fee payment per OR — 19c41731f96632d9__Exhibit C to C-1 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#67 doc#427 _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱2,319.43 — registration_fee payment per OR — 1991-00-00_power_of_attorney_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#76 doc#369 _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱546.70 — registration_fee payment per OR — 2021-11-23_TCT_2021002127.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#77 doc#368 _[verified]_
+
+* **2025-02-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱705.48 — registration_fee payment per OR — 2025-02-25_receipt_registry_deeds.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#78 doc#367 _[verified]_
+
+* **2025-02-26 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c41731f96632d9__Exhibit E - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-05; from: government_issued
+  - **Provenance:** doc#429 status=government_issued _[verified]_
+
+* **2025-03-06 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-03-06_update_request.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#360 status=government_issued _[verified]_
+
+* **2025-03-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-03-06_update_request_registry_deeds.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#356 status=unknown _[inferred_strong]_
+
+* **2025-03-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] Special Power of Attorney — 2025-03-13_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-181; T-8216; from: unknown
+  - **Provenance:** doc#285 status=unknown _[inferred_strong]_
+
+* **2025-03-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — 2025-03-13_special_power_of_attorney.pdf
+  - **Parties/Titles:** T-8216; from: unknown
+  - **Provenance:** doc#280 status=unknown _[inferred_strong]_
+
+* **2025-04-08 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-04-08_information_request_form.pdf
+  - **Parties/Titles:** T-48375; from: government_issued
+  - **Provenance:** doc#245 status=government_issued _[verified]_
+
+* **2025-04-28 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-04-28_request_for_property_records.pdf
+  - **Parties/Titles:** T-0966-698; T-32911; T-4497; from: government_issued
+  - **Provenance:** doc#303 status=government_issued _[verified]_
+
+* **2025-04-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-04-28_request_for_property_records.pdf
+  - **Parties/Titles:** T-0966-698; T-32911; T-4497; from: government_issued
+  - **Provenance:** doc#296 status=government_issued _[verified]_
+
+* **2025-04-28 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-04-28_property_records_request.pdf
+  - **Parties/Titles:** T-0966-698; T-32911; T-4497; from: government_issued
+  - **Provenance:** doc#297 status=government_issued _[verified]_
+
+* **2025-05-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-15_letter_to_governor_padilla.pdf
+  - **Parties/Titles:** T-2023; T-26; T-32911; T-32917; T-4497; from: executed_filed
+  - **Provenance:** doc#365 status=executed_filed _[verified]_
+
+* **2025-05-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-15_Letter_to_Mayor_Alexander_Pajarillo.pdf
+  - **Parties/Titles:** T-111; T-32911; from: government_issued
+  - **Provenance:** doc#305 status=government_issued _[verified]_
+
+* **2025-05-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-21_Mayor_Alex_Return_letter.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#304 status=unknown _[inferred_strong]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2025-05-21_receipt_registry_deeds.pdf
+  - **Parties/Titles:** T-1035932; T-2758048; T-52917; from: government_issued
+  - **Provenance:** doc#328 status=government_issued _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-21_TCT_47655.pdf
+  - **Parties/Titles:** T-20; T-203; T-2399; T-31; T-47655; T-4914; T-71; from: government_issued
+  - **Provenance:** doc#16 status=government_issued _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-21_TCT-33415_Edgard_Santiago.pdf
+  - **Parties/Titles:** T-32917; T-33415; T-33416; from: government_issued
+  - **Provenance:** doc#315 status=government_issued _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-21_TCT-34243_Erlinda_Tychingco.pdf
+  - **Parties/Titles:** T-232; T-34243; T-34245; from: government_issued
+  - **Provenance:** doc#321 status=government_issued _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2025-05-21_receipt_for_property_transaction.pdf
+  - **Parties/Titles:** T-1035932; from: government_issued
+  - **Provenance:** doc#327 status=government_issued _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱698,049.00 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#43 doc#614 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#44 doc#613 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#45 doc#612 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#46 doc#611 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#47 doc#609 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#49 doc#607 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#50 doc#606 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 filing_fee ₱1,613.95 — filing_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#51 doc#589 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,613.95 — registration_fee payment per OR — 1992-03-19_special_power_of_attorney.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#82 doc#329 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,613.95 — registration_fee payment per OR — 2025-05-21_receipt_registry_deeds.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#83 doc#328 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_cancelled_TCT_52354.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#86 doc#325 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT_T-46038.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#87 doc#324 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT_52536_heirs_cancelled.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#88 doc#323 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2018-08-02_TCT_079-2018001329.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#89 doc#322 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-21_TCT-34243_Erlinda_Tychingco.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#90 doc#321 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT-33776_Roscoe_Leano.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#91 doc#320 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 1995-04-10_TCT_T-36668.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#92 doc#319 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT_T-33776.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#93 doc#318 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 1994-02-15_TCT_33686_Jose_Pascual_Jr.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#94 doc#316 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 1992-11-09_TCT_33416_Edgardo_Santiago.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#95 doc#314 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱698,049.00 — registration_fee payment per OR — 2025-05-22_TCT_51640_Pedro_Valledor.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#96 doc#313 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 1994-09-22_TCT_33350_Elena_Vergara.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#97 doc#312 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 1999-06-02_transfer_certificate_title_Maria_Cereza.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#98 doc#311 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT_49037_cancelled.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#99 doc#310 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT_47657_heirs_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#100 doc#309 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#162 doc#24 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱6,980.49 — registration_fee payment per OR — 2025-05-22_TCT-38838_heirs.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#167 doc#19 _[verified]_
+
+* **2025-05-21 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱698,049.00 — registration_fee payment per OR — 1998-10-02_transfer_certificate_of_title.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#170 doc#15 _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-11; T-20; T-3253; T-52536; from: government_issued
+  - **Provenance:** doc#606 status=government_issued _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-00; T-20; T-20802; T-4497; T-481; T-48336; from: government_issued
+  - **Provenance:** doc#614 status=government_issued _[verified]_
+
+* **2025-05-21 | legal_act**
+  - **Description:** [PAR-CRIM9221] Special Power of Attorney — (no name)
+  - **Parties/Titles:** T-1993; from: government_issued
+  - **Provenance:** doc#589 status=government_issued _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-10; T-10145; T-12; T-14; T-15; T-33416; T-3415; from: government_issued
+  - **Provenance:** doc#611 status=government_issued _[verified]_
+
+* **2025-05-21 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-11; T-20; T-21; T-2399; T-31; T-4497; T-4814; T-51541; T-51641; T-91; from: government_issued
+  - **Provenance:** doc#613 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_47657_heirs_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-10; T-12; T-13; T-14; T-15; T-16; T-17; T-18; T-19; T-20902; T-21; T-22; T-2399; T-26; T-31; T-41; T-4314; T-47657; T-71; from: government_issued
+  - **Provenance:** doc#309 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_Heirs_of_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-11; T-20; T-21; T-2399; T-31; T-4497; T-4814; T-51541; T-51641; T-91; from: government_issued
+  - **Provenance:** doc#24 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT-38838_heirs.pdf
+  - **Parties/Titles:** T-106; T-12; T-13; T-14; T-16; T-17; T-18; T-19; T-38838; T-4814; T-51; from: government_issued
+  - **Provenance:** doc#19 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_cancelled_TCT_52354.pdf
+  - **Parties/Titles:** T-10; T-12; T-15; T-2132; T-263; T-4414; T-52354; T-782; from: government_issued
+  - **Provenance:** doc#325 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_T-46038.pdf
+  - **Parties/Titles:** T-46038; from: government_issued
+  - **Provenance:** doc#324 status=government_issued _[verified]_
+
+* **2025-05-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-22_collaborative_enforcement_of_donation.pdf
+  - **Parties/Titles:** T-0966698; from: unknown
+  - **Provenance:** doc#344 status=unknown _[inferred_strong]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_T-33776.pdf
+  - **Parties/Titles:** T-10; T-33776; T-91; from: government_issued
+  - **Provenance:** doc#318 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT-33776_Roscoe_Leano.pdf
+  - **Parties/Titles:** T-10; T-33776; T-91; from: government_issued
+  - **Provenance:** doc#320 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_52536_heirs_cancelled.pdf
+  - **Parties/Titles:** T-11; T-20; T-3253; T-52536; from: government_issued
+  - **Provenance:** doc#323 status=government_issued _[verified]_
+
+* **2025-05-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-22_Road_Donation_Received_by_the_mayors_office.pdf
+  - **Parties/Titles:** T-0966698; from: unknown
+  - **Provenance:** doc#302 status=unknown _[inferred_strong]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_49037_cancelled.pdf
+  - **Parties/Titles:** T-11; T-16; T-20; T-259; T-34321; T-4014; T-4497; T-49037; T-8130; from: government_issued
+  - **Provenance:** doc#310 status=government_issued _[verified]_
+
+* **2025-05-22 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-22_TCT_51640_Pedro_Valledor.pdf
+  - **Parties/Titles:** T-51; T-51640; T-990; from: government_issued
+  - **Provenance:** doc#313 status=government_issued _[verified]_
+
+* **2025-05-22 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱2,046.08 — registration_fee payment per OR — 2025-05-21_receipt_for_property_transaction.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#84 doc#327 _[verified]_
+
+* **2025-05-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-23_request_for_compliance.pdf
+  - **Parties/Titles:** T-32911; from: unknown
+  - **Provenance:** doc#341 status=unknown _[inferred_strong]_
+
+* **2025-05-25 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-25_TCT_MWK-001.pdf
+  - **Parties/Titles:** T-11; T-1132; T-20; T-20902; T-2399; T-31; T-4497; T-451; from: government_issued
+  - **Provenance:** doc#307 status=government_issued _[verified]_
+
+* **2025-05-25 | title_event**
+  - **Description:** [PAR-CRIM9221] Title (TCT/OCT) — 2025-05-25_TCT_Mercedes_Camarines_Norte.pdf
+  - **Parties/Titles:** T-3100; T-41; T-48; T-48335; T-55; from: government_issued
+  - **Provenance:** doc#306 status=government_issued _[verified]_
+
+* **2025-05-26 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-05-26_follow_up_on_property_request.pdf
+  - **Parties/Titles:** T-111; T-4497; T-4934; from: government_issued
+  - **Provenance:** doc#333 status=government_issued _[verified]_
+
+* **2025-05-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-05-26_follow_up_on_request.pdf
+  - **Parties/Titles:** T-111; T-4497; T-4934; from: government_issued
+  - **Provenance:** doc#355 status=government_issued _[verified]_
+
+* **2025-05-27 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-05-27_tax_liability_inquiry.pdf
+  - **Parties/Titles:** T-30681; T-30683; T-32478; T-32911; from: government_issued
+  - **Provenance:** doc#330 status=government_issued _[verified]_
+
+* **2025-05-27 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-05-27_request_for_tax_declaration.pdf
+  - **Parties/Titles:** T-30681; T-30683; T-32478; T-32911; from: draft_unsigned
+  - **Provenance:** doc#332 status=draft_unsigned _[inferred_strong]_
+
+* **2025-05-27 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-05-27_request_for_tax_declaration_assessment_records.pdf
+  - **Parties/Titles:** T-30681; T-30683; T-32478; T-32911; from: government_issued
+  - **Provenance:** doc#338 status=government_issued _[verified]_
+
+* **2025-05-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-27_Mayor_Letter_Clarification.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#342 status=unknown _[inferred_strong]_
+
+* **2025-05-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-0966698; T-10; T-32917; T-38838; T-4497; T-4501; T-47657; T-49060; T-49061; T-52540; from: executed_notarized
+  - **Provenance:** doc#591 status=executed_notarized _[verified]_
+
+* **2025-05-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-28_LGU_Letter_Invitation_for_Dialogue.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#340 status=unknown _[inferred_strong]_
+
+* **2025-05-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-05-28_follow_up_on_property_documents.pdf
+  - **Parties/Titles:** T-32911; from: unknown
+  - **Provenance:** doc#343 status=unknown _[inferred_strong]_
+
+* **2025-05-28 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-05-28_request_for_tax_record_updates.pdf
+  - **Parties/Titles:** T-0966698; T-30681; T-30683; T-32478; T-32911; from: email_received
+  - **Provenance:** doc#331 status=email_received _[inferred_strong]_
+
+* **2025-05-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-28_request_for_tax_update_Mercedes.pdf
+  - **Parties/Titles:** T-30681; T-30683; T-32478; T-32911; T-4497; from: government_issued
+  - **Provenance:** doc#337 status=government_issued _[verified]_
+
+* **2025-05-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-05-29_response_to_mayor_pajarillo.pdf
+  - **Parties/Titles:** T-0966698; T-32911; from: unknown
+  - **Provenance:** doc#339 status=unknown _[inferred_strong]_
+
+* **2025-06-03 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2025-06-03_receipt_for_supporting_docs.pdf
+  - **Parties/Titles:** T-1035933; T-1981; T-412; T-511; T-590; from: government_issued
+  - **Provenance:** doc#336 status=government_issued _[verified]_
+
+* **2025-06-03 | transaction**
+  - **Description:** [PAR-CRIM9221] Receipt — 2025-06-03_receipt_TCT_111.pdf
+  - **Parties/Titles:** T-1035933; T-111; from: government_issued
+  - **Provenance:** doc#383 status=government_issued _[verified]_
+
+* **2025-06-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱349.73 — registration_fee payment per OR — 2025-06-03_receipt_TCT_111.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#74 doc#383 _[verified]_
+
+* **2025-06-03 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱590.91 — registration_fee payment per OR — 2025-06-03_receipt_for_supporting_docs.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#81 doc#336 _[verified]_
+
+* **2025-06-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-06-06_request_for_records.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#334 status=government_issued _[verified]_
+
+* **2025-06-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Cesar de la Fuente/Just copensation
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: macao66@yahoo.com
+  - **Provenance:** gmail#4427 labels=SENT _[verified]_
+
+* **2025-06-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Reply to Letter Request
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Gemma Abla &lt;ablagemma@yahoo.com&gt;
+  - **Provenance:** gmail#4426 labels=SENT _[verified]_
+
+* **2025-06-18 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LGU Mercedes Letter of Invitation for a Dialogue
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#4424 labels=SENT _[verified]_
+
+* **2025-06-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Reply to Letter Request
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Gemma Abla &lt;ablagemma@yahoo.com&gt;
+  - **Provenance:** gmail#4422 labels=SENT _[verified]_
+
+* **2025-06-20 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 filing_fee ₱300.00 — filing_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#63 doc#480 _[verified]_
+
+* **2025-06-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-06-23_document_search_response.pdf
+  - **Parties/Titles:** T-31298; T-32917; from: government_issued
+  - **Provenance:** doc#353 status=government_issued _[verified]_
+
+* **2025-06-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-06-27_correspondence_from_municipal_treasurer.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#354 status=unknown _[inferred_strong]_
+
+* **2025-07-01 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-07-01_DAR_Cabezudo_Inquiry.pdf
+  - **Parties/Titles:** T-0966698; T-4494; T-4501; T-4503; from: government_issued
+  - **Provenance:** doc#362 status=government_issued _[verified]_
+
+* **2025-07-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Register of Deeds  Issue (Heirs of Mary Worrick)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "admin@dialogolaw.com" &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4417 labels=SENT _[verified]_
+
+* **2025-07-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Request for Records Relating to Landholdings (4 titles in total) under CARP – For Reference and Documentation
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: fssc5@landbank.com
+  - **Provenance:** gmail#4414 labels=SENT _[verified]_
+
+* **2025-07-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Register of Deeds Issue (Heirs of Mary Worrick)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4411 labels=SENT _[verified]_
+
+* **2025-07-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Confirmation for Heirs of Mary Worrick
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: admin@dialogolaw.com
+  - **Provenance:** gmail#4412 labels=SENT _[verified]_
+
+* **2025-07-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Register of Deeds Issue (Heirs of Mary Worrick)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4410 labels=SENT _[verified]_
+
+* **2025-07-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-07-09_landbank_inquiry.pdf
+  - **Parties/Titles:** T-10; T-11; T-30681; T-30683; T-32478; T-4494; T-4501; T-4502; T-4503; T-4544; T-772; from: email_received
+  - **Provenance:** doc#363 status=email_received _[inferred_strong]_
+
+* **2025-07-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Confirmation for Heirs of Mary Worrick
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4403 labels=SENT _[verified]_
+
+* **2025-07-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Heirs of Mary Worrick
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Records Camarines Norte &lt;recordscn.05@yahoo.com&gt;
+  - **Provenance:** gmail#4408 labels=SENT _[verified]_
+
+* **2025-07-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Request for Records Relating to Landholdings (4 titles in total) under CARP – For Reference and Documentation
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: fssc5@landbank.com
+  - **Provenance:** gmail#4407 labels=SENT _[verified]_
+
+* **2025-07-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Request for Records Relating to Landholdings (4 titles in total) under CARP – For Reference and Documentation
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: fssc5@landbank.com
+  - **Provenance:** gmail#4406 labels=SENT _[verified]_
+
+* **2025-07-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-07-11_land_transfer_claims_Mary_Worrick_Keesey.pdf
+  - **Parties/Titles:** T-22; T-30681; T-30683; T-32478; T-4494; T-4502; T-4503; from: government_issued
+  - **Provenance:** doc#374 status=government_issued _[verified]_
+
+* **2025-07-11 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 197f8ba27001799d__Outlook-3ocli0ki.png
+  - **Parties/Titles:** —
+  - **Provenance:** doc#451 status=None _[inferred_strong]_
+
+* **2025-07-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Balane (Annulment of Title) Follow Up
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#464 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-07-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Balane (Annulment of Title) Follow Up
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "barandon_lawoffice@yahoo.com" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#465 labels=SENT _[verified]_
+
+* **2025-07-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Confirmation for Heirs of Mary Worrick
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4401 labels=SENT _[verified]_
+
+* **2025-07-15 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 filing_fee ₱100.00 — filing_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#54 doc#567 _[verified]_
+
+* **2025-07-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Register of Deeds Issue (Heirs of Mary Worrick)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4398 labels=SENT _[verified]_
+
+* **2025-07-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Confirmation for Heirs of Mary Worrick
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4397 labels=SENT _[verified]_
+
+* **2025-07-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Register of Deeds Issue (Heirs of Mary Worrick)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4399 labels=SENT _[verified]_
+
+* **2025-07-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Confirmation for Heirs of Mary Worrick
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Dialogo Law Admin &lt;admin@dialogolaw.com&gt;
+  - **Provenance:** gmail#4396 labels=SENT _[verified]_
+
+* **2025-08-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] Notice — 2025-08-12_notice_of_acquisition.pdf
+  - **Parties/Titles:** T-122025; from: government_issued
+  - **Provenance:** doc#370 status=government_issued _[verified]_
+
+* **2025-08-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Confirmation of Sale / T-30683
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: pat zschoche &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#4388 labels=SENT _[verified]_
+
+* **2025-08-18 | correspondence**
+  - **Description:** [PAR-CRIM9221] Demand Letter — 19c417f2bdf914ea__Exhibit J to J-1 - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-2025; T-52540; from: government_issued
+  - **Provenance:** doc#420 status=government_issued _[verified]_
+
+* **2025-08-18 | correspondence**
+  - **Description:** [PAR-CRIM9221] Demand Letter — 2025-08-18_final_demand_letter.pdf
+  - **Parties/Titles:** T-2025; T-5254; from: government_issued
+  - **Provenance:** doc#388 status=government_issued _[verified]_
+
+* **2025-08-29 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2025-08-29_request_for_investigation.pdf
+  - **Parties/Titles:** T-0966; T-29; from: government_issued
+  - **Provenance:** doc#380 status=government_issued _[verified]_
+
+* **2025-08-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Fw: Confirmation of Sale / T-30683
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "Grandma💚💚👵👵💚💚" &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#4383 labels=SENT _[verified]_
+
+* **2025-09-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Reply to Letter Request
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: colenacious530@gmail.com
+  - **Provenance:** gmail#4381 labels=SENT _[verified]_
+
+* **2025-09-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Reply to Letter Request
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: colenacious530@gmail.com
+  - **Provenance:** gmail#4382 labels=SENT _[verified]_
+
+* **2025-09-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-09-03_road_donation_reply.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#375 status=unknown _[inferred_strong]_
+
+* **2025-09-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-09-03_lgu_responses.pdf
+  - **Parties/Titles:** T-14; T-20; from: unknown
+  - **Provenance:** doc#378 status=unknown _[inferred_strong]_
+
+* **2025-09-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Request for Certified Copy of Subdivision Survey Plan (Psd-221861), Clarification on Government Occupancies, and Related Documents for
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: colenacious530@gmail.com
+  - **Provenance:** gmail#4377 labels=SENT _[verified]_
+
+* **2025-09-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Request for Certified Copy of Subdivision Survey Plan (Psd-221861), Clarification on Government Occupancies, and Related Documents for Lot C
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: penro.camnorte@yahoo.com
+  - **Provenance:** gmail#4378 labels=SENT _[verified]_
+
+* **2025-09-05 | legal_memo**
+  - **Description:** [PAR-CRIM9221] Legal Memorandum — 2025-09-05_legal_memorandum_heirs_of_mary_worrick_keesey.pdf
+  - **Parties/Titles:** T-2005; from: executed_filed
+  - **Provenance:** doc#376 status=executed_filed _[verified]_
+
+* **2025-09-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: LGU Mercedes Letter of Invitation for a Dialogue
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mvfibasco@gmail.com
+  - **Provenance:** gmail#4371 labels=SENT _[verified]_
+
+* **2025-09-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-09-15_Mayor_Alex_roads_combined.pdf
+  - **Parties/Titles:** T-4814; from: draft_unsigned
+  - **Provenance:** doc#379 status=draft_unsigned _[inferred_strong]_
+
+* **2025-09-17 | vital_record**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#567 status=government_issued _[verified]_
+
+* **2025-09-18 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Baptism Record  1909
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: contact@dioceseofsurigao.org
+  - **Provenance:** gmail#4364 labels=SENT _[verified]_
+
+* **2025-09-19 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱200.07 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#53 doc#572 _[verified]_
+
+* **2025-09-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER DATED SEPTEMBER 16, 2025 RE: REQUEST FOR A CERTIFIED COPY OF APPROVED SUBDIVISION PLAN PSD-221861
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DENR-PENRO CAMARINES NORTE &lt;penro.camnorte@yahoo.com&gt;
+  - **Provenance:** gmail#4363 labels=SENT _[verified]_
+
+* **2025-09-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#459 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-09-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#460 labels=SENT _[verified]_
+
+* **2025-09-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Update on the Demand Letter Sent to Mrs. Gloria Balane et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#461 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-09-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#457 labels=SENT _[verified]_
+
+* **2025-09-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Update on the Demand Letter Sent to Mrs. Gloria Balane et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#458 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-09-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Clarification on Real Property Tax Records – Heirs of Mary Worrick Keesey
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mto_mercedes@yahoo.com
+  - **Provenance:** gmail#4360 labels=SENT _[verified]_
+
+* **2025-09-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Signature Verification (Heirs of Mary Worrick)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "nbinagadistrictoffice@gmail.com" &lt;nbinagadistrictoffice@gmail.com&gt;
+  - **Provenance:** gmail#456 labels=SENT _[verified]_
+
+* **2025-09-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Clarification on Real Property Tax Records – Heirs of Mary Worrick Keesey
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mto_mercedes@yahoo.com.ph
+  - **Provenance:** gmail#4359 labels=SENT _[verified]_
+
+* **2025-09-29 | legal_act**
+  - **Description:** [PAR-CRIM9221] Contract — (no name)
+  - **Parties/Titles:** from: draft_unsigned
+  - **Provenance:** doc#598 status=draft_unsigned _[inferred_strong]_
+
+* **2025-09-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Requested Docs for your Files
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#454 labels=SENT _[verified]_
+
+* **2025-10-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 2025-10-01_complaint_affidavit.pdf
+  - **Parties/Titles:** T-24; from: government_issued
+  - **Provenance:** doc#384 status=government_issued _[verified]_
+
+* **2025-10-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Requested Docs for your Files
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#452 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-10-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#532 status=government_issued _[verified]_
+
+* **2025-10-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#576 status=government_issued _[verified]_
+
+* **2025-10-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-4497; from: government_issued
+  - **Provenance:** doc#597 status=government_issued _[verified]_
+
+* **2025-10-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — (no name)
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#595 status=unknown _[inferred_strong]_
+
+* **2025-10-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] Email — 2025-10-03_road_donation_inquiry_mercedes.pdf
+  - **Parties/Titles:** T-0966698; T-111; T-32917; from: email_received
+  - **Provenance:** doc#381 status=email_received _[inferred_strong]_
+
+* **2025-10-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-111; T-4497; from: draft_unsigned
+  - **Provenance:** doc#596 status=draft_unsigned _[inferred_strong]_
+
+* **2025-10-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#570 status=government_issued _[verified]_
+
+* **2025-10-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER DATED SEPTEMBER 16, 2025 RE: REQUEST FOR A CERTIFIED COPY OF APPROVED SUBDIVISION PLAN PSD-221861
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DENR-PENRO CAMARINES NORTE &lt;penro.camnorte@yahoo.com&gt;
+  - **Provenance:** gmail#4351 labels=SENT _[verified]_
+
+* **2025-10-16 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#594 status=government_issued _[verified]_
+
+* **2025-10-18 | government_submission**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-18; from: government_issued
+  - **Provenance:** doc#592 status=government_issued _[verified]_
+
+* **2025-10-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Review OCR Data - Low Confidence Fields Detected
+  - **Parties/Titles:** from: jonzschoche@gmail.com; to: jonathan@hayuma.org
+  - **Provenance:** gmail#4340 labels=SENT _[verified]_
+
+* **2025-10-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-4494; T-4501; from: executed_filed
+  - **Provenance:** doc#593 status=executed_filed _[verified]_
+
+* **2025-10-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Initial Draft of the Complaint
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#448 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-10-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Initial Draft of the Complaint
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#447 labels=SENT _[verified]_
+
+* **2025-10-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Initial Draft of the Complaint
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#449 labels=SENT _[verified]_
+
+* **2025-10-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Initial Draft of the Complaint
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#450 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-10-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Soft Copies of the Special Power of Attorney
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#443 labels=DRAFT _[verified]_
+
+* **2025-10-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Documentary Exhibits to be Attached to the Complaint
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#445 labels=SENT _[verified]_
+
+* **2025-10-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Soft Copies of the Special Power of Attorney
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#444 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-10-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Documentary Exhibits to be Attached to the Complaint
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#446 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-11-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19b9b7672d6e6132__[DRAFT] Judicial Affidavit - Jonathan Paul Zschoche.pdf
+  - **Parties/Titles:** T-15; T-52540; from: executed_filed
+  - **Provenance:** doc#445 status=executed_filed _[verified]_
+
+* **2025-11-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c417f2bdf914ea__Exhibit K - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-15; T-52540; from: executed_filed
+  - **Provenance:** doc#421 status=executed_filed _[verified]_
+
+* **2025-11-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Gloria Balane Complaint
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "Grandma💚💚👵👵💚💚" &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#442 labels=SENT _[verified]_
+
+* **2025-11-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: SPA
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "dean@apostillepros.com" &lt;dean@apostillepros.com&gt;
+  - **Provenance:** gmail#4326 labels=SENT _[verified]_
+
+* **2025-11-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Soft Copies of the Special Power of Attorney
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;, Candy Orena &lt;mcaorena@avaslaw.com&gt;
+  - **Provenance:** gmail#441 labels=SENT _[verified]_
+
+* **2025-11-12 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c41731f96632d9__Exhibit A - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#425 status=unknown _[inferred_strong]_
+
+* **2025-11-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — (no subject)
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#440 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-11-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re:
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#439 labels=SENT _[verified]_
+
+* **2025-11-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re:
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#438 labels=DRAFT _[verified]_
+
+* **2025-11-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Latest Draft of Complaint Against Balane, et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#437 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-11-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Latest Draft of Complaint Against Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#436 labels=SENT _[verified]_
+
+* **2025-11-25 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱1,575.18 — registration_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#52 doc#579 _[verified]_
+
+* **2025-11-25 | transaction**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-197; T-337; T-400; from: government_issued
+  - **Provenance:** doc#579 status=government_issued _[verified]_
+
+* **2025-11-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#578 status=government_issued _[verified]_
+
+* **2025-11-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4322 labels=SENT _[verified]_
+
+* **2025-11-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4320 labels=SENT _[verified]_
+
+* **2025-12-02 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4317 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — (no name)
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#575 status=unknown _[inferred_strong]_
+
+* **2025-12-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER DATED NOVEMBER 26, 2025 RE: LOT 2-A, (LRA) PSD-221861
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DENR-PENRO CAMARINES NORTE &lt;penro.camnorte@yahoo.com&gt;
+  - **Provenance:** gmail#4316 labels=SENT _[verified]_
+
+* **2025-12-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Latest Draft of Complaint Against Balane, et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#434 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-12-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Jose Luis Agcaoili &lt;jlvagcaoili@gmail.com&gt;, Candy Orena &lt;mcaorena@avaslaw.com&gt;, Mom &lt;swisslassie@hotmail.com&gt;, "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#433 labels=SENT _[verified]_
+
+* **2025-12-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4315 labels=SENT _[verified]_
+
+* **2025-12-05 | transaction**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#573 status=government_issued _[verified]_
+
+* **2025-12-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-12-07_road_donation_implementation_inquiry_mercedes.pdf
+  - **Parties/Titles:** T-0966-698; from: unknown
+  - **Provenance:** doc#385 status=unknown _[inferred_strong]_
+
+* **2025-12-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4313 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4311 labels=SENT _[verified]_
+
+* **2025-12-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — ID Submission #2 (Passport)Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4309 labels=SENT _[verified]_
+
+* **2025-12-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Latest Draft of Complaint Against Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#432 labels=SENT _[verified]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] Letter — 2025-12-10_concerns_regarding_ease_of_doing_business_compliance.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#386 status=government_issued _[verified]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] Correspondence — 2025-12-10_road_donation_implementation_inquiry_mercedes.pdf
+  - **Parties/Titles:** from: email_received
+  - **Provenance:** doc#387 status=email_received _[inferred_strong]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: pat zschoche &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#429 labels=SENT _[verified]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "dilgcamarinesnorte2020@gmail.com" &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#4302 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Heirs of Mary Worrick Tax Asessment
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mto_mercedes@yahoo.com.ph
+  - **Provenance:** gmail#4304 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: pat zschoche &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#430 labels=DRAFT _[verified]_
+
+* **2025-12-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: pat zschoche &lt;swisslassie@hotmail.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#431 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-12-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ID Submission #2 (Passport)Re: ARTA CART INDORSEMENT - CTN SL-2025-1021-0747
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4300 labels=SENT _[verified]_
+
+* **2025-12-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — (no name)
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#569 status=unknown _[inferred_strong]_
+
+* **2025-12-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4299 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Latest Draft of Complaint Against Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#428 labels=SENT _[verified]_
+
+* **2025-12-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4297 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Heirs of Mary Worrick Tax Asessment
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mto_mercedes@yahoo.com.ph
+  - **Provenance:** gmail#4298 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Latest Draft of the Complaint Against Gloria Balane, et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#427 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-12-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Tax History
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#4293 labels=SENT _[verified]_
+
+* **2025-12-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Heirs of Mary Worrick Tax Asessment
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#4294 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4295 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Latest Draft of the Complaint Against Gloria Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#426 labels=SENT _[verified]_
+
+* **2025-12-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Latest Draft of the Complaint Against Gloria Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#425 labels=SENT _[verified]_
+
+* **2025-12-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LTC of Mary Worrick Keesey
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: FSSC5 &lt;FSSC5@landbank.com&gt;
+  - **Provenance:** gmail#4290 labels=SENT _[verified]_
+
+* **2025-12-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Heirs of Mary Worrick Tax Asessment
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mto_mercedes@yahoo.com.ph
+  - **Provenance:** gmail#4288 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Heirs of Mary Worrick Tax Asessment
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mto_mercedes@yahoo.com.ph
+  - **Provenance:** gmail#4289 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Onward and Upward
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: John.Garrity@beaconactivity.ph
+  - **Provenance:** gmail#4287 labels=SENT _[verified]_
+
+* **2025-12-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "dilgcamarinesnorte2020@gmail.com" &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#4286 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2025-12-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: 2023 bills tax payment receipts
+  - **Parties/Titles:** from: colen ibasco &lt;colenacious@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#424 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-12-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — DETAILED STATEMENT OF EXPENSES
+  - **Parties/Titles:** from: colen ibasco &lt;colenacious@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#422 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-12-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: 2023 bills tax payment receipts
+  - **Parties/Titles:** from: colen ibasco &lt;colenacious@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#423 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2025-12-29 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Heirs of Mary Worrick Tax Asessment
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;, Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;, mto_mercedes@yahoo.com.ph
+  - **Provenance:** gmail#4284 labels=SENT,Label_5023319663922629422 _[verified]_
+
+### 2026
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — [OSCA] Jonathan Paul Zschoche v. Municipal Engineer's Office - Mercedes, Camarines Norte (CTN SL-2026-0218-1378).pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#695 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — SCA - Jonathan Paul Zschoche v. Municipal Engineer's Office - Mercedes, Camarines Norte (CTN SL-2026-0218-137.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#696 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — [OSCA] Jonathan Paul Zschoche v. Provincial Environment and Natural Resources Office (PENRO) – Camarines Norte (CTN SL-2026-0209-1321).pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#697 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — SCA - Jonathan Paul Zschoche v. Provincial Environment and Natural Resources Office (PENRO) – Camarines Norte (CTN SL-2026-0209-1321).pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#698 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — ANNEX A (LGU CART HEARING MERCEDES APRIL 6 2026).pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#709 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — RTC-CTN SL-2026-0218-1378.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#733 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — REGIONAL ESCALATION AND REJOINDER (ARTA) CTN SL-2026-0209-1319.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#741 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — RTC-CTN SL-2026-0209-1321.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#743 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — RTC-CTN SL-2026-0128-1212.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#763 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Response to letter dated February 11, 2026.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#765 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Scan Mar 21, 2026 at 7.02 PM.pdf
+  - **Parties/Titles:** T-878; from: unknown
+  - **Provenance:** doc#662 status=unknown _[inferred_strong]_
+
+* **2026-01-01 | government_submission**
+  - **Description:** [PAR-CRIM9221] doc — Scan Mar 21, 2026 at 5.12 PM.pdf
+  - **Parties/Titles:** T-1001611; from: government_issued
+  - **Provenance:** doc#664 status=government_issued _[verified]_
+
+* **2026-01-01 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — Scan Mar 21, 2026 at 5.09 PM.pdf
+  - **Parties/Titles:** T-722; from: government_issued
+  - **Provenance:** doc#665 status=government_issued _[verified]_
+
+* **2026-01-01 | title_event**
+  - **Description:** [PAR-CRIM9221] doc — Scan Mar 21, 2026 at 5.02 PM.pdf
+  - **Parties/Titles:** T-07; T-408; T-415; T-430; T-69; from: government_issued
+  - **Provenance:** doc#666 status=government_issued _[verified]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — AFFIDAVIT SL-2026-0128-1210.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#812 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Manifestation REPLY TO FEB 20 from SB SL-2026-0128-1212.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#817 status=None _[inferred_strong]_
+
+* **2026-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — RESOLUTION_NOC_CTN_SL_2026_0128_1210_Jonathan_Paul_Zschoche_v_LGU.PDF
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#624 status=government_issued _[verified]_
+
+* **2026-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — CTN SL-2026-0423-1891.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#687 status=government_issued _[verified]_
+
+* **2026-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — Scan Mar 22, 2026 at 4.02 PM.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#661 status=unknown _[inferred_strong]_
+
+* **2026-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19dbd60609b3a9bc__[updated 04-24-2026] Affidavit - Summary Judgment.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#395 status=executed_filed _[verified]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19e058aeb81b5738__Memo_PillarsforSummarJudgment_May8_2026.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#452 status=None _[inferred_strong]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19b92644370fe9e1__Zschoche Complaint 2026.docx
+  - **Parties/Titles:** T-2026
+  - **Provenance:** doc#446 status=None _[inferred_strong]_
+
+* **2026-01-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — NOR-CTN SL-2026-0423-1891 (CSC).pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#689 status=government_issued _[verified]_
+
+* **2026-01-01 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — CTN SL-2026-0423-1891.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#690 status=government_issued _[verified]_
+
+* **2026-01-01 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Rejoinder SL-2026-0128-1212.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#829 status=None _[inferred_strong]_
+
+* **2026-01-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — Gmail - ARTA Referral of Complaint (CTN SL-2026-0423-1891).pdf
+  - **Parties/Titles:** T-10; from: government_issued
+  - **Provenance:** doc#691 status=government_issued _[verified]_
+
+* **2026-01-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: updated expense statement
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: colen ibasco &lt;colenacious@yahoo.com&gt;
+  - **Provenance:** gmail#4283 labels=SENT _[verified]_
+
+* **2026-01-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — (no subject)
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#30 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Re:
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#28 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Re:
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#415 labels=SENT _[verified]_
+
+* **2026-01-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Re:
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#29 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — updated
+  - **Parties/Titles:** from: colen ibasco &lt;colenacious@yahoo.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#420 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re:
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#418 labels=SENT _[verified]_
+
+* **2026-01-06 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19b92644370fe9e1__JA INTERVIEW.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#447 status=None _[inferred_strong]_
+
+* **2026-01-06 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19b92644370fe9e1__JA LAST PAGE DE LEON.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#448 status=None _[inferred_strong]_
+
+* **2026-01-06 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19b92644370fe9e1__JA - JONATHAN.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#449 status=None _[inferred_strong]_
+
+* **2026-01-06 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19b92644370fe9e1__JA - SHIRLEY.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#450 status=None _[inferred_strong]_
+
+* **2026-01-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Updated Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#27 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Updated Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#413 labels=SENT _[verified]_
+
+* **2026-01-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Re:
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Candy Orena &lt;mcaorena@avaslaw.com&gt;, Jose Luis Agcaoili &lt;jlvagcaoili@gmail.com&gt;
+  - **Provenance:** gmail#412 labels=SENT _[verified]_
+
+* **2026-01-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: REQUEST FOR COPIES OF REQUIREMENTS AND RECORDS
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sese Law Office &lt;seselaw@hotmail.com&gt;
+  - **Provenance:** gmail#4125 labels=SENT _[verified]_
+
+* **2026-01-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4123 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#4124 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Updated Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#26 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — RE: DELAYED REGISTRATION OF BIRTH FOR PATRICIA ANN KEESEY
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Jose Luis Agcaoili &lt;jlvagcaoili@gmail.com&gt;, Candy Orena &lt;mcaorena@avaslaw.com&gt;, "Grandma💚💚👵👵💚💚" &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#4121 labels=SENT _[verified]_
+
+* **2026-01-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Updated Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#410 labels=SENT _[verified]_
+
+* **2026-01-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4122 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: DELAYED REGISTRATION OF BIRTH FOR PATRICIA ANN KEESEY
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Pamela Bianca Cruz &lt;pbcruz@avaslaw.com&gt;
+  - **Provenance:** gmail#4118 labels=SENT _[verified]_
+
+* **2026-01-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#4116 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4117 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-23 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c417f2bdf914ea__Exhibit L - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#422 status=executed_filed _[verified]_
+
+* **2026-01-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Complaint against Balane, et al.
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#24 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-01-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Fw: [OSCA] CTN SL-2025-1104-0792 (PATRICIA KEESEY ZSCHOCHE represented by Jonathan Paul Zschoche vs. MUNICIPAL ENGINEERING OFFICE OF TH
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "Grandma💚💚👵👵💚💚" &lt;swisslassie@hotmail.com&gt;, Candy Orena &lt;mcaorena@avaslaw.com&gt;
+  - **Provenance:** gmail#4114 labels=SENT _[verified]_
+
+* **2026-01-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Complaint against Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#407 labels=SENT _[verified]_
+
+* **2026-01-24 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#565 status=government_issued _[verified]_
+
+* **2026-01-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Subject: URGENT: Formal Request for Information (FOI) - Zschoche / Heirs of Keesey
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: meo_mercedescn@yahoo.com
+  - **Provenance:** gmail#4112 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Subject: URGENT: Formal Request for Information (FOI) - Zschoche / Heirs of Keesey
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: meo_mercedescn@yahoo.com
+  - **Provenance:** gmail#4113 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Road Donation Implementation and Inquiry Mercedes
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4111 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: FORMAL COMPLAINT: R.A. 11032 Violations – Municipal Government of Mercedes, Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: complaints@arta.gov.ph
+  - **Provenance:** gmail#4108 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — FORMAL COMPLAINT: R.A. 11032 Violations – Municipal Government of Mercedes, Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4109 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — FORMAL COMPLAINT: Violation of RA 11032 - LGU Mercedes, Camarines Norte (SB Member Francisco Noel Y. Ong)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: complaints@arta.gov.ph
+  - **Provenance:** gmail#4110 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-01-27 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-05; from: government_issued
+  - **Provenance:** doc#531 status=government_issued _[verified]_
+
+* **2026-01-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Caringo High School Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Benjz Gerard Sevilla &lt;bgsevilla@unconnected.org&gt;
+  - **Provenance:** gmail#4104 labels=SENT _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#398 labels=SENT _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#21 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#22 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#23 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#20 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#400 labels=SENT _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#402 labels=SENT _[verified]_
+
+* **2026-02-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of the Complaint and Judicial Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#404 labels=SENT _[verified]_
+
+* **2026-02-03 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19c2398cfc387fa1__ja donata king.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#439 status=None _[inferred_strong]_
+
+* **2026-02-03 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19c236dc931174a9__ja francia delos reyes shocky.docx
+  - **Parties/Titles:** —
+  - **Provenance:** doc#440 status=None _[inferred_strong]_
+
+* **2026-02-03 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19c22b7bf1fdf845__JUDICIAL AFFIDAVIT SHIRLEY D. DE LEON.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#442 status=executed_filed _[verified]_
+
+* **2026-02-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] Notice — 19c4172f621d143f__Notice of Appearance - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#437 status=executed_filed _[verified]_
+
+* **2026-02-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Caringo High School Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Benjz Gerard Sevilla &lt;bgsevilla@unconnected.org&gt;
+  - **Provenance:** gmail#4096 labels=SENT _[verified]_
+
+* **2026-02-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Caringo High School Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Benjz Gerard Sevilla &lt;bgsevilla@unconnected.org&gt;
+  - **Provenance:** gmail#4097 labels=SENT _[verified]_
+
+* **2026-02-04 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Screenshot 2026-02-04 at 6.32.35 PM.png
+  - **Parties/Titles:** T-2026-02
+  - **Provenance:** doc#795 status=None _[inferred_strong]_
+
+* **2026-02-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Members of the Sangguniang Bayan
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4095 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-02-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Order — 19c4177763c3140e__ORDER Civil Case No. 26-360, Patricia Keesey Zschoche Vs. Spouses Efren Balane and Gloria Balane et al (3).pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#423 status=executed_filed _[verified]_
+
+* **2026-02-06 | transaction**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#475 status=government_issued _[verified]_
+
+* **2026-02-06 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 filing_fee ₱80.00 — filing_fee payment per OR —
+  - **Parties/Titles:** —
+  - **Provenance:** tx#64 doc#475 _[verified]_
+
+* **2026-02-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Subject: FORMAL ADMINISTRATIVE COMPLAINT - Jonathan Zschoche vs. Nestor Fortuno & Leonora Remoto (DENR-PENRO Camarines Norte)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: complaints@arta.gov.ph
+  - **Provenance:** gmail#4091 labels=SENT _[verified]_
+
+* **2026-02-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Formal Complaint vs. Ms. Gemma Abla, Municipal Assessor, Mercedes, Camarines Norte – Violations of R.A. No. 11032 (Ease of Doing Business an
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: complaints@arta.gov.ph
+  - **Provenance:** gmail#4090 labels=SENT _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jonathan Paul Zschoche, v. Sps. Efren Balane
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#16 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER DATED NOVEMBER 26, 2025 RE: LOT 2-A, (LRA) PSD-221861
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DENR-PENRO CAMARINES NORTE &lt;penro.camnorte@yahoo.com&gt;
+  - **Provenance:** gmail#4088 labels=SENT _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Order dated February 6, 2026
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#17 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jonathan Paul Zschoche, v. Sps. Efren Balane
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#19 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jonathan Paul Zschoche, v. Sps. Efren Balane
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#18 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Urgent Demand for Immediate Release of Withheld Tax Records – No Meeting Required; Reference ARTA Complaint Filed February 8, 2026
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Gemma Abla &lt;ablagemma@yahoo.com&gt;
+  - **Provenance:** gmail#4087 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-02-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: New RFO-Referred Complaint  - Jonathan Zschoche vs. Nestor Fortuno & Leonora Remoto (DENR-PENRO Camarines Norte)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4089 labels=SENT _[verified]_
+
+* **2026-02-09 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19c41731f96632d9__COMPLAINT.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#424 status=None _[inferred_strong]_
+
+* **2026-02-09 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19c417f2bdf914ea__Exhibit I - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#419 status=None _[inferred_strong]_
+
+* **2026-02-09 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c4172f621d143f__Exhibit M - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#433 status=executed_filed _[verified]_
+
+* **2026-02-09 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19c4172f621d143f__Verified Declaration - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#438 status=unknown _[inferred_strong]_
+
+* **2026-02-09 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — 19c4172f621d143f__Exhibit N - Complaint - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#434 status=executed_filed _[verified]_
+
+* **2026-02-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Supervisory Intervention Needed – Engineer’s Response to FOI Request Dated January 24, 2026
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#4085 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-02-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Threats from defendant Erwin Balane. Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche herein represented by her Attorney-in-fact Jona
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#393 labels=SENT _[verified]_
+
+* **2026-02-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Members of the Sangguniang Bayan
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#4084 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-02-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4083 labels=SENT _[verified]_
+
+* **2026-02-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#4080 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-02-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#4081 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-02-18 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Executive Briefing for Gov. Ascutia/Mayor Alex Meeting / Keesey Estate Settlement Framework
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#40 labels=SENT _[verified]_
+
+* **2026-02-18 | legal_memo**
+  - **Description:** [PAR-CRIM9221] Memorandum — 19c6e52efc4d8667__Executive Briefing_ Gov. Ascutia Meeting.pdf
+  - **Parties/Titles:** from: unknown
+  - **Provenance:** doc#456 status=unknown _[inferred_strong]_
+
+* **2026-02-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Reply to the Complaint against the officials of PENRO Camarines Norte due to alleged violations of RA 11032 in connection with land conc
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DENR Action Center &lt;actioncenter@denr.gov.ph&gt;
+  - **Provenance:** gmail#4075 labels=SENT _[verified]_
+
+* **2026-02-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4074 labels=SENT _[verified]_
+
+* **2026-02-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: [OSCA] CTN SL-2025-1021-0747 (Jonathan Paul Zschoche vs. Hon. Alexander Pajarillo of the Municipal Government of Mercedes, Camarines No
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Mom &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#4072 labels=SENT _[verified]_
+
+* **2026-02-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Reply to the Complaint against the officials of PENRO Camarines Norte due to alleged violations of RA 11032 in connection with land conc
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DENR Action Center &lt;actioncenter@denr.gov.ph&gt;, complaints@arta.gov.ph
+  - **Provenance:** gmail#4073 labels=SENT _[verified]_
+
+* **2026-02-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#533 status=government_issued _[verified]_
+
+* **2026-02-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4070 labels=SENT _[verified]_
+
+* **2026-03-03 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Caringo High School Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Mea Thompson &lt;mthompson@unconnected.org&gt;
+  - **Provenance:** gmail#4069 labels=SENT _[verified]_
+
+* **2026-03-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;, Gemma Abla &lt;ablagemma@yahoo.com&gt;
+  - **Provenance:** gmail#4065 labels=SENT _[verified]_
+
+* **2026-03-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Caringo High School Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Mea Thompson &lt;mthompson@unconnected.org&gt;
+  - **Provenance:** gmail#4068 labels=SENT _[verified]_
+
+* **2026-03-04 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: draft_unsigned
+  - **Provenance:** doc#529 status=draft_unsigned _[inferred_strong]_
+
+* **2026-03-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Members of the Sangguniang Bayan
+  - **Parties/Titles:** from: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#137 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#4064 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-03-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Members of the Sangguniang Bayan
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#136 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-03-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: "jonzschoche@gmail.com" &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#134 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — LETTER RESPONSE OF THE DILG CAMNORTE RE: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION
+  - **Parties/Titles:** from: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#135 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#133 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-03-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#131 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4059 labels=SENT _[verified]_
+
+* **2026-03-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4060 labels=SENT _[verified]_
+
+* **2026-03-09 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4061 labels=SENT _[verified]_
+
+* **2026-03-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — (no subject)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#124 labels=DRAFT _[verified]_
+
+* **2026-03-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Omnibus Plea for Full Compliance - Outstanding RPT Inquiries [ARTA Case No. CTN SL-2026-0128-1210]
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: loidamacale@mercedes.gov.ph, Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#123 labels=SENT _[verified]_
+
+* **2026-03-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Please ask Aunt Gerry
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "Grandma💚💚👵👵💚💚" &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#4057 labels=SENT _[verified]_
+
+* **2026-03-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4056 labels=SENT _[verified]_
+
+* **2026-03-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4053 labels=SENT _[verified]_
+
+* **2026-03-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4054 labels=SENT _[verified]_
+
+* **2026-03-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND ENGR. LEONORA REMOTO
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: R5 Legal Division &lt;legal.r5@denr.gov.ph&gt;, Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#121 labels=SENT _[verified]_
+
+* **2026-03-11 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#530 status=government_issued _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#116 labels=SENT _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: RESPONSE OF MUNICIPAL MAYOR & MS. LOIDA E. MACALE FOR CART CTN SL 2026-0128-1210
+  - **Parties/Titles:** from: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#118 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: URGENT Bukas na Liham at Manifestasyon – Request for Immediate Forwarding to All Honorable Members of the Sangguniang Bayan
+  - **Parties/Titles:** from: Sangguniang Bayan &lt;sangguniangbayan@mercedes.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#114 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND ENGR. LEONORA REMOTO
+  - **Parties/Titles:** from: R5 PENRO Camarines Norte &lt;penrocamarinesnorte@denr.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#119 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: LETTER RESPONSE OF THE DILG CAMNORTE RE: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION
+  - **Parties/Titles:** from: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#115 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: RESPONSE OF MUNICIPAL MAYOR & MS. LOIDA E. MACALE FOR CART CTN SL 2026-0128-1210
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#120 labels=SENT _[verified]_
+
+* **2026-03-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER RESPONSE OF THE DILG CAMNORTE RE: NOTICE OF ADMINISTRATIVE ESCALATION AND CALL FOR PROCEDURAL RESOLUTION
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#117 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-03-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#112 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: RESPONSE OF MUNICIPAL MAYOR & MS. LOIDA E. MACALE FOR CART CTN SL 2026-0128-1210
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#111 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND ENGR. LEONORA REMOTO
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, R5 Legal Division &lt;legal.r5@denr.gov.ph&gt;
+  - **Provenance:** gmail#113 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Fwd: Please ask Aunt Gerry
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: gerry hoppe &lt;gkhoppe@gmail.com&gt;, Marcia Keesey &lt;m_keesey@yahoo.com&gt;, Mom &lt;swisslassie@hotmail.com&gt;
+  - **Provenance:** gmail#110 labels=SENT _[verified]_
+
+* **2026-03-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4047 labels=SENT _[verified]_
+
+* **2026-03-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4046 labels=SENT _[verified]_
+
+* **2026-03-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: REFERRAL OF REQUESTS/ISSUES RAISED BY MR JONATHAN ZSCHOCHE
+  - **Parties/Titles:** from: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#106 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Updates on Civil Case against Gloria Balane, et al.
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#15 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ORDER FOR SUBMISSION OF COUNTER-AFFIDAVIT - JONATHAN ZSCHOCHE VS. NESTOR FRANZ A. FORTUNO AND ENGR. LEONORA REMOTO
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#105 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-16 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19cf58ae664f370d__4606.jpg
+  - **Parties/Titles:** —
+  - **Provenance:** doc#417 status=None _[inferred_strong]_
+
+* **2026-03-16 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19cf58ae664f370d__4607.jpg
+  - **Parties/Titles:** —
+  - **Provenance:** doc#418 status=None _[inferred_strong]_
+
+* **2026-03-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Reply to email Re: Omnibus Plea for Full Compliance - Outstanding RPT Inquiries [ARTA Case No. CTN SL-2026-0128-1210]
+  - **Parties/Titles:** from: Loida Macale &lt;loidamacale@mercedes.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#100 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST
+  - **Parties/Titles:** from: Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#101 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#102 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-03-17 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_LEGAL PROPOSAL
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4044 labels=SENT _[verified]_
+
+* **2026-03-18 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Reply to email Re: Omnibus Plea for Full Compliance - Outstanding RPT Inquiries [ARTA Case No. CTN SL-2026-0128-1210]
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Loida Macale &lt;loidamacale@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#99 labels=SENT _[verified]_
+
+* **2026-03-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1212
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, "lourdestotanes@yahoo.com" &lt;lourdestotanes@yahoo.com&gt;, "mercedesmunicipality@gmail.com" &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#95 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0128-1210
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, "lourdestotanes@yahoo.com" &lt;lourdestotanes@yahoo.com&gt;, "mercedesmunicipality@gmail.com" &lt;mercedesmunicipality@gmail.com&gt;, Loida Macale &lt;loidamacale@mercedes.
+  - **Provenance:** gmail#96 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-19 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: "jonzschoche@gmail.com" &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#97 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-19 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱3,394.77 — cnr payment per OR — 19d65cb30b6c58e2__Exhibit 7 - Special Power of Attorney dated March 16, 1992.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#69 doc#416 _[verified]_
+
+* **2026-03-19 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱3,394.77 — registration_fee payment per OR — 19d65cb30b6c58e2__Exhibit 6 - Deed of Absolute Sale.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#70 doc#415 _[verified]_
+
+* **2026-03-19 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 registration_fee ₱2,339.56 — registration_fee payment per OR — 19d65cb30b6c58e2__Exhibit 3 - TCT No. T-50192.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#72 doc#412 _[verified]_
+
+* **2026-03-19 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱2,339.56 — cnr payment per OR — 19d65cb30b6c58e2__Exhibit 1 - Transfer Certificate of Title No. 079-202100216.pd
+  - **Parties/Titles:** —
+  - **Provenance:** tx#73 doc#410 _[verified]_
+
+* **2026-03-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_LEGAL PROPOSAL
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4042 labels=SENT _[verified]_
+
+* **2026-03-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_LEGAL PROPOSAL
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4039 labels=SENT _[verified]_
+
+* **2026-03-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#91 labels=SENT _[verified]_
+
+* **2026-03-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4033 labels=SENT _[verified]_
+
+* **2026-03-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4034 labels=SENT _[verified]_
+
+* **2026-03-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4035 labels=SENT _[verified]_
+
+* **2026-03-25 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: AB Law_Initial Meeting
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Agnes Botor &lt;botor.agnes@gmail.com&gt;
+  - **Provenance:** gmail#4036 labels=SENT _[verified]_
+
+* **2026-03-26 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — (no name)
+  - **Parties/Titles:** T-1321; T-2025; from: executed_filed
+  - **Provenance:** doc#480 status=executed_filed _[verified]_
+
+* **2026-03-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0218-1378
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: "jonpeezee@hotmail.com" &lt;jonpeezee@hotmail.com&gt;, "jonzschoche@gmail.com" &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#88 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#90 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#87 labels=SENT _[verified]_
+
+* **2026-03-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#89 labels=SENT _[verified]_
+
+* **2026-03-26 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_LEGAL PROPOSAL
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4028 labels=SENT _[verified]_
+
+* **2026-03-27 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#86 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-03-30 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 cnr ₱196.97 — cnr payment per OR — 19d65cb30b6c58e2__Exhibit 4 - Deed of Absolute Sale.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#71 doc#413 _[verified]_
+
+* **2026-03-31 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4024 labels=SENT _[verified]_
+
+* **2026-03-31 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4025 labels=SENT _[verified]_
+
+* **2026-03-31 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST
+  - **Parties/Titles:** from: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#84 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX,Label_5023319663922629422 _[verified]_
+
+* **2026-03-31 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_LEGAL PROPOSAL
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4026 labels=SENT _[verified]_
+
+* **2026-04-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1319
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, "usecais@denr.gov.ph" &lt;usecais@denr.gov.ph&gt;, MGT DENR &lt;mgt_denr@yahoo.com&gt;, DENR ARTA &lt;denr.arta@denr.gov.ph&gt;, DENR Action Center &lt;actioncenter@denr.gov.ph&gt;
+  - **Provenance:** gmail#83 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-01 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0209-1321
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, Yahoo &lt;lourdestotanes@yahoo.com&gt;, "mercedesmunicipality@gmail.com" &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#82 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-05 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Updates on Civil Case against Gloria Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#391 labels=SENT _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — 19d6611a605bead6__Compliance.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#404 status=executed_filed _[verified]_
+
+* **2026-04-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#78 labels=SENT,Label_5023319663922629422 _[verified]_
+
+* **2026-04-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#81 labels=SENT _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — (no name)
+  - **Parties/Titles:** T-1992; T-50192; from: executed_filed
+  - **Provenance:** doc#470 status=executed_filed _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — 19d7ac3b77b0c3d3__Reply - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-1992; T-50192; from: executed_filed
+  - **Provenance:** doc#402 status=executed_filed _[verified]_
+
+* **2026-04-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] Reply — 19d84c7e62535e5f__Reply - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-1992; T-50192; from: executed_filed
+  - **Provenance:** doc#399 status=executed_filed _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Motion — 19dd279fa339944a__Motion to Render Summary Judgment - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#393 status=executed_filed _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Motion — 19da92414fea0d6a__[DRAFT] Motion to Render Summary Judgment - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#396 status=executed_filed _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Court Filing — 19d8579af748c98e__Reply - Civil Case No. 26-036.pdf
+  - **Parties/Titles:** T-1992; T-50192; from: executed_filed
+  - **Provenance:** doc#398 status=executed_filed _[verified]_
+
+* **2026-04-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] Reply — 19d84b3db2ecffa2__Reply - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** T-1992; T-50192; from: executed_filed
+  - **Provenance:** doc#401 status=executed_filed _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19da92414fea0d6a__Affidavit - Summary Judgment.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#397 status=executed_filed _[verified]_
+
+* **2026-04-06 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — file_36.pdf
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#625 status=government_issued _[verified]_
+
+* **2026-04-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#38 labels=SENT _[verified]_
+
+* **2026-04-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4018 labels=SENT _[verified]_
+
+* **2026-04-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Bala
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#14 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-07 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Bala
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#13 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19d6611a605bead6__Judicial Affidavit of Salvador Osum Dela Fuente.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#407 status=executed_filed _[verified]_
+
+* **2026-04-07 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19d65cb30b6c58e2__Exhibit 5 - Receipts.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** doc#414 status=None _[inferred_strong]_
+
+* **2026-04-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Answer — 19d6611a605bead6__Answer with Special and Affirmative Defenses and Compulsory Counterclaim.pdf
+  - **Parties/Titles:** T-52540; from: executed_filed
+  - **Provenance:** doc#405 status=executed_filed _[verified]_
+
+* **2026-04-07 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19d6611a605bead6__Judicial Affidavit of Engr. Erwin H. Balane.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#409 status=executed_filed _[verified]_
+
+* **2026-04-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — COMPLAINT AFFIDAVIT (ENGINEER ERWIN BALANE) CTN SL-2026-0218-1378
+  - **Parties/Titles:** from: Jonathan Z &lt;jonpeezee@hotmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;, "jonzschoche@gmail.com" &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#76 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Guardianship_Documents_Combined
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: botoradan@gmail.com
+  - **Provenance:** gmail#77 labels=SENT _[verified]_
+
+* **2026-04-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#37 labels=SENT _[verified]_
+
+* **2026-04-08 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — 19d6ad65eaa073e9__ZSCHOCHE VS BALANE Civil Case No.26-360
+  - **Parties/Titles:** —
+  - **Provenance:** doc#453 status=None _[inferred_strong]_
+
+* **2026-04-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: COMPLAINT AFFIDAVIT (ENGINEER ERWIN BALANE) CTN SL-2026-0218-1378
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Z &lt;jonpeezee@hotmail.com&gt;, "jonzschoche@gmail.com" &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#75 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche, herein represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#36 labels=SENT _[verified]_
+
+* **2026-04-10 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Updates on Civil Case against Gloria Balane, et al.
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#385 labels=SENT _[verified]_
+
+* **2026-04-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane)
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#12 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#383 labels=SENT _[verified]_
+
+* **2026-04-11 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19d7ac3b77b0c3d3__Verification - Reply.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#403 status=executed_filed _[verified]_
+
+* **2026-04-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane and Glori
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#8 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: reply and verification
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#9 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane)
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#11 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft Reply in Civil Case No. 26-360 (Zschoche v. Balane)
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#10 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-13 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19d84c7e62535e5f__Verification - Reply.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#400 status=executed_filed _[verified]_
+
+* **2026-04-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of Judicial Affidavit of Jonathan Zschocha
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Adan Botor &lt;botoradan@gmail.com&gt;
+  - **Provenance:** gmail#4009 labels=SENT _[verified]_
+
+* **2026-04-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Subject: Professional Mandate for Due Diligence and Partnership Procurement (EXPA No. 000322-V)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "villareal.maribel@gmail.com" &lt;villareal.maribel@gmail.com&gt;
+  - **Provenance:** gmail#4010 labels=SENT _[verified]_
+
+* **2026-04-14 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of Judicial Affidavit of Jonathan Zschocha
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Adan Botor &lt;botoradan@gmail.com&gt;
+  - **Provenance:** gmail#74 labels=SENT _[verified]_
+
+* **2026-04-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4007 labels=SENT _[verified]_
+
+* **2026-04-16 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: ARTA CART INDORSEMENT - CTN SL-2026-0218-1378
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: "jonpeezee@hotmail.com" &lt;jonpeezee@hotmail.com&gt;, "jonzschoche@gmail.com" &lt;jonzschoche@gmail.com&gt;, Yahoo &lt;lourdestotanes@yahoo.com&gt;, "mercedesmunicipality@gmail.com" &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#73 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#465 status=government_issued _[verified]_
+
+* **2026-04-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025-1008-0690 & SL-2025-1104-0792
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;
+  - **Provenance:** gmail#71 labels=SENT _[verified]_
+
+* **2026-04-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025-1008-0690 & SL-2025-1104-0792
+  - **Parties/Titles:** from: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, MEO Mercedes &lt;meo_mercedescn@yahoo.com&gt;
+  - **Provenance:** gmail#72 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-20 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#7 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-21 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#374 labels=SENT _[verified]_
+
+* **2026-04-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4001 labels=SENT _[verified]_
+
+* **2026-04-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Caringo High School Camarines Norte/Resuming at New School
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Mea Thompson &lt;mthompson@unconnected.org&gt;
+  - **Provenance:** gmail#4002 labels=SENT _[verified]_
+
+* **2026-04-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fwd: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025-1008-0690 & SL-2025-1104-0792
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "jlvagcaoili@avaslaw.com" &lt;jlvagcaoili@avaslaw.com&gt;, Jose Luis Agcaoili &lt;jlvagcaoili@gmail.com&gt;
+  - **Provenance:** gmail#67 labels=DRAFT _[verified]_
+
+* **2026-04-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: ABLAW_BILLING INVOICE
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: AB Law Admin and Billing &lt;lawoffice.ablaw@gmail.com&gt;
+  - **Provenance:** gmail#4003 labels=SENT _[verified]_
+
+* **2026-04-22 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025-1008-0690 & SL-2025-1104-0792
+  - **Parties/Titles:** from: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#69 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-23 | uncategorized**
+  - **Description:** [PAR-CRIM9221] Legal — 2026-04-23_zschoche-complaint-manifestation
+  - **Parties/Titles:** —
+  - **Provenance:** doc#5 status=None _[inferred_strong]_
+
+* **2026-04-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Submission of Standalone Complaint with Manifestation for Supervisory Review of CART Process
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#64 labels=SENT _[verified]_
+
+* **2026-04-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Submission of Standalone Complaint with Manifestation for Supervisory Review of CART Process
+  - **Parties/Titles:** from: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#65 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-23 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Submission of Standalone Complaint with Manifestation for Supervisory Review of CART Process
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#66 labels=SENT _[verified]_
+
+* **2026-04-23 | uncategorized**
+  - **Description:** [PAR-CRIM9221] doc — Screenshot 2026-04-23 at 6.49.23 AM.png
+  - **Parties/Titles:** T-2026-04
+  - **Provenance:** doc#799 status=None _[inferred_strong]_
+
+* **2026-04-24 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#462 status=executed_filed _[verified]_
+
+* **2026-04-24 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#464 status=executed_filed _[verified]_
+
+* **2026-04-24 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — (no name)
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#463 status=executed_filed _[verified]_
+
+* **2026-04-24 | legal_act**
+  - **Description:** [PAR-CRIM9221] Affidavit — 19dd279fa339944a__Annex A - Motion to Render Summary Judgment - Civil Case No. 26-360.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#394 status=executed_filed _[verified]_
+
+* **2026-04-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] Notice — 19dd283ed78a33b4__Notice of Pre-trial Conference Civ.Case No 26-360 Zschoche vs. Balane et al..pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#392 status=executed_filed _[verified]_
+
+* **2026-04-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#6 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-24 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Draft of the Motion to Render Summary Judgment and the Required Attached Affidavit
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#372 labels=SENT _[verified]_
+
+* **2026-04-26 | legal_act**
+  - **Description:** [PAR-CRIM9221] Complaint — (no name)
+  - **Parties/Titles:** T-12; from: executed_filed
+  - **Provenance:** doc#472 status=executed_filed _[verified]_
+
+* **2026-04-27 | legal_act**
+  - **Description:** [PAR-CRIM9221] Motion — 19dfbef5cd4ecc2f__Comment Opposition.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#391 status=executed_filed _[verified]_
+
+* **2026-04-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane a
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#35 labels=SENT _[verified]_
+
+* **2026-04-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Resolution - Zschoche v. Municipal Engineering Office - Mercedes, Camarines Norte - CTNs SL-2025-1008-0690 & SL-2025-1104-0792
+  - **Parties/Titles:** from: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#63 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Notice of Pre-Trial Conference for Civil Case No. 26-360
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#4 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Notice of Pre-Trial Conference for Civil Case No. 26-360
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#368 labels=SENT _[verified]_
+
+* **2026-04-28 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane and G
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#5 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-04-30 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Endorsement of Resolution and Annexes CTN SL-2025-1008-0690 and CTN SL-2025-1104-0792
+  - **Parties/Titles:** from: Litigation Proper Unit &lt;litigationproper@arta.gov.ph&gt;; to: "ro05@csc.gov.ph" &lt;ro05@csc.gov.ph&gt;
+  - **Provenance:** gmail#62 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-04 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2026-05-04_arta-referral-notice
+  - **Parties/Titles:** —
+  - **Provenance:** doc#3 status=None _[inferred_strong]_
+
+* **2026-05-04 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — 2026-05-04_arta-referral-notice
+  - **Parties/Titles:** —
+  - **Provenance:** doc#4 status=None _[inferred_strong]_
+
+* **2026-05-04 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: NOTICE OF REFERRAL - CTN SL-2026-0423-1891 (CSC)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Southern Luzon - Complaints Handling &lt;complaints.southernluzon@arta.gov.ph&gt;
+  - **Provenance:** gmail#56 labels=SENT _[verified]_
+
+* **2026-05-05 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#457 status=government_issued _[verified]_
+
+* **2026-05-05 | government_submission**
+  - **Description:** [PAR-CRIM9221] Government Submission — (no name)
+  - **Parties/Titles:** from: government_issued
+  - **Provenance:** doc#458 status=government_issued _[verified]_
+
+* **2026-05-05 | legal_act**
+  - **Description:** [PAR-CRIM9221] doc — (no name)
+  - **Parties/Titles:** T-14; T-48336; from: executed_filed
+  - **Provenance:** doc#459 status=executed_filed _[verified]_
+
+* **2026-05-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: URGENT — Petition for Supervisory Review — Filed 05 May 2026
+  - **Parties/Titles:** from: Malacanang Records Office &lt;mro@op.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#53 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane and G
+  - **Parties/Titles:** from: "BONIFACIO, JR. BARANDON" &lt;barandon_lawoffice@yahoo.com&gt;
+  - **Provenance:** gmail#3 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Notice of Filing at the Office of the President — Zschoche v. Balane — ARTA CTN SL-2025-1008-0690 & SL-2025-1104-0792
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;
+  - **Provenance:** gmail#52 labels=SENT _[verified]_
+
+* **2026-05-06 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — URGENT — Petition for Supervisory Review — Filed 05 May 2026
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: mro@op.gov.ph, oes@op.ph
+  - **Provenance:** gmail#54 labels=SENT _[verified]_
+
+* **2026-05-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Caringo High School Camarines Norte/Resuming at New School
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Benjz Gerard Sevilla &lt;bgsevilla@unconnected.org&gt;
+  - **Provenance:** gmail#3987 labels=SENT _[verified]_
+
+* **2026-05-08 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane a
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#34 labels=SENT _[verified]_
+
+* **2026-05-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] Reply — 19e15ecbb8bd9d80__[DRAFT] Reply to the Comment Opposition - Civil Case No. 26-360 - Copy.pdf
+  - **Parties/Titles:** from: executed_filed
+  - **Provenance:** doc#390 status=executed_filed _[verified]_
+
+* **2026-05-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane a
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#2 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane a
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#32 labels=SENT _[verified]_
+
+* **2026-05-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane a
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#33 labels=SENT _[verified]_
+
+* **2026-05-11 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: Fw: Civil Case No. 26-360, Patricia Keesey Zschoche represented by her Attorney-in-Fact Jonathan Paul Zschoche v. Spouses Efren Balane a
+  - **Parties/Titles:** from: Barandon Law Offices Records &lt;barandonlawoffice.records@gmail.com&gt;
+  - **Provenance:** gmail#1 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: NOTICE OF REFERRAL - CTN SL-2026-0423-1891 (DILG)
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Romar Panganiban &lt;rbpanganiban@dilg.gov.ph&gt;
+  - **Provenance:** gmail#48 labels=DRAFT _[verified]_
+
+* **2026-05-12 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST
+  - **Parties/Titles:** from: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;
+  - **Provenance:** gmail#47 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — [OSCA] CTN SL-2026-0218-1378 Jonathan Paul Zschoche v. Municipal Engineer's Office - Mercedes, Camarines Norte
+  - **Parties/Titles:** from: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;, "helpdesk@mercedes.gov.ph" &lt;helpdesk@mercedes.gov.ph&gt;, MEO Mercedes &lt;meo_mercedescn@yahoo.com&gt;
+  - **Provenance:** gmail#43 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: LETTER FROM JONATHAN ZSCHOCHE REITERATING REQUEST
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: DILG CAMARINES NORTE &lt;dilgcamarinesnorte2020@gmail.com&gt;
+  - **Provenance:** gmail#46 labels=SENT _[verified]_
+
+* **2026-05-13 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — [OSCA] CTN SL-2026-0209-1321 Jonathan Paul Zschoche v. Municipal Assessor's Office, Mercedes, Camarines Norte
+  - **Parties/Titles:** from: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;, "helpdesk@mercedes.gov.ph" &lt;helpdesk@mercedes.gov.ph&gt;
+  - **Provenance:** gmail#44 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-13 | judicial_event**
+  - **Description:** [PAR-CRIM9221] ⏰ pretrial — Pretrial — CV-2026-360 (Heirs vs Balane)
+  - **Parties/Titles:** —
+  - **Provenance:** deadline#1 _[inferred_weak]_
+
+* **2026-05-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 RECEIVED — [RESOLUTION - NOC] CTN SL-2026-0128-1210 Jonathan Paul Zschoche v LGU Mercedes, Camarines Norte
+  - **Parties/Titles:** from: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;; to: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;, Bayan Ng Mercedes &lt;mercedesmunicipality@gmail.com&gt;
+  - **Provenance:** gmail#42 labels=IMPORTANT,CATEGORY_PERSONAL,INBOX _[verified]_
+
+* **2026-05-15 | correspondence**
+  - **Description:** [PAR-CRIM9221] 📧 SENT — Re: [RESOLUTION - NOC] CTN SL-2026-0128-1210 Jonathan Paul Zschoche v LGU Mercedes, Camarines Norte
+  - **Parties/Titles:** from: Jonathan Zschoche &lt;jonzschoche@gmail.com&gt;; to: Litigation Division - ARTA &lt;litigationdivision@arta.gov.ph&gt;
+  - **Provenance:** gmail#41 labels=SENT _[verified]_
+
+* **2026-05-16 | procedural_intake**
+  - **Description:** [PAR-CRIM9221] 📋 PRE-intake fired — Send demand letter — prep (T-3d)
+  - **Parties/Titles:** from: Leo; to: Jonathan
+  - **Provenance:** intake#1 deadline#2 _[verified]_
+
+* **2026-05-17 | procedural_intake**
+  - **Description:** [PAR-CRIM9221] 📋 PRE-intake fired — Send demand letter — prep (T-3d)
+  - **Parties/Titles:** from: Leo; to: Jonathan
+  - **Provenance:** intake#3 deadline#2 _[verified]_
+
+* **2026-05-17 | procedural_intake**
+  - **Description:** [PAR-CRIM9221] 📋 POST-intake fired — Pretrial conference — completed, intake checklist
+  - **Parties/Titles:** from: Leo; to: Jonathan
+  - **Provenance:** intake#4 deadline#1 _[verified]_
+
+* **2026-05-18 | judicial_event**
+  - **Description:** [PAR-CRIM9221] ⏰ send_demand_letter — Send demand letter to RD Camarines Norte (title history update)
+  - **Parties/Titles:** —
+  - **Provenance:** deadline#2 _[inferred_weak]_
+
+* **2026-06-02 | judicial_event**
+  - **Description:** [PAR-CRIM9221] ⚖ Mediation/Settlement Conference scheduled at RTC for Civil Case 26-360 (Zschoche v. Balane)
+  - **Parties/Titles:** from: Don Qi Style (Telegram chat-note #112)
+  - **Provenance:** chat_notes#112 2026-05-17; primary court Notice not yet ingested _[asserted_pending_primary_evidence]_
+
+* **2026-06-02 | judicial_event**
+  - **Description:** [PAR-CRIM9221] ⏰ pretrial — Mediation / Settlement Conference — Civil Case 26-360
+  - **Parties/Titles:** —
+  - **Provenance:** deadline#3 _[inferred_weak]_
+
+### 2028
+
+* **2028-12-01 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 rpt ₱195.00 — RPT payment per OR #3025370 (PTO CAMARINES NORTE)
+  - **Parties/Titles:** —
+  - **Provenance:** tx#32 doc#428 _[verified]_
+
+### 2029
+
+* **2029-10-23 | transaction**
+  - **Description:** [PAR-CRIM9221] 💰 other ₱1,000.00 — other payment per OR — null_receipt.pdf
+  - **Parties/Titles:** —
+  - **Provenance:** tx#121 doc#215 _[verified]_
+
+### (Undated)
+
+* **— | title_annotation** — 🏷 SALE on T-52540 (PE &lt;no_pe_8&gt;); notary Donald E. Asis _(instruments_on_title#45 doc#48)_
+* **— | title_annotation** — 🏷 Reference to TCT-52540 on T-52540 (PE &lt;no_pe_7&gt;); notary Donald E. Asis _(instruments_on_title#54 doc#96)_
+
+# 4. MISSING / ANOMALOUS GAPS
+
+- 🔴 **[CRITICAL] missing_primary_instrument** — 2005 Revocation of SPA (Cesar dela Fuente): Currently testimonial via Judicial Affidavit doc#441. Primary notarized instrument missing — single biggest evidence gap on the void-SPA theory.
+- 🔴 **[CRITICAL] missing_primary_instrument** — Mary Worrick Keesey death certificate (PSA-issued, ~1988): Testimonial only via project memory; PSA-certified primary document not in corpus.
+- 🔴 **[CRITICAL] missing_primary_instrument** — Cesar dela Fuente death certificate (2017): Referenced in LandBank's CV-6839 filing (doc#364); primary PSA certificate not yet ingested.
+- 🔴 **[CRITICAL] missing_primary_instrument** — The 2016 Deed of Sale (Cesar → buyer that led to T-52540 cancellation): The void deed at issue in CV 26-360. Not directly in corpus per current scan.
+- 🟠 **[HIGH] weak_legal_provenance** — 42 legal-act/title events lack verified provenance — cannot be cited as fact in court output without upgrade.
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1912 and 1922 (10-year gap).
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1922 and 1947 (25-year gap).
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1947 and 1953 (6-year gap).
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1953 and 1963 (10-year gap).
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1964 and 1975 (11-year gap).
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1976 and 1979 (3-year gap).
+- 🟡 **[MEDIUM] year_gap** — No events recorded between 1981 and 1988 (7-year gap).
+- 🟡 **[MEDIUM] orphan_legal_acts** — 57 legal-act events have no linked TCT or party (can't be queried by 'what touched T-4497' or 'what did Cesar do').
+
+---
+_Generated by generate_case_bible.py (deploy_156) from client_history with multi-attribution + canonical event vocabulary._
