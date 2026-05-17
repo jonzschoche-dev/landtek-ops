@@ -244,6 +244,40 @@ INVARIANTS = [
          """,
          msg="{n} matter(s) have gmail attachments still unextracted into documents. Run extract_email_attachments."),
 
+    # ─── DRAFT-AS-FILED GUARDS (Jonathan 2026-05-16: "a draft cannot be considered a filed case") ──
+    dict(id="DRAFT_CITED_AS_PLAINTIFF_FILING", severity="P0",
+         name="A doc with [DRAFT] in filename is tagged as a filed plaintiff/respondent/court party-filing",
+         sql=r"""
+            SELECT cpf.id AS party_filing_id, cpf.doc_id, d.smart_filename, d.execution_status
+              FROM case_party_filings cpf JOIN documents d ON d.id = cpf.doc_id
+             WHERE cpf.filing_party IN ('plaintiff','respondent','court')
+               AND (d.smart_filename ILIKE '%[DRAFT]%' OR d.smart_filename ILIKE '%draft%'
+                    OR d.execution_status = 'draft_unsigned')
+         """,
+         msg="{n} draft doc(s) currently tagged as a filed party-filing. Drafts cannot be cited as filed."),
+
+    dict(id="DRAFT_AS_DEADLINE_SOURCE", severity="P0",
+         name="A case_deadline cites a draft doc as its source",
+         sql=r"""
+            SELECT cd.id, cd.title, d.smart_filename, d.execution_status
+              FROM case_deadlines cd JOIN documents d ON d.id = cd.source_doc_id
+             WHERE d.smart_filename ILIKE '%[DRAFT]%' OR d.execution_status = 'draft_unsigned'
+         """,
+         msg="{n} deadline(s) source a draft doc. Drafts cannot anchor a real deadline."),
+
+    dict(id="DEED_NO_TITLE_ANNOTATION", severity="P1",
+         name="Executed deed of sale/donation doesn't appear annotated on any title (instruments_on_title)",
+         sql=r"""
+            SELECT d.id, d.smart_filename, d.classification
+              FROM documents d
+             WHERE d.classification IN ('Deed','Deed of Sale','Deed of Donation','Special Power of Attorney')
+               AND d.execution_status IN ('executed_notarized','executed_filed','government_issued')
+               AND NOT (d.smart_filename ILIKE '%[DRAFT]%')
+               AND NOT EXISTS (SELECT 1 FROM instruments_on_title iot WHERE iot.doc_id = d.id)
+               AND NOT EXISTS (SELECT 1 FROM title_chain tc WHERE tc.source_doc_id = d.id)
+         """,
+         msg="{n} executed deed(s) NOT annotated on any title. Per Jonathan: 'a deed of sale needs to be recorded on a corresponding title and lot'. These deeds may exist as instruments but title transfer is unproven."),
+
     # ─── LEGAL-ACT VALIDITY (per feedback_legal_act_validity_scrutiny) ───
     dict(id="UNAUDITED_LEGAL_ACT", severity="P1",
          name="Doc titled as a legal act (deed/donation/spa/revocation) has no validity audit",
