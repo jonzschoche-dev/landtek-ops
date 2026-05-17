@@ -198,6 +198,19 @@ def main():
           -- gmail
           g.subject AS gmail_subject, g.from_addr, g.from_name AS gmail_from_name,
           g.message_id AS gmail_message_id,
+          -- instruments_on_title (Torrens Memorandum of Encumbrances)
+          iot.pe_number AS iot_pe_number,
+          iot.instrument_type AS iot_instrument_type,
+          iot.executor_full_name AS iot_executor,
+          iot.notary_name AS iot_notary,
+          iot.notary_doc_no AS iot_doc_no,
+          iot.notary_page AS iot_page,
+          iot.notary_book AS iot_book,
+          iot.notary_series_year AS iot_series,
+          iot.parent_tct_number AS iot_parent_tct,
+          iot_d.drive_link AS iot_d_drive_link,
+          iot_d.drive_file_id AS iot_d_drive_file_id,
+          iot_d.file_path AS iot_d_file_path,
           -- title_transfers (no source_doc_id column; uses cnr_received_doc_id /
           -- cancelled_by_doc_id, plus the transfer_documents join table)
           tt.instrument_type, tt.parent_title, tt.derivative_title,

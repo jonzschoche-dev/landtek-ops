@@ -1,12 +1,12 @@
 # Daily Strategic Digest — Sunday, May 17, 2026
-_Generated 10:10 UTC · LLM spend today: $0.8671 across 120 calls · Open inquiries: 5_
+_Generated 23:00 UTC · LLM spend today: $5.1680 across 1168 calls · Open inquiries: 14_
 
 ---
 
 ## I. Per-client priorities
 
 ### 👤 Heirs of Mary Worrick Keesey  _(client_code: `MWK-001`)_
-**9 active matter(s)**
+**10 active matter(s)**
 
 **MWK-ARTA-0747** — ARTA SL-2025-1021-0747 — Mayor Pajarillo R.A. 11032 §21(b)(d)(e)
   · Stage: `complaint_filed_awaiting_response`
@@ -19,6 +19,10 @@ _Generated 10:10 UTC · LLM spend today: $0.8671 across 120 calls · Open inquir
   · WHAT: Determine respondent identity + ARTA hearing schedule. Currently sparse evidence in corpus — needs Jonathan to upload the complaint affidavit + any ARTA acknowledgment.
   · WHO: jonathan
   · Venue: ARTA / Office of the President · Docket: `CTN SL-2026-0128-1210`
+
+**MWK-ARTA-1212** — ARTA SL-2026-0128-1212 (referenced docs#753, 763, 817, 829 — matter missing from
+  · Stage: `complaint_filed_awaiting_response`
+  · Venue: ARTA Southern Luzon / RTC · Docket: `CTN SL-2026-0128-1212`
 
 **MWK-ARTA-1319** — ARTA SL-2026-0209-1319 — vs. Nestor Franz... (CART Southern Luzon)
   · Stage: `complaint_filed_awaiting_response`
@@ -97,6 +101,7 @@ _Generated 10:10 UTC · LLM spend today: $0.8671 across 120 calls · Open inquir
 
 ### 📨 Open intakes awaiting your input
 
+- `MWK-001` · **Pretrial conference — completed, intake checklist** — 0/5 items (post)
 - `MWK-001` · **Send demand letter — prep (T-3d)** — 0/5 items (pre)
 
 ### ⏰ Upcoming deadlines (next 30 days, all clients)
@@ -126,11 +131,11 @@ _Goal: world's greatest executive assistant for Filipino land + property._
 | Pillar | Metric |
 |---|---|
 | Active clients | 2 |
-| Active matters | 17 |
-| LLM cost today | $0.8671 (7d avg $0.8388) |
-| Truth-negotiator back-test today | 96/120 pass |
+| Active matters | 18 |
+| LLM cost today | $5.1680 (7d avg $2.9893) |
+| Truth-negotiator back-test today | 44/55 pass |
 | Validity audits (corpus) | PARTIALLY_PRESENT_internal_com=100, INTERNALLY_VERIFIED=57, ASSERTED_BUT_INCOMPLETE_majori=29 |
-| Open inquiry queue | 5 |
+| Open inquiry queue | 14 |
 
 ### Trajectory pillars — where we stand on each
 
@@ -154,5 +159,3 @@ _Goal: world's greatest executive assistant for Filipino land + property._
 ## IV. Meta-agent flags (last 24h)
 
 - 🔴 <b>Deadline alert (T1) — MWK-001</b> <b>Send demand letter to RD Camarines Norte (title history update)</b> Due 2026-05-18 — <b>T-1d</b> <i>Demand letter requiring Register of Deeds Camarines Norte to update title history records. Linked to active correspondence thread.</i>  <b>Blocking bottleneck
-- 🆘 <b>Deadline alert (OVERDUE) — MWK-001</b> <b>Pretrial — CV-2026-360 (Heirs vs Balane)</b> ⚠️ <b>OVERDUE by 3 day(s)</b> (was due 2026-05-13) <i>Pretrial conference for accion reinvindicatoria, Camarines Norte RTC</i>  <b>Blocking bottlenecks:</b>   • Risk: Civil Case 26-360 and Case 6839 may be du
-- 🆘 <b>Deadline alert (OVERDUE) — MWK-001</b> <b>Pretrial — CV-2026-360 (Heirs vs Balane)</b> ⚠️ <b>OVERDUE by 3 day(s)</b> (was due 2026-05-13) <i>Pretrial conference for accion reinvindicatoria, Camarines Norte RTC</i>  <b>Blocking bottlenecks:</b>   • Risk: Civil Case 26-360 and Case 6839 may be du

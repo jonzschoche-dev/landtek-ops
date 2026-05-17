@@ -755,12 +755,32 @@ def synthesize_year_narratives(events):
 # ── Cross-reference index builder (Layer D appendix) ───────────────────
 def build_cross_reference_index(events):
     """Aggregate every title_ref, every named person, and every matter_code
-    into a relational index. Returns dict with three sub-dicts:
-      by_title  -> {tct_number: [(date, event_id, summary), ...]}
-      by_person -> {person_name: [(date, event_id, summary), ...]}
-      by_matter -> {matter_code: [(date, event_id, summary), ...]}
-    """
+    into a relational index. Returns dict with three sub-dicts.
+
+    deploy_167: filter to substantive events only (same rule as the detailed
+    event log) — index value is navigation, not completeness; including 169
+    routine tax-doc/transaction entries buries the events that matter."""
     from collections import defaultdict
+    SUBSTANTIVE_KINDS = {"legal_act", "judicial_event", "vital_record",
+                          "government_submission", "legal_memo", "title_event"}
+    SUBSTANTIVE_CORRESPONDENCE_KEYWORDS = (
+        "demand", "notice", "order", "petition", "motion", "reply",
+        "complaint", "affidavit", "memorandum", "subpoena", "decision",
+        "judgment", "manifestation", "rejoinder",
+    )
+
+    def _is_substantive(ev):
+        kind = ev.get("event_kind_canonical") or ""
+        if kind in SUBSTANTIVE_KINDS:
+            return True
+        if kind == "correspondence":
+            blob = ((ev.get("doc_classification") or "") + " " +
+                    (ev.get("doc_title") or "") + " " +
+                    (ev.get("doc_smart_filename") or "")).lower()
+            return any(k in blob for k in SUBSTANTIVE_CORRESPONDENCE_KEYWORDS)
+        return False
+
+    events = [e for e in events if _is_substantive(e)]
     by_title = defaultdict(list)
     by_person = defaultdict(list)
     by_matter = defaultdict(list)
@@ -952,74 +972,87 @@ def render_markdown(matter, events, deadlines, coverage, projected, gaps,
             out.append(f"*{len(year_events)} events recorded in {year} "
                        "— narrative synthesis unavailable (likely <2 events or LLM error).*")
         out.append("")
-        out.append("**Detailed Event Log:**")
+        out.append("**Detailed Event Log:** _(substantive events only — legal acts, judicial events, vital records, government submissions, court orders, key correspondence)_")
         out.append("")
-        # Empty-event collapse: detect runs of consecutive events on the same date
-        # that have BOTH no substantive context AND no title_refs/party_refs/persons.
-        # These are typically docs backfilled to YYYY-01-01 with no extracted text.
-        rendered_events = list(year_events)
-        i = 0
-        while i < len(rendered_events):
-            e = rendered_events[i]
-            ctx = build_substantive_context(e)
-            entities = collect_entities_titles(e)
-            is_empty = (ctx == "[Context Missing in DB]"
-                         and entities == "[No entities/titles linked]")
-            # Collapse run
-            if is_empty:
-                same_day = e["primary_date"]
-                run_ids = [e["id"]]
-                run_provs = [e.get("citation_ref") or f"{e['source_table']}#{e['source_id']}"]
-                j = i + 1
-                while j < len(rendered_events):
-                    e2 = rendered_events[j]
-                    ctx2 = build_substantive_context(e2)
-                    entities2 = collect_entities_titles(e2)
-                    if (e2["primary_date"] == same_day and
-                        ctx2 == "[Context Missing in DB]" and
-                        entities2 == "[No entities/titles linked]"):
-                        run_ids.append(e2["id"])
-                        run_provs.append(e2.get("citation_ref") or f"{e2['source_table']}#{e2['source_id']}")
-                        j += 1
-                    else:
-                        break
-                if len(run_ids) >= 3:
-                    out.append(f"* **{same_day.isoformat()} | [collapsed] | "
-                               f"{len(run_ids)} undocumented entries** "
-                               f"_(no extracted text, no entities/titles — likely pending OCR)_")
-                    out.append(f"  - **event_ids:** {', '.join(str(x) for x in run_ids[:30])}"
-                                + (f" (+{len(run_ids)-30} more)" if len(run_ids) > 30 else ""))
-                    out.append(f"  - **Provenance:** {md_escape(', '.join(run_provs[:8]))}"
-                                + (f", … ({len(run_provs)-8} more)" if len(run_provs) > 8 else ""))
-                    out.append("")
-                    i = j
-                    continue
-            # Otherwise render normally
-            kind = e.get("event_kind_canonical") or e.get("event_kind") or "event"
+        # SUBSTANTIVE-ONLY FILTER (deploy_167 fix per Jonathan 2026-05-17):
+        # The 635-page bloat came from rendering raw OCR for all 1,034 events including
+        # 169 transactions, 109 tax docs, 52 title annotations. None of those help a
+        # lawyer. Filter to high-signal canonical kinds + use analyst_memo summaries
+        # instead of raw text dumps.
+        SUBSTANTIVE_KINDS = {"legal_act", "judicial_event", "vital_record",
+                              "government_submission", "legal_memo"}
+        SUBSTANTIVE_CORRESPONDENCE_KEYWORDS = (
+            "demand", "notice", "order", "petition", "motion", "reply",
+            "complaint", "affidavit", "memorandum", "subpoena", "decision",
+            "judgment", "manifestation", "rejoinder", "verification",
+        )
+
+        def is_substantive(ev):
+            kind = ev.get("event_kind_canonical") or ""
+            if kind in SUBSTANTIVE_KINDS:
+                return True
+            if kind == "title_event":
+                # Title issuance/cancellation events are substantive; bulk
+                # certification requests are not.
+                cls = (ev.get("doc_classification") or "").lower()
+                if "cancellation" in cls or "issuance" in cls or "transfer" in cls:
+                    return True
+                return False
+            if kind == "correspondence":
+                # Only correspondence whose action/title indicates substantive content
+                action_raw = (ev.get("doc_classification") or ev.get("event_kind") or "").lower()
+                title_raw = (ev.get("doc_title") or "").lower()
+                fname_raw = (ev.get("doc_smart_filename") or "").lower()
+                blob = action_raw + " " + title_raw + " " + fname_raw
+                return any(k in blob for k in SUBSTANTIVE_CORRESPONDENCE_KEYWORDS)
+            # All transactions, tax docs, title annotations, intakes, uncategorized: skip
+            return False
+
+        def extract_event_summary(ev):
+            """Pull the cleanest readable summary from analyst_memo, fall back to
+            what_summary, NEVER print raw OCR (the 635-page bug)."""
+            memo = ev.get("doc_analyst_memo")
+            if isinstance(memo, dict):
+                # Prefer headline (one-liner) over summary (paragraph)
+                if memo.get("headline"):
+                    return memo["headline"][:280]
+                if memo.get("summary"):
+                    return memo["summary"][:380]
+            # Calendar events have a description
+            if ev.get("cal_description"):
+                return ev["cal_description"][:280]
+            # Gmail: use the subject (the body is usually OCR noise too)
+            if ev.get("gmail_subject"):
+                return f"[Email] {ev['gmail_subject'][:240]}"
+            # Title transfer events have structured fields
+            if ev.get("tt_instrument_type"):
+                return (f"{ev['tt_instrument_type']}: "
+                        f"{ev.get('tt_parent_title','?')}→{ev.get('tt_derivative_title','?')} "
+                        f"({ev.get('tt_transferor','?')}→{ev.get('tt_transferee_name','?')})")
+            # Last resort: the system-generated what_summary
+            if ev.get("what_summary"):
+                ws = ev["what_summary"].strip()
+                if not ws.startswith("doc — "):  # filter out the no-context placeholder
+                    return ws[:280]
+            return "[no substantive summary available — see source doc]"
+
+        substantive_events = [e for e in year_events if is_substantive(e)]
+        skipped = len(year_events) - len(substantive_events)
+        if skipped:
+            out.append(f"_({skipped} routine event(s) suppressed — transactions, tax filings, "
+                       f"bulk title certifications. Full list available in cross-reference index by matter.)_")
+            out.append("")
+        for e in substantive_events:
             d = e["primary_date"].isoformat()
             mcodes = e.get("matter_codes") or []
-            tags = [shorten_matter_tag(mc) for mc in mcodes[:3]] if mcodes else ["GENERAL"]
+            tags = [shorten_matter_tag(mc) for mc in mcodes[:2]] if mcodes else ["GENERAL"]
             tag_str = "|".join(tags)
             action = translate_action(e)
-            out.append(f"* **{d} | [{tag_str}] | {action}**")
-            out.append(f"  - **Context:** {md_escape(ctx)[:1500]}")
-            out.append(f"  - **Key Entities/Titles:** {md_escape(entities)}")
-            # Cross-references: matter codes + title refs + party refs
-            xrefs = []
-            if mcodes and len(mcodes) > 1:
-                xrefs.append("matters: " + ", ".join(shorten_matter_tag(mc) for mc in mcodes))
-            elif mcodes:
-                xrefs.append("matter: " + shorten_matter_tag(mcodes[0]))
-            if e.get("title_refs"):
-                xrefs.append("titles: " + ", ".join(e["title_refs"][:5]))
-            if e.get("party_refs"):
-                xrefs.append("party_ids: " + ", ".join(str(p) for p in e["party_refs"][:3]))
-            out.append(f"  - **Cross-References:** {md_escape('; '.join(xrefs)) if xrefs else '—'}")
+            summary = extract_event_summary(e)
             prov = e.get("citation_ref") or f"{e['source_table']}#{e['source_id']}"
-            prov_level = e.get("provenance") or "?"
-            out.append(f"  - **Provenance:** {md_escape(prov)} _[{prov_level}]_")
-            out.append("")
-            i += 1
+            # Compact single-bullet format — one line per event in normal cases
+            out.append(f"* **{d}** · [{tag_str}] · **{action}** — {md_escape(summary)} _[{prov}]_")
+        out.append("")
 
     if undated:
         out.append("### (Undated)")

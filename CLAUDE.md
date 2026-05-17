@@ -18,7 +18,9 @@ A user is connecting from their phone via Tailscale+Termius. They need quick, de
 ## Active matter (priority context)
 
 **Civil Case No. 26-360 (Zschoche v. Balane)** — accion reinvindicatoria over TCT T-4497
-and its derivative titles. Patricia Keesee Zschoche (US, mother of user Jonathan Zschoche)
+and its derivative titles. **Patricia Keesey Zschoche** (US, mother of user Jonathan
+Zschoche; spelling KEESEY verified against 307 corpus occurrences including her birth
+certificate and the RTC Order caption — earlier "Keesee" in this memory was a typo)
 is plaintiff, represented by Atty. Bonifacio Jr. Barandon (Barandon Law Offices, Daet).
 Defendants: Gloria Balane et al. who hold contested TCT T-079-2021002126 (issued 2021 from
 cancelled T-52540 via 2016 Deed of Sale executed by Cesar de la Fuente under an SPA

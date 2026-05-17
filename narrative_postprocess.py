@@ -31,12 +31,19 @@ CORRECTIONS = [
      re.IGNORECASE,
      "Opus re-audit: Branch 64 sits in Daet"),
 
-    # Spelling: Keesey → Keesee for the caption-name pattern
-    # Specifically "Patricia Keesey Zschoche" (the plaintiff caption)
-    (r"\bPatricia\s+Keesey\s+Zschoche\b",
-     "Patricia Keesee Zschoche",
+    # REVERSE direction (deploy_166): the canonical spelling is KEESEY.
+    # Earlier "Keesee" was a typo seeded by CLAUDE.md and propagated through
+    # Opus/Haiku. Corpus evidence: 307 KEESEY occurrences vs 0 KEESEE; Patricia's
+    # birth certificate, RTC Order caption (CV 26-360), and ARTA filings all
+    # spell KEESEY. Reverse any prior Keesee→Keesey to fix the error.
+    (r"\bPatricia\s+Keesee\s+Zschoche\b",
+     "Patricia Keesey Zschoche",
      0,
-     "Opus re-audit: caption spelling is KEESEE, not KEESEY"),
+     "deploy_166: revert prior Keesee enforcement — corpus has KEESEY 307x, KEESEE 0x"),
+    (r"\bKEESEE\b",
+     "KEESEY",
+     0,
+     "deploy_166: revert prior Keesee enforcement (all-caps)"),
 
     # Editorial-conclusion strip: the "no causal linkage..." sentence in 2026
     (r"No causal linkage between the ARTA filings and CV-26360 discovery phases is evident from the record;\s*both tracks advanced in parallel\.",
@@ -74,9 +81,14 @@ def apply_corrections(text):
 
 
 def patch_narrative_blocks(md):
-    """Apply corrections only to narrative paragraphs (between
-    '### YYYY — Annual Narrative Summary' and '**Detailed Event Log:**')."""
-    # Find all narrative blocks
+    """Apply corrections to narrative paragraphs (between
+    '### YYYY — Annual Narrative Summary' and '**Detailed Event Log:**')
+    AND apply CANONICAL-NAME corrections globally to the whole document
+    (deploy_166 fix — earlier the post-processor only touched narrative blocks,
+    but the wrong-spelling errors propagated into the cross-ref index and
+    event log too).
+    """
+    # Step 1: narrative-only corrections (venue, editorial strip, etc.)
     pattern = re.compile(
         r"(### \d{4} — Annual Narrative Summary\n+\*)([^*]+?)(\*\n+\*\*Detailed Event Log:\*\*)",
         re.MULTILINE
@@ -88,6 +100,24 @@ def patch_narrative_blocks(md):
         all_applied.extend(applied)
         return prefix + new_narrative + suffix
     new_md = pattern.sub(replacer, md)
+
+    # Step 2: GLOBAL canonical-name fixes (apply to whole doc, including cross-ref).
+    # Corpus evidence: Keesey appears 307× (Mary), 108× (Geraldine), 109× (Marcia),
+    # Patricia birth-cert KEESEY, RTC Order KEESEY, ARTA caption KEESEY. Keesee = 0.
+    GLOBAL_NAME_FIXES = [
+        (r"\bKeesee\b",           "Keesey",       0,
+         "deploy_166: KEESEE → KEESEY (canonical family name; 0 corpus occurrences of KEESEE)"),
+        (r"\bKEESEE\b",           "KEESEY",       0,
+         "deploy_166: KEESEE → KEESEY (all-caps)"),
+        (r"\bKeeseey\b",          "Keesey",       0,
+         "deploy_166: Keeseey (typo) → Keesey"),
+        (r"\bKEESEEY\b",          "KEESEY",       0,
+         "deploy_166: KEESEEY → KEESEY"),
+    ]
+    for pat, repl, flags, why in GLOBAL_NAME_FIXES:
+        new_md, n = re.subn(pat, repl, new_md, flags=flags)
+        if n > 0:
+            all_applied.append({"pattern": pat, "n": n, "why": why})
     return new_md, all_applied
 
 
