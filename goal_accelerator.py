@@ -271,8 +271,12 @@ def main():
                     else:
                         print(f"     [DRY] (FIRM) [impact={impact:.2f}] {atext[:90]}")
 
-    # ── Telegram digest ──
-    if all_picks and not args.no_tg and not args.dry_run and tg_token:
+    # ── Enqueue digest into tg_inquiry_queue (deploy_148) ──
+    # Per [[feedback_telegram_inquiry_queue]] + [[feedback_legacy_bot_decommission]]:
+    # no script may sendMessage directly. The dispatcher fires one inquiry at a time;
+    # this digest waits its turn instead of stepping on an active intake.
+    if all_picks and not args.no_tg and not args.dry_run:
+        import html as _html
         all_picks.sort(key=lambda p: p["impact"], reverse=True)
         top = all_picks[:5]
         lines = [
@@ -281,18 +285,33 @@ def main():
             "",
         ]
         for p in top:
-            tag = "🏢 FIRM" if p["case"] == "FIRM" else f"📁 {p['case']}"
+            tag = "🏢 FIRM" if p["case"] == "FIRM" else f"📁 {_html.escape(p['case'])}"
             lines.append(f"<b>#{p['id']} {tag}</b> · impact {p['impact']:.2f}")
-            lines.append(f"  {p['text']}")
+            lines.append(f"  {_html.escape(p['text'])}")
             if p["rationale"]:
-                lines.append(f"  <i>{p['rationale'][:200]}</i>")
+                lines.append(f"  <i>{_html.escape(p['rationale'][:200])}</i>")
             lines.append("")
-        lines.append("<i>Accept/decline via /api/proposed_action — or just discuss the one you want to act on.</i>")
-        text = "\n".join(lines)
-        r = requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage",
-                          json={"chat_id": JONATHAN_TG_ID, "text": text, "parse_mode": "HTML",
-                                "disable_web_page_preview": True}, timeout=15)
-        print(f"\n  → Telegram digest: {r.status_code}")
+        lines.append("<i>Reply with the pick # to act on it, or /skip to dismiss.</i>")
+        digest_html = "\n".join(lines)
+        # Run through output_audit (warn-mode — advisory content)
+        try:
+            import sys as _sys; _sys.path.insert(0, "/root/landtek")
+            from output_audit import audit_text
+            passed, findings = audit_text(digest_html, strict=False)
+            if not passed:
+                print(f"  ⚠ output_audit flagged {len(findings)} finding(s); enqueuing anyway (warn-mode)")
+        except Exception as e:
+            print(f"  ⚠ output_audit skipped: {e}")
+        cur.execute("""
+            INSERT INTO tg_inquiry_queue
+              (kind, priority, source_table, source_id, matter_code,
+               composed_html, notes)
+            VALUES ('report', 20, 'proposed_actions', NULL, NULL, %s,
+                    'goal_accelerator daily digest (top ' || %s || ')')
+            RETURNING id
+        """, (digest_html, len(top)))
+        qid = cur.fetchone()["id"]
+        print(f"\n  → enqueued accelerator digest as tg_inquiry_queue#{qid} (kind=report, prio=20)")
 
     cur.close(); conn.close()
 
