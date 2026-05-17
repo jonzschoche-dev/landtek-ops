@@ -283,15 +283,22 @@ def main():
     print(f"  Wrote: {out_path} ({len(md):,} chars)")
 
     if args.tg:
-        import requests
-        token = get("TELEGRAM_BOT_TOKEN")
-        with open(out_path, "rb") as fh:
-            r = requests.post(
-                f"https://api.telegram.org/bot{token}/sendDocument",
-                data={"chat_id": "6513067717",
-                      "caption": f"🔧 Improvement audit — {date.today().isoformat()}"},
-                files={"document": fh}, timeout=30)
-        print(f"  TG: {r.status_code}")
+        from output_audit import audit_text
+        passed, findings = audit_text(md, strict=True)
+        if not passed:
+            print(f"  ✗ TG send BLOCKED — {sum(1 for f in findings if f['severity']=='high')} hallucination-risk lines")
+            for f in [f for f in findings if f["severity"] == "high"][:5]:
+                print(f"     line {f['line']}: {f['issue']} — {f['snippet'][:80]}")
+        else:
+            import requests
+            token = get("TELEGRAM_BOT_TOKEN")
+            with open(out_path, "rb") as fh:
+                r = requests.post(
+                    f"https://api.telegram.org/bot{token}/sendDocument",
+                    data={"chat_id": "6513067717",
+                          "caption": f"🔧 Improvement audit — {date.today().isoformat()}"},
+                    files={"document": fh}, timeout=30)
+            print(f"  TG: {r.status_code}")
 
 
 if __name__ == "__main__":

@@ -401,8 +401,16 @@ def main():
 
     if args.tg:
         tg_text = build_tg_compact(d, full_md_chars=len(md))
-        ok, info = tg_send_raw(tg_text)
-        print(f"  TG digest: {'sent' if ok else 'FAILED'} {info if not ok else ''}")
+        # Pre-send audit per feedback_output_no_hallucination_discipline
+        from output_audit import audit_text
+        passed, findings = audit_text(tg_text, strict=True)
+        if not passed:
+            print(f"  ✗ TG digest BLOCKED — {sum(1 for f in findings if f['severity']=='high')} hallucination-risk lines")
+            for f in [f for f in findings if f["severity"] == "high"][:5]:
+                print(f"     line {f['line']}: {f['issue']} — {f['snippet'][:80]}")
+        else:
+            ok, info = tg_send_raw(tg_text)
+            print(f"  TG digest: {'sent' if ok else 'FAILED'} {info if not ok else ''}")
 
     if args.tg_file:
         # Send the full markdown as a document
