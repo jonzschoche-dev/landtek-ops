@@ -166,9 +166,12 @@ def maybe_fire_intake(cur, deadline, timing, days_until=None, token=None):
             VALUES ('intake_item', %s, 'stage_intake_response', %s, %s,
                     %s, %s, %s, false, %s)
         """, (
-            30 + i,  # earlier items get slightly higher priority (lower = sooner)
+            # Atomic intake items at priority 5 (between jump=0 and P1=10) so an
+            # in-progress conversation isn't interrupted by gap_alerts at P1.
+            # The +i adds ordering within the intake (Q1 fires before Q2).
+            5 + i,
             str(intake_resp_id),
-            None,  # matter_code (optional)
+            None,
             html,
             intake_resp_id,
             i,

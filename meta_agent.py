@@ -16,10 +16,20 @@ Usage:
   python3 meta_agent.py --json     # machine-readable output
 """
 import argparse
+import html
 import json
 import sys
 from datetime import datetime
 import psycopg2, psycopg2.extras
+
+
+def esc(s) -> str:
+    """HTML-escape a value for safe embedding in Telegram HTML messages.
+    Only escapes <, >, & (not quotes — they're allowed inside text/code blocks).
+    """
+    if s is None:
+        return ""
+    return html.escape(str(s), quote=False)
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
@@ -351,8 +361,8 @@ def enqueue_consolidated_digest(cur, failures: list):
     sev_order = ["P0", "P1", "P2", "P3"]
     top_sev = min((f["severity"] for f in failures), key=lambda s: sev_order.index(s) if s in sev_order else 99)
 
-    lines = [f"⚠️ <b>Meta-agent gap digest — {len(failures)} finding(s)</b>",
-             f"<i>Highest severity: {top_sev}</i>", ""]
+    lines = [f"⚠️ <b>Meta-agent gap digest — {esc(len(failures))} finding(s)</b>",
+             f"<i>Highest severity: {esc(top_sev)}</i>", ""]
     # Group by severity for readability
     by_sev = {}
     for f in failures:
@@ -360,22 +370,22 @@ def enqueue_consolidated_digest(cur, failures: list):
     for sev in sev_order:
         if sev not in by_sev: continue
         sev_emoji = {"P0": "🚨", "P1": "🆘", "P2": "🟠", "P3": "🟡"}.get(sev, "•")
-        lines.append(f"<b>{sev_emoji} {sev}</b>")
+        lines.append(f"<b>{sev_emoji} {esc(sev)}</b>")
         for f in by_sev[sev]:
-            lines.append(f"  • <b>{f['name']}</b>")
-            lines.append(f"    {f['message']}")
+            lines.append(f"  • <b>{esc(f['name'])}</b>")
+            lines.append(f"    {esc(f['message'])}")
             for ev in f.get("evidence", [])[:2]:
-                ev_str = str(ev)[:160].replace("<", "&lt;").replace(">", "&gt;")
+                ev_str = esc(str(ev)[:160])
                 lines.append(f"    <code>{ev_str}</code>")
         lines.append("")
     lines.append("<i>Reply /skip to dismiss, /done when resolved, or describe action taken.</i>")
-    html = "\n".join(lines)[:4000]  # Telegram cap
+    composed = "\n".join(lines)[:4000]  # Telegram cap
 
     cur.execute("""
         INSERT INTO tg_inquiry_queue
           (kind, priority, source_table, composed_html, notes)
         VALUES ('gap_alert', %s, 'meta_agent', %s, %s)
-    """, (severity_priority(top_sev), html, dedup_key))
+    """, (severity_priority(top_sev), composed, dedup_key))
     return True
 
 
