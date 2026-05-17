@@ -34,14 +34,21 @@ def resolve_client_for_case(cur, case_file):
 
 
 def upsert_event(cur, row):
-    """INSERT into client_history; ON CONFLICT (source_table, source_id) DO NOTHING (append-only)."""
+    """INSERT into client_history; ON CONFLICT (source_table, source_id) DO NOTHING (append-only).
+
+    Populates event_kind_canonical via event_kind_taxonomy lookup (deploy_151).
+    Rows whose raw_kind isn't in the taxonomy get 'uncategorized' so nothing is lost.
+    """
     cur.execute("""
         INSERT INTO client_history
           (client_code, case_file, matter_code, event_date, event_datetime,
-           event_kind, source_table, source_id,
+           event_kind, event_kind_canonical, source_table, source_id,
            who_from, who_to, what_summary, citation_ref, attachments, provenance)
         VALUES (%(client_code)s, %(case_file)s, %(matter_code)s, %(event_date)s,
-                %(event_datetime)s, %(event_kind)s, %(source_table)s, %(source_id)s,
+                %(event_datetime)s, %(event_kind)s,
+                COALESCE((SELECT canonical_kind FROM event_kind_taxonomy WHERE raw_kind = %(event_kind)s),
+                         'uncategorized'),
+                %(source_table)s, %(source_id)s,
                 %(who_from)s, %(who_to)s, %(what_summary)s, %(citation_ref)s,
                 %(attachments)s, %(provenance)s)
         ON CONFLICT (source_table, source_id) DO NOTHING
