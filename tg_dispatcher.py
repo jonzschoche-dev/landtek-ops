@@ -129,6 +129,111 @@ def evaluate_and_followup(cur, answered_row, answer_text, token, verbose=False):
             print(f"  enqueued follow-up for intake#{answered_row['intake_response_id']} item {answered_row['item_index']}")
 
 
+def handle_opus_strategic_command(text, token, reply_to=None):
+    """Fire `python3 opus_advisor.py strategic --matter X` and ship the memo to TG.
+
+    Acknowledges immediately (Opus takes 10-20s), then posts the memo when ready.
+    Output is audited via output_audit before send.
+    """
+    import re as _re
+    import subprocess
+    import sys as _sys
+    _sys.path.insert(0, "/root/landtek")
+    m = _re.match(r"/opus[-_]strategic\s+(\S+)\s*$", text.strip(), _re.IGNORECASE)
+    if not m:
+        tg_send(
+            "⚠️ Usage: <code>/opus-strategic &lt;matter_code&gt;</code>\n"
+            "Example: <code>/opus-strategic MWK-CV26360</code>\n"
+            "Cost: ~$0.05-0.20 per memo (Opus 4.7).\n"
+            "Use <code>/matters</code> to list available matter codes.",
+            token, reply_to=reply_to)
+        return
+    matter_code = m.group(1)
+    tg_send(
+        f"⏳ Calling Opus 4.7 for strategic memo on <code>{matter_code}</code>... "
+        f"(takes 10-20s; cost ~$0.10-0.20)",
+        token, reply_to=reply_to)
+    try:
+        result = subprocess.run(
+            ["/usr/bin/python3", "/root/landtek/opus_advisor.py", "strategic",
+             "--matter", matter_code],
+            capture_output=True, text=True, timeout=90,
+        )
+        memo = result.stdout
+        if not memo or len(memo.strip()) < 100:
+            tg_send(f"⚠️ Opus returned empty or short output. stderr: {(result.stderr or '')[:300]}",
+                    token, reply_to=reply_to)
+            return
+    except subprocess.TimeoutExpired:
+        tg_send(f"⏱ Opus call timed out (>90s) for {matter_code}", token, reply_to=reply_to)
+        return
+    except Exception as e:
+        tg_send(f"❌ Opus error: {str(e)[:200]}", token, reply_to=reply_to)
+        return
+
+    # Output audit BEFORE send (no-hallucination discipline)
+    from output_audit import audit_text
+    passed, findings = audit_text(memo, strict=False)  # warn-only for advisor memos
+
+    # Strip the leading "=== Opus strategic memo — X ===" wrapper if present
+    memo_clean = _re.sub(r"^=+\s*Opus.*?=+\s*\n", "", memo, count=1, flags=_re.MULTILINE).strip()
+
+    # Send: if short enough, inline. Otherwise as a document.
+    if len(memo_clean) <= 3800:
+        # Strip markdown headers/bolds to plain Telegram-safe text (mostly)
+        safe = memo_clean.replace("**", "")
+        tg_send(f"🦉 <b>Opus strategic memo — {matter_code}</b>\n\n<pre>{safe[:3700]}</pre>",
+                token, reply_to=reply_to)
+    else:
+        import tempfile, os, requests
+        from pathlib import Path
+        out_path = Path(f"/root/landtek/drafts/opus_strategic_{matter_code}_{__import__('datetime').date.today().isoformat()}.md")
+        out_path.write_text(memo_clean)
+        with open(out_path, "rb") as fh:
+            requests.post(
+                f"https://api.telegram.org/bot{token}/sendDocument",
+                data={"chat_id": JONATHAN_TG,
+                      "caption": f"🦉 Opus strategic memo — {matter_code} ({len(memo_clean):,} chars)",
+                      "reply_to_message_id": reply_to or ""},
+                files={"document": fh}, timeout=30)
+
+
+def handle_opus_resolve_command(text, token, reply_to=None):
+    """Fire `python3 opus_advisor.py resolve-dispute --deadline N`."""
+    import re as _re
+    import subprocess
+    m = _re.match(r"/opus[-_]resolve\s+(\d+)\s*$", text.strip(), _re.IGNORECASE)
+    if not m:
+        tg_send(
+            "⚠️ Usage: <code>/opus-resolve &lt;deadline_id&gt;</code>\n"
+            "Example: <code>/opus-resolve 2</code>\n"
+            "Triggers Opus to resolve a priority dispute on the given deadline.\n"
+            "Cost: ~$0.05 per resolution.",
+            token, reply_to=reply_to)
+        return
+    deadline_id = int(m.group(1))
+    tg_send(f"⏳ Opus resolving priority dispute on deadline #{deadline_id}...",
+            token, reply_to=reply_to)
+    try:
+        result = subprocess.run(
+            ["/usr/bin/python3", "/root/landtek/opus_advisor.py", "resolve-dispute",
+             "--deadline", str(deadline_id)],
+            capture_output=True, text=True, timeout=60,
+        )
+        memo = result.stdout
+        if not memo or len(memo.strip()) < 50:
+            tg_send(f"⚠️ Opus returned empty output. stderr: {(result.stderr or '')[:300]}",
+                    token, reply_to=reply_to)
+            return
+    except Exception as e:
+        tg_send(f"❌ Opus error: {str(e)[:200]}", token, reply_to=reply_to)
+        return
+    memo_clean = _re.sub(r"^=+\s*Opus.*?=+\s*\n", "", memo, count=1, flags=_re.MULTILINE).strip()
+    safe = memo_clean.replace("**", "").replace("<", "&lt;").replace(">", "&gt;")
+    tg_send(f"🦉 <b>Opus priority resolution — deadline #{deadline_id}</b>\n\n<pre>{safe[:3700]}</pre>",
+            token, reply_to=reply_to)
+
+
 def handle_priority_command(text, token, reply_to=None):
     """Parse `/priority <deadline_id> <P0|P1|P2|P3|P4|P5>` and update Jonathan's
     priority signal. Recomputes consensus state.
@@ -530,6 +635,18 @@ def cycle(cur, token, verbose=False):
             handle_priority_command(text, token, msg.get("message_id"))
             if verbose:
                 print(f"  handled /priority")
+            continue
+        # /opus-strategic <matter> — fire Opus strategic memo (~$0.20)
+        if text.startswith("/opus-strategic") or text.startswith("/opus_strategic"):
+            handle_opus_strategic_command(text, token, msg.get("message_id"))
+            if verbose:
+                print(f"  handled /opus-strategic")
+            continue
+        # /opus-resolve <deadline_id> — fire Opus dispute resolution (~$0.05)
+        if text.startswith("/opus-resolve") or text.startswith("/opus_resolve"):
+            handle_opus_resolve_command(text, token, msg.get("message_id"))
+            if verbose:
+                print(f"  handled /opus-resolve")
             continue
         # Any other text from Jonathan = answer to current active inquiry
         if text.startswith("/"):
