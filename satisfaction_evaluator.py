@@ -13,13 +13,11 @@ intake_response_id NOT NULL.
 
 Returns: {"satisfied": bool, "follow_up": str|null, "reason": str}
 """
-import json
-import re
 import sys
 
 sys.path.insert(0, "/root/landtek")
 from landtek_core import get
-from llm_billing import anthropic_call
+from llm_billing import anthropic_tool_call
 
 SYSTEM = """You evaluate whether a human's answer fully addresses the atomic
 factual question that was asked in a legal-ops intake. Be strict — partial
@@ -40,8 +38,28 @@ A NOT satisfied answer might:
 If NOT satisfied, propose ONE minimal follow-up question that targets the
 missing element. Don't ask multiple follow-ups; pick the most important.
 
-OUTPUT JSON ONLY (no prose, no fences):
-{"satisfied": bool, "follow_up": str | null, "reason": str (<200 chars)}"""
+Call the submit_evaluation tool with the structured verdict."""
+
+EVAL_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "satisfied": {
+            "type": "boolean",
+            "description": "True if answer fully addresses the atomic question; false otherwise.",
+        },
+        "follow_up": {
+            "type": ["string", "null"],
+            "description": "Single minimal follow-up question if not satisfied; null otherwise. Max 200 chars.",
+            "maxLength": 250,
+        },
+        "reason": {
+            "type": "string",
+            "description": "Brief explanation of the verdict. Max 200 chars.",
+            "maxLength": 300,
+        },
+    },
+    "required": ["satisfied", "reason"],
+}
 
 
 def evaluate(client, question: str, answer: str, intake_context: str | None = None):
@@ -49,33 +67,31 @@ def evaluate(client, question: str, answer: str, intake_context: str | None = No
     if intake_context:
         user += f"\n\nINTAKE CONTEXT: {intake_context}"
 
-    msg = anthropic_call(
-        client,
-        called_from="satisfaction_evaluator",
-        purpose="answer_completeness",
-        case_file=None,
-        model="claude-haiku-4-5-20251001",
-        max_tokens=250,
-        system=SYSTEM,
-        messages=[{"role": "user", "content": user}],
-    )
-    out = msg.content[0].text.strip()
-    out = re.sub(r"^```(?:json)?\s*|\s*```$", "", out)
-    m = re.search(r"\{.*\}", out, re.DOTALL)
-    if not m:
-        return {"satisfied": False, "follow_up": None,
-                "reason": f"evaluator_no_json: {out[:120]}"}
     try:
-        r = json.loads(m.group(0))
-        # Defensive defaults
+        result = anthropic_tool_call(
+            client,
+            tool_name="submit_evaluation",
+            tool_description="Submit the verdict on whether the human's answer is satisfied or needs follow-up.",
+            input_schema=EVAL_SCHEMA,
+            called_from="satisfaction_evaluator",
+            purpose="answer_completeness",
+            case_file=None,
+            model="claude-haiku-4-5-20251001",
+            max_tokens=300,
+            system=SYSTEM,
+            messages=[{"role": "user", "content": user}],
+        )
         return {
-            "satisfied": bool(r.get("satisfied", False)),
-            "follow_up": (r.get("follow_up") or None),
-            "reason": str(r.get("reason", ""))[:300],
+            "satisfied": bool(result.get("satisfied", False)),
+            "follow_up": result.get("follow_up") or None,
+            "reason": str(result.get("reason", ""))[:300],
         }
     except Exception as e:
-        return {"satisfied": False, "follow_up": None,
-                "reason": f"evaluator_parse_error: {str(e)[:120]}"}
+        return {
+            "satisfied": False,
+            "follow_up": None,
+            "reason": f"evaluator_tool_call_error: {str(e)[:120]}",
+        }
 
 
 if __name__ == "__main__":

@@ -190,6 +190,65 @@ def gemini_call(model_obj, *, called_from, purpose=None, case_file=None,
                   prompt_hash, metadata or None, case_file)
 
 
+def anthropic_tool_call(client, *, tool_name: str, input_schema: dict,
+                        called_from: str, purpose: str = None, case_file: str = None,
+                        tool_description: str = None, **kwargs):
+    """Programmatic tool-calling variant — forces the model to emit STRUCTURED
+    output via Anthropic's tool-use API. No regex/JSON parsing needed.
+
+    Returns the validated `block.input` dict from the tool_use block.
+
+    Benefits over plain text+json.loads:
+      • Anthropic validates the schema server-side
+      • No code-fence / "Extra data" / silent json.loads failures
+      • Forces compliance via tool_choice={'type':'tool','name':tool_name}
+      • cache_control on system prompt still works
+      • Cleaner caller code (~10 lines saved per script)
+
+    Usage:
+        result = anthropic_tool_call(
+            client,
+            tool_name="submit_party_classification",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "party": {"type": "string", "enum": ["plaintiff","respondent","court","agency","third_party"]},
+                    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                    "reason": {"type": "string"},
+                },
+                "required": ["party","confidence","reason"]
+            },
+            called_from="party_filing_disambiguator",
+            purpose="disambiguate_party",
+            case_file="MWK-001",
+            model="claude-haiku-4-5-20251001",
+            max_tokens=300,
+            system=PROMPT,
+            messages=[{"role":"user", "content": ...}],
+        )
+        # result is already a dict: {"party": "plaintiff", "confidence": 0.92, "reason": "..."}
+    """
+    tools = [{
+        "name": tool_name,
+        "description": tool_description or f"Submit the {tool_name} result with the structured schema fields.",
+        "input_schema": input_schema,
+    }]
+    kwargs["tools"] = tools
+    kwargs["tool_choice"] = {"type": "tool", "name": tool_name}
+    resp = anthropic_call(client,
+                          called_from=called_from,
+                          purpose=purpose,
+                          case_file=case_file,
+                          **kwargs)
+    for block in resp.content:
+        if hasattr(block, "type") and block.type == "tool_use" and block.name == tool_name:
+            return block.input  # already a validated dict
+    raise RuntimeError(
+        f"anthropic_tool_call({tool_name}): no tool_use block in response — "
+        f"got types {[getattr(b,'type',None) for b in resp.content]}"
+    )
+
+
 # Convenience: get today's running total
 def today_total_usd() -> float:
     conn = psycopg2.connect(DSN); conn.autocommit = True
