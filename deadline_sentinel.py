@@ -94,11 +94,14 @@ def event_already_occurred(cur, deadline):
 
 
 def maybe_fire_intake(cur, deadline, timing, days_until=None, token=None):
-    """Fire a pre- or post-event stage intake checklist via Telegram.
+    """ATOMIC intake firing (deploy_138). Per [[feedback_atomic_inquiry_with_followups]]:
+    each checklist item becomes its own tg_inquiry_queue row. The dispatcher fires
+    them ONE AT A TIME, in order. After each answer, satisfaction_evaluator runs;
+    if not satisfied, a follow-up row is enqueued with higher priority so it fires
+    BEFORE the next planned item.
 
-    timing='pre' fires at the template's fire_days_before; only once per (deadline, timing).
-    timing='post' fires immediately upon auto-complete; only once per (deadline, timing).
-    Records in stage_intake_response so re-runs are idempotent.
+    Idempotent — once intake_response exists, won't re-queue.
+    Returns (ok: bool, info: str).
     """
     if not deadline.get("stage_key"):
         return False, "no_stage_key"
@@ -110,43 +113,69 @@ def maybe_fire_intake(cur, deadline, timing, days_until=None, token=None):
     tpl = cur.fetchone()
     if not tpl:
         return False, "no_template"
-    # Don't re-fire
+
+    # Already fired?
     cur.execute("""
         SELECT id FROM stage_intake_response
-         WHERE deadline_id = %s AND timing = %s
-         LIMIT 1
+         WHERE deadline_id = %s AND timing = %s LIMIT 1
     """, (deadline["id"], timing))
     if cur.fetchone():
         return False, "already_fired"
-    # If pre, gate by days_until <= fire_days_before
+
+    # Pre gating
     if timing == "pre" and tpl.get("fire_days_before") is not None:
         if days_until is None or days_until > tpl["fire_days_before"] or days_until < 0:
             return False, "not_yet_or_past"
 
-    # Compose checklist message
+    checklist = tpl["checklist"] if isinstance(tpl["checklist"], list) else []
+    if not checklist:
+        return False, "empty_checklist"
+
+    # 1. Create the stage_intake_response parent row
+    cur.execute("""
+        INSERT INTO stage_intake_response
+          (deadline_id, template_id, timing, items_total, status, notes, item_status)
+        VALUES (%s, %s, %s, %s, 'open', %s, %s::jsonb)
+        RETURNING id
+    """, (deadline["id"], tpl["id"], timing, len(checklist),
+          "fired atomically via deadline_sentinel (deploy_138)",
+          '{}'))
+    intake_resp_id = cur.fetchone()["id"]
+
+    # 2. Enqueue ONE atomic row per checklist item
     when = deadline["due_date"].strftime("%a %b %d, %Y")
     icon = "🔔" if timing == "pre" else "📋"
-    header = f"{icon} <b>{tpl['title']}</b>"
-    sub = (f"Case: <b>{deadline['case_file']}</b> · {deadline['title'][:70]}\n"
-           f"{'Due' if timing=='pre' else 'Was due'}: {when}")
-    items = "\n".join(f"  {i+1}. {item}" for i, item in enumerate(tpl["checklist"]))
-    note = f"\n\n<i>{tpl['notes']}</i>" if tpl.get("notes") else ""
-    reply_help = ("\n\nReply with the doc directly to ingest, or "
-                  "<code>/skip &lt;n&gt;</code> if item N doesn't apply.")
-    text = f"{header}\n{sub}\n\n{items}{note}{reply_help}"
+    header_ctx = (f"<i>{icon} {tpl['title']}</i>\n"
+                  f"<i>Case: {deadline['case_file']} · {deadline['title'][:70]}</i>\n"
+                  f"<i>{'Due' if timing=='pre' else 'Was due'}: {when}</i>")
 
-    if token:
-        ok, info = tg_send(text, token)
-    else:
-        ok, info = True, "dry"
-
-    if ok:
+    enqueued = 0
+    for i, item in enumerate(checklist):
+        html = (
+            f"{header_ctx}\n\n"
+            f"<b>Question {i+1} of {len(checklist)}:</b>\n"
+            f"{item}\n\n"
+            f"<i>Reply with the specific factual answer (doc, photo, or text). "
+            f"<code>/skip</code> if this item doesn't apply. "
+            f"One question at a time — Leo will follow up if your answer is incomplete.</i>"
+        )
         cur.execute("""
-            INSERT INTO stage_intake_response (deadline_id, template_id, timing, items_total, status, notes)
-            VALUES (%s, %s, %s, %s, 'open', %s)
-        """, (deadline["id"], tpl["id"], timing, len(tpl["checklist"]),
-              f"fired via deadline_sentinel" + ("" if ok else f" — tg failed: {info[:100]}")))
-    return ok, info
+            INSERT INTO tg_inquiry_queue
+              (kind, priority, source_table, source_id, matter_code,
+               composed_html, intake_response_id, item_index, is_followup, notes)
+            VALUES ('intake_item', %s, 'stage_intake_response', %s, %s,
+                    %s, %s, %s, false, %s)
+        """, (
+            30 + i,  # earlier items get slightly higher priority (lower = sooner)
+            str(intake_resp_id),
+            None,  # matter_code (optional)
+            html,
+            intake_resp_id,
+            i,
+            f"atomic intake_item {i+1}/{len(checklist)} for intake#{intake_resp_id}"
+        ))
+        enqueued += 1
+    return True, f"enqueued {enqueued} atomic items for intake#{intake_resp_id}"
 
 
 def load_env_token():

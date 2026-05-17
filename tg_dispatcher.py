@@ -48,6 +48,87 @@ def tg_send(text, token, reply_to=None):
     return True, "ok", j["result"]["message_id"]
 
 
+def evaluate_and_followup(cur, answered_row, answer_text, token, verbose=False):
+    """After an atomic intake_item gets answered, run the satisfaction evaluator.
+    If not satisfied, enqueue a follow-up row with HIGH priority so it fires
+    BEFORE the next planned item. If satisfied, mark the corresponding item
+    in stage_intake_response.item_status as 'satisfied'.
+
+    Per [[feedback_atomic_inquiry_with_followups]]: we do not rush facts.
+    """
+    import sys as _sys
+    _sys.path.insert(0, "/root/landtek")
+    from satisfaction_evaluator import evaluate
+    from landtek_core import get
+    import anthropic
+
+    # Extract the question text from the composed_html (the bolded "Question N: ..." block)
+    import re as _re
+    m = _re.search(r"<b>Question\s+\d+\s+of\s+\d+:</b>\s*([^<]+)",
+                   answered_row["composed_html"] or "")
+    question_text = (m.group(1).strip() if m else
+                     answered_row["composed_html"][:200])
+
+    client = anthropic.Anthropic(api_key=get("ANTHROPIC_API_KEY"))
+    verdict = evaluate(client, question_text, answer_text)
+    if verbose:
+        print(f"  satisfaction: {verdict}")
+
+    # Record verdict on the row
+    cur.execute("""
+        UPDATE tg_inquiry_queue
+           SET satisfaction_verdict = %s,
+               satisfaction_reason = %s
+         WHERE id = %s
+    """, ("satisfied" if verdict["satisfied"] else "needs_followup",
+          verdict.get("reason", "")[:300], answered_row["id"]))
+
+    # Update item_status in stage_intake_response
+    cur.execute("""
+        SELECT item_status FROM stage_intake_response WHERE id = %s
+    """, (answered_row["intake_response_id"],))
+    cur_status = (cur.fetchone() or {}).get("item_status") or {}
+    if isinstance(cur_status, str):
+        import json as _json
+        cur_status = _json.loads(cur_status)
+    item_key = str(answered_row["item_index"])
+    cur_status[item_key] = "satisfied" if verdict["satisfied"] else "needs_followup"
+    import json as _json
+    cur.execute("""
+        UPDATE stage_intake_response
+           SET item_status = %s::jsonb,
+               items_received = (SELECT COUNT(*) FROM jsonb_each_text(%s::jsonb) WHERE value='satisfied'),
+               status = CASE
+                 WHEN (SELECT COUNT(*) FROM jsonb_each_text(%s::jsonb) WHERE value IN ('satisfied','skipped')) = items_total
+                 THEN 'complete'
+                 ELSE 'partial' END
+         WHERE id = %s
+    """, (_json.dumps(cur_status), _json.dumps(cur_status), _json.dumps(cur_status),
+          answered_row["intake_response_id"]))
+
+    # If not satisfied, enqueue a follow-up atomic row at HIGHER priority (5 = jump)
+    if not verdict["satisfied"] and verdict.get("follow_up"):
+        followup_html = (
+            f"🔁 <b>Follow-up</b>  <i>(to your prior answer)</i>\n\n"
+            f"<b>{verdict['follow_up']}</b>\n\n"
+            f"<i>Leo: {verdict.get('reason','')[:160]}</i>\n\n"
+            f"<i>Reply with the specific fact. <code>/skip</code> if not applicable.</i>"
+        )
+        cur.execute("""
+            INSERT INTO tg_inquiry_queue
+              (kind, priority, source_table, source_id, parent_id,
+               intake_response_id, item_index, is_followup,
+               composed_html, notes)
+            VALUES ('intake_followup', 5, 'tg_inquiry_queue', %s, %s,
+                    %s, %s, true, %s, %s)
+        """, (str(answered_row["id"]), answered_row["id"],
+              answered_row["intake_response_id"], answered_row["item_index"],
+              followup_html,
+              f"follow-up to inquiry#{answered_row['id']} on intake#{answered_row['intake_response_id']} item {answered_row['item_index']}"))
+        if verbose:
+            print(f"  enqueued follow-up for intake#{answered_row['intake_response_id']} item {answered_row['item_index']}")
+
+
 def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
     """Pull a Telegram photo/document, OCR via Gemini, ingest into documents +
     bind to the currently-active inquiry if any.
@@ -106,7 +187,10 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
     # 5. Try to bind to the currently-active inquiry (if any) — append response
     conn = psycopg2.connect(DSN); conn.autocommit = True
     c = conn.cursor()
-    c.execute("SELECT id, source_table, source_id FROM tg_inquiry_queue WHERE status='active' LIMIT 1")
+    c.execute("""
+        SELECT id, intake_response_id, item_index, composed_html, kind
+          FROM tg_inquiry_queue WHERE status='active' LIMIT 1
+    """)
     active = c.fetchone()
     bind_note = ""
     if active:
@@ -121,6 +205,21 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
         """, (f"\n[image uploaded: {fname}]\n" + extracted_text[:2000],
               f" | image bound: {fname}", active_id))
         bind_note = f" + bound to active inquiry #{active_id}"
+        # If it's an atomic intake_item, evaluate the OCR text as the answer
+        if active[1] and active[4] in ("intake_item", "intake_followup"):
+            cur_d = psycopg2.connect(DSN); cur_d.autocommit = True
+            from psycopg2.extras import RealDictCursor
+            cur_dx = cur_d.cursor(cursor_factory=RealDictCursor)
+            cur_dx.execute("""
+                SELECT id, intake_response_id, item_index, composed_html, kind
+                  FROM tg_inquiry_queue WHERE id = %s
+            """, (active_id,))
+            row = cur_dx.fetchone()
+            try:
+                evaluate_and_followup(cur_dx, row, extracted_text, token, verbose=False)
+            except Exception as e:
+                print(f"  satisfaction-on-image-failed: {e}", flush=True)
+            cur_dx.close(); cur_d.close()
 
     # 6. Insert into documents
     c.execute("""
@@ -358,13 +457,17 @@ def cycle(cur, token, verbose=False):
             continue  # other slash commands — leave to dedicated handler
         cur.execute("""
             UPDATE tg_inquiry_queue SET status='answered', response_text=%s, responded_at=NOW()
-             WHERE status='active' RETURNING id
+             WHERE status='active'
+             RETURNING id, intake_response_id, item_index, composed_html, kind
         """, (text[:4000],))
         r = cur.fetchone()
         if r:
             answer_recorded = True
             if verbose:
                 print(f"  marked active inquiry #{r['id']} as ANSWERED")
+            # If this was an atomic intake_item, run satisfaction evaluator
+            if r["intake_response_id"] and r["kind"] in ("intake_item", "intake_followup"):
+                evaluate_and_followup(cur, r, text, token, verbose=verbose)
 
     cur.execute("UPDATE tg_update_cursor SET last_update_id=%s, updated_at=NOW() WHERE id=1",
                 (new_max,))
