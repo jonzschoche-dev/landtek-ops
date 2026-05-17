@@ -685,7 +685,52 @@ def cycle(cur, token, verbose=False):
         if verbose:
             print(f"  no queued inquiries")
         return
-    ok, info, msg_id = tg_send(nxt["composed_html"], token)
+
+    # ── Gate: output_audit before every send (deploy_149) ──
+    # Per [[feedback_output_no_hallucination_discipline]]: nothing leaves the
+    # queue without passing the assertive-fact-citation linter. The dispatcher
+    # is the universal chokepoint, so this catches output from every producer
+    # past, present, and future — even ones that forgot to call audit themselves.
+    composed = nxt["composed_html"]
+    audit_appended = ""
+    try:
+        from output_audit import audit_text
+        # Get the row's kind so we can tier the strictness.
+        cur.execute("SELECT kind FROM tg_inquiry_queue WHERE id=%s", (nxt["id"],))
+        kind_row = cur.fetchone()
+        kind = (kind_row or {}).get("kind", "")
+        # 'report' and 'brief' assert facts → strict. Everything else is warn-only.
+        strict_mode = kind in ("report", "brief")
+        passed, findings = audit_text(composed, strict=strict_mode)
+        high_findings = [f for f in findings if f.get("severity") == "high"]
+        if strict_mode and not passed:
+            # Block delivery — surface findings to Jonathan as a meta-alert instead.
+            sample = "\n".join(f"  L{f['line']}: {f['issue']} — {f['snippet'][:120]}"
+                                for f in high_findings[:5])
+            cur.execute("""
+                UPDATE tg_inquiry_queue
+                   SET status='superseded',
+                       notes = COALESCE(notes,'') || ' | BLOCKED_BY_AUDIT: ' || %s
+                 WHERE id=%s
+            """, (f"{len(high_findings)} high-severity findings", nxt["id"]))
+            block_html = (
+                f"🛑 <b>Output blocked by audit</b> (queue#{nxt['id']}, kind={kind})\n\n"
+                f"{len(high_findings)} assertive fact(s) lacked citations — producer must "
+                f"add doc# refs or hedge language before resend.\n\n<pre>{sample[:1500]}</pre>"
+            )
+            tg_send(block_html, token)
+            if verbose:
+                print(f"  🛑 BLOCKED inquiry #{nxt['id']} ({kind}) — {len(high_findings)} high findings")
+            return
+        if high_findings:
+            # Warn-mode: deliver but append a discreet footer
+            audit_appended = (f"\n\n<i>⚠️ {len(high_findings)} audit finding(s) — "
+                              f"see notes if a claim looks unsupported.</i>")
+    except Exception as e:
+        if verbose:
+            print(f"  ⚠ output_audit skipped: {e}")
+
+    ok, info, msg_id = tg_send(composed + audit_appended, token)
     if ok:
         cur.execute("""
             UPDATE tg_inquiry_queue
