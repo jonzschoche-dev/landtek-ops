@@ -71,12 +71,28 @@ def fetch_docs(cur, case_file):
                lot_number, area_sqm, consideration_price,
                grantor_seller, grantee_buyer,
                length(coalesce(extracted_text, '')) AS text_len,
-               drive_link, drive_file_id
+               drive_link, drive_file_id,
+               strategic_relevance AS description,
+               related_to_doc_id, relationship_kind
           FROM documents
          WHERE case_file = %s
          ORDER BY id
     """, (case_file,))
     return cur.fetchall()
+
+
+def filename_stem(d):
+    """Normalize filename for fuzzy comparison.
+    Strips gmail hex-hash prefix, extension, special chars, dates."""
+    raw = d.get("smart_filename") or d.get("original_filename") or ""
+    raw = re.sub(r'^[0-9a-f]{8,}__', '', raw)         # strip gmail hash
+    raw = re.sub(r'\.(pdf|docx|jpg|jpeg|png|heic|tif|tiff)$', '', raw, flags=re.IGNORECASE)
+    raw = re.sub(r'\b\d{4}-\d{2}-\d{2}\b', '', raw)   # strip ISO dates
+    raw = re.sub(r'\bYYYY-MM-DD\b', '', raw, flags=re.IGNORECASE)
+    raw = re.sub(r'\((\d+)\)', '', raw)               # strip "(3)" copy markers
+    raw = re.sub(r'\bcopy of\b', '', raw, flags=re.IGNORECASE)
+    raw = re.sub(r'[^a-zA-Z0-9]+', '', raw).lower()
+    return raw[:40]
 
 
 def canonical_pick(members):
@@ -93,10 +109,76 @@ def canonical_pick(members):
     return max(members, key=score)
 
 
+def apply_from_csv(case_file):
+    """Read the most recent consolidation_candidates_<case>_<date>.csv and apply
+    UPDATEs ONLY for rows where APPROVED_FOR_MERGE is 'Y' or 'TRUE' (case-insensitive)."""
+    out_dir = Path("/root/landtek/drafts")
+    matching = sorted(out_dir.glob(f"consolidation_candidates_{case_file}_*.csv"))
+    if not matching:
+        print(f"No CSV found for {case_file}. Run without --apply first.")
+        return
+    csv_path = matching[-1]
+    print(f"Reading {csv_path}")
+
+    # Group rows by cluster
+    from collections import defaultdict
+    clusters = defaultdict(list)
+    with open(csv_path) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            clusters[row["cluster_id"]].append(row)
+
+    conn = psycopg2.connect(DSN); conn.autocommit = False
+    cur = conn.cursor()
+
+    applied = 0
+    skipped_no_approval = 0
+    skipped_no_canonical = 0
+    for cid, rows in clusters.items():
+        # Any approval in this cluster?
+        approved = [r for r in rows if (r.get("APPROVED_FOR_MERGE") or "").strip().upper() in ("Y", "TRUE", "YES", "1")]
+        if not approved:
+            skipped_no_approval += 1
+            continue
+        # Identify the canonical (must be marked CANONICAL in is_canonical column)
+        canon_rows = [r for r in rows if r["is_canonical"] == "CANONICAL"]
+        if not canon_rows:
+            skipped_no_canonical += 1
+            print(f"  cluster {cid}: ⚠ no row marked CANONICAL — skipping")
+            continue
+        canon_id = int(canon_rows[0]["doc_id"])
+        # For each approved dup row, set related_to_doc_id = canon
+        for r in approved:
+            doc_id = int(r["doc_id"])
+            if doc_id == canon_id:
+                continue  # canonical can be approved but doesn't link to itself
+            cur.execute("""
+                UPDATE documents
+                   SET related_to_doc_id  = %s,
+                       relationship_kind  = 'near_duplicate',
+                       updated_at         = NOW()
+                 WHERE id = %s
+                   AND (related_to_doc_id IS NULL OR related_to_doc_id <> %s)
+            """, (canon_id, doc_id, canon_id))
+            if cur.rowcount > 0:
+                print(f"  cluster {cid}: doc#{doc_id} → near_duplicate of doc#{canon_id}")
+                applied += 1
+    conn.commit()
+    print(f"\n✓ Applied: {applied} consolidations")
+    print(f"  Skipped: {skipped_no_approval} clusters (no APPROVED_FOR_MERGE marks)")
+    print(f"  Skipped: {skipped_no_canonical} clusters (no row marked CANONICAL)")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--case", default="MWK-001")
+    ap.add_argument("--apply", action="store_true",
+                    help="Read latest CSV and apply consolidations for APPROVED_FOR_MERGE='Y' rows")
     args = ap.parse_args()
+
+    if args.apply:
+        apply_from_csv(args.case)
+        return
 
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -145,7 +227,6 @@ def main():
     for aa, members in by_amount_area.items():
         if len(members) < 2: continue
         # Require at least one party-name token in common across all members
-        # (catches "Gloria H. Balane" vs "Gloria H. Balane, Efren M. Balane")
         token_intersection = None
         for m in members:
             tokens = doc_tokens[m["id"]]["grantee"] | doc_tokens[m["id"]]["grantor"]
@@ -155,6 +236,49 @@ def main():
                 token_intersection &= tokens
         if token_intersection:
             by_tier4[aa] = members
+
+    # ── TIER 5 — loose: same date + same instrument_type + shared party token ──
+    # Per Jonathan 2026-05-17: catches SPAs / tax decs / LRA certs ingested
+    # multiple times where price/area aren't extracted but date + type + a
+    # party in common is enough signal to flag as candidate dup.
+    by_date_type = defaultdict(list)
+    for d in docs:
+        if not d.get("doc_date_norm") or not d.get("classification"):
+            continue
+        by_date_type[(d["doc_date_norm"], d["classification"].lower())].append(d)
+    by_tier5 = defaultdict(list)
+    for fp, members in by_date_type.items():
+        if len(members) < 2: continue
+        # Sub-cluster by shared party token (grantor OR grantee)
+        token_to_docs = defaultdict(list)
+        for m in members:
+            mt = doc_tokens[m["id"]]["grantor"] | doc_tokens[m["id"]]["grantee"]
+            for tok in mt:
+                token_to_docs[tok].append(m)
+        for tok, group in token_to_docs.items():
+            if len(group) >= 2:
+                # Dedup by id within group
+                seen = set(); uniq = []
+                for m in group:
+                    if m["id"] not in seen:
+                        seen.add(m["id"]); uniq.append(m)
+                if len(uniq) >= 2:
+                    by_tier5[(fp, tok)] = uniq
+
+    # ── TIER 6 — looser still: same date + similar filename stem ──
+    # Catches ingest-path duplicates where party fields aren't populated
+    # at all (untyped scans, screenshots, gmail attachments) but the
+    # filename gives away the duplication.
+    by_date_stem = defaultdict(list)
+    for d in docs:
+        if not d.get("doc_date_norm"): continue
+        stem = filename_stem(d)
+        if len(stem) < 6: continue   # skip too-short stems (high false-pos rate)
+        by_date_stem[(d["doc_date_norm"], stem)].append(d)
+    by_tier6 = defaultdict(list)
+    for fp, members in by_date_stem.items():
+        if len(members) >= 2:
+            by_tier6[fp] = members
 
     # Union-find cluster collection: each tier ADDS to or EXTENDS clusters.
     # When a tier's fingerprint group includes docs already in cluster X, it
@@ -199,6 +323,10 @@ def main():
         merge_or_create(members, "TIER3_lot+area+price+parties", fp)
     for fp, members in by_tier4.items():
         merge_or_create(members, "TIER4_area+price+parties_(lot_fuzzy)", fp)
+    for fp, members in by_tier5.items():
+        merge_or_create(members, "TIER5_date+type+party_token", fp)
+    for fp, members in by_tier6.items():
+        merge_or_create(members, "TIER6_date+filename_stem", fp)
 
     # Convert to the same shape downstream code expects
     clusters = []
@@ -219,7 +347,8 @@ def main():
 
     with open(csv_path, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["cluster_id","tier","member_count","is_canonical",
+        w.writerow(["APPROVED_FOR_MERGE",   # ← far-left blank approval column
+                    "cluster_id","tier","member_count","is_canonical",
                     "doc_id","date","classification","filename",
                     "lot_number","area_sqm","price","grantor","grantee",
                     "text_len","drive_link","fingerprint"])
@@ -227,6 +356,7 @@ def main():
             canon = canonical_pick(cluster["members"])
             for m in cluster["members"]:
                 w.writerow([
+                    "",   # APPROVED_FOR_MERGE — blank by default; user marks Y/TRUE
                     cid, cluster["tier"], len(cluster["members"]),
                     "CANONICAL" if m["id"] == canon["id"] else "dup",
                     m["id"], m.get("doc_date_norm"), m.get("classification"),
