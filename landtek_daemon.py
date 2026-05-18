@@ -211,17 +211,65 @@ def find_new_files(cur, since_timestamp=None):
 
 # ── Pipeline steps ───────────────────────────────────────────────────────
 def step_a_ocr(doc_id):
-    """Skip if extracted_text already present (≥200 chars matches what Steps
-    B+C require as the eligibility threshold)."""
+    """Step A — ensure text exists for Steps B+C+D.
+
+    Cascade (cheapest → most expensive):
+      1. Existing extracted_text already ≥200 chars → done, skip
+      2. file_path exists → run Gemini 2.5 Flash on the PDF/image
+      3. fallback: leave text as-is (Steps B+C will see thin text and emit nothing)
+
+    Returns True if text is now sufficient for downstream; False otherwise.
+    """
     conn, cur = db()
-    cur.execute("SELECT length(coalesce(extracted_text,'')) AS tlen FROM documents WHERE id=%s", (doc_id,))
+    cur.execute("""
+        SELECT length(coalesce(extracted_text,'')) AS tlen, file_path, drive_file_id,
+               original_filename, smart_filename
+          FROM documents WHERE id=%s
+    """, (doc_id,))
     r = cur.fetchone()
     conn.close()
-    if r and r["tlen"] >= 200:
-        log(f"  Step A: ocr SKIPPED (text already present, {r['tlen']} chars)")
+    if not r:
+        log(f"  Step A: doc#{doc_id} not found"); return False
+    if r["tlen"] >= 200:
+        log(f"  Step A: text already present ({r['tlen']} chars)")
         return True
-    log(f"  Step A: text missing/short ({r['tlen'] if r else 0} chars) — Gemini OCR would run here (not yet wired)")
-    return False
+
+    # Try Gemini Vision on the source PDF if we have a local file_path
+    file_path = r.get("file_path")
+    if not file_path or not Path(file_path).exists():
+        log(f"  Step A: text thin ({r['tlen']} chars) AND no local file_path — cannot OCR. Skipping B+C.")
+        return False
+
+    try:
+        log(f"  Step A: text thin ({r['tlen']} chars) — invoking Gemini 2.5 Flash on {Path(file_path).name}")
+        # Reuse the existing gemini_extract function
+        sys.path.insert(0, "/root/landtek")
+        from gemini_image_pdf_fallback import gemini_extract, load_env
+        env = load_env()
+        api_key = env.get("GEMINI_API_KEY")
+        if not api_key:
+            log(f"    ✗ Gemini API key missing from .env")
+            return False
+        result = gemini_extract(file_path, api_key)
+        text = result if isinstance(result, str) else (result.get("text") if isinstance(result, dict) else None)
+        if not text or len(text) < 200:
+            log(f"    ✗ Gemini returned thin/no text ({len(text or '')} chars)")
+            return False
+        # Persist
+        conn, cur = db()
+        cur.execute("""
+            UPDATE documents
+               SET extracted_text = %s,
+                   doc_date_quality = COALESCE(doc_date_quality, 'gemini_ocr_via_daemon'),
+                   updated_at = NOW()
+             WHERE id = %s
+        """, (text, doc_id))
+        conn.close()
+        log(f"    ✓ Gemini OCR ok: {len(text)} chars written to documents.extracted_text")
+        return True
+    except Exception as e:
+        log(f"    ✗ Gemini OCR error: {str(e)[:200]}")
+        return False
 
 
 def step_b_lineage(doc_id):

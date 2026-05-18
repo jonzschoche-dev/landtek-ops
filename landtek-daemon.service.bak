@@ -1,0 +1,23 @@
+[Unit]
+Description=LandTek autonomous ingestion + reasoning daemon (per-doc pipeline)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/landtek_daemon.py
+Restart=on-failure
+RestartSec=15
+StandardOutput=append:/var/log/landtek_daemon.log
+StandardError=append:/var/log/landtek_daemon.log
+# Cost-discipline guard: kill if it consumes more than 1 GB RSS
+# (would indicate a stuck Sonnet call or runaway memory)
+MemoryMax=1G
+# Don't restart-loop forever if config is broken
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target
