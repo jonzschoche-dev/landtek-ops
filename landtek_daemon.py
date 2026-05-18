@@ -62,9 +62,88 @@ PHANTOM_TITLE_PATTERNS = [
 ]
 
 
+import hashlib
+
 def log(msg):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{ts}] {msg}", flush=True)
+
+
+def sha256_of(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def infer_case_file(path):
+    """Infer case_file from path. /case_files/MWK-001/* → MWK-001 etc.
+    Defaults to MWK-001 for /uploads/ since that's the active case."""
+    s = str(path)
+    for cf in ("MWK-001", "Paracale-001", "Owner"):
+        if f"/{cf}/" in s or f"/{cf}." in s:
+            return cf
+    return "MWK-001"
+
+
+def extract_text_fast(path):
+    """Try pdftotext first (free, fast). Returns text or empty string."""
+    if str(path).lower().endswith(".pdf"):
+        try:
+            r = subprocess.run(["pdftotext", "-layout", str(path), "-"],
+                                capture_output=True, text=True, timeout=60)
+            return r.stdout if r.returncode == 0 else ""
+        except Exception:
+            return ""
+    return ""
+
+
+def ingest_file(path):
+    """Auto-ingest sidecar — insert a new file into documents, return doc_id.
+    Steps:
+      1. SHA256 content hash
+      2. Dedup-check against documents.content_hash → returns None on dup
+         (the existing doc is already in the corpus and presumed processed;
+          re-running pipeline on every dup detected on each poll is wasteful)
+      3. Insert row (case_file, file_path, original_filename, content_hash, etc.)
+      4. Attempt fast text extraction (pdftotext); leave for Gemini OCR if empty
+    Returns: doc_id for NEW docs only. Returns None for duplicates (caller
+    should skip pipeline run on dups).
+    """
+    conn, cur = db()
+    try:
+        content_hash = sha256_of(path)
+        # Dedup check — content_hash already in DB means this file was previously ingested
+        cur.execute("SELECT id, case_file FROM documents WHERE content_hash = %s LIMIT 1", (content_hash,))
+        existing = cur.fetchone()
+        if existing:
+            log(f"  Ingest: dup detected (matches doc#{existing['id']}, case={existing['case_file']}) — skipping pipeline")
+            return None  # caller skips process_doc
+
+        case_file = infer_case_file(path)
+        original_filename = path.name
+        text = extract_text_fast(path)
+        text_len = len(text or "")
+
+        cur.execute("""
+            INSERT INTO documents
+              (case_file, original_filename, smart_filename, file_path, file_name,
+               content_hash, extracted_text, classification, execution_status,
+               status, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NULL, NULL, 'ingested_by_daemon',
+                    NOW(), NOW())
+            RETURNING id
+        """, (case_file, original_filename, original_filename, str(path),
+              path.stem, content_hash, text or None))
+        doc_id = cur.fetchone()["id"]
+        log(f"  Ingest: inserted as doc#{doc_id} (case={case_file}, text={text_len} chars{', OCR pending' if text_len < 100 else ''})")
+        return doc_id
+    except Exception as e:
+        log(f"  ✗ Ingest failed for {path}: {str(e)[:200]}")
+        return None
+    finally:
+        conn.close()
 
 
 def db():
@@ -97,13 +176,20 @@ def save_state(state):
 # ── File watcher ─────────────────────────────────────────────────────────
 def find_new_files(cur, since_timestamp=None):
     """Return list of PDF/image files in WATCH_DIRS not yet in documents table.
-    Matches by drive_file_id (if it can be parsed from filename) or by basename."""
+    Checks by (file_path, original_filename, smart_filename) — all three because
+    different ingest paths populate different fields. Files whose content_hash
+    matches an existing doc will still be caught by ingest_file's dedup check,
+    so this layer just optimizes by skipping obviously-known files."""
     cur.execute("""
-        SELECT DISTINCT smart_filename FROM documents WHERE case_file='MWK-001'
-         UNION
-        SELECT DISTINCT original_filename FROM documents WHERE case_file='MWK-001'
+        SELECT file_path, original_filename, smart_filename FROM documents
+         WHERE case_file IN ('MWK-001', 'Paracale-001', 'Owner', 'Unknown')
     """)
-    known_names = {r["smart_filename"] for r in cur.fetchall() if r["smart_filename"]}
+    rows = cur.fetchall()
+    known_paths = {r["file_path"] for r in rows if r["file_path"]}
+    known_names = set()
+    for r in rows:
+        if r["smart_filename"]: known_names.add(r["smart_filename"])
+        if r["original_filename"]: known_names.add(r["original_filename"])
 
     new_files = []
     for d in WATCH_DIRS:
@@ -115,6 +201,8 @@ def find_new_files(cur, since_timestamp=None):
                 continue
             if f.suffix.lower() not in (".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".heic"):
                 continue
+            if str(f) in known_paths:
+                continue
             if f.name in known_names:
                 continue
             new_files.append(f)
@@ -123,16 +211,16 @@ def find_new_files(cur, since_timestamp=None):
 
 # ── Pipeline steps ───────────────────────────────────────────────────────
 def step_a_ocr(doc_id):
-    """Skip if extracted_text already present and substantial."""
+    """Skip if extracted_text already present (≥200 chars matches what Steps
+    B+C require as the eligibility threshold)."""
     conn, cur = db()
     cur.execute("SELECT length(coalesce(extracted_text,'')) AS tlen FROM documents WHERE id=%s", (doc_id,))
     r = cur.fetchone()
     conn.close()
-    if r and r["tlen"] >= 500:
+    if r and r["tlen"] >= 200:
         log(f"  Step A: ocr SKIPPED (text already present, {r['tlen']} chars)")
         return True
-    log(f"  Step A: text missing/short — would invoke Gemini OCR here (no-op in this build)")
-    # If we wanted to actually OCR new files, we'd call gemini_image_pdf_fallback.py here
+    log(f"  Step A: text missing/short ({r['tlen'] if r else 0} chars) — Gemini OCR would run here (not yet wired)")
     return False
 
 
@@ -264,14 +352,26 @@ def step_d_anomalies(doc_id):
 
 
 def process_doc(doc_id):
-    """Full per-doc pipeline. Returns dict with results."""
+    """Full per-doc pipeline. Returns dict with results.
+    If Step A returns False (text missing, OCR would be needed but isn't
+    wired yet), Steps B+C are skipped to avoid wasted Sonnet calls."""
     log(f"━━━ Processing doc#{doc_id} ━━━")
     result = {
         "doc_id": doc_id,
         "started_at": datetime.now(timezone.utc).isoformat(),
         "steps": {},
     }
-    result["steps"]["a_ocr"] = step_a_ocr(doc_id)
+    step_a = step_a_ocr(doc_id)
+    result["steps"]["a_ocr"] = step_a
+    if not step_a:
+        log(f"  Skipping B+C+D for doc#{doc_id} — text missing, OCR not yet wired in daemon")
+        result["steps"]["b_lineage"] = "skipped_no_text"
+        result["steps"]["c_graph"] = "skipped_no_text"
+        result["steps"]["d_anomalies"] = "skipped_no_text"
+        result["anomalies_flagged"] = 0
+        result["anomalies"] = []
+        result["completed_at"] = datetime.now(timezone.utc).isoformat()
+        return result
     result["steps"]["b_lineage"] = step_b_lineage(doc_id)
     result["steps"]["c_graph"] = step_c_graph(doc_id)
     anomalies = step_d_anomalies(doc_id)
@@ -314,8 +414,10 @@ def main():
             log(f"New files detected: {len(new_files)}")
             for f in new_files:
                 log(f"  → {f}")
-                # For real production: insert into documents, then process_doc
-                # For now, just log — the user can wire ingest separately
+                doc_id = ingest_file(f)
+                if doc_id:
+                    result = process_doc(doc_id)
+                    update_state(result)
         else:
             log(f"No new files. Sleeping {POLL_INTERVAL}s...")
         if args.once:
