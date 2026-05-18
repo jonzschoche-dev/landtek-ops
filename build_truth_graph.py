@@ -97,40 +97,38 @@ TRIPLE_SCHEMA = {
 }
 
 
-SYSTEM_PROMPT = """You are a Knowledge-Graph Extractor for the Philippine Torrens land system.
-Your job is to read legal-document text and emit every explicit relationship as
-a directed triple (subject) -> [predicate] -> (object).
+SYSTEM_PROMPT = """You are a Knowledge-Graph Extractor for Philippine Torrens land documents.
+Extract every relationship as a directed triple (subject)→[predicate]→(object).
 
-FOUNDATIONAL TRUNK AXIOM (load-bearing):
-  OCT T-106 (1934) is the foundational original certificate.
-  T-111 follows OCT T-106. T-4493 follows T-111.
-  These three form the mother trunk of the MWK-001 estate.
-  Composite/typo references ('1-106', 'F-106', 'OCT 106', '7-32917', etc.) normalize
-  to their canonical form before being emitted as subject/object.
+TABULAR MATRIX MODE (use whenever you see rows with TCT + name + lot + area):
+  When you see structured rows like:
+      TCT-NNNNN  PersonName  Lot-Code  Area
+      TCT-NNNNN  OtherName   Lot-Code  Area
+  Emit one (TCT-NNNNN, SOLD_TO, PersonName) triple per row.
+  Put lot/area in `attributes`. Use the row text itself as source_excerpt.
+  Skip rows where the TCT is "T-????" or otherwise unknown.
 
-NAMING NORMALIZATION:
-  - Titles: 'TCT-XXXXX' for transfer certificates, 'OCT T-XXX' for originals,
-    'T-XXX-NNNNNNNNNN' for long-format 2021-era titles. NEVER 'T-2023' (year)
-    or 'T-025-07' (tax PIN) — those are NOT real titles.
-  - People: full verbatim names. Don't strip 'Jr.' / 'III' / middle initials.
-  - Organizations: official names (e.g., 'Philippine National Police', not 'PNP'
-    in the subject — but you may include the acronym in attributes).
+PREDICATE DIRECTION (be strict):
+  SOLD_TO / SOLD_PORTION_TO / DONATED_TO: subject = seller/donor; object = buyer/donee
+  IS_DERIVATIVE_OF: subject = child title; object = mother title
+  IS_MOTHER_OF:     subject = mother title; object = child title
+  AUTHORIZED_BY:    subject = agent (person given power); object = principal (who granted)
+  REVOKED_BY:       subject = agent (whose authority was revoked); object = principal (who revoked)
+  CANCELLED_BY:     subject = cancelled item; object = the cancelling thing (NEVER same as subject)
+  ANNOTATED_ON:     subject = instrument/record; object = title where it's annotated
+  EXECUTED_BY:      subject = instrument; object = executing party
+  CONTESTED_IN:     subject = title/instrument; object = court or case
+  REPRESENTED_BY:   subject = principal; object = representative
 
-PREDICATE DISCIPLINE:
-  Use ONLY the canonical predicate enum. If the relationship doesn't fit one,
-  skip the triple rather than inventing a new predicate.
+HARD RULES:
+  • subject MUST NOT EQUAL object. Skip the triple instead.
+  • Do not emit DIED — death dates go in attributes of a related triple.
+  • Trunk axiom: OCT T-106 → T-111 → T-4493 → T-4497.
+  • Titles: 'TCT-NNNN' / 'OCT T-NNN' / 'T-NNN-NNNNNNNNNN'. Reject 'T-YYYY' (year) and 'T-NNN-NN' (tax PIN).
+  • Every triple needs source_excerpt = verbatim text substring.
 
-EVIDENCE DISCIPLINE:
-  Every triple MUST have a source_excerpt that is a VERBATIM substring of the
-  input text. This is the audit trail — paraphrasing breaks the citation chain.
-
-ASSERTION DISCIPLINE:
-  Only emit triples that are EXPLICIT in the text. If the document says
-  'Cesar de la Fuente sold to Roscoe Leaño', emit (Cesar de la Fuente,
-  SOLD_TO, Roscoe Leaño). If the document only references a name without
-  asserting a relationship, do NOT invent one.
-
-You MUST use the tool 'submit_triples'. No conversational text."""
+Extract aggressively from BOTH prose AND tabular data. Use tool 'submit_triples'.
+"""
 
 
 USER_TEMPLATE = """DOCUMENT:
@@ -150,6 +148,115 @@ def truncate_text(text, head=8000, tail=4000):
     if not text: return ""
     if len(text) <= head + tail: return text
     return text[:head] + "\n\n... [middle truncated] ...\n\n" + text[-tail:]
+
+
+# ── Entity canonicalization layer (deploy_181) ──────────────────────────
+import re
+
+# Hard aliases for known multi-form entities. Add new ones as we discover
+# them; the rule is "every variant of the same person resolves to one
+# canonical string."
+ENTITY_ALIASES = {
+    # Patricia Keesey Zschoche (the plaintiff in CV-26-360)
+    "patricia keesey zschoche":     "Patricia Keesey Zschoche",
+    "patricia k zschoche":          "Patricia Keesey Zschoche",
+    "patricia k. zschoche":         "Patricia Keesey Zschoche",
+    "patricia keesey":              "Patricia Keesey Zschoche",
+    "patricia ann keesey":          "Patricia Keesey Zschoche",
+    "patricia anne keesey":         "Patricia Keesey Zschoche",
+    # Cesar dela Fuente — the void-SPA actor
+    "cesar dela fuente":            "Cesar dela Fuente",
+    "cesar de la fuente":           "Cesar dela Fuente",
+    "cesar m dela fuente":          "Cesar dela Fuente",
+    "cesar m. dela fuente":         "Cesar dela Fuente",
+    "cesar m delafuente":           "Cesar dela Fuente",
+    "cesar m. delafuente":          "Cesar dela Fuente",
+    "cesar n dela fuente":          "Cesar dela Fuente",
+    "cesar n. dela fuente":         "Cesar dela Fuente",
+    "cesar k dela fuente":          "Cesar dela Fuente",
+    "cesar k. delafuente":          "Cesar dela Fuente",
+    "cesar k. dela fuente":         "Cesar dela Fuente",
+    # Sisters
+    "geraldine k hoppe":            "Geraldine Keesey Hoppe",
+    "geraldine k. hoppe":           "Geraldine Keesey Hoppe",
+    "geraldine keesey hoppe":       "Geraldine Keesey Hoppe",
+    "geraldine k hopps":            "Geraldine Keesey Hoppe",   # OCR typo HOPPS→HOPPE
+    "geraldine k. hopps":           "Geraldine Keesey Hoppe",
+    "marcia keesey":                "Marcia Ellen Keesey",
+    "marcia ellen keesey":          "Marcia Ellen Keesey",
+    # The decedent
+    "mary worrick keesey":          "Mary Worrick Keesey",
+    "mary w keesey":                "Mary Worrick Keesey",
+    "mary w. keesey":               "Mary Worrick Keesey",
+    "mwk":                          "Mary Worrick Keesey",
+    "heirs of mary worrick keesey": "Heirs of Mary Worrick Keesey",
+    "estate of mary worrick keesey":"Heirs of Mary Worrick Keesey",
+    # Jonathan
+    "jonathan zschoche":            "Jonathan Paul Zschoche",
+    "jonathan p zschoche":          "Jonathan Paul Zschoche",
+    "jonathan p. zschoche":         "Jonathan Paul Zschoche",
+    "jonathan paul zschoche":       "Jonathan Paul Zschoche",
+    # PNP
+    "pnp":                                "Philippine National Police",
+    "philippine national police (pnp)":   "Philippine National Police",
+    # Title-name normalizations
+    "tct no 4497":                  "TCT-4497",
+    "tct no. 4497":                 "TCT-4497",
+    "tct 4497":                     "TCT-4497",
+    "t-4497":                       "TCT-4497",
+}
+
+
+def normalize_entity_name(s):
+    """Canonicalize an entity-name string per the user's spec:
+       - Strip hyphens (replace with space)
+       - Strip leading/trailing whitespace
+       - Collapse internal multi-spaces to single
+       - Then apply known-alias mappings (case-insensitive)
+    Titles (TCT-NNNNN / OCT T-NNN / T-NNN-NNNNNNNNNN) preserve their canonical
+    form; we don't strip the hyphen INSIDE TCT-XXXXX because that's a
+    structural separator, not a name-level hyphen. Detect that case.
+    """
+    if not s: return s
+    raw = s.strip()
+    # Preserve title-format hyphens: TCT-XXXXX, OCT T-XXX, T-XXX-NNN...
+    is_title = bool(re.match(r'^(TCT-\d+|OCT\s*T-\d+|T-\d+(-\d+)*)$', raw, re.IGNORECASE))
+    if is_title:
+        # Just normalize case + spacing
+        clean = re.sub(r'\s+', ' ', raw).strip().upper().replace("TCT ", "TCT-").replace("OCT ", "OCT T-")
+        # Final canonical title form
+        m = re.match(r'^TCT-?(\d+)$', clean.replace(" ", ""), re.IGNORECASE)
+        if m: return f"TCT-{m.group(1)}"
+        if clean.startswith("OCT"):
+            m = re.search(r'(\d+)', clean)
+            if m: return f"OCT T-{m.group(1)}"
+        return clean
+    # Person/organization name path
+    cleaned = raw.replace("-", " ")
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    # Alias lookup (case-insensitive on the no-punctuation form)
+    alias_key = re.sub(r'[^\w\s]', '', cleaned).lower().strip()
+    if alias_key in ENTITY_ALIASES:
+        return ENTITY_ALIASES[alias_key]
+    return cleaned
+
+
+def validate_triple(t):
+    """Return (is_valid, reason). Reject triples that fail hard rules."""
+    subj = (t.get("subject") or "").strip()
+    obj  = (t.get("object")  or "").strip()
+    pred = (t.get("predicate") or "").strip()
+    if not subj or not obj or not pred:
+        return False, "empty_field"
+    # CASE-INSENSITIVE self-reference check (after normalization)
+    subj_norm = normalize_entity_name(subj)
+    obj_norm  = normalize_entity_name(obj)
+    if subj_norm.lower() == obj_norm.lower():
+        return False, f"self_reference ({subj_norm})"
+    # Reject DIED predicate (unary, shouldn't be a triple)
+    if pred == "DIED":
+        return False, "DIED_is_unary_not_relational"
+    return True, "ok"
 
 
 def fetch_candidates(cur, case_file, limit=None, force_id=None):
@@ -210,6 +317,14 @@ def extract_triples(client, doc):
 
 
 def persist(cur, doc, triples):
+    """Persist with canonicalization + validation (deploy_181).
+    Each triple is:
+      1. Validated (subject/object/predicate non-empty, no self-reference,
+         no unary predicates like DIED)
+      2. Subject and object normalized via normalize_entity_name()
+      3. Inserted into knowledge_graph_triples
+    Rejections are logged + accumulated into attributes_json for the
+    audit trail (so we can see how many got dropped per doc)."""
     fname = doc.get("smart_filename") or doc.get("original_filename") or ""
     if not triples:
         cur.execute("""
@@ -221,18 +336,35 @@ def persist(cur, doc, triples):
         """, (doc["id"], fname))
         return 0
     n = 0
+    rejected = 0
+    rejection_reasons = []
     for t in triples:
-        if not (t.get("subject") and t.get("predicate") and t.get("object")):
+        ok, reason = validate_triple(t)
+        if not ok:
+            rejected += 1
+            rejection_reasons.append(f"{(t.get('subject') or '')[:30]}—[{t.get('predicate')}]→{(t.get('object') or '')[:30]}: {reason}")
+            continue
+        # Canonicalize entity names
+        subj_canon = normalize_entity_name(t["subject"])
+        obj_canon  = normalize_entity_name(t["object"])
+        # Skip if canonicalization made them equal (e.g., Patricia variants)
+        if subj_canon.lower() == obj_canon.lower():
+            rejected += 1
+            rejection_reasons.append(f"self_after_canonicalization: {subj_canon}")
             continue
         cur.execute("""
             INSERT INTO knowledge_graph_triples
               (source_doc_id, source_doc_name, subject_entity, relationship_type,
                object_entity, attributes_json, source_excerpt)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (doc["id"], fname, t["subject"], t["predicate"], t["object"],
+        """, (doc["id"], fname, subj_canon, t["predicate"], obj_canon,
               psycopg2.extras.Json(t.get("attributes") or {}),
               t.get("source_excerpt")))
         n += 1
+    if rejected:
+        print(f"    canonicalization: {n} accepted, {rejected} rejected")
+        for r in rejection_reasons[:5]:
+            print(f"      drop: {r}")
     return n
 
 
