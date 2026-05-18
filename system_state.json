@@ -1,0 +1,28 @@
+{
+  "last_run": "2026-05-18T00:46:00.075850+00:00",
+  "docs_processed": 1,
+  "anomalies": [],
+  "axioms": {
+    "foundational_trunk": [
+      "OCT T-106",
+      "T-111",
+      "T-4493",
+      "T-4497"
+    ],
+    "cesar_death_date": "2017-06-21",
+    "spa_revoked_date": "2005-08-15",
+    "named_transferees_count": 23
+  },
+  "last_doc": {
+    "doc_id": 421,
+    "started_at": "2026-05-18T00:45:00.571661+00:00",
+    "steps": {
+      "a_ocr": true,
+      "b_lineage": true,
+      "c_graph": true
+    },
+    "anomalies_flagged": 0,
+    "anomalies": [],
+    "completed_at": "2026-05-18T00:46:00.055802+00:00"
+  }
+}
