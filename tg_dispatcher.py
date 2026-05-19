@@ -594,16 +594,44 @@ def cycle(cur, token, verbose=False):
             try:
                 file_id = None
                 caption = msg.get("caption", "")
+                filename_hint = ""  # for receipt ack
                 if msg.get("photo"):
-                    # Take the largest photo (last entry typically)
                     file_id = msg["photo"][-1]["file_id"]
                     file_kind = "photo"
+                    filename_hint = "photo"
                 else:
                     file_id = msg["document"]["file_id"]
-                    file_kind = msg["document"].get("mime_type","unknown")
+                    file_kind = msg["document"].get("mime_type", "unknown")
+                    filename_hint = msg["document"].get("file_name") or file_kind
                 ingest_id = handle_uploaded_image(token, file_id, file_kind, caption, msg.get("message_id"))
                 if verbose:
                     print(f"  handled {file_kind} upload → uploaded_files#{ingest_id}")
+
+                # ── Client-facing receipt ack (P0 service-floor — every client upload
+                # gets an acknowledgment within 60s so they know the file landed).
+                # Routes through comms_send so it honors audience + the gate.
+                sender_chat_id = str(chat.get("id"))
+                if sender_chat_id in ALLOWED_INBOUND_CHAT_IDS:
+                    from comms import comms_send, CLIENT_CHAT_IDS as _CC
+                    # Determine audience: if uploader is a client, ack to client only
+                    # (they need confirmation); ops sees it via the inbound log already.
+                    ack_audience = "client" if sender_chat_id in _CC else "ops"
+                    safe_name = (str(filename_hint)[:80]
+                                  .replace("&", "&amp;")
+                                  .replace("<", "&lt;")
+                                  .replace(">", "&gt;"))
+                    ack_text = (
+                        f"✓ Received <b>{safe_name}</b> "
+                        f"(filed under MWK-001, ref #{ingest_id}). "
+                        f"Leo is reviewing the file. You'll get a confirmation or "
+                        f"clarifying question shortly."
+                    )
+                    try:
+                        comms_send(ack_text, audience=ack_audience,
+                                    kind="ad_hoc", case_file="MWK-001",
+                                    reply_to=msg.get("message_id"))
+                    except Exception as _e:
+                        print(f"  ⚠ receipt-ack failed: {_e}")
             except Exception as e:
                 tg_send(f"⚠️ Image handler error: {str(e)[:200]}", token, reply_to=msg.get("message_id"))
                 if verbose:

@@ -119,14 +119,14 @@ def event_already_occurred(cur, deadline):
     Returns: (event_occurred: bool, evidence_doc_id: int|None, evidence_summary: str)
     """
     cur.execute("""
-        SELECT id, smart_filename, classification, execution_status, doc_date
+        SELECT id, smart_filename, classification, execution_status, doc_date_norm
           FROM documents
          WHERE case_file = %s
-           AND doc_date IS NOT NULL
-           AND doc_date > %s
+           AND doc_date_norm IS NOT NULL
+           AND doc_date_norm > %s::date
            AND execution_status IN ('executed_filed', 'executed_notarized',
                                     'government_issued', 'executed_signed_only')
-         ORDER BY doc_date ASC
+         ORDER BY doc_date_norm ASC
          LIMIT 1
     """, (deadline["case_file"], deadline["due_date"]))
     row = cur.fetchone()
@@ -235,14 +235,31 @@ def load_env_token():
     return env.get("TELEGRAM_BOT_TOKEN")
 
 
-def tg_send(text, token):
-    r = requests.post(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        json={"chat_id": JONATHAN_TG_ID, "text": text, "parse_mode": "HTML",
-              "disable_web_page_preview": True},
-        timeout=15,
-    )
-    return r.status_code == 200, r.text[:200]
+def tg_send(text, token, assigned_to=None, case_file="MWK-001"):
+    """Route via comms_send. audience derived from case_deadlines.assigned_to:
+        'administrator' / 'don_qi'        → both (Don Qi + Jonathan)
+        'both'                            → both
+        'client'                          → both (alias)
+        'ops' / NULL / anything else      → ops (Jonathan only — safe default)
+    """
+    import sys as _sys
+    _sys.path.insert(0, "/root/landtek")
+    from comms import comms_send
+    at = (assigned_to or "").strip().lower()
+    if at in ("administrator", "don_qi", "donqi", "client", "both"):
+        audience = "both"
+    else:
+        audience = "ops"
+    ok, results = comms_send(text, audience=audience, kind="report",
+                              case_file=case_file, token=token,
+                              strict_audit=False)  # reminders aren't fact-heavy
+    if not ok:
+        first = results[0] if results else {}
+        return False, str(first.get("reason") or first.get("tg_description") or "")[:200]
+    fails = [r for r in results if not r.get("ok")]
+    if fails:
+        return True, f"partial: {len(fails)} fail"
+    return True, "ok"
 
 
 def compose_reminder(d, tier, days_until, bottlenecks):
@@ -318,6 +335,7 @@ def main():
                priority_jonathan, priority_client, priority_consensus_state,
                reminder_t14_sent_at, reminder_t7_sent_at, reminder_t3_sent_at,
                reminder_t1_sent_at, reminder_t0_sent_at, reminder_dayof_sent_at,
+               assigned_to,
                (SELECT max(sent_at) FROM deadline_alerts a
                  WHERE a.deadline_id = case_deadlines.id AND a.tier='overdue') AS last_overdue_alert
           FROM case_deadlines
@@ -416,7 +434,9 @@ def main():
             print("    ---")
             continue
 
-        ok, info = tg_send(text, token)
+        ok, info = tg_send(text, token,
+                            assigned_to=d.get("assigned_to"),
+                            case_file=d.get("case_file", "MWK-001"))
         if ok:
             sent_count += 1
             if tier != "overdue":
