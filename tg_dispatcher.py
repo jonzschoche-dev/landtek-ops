@@ -22,7 +22,15 @@ from datetime import datetime, timezone
 import psycopg2, psycopg2.extras, requests
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
-JONATHAN_TG = "6513067717"
+JONATHAN_TG = "6513067717"  # kept for inbound dedup (getUpdates filter — see below)
+
+# Hardcoded outbound recipients (per [[feedback_client_comms_hardcoded]] P0).
+from comms_recipients import recipients_for, all_recipients_uniq, MWK_001_RECIPIENTS
+
+# Allowed inbound senders — Jonathan AND Don Qi. Any other chat_id is ignored
+# but logged. This is the inbound-side fan-in for the same hardcoded recipient
+# set. If you add a new recipient in comms_recipients.py, this picks it up too.
+ALLOWED_INBOUND_CHAT_IDS = {cid for _, cid in all_recipients_uniq()}
 
 
 def load_token():
@@ -33,19 +41,32 @@ def load_token():
     return None
 
 
-def tg_send(text, token, reply_to=None):
-    body = {"chat_id": JONATHAN_TG, "text": text, "parse_mode": "HTML",
-            "disable_web_page_preview": True}
-    if reply_to:
-        body["reply_to_message_id"] = reply_to
-    r = requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json=body, timeout=15)
-    try:
-        j = r.json()
-    except Exception:
-        return False, r.text[:200], None
-    if not j.get("ok"):
-        return False, j.get("description", "")[:200], None
-    return True, "ok", j["result"]["message_id"]
+def tg_send(text, token, reply_to=None, case_file="MWK-001", audience="ops", kind="ad_hoc"):
+    """Thin wrapper — delegates to comms.comms_send (the canonical chokepoint).
+
+    Maintains its old (ok, detail, message_id) return signature so existing
+    dispatcher call sites work unchanged. audience defaults to "ops" (safe),
+    callers that touch a client must pass audience="client" or "both" + kind.
+    """
+    from comms import comms_send
+    ok, results = comms_send(text, audience=audience, kind=kind,
+                              case_file=case_file, reply_to=reply_to, token=token)
+    if not ok:
+        # Blocked or all-recipients-failed
+        first = results[0] if results else {}
+        reason = first.get("reason") or first.get("tg_description") or "no recipients"
+        details = "; ".join(
+            f"{r.get('name','?')}({r.get('chat_id','?')}): {r.get('tg_description','blocked')[:80]}"
+            for r in results if not r.get("ok"))
+        return False, (details or reason)[:300], None
+    # primary mid = first successful recipient
+    primary_mid = next((r["message_id"] for r in results if r.get("ok")), None)
+    fail_count = sum(1 for r in results if not r.get("ok"))
+    ok_count = sum(1 for r in results if r.get("ok"))
+    if fail_count == 0:
+        return True, "ok", primary_mid
+    summary = f"partial: {fail_count} fail / {ok_count} ok"
+    return True, summary, primary_mid
 
 
 def evaluate_and_followup(cur, answered_row, answer_text, token, verbose=False):
@@ -189,13 +210,15 @@ def handle_opus_strategic_command(text, token, reply_to=None):
         from pathlib import Path
         out_path = Path(f"/root/landtek/drafts/opus_strategic_{matter_code}_{__import__('datetime').date.today().isoformat()}.md")
         out_path.write_text(memo_clean)
-        with open(out_path, "rb") as fh:
-            requests.post(
-                f"https://api.telegram.org/bot{token}/sendDocument",
-                data={"chat_id": JONATHAN_TG,
-                      "caption": f"🦉 Opus strategic memo — {matter_code} ({len(memo_clean):,} chars)",
-                      "reply_to_message_id": reply_to or ""},
-                files={"document": fh}, timeout=30)
+        # Fan-out document to every hardcoded recipient (P0 — never single-recipient).
+        for _name, _cid in MWK_001_RECIPIENTS:
+            with open(out_path, "rb") as fh:
+                requests.post(
+                    f"https://api.telegram.org/bot{token}/sendDocument",
+                    data={"chat_id": _cid,
+                          "caption": f"🦉 Opus strategic memo — {matter_code} ({len(memo_clean):,} chars)",
+                          "reply_to_message_id": reply_to or ""},
+                    files={"document": fh}, timeout=30)
 
 
 def handle_opus_resolve_command(text, token, reply_to=None):
@@ -558,7 +581,9 @@ def cycle(cur, token, verbose=False):
         new_max = max(new_max, u["update_id"])
         msg = u.get("message") or {}
         chat = msg.get("chat", {})
-        if str(chat.get("id")) != str(JONATHAN_TG):
+        # Accept inbound from ANY hardcoded recipient (Jonathan AND Don Qi).
+        # Per [[feedback_client_comms_hardcoded]] — administrators reply too.
+        if str(chat.get("id")) not in ALLOWED_INBOUND_CHAT_IDS:
             continue
 
         # ─── IMAGE / PHOTO / DOCUMENT handler ─────────────────────────────
@@ -675,7 +700,8 @@ def cycle(cur, token, verbose=False):
             print(f"  active inquiry exists, waiting for reply")
         return  # something is active — wait
     cur.execute("""
-        SELECT id, composed_html FROM tg_inquiry_queue
+        SELECT id, composed_html, kind, audience, COALESCE(matter_code, 'MWK-001') AS case_file
+          FROM tg_inquiry_queue
          WHERE status='queued'
          ORDER BY priority ASC, composed_at ASC
          LIMIT 1
@@ -730,7 +756,16 @@ def cycle(cur, token, verbose=False):
         if verbose:
             print(f"  ⚠ output_audit skipped: {e}")
 
-    ok, info, msg_id = tg_send(composed + audit_appended, token)
+    # Route by the row's explicit `audience` column (deploy 2026-05-19).
+    # Falls back to kind-derived audience if the column is unset (legacy rows).
+    inquiry_audience = (nxt.get("audience") or "").strip().lower()
+    if inquiry_audience not in ("ops", "client", "both"):
+        from comms_recipients import audience_for_kind
+        inquiry_audience = audience_for_kind(kind)
+    inquiry_case = nxt.get("case_file") or "MWK-001"
+    ok, info, msg_id = tg_send(composed + audit_appended, token,
+                                audience=inquiry_audience, kind=kind,
+                                case_file=inquiry_case)
     if ok:
         cur.execute("""
             UPDATE tg_inquiry_queue

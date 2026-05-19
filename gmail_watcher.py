@@ -23,7 +23,10 @@ import psycopg2
 import psycopg2.extras
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
-JONATHAN_TG_ID = "6513067717"
+JONATHAN_TG_ID = "6513067717"  # legacy reference; outbound now uses comms_recipients
+import sys as _sys
+_sys.path.insert(0, "/root/landtek")
+from comms_recipients import MWK_001_RECIPIENTS
 
 # ── Category detection patterns ────────────────────────────────────────
 CATEGORY_PATTERNS = [
@@ -326,11 +329,34 @@ def main():
             else:
                 buf = buf + ("\n" if buf else "") + ln
         if buf: chunks.append(buf)
-        for c in chunks:
-            requests.post(f"https://api.telegram.org/bot{env['TELEGRAM_BOT_TOKEN']}/sendMessage",
-                          json={"chat_id": JONATHAN_TG_ID, "text": c, "parse_mode": "HTML",
-                                "disable_web_page_preview": True})
-        print(f"  → TG digest sent ({len(chunks)} chunks)")
+        # OPS-ONLY: gmail digest is an operator-facing summary (bill categorization,
+        # email triage). It must never reach the client/administrator. Per the
+        # 2026-05-19 ops-leak incident — see [[feedback_client_comms_hardcoded]].
+        from comms_recipients import OPS_RECIPIENTS
+        per_recipient_results = []
+        for _name, _cid in OPS_RECIPIENTS:
+            ok_count, fail_count = 0, 0
+            for c in chunks:
+                try:
+                    r = requests.post(
+                        f"https://api.telegram.org/bot{env['TELEGRAM_BOT_TOKEN']}/sendMessage",
+                        json={"chat_id": _cid, "text": c, "parse_mode": "HTML",
+                              "disable_web_page_preview": True},
+                        timeout=15)
+                    j = r.json() if r.content else {}
+                    if r.status_code == 200 and j.get("ok"):
+                        ok_count += 1
+                    else:
+                        fail_count += 1
+                        print(f"  ✗ TG digest FAIL to {_name}({_cid}): "
+                              f"HTTP {r.status_code} — {j.get('description','no-desc')[:120]}")
+                except Exception as e:
+                    fail_count += 1
+                    print(f"  ✗ TG digest EXCEPTION to {_name}({_cid}): {str(e)[:120]}")
+            per_recipient_results.append((_name, _cid, ok_count, fail_count))
+        for _name, _cid, ok_c, fail_c in per_recipient_results:
+            tag = "✓" if fail_c == 0 else ("⚠" if ok_c > 0 else "✗")
+            print(f"  {tag} TG digest → {_name} ({_cid}): {ok_c} ok / {fail_c} fail")
 
     cur.close(); conn.close()
 
