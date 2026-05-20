@@ -621,6 +621,7 @@ def cycle(cur, token, verbose=False):
     updates = fetch_updates(token, last_id)
     new_max = last_id
     answer_recorded = False
+    force_promote = False
     for u in updates:
         new_max = max(new_max, u["update_id"])
         msg = u.get("message") or {}
@@ -715,6 +716,13 @@ def cycle(cur, token, verbose=False):
         if not text:
             continue
         # Slash commands handled separately by future handler; here we treat /skip and /done specially
+        if text.startswith("/next"):
+            # Bypass the post-answer cooldown and promote the next queued item
+            # immediately. Useful when Jonathan wants to power through the queue.
+            force_promote = True
+            if verbose:
+                print(f"  /next received — bypassing cooldown this cycle")
+            continue
         if text.startswith("/skip"):
             cur.execute("""
                 UPDATE tg_inquiry_queue SET status='skipped', response_text=%s, responded_at=NOW()
@@ -962,6 +970,30 @@ def cycle(cur, token, verbose=False):
         if verbose:
             print(f"  active inquiry exists, waiting for reply")
         return  # something is active — wait
+
+    # Cooldown: after Jonathan answers an inquiry, give him a window to follow
+    # up before the queue bumps him to a new topic. Bypassed by /next or by
+    # an urgent (priority<=0) queued item. Per the 2026-05-20 topic-hop
+    # failure (Maribel → Vito Cruz fired 1 min after the Maribel answer).
+    COOLDOWN_AFTER_ANSWER_SEC = 180
+    if not force_promote:
+        cur.execute("""
+            SELECT EXTRACT(EPOCH FROM (NOW() - MAX(responded_at)))::int AS sec_since
+              FROM tg_inquiry_queue
+             WHERE responded_at IS NOT NULL
+        """)
+        row = cur.fetchone() or {}
+        sec_since = row.get("sec_since") if isinstance(row, dict) else row[0]
+        if sec_since is not None and sec_since < COOLDOWN_AFTER_ANSWER_SEC:
+            cur.execute("SELECT 1 FROM tg_inquiry_queue WHERE status='queued' AND priority <= 0 LIMIT 1")
+            has_urgent = cur.fetchone() is not None
+            if not has_urgent:
+                if verbose:
+                    remain = COOLDOWN_AFTER_ANSWER_SEC - sec_since
+                    print(f"  cooldown active ({sec_since}s since last answer, "
+                          f"{remain}s remaining) — not promoting")
+                return
+
     cur.execute("""
         SELECT id, composed_html, kind, audience, COALESCE(matter_code, 'MWK-001') AS case_file
           FROM tg_inquiry_queue
