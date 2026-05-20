@@ -165,7 +165,7 @@ def probe_evidence(cur, claim_text, anchors, case_file=None):
                  WHERE extracted_text ILIKE %s
                    AND (%s::text IS NULL OR case_file = %s)
                  ORDER BY id
-                 LIMIT 8
+                 LIMIT 25
             """, (f"%{val}%", case_file, case_file))
             for d in cur.fetchall():
                 # extract a 250-char context window around first match
