@@ -1,0 +1,50 @@
+- [Never invent schemas](feedback_no_invented_schemas.md) — on LandTek, always get authoritative column lists from Jonathan; do not infer
+- [Infer scope from the knowledge base](feedback_infer_dont_ask.md) — derive 26-360 chain membership / title correlations from chain_of_title + title_chain + transferees + lot codes BEFORE asking Jonathan
+- [Leo must never go offline](feedback_leo_must_never_go_offline.md) — n8n workflow changes require real functional staging test + post-deploy health check + snapshot rollback path; brief outages are business-critical
+- [Information is gold](feedback_information_is_gold.md) — every upload must be protected, organized, never lost; deletions need explicit approval + audit trail; default to capture not skip
+- [Leo as legal-ops AI with agency](feedback_legal_ops_ai.md) — granular asset/law/evidence ontology + client goals + Landtek duties + bottleneck detection + tools to act under Jonathan's direction
+- [Leo must self-research before asking](feedback_leo_must_self_research.md) — clarification questions must be unanswerable from corpus; search docs first, propose answer, escalate only if truly unknown
+- [Reports are the measure of intelligence](feedback_reports_are_the_measure.md) — action-first hierarchy, narrative not dumps, executive summary leads, raw data in appendix
+- [Execution-status is a first-class fact](feedback_execution_status_required.md) — filed/notarized/executed vs email-sent vs draft; drafts are never cited as fact
+- [Case stage awareness](feedback_case_stage_awareness.md) — know each case/complaint's procedural stage, what comes next, and surface deadline reminders proactively
+- [Leo's mission: agency + zero missed deadlines](feedback_leo_mission_agency.md) — never miss a deadline, expedite every process, proactively push BOTH client agendas AND Landtek firm agenda forward
+- [Financial planning layer](feedback_financial_planning_layer.md) — client + firm accounting, monthly overhead, property-value extraction, investor-grade reports to attract capital
+- [Asset valuation + market modeling](feedback_asset_valuation_layer.md) — per-title tax dec/assessed/zonal/MPV, dev plans tied to client+Landtek goals, depressed-value buy/sell modeling
+- [Asset risk analysis (internal)](feedback_asset_risk_analysis.md) — per-asset risk profile + mitigation, drives risk-corrected valuation and low-hanging-fruit identification
+- [Evolving assessments](feedback_evolving_assessments.md) — risk + valuation are moving targets; system must version, detect staleness, re-eval on event triggers
+- [Bilingual corpus search](feedback_bilingual_corpus_search.md) — every search must include Filipino + English keyword pairs; PH affidavits use Tagalog for substantive testimony
+- [Financial urgency](project_financial_urgency.md) — financial tools are survival-critical (P0); revenue must support Leo's infrastructure
+- [Multi-channel expansion](project_multi_channel_expansion.md) — Leo's brain is platform-agnostic; WhatsApp + web chat + email + SMS + voice + Slack + branded app + public REST API all viable adapters
+- [Title-asset-matter linkage](feedback_title_asset_matter_linkage.md) — resolve TCT↔ARP↔lot, title lifecycle (active/cancelled/contested), and titles-in-active/forthcoming-matter linkage
+- [Master file directory](feedback_master_file_directory.md) — every file's storage location (DB/local/Drive) + per-role access pattern + integrity scorecard
+- [Filename convention](feedback_filename_convention.md) — canonical pattern `{CASE}_{date}_{TYPE}_{slug}_{id}.{ext}` for every doc
+- [Exact inventory + dedup](feedback_exact_inventory_dedup.md) — exhaustive manifest + sha256-exact + near-duplicate + content-similar detection
+- [Email categories](feedback_email_categories.md) — Gmail watcher classifies into legal/bill/receipt/bank/client/system/personal/promotional; bills auto-feed overhead + transactions
+- [Leo must be proactive](feedback_leo_must_be_proactive.md) — every reachable data source gets continuous auto-pull (Gmail every 15m, Drive every 30m); manual-trigger-only is the exception
+- [Physical filing mirror](feedback_physical_filing_mirror.md) — folder hierarchy must mirror the office's physical filing cabinet; per-folder INDEX manifest; humans can find files even if server is down
+- [Hyper-vigilance meta-agent](feedback_hyper_vigilance_meta_agent.md) — a second AI node audits Leo for complacency every hour; back-tests truth_negotiator; auto-remediates gaps before Jonathan flags them
+- [90-day strategic roadmap](project_90day_roadmap.md) — Phase 1 Data Integrity (by 5-30) → Phase 2 Relational/Financial Deepening (by 6-30) → Phase 3 Autonomous Synthesis (by 8-14)
+- [Cost discipline (5 rules)](feedback_cost_discipline.md) — SQL-first filter, strict Haiku/Sonnet tiering (Sonnet only for verdicts+briefs), pre-computed daily summaries, top-3 Qdrant chunks, strict JSON output
+- [Civil Case 26-360 load-bearing dates](project_civil_case_26_360_load_bearing_dates.md) — MWK died 1988-03-17, SPA revoked 2005-08-15; both testimonial only, primary instruments missing
+- [Title origins (MWK estate)](project_title_origins_mwk.md) — OCT T-106 (1934) is canonical root; T-4497 issued 1964-06-02; THREE Worrick sisters (Mary/Helen/Alice) co-held T-111; Helen died pre-1953; spelling KEESY vs KEESEY
+- [Legal-act validity scrutiny (P0)](feedback_legal_act_validity_scrutiny.md) — doc title ≠ proof of act; every donation/sale/revocation/transfer must be audited against PH Civil Code validity components before being asserted as fact
+- [Output no-hallucination discipline (P0)](feedback_output_no_hallucination_discipline.md) — every claim in any output must cite source doc# + provenance + validity verdict; pre-send audit blocks bare assertions; spelling variants tracked not flattened
+- [Classify by subject not by actor (P0)](feedback_classify_by_subject_not_by_actor.md) — Jonathan acts for MWK + Inocalla + others; case_file is determined by docket/adverse-party/property, NEVER by Jonathan-name-presence
+- [Atomic inquiry with follow-ups (P0)](feedback_atomic_inquiry_with_followups.md) — each intake-item is its own atomic Q; Leo asks one, follow-ups until satisfied, THEN advances; never rush facts; every detail relevant for reasons unknown until later
+- [Legacy bot decommission (P0)](feedback_legacy_bot_decommission.md) — 2026-05-17 killed Leo n8n + 8 legacy timers spamming Telegram with hallucinations + repeats; only consolidated meta-agent + tg-dispatcher may send; no new direct-TG paths
+- [Client comms hardcoded (P0)](feedback_client_comms_hardcoded.md) — every outbound sender hardcodes recipient (name, telegram_id) for each case; no DB lookup, no webhook dependency; "we die when this breaks"
+- [2026-05-17 comms blackout incident](project_2026_05_17_comms_blackout.md) — n8n decommission left bot webhook pointed at dead endpoint; Don Qi + Jonathan inbound silently dropped 48h
+- [Don Qi = MWK-001 Administrator](project_don_qi_administrator.md) — Don Qi Style (telegram 8575986732) administers MWK-001 estate; shares first name "Jonathan" with owner but is a SEPARATE person
+- [No ops-leak to client EVER (P0)](feedback_no_ops_leak_to_client_ever.md) — internal ops content must never reach a client; denylist gate + audience taxonomy + Opus audit; "we die when this breaks"
+- [Comms chokepoint architecture (deployed 2026-05-19)](project_comms_chokepoint_architecture.md) — `comms.comms_send()` chokepoint + `requests.post` backstop + `audience` column + hourly repo scanner; gradual migration of 18 legacy senders
+- [Priority is goal-weighted not date (P0)](feedback_priority_is_goal_weighted_not_date.md) — substantive events (mediation/trial/hearing) outrank admin tasks (demand letter/agency request) even when admin sooner; tier_rank × 1000 + days_until ranking
+- [Priority consensus required (P0)](feedback_priority_consensus_required.md) — every deadline/matter carries 3 priority signals (Leo+Jonathan+client); canonical priority is consensus; Leo's job is to actively surface disagreement and drive resolution, never silently pick
+- [Legal status awareness (P0)](feedback_legal_status_awareness.md) — stage trumps date; never alert past-due if post-deadline filings exist; never ask what's in the corpus; trust collapse = corruption wins
+- [Stage-transition intake](feedback_stage_transition_intake.md) — when a stage flips, auto-fire itemized post-stage checklist (Pre-Trial Order, receipts, decision, etc.); never ask vague "anything you have"
+- [Landtek management style](feedback_landtek_management_style.md) — every pending event: WHAT/WHEN/WHO/OUTCOME/GOAL_LINK; goal-linked; result-driving (auto-escalate on stall); never just wait
+- [Telegram inquiry queue](feedback_telegram_inquiry_queue.md) — ONE open inquiry at a time, answered before next fires; tg_inquiry_queue + dispatcher (1/min); priority ladder; coalesce same-matter asks; aging
+- [Opus pre-delivery audit (P0)](feedback_opus_pre_delivery_audit.md) — fire multi-pass Opus audit gate before any high-stakes client-facing output (bibles/memos/briefs); $1-1.50 insurance vs reputational risk of one un-citable claim; deterministic post-processor for LLM-narrator residuals
+- [Verify canonical facts (P0)](feedback_verify_canonical_facts.md) — names/dates/dockets MUST be corpus-count-verified before being treated as authoritative; CLAUDE.md is hint not truth; one wrong seed (e.g., Keesee→Keesey) cascades through Opus + Haiku + post-processors
+- [Delia Macaso (doc#590)](project_delia_macaso_transferee.md) — 2002 transferee from Cesar dela Fuente (pre-revocation, executed_notarized); OCR misread as "Vacaseo" — post-processor now auto-corrects
+- [Same surname ≠ same family (P0)](feedback_same_surname_not_family.md) — default to independent actors; family_group populated only with doc-anchored evidence; user-asserted ties logged but not acted on
+- [User on desktop, not just phone](user_desktop_access.md) — Jonathan uses Claude Code from desktop; don't assume mobile/Termius scroll constraints when formatting responses; recommend claude.ai/code web UI for history browsing
