@@ -185,43 +185,34 @@ def format_educated_followup(doc_id, classification, case_file_guess,
                               amount_php, doc_date, confidence,
                               needs_human_question):
     """Build the one-message educated follow-up question Leo asks after
-    classifying an upload. Returns (composed_html, notes_json_str)."""
-    # Compact header
-    kind_label = (classification or "unknown").replace("_", " ")
-    parts = [f"📷 <b>doc#{doc_id}</b> · {kind_label}"]
-    if amount_php:
-        parts.append(f"₱{amount_php:,.2f}")
-    if doc_date:
-        parts.append(doc_date)
-    if vendor_or_party:
-        parts.append(f"<i>{vendor_or_party[:50]}</i>")
-    header = " · ".join(parts)
+    classifying an upload. Returns (composed_html, notes_json_str).
 
-    body_lines = [header]
-    if key_fact:
-        body_lines.append(f"<i>{key_fact[:180]}</i>")
+    Tight format — header on one line, action on the next. No confidence
+    percentages in the user-facing text unless they affect the verb."""
+    kind_label = (classification or "doc").replace("_", " ")
+    head_parts = [f"📷 <b>#{doc_id}</b>", kind_label]
+    if amount_php:
+        head_parts.append(f"₱{amount_php:,.2f}")
+    if doc_date:
+        head_parts.append(doc_date)
+    if vendor_or_party:
+        head_parts.append(vendor_or_party[:40])
+    header = " · ".join(head_parts)
 
     if confidence >= 0.7 and matter_code_guess:
-        body_lines.append(
-            f"\n<b>Filing to:</b> <code>{matter_code_guess}</code> "
-            f"(conf {confidence:.0%}). Reply <code>/confirm</code>, "
-            f"a different matter_code, or <code>/skip</code>."
-        )
+        action = f"→ <code>{matter_code_guess}</code>  ·  <code>/confirm</code> or matter_code"
     elif confidence >= 0.5 and case_file_guess:
-        body_lines.append(
-            f"\n<b>Client:</b> <code>{case_file_guess}</code> "
-            f"(conf {confidence:.0%}). Which matter? Reply with a "
-            f"matter_code, or <code>/skip</code>."
-        )
+        action = f"client: <code>{case_file_guess}</code>  ·  matter?"
     elif needs_human_question:
-        body_lines.append(f"\n<b>?</b> {needs_human_question}")
+        action = needs_human_question[:120]
     else:
-        body_lines.append(
-            "\nWhich client + matter? Reply with <code>case_file/matter_code</code> "
-            "or <code>/skip</code>."
-        )
+        action = "client + matter?"
 
+    body_lines = [header, action]
+    if key_fact and confidence < 0.7:
+        body_lines.insert(1, f"<i>{key_fact[:140]}</i>")
     composed = "\n".join(body_lines)[:400]
+
     notes = json.dumps({
         "kind": "doc_classifier",
         "doc_id": doc_id,

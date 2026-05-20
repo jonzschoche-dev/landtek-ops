@@ -463,9 +463,13 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
     except Exception as e:
         cls["needs_human_question"] = f"Classifier failed ({str(e)[:80]}) — what is this?"
 
-    # 4. Insert documents with classified fields (no more hardcoded MWK-001)
+    # 4. Insert documents with classified fields (no more hardcoded MWK-001).
+    # When the classifier can't determine case_file (== could be any client),
+    # use 'UNCLASSIFIED' as an explicit sentinel — never silently guess a
+    # specific client folder. The educated follow-up Q asks Jonathan which
+    # client this belongs to and the reply router can update the row.
     classification = cls.get("kind", "unknown")
-    case_file = cls.get("case_file_guess") or "MWK-001"  # fallback for NOT NULL
+    case_file = cls.get("case_file_guess") or "UNCLASSIFIED"
     case_file_was_defaulted = cls.get("case_file_guess") is None
     doc_date = cls.get("doc_date") or None
     doc_date_quality = "from_doc" if cls.get("doc_date") else "upload_date_fallback"
@@ -710,13 +714,13 @@ def handle_matters_command(token, reply_to=None):
 
 def handle_inbox_command(token, reply_to=None):
     """Show what's queued without releasing anything. Per the 2026-05-20
-    pull-only contract: Jonathan sees what's pending on demand, no auto-fire."""
+    pull-only contract: Jonathan sees what's pending on demand, no auto-fire.
+    Tight: one line per item, no preview clutter."""
     import psycopg2 as _pg
     conn = _pg.connect(DSN); conn.autocommit = True
     c = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     c.execute("""
-        SELECT id, kind, priority, source_table, matter_code,
-               LEFT(composed_html, 110) AS preview
+        SELECT id, kind, priority, source_table, matter_code, notes
           FROM tg_inquiry_queue
          WHERE status='queued'
          ORDER BY priority ASC, composed_at ASC
@@ -727,54 +731,53 @@ def handle_inbox_command(token, reply_to=None):
     total = c.fetchone()["n"]
     c.close(); conn.close()
     if total == 0:
-        tg_send("📭 Inbox empty.", token, reply_to=reply_to)
+        tg_send("📭 empty", token, reply_to=reply_to)
         return
-    lines = [f"📥 <b>Inbox · {total} queued</b>", ""]
+    lines = [f"📥 <b>{total} queued</b>"]
     for it in items:
-        prio_tag = ("🔴 P0" if it["priority"] <= 0
-                    else f"P{it['priority']//10}")
-        src = it["source_table"] or "?"
+        prio = ("P0" if it["priority"] <= 0 else f"P{it['priority']//10}")
+        # Pull a short tag from notes JSON if available, else use source_table
+        tag = it["source_table"] or "?"
+        try:
+            n = json.loads(it["notes"] or "{}")
+            v = n.get("vendor") or n.get("vendor_or_party") or n.get("classification")
+            if v:
+                tag = f"{tag} · {str(v)[:30]}"
+        except Exception:
+            pass
         mc = it["matter_code"] or "—"
-        preview = (it["preview"] or "").replace("<b>", "").replace("</b>", "")
-        preview = preview.replace("<code>", "").replace("</code>", "")[:80]
-        lines.append(f"<code>#{it['id']}</code> {prio_tag} · {it['kind']} · {src} · {mc}")
-        lines.append(f"  <i>{preview}…</i>")
-    lines.append("")
-    lines.append("Reply <code>/next</code> to release the top, "
-                 "<code>/digest</code> for findings, or a specific "
-                 "<code>#id</code> to release one.")
+        lines.append(f"<code>#{it['id']}</code> {prio} · {it['kind']} · {tag} · {mc}")
+    lines.append("<code>/next</code> · <code>/digest</code>")
     tg_send("\n".join(lines)[:3800], token, reply_to=reply_to)
 
 
 def handle_digest_command(token, reply_to=None):
     """Run meta_agent inline + show top findings. Bypasses the queue entirely
-    so /digest produces a single message regardless of pull-only mode."""
+    so /digest produces a single message regardless of pull-only mode.
+    Tight: one line per finding."""
     try:
         sys.path.insert(0, "/root/landtek")
         from meta_agent import run_cycle as _meta_run
         findings = _meta_run(enqueue=False, json_out=False, verbose=False)
     except Exception as e:
-        tg_send(f"⚠️ Digest run failed: {str(e)[:200]}", token, reply_to=reply_to)
+        tg_send(f"⚠️ digest failed: {str(e)[:160]}", token, reply_to=reply_to)
         return
-    if not findings:
-        tg_send("✅ No findings.", token, reply_to=reply_to)
+    failures = [f for f in (findings or []) if f.get("status") == "fail"]
+    if not failures:
+        tg_send("✅ no findings", token, reply_to=reply_to)
         return
-    by_sev = {"P0": [], "P1": [], "P2": [], "P3": [], "P4": []}
-    for f in findings:
-        sev = (f.get("severity") or "P3").upper()
-        by_sev.setdefault(sev, []).append(f)
-    lines = [f"🩺 <b>Digest · {len(findings)} finding(s)</b>", ""]
-    for sev in ("P0", "P1", "P2", "P3", "P4"):
-        if not by_sev.get(sev):
-            continue
-        lines.append(f"<b>{sev}</b>")
-        for f in by_sev[sev][:3]:
-            lines.append(f"  • {(f.get('name') or '?')[:80]}")
-            msg = (f.get("message") or "").strip()
-            if msg:
-                lines.append(f"    <i>{msg[:120]}</i>")
-        if len(by_sev[sev]) > 3:
-            lines.append(f"  <i>…+{len(by_sev[sev]) - 3} more {sev}</i>")
+    failures.sort(key=lambda f: (f.get("severity") or "P9", f.get("name") or ""))
+    lines = [f"🩺 <b>{len(failures)} finding(s)</b>"]
+    for f in failures[:10]:
+        sev = (f.get("severity") or "P?").upper()
+        name = (f.get("name") or "?")[:60]
+        msg = (f.get("message") or "").strip()[:80]
+        line = f"<b>{sev}</b> · {name}"
+        if msg:
+            line += f" — <i>{msg}</i>"
+        lines.append(line)
+    if len(failures) > 10:
+        lines.append(f"<i>+{len(failures) - 10} more</i>")
     tg_send("\n".join(lines)[:3800], token, reply_to=reply_to)
 
 
@@ -891,31 +894,27 @@ def cycle(cur, token, verbose=False):
                           f"{(ingest or {}).get('case_file','unclassified')} · "
                           f"conf {(ingest or {}).get('confidence',0):.0%})")
 
-                # Client-facing receipt ack uses the CLASSIFIED case_file when
-                # available — no more hardcoded MWK-001. If case_file couldn't
-                # be inferred, the ack says "pending classification" so the
-                # client/operator knows Leo isn't sure yet.
+                # Receipt-ack: only for CLIENT uploads. Ops uploads get the
+                # educated follow-up question (queued at priority 0 by
+                # handle_uploaded_image) as the single response — no double
+                # message. Per 2026-05-20 "human cadence" mandate.
                 sender_chat_id = str(chat.get("id"))
-                if sender_chat_id in ALLOWED_INBOUND_CHAT_IDS and ingest_id:
-                    from comms import comms_send, CLIENT_CHAT_IDS as _CC
-                    ack_audience = "client" if sender_chat_id in _CC else "ops"
-                    safe_name = (str(filename_hint)[:80]
+                from comms import CLIENT_CHAT_IDS as _CC
+                if (sender_chat_id in _CC) and ingest_id:
+                    from comms import comms_send
+                    safe_name = (str(filename_hint)[:60]
                                   .replace("&", "&amp;")
                                   .replace("<", "&lt;")
                                   .replace(">", "&gt;"))
-                    cf_for_ack = (ingest or {}).get("case_file") or "pending classification"
-                    ack_text = (
-                        f"✓ Received <b>{safe_name}</b> "
-                        f"(ref #{ingest_id} · {cf_for_ack}). "
-                        f"Leo is reviewing the file."
-                    )
+                    cf_for_ack = (ingest or {}).get("case_file") or "filing"
+                    ack_text = f"✓ Received <b>{safe_name}</b> · ref #{ingest_id} · {cf_for_ack}."
                     try:
-                        comms_send(ack_text, audience=ack_audience,
+                        comms_send(ack_text, audience="client",
                                     kind="ad_hoc",
                                     case_file=(ingest or {}).get("case_file") or "MWK-001",
                                     reply_to=msg.get("message_id"))
                     except Exception as _e:
-                        print(f"  ⚠ receipt-ack failed: {_e}")
+                        print(f"  ⚠ client receipt-ack failed: {_e}")
             except Exception as e:
                 tg_send(f"⚠️ Image handler error: {str(e)[:200]}", token, reply_to=msg.get("message_id"))
                 if verbose:
