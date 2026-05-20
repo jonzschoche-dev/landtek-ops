@@ -9,6 +9,18 @@ metadata:
 
 **Re-audited 2026-05-16 after Jonathan corrected my hallucination on the 1953 donation. Every legal-act claim in this memory carries a VALIDITY STATUS, not bare "fact" assertions.**
 
+## Trunk & ghost title registry (Jonathan, 2026-05-21)
+
+**Operative root for MWK-001 chain: `T-111`** — the earliest title Jonathan has actually seen documented. Primary doc retrieval still pending; the 1953 donation deed (doc#279) recites T-111 as the joint Worrick-sisters title.
+
+**`OCT T-106` is a GHOST TITLE.** Cross-cited in many TCT extractions ("originally registered under OCT T-106"), but **no operative document is in the corpus**. Chronologically, T-111 (1912) PREDATES OCT T-106 (1934) — so the "OCT T-106 → T-111" / "OCT T-106 → T-4497" verified-but-no-source-doc edges in title_chain are likely OCR/extraction artifacts, not real lineage.
+
+**Rule**: chain walkers, case-theory output, and evidence renderings **must not present OCT T-106 as the operative root**. Use T-111. Mark T-106 references explicitly as "ghost / referenced not anchored."
+
+Aliases of OCT T-106 in the corpus (all ghost): `OCT T-106`, `T-106`, `1-106`, `F-106` (last three are OCR/normalization variants).
+
+Codified at code level in `title_chain_canon.py` (TRUNKS, GHOST_TITLES, OPERATIVE_ROOTS).
+
 ```
 ~1903   Land Registration Act (Act 496) era. LRC Record No. 10784 originates.
   ↓

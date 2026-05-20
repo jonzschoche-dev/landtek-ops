@@ -168,8 +168,7 @@ def render_tree(root, children_of, contested, depth=0, prefix="", is_last=True, 
 
 # Known contested titles for inline-flagging (per the void-SPA case)
 CONTESTED = {
-    "T-079-2021002126": "Balane title — VOID per CV-26-360 theory (issued from 2016 void deed)",
-    "T-079-2021002127": "Issued from same cancelled mother T-52540",
+    "T-079-2021002127": "Balane title — VOID per CV-26-360 theory (issued from 2016 void deed)",
     "T-52540":          "Cancelled 2021 to issue Balane T-079 — CV-26-360 contesting cancellation",
 }
 

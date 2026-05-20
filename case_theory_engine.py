@@ -29,6 +29,7 @@ import argparse
 import importlib
 import json
 import os
+import re
 import sys
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -38,6 +39,11 @@ import psycopg2
 import psycopg2.extras
 
 sys.path.insert(0, "/root/landtek")
+
+from title_chain_walker import render_chain_md, chain_integrity_audit  # noqa: E402
+
+# Pattern for TCT/OCT title references in claim text.
+TITLE_REF = re.compile(r"\b(?:OCT\s+)?T-\d{2,5}(?:-\d{3,15})?\b")
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 DRAFTS_DIR = Path("/root/landtek/drafts")
@@ -323,7 +329,7 @@ def render_markdown(theory, results, run_meta, cur):
             lines.append("")
 
     # Chain integrity overview
-    lines.append("## Chain integrity")
+    lines.append("## Claim-dependency chain integrity")
     lines.append("")
     broken_chains = [r for r in results if r.get("chain_broken_at")]
     if broken_chains:
@@ -335,6 +341,45 @@ def render_markdown(theory, results, run_meta, cur):
     else:
         lines.append("All claims with dependencies have those dependencies verified.")
     lines.append("")
+
+    # Title chain audit — for every title referenced anywhere in the theory,
+    # walk its ancestry, surface ghost-title refs, flag missing/weak edges.
+    matter = theory.get("matter_code", "MWK-001")
+    titles_seen = set()
+    for r in results:
+        for m in TITLE_REF.findall(r.get("text") or ""):
+            titles_seen.add(m.strip())
+    if titles_seen:
+        lines.append("## Title chain audit")
+        lines.append("")
+        lines.append(f"Every TCT/OCT referenced in the theory's claims is walked up to operative root via "
+                     f"`title_chain_walker`. Canon (`title_chain_canon.py`) trumps DB ambiguity — ghost titles "
+                     f"(e.g. OCT T-106) are flagged, not presented as roots.")
+        lines.append("")
+
+        # Integrity summary first (compact)
+        audit = chain_integrity_audit(cur, sorted(titles_seen), matter)
+        lines.append("### Integrity summary")
+        lines.append("")
+        lines.append("| Title | Chain length | Issues |")
+        lines.append("|---|---|---|")
+        for a in audit:
+            issues_str = "; ".join(a["issues"]) if a["issues"] else "_(clean)_"
+            issues_disp = issues_str[:140].replace("|", "/")
+            lines.append(f"| `{a['title']}` | {a['chain_length']} | {issues_disp} |")
+        lines.append("")
+
+        # Full per-title rendering (collapsible-ish — just sectioned)
+        lines.append("### Per-title ancestral chains")
+        lines.append("")
+        for t in sorted(titles_seen):
+            lines.append(f"#### `{t}`")
+            lines.append("")
+            try:
+                lines.append(render_chain_md(cur, t, matter))
+            except Exception as e:
+                lines.append(f"_chain walk failed: {e}_")
+            lines.append("")
 
     return "\n".join(lines)
 
