@@ -456,6 +456,7 @@ def run_cycle(enqueue=False, json_out=False, verbose=True):
         pass
 
     cur.close(); conn.close()
+    return findings
 
 
 def main():

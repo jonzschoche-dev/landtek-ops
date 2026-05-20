@@ -322,7 +322,7 @@ def queue_confirmation_intake(matter_code, doc_id, result, proposal=None, case_f
             INSERT INTO tg_inquiry_queue
               (kind, audience, priority, source_table, source_id, matter_code,
                composed_html, notes)
-            VALUES ('intake_item', 'ops', 18, 'receipt_extractor', %s, %s,
+            VALUES ('intake_item', 'ops', 0, 'receipt_extractor', %s, %s,
                     %s, %s)
             RETURNING id
         """, (doc_id, matter_code, body, json.dumps(notes_obj)))
