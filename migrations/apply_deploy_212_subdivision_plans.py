@@ -100,7 +100,7 @@ def upsert_plan(cur, plan_ref, normalized_ref, source_doc_id=None, case_file=Non
     """, (plan_ref, normalized_ref, source_doc_id, case_file, provenance,
           notes, parent_title, child_titles or [], lot_designations or []))
     row = cur.fetchone()
-    return row[0] if row else False
+    return bool(row and row.get("inserted"))
 
 
 def backfill_from_documents(cur):
