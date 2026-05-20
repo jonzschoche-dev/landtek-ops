@@ -163,6 +163,32 @@ EOF
     fi
     echo ""
 
+    # Truth-test gate (deploy_221C onward). Asserts the bulletproof base
+    # is intact against VPS DB. Failure blocks the deploy.
+    # Skip with: LANDTEK_SKIP_TRUTH_TESTS=1 (only for cases where the deploy
+    # explicitly modifies a previously-locked truth — must be matched by a
+    # truth_tests/ assertion update in the same deploy).
+    if [ -z "$LANDTEK_SKIP_TRUTH_TESTS" ] && [ -d "$REPO/truth_tests" ]; then
+      hdr "truth_tests pre-deploy gate"
+      if [ "$SIDE" = "VPS" ]; then
+        if ! python3 "$REPO/truth_tests/run_all.py"; then
+          err "truth_tests FAILED — deploy blocked. Investigate data-layer drift before retrying."
+          err "If this is an intentional truth update, run with: LANDTEK_SKIP_TRUTH_TESTS=1 $0 deploy ... (and include the corresponding test update)."
+          exit 3
+        fi
+      else
+        # Mac side: tests run against VPS DB state via SSH.
+        if ! ssh -o ConnectTimeout=10 root@100.85.203.58 \
+            "cd /root/landtek && python3 truth_tests/run_all.py" ; then
+          err "truth_tests FAILED on VPS — deploy blocked."
+          err "Skip with: LANDTEK_SKIP_TRUTH_TESTS=1 $0 deploy ..."
+          exit 3
+        fi
+      fi
+      ok "truth_tests passed"
+      echo ""
+    fi
+
     hdr "Stage specific paths"
     git add "${paths[@]}"
     git status --short | head -10
