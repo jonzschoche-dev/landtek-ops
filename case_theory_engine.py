@@ -384,35 +384,46 @@ def render_markdown(theory, results, run_meta, cur):
     return "\n".join(lines)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("theory", help="Python module path, e.g. case_theories.civil_case_26_360")
-    ap.add_argument("--no-report", action="store_true",
-                    help="Run + print summary but don't write markdown/json")
-    args = ap.parse_args()
+def run_theory(theory, cur, claim_cache=None, write_report=True, verbose=True):
+    """Evaluate every claim, compute chain health, optionally write markdown/json.
 
-    _load_anthropic_key()
-    mod = importlib.import_module(args.theory)
-    theory = mod.THEORY
+    `claim_cache`: optional dict keyed on (claim_text, matter) → already-evaluated
+    result dict. Used by --all-transferees mode to avoid re-evaluating the shared
+    spine 19 times.
 
-    print(f"Theory: {theory['theory_id']} ({len(theory['claims'])} claims)")
-    print(f"Matter: {theory.get('matter_code')}")
-    print(f"Summary: {theory.get('summary', '')[:120]}…")
-    print()
-
-    conn = psycopg2.connect(DSN)
-    conn.autocommit = True
-    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
+    Returns (results, run_meta, md_path, json_path).
+    """
+    matter = theory.get("matter_code")
     results = []
     for claim in theory["claims"]:
-        print(f"  → {claim['id']:42s} ", end="", flush=True)
-        r = evaluate_claim(cur, claim, theory.get("matter_code"))
+        if verbose:
+            print(f"  → {claim['id']:42s} ", end="", flush=True)
+        # Cache lookup (spine claims are identical across transferees)
+        cache_key = (claim["text"], matter) if claim_cache is not None else None
+        if cache_key is not None and cache_key in claim_cache:
+            cached = claim_cache[cache_key]
+            # Re-stamp claim-specific fields (id, section, dev impact, deps, etc.)
+            r = dict(cached)
+            r["id"] = claim["id"]
+            r["section"] = claim.get("section", "")
+            r["depends_on"] = claim.get("depends_on", [])
+            r["transfer_link"] = claim.get("transfer_link")
+            r["if_supported_implies"] = claim.get("if_supported_implies", "")
+            r["defense_anticipation"] = claim.get("defense_anticipation", "")
+            r["development_impact"] = claim.get("development_impact", "")
+            r["title_curative_score_delta"] = int(claim.get("title_curative_score_delta") or 0)
+            if verbose:
+                print(f"(cache hit) {r.get('verdict', '?')}")
+        else:
+            r = evaluate_claim(cur, claim, matter)
+            if cache_key is not None:
+                claim_cache[cache_key] = r
+            if verbose:
+                emoji = VERDICT_EMOJI.get(r.get("verdict", "?"), "·")
+                delta = r.get("title_curative_score_delta", 0)
+                cite = r.get("citation_tag") or "—"
+                print(f"{emoji} {r.get('verdict', '?'):14s} Δ{delta:+d}  cite={cite}")
         results.append(r)
-        emoji = VERDICT_EMOJI.get(r.get("verdict", "?"), "·")
-        delta = r.get("title_curative_score_delta", 0)
-        cite = r.get("citation_tag") or "—"
-        print(f"{emoji} {r.get('verdict', '?'):14s} Δ{delta:+d}  cite={cite}")
 
     results = compute_chain_health(results)
 
@@ -420,20 +431,25 @@ def main():
     n_struct = sum(1 for r in results if r.get("structurally_supported"))
     realized = sum(max(0, r.get("title_curative_score_delta", 0) or 0)
                    for r in results if r.get("verdict") == "verified")
-    possible = sum(max(0, r.get("title_curative_score_delta", 0) or 0)
-                   for r in results)
-    print()
-    print(f"→ {n_verified}/{len(results)} verified · "
-          f"{n_struct}/{len(results)} structurally supported · "
-          f"title curative {realized}/{possible}")
+    possible = sum(max(0, r.get("title_curative_score_delta", 0) or 0) for r in results)
+    if verbose:
+        print()
+        print(f"→ {n_verified}/{len(results)} verified · "
+              f"{n_struct}/{len(results)} structurally supported · "
+              f"title curative {realized}/{possible}")
 
     run_meta = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "theory_id": theory["theory_id"],
         "n_claims": len(results),
+        "n_verified": n_verified,
+        "n_structurally_supported": n_struct,
+        "curative_realized": realized,
+        "curative_possible": possible,
     }
 
-    if not args.no_report:
+    md_path = json_path = None
+    if write_report:
         DRAFTS_DIR.mkdir(parents=True, exist_ok=True)
         date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         md_path = DRAFTS_DIR / f"case_theory_{theory['theory_id']}_{date}.md"
@@ -443,9 +459,116 @@ def main():
             {"theory": theory, "results": results, "run_meta": run_meta},
             indent=2, default=str,
         ))
+        if verbose:
+            print(f"Markdown: {md_path}")
+            print(f"JSON:     {json_path}")
+
+    return results, run_meta, md_path, json_path
+
+
+def render_transferee_summary(per_transferee, run_date):
+    """Build the consolidated summary across all 19 transferees."""
+    lines = []
+    lines.append(f"# Per-transferee case theory summary — {run_date}")
+    lines.append("")
+    lines.append("Each row is one named transferee under TCT T-4497. Shared void-chain "
+                 "spine (15 claims) is identical across all; verdict differences come "
+                 "from per-transferee leaf claims.")
+    lines.append("")
+    lines.append("| Transferee | Parcels (title_transfers) | Verified | Curative | Structural |")
+    lines.append("|---|---|---|---|---|")
+
+    for entry in per_transferee:
+        name = entry["name"]
+        meta = entry["meta"]
+        n_parcels = entry["n_parcels"]
+        slug = entry["theory_id"]
+        verified = f"{meta['n_verified']}/{meta['n_claims']}"
+        curative = f"{meta['curative_realized']}/{meta['curative_possible']}"
+        struct = f"{meta['n_structurally_supported']}/{meta['n_claims']}"
+        lines.append(f"| [{name}](case_theory_{slug}_{run_date}.md) | {n_parcels} | "
+                     f"{verified} | {curative} | {struct} |")
+
+    lines.append("")
+    lines.append("## Coverage gaps (transferees with 0 rows in title_transfers)")
+    lines.append("")
+    gaps = [e for e in per_transferee if e["n_parcels"] == 0]
+    if gaps:
+        for e in gaps:
+            lines.append(f"- **{e['name']}** — no `title_transfers` row found. "
+                         f"Specific derivative title, transfer date, consideration not in DB. "
+                         f"Discovery priority for this transferee.")
+    else:
+        lines.append("_All transferees have at least one title_transfers row._")
+    lines.append("")
+
+    # Highest-leverage transferees (most parcels, most verified leaves)
+    lines.append("## Strongest individual positions")
+    lines.append("")
+    by_score = sorted(per_transferee,
+                      key=lambda x: (-x["meta"]["curative_realized"],
+                                     -x["meta"]["n_verified"]))
+    for e in by_score[:5]:
+        m = e["meta"]
+        lines.append(f"- **{e['name']}** — {m['n_verified']} verified, "
+                     f"curative {m['curative_realized']}/{m['curative_possible']}, "
+                     f"{e['n_parcels']} documented parcel(s)")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("theory", nargs="?", default=None,
+                    help="Python module path, e.g. case_theories.civil_case_26_360")
+    ap.add_argument("--all-transferees", action="store_true",
+                    help="Run a per-transferee theory for each of the 19 non-Balane named transferees")
+    ap.add_argument("--no-report", action="store_true",
+                    help="Run + print summary but don't write markdown/json")
+    args = ap.parse_args()
+
+    _load_anthropic_key()
+
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    if args.all_transferees:
+        from case_theories.transferees import list_transferees, build_theory as build_transferee
+        roster = list_transferees(cur)
+        print(f"Running per-transferee theories for {len(roster)} transferees…\n")
+        claim_cache = {}  # share spine evaluations across transferees
+        per_transferee = []
+        for i, (name, parcels) in enumerate(roster, 1):
+            print(f"[{i}/{len(roster)}] {name} ({len(parcels)} parcel(s))")
+            theory = build_transferee(name, parcels)
+            results, meta, *_ = run_theory(
+                theory, cur, claim_cache=claim_cache,
+                write_report=not args.no_report, verbose=True,
+            )
+            per_transferee.append({
+                "name": name,
+                "theory_id": theory["theory_id"],
+                "n_parcels": len(parcels),
+                "meta": meta,
+            })
+            print()
+
+        if not args.no_report:
+            run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            summary_path = DRAFTS_DIR / f"case_theory_transferees_summary_{run_date}.md"
+            summary_path.write_text(render_transferee_summary(per_transferee, run_date))
+            print(f"Summary: {summary_path}")
+    elif args.theory:
+        mod = importlib.import_module(args.theory)
+        theory = mod.THEORY
+        print(f"Theory: {theory['theory_id']} ({len(theory['claims'])} claims)")
+        print(f"Matter: {theory.get('matter_code')}")
+        print(f"Summary: {theory.get('summary', '')[:120]}…")
         print()
-        print(f"Markdown: {md_path}")
-        print(f"JSON:     {json_path}")
+        run_theory(theory, cur, write_report=not args.no_report, verbose=True)
+    else:
+        ap.error("either provide a theory module path or use --all-transferees")
 
     cur.close()
     conn.close()
