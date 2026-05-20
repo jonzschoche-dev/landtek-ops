@@ -63,3 +63,7 @@ n8n_data/
 # Uncomment to exclude:
 # snapshots/*.json
 staging/.env
+
+# Daemon-written runtime state (churns constantly, never commit)
+system_state.json
+drafts/daily_digest_*.md
