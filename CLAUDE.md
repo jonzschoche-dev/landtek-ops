@@ -107,15 +107,81 @@ Leo tools Flask service: `/root/landtek/leo_tools/server.py` on port 8765. Expos
 `/api/get_entity`, `/api/fuzzy_find_entity`, `/api/get_thread`, `/api/list_threads`,
 `/api/query_documents`, `/api/pending_entity_types`. n8n calls these.
 
-## Deploy pipeline (how to push a change)
+## Git push protocol (READ EVERY SESSION — multi-agent coordination)
 
-This VPS has a `cowork-bridge` daemon that polls a GitHub repo every 30s.
-Push a shell script to:
+You are not the only Claude touching this repo. A Mac-side Claude (running in the
+desktop app's SSH workspace + via a Mac auto-sync daemon) reads, edits, and pushes
+to the same `landtek-ops` repository from `~/landtek/` on Jonathan's Mac Studio.
+If you don't sync before/after work, you'll race the Mac session and produce merge
+conflicts that destroy state. Honor this protocol exactly.
+
+**The five things to know:**
+| | |
+|---|---|
+| Repo path on VPS | `/root/landtek` |
+| Remote URL | `git@github.com:jonzschoche-dev/landtek-ops.git` (SSH form — HTTPS PATs were rotated out 2026-05-20) |
+| Auth | Deploy key at `/root/.ssh/cowork_bridge_deploy` (private); public registered as a Deploy Key with **write access** on the `landtek-ops` repo |
+| Git identity | `user.name = "LandTek Ops"` · `user.email = "ops@landtek.local"` (already configured; do not change) |
+| Default branch | `main` |
+
+**Push protocol — every session, every push:**
+```bash
+# 1. Start of session — sync first, ALWAYS
+cd /root/landtek
+git status                 # check for any pre-existing dirty state
+git fetch origin main
+git pull --rebase          # catch the Mac side's pushes since you last ran
+
+# 2. Do work — edit files, run scripts, etc.
+
+# 3. Before committing — review what you'll add
+git status
+git diff                   # eyeball every change
+
+# 4. Stage SPECIFIC files (never `git add .`)
+git add path/to/file1.py path/to/file2.md
+
+# 5. Commit with a deploy_NNN tag + short why
+git commit -m "deploy_NNN: short description of the change"
+
+# 6. Push
+git push
+
+# 7. If push rejected (non-fast-forward — Mac side pushed in parallel):
+git pull --rebase          # rebase your commit on top of theirs
+git push                   # now ff
+```
+
+**Anti-patterns — never do these:**
+- ❌ `git add .` or `git add -A` — sweep loops + orchestrators drop log files,
+  snapshots, and tarballs into the repo dir. Use specific paths or check `.gitignore`
+  first; never blanket-stage.
+- ❌ `git push --force` or `git push --force-with-lease` to `main` — overwrites
+  the Mac side's work + breaks the auto-sync daemon's safety check.
+- ❌ Committing secrets — never stage `.env`, `*.pem`, `google-creds.json`, or
+  `~/.claude/history.jsonl`. The credential-scrub of 2026-05-20 was triggered by
+  exactly this slip.
+- ❌ Forgetting to `git fetch && git pull --rebase` at session start — assume Mac
+  Claude shipped commits while you were away.
+
+**Companion files (after Mac Claude pushes them):**
+- `WORKFLOW.md` — multi-agent coordination doc with the full discipline
+- `LEO_MASTER_PLAN.md` — current strategic ledger
+- `scripts/mac_sync.sh` — the Mac-side auto-pull script
+- These don't exist on VPS until Mac Claude commits + pushes them; check on session start.
+
+---
+
+## Deploy pipeline (cowork-bridge — separate from git push)
+
+This VPS has a `cowork-bridge` daemon (separate from the git-push protocol above) that polls
+a different GitHub repo every 30s for scheduled-task shell scripts:
 ```
 git@github.com:jonzschoche-dev/leolandtek-deploys.git → inbox/NNN_name.sh
 ```
 or via the local clone at `/opt/cowork-bridge/repo`. The daemon executes the script with a
-30-min timeout and writes output to `outbox/`.
+30-min timeout and writes output to `outbox/`. Auth: separate deploy key at
+`/root/.ssh/cowork_bridge_deploy` (provisioned 2026-05-20).
 
 To run a one-shot command on the VPS, you can also just use the Bash tool — you have
 direct shell access. The deploy pipeline is for batch/scheduled work that needs auditing.
