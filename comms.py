@@ -39,6 +39,37 @@ CLIENT_CHAT_IDS = {cid for _, cid in MWK_001_CLIENT_RECIPIENTS}
 # Strict kinds — output_audit runs in strict mode (block on factual-citation failure)
 STRICT_AUDIT_KINDS = {"report", "brief", "memo", "demand_letter", "mediation_memo"}
 
+# ─── Concision caps per [[feedback_log_event_before_inferring]] ───────────
+# Hard char caps on the *text* of any Telegram outbound, per kind.
+# Documents (PDF attachments) are exempt; their caption is capped to 300.
+# Anything else not in this table defaults to 400.
+KIND_CHAR_CAPS = {
+    "intake_item":    400,
+    "ad_hoc":         400,
+    "comms_probe":    300,
+    "gap_alert":      800,
+    "report":         500,   # daily picks / accelerator output
+    "deadline_alert": 500,
+    "memo":           99999, # PDF attachment path — caption is separate
+    "brief":          99999,
+    "demand_letter":  99999,
+    "mediation_memo": 99999,
+}
+DEFAULT_CHAR_CAP = 400
+
+
+def _enforce_concision(text: str, kind: str) -> tuple[str, bool]:
+    """Return (possibly-truncated text, was_truncated). Never silently drop content;
+    always leave a trailing `[… /more]` indicator so the operator can pull detail."""
+    cap = KIND_CHAR_CAPS.get(kind, DEFAULT_CHAR_CAP)
+    if len(text) <= cap:
+        return text, False
+    # Truncate at the previous line boundary to avoid mid-sentence cuts
+    cut = text.rfind("\n", 0, cap - 30)
+    if cut < cap // 2:
+        cut = cap - 30
+    return text[:cut].rstrip() + "\n\n<i>[… truncated by concision rule · reply /more for full]</i>", True
+
 
 def _load_token() -> str:
     """Read TELEGRAM_BOT_TOKEN from /root/landtek/.env. Cached after first call."""
@@ -149,6 +180,9 @@ def comms_send(
         raise ValueError(
             f"comms_send: unknown audience {audience!r}; must be 'ops', 'client', or 'both'"
         )
+
+    # ── Concision enforcement (per [[feedback_log_event_before_inferring]]) ──
+    text, _was_truncated = _enforce_concision(text, kind)
 
     # ── client_safe_gate (denylist) for any client-reaching audience ──
     if audience in ("client", "both"):

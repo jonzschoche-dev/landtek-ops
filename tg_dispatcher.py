@@ -423,13 +423,18 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
             cur_dx.close(); cur_d.close()
 
     # 6. Insert into documents
+    # NB: `content_hash` has TWO PARTIAL unique indexes (WHERE content_hash IS NOT NULL).
+    # `ON CONFLICT (col)` needs a non-partial UNIQUE — so we either include the index
+    # predicate, or just catch the duplicate-key exception. Using `WHERE` form
+    # matches the partial index. Per 2026-05-20 Maribel-meeting silent-drop incident.
     c.execute("""
         INSERT INTO documents (case_file, original_filename, smart_filename, mime_type,
                                content_hash, file_path, extracted_text, status,
                                text_length, timestamp, doc_date_norm, doc_date_quality)
         VALUES ('MWK-001', %s, %s, %s, %s, %s, %s, 'ingested_from_telegram',
                 %s, NOW(), CURRENT_DATE, 'parsed_by_telegram_upload')
-        ON CONFLICT (content_hash) DO UPDATE SET file_path = EXCLUDED.file_path
+        ON CONFLICT (content_hash) WHERE content_hash IS NOT NULL
+          DO UPDATE SET file_path = EXCLUDED.file_path
         RETURNING id
     """, (fname, fname, "image/jpeg" if file_kind == "photo" else file_kind,
           content_hash, local_path, extracted_text, len(extracted_text)))

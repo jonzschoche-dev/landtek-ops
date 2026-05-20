@@ -144,25 +144,31 @@ def build_user_msg(ctx):
 
 
 def queue_intake_inquiry(cur, matter_code, ctx, result):
-    """Enqueue one atomic intake_item for this matter."""
+    """Enqueue one atomic intake_item for this matter.
+    Per [[feedback_log_event_before_inferring]]: max 400 chars, ONE question, NO inference dump.
+    Full Haiku proposal stored in DB notes; user requests details only if desired."""
     m = ctx["matter"]
-    citations = ", ".join(f"doc#{d['id']}" for d in ctx["docs"][:6]) or "(no docs tagged)"
-    open_q_lines = "\n".join(f"  • {q}" for q in (result.get("open_questions") or [])[:4])
+    # Stash the full research result in notes for /detail retrieval (NOT in the Telegram body)
+    detail_blob = json.dumps({
+        "matter_summary":       result.get("matter_summary",""),
+        "opposing_party":       result.get("opposing_party",""),
+        "venue":                result.get("venue",""),
+        "current_stage_proposed": result.get("current_stage_proposed",""),
+        "last_action_observed": result.get("last_action_observed",""),
+        "next_move_proposed":   result.get("next_move_proposed",""),
+        "confidence":           result.get("confidence",0),
+        "open_questions":       result.get("open_questions",[]),
+    })[:5000]
+    # Compose the SHORT intake body: 1 heading line + 1 question + reply options. ~280 chars.
+    short_title = (m['title'] or matter_code)[:60]
     body = (
-        f"📋 <b>Inocalla matter — {matter_code}</b>\n"
-        f"<i>Self-researched proposal · confidence {result.get('confidence',0):.0%} · {citations}</i>\n\n"
-        f"<b>Matter:</b> {m['title']}\n\n"
-        f"<b>Proposed summary:</b>\n{result.get('matter_summary','')}\n\n"
-        f"<b>Opposing party:</b> {result.get('opposing_party','unknown')}\n"
-        f"<b>Venue:</b> {result.get('venue','unknown')}\n"
-        f"<b>Current stage (proposed):</b> {result.get('current_stage_proposed','unknown')}\n"
-        f"<b>Last action observed:</b> {result.get('last_action_observed','')}\n"
-        f"<b>Next move (proposed):</b> {result.get('next_move_proposed','')}\n\n"
-        f"<b>Open questions Leo cannot answer from the corpus:</b>\n{open_q_lines}\n\n"
-        f"<i>Reply with: <code>/confirm {matter_code}</code> to accept the proposal · "
-        f"<code>/correct {matter_code}</code> + your corrections · "
-        f"<code>/skip</code> to leave for later.</i>"
+        f"📋 <b>{matter_code}</b> — {short_title}\n"
+        f"Stage guess: <b>{(result.get('current_stage_proposed') or 'unknown')[:50]}</b> "
+        f"(conf {result.get('confidence',0):.0%}).\n"
+        f"<b>Confirm in 1-2 lines</b>: client · opposing party · current stage. "
+        f"Or <code>/skip</code>."
     )
+    body = body[:1100]  # safety upper bound
     # source_id is integer (matter pk), not matter_code; use matters.id
     cur.execute("SELECT id FROM matters WHERE matter_code=%s", (matter_code,))
     matter_id_row = cur.fetchone()
