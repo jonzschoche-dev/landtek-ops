@@ -159,7 +159,9 @@ def store_extraction_chunk(cur, doc_id: int, result: dict):
     """, (doc_id, field_status, json.dumps(result), prov,
           result.get("title_number")))
     row = cur.fetchone()
-    return row[0] if row else None
+    if not row:
+        return None
+    return row["id"] if isinstance(row, dict) else row[0]
 
 
 def maybe_update_titles_table(cur, doc_id: int, result: dict, auto=False):
@@ -240,7 +242,8 @@ def queue_review_intake(cur, doc_id: int, result: dict):
         RETURNING id
     """, (doc_id, 'MWK-CV26360', body[:400],
           f"extract_tct:doc={doc_id}:conf={conf:.2f}:type={actual}:title={tn}"))
-    return cur.fetchone()[0]
+    row = cur.fetchone()
+    return row["id"] if isinstance(row, dict) else row[0]
 
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────
