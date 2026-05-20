@@ -107,7 +107,11 @@ def apply_proposal(cur, proposal, actor, reason, lock_after=False):
             f'INSERT INTO "{target}" ({col_list}) VALUES ({placeholders}) RETURNING id',
             list(state.values()),
         )
-        new_id = cur.fetchone()[0] if cur.description else None
+        if cur.description:
+            r = cur.fetchone()
+            new_id = r['id'] if isinstance(r, dict) else r[0]
+        else:
+            new_id = None
     elif op == 'UPDATE':
         if not proposal['target_row_id']:
             raise ValueError(f"UPDATE proposal #{proposal['id']} missing target_row_id")
