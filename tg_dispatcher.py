@@ -695,6 +695,37 @@ def cycle(cur, token, verbose=False):
             if verbose:
                 print(f"  handled /opus-strategic")
             continue
+        # /cost /probability /value — queue legal-profitability foundation intakes
+        if text.startswith(("/cost", "/probability", "/value")):
+            import re as _re
+            from legal_intake import (queue_cost_intake, queue_probability_intake,
+                                       queue_value_intake)
+            tokens = text.split(None, 3)
+            cmd = tokens[0].lower()
+            matter = tokens[1] if len(tokens) >= 2 else None
+            if not matter:
+                tg_send(
+                    f"⚠️ Usage: <code>{cmd} &lt;matter_code&gt;</code> "
+                    + ("[scenario]" if cmd == "/probability" else "[asset]" if cmd == "/value" else "")
+                    + "\nExample: <code>/cost MWK-CV26360</code>",
+                    token, reply_to=msg.get("message_id"), audience="ops", kind="ad_hoc")
+                continue
+            try:
+                if cmd == "/cost":
+                    iid = queue_cost_intake(matter)
+                elif cmd == "/probability":
+                    scenario = " ".join(tokens[2:]) or "general outcome"
+                    iid = queue_probability_intake(matter, scenario)
+                else:  # /value
+                    asset = " ".join(tokens[2:]) or f"main asset of {matter}"
+                    iid = queue_value_intake(matter, asset)
+                tg_send(f"✓ Queued intake #{iid} — will fire when the queue is clear.",
+                        token, reply_to=msg.get("message_id"), audience="ops", kind="ad_hoc")
+                if verbose: print(f"  handled {cmd} for {matter} → inquiry #{iid}")
+            except Exception as e:
+                tg_send(f"❌ Intake failed: {str(e)[:200]}",
+                        token, reply_to=msg.get("message_id"), audience="ops", kind="ad_hoc")
+            continue
         # /forensic <matter> — fire ELITE_FORENSIC_LAND_TITLE agent (~$2-3 Opus 4.7)
         if text.startswith("/forensic"):
             import re as _re, subprocess as _sp
