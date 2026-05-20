@@ -48,3 +48,5 @@
 - [Delia Macaso (doc#590)](project_delia_macaso_transferee.md) — 2002 transferee from Cesar dela Fuente (pre-revocation, executed_notarized); OCR misread as "Vacaseo" — post-processor now auto-corrects
 - [Same surname ≠ same family (P0)](feedback_same_surname_not_family.md) — default to independent actors; family_group populated only with doc-anchored evidence; user-asserted ties logged but not acted on
 - [User on desktop, not just phone](user_desktop_access.md) — Jonathan uses Claude Code from desktop; don't assume mobile/Termius scroll constraints when formatting responses; recommend claude.ai/code web UI for history browsing
+- [Synthesis must cross-source (P0)](feedback_synthesis_must_cross_source.md) — never anchor case output on a single matter_code; cross-search documents+chat_notes+gmail+entities+client_history+calendar+drafts; guardianship blind-spot 2026-05-20 incident
+- [Facts in chat are first-class (P0)](feedback_facts_in_chat_are_first_class.md) — every chat-stated fact (date/counsel/docket/party/matter) must produce a DB encoding within 1 hour; failure = user has to repeat themselves; dispatcher must surface encoding asks
