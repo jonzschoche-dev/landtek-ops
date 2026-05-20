@@ -695,6 +695,34 @@ def cycle(cur, token, verbose=False):
             if verbose:
                 print(f"  handled /opus-strategic")
             continue
+        # /forensic <matter> — fire ELITE_FORENSIC_LAND_TITLE agent (~$2-3 Opus 4.7)
+        if text.startswith("/forensic"):
+            import re as _re, subprocess as _sp
+            m = _re.match(r"/forensic\s+(\S+)\s*$", text.strip(), _re.IGNORECASE)
+            if not m:
+                tg_send(
+                    "⚠️ Usage: <code>/forensic &lt;matter_code&gt;</code>\n"
+                    "Example: <code>/forensic MWK-CV26360</code>\n"
+                    "Cost: ~$0.50-3.00 per analysis (Opus 4.7 forensic agent).\n"
+                    "Produces partner-grade structured analysis (sections I-VII) + PDF.",
+                    token, reply_to=msg.get("message_id"), audience="ops", kind="ad_hoc")
+            else:
+                matter_code = m.group(1)
+                tg_send(
+                    f"⏳ Calling forensic agent for <code>{matter_code}</code>... "
+                    f"(20-40s; cost ~$0.50-3.00). PDF will be delivered on completion.",
+                    token, reply_to=msg.get("message_id"), audience="ops", kind="ad_hoc")
+                try:
+                    _sp.Popen(["/usr/bin/python3", "/root/landtek/forensic_agent.py",
+                               "--matter", matter_code],
+                              cwd="/root/landtek",
+                              stdout=open("/var/log/forensic_agent.log","ab"),
+                              stderr=open("/var/log/forensic_agent.log","ab"))
+                    if verbose: print(f"  handled /forensic for {matter_code} (background)")
+                except Exception as e:
+                    tg_send(f"❌ Forensic agent failed to launch: {str(e)[:200]}",
+                            token, reply_to=msg.get("message_id"), audience="ops", kind="ad_hoc")
+            continue
         # /opus-resolve <deadline_id> — fire Opus dispute resolution (~$0.05)
         if text.startswith("/opus-resolve") or text.startswith("/opus_resolve"):
             handle_opus_resolve_command(text, token, msg.get("message_id"))
