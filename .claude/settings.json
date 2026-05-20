@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "matcher": "startup",
+        "command": "/root/landtek/scripts/landtek_git_routine.sh start || true"
+      }
+    ]
+  }
+}
