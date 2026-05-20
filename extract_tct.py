@@ -131,18 +131,33 @@ def extract_one_tct(client, doc_id: int, extracted_text: str, model="claude-haik
 # ─── PERSISTENCE ──────────────────────────────────────────────────────────
 
 def store_extraction_chunk(cur, doc_id: int, result: dict):
-    """Always persist the result to extraction_chunks as an audit trail,
-    regardless of confidence. Provenance based on confidence."""
-    prov = ("verified" if result.get("confidence", 0) >= CONFIDENCE_FLOOR
-            else "inferred_strong" if result.get("confidence", 0) >= 0.50
+    """Persist the result to extraction_chunks as an audit trail.
+    Uses actual schema: structured_value (jsonb) + provenance_level + field_status.
+    UNIQUE constraint is (doc_id, chunk_type, field_name) — pin field_name to
+    'full_extraction' so re-runs upsert via ON CONFLICT.
+    """
+    conf = result.get("confidence", 0)
+    prov = ("verified" if conf >= CONFIDENCE_FLOOR
+            else "inferred_strong" if conf >= 0.50
             else "inferred_weak")
+    field_status = ("verified" if conf >= CONFIDENCE_FLOOR
+                    else "pending_review" if conf >= 0.50
+                    else "low_confidence")
     cur.execute("""
         INSERT INTO extraction_chunks
-            (doc_id, chunk_type, raw_json, provenance, created_at)
-        VALUES (%s, 'tct_extracted', %s::jsonb, %s, NOW())
-        ON CONFLICT DO NOTHING
+            (doc_id, chunk_type, field_name, field_status,
+             structured_value, provenance_level, tct_number, created_at)
+        VALUES (%s, 'tct_extracted', 'full_extraction', %s,
+                %s::jsonb, %s, %s, NOW())
+        ON CONFLICT (doc_id, chunk_type, field_name) DO UPDATE
+          SET structured_value = EXCLUDED.structured_value,
+              provenance_level = EXCLUDED.provenance_level,
+              field_status     = EXCLUDED.field_status,
+              tct_number       = EXCLUDED.tct_number,
+              created_at       = NOW()
         RETURNING id
-    """, (doc_id, json.dumps(result), prov))
+    """, (doc_id, field_status, json.dumps(result), prov,
+          result.get("title_number")))
     row = cur.fetchone()
     return row[0] if row else None
 
