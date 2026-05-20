@@ -40,7 +40,7 @@ import psycopg2.extras
 
 sys.path.insert(0, "/root/landtek")
 
-from title_chain_walker import render_chain_md, chain_integrity_audit  # noqa: E402
+from title_chain_walker import render_chain_md, chain_integrity_audit, render_annotations_md  # noqa: E402
 
 # Pattern for TCT/OCT title references in claim text.
 TITLE_REF = re.compile(r"\b(?:OCT\s+)?T-\d{2,5}(?:-\d{3,15})?\b")
@@ -370,7 +370,7 @@ def render_markdown(theory, results, run_meta, cur):
         lines.append("")
 
         # Full per-title rendering (collapsible-ish — just sectioned)
-        lines.append("### Per-title ancestral chains")
+        lines.append("### Per-title ancestral chains + annotation history")
         lines.append("")
         for t in sorted(titles_seen):
             lines.append(f"#### `{t}`")
@@ -379,6 +379,12 @@ def render_markdown(theory, results, run_meta, cur):
                 lines.append(render_chain_md(cur, t, matter))
             except Exception as e:
                 lines.append(f"_chain walk failed: {e}_")
+            lines.append("")
+            # deploy_220-B: annotation history per title
+            try:
+                lines.append(render_annotations_md(cur, t))
+            except Exception as e:
+                lines.append(f"_annotation render failed: {e}_")
             lines.append("")
 
     return "\n".join(lines)

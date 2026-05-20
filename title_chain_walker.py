@@ -212,6 +212,42 @@ def render_chain_md(cur, start_title, matter="MWK-001"):
     return "\n".join(lines)
 
 
+def render_annotations_md(cur, title, limit=15):
+    """Render instruments_on_title rows for a title as a Markdown table.
+
+    Surfaces the per-title annotation history (deeds, confirmations, affidavits,
+    etc.) extracted into instruments_on_title — the operative legal-act record
+    for what happened on this title.
+
+    For mediation prep + cross-examination defense (deploy_220-B).
+    """
+    cur.execute("""
+        SELECT id, entry_date, instrument_type, executor_full_name, pe_number,
+               LEFT(COALESCE(acknowledgment_quote, source_quote_full, ''), 80) AS quote
+          FROM instruments_on_title
+         WHERE parent_tct_number = %s
+         ORDER BY entry_date NULLS LAST, id
+         LIMIT %s
+    """, (title, limit))
+    rows = cur.fetchall()
+    if not rows:
+        return (f"_No annotations extracted for `{title}` in `instruments_on_title`. "
+                f"Either no encumbrances exist on this title, or the title's physical doc "
+                f"needs heightened OCR extraction._")
+    lines = []
+    lines.append(f"**Annotations for `{title}`** ({len(rows)} extracted):")
+    lines.append("")
+    lines.append("| Entry date | Instrument type | Executor | PE # |")
+    lines.append("|---|---|---|---|")
+    for r in rows:
+        date_str = str(r.get("entry_date") or "—")[:10]
+        itype = (r.get("instrument_type") or "?")[:35]
+        exec_n = (r.get("executor_full_name") or "—")[:40]
+        pe = (r.get("pe_number") or "—")[:25]
+        lines.append(f"| {date_str} | {itype} | {exec_n} | {pe} |")
+    return "\n".join(lines)
+
+
 def chain_integrity_audit(cur, titles, matter="MWK-001"):
     """For each title in `titles`, audit its chain and flag issues.
 
