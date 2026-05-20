@@ -79,6 +79,42 @@ def _route_to_onboard_or_agent(channel, channel_user_id, display_name, username,
     return (j.get("reply"), j.get("state_after"), j.get("passthrough", False))
 
 
+def _forward_to_agent(channel, channel_user_id, display_name, username, message):
+    """POST an approved user's message to the n8n AI Agent webhook
+    (env: N8N_CHAT_WEBHOOK_URL). Returns True on 2xx. The n8n side is
+    expected to dispatch the response back via the normal outbound sender
+    for the channel, so this function does not return a reply body."""
+    import requests
+    url = _env("N8N_CHAT_WEBHOOK_URL")
+    status = "pending_no_agent_webhook"
+    if url:
+        try:
+            r = requests.post(url, json={
+                "channel": channel, "channel_user_id": channel_user_id,
+                "display_name": display_name, "username": username,
+                "message": message,
+            }, timeout=30)
+            ok = 200 <= r.status_code < 300
+            status = "forwarded_to_agent" if ok else f"agent_http_{r.status_code}"
+        except Exception as e:
+            ok = False
+            status = f"agent_error:{type(e).__name__}"
+    else:
+        ok = False
+
+    conn = _db(); conn.autocommit = True; cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name=%s), %s, 'inbound', %s, now(), %s,
+                    jsonb_build_object('forwarded_to', 'n8n_agent'))
+        """, (channel, str(channel_user_id), message, status))
+    finally:
+        cur.close(); conn.close()
+    return ok
+
+
 # ════════════════════════════════════════════════════════════════
 # WhatsApp Business (Meta / 360dialog) — inbound webhook
 # ════════════════════════════════════════════════════════════════
@@ -110,13 +146,15 @@ def whatsapp_webhook():
                     _log_inbound("whatsapp", wa_id, text, raw_payload=msg)
                     reply, state, passthrough = _route_to_onboard_or_agent(
                         "whatsapp", wa_id, display, None, text)
+                    forwarded = False
                     if reply:
                         _whatsapp_send(wa_id, reply)
                     elif passthrough:
-                        # TODO: when WhatsApp adapter is live, push to n8n AI Agent path
-                        # For now, just acknowledge
-                        _whatsapp_send(wa_id, "Thank you — Atty. Jonathan has been notified.")
-                    results.append({"wa_id": wa_id, "state": state, "replied": bool(reply)})
+                        forwarded = _forward_to_agent("whatsapp", wa_id, display, None, text)
+                        if not forwarded:
+                            _whatsapp_send(wa_id, "Thank you — Atty. Jonathan has been notified.")
+                    results.append({"wa_id": wa_id, "state": state,
+                                    "replied": bool(reply), "forwarded": forwarded})
         return jsonify({"ok": True, "processed": results}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
