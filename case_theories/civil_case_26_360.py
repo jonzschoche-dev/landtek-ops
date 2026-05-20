@@ -60,6 +60,23 @@ THEORY = {
             "title_curative_score_delta": 2,
         },
         {
+            "id": "mwk-estate-ejs-attempted",
+            "section": "Title chain foundation",
+            "text": "The estate of Mary Worrick Keesey was the subject of an extrajudicial settlement / "
+                    "intestate-estate process initiated by her heirs",
+            "depends_on": ["mwk-deceased", "patricia-is-heir"],
+            "transfer_link": None,
+            "if_supported_implies": "EJS is the operative transfer mechanism. Cesar's 1992 SPA was the heirs' "
+                                    "instrument to perfect partial sales during partition. T-4497 remained in "
+                                    "'Heirs of MWK' form because the EJS-partition into named individuals never "
+                                    "completed cleanly — Cesar's interventions disrupted the process.",
+            "defense_anticipation": "Defendants may argue EJS was abandoned or superseded by Cesar's post-revocation sales.",
+            "development_impact": "Establishes the legal pathway MWK → heirs (EJS) → individual partition. "
+                                  "The void chain through Cesar's 2016 deed corrupted this pathway. "
+                                  "Title curative requires restoring the EJS process to its proper conclusion.",
+            "title_curative_score_delta": 3,
+        },
+        {
             "id": "t4497-is-mother-title",
             "section": "Title chain foundation",
             "text": "TCT T-4497 is the mother title of the contested Mercedes properties",
