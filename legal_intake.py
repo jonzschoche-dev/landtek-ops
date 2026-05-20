@@ -48,55 +48,19 @@ def _conn():
 
 # ─── INTAKE BODIES (the ask templates Jonathan sees in Telegram) ────────────
 
-COST_INTAKE_TEMPLATE = """💰 <b>Legal cost intake — {matter}</b>
-<i>Foundation data — costs are tracked actuals, not estimates.</i>
-
-What did the firm just spend on this matter? Reply in this format:
-
-<code>category | amount | date | description</code>
-
-Categories:
-  • <code>counsel_retainer</code>  • <code>filing_fee</code>  • <code>travel</code>
-  • <code>expert</code>  • <code>admin</code>  • <code>misc</code>
-
-Examples:
-  <code>filing_fee | 12500 | 2026-05-18 | RTC Daet docket fee for CV-26360</code>
-  <code>travel | 4200 | 2026-05-22 | Don Qi Naga round trip + Botor meeting</code>
-
-Or reply <code>/skip</code> if there's nothing to log right now."""
-
-PROBABILITY_INTAKE_TEMPLATE = """🎯 <b>Outcome probability intake — {matter}</b>
-<i>Scenario:</i> {scenario}
-{rationale_block}
-
-Your (or counsel's) estimate. Reply in any of these forms:
-
-<code>0.6</code>                     <i>(point estimate)</i>
-<code>0.4-0.7</code>                 <i>(low-high band)</i>
-<code>0.55 source: Atty.Barandon</code>
-<code>unknown</code>                 <i>(if no one can estimate yet)</i>
-
-Add a rationale on a new line if you want to capture the reasoning.
-
-Or <code>/skip</code> to leave unestimated (the system will keep showing
-"P = unknown — needs counsel input" until you set it)."""
-
-VALUE_INTAKE_TEMPLATE = """🏠 <b>Dominion value intake — {matter}</b>
-<i>Asset:</i> {asset}
-
-What's the estimated market/recovery value? Use any of these forms:
-
-<code>50M</code>                          <i>(point — treated as mid)</i>
-<code>40M-60M</code>                      <i>(low-high band)</i>
-<code>40M / 50M / 80M</code>              <i>(low / mid / high)</i>
-<code>50M basis: zonal-2024-Daet</code>
-
-Acceptable basis values:
-  • <code>appraisal:NAME:DATE</code>   • <code>BIR-zonal:CITY:DATE</code>
-  • <code>comparable:RECENT_SALE</code>  • <code>tax-declaration:ARP</code>
-  • <code>asserted</code>  (Jonathan's gut estimate)
-
+COST_INTAKE_TEMPLATE = """💰 <b>Cost intake — {matter}</b>
+Reply: <code>category | amount | YYYY-MM-DD | description</code>
+Categories: counsel_retainer · filing_fee · travel · expert · admin · misc
 Or <code>/skip</code>."""
+
+PROBABILITY_INTAKE_TEMPLATE = """🎯 <b>P intake — {matter}</b>
+<i>Scenario:</i> {scenario}
+{rationale_block}Reply: <code>0.6</code> · <code>0.4-0.7</code> · <code>0.55 source: Barandon</code> · <code>unknown</code> · <code>/skip</code>."""
+
+VALUE_INTAKE_TEMPLATE = """🏠 <b>Value intake — {matter}</b>
+<i>Asset:</i> {asset}
+Reply: <code>50M</code> · <code>40M-60M</code> · <code>40M/50M/80M</code> · <code>50M basis:zonal-Daet</code> · <code>/skip</code>
+Basis: appraisal:NAME:DATE · BIR-zonal:CITY:DATE · comparable:SALE · tax-declaration:ARP · asserted"""
 
 
 # ─── PARSERS (turn reply text → DB row) ────────────────────────────────
