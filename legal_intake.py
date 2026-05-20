@@ -156,14 +156,35 @@ def parse_probability_reply(text):
     return None
 
 
-def parse_value_reply(text):
-    """Returns {low, mid, high, basis} or None."""
-    first = text.strip().splitlines()[0]
-    basis_m = re.search(r"basis:\s*(\S+(?::\S+)*)", first, re.IGNORECASE)
-    basis = basis_m.group(1) if basis_m else "asserted"
-    main = re.sub(r"basis:\s*\S+(?::\S+)*", "", first, flags=re.IGNORECASE).strip()
+BARE_BASIS_WORDS = {"asserted", "zonal", "appraisal", "comparable", "tax-declaration",
+                     "tax-dec", "unknown", "guess"}
 
-    # "40M / 50M / 80M"  → low/mid/high
+def parse_value_reply(text):
+    """Returns {low, mid, high, basis} or None.
+    Accepts: '50M' · '40M-60M' · '40M / 50M / 80M' · '50M asserted'
+           · '50M basis: zonal' · '40M-60M basis: zonal-2024-Daet'"""
+    first = text.strip().splitlines()[0]
+
+    # 1) Pull out "basis: ..." if present
+    basis_m = re.search(r"basis:\s*([^\s]+(?::[^\s]+)*)", first, re.IGNORECASE)
+    basis = basis_m.group(1) if basis_m else None
+    main = re.sub(r"basis:\s*[^\s]+(?::[^\s]+)*", "", first, flags=re.IGNORECASE).strip()
+
+    # 2) Pull out any bare basis word (asserted / zonal / etc.) as a fallback basis
+    if basis is None:
+        tokens = main.split()
+        keep = []
+        for t in tokens:
+            if t.lower() in BARE_BASIS_WORDS and basis is None:
+                basis = t.lower()
+            else:
+                keep.append(t)
+        main = " ".join(keep).strip()
+    if basis is None:
+        basis = "asserted"
+
+    # 3) Now parse the cleaned-up `main` for value(s)
+    # "40M / 50M / 80M"
     if "/" in main:
         toks = [t.strip() for t in main.split("/")]
         if len(toks) == 3:
@@ -171,16 +192,15 @@ def parse_value_reply(text):
             if lo and mid and hi:
                 return {"low": lo, "mid": mid, "high": hi, "basis": basis}
 
-    # "40M-60M"  → low/high (mid = avg)
-    if "-" in main and not main.startswith("-"):
-        toks = main.split("-")
-        if len(toks) == 2:
-            lo = parse_value_token(toks[0].strip())
-            hi = parse_value_token(toks[1].strip())
-            if lo and hi:
-                return {"low": lo, "mid": (lo+hi)/2, "high": hi, "basis": basis}
+    # "40M-60M"
+    m_range = re.match(r"^\s*([\d,.]+[MmKk]?)\s*[-–]\s*([\d,.]+[MmKk]?)\s*$", main)
+    if m_range:
+        lo = parse_value_token(m_range.group(1))
+        hi = parse_value_token(m_range.group(2))
+        if lo and hi:
+            return {"low": lo, "mid": (lo+hi)/2, "high": hi, "basis": basis}
 
-    # Point "50M"
+    # Point "50M" (or with trailing space)
     v = parse_value_token(main)
     if v:
         return {"low": None, "mid": v, "high": None, "basis": basis}

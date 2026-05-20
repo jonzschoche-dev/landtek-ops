@@ -768,19 +768,104 @@ def cycle(cur, token, verbose=False):
         # Any other text from Jonathan = answer to current active inquiry
         if text.startswith("/"):
             continue  # other slash commands — leave to dedicated handler
+        # Look up the active inquiry FIRST so we can route legal_intake replies
+        cur.execute("""
+            SELECT id, intake_response_id, item_index, composed_html, kind,
+                   matter_code, source_table, notes
+              FROM tg_inquiry_queue
+             WHERE status='active'
+             LIMIT 1
+        """)
+        active = cur.fetchone()
+        if not active:
+            continue
+
+        # ── Legal-intake reply router (per [[feedback_facts_in_chat_are_first_class]]) ──
+        # If the active inquiry came from legal_intake, parse the reply + persist.
+        if active["source_table"] == "legal_intake" and (active["notes"] or "").startswith("legal_intake:"):
+            import sys as _sys; _sys.path.insert(0, "/root/landtek")
+            from legal_intake import (parse_cost_reply, parse_probability_reply,
+                                       parse_value_reply, write_cost,
+                                       write_probability, write_value)
+            kind_tag = active["notes"].split(":")[1]   # cost | probability | value
+            matter = active["matter_code"]
+            parsed = None
+            ack_msg = None
+            try:
+                if kind_tag == "cost":
+                    parsed = parse_cost_reply(text)
+                    if parsed:
+                        row_id = write_cost(matter, parsed,
+                                              source_label=f"telegram-reply:{msg.get('from',{}).get('id','?')}:2026-05-20")
+                        ack_msg = (f"✓ Cost logged · {matter} · {parsed['category']} · "
+                                   f"₱{parsed['amount_php']:,.2f} · {parsed['incurred_date']} "
+                                   f"(row #{row_id})")
+                    else:
+                        ack_msg = ("⚠️ Couldn't parse. Format: "
+                                   "<code>category | amount | YYYY-MM-DD | description</code>")
+                elif kind_tag == "probability":
+                    parsed = parse_probability_reply(text)
+                    if parsed:
+                        # Extract scenario from notes: legal_intake:probability:matter=X:scenario=Y
+                        scen = "general outcome"
+                        for tok in active["notes"].split(":"):
+                            if tok.startswith("scenario="):
+                                scen = tok[len("scenario="):]
+                        row_id = write_probability(matter, scen, parsed)
+                        if parsed["p"] is None:
+                            ack_msg = f"✓ Recorded as unknown · {matter} · {scen[:50]} (row #{row_id})"
+                        elif parsed["low"] is not None:
+                            ack_msg = (f"✓ P logged · {matter} · {parsed['low']:.2f}–{parsed['high']:.2f} "
+                                       f"(mid {parsed['p']:.2f}) · {scen[:40]} (row #{row_id})")
+                        else:
+                            ack_msg = (f"✓ P logged · {matter} · {parsed['p']:.2f} "
+                                       f"· {scen[:40]} (row #{row_id})")
+                    else:
+                        ack_msg = ("⚠️ Couldn't parse. Reply with <code>0.6</code> or "
+                                   "<code>0.4-0.7</code> or <code>unknown</code>.")
+                elif kind_tag == "value":
+                    parsed = parse_value_reply(text)
+                    if parsed:
+                        asset = "main asset"
+                        for tok in active["notes"].split(":", 3):
+                            if tok.startswith("asset="):
+                                asset = tok[len("asset="):]
+                        row_id = write_value(matter, asset, parsed)
+                        v = (parsed["mid"] or parsed["low"] or parsed["high"] or 0)
+                        ack_msg = (f"✓ Value logged · {matter} · ₱{v:,.0f} · "
+                                   f"basis: {parsed['basis']} (row #{row_id})")
+                    else:
+                        ack_msg = ("⚠️ Couldn't parse. Format: <code>50M</code> or "
+                                   "<code>40M-60M</code> or <code>40M / 50M / 80M basis: zonal</code>")
+            except Exception as e:
+                ack_msg = f"⚠️ Persist failed: {str(e)[:120]}"
+
+            # Mark inquiry answered with raw text
+            cur.execute("""
+                UPDATE tg_inquiry_queue SET status='answered', response_text=%s, responded_at=NOW()
+                 WHERE id=%s
+            """, (text[:4000], active["id"]))
+            answer_recorded = True
+            # Concise ack (per concision cap — status_ack is 200 chars)
+            if ack_msg:
+                tg_send(ack_msg, token, reply_to=msg.get("message_id"),
+                        audience="ops", kind="ad_hoc")
+            if verbose:
+                print(f"  legal_intake reply ({kind_tag}) → {('ok' if parsed else 'parse-failed')}")
+            continue
+
+        # ── Default path: mark as answered (existing behavior) ──
         cur.execute("""
             UPDATE tg_inquiry_queue SET status='answered', response_text=%s, responded_at=NOW()
-             WHERE status='active'
-             RETURNING id, intake_response_id, item_index, composed_html, kind
-        """, (text[:4000],))
-        r = cur.fetchone()
-        if r:
-            answer_recorded = True
-            if verbose:
-                print(f"  marked active inquiry #{r['id']} as ANSWERED")
-            # If this was an atomic intake_item, run satisfaction evaluator
-            if r["intake_response_id"] and r["kind"] in ("intake_item", "intake_followup"):
-                evaluate_and_followup(cur, r, text, token, verbose=verbose)
+             WHERE id=%s
+        """, (text[:4000], active["id"]))
+        r = active
+        answer_recorded = True
+        if verbose:
+            print(f"  marked active inquiry #{r['id']} as ANSWERED")
+        # If this was an atomic intake_item, run satisfaction evaluator
+        if r["intake_response_id"] and r["kind"] in ("intake_item", "intake_followup"):
+            evaluate_and_followup(cur, r, text, token, verbose=verbose)
 
     cur.execute("UPDATE tg_update_cursor SET last_update_id=%s, updated_at=NOW() WHERE id=1",
                 (new_max,))
