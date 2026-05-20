@@ -10,6 +10,30 @@ The directive defines:
 
 ---
 
+## Session-start protocol (multi-agent git routine)
+
+A **SessionStart hook** has just run `scripts/landtek_git_routine.sh start` — its
+output appears in your context above this file. Read it before doing anything else.
+
+- **"Working tree clean / Up to date"** → proceed normally.
+- **"Pulled N new commits"** → the other agent (VPS or Mac) wrote those files for
+  a reason that may affect your task. Read the new files before editing anything.
+- **"Working tree dirty before pull"** → STOP. Surface the dirty files to Jonathan
+  and decide together before any new work. Never blindly discard or commit them.
+
+**Before saying "done for now"**, invoke `/session-end` to surface uncommitted /
+unpushed / untracked work. The SessionEnd hook also fires on `/quit` as a safety
+net, but `/session-end` mid-conversation lets you handle warnings in dialogue.
+
+For commits, use the routine's deploy mode (never `git add .`):
+```
+scripts/landtek_git_routine.sh deploy <NN> "short title" path1 path2 ...
+```
+
+Full rationale: `memory/feedback_multi_agent_git_routine.md` (P0 rule).
+
+---
+
 # LANDTEK — Evidence-grade RAG database for Philippine property cases
 
 You are Claude Code running on the LandTek VPS. This file is your project memory.
