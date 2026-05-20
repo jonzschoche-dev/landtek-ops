@@ -46,7 +46,7 @@ and its derivative titles. **Patricia Keesey Zschoche** (US, mother of user Jona
 Zschoche; spelling KEESEY verified against 307 corpus occurrences including her birth
 certificate and the RTC Order caption — earlier "Keesee" in this memory was a typo)
 is plaintiff, represented by Atty. Bonifacio Jr. Barandon (Barandon Law Offices, Daet).
-Defendants: Gloria Balane et al. who hold contested TCT T-079-2021002126 (issued 2021 from
+Defendants: Gloria Balane et al. who hold contested TCT T-079-2021002127 (issued 2021 from
 cancelled T-52540 via 2016 Deed of Sale executed by Cesar de la Fuente under an SPA
 revoked in 2005).
 

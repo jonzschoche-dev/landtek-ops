@@ -2,7 +2,7 @@
 
 Accion reinvindicatoria over TCT T-4497 (mother title, Heirs of Mary Worrick
 Keesey). Plaintiff: Patricia Keesey Zschoche. Defendants: Gloria Balane et al.
-holding contested TCT T-079-2021002126 (issued 2021 from cancelled T-52540 via
+holding contested TCT T-079-2021002127 (issued 2021 from cancelled T-52540 via
 2016 Deed of Sale executed by Cesar de la Fuente under SPA revoked 2005).
 
 This file defines the offense theory as a CHAIN of claims with dependencies,
@@ -21,7 +21,7 @@ THEORY = {
         "Void chain: SPA to Cesar de la Fuente revoked 2005 → "
         "Cesar's 2016 Deed of Absolute Sale void at inception → "
         "2021 cancellation of TCT T-52540 (executed via that void deed) is itself void → "
-        "TCT T-079-2021002126 issued 2021 to Gloria Balane derives from a void cancellation. "
+        "TCT T-079-2021002127 issued 2021 to Gloria Balane derives from a void cancellation. "
         "Title restoration to the heirs of Mary Worrick Keesey is the remedy."
     ),
     "forcing_function": {
@@ -82,9 +82,12 @@ THEORY = {
             "title_curative_score_delta": 4,
         },
         {
-            "id": "t32917-derives-from-t4497",
+            # NOTE: title_chain has T-4497 → T-32917 (provenance verified) but
+            # source_doc_id IS NULL — so engine's Direction C currently skips
+            # graph-only evidence. Claim is reworded to test what docs ASSERT.
+            "id": "t32917-listed-as-mwk-property",
             "section": "Title chain foundation",
-            "text": "TCT T-32917 derives from TCT T-4497",
+            "text": "TCT T-32917 is listed in the heirs' records as part of the Mary Worrick Keesey estate properties",
             "depends_on": ["t4497-is-mother-title"],
             "transfer_link": None,
             "if_supported_implies": "T-32917's 17 sub-subdivisions are all under the MWK estate umbrella.",
@@ -163,7 +166,7 @@ THEORY = {
         {
             "id": "balane-title-from-t52540",
             "section": "Void instrument theory",
-            "text": "TCT T-079-2021002126 was issued in 2021 to Gloria Balane derived from the cancelled T-52540",
+            "text": "TCT T-079-2021002127 was issued in 2021 to Gloria Balane derived from the cancelled T-52540",
             "depends_on": ["t52540-cancelled-via-cesar-deed"],
             "transfer_link": None,
             "if_supported_implies": "The contested title's chain of authority traces back to the void 2016 deed.",
@@ -222,7 +225,7 @@ THEORY = {
         {
             "id": "balane-registered-owner",
             "section": "Defense claims to test",
-            "text": "Gloria Balane is the registered owner of TCT T-079-2021002126",
+            "text": "Gloria Balane is the registered owner of TCT T-079-2021002127",
             "depends_on": [],
             "transfer_link": None,
             "if_supported_implies": "Adversary identity is settled; targets the rescission of this specific title.",
@@ -266,25 +269,31 @@ THEORY = {
             "title_curative_score_delta": 1,
         },
         {
+            # Reworded after deploy_209 diagnostic: corpus has no per-parcel
+            # area/price (specific 629sqm/PHP 44,030 claim refuted because docs
+            # gave T-32917 TOTAL area 85,149sqm). title_transfers does have
+            # Pascual under derivatives T-33686 + T-48335, parent T-4497-derivatives.
             "id": "jose-pascual-transferee",
-            "section": "Named transferees (under T-32917)",
-            "text": "Jose Pascual Jr. acquired a 629 sqm parcel under TCT T-32917 for PHP 44,030",
+            "section": "Named transferees (under T-4497 derivatives)",
+            "text": "Jose Pascual Jr. is a named transferee of land under the TCT T-4497 estate (per title_transfers, derivatives T-33686 and T-48335)",
             "depends_on": [],
             "transfer_link": None,
             "if_supported_implies": "Documented transfer to one of the 19 non-Balane named transferees.",
             "defense_anticipation": "Good-faith purchaser arguments.",
-            "development_impact": "Per-parcel recoverable; PHP 44,030 / 629sqm ≈ PHP 70/sqm — historical price grounds future valuation deltas.",
+            "development_impact": "Per-parcel recoverable; specific consideration/area pending source verification — gap to close before per-transferee strategy goes live.",
             "title_curative_score_delta": 1,
         },
         {
-            "id": "elsa-iligan-transferee",
-            "section": "Named transferees (under T-32917)",
-            "text": "Elsa O. Iligan acquired a 300 sqm parcel under TCT T-32917 for PHP 7,000",
+            # Name canonicalization: title_transfers has "Elsa Illigan" (two
+            # L's), not "Elsa O. Iligan". Specific area/price not in corpus.
+            "id": "elsa-illigan-transferee",
+            "section": "Named transferees (under T-4497 derivatives)",
+            "text": "Elsa Illigan is a named transferee of land under the TCT T-4497 estate",
             "depends_on": [],
             "transfer_link": None,
             "if_supported_implies": "Documented transfer to one of the 19 non-Balane named transferees.",
             "defense_anticipation": "Good-faith purchaser arguments.",
-            "development_impact": "Per-parcel recoverable; PHP 7,000 / 300sqm ≈ PHP 23/sqm — bargain-price flag potentially relevant to good-faith analysis.",
+            "development_impact": "Per-parcel recoverable; specific consideration/area pending source verification.",
             "title_curative_score_delta": 1,
         },
     ],
