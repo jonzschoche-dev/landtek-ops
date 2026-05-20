@@ -17,17 +17,19 @@
 
 ## I. EXECUTIVE SUMMARY
 
-Plaintiffs are the three daughters and heirs of Mary Worrick Keesey, registered owner of TCT No. T-4497 — a primitive title covering approximately 35-40 parcels of agricultural and residential land in Daet and Mercedes, Camarines Norte, with collective assessed value exceeding ₱10,000,000. The estate was never partitioned. Yet between 1991 and the present, more than three dozen derivative titles were issued by the Register of Deeds based on instruments executed by Cesar M. De La Fuente — an agent whose authority was narrow from inception, terminated repeatedly across three decades, and absolutely extinguished by his death in 2017.
+Plaintiffs are the three daughters and heirs of Mary Worrick Keesey, registered owner of TCT No. T-4497 — a primitive title covering Daet and Mercedes, Camarines Norte, with collective assessed value exceeding ₱10,000,000. The estate was never partitioned. Yet between 1991 and the present, derivative titles were issued by the Register of Deeds based on instruments executed by Cesar M. De La Fuente — an agent whose authority was narrow from inception, terminated repeatedly across three decades, and absolutely extinguished by his death in 2017.
+
+> **Note on inventory:** the complaint draft claims approximately 35-40 derivative titles. The firm's verified mapping to date covers **26 derivatives** of T-4497 (18 verified + 8 inferred-strong; see §IV Cause B). Reconciling the 9-14-title gap is a §VII pre-filing item — the complaint should either be pleaded to the verified number with reservation to amend, or the additional titles must be authenticated before filing.
 
 Plaintiffs seek a comprehensive judicial unwinding: declare every unauthorized instrument void *ab initio*, cancel every derivative TCT, reinstate T-4497 as the sole controlling title, recover possession from current occupants, account for thirty-plus years of fruits, and assess damages against both the private defendants and the public officers whose complicity made the scheme possible.
 
-The case is structurally strong because it does not depend on any single revocation date; it rests on the **co-ownership void** (Civil Code Arts. 777, 493) that prevented Cesar from ever lawfully fragmenting the estate, regardless of what authority he possessed at any moment. Each subsequent revocation event — 1999 implied, 2005 formal, 2007 public notice, 2017 death — provides an independent and cumulative basis for voidness.
+The case rests on the **co-ownership void** (Civil Code Arts. 777, 493) that prevented Cesar from ever lawfully fragmenting the estate, regardless of what authority he possessed at any moment. Successive revocation events — 1999 implied, 2005 formal, 2007 public notice, 2017 death — provide additional, layered bases for voidness, though Layers 3-5 currently rest on testimonial evidence pending primary-instrument recovery.
 
-**The single highest-leverage fact** is that title issuances continued **after Cesar's death in 2017**, including the 2021 derivative chain that produced Gloria Balane's TCT T-079-2021002126 (Civil Code Art. 1919(3) extinguishes agency by death; no defense survives a post-mortem-executed instrument).
+**The single highest-leverage fact** is that title issuances continued **after Cesar's death in 2017**, including the 2021 derivative chain that produced Gloria Balane's TCT T-079-2021002126 (Civil Code Art. 1919(3) extinguishes agency by death; no defense survives a post-mortem-executed instrument). **This theory is contingent on authenticating Cesar's death certificate**, which is currently absent from the corpus — its acquisition is the #1 pre-filing action (§VII).
 
-The principal risks are evidentiary — the 1999 revocation letter's proof of delivery is reportedly lost, and the 2005 formal revocation instrument has not yet been located in the corpus. These gaps must be closed before the complaint is filed.
+> **Calendar context:** a Mediation / Settlement Conference is currently calendared for **2026-06-02 at RTC Daet** under the existing administrative docket CV-26360 (see also `calendar_events.id=3` and `case_deadlines.id=3`). Whether the June 2 event survives the imminent reframed-complaint filing — or whether the new complaint will be filed before, after, or in place of attending mediation — is a strategic decision for the principal and Atty. Barandon, addressed in §IX.
 
-**Recommendation:** Proceed to filing within 30 days, conditional on locating the 2005 formal revocation primary instrument (or formally substituting it with affidavit testimony coupled with the supportive 1999 dispatch and 2007 published notice).
+**Recommendation:** Proceed to pre-filing readiness completion within 30 days. Filing should occur after (i) Cesar's death certificate is authenticated, (ii) the 2005 SPA revocation primary is located or affidavit-substituted, (iii) all three plaintiff SPAs or the guardianship grant locks in standing, and (iv) the June 2 mediation outcome is known.
 
 ---
 
@@ -163,7 +165,11 @@ Counsel should anticipate and pre-empt the following defenses. Each is a known c
 
 Defendants will argue that their TCTs are indefeasible under P.D. 1529 after one year from issuance.
 
-**Counter:** *Spring cannot rise higher than its source*. Indefeasibility does not attach when the originating instrument is void *ab initio*. (Cite the leading SC authority on void-source derivative titles.) The complaint frames this as a direct attack on derivative TCTs whose root (the unauthorized deeds) was always void, never voidable.
+**Counter:** *Spring cannot rise higher than its source*. Indefeasibility does not attach when the originating instrument is void *ab initio*.
+
+> **[Atty. Barandon to insert preferred string-cite. Candidates: *Heirs of Gregorio Lopez v. Development Bank of the Philippines*; *Spouses Aguinaldo v. Torres*; *Mercado v. Mercado*; *Vda. de Cabrera v. CA*. Selection depends on which line of authority Atty. Barandon judges strongest for RTC Daet.]**
+
+The complaint frames this as a direct attack on derivative TCTs whose root (the unauthorized deeds) was always void, never voidable.
 
 ### Defense 2 — Innocent Purchaser for Value (IPV)
 
@@ -245,16 +251,18 @@ Reviewing the draft complaint against required filing elements:
 
 In order of priority and dependency:
 
-1. **Confirm all three plaintiffs have executed the AIF SPA.** Without this the case cannot file. *Owner: Jonathan. Deadline: 7 days.*
-2. **Locate the 2005 formal revocation instrument** in family records, Atty. Barandon's archive, or Camarines Norte notarial roll books. If unavailable within 14 days, document the substitute affidavit pathway. *Owner: Jonathan + Atty. Barandon. Deadline: 14 days.*
-3. **Atty. Barandon's red-line review** of the complaint draft — particularly Causes A, B, F, H for citation completeness and procedural form. *Owner: Atty. Barandon. Deadline: 10 days.*
-4. **Finalize Annex "A"** — the derivative-TCT inventory. The system already maps 26 verified/inferred derivatives from T-4497; the complaint claims 35-40; locate the remaining 9-14 from ROD records or family archive. *Owner: Leo + Atty. Barandon. Deadline: 14 days.*
-5. **Acquire the 2016 Deed of Absolute Sale** (the instrument that produced T-52540 → T-079-2021002126 chain). This is the single best documentary exhibit of the post-revocation void. *Owner: Atty. Barandon via ROD records request. Deadline: 21 days.*
-6. **Send the RD Camarines Norte demand letter** (currently overdue from 18 May) requesting full title-history of T-4497 and named derivatives. This produces several of the items above as a byproduct. *Owner: Atty. Barandon. Deadline: this week.*
-7. **Tier-by-tier per-defendant disambiguation** — for each named defendant: which derivative TCT they currently hold (or which lot they currently occupy), which dated instrument they took under, current possession status. Required for the reconveyance and accounting causes; informs settlement strategy per defendant. *Owner: Leo. Deadline: 21 days.*
-8. **Filing fee + cost estimate.** Atty. Barandon supplies; Jonathan reserves. *Deadline: 14 days.*
+1. **Authenticate Cesar M. De La Fuente's death certificate.** This is the single document that hardens Layer 6 — the post-mortem-instrument theory that is currently described as our cleanest factual fulcrum. Without it the strongest layer of the case is testimonial. *Owner: Atty. Barandon (PSA / civil registry request) or Jonathan if family records hold a copy. Deadline: 7 days.*
+2. **Confirm all three plaintiffs have executed the AIF SPA** (Patricia, Geraldine, Marcia). Without this the case cannot file under the SPA pathway. *Owner: Jonathan. Deadline: 7 days.*
+3. **Locate the 2005 formal SPA revocation instrument** in family records, Atty. Barandon's archive, or Camarines Norte notarial roll books. If unavailable within 14 days, document the substitute affidavit pathway. *Owner: Jonathan + Atty. Barandon. Deadline: 14 days.*
+4. **Atty. Barandon's red-line review** of the complaint draft — particularly Causes A, B, F, H for citation completeness and procedural form; also resolve §V Defense 1 string-cite. *Owner: Atty. Barandon. Deadline: 10 days.*
+5. **Reconcile the derivative-TCT count.** The system maps 26 verified/inferred derivatives from T-4497; the complaint claims 35-40. Either (a) plead the verified 26 with reservation to amend, or (b) locate the additional 9-14 via ROD records request. The current draft cannot ship until this is resolved. *Owner: Atty. Barandon (ROD request) + Leo (corpus mapping). Deadline: 14 days.*
+6. **Acquire the 2016 Deed of Absolute Sale** (the instrument that produced T-52540 → T-079-2021002126 chain). This is the single best documentary exhibit of the post-revocation void. *Owner: Atty. Barandon via ROD records request. Deadline: 21 days.*
+7. **Send the RD Camarines Norte demand letter** (currently overdue from 18 May) requesting full title-history of T-4497 and named derivatives. This produces several of the items above as a byproduct. *Owner: Atty. Barandon. Deadline: this week.*
+8. **Tier-by-tier per-defendant disambiguation** — for each named defendant: which derivative TCT they currently hold (or which lot they currently occupy), which dated instrument they took under, current possession status. Required for the reconveyance and accounting causes; informs settlement strategy per defendant. *Owner: Leo. Deadline: 21 days.*
+9. **Filing fee + cost estimate.** Atty. Barandon supplies; Jonathan reserves. *Deadline: 14 days.*
+10. **June 2 mediation strategy decision.** Attend / postpone / cite-as-record-of-non-resolution? Decision driven by §IX sequencing analysis. *Owner: Jonathan + Atty. Barandon. Deadline: 26 May (one week before mediation).*
 
-Target filing window: **mid-to-late June 2026,** contingent on Items 1, 2, and 3.
+Target filing window: **mid-to-late June 2026,** contingent on Items 1-5.
 
 ---
 

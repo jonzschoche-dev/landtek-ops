@@ -140,23 +140,33 @@ def extract_facts(client, content: str, summary: str | None,
 # ─── ENCODING PROPOSAL (resolve against DB) ──────────────────────────────
 
 def resolve_counsel(cur, raw_text, normalized):
-    """Is this counsel already in entities? If yes: do they have a role?"""
+    """Is this counsel already in entities? Use pg_trgm similarity (not substring)
+    because canonical names contain middle initials/suffixes that break ILIKE.
+    Threshold 0.35: a "fuzzy" but not crazy match.
+    """
+    # Prefer to match the canonical (canonical_id IS NULL) — not an alias row
     cur.execute("""
-        SELECT id, canonical_name, role, mentions_count
+        SELECT id, canonical_name, role, mentions_count,
+               similarity(canonical_name, %s) AS sim
           FROM entities
-         WHERE canonical_name ILIKE %s OR %s = ANY(aliases)
-         ORDER BY mentions_count DESC LIMIT 1
-    """, (f"%{normalized}%", normalized))
+         WHERE canonical_id IS NULL
+           AND (canonical_name ILIKE 'atty.%%' OR role ILIKE '%%counsel%%'
+                OR similarity(canonical_name, %s) > 0.35)
+         ORDER BY sim DESC, mentions_count DESC
+         LIMIT 1
+    """, (normalized, normalized))
     row = cur.fetchone()
-    if not row:
-        return {"action": "create_entity", "reason": "counsel not in entities table",
+    if not row or row["sim"] < 0.35:
+        return {"action": "create_entity",
+                "reason": f"counsel {normalized!r} not in entities (best sim: {(row['sim'] if row else 0):.2f})",
                 "proposed_payload": {"canonical_name": normalized, "type": "person",
                                      "role": "Counsel (matter TBC)"}}
     if not row["role"]:
         return {"action": "update_entity_role", "entity_id": row["id"],
-                "reason": f"counsel {row['canonical_name']} (id={row['id']}) has NULL role",
+                "reason": f"matched {row['canonical_name']!r} (id={row['id']}, sim={row['sim']:.2f}) — has NULL role",
                 "proposed_payload": {"role": "Counsel (matter TBC)"}}
-    return {"action": "none", "reason": f"counsel {row['canonical_name']} (id={row['id']}) already has role: {row['role']}"}
+    return {"action": "none",
+            "reason": f"matched {row['canonical_name']!r} (id={row['id']}, sim={row['sim']:.2f}) — role already: {row['role'][:60]}"}
 
 
 def resolve_matter_status(cur, related_case, normalized):
@@ -177,15 +187,21 @@ def resolve_matter_status(cur, related_case, normalized):
 
 
 def resolve_docket(cur, normalized):
-    """Docket number — find matching matter."""
+    """Docket number — find matching matter via trigram (handles formatting variants like
+    'Civil Case 26-360' vs 'Civil Case No. 26-360' vs 'CV-2026-360')."""
     cur.execute("""
-        SELECT matter_code, docket_number FROM matters
-         WHERE docket_number ILIKE %s LIMIT 3
-    """, (f"%{normalized}%",))
+        SELECT matter_code, docket_number, title,
+               similarity(COALESCE(docket_number,'') || ' ' || COALESCE(title,''), %s) AS sim
+          FROM matters
+         WHERE status = 'active'
+         ORDER BY sim DESC LIMIT 3
+    """, (normalized,))
     rows = cur.fetchall()
-    if rows:
-        return {"action": "none", "reason": f"docket {normalized!r} matches matter {rows[0]['matter_code']}"}
-    return {"action": "create_matter", "reason": f"docket {normalized!r} has no matching matters row",
+    if rows and rows[0]["sim"] >= 0.35:
+        return {"action": "none",
+                "reason": f"docket {normalized!r} matches matter {rows[0]['matter_code']} (sim={rows[0]['sim']:.2f})"}
+    return {"action": "create_matter",
+            "reason": f"docket {normalized!r} has no matching matters row (best sim: {(rows[0]['sim'] if rows else 0):.2f})",
             "proposed_payload": {"docket_number": normalized}}
 
 
