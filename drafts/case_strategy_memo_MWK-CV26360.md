@@ -43,13 +43,15 @@ The complaint rests on a **layered nullity** doctrine. Each layer independently 
 
 **Layer 3 — Implied revocation (1999 forward).** In 1999, the heirs prepared and dispatched a revocation letter. From that date Cesar rendered no accounting and ceased all contact. Under the law of agency, this cessation extinguished whatever residual agency remained.
 
-**Layer 4 — Formal revocation (2005 forward).** In 2005, the heirs issued a formal, unconditional revocation of all authority. All Cesar's instruments executed after 2005 are unquestionably void.
+**Layer 4 — Formal revocation (2005 forward).** In 2005, the heirs issued a formal, unconditional revocation of all authority granted under the 1991 and 1992 SPAs. All Cesar's instruments executed after 2005 are **presumptively void**, conditional on authenticating the 2005 primary revocation instrument *or* substituting affidavit testimony from the heirs coupled with the corroborating 1999 dispatch and 2007 published notice. The strength of Layer 4 scales with the evidentiary recovery achieved during pre-filing (§VII item 3).
 
 **Layer 5 — Constructive notice (2007 forward).** Plaintiffs published a Public Notice of Irregularities. After 2007, no purchaser, transferee, or subsequent owner can claim status as innocent purchaser for value: the irregularity was on the public record.
 
 **Layer 6 — Death extinguishment (21 June 2017 forward).** Cesar M. De La Fuente died on or about 21 June 2017. Under Civil Code Art. 1919(3), agency is extinguished by the agent's death. Any instrument executed in Cesar's name after this date — including those that supplied the 2021 chain to Gloria Balane's TCT T-079-2021002126 — is not merely void for want of agency, but legally impossible. **This is the cleanest factual fulcrum of the case.**
 
-**Layer 7 — Discovery and concealment defeat laches.** Plaintiffs reside in the United States. Throughout 1991-2020, no encumbrance was annotated on T-4497 sufficient to give them notice of any of the void transactions. Plaintiffs discovered the fraud only in 2020, whereupon they immediately filed public notices of nullity, served formal demands, and pursued administrative escalation. The doctrine that fraud actively concealed cannot give rise to laches squarely applies. Further, because the underlying acts are *void* and not merely voidable, the action to declare nullity does not prescribe.
+**Layer 7a — Imprescriptibility of nullity actions (governs Causes A, B, E).** Because the underlying acts are *void ab initio* and not merely voidable, the action to declare them null does not prescribe. This is a rule of law, not a tolling argument: time cannot cure what is structurally non-existent. Cancellation of derivative TCTs (Cause B) and quieting of title (Cause E) flow from the same imprescriptibility.
+
+**Layer 7b — Discovery-rule tolling defeats laches on prescriptive claims (governs Causes C, D, F).** Reconveyance, *accion reivindicatoria*, and accounting of fruits each have their own prescriptive frameworks. For each, the discovery rule applies: plaintiffs reside in the United States and throughout 1991-2020 no encumbrance was annotated on T-4497 sufficient to give them notice. Plaintiffs discovered the fraud only in 2020, whereupon they immediately filed public notices of nullity, served formal demands, and pursued administrative escalation. Concealed fraud cannot give rise to laches; the prescriptive period (where applicable) runs from 2020, not from each underlying void act.
 
 ---
 
@@ -87,11 +89,27 @@ Cesar M. De La Fuente (deceased 2017), represented by his heirs, successors, and
 
 ### Tier V — Universal and Nominal Defendants
 
-- John Does 1-100: unknown transferees claiming through void acts
-- John Does 101-200: public employees and officials in the ROD and Assessor's Offices who knowingly processed the fraudulent instruments
-- Registrar of Deeds, Camarines Norte (nominal under P.D. 1529)
-- City/Municipal Assessor's Offices of Daet and Mercedes (nominal, for tax record cancellation)
+**Named individual officials (already identified through the firm's ARTA filings):**
+
+- **Hon. Alexander L. Pajarillo** — Municipal Mayor, Mercedes — respondent in ARTA SL-2025-1021-0747 (Cause H, R.A. 11032 §21(b)(d)(e) violations)
+- **Loida E. Macale** — Municipal Treasurer, Mercedes — respondent in ARTA SL-2026-0128-1210
+- **Gemma P. Abla** — Municipal Assessor, Mercedes — respondent in ARTA SL-2026-0209-1321 (refusal to deliver tax assessment records); also subject of related Rejoinder filings
+- **Engr. Erwin Balane** — Municipal Engineer, Mercedes — respondent in ARTA SL-2026-0218-1378 (3rd-count R.A. 11032 violations)
+- **Hon. Noel Ong** — SB Councilor, Mercedes — respondent in MTO/ARTA filings (DOC #836)
+- **(DILG) Vencer** — DILG official identified in DOC #831 complaint; capacity to be confirmed
+
+**John Does — placeholder categories:**
+
+- John Does 1-100: unknown transferees claiming through void acts (to be progressively named as the per-defendant disambiguation completes — §VII item 8)
+- John Does 101-200: other public employees and officials in the ROD and Assessor's Offices who knowingly processed the fraudulent instruments
+
+**Nominal defendants:**
+
+- Registrar of Deeds, Camarines Norte (under P.D. 1529)
+- City/Municipal Assessor's Offices of Daet and Mercedes (for tax record cancellation)
 - The Republic of the Philippines (for reversion, if necessary)
+
+> **Tier exposure ranking (added per pre-delivery audit).** Tier IV (Bayani) is the strongest tier for plaintiffs because Layer 6 (death extinguishment) is corpus-anchored once Cesar's death certificate is in hand. Tier III (including Balane) is next-strongest because Layers 1-5 all converge there. Tier II is mid-strength. **Tier I is currently the most exposed:** it depends entirely on Layers 1 and 2, both of which require the 1991 and 1992 SPAs in the corpus, which the firm does not yet possess. If those instruments cannot be located, the Tier I claims rest on the co-ownership/lack-of-partition argument alone (Layer 1 unaided by Layer 2) — still legally sufficient under Civil Code Art. 493, but evidentially leaner. Litigation strategy should sequence the strongest-tier counts first.
 
 ---
 
@@ -217,11 +235,11 @@ Reviewing the draft complaint against required filing elements:
 ### Ready
 
 - ✓ Caption with all three plaintiffs identified
-- ✓ Defendant taxonomy (28 named + John Does + nominal defendants)
+- ✓ Defendant taxonomy (28 named + named ARTA officials migrated into Tier V + John Does + nominal defendants)
 - ✓ Jurisdiction + venue properly pleaded under B.P. 129 / R.A. 11576
 - ✓ Eight causes of action with legal authorities
 - ✓ Prayer with specific relief items
-- ✓ Verification template
+- ⚠ **Verification template** — *ready conditional on §VII item 2 (all three plaintiff SPAs executed); cannot be signed until authority chain is complete*
 - ✓ Annex framework with 13 exhibits/annexes identified
 - ✓ **Parallel authority track (Judicial Guardianship) drafted and in pre-filing review under separate counsel** — see §IX
 
@@ -348,7 +366,14 @@ Two reasonable paths; the call is yours. My read:
 - **Path X (file CV-26360 first):** mid-to-late June filing as the main memo proposes, on SPA authority. Pro: maintains pre-mediation momentum before June 2, places Balane on the defensive sooner. Con: invites Defense-5 capacity challenge that the guardianship would foreclose.
 - **Path Y (wait for guardianship grant):** delay CV-26360 filing until guardianship order issues. Pro: bulletproof authority foundation, integrated exhibit pack, no SPA-vulnerability. Con: timeline pushed; depends on how fast RTC Daet acts on a petition that hasn't yet been filed.
 
-**Recommended path: Hybrid.** Continue CV-26360 pre-filing work in parallel; do NOT file before the guardianship petition is at least filed and docketed. Use the guardianship petition's filing date as the trigger for CV-26360 filing readiness review. Coordinate with both counsel weekly until both matters are docketed.
+**Recommended path: Hybrid with hard fallback date.**
+
+1. Continue CV-26360 pre-filing work in parallel with guardianship preparation. **Target: guardianship petition filed at RTC Daet on or before 2026-05-30** (10 days from this memo's date).
+2. **If guardianship is filed and docketed by 2026-05-30:** wait for the docketing before filing CV-26360, so CV-26360 references the guardianship docket and the authority question is foreclosed at filing.
+3. **If guardianship slips past 2026-05-30:** file CV-26360 on or before 2026-06-15 under SPA framing (assuming all three plaintiff SPAs are executed per §VII item 2), expressly accepting the Defense 5 capacity exposure and reserving the right to amend the verification once the guardianship grant issues.
+4. Coordinate Barandon-Botor weekly meetings until both matters are docketed; the May 22 Naga meeting is the first of these. Use that meeting to either lock in the May 30 guardianship-filing date or trigger the fallback explicitly.
+
+This path eliminates the "indefinite wait" failure mode by giving the hybrid recommendation a committed trigger date.
 
 ---
 
