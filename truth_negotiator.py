@@ -327,6 +327,11 @@ def call_challenger(claim_text, evidence_summaries):
             case_file="MWK-001",
             model="claude-sonnet-4-6",
             max_tokens=400,
+            # deploy_217: temperature=0 for back-test stability + per-transferee
+            # number reproducibility. Greedy decoding → identical input → identical
+            # output. Yesterday-vs-today verdict drift on t4497-registered claim
+            # traced to default temperature > 0 sampling.
+            temperature=0,
             # Prompt caching: the system prompt is ~2K tokens of static instructions.
             # Use EXTENDED 1h TTL (was 5-min ephemeral). Truth-negotiator runs in
             # bursts throughout the day; 1h cache amortizes the write cost across
