@@ -588,8 +588,37 @@ def cycle(cur, token, verbose=False):
         chat = msg.get("chat", {})
         # Accept inbound from ANY hardcoded recipient (Jonathan AND Don Qi).
         # Per [[feedback_client_comms_hardcoded]] — administrators reply too.
-        if str(chat.get("id")) not in ALLOWED_INBOUND_CHAT_IDS:
+        sender_chat_id_str = str(chat.get("id"))
+        if sender_chat_id_str not in ALLOWED_INBOUND_CHAT_IDS:
             continue
+
+        # ── chat_notes auto-write (per [[feedback_facts_in_chat_are_first_class]]) ──
+        # Every recognized inbound text gets a chat_notes row so fact_extractor
+        # can see it on its next 5-min cycle, even when the dispatcher
+        # handles the message as a slash-command or as an inquiry answer.
+        # Fixes the 2026-05-20 14:11-14:17 PHT gap where 7 prose corrections
+        # were captured as tg_inquiry_queue.response_text but never as
+        # chat_notes — so the encoder pipeline never saw them.
+        _inbound_text = (msg.get("text") or msg.get("caption") or "").strip()
+        if _inbound_text:
+            _tg_msg_id = msg.get("message_id")
+            try:
+                cur.execute("""
+                    INSERT INTO chat_notes (
+                        telegram_msg_id, sender_id, sender_name, content,
+                        topic, importance, provenance_level
+                    ) VALUES (%s, %s, %s, %s, 'misc', 3, 'inferred_strong')
+                    ON CONFLICT DO NOTHING
+                """, (str(_tg_msg_id) if _tg_msg_id else None,
+                      sender_chat_id_str,
+                      (msg.get("from", {}).get("first_name", "")
+                       + " " + msg.get("from", {}).get("last_name", "")).strip()
+                      or "(unknown sender)",
+                      _inbound_text[:4000]))
+            except Exception as _e:
+                # Never let chat_notes failure block dispatcher flow
+                if verbose:
+                    print(f"  ⚠ chat_notes insert failed: {_e}")
 
         # ─── IMAGE / PHOTO / DOCUMENT handler ─────────────────────────────
         # Per Jonathan 2026-05-17: must "scan a screenshot for text and context".
