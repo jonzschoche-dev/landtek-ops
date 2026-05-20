@@ -92,8 +92,54 @@ def extract_atoms(claim):
     return atoms or [{"text": claim, "anchors": []}]
 
 
+def _expand_entity_anchors(cur, anchors):
+    """Expand entity anchors through the entities table to catch name variants.
+
+    Addresses fragmentation like 'Cesar M. de la Fuente' / 'Cesar N. dela Fuente' /
+    'Cesar Dela Fuente' — same person, different recorded forms across docs.
+    Pulls canonical_name + aliases of verified entity records that match the anchor.
+    Bounded: top 3 verified entities per anchor (by mentions_count).
+
+    Failure-safe: if entities table query errors, falls back to base anchors.
+    """
+    expanded = []
+    seen = set()
+
+    def _push(kind, v):
+        if not v or len(v) < 3:
+            return
+        key = v.lower().strip()
+        if key in seen:
+            return
+        seen.add(key)
+        expanded.append((kind, v))
+
+    for kind, val in anchors:
+        _push(kind, val)
+        if kind != "entity" or not val or len(val) < 3:
+            continue
+        try:
+            cur.execute("""
+                SELECT canonical_name, aliases
+                  FROM entities
+                 WHERE provenance_level = 'verified'
+                   AND (canonical_name ILIKE %s OR %s = ANY(aliases))
+                 ORDER BY mentions_count DESC NULLS LAST
+                 LIMIT 3
+            """, (f"%{val}%", val))
+            for row in cur.fetchall():
+                _push("entity", row["canonical_name"])
+                for alias in (row.get("aliases") or []):
+                    _push("entity", alias)
+        except Exception:
+            # Entities lookup failure must not block the probe.
+            continue
+    return expanded
+
+
 def probe_evidence(cur, claim_text, anchors, case_file=None):
     """4-direction probe. Returns list of evidence dicts."""
+    anchors = _expand_entity_anchors(cur, anchors)
     evidence = []
     seen_doc_ids = set()
 
@@ -403,7 +449,7 @@ def negotiate(claim_text, case_file=None, asked_by="cli", skip_challenger=False)
     # Final ranking — surface high-evidentiary-value docs (affidavits, pleadings, orders)
     # AND high-precision-quote hits to the top, so the challenger sees them
     CLASS_RANK = {
-        "Judicial Affidavit": 12, "Affidavit": 11, "Complaint": 10, "Court Filing": 9,
+        "Judicial Affidavit": 12, "Court Filing": 11, "Affidavit": 11, "Complaint": 10,
         "Reply": 8, "Motion": 8, "Answer": 8, "Order": 9, "Resolution": 7,
         "Notice": 6, "Memorandum": 6, "Demand Letter": 5, "Deed": 4,
         "Special Power of Attorney": 4, "Power of Attorney": 4, "Letter": 3,
