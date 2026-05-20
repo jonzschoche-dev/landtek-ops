@@ -131,34 +131,9 @@ Leo tools Flask service: `/root/landtek/leo_tools/server.py` on port 8765. Expos
 `/api/get_entity`, `/api/fuzzy_find_entity`, `/api/get_thread`, `/api/list_threads`,
 `/api/query_documents`, `/api/pending_entity_types`. n8n calls these.
 
-## Session-start protocol (automatic — read the hook output above)
-
-A SessionStart hook (configured in `.claude/settings.json`) has just run
-`scripts/landtek_git_routine.sh start` — its output is in your context above
-this CLAUDE.md.
-
-- If it reported **"Working tree clean / Up to date"** → proceed normally.
-- If it pulled new commits → **read the new files first** before any further work; the other agent (VPS or Mac) wrote them for a reason that may affect your task.
-- If it warned **"Working tree dirty before pull"** → STOP, surface the dirty files to Jonathan, decide together before any new work.
-
-A SessionEnd hook also fires automatically on `/quit` or window close — last-second warning if there's uncommitted or unpushed work.
-
-Manual triggers (use anytime during a session):
-
-```bash
-$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh check    # snapshot, no changes
-$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh end      # full handoff report
-$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh deploy <NN> "desc" path1 path2
-                                                            # safe commit + push
-# OR via slash command:
-/session-end
-```
-
-The full routine + rationale + handoff template lives in memory: `[[feedback_multi_agent_git_routine]]`.
-
----
-
 ## Git push protocol (READ EVERY SESSION — multi-agent coordination)
+
+*(Session-start ritual + handoff routine now live at the top of this file. The protocol below is the deeper detail.)*
 
 You are not the only Claude touching this repo. A Mac-side Claude (running in the
 desktop app's SSH workspace + via a Mac auto-sync daemon) reads, edits, and pushes
