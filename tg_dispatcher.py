@@ -874,6 +874,80 @@ def cycle(cur, token, verbose=False):
                 print(f"  question detected, not recorded as answer to #{active['id']}")
             continue
 
+        # ── Receipt-extractor reply router ──
+        # Active intake came from receipt_extractor; notes carry a JSON blob
+        # with vendor/total/date/category and either an assigned matter or a
+        # context-proposal. Accept: /confirm (use the assigned matter or the
+        # proposal), a bare matter_code (override), or /skip (handled upstream).
+        if active["source_table"] == "receipt_extractor":
+            import json as _json
+            import re as _re
+            import sys as _sys; _sys.path.insert(0, "/root/landtek")
+            from receipt_extractor import write_cost_from_receipt
+            ack_msg = None
+            assigned_matter = None
+            try:
+                try:
+                    note_obj = _json.loads(active["notes"] or "{}")
+                except Exception:
+                    note_obj = {}
+                doc_id = note_obj.get("doc_id")
+                vendor = note_obj.get("vendor", "?")
+                total = note_obj.get("total_php") or 0
+                proposed = note_obj.get("proposed_matter")
+                preassigned = note_obj.get("matter_code") or active.get("matter_code")
+                lower = text.strip().lower()
+
+                if lower == "/confirm":
+                    assigned_matter = preassigned or proposed
+                    if not assigned_matter:
+                        ack_msg = ("⚠️ /confirm with no preassigned or proposed matter. "
+                                   "Reply with a matter_code instead (e.g. <code>MWK-CV26360</code>).")
+                elif _re.match(r"^[A-Z][A-Z0-9-]{1,40}$", text.strip()):
+                    assigned_matter = text.strip()
+                else:
+                    ack_msg = ("⚠️ Couldn't parse. Reply <code>/confirm</code> to accept "
+                               "the proposed matter, a different matter_code, or "
+                               "<code>/skip</code>.")
+
+                if assigned_matter and not ack_msg:
+                    result_for_write = {
+                        "vendor": vendor,
+                        "total_php": total,
+                        "date": note_obj.get("date"),
+                        "category": note_obj.get("category", "misc"),
+                        "notes": "",
+                        "confidence": 0,  # not used in write
+                    }
+                    row_id = write_cost_from_receipt(assigned_matter, doc_id, result_for_write)
+                    # Backfill matter onto the document + client_history rows
+                    cur.execute("UPDATE documents SET matter_code = %s WHERE id = %s",
+                                (assigned_matter, doc_id))
+                    cur.execute("""
+                        UPDATE client_history
+                           SET matter_code = %s,
+                               matter_codes = ARRAY[%s]::text[],
+                               what_summary = REPLACE(what_summary, ' · PENDING matter assignment', '')
+                         WHERE source_table = 'receipt_extractor'
+                           AND source_id = %s
+                    """, (assigned_matter, assigned_matter, str(doc_id)))
+                    ack_msg = (f"✓ Receipt doc#{doc_id} ({vendor[:30]} · ₱{total:,.2f}) "
+                               f"logged to <code>{assigned_matter}</code> (row #{row_id})")
+            except Exception as e:
+                ack_msg = f"⚠️ Receipt-assign failed: {str(e)[:160]}"
+
+            cur.execute("""
+                UPDATE tg_inquiry_queue SET status='answered', response_text=%s, responded_at=NOW()
+                 WHERE id=%s
+            """, (text[:4000], active["id"]))
+            answer_recorded = True
+            if ack_msg:
+                tg_send(ack_msg, token, reply_to=msg.get("message_id"),
+                        audience="ops", kind="ad_hoc")
+            if verbose:
+                print(f"  receipt_extractor reply → {('assigned ' + assigned_matter) if assigned_matter else 'no assignment'}")
+            continue
+
         # ── Legal-intake reply router (per [[feedback_facts_in_chat_are_first_class]]) ──
         # If the active inquiry came from legal_intake, parse the reply + persist.
         if active["source_table"] == "legal_intake" and (active["notes"] or "").startswith("legal_intake:"):
