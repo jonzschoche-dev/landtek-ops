@@ -110,7 +110,12 @@ case "$cmd" in
     echo ""
 
     hdr "Untracked files (likely real work?)"
-    untracked=$(git ls-files --others --exclude-standard | grep -v '^drafts/daily_digest_' | grep -v '\.mac-backup\|\.vps-backup' | head -20)
+    # set -e + pipefail makes empty grep results exit 1, masking real state.
+    # `|| true` keeps the pipeline successful when nothing matches.
+    untracked=$(git ls-files --others --exclude-standard \
+                  | { grep -v '^drafts/daily_digest_' || true; } \
+                  | { grep -v '\.mac-backup\|\.vps-backup' || true; } \
+                  | head -20)
     if [ -n "$untracked" ]; then
       echo "$untracked"
       warn "Review — stage + commit, gitignore, or leave as scratch?"
