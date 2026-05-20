@@ -74,3 +74,7 @@ notifications/blocked.txt
 
 # Per-machine Claude Code config (permissions allowlist, machine-specific paths)
 .claude/settings.local.json
+
+# Pre-merge snapshots from the multi-agent git routine (see feedback_multi_agent_git_routine.md)
+*.mac-backup-*
+*.vps-backup-*
