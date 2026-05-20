@@ -15,7 +15,9 @@ Flow each cycle:
   4. Update tg_update_cursor.
 """
 import argparse
+import json
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -39,6 +41,45 @@ def load_token():
             if line.startswith("TELEGRAM_BOT_TOKEN="):
                 return line.strip().split("=", 1)[1]
     return None
+
+
+_QUESTION_STARTERS = {
+    "did", "do", "does", "is", "are", "was", "were", "can", "could",
+    "will", "would", "should", "has", "have", "had", "may", "might",
+    "what", "whats", "what's", "when", "where", "who", "whos", "who's",
+    "why", "how", "which",
+    "tell", "show", "give", "find", "list", "check", "explain",
+    "any", "anything", "anyone",
+}
+
+
+def _looks_like_question(text: str) -> bool:
+    """Heuristic: does this look like Jonathan asking Leo something, rather
+    than an answer to the currently-active inquiry?
+
+    True for: 'Did emails come today?', 'What's the status', 'Tell me about Maribel'.
+    False for: 'She's the president of NIBDC', '50M', 'counsel_retainer | 12500 | ...',
+    '/confirm', 'next' — i.e. anything that looks like a fact, an option pick,
+    a parser-format reply, or a slash command (slash commands are filtered upstream)."""
+    if not text:
+        return False
+    t = text.strip()
+    if not t:
+        return False
+    if t.endswith("?"):
+        return True
+    first = t.split()[0].lower().rstrip(",.:!")
+    return first in _QUESTION_STARTERS
+
+
+def _unescape_literals(text: str) -> str:
+    """Convert literal backslash-n / -t / -r sequences in composed_html into real
+    whitespace. Some LLM-driven producers serialize their reply as a JSON string
+    and store it raw, leaving \\n visible in Telegram. Intake bodies don't
+    legitimately need the literal escape, so this is safe to do unconditionally."""
+    if not text:
+        return text
+    return text.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", "\t")
 
 
 def tg_send(text, token, reply_to=None, case_file="MWK-001", audience="ops", kind="ad_hoc"):
@@ -331,39 +372,45 @@ def handle_priority_command(text, token, reply_to=None):
 
 
 def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
-    """Pull a Telegram photo/document, OCR via Gemini, ingest into documents +
-    bind to the currently-active inquiry if any.
+    """Pull a Telegram photo/document, OCR via Gemini, classify via Haiku,
+    insert with structured fields, log canonical-bible event, and queue an
+    educated follow-up question.
 
-    Per Jonathan 2026-05-17: must scan screenshots and pull text + context.
+    Returns dict {doc_id, classification, case_file, matter_code_guess,
+    confidence, bound_to_inquiry} so callers (the cycle loop) can build a
+    proper ack with the actual classified fields.
     """
-    import os, requests, hashlib, time, psycopg2
-    from datetime import datetime
+    import os, requests, hashlib, time, psycopg2, json as _json
+    import sys as _sys; _sys.path.insert(0, "/root/landtek")
 
-    # 1. Get the file_path from Telegram
+    result = {"doc_id": None, "classification": None, "case_file": None,
+              "matter_code_guess": None, "confidence": 0.0,
+              "bound_to_inquiry": None, "vendor_or_party": None,
+              "amount_php": None, "doc_date": None}
+
+    # 1. Get + download the file
     r = requests.get(f"https://api.telegram.org/bot{token}/getFile",
                      params={"file_id": file_id}, timeout=20)
     j = r.json()
     if not j.get("ok"):
         tg_send(f"⚠️ getFile failed: {j.get('description','?')[:200]}", token, reply_to=reply_to)
-        return None
+        return result
     file_path = j["result"]["file_path"]
-    # 2. Download
     bin_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
     binr = requests.get(bin_url, timeout=60)
     binr.raise_for_status()
     blob = binr.content
     content_hash = hashlib.sha256(blob).hexdigest()
-    # 3. Save locally
     os.makedirs("/root/landtek/uploads/telegram", exist_ok=True)
     ext = ".jpg" if file_kind == "photo" else "." + (file_kind.split("/")[-1] if "/" in file_kind else "bin")
     fname = f"tg_{int(time.time())}_{content_hash[:12]}{ext}"
     local_path = f"/root/landtek/uploads/telegram/{fname}"
     with open(local_path, "wb") as fh:
         fh.write(blob)
-    # 4. OCR via Gemini Vision (cost-logged via wrapper)
+
+    # 2. OCR via Gemini Vision
     extracted_text = ""
     try:
-        import sys as _sys; _sys.path.insert(0, "/root/landtek")
         import google.generativeai as genai
         from llm_billing import gemini_call
         from landtek_core import get
@@ -385,17 +432,120 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
     except Exception as e:
         extracted_text = f"OCR_FAILED: {str(e)[:200]}"
 
-    # 5. Try to bind to the currently-active inquiry (if any) — append response
+    # 3. Classify via Haiku (with context: active matters + recent uploads)
     conn = psycopg2.connect(DSN); conn.autocommit = True
+    from psycopg2.extras import RealDictCursor
+    cd = conn.cursor(cursor_factory=RealDictCursor)
+    cd.execute("""
+        SELECT matter_code, case_file, title FROM matters
+         WHERE status='active' ORDER BY case_file, matter_code LIMIT 60
+    """)
+    active_matters = cd.fetchall()
+    cd.execute("""
+        SELECT id, classification, case_file, LEFT(extracted_text, 200) AS key_fact
+          FROM documents
+         WHERE timestamp > NOW() - INTERVAL '15 minutes'
+         ORDER BY timestamp DESC LIMIT 5
+    """)
+    recent_uploads = cd.fetchall()
+    cd.close()
+
+    cls = {"kind": "unknown", "case_file_guess": None, "matter_code_guess": None,
+           "doc_date": None, "key_fact": "", "vendor_or_party": None,
+           "amount_php": None, "parties": [], "confidence": 0.0,
+           "needs_human_question": ""}
+    try:
+        import anthropic
+        from doc_classifier import classify_document
+        a_client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+        cls.update(classify_document(a_client, doc_id_placeholder := -1,
+                                       extracted_text, active_matters, recent_uploads))
+    except Exception as e:
+        cls["needs_human_question"] = f"Classifier failed ({str(e)[:80]}) — what is this?"
+
+    # 4. Insert documents with classified fields (no more hardcoded MWK-001).
+    # When the classifier can't determine case_file (== could be any client),
+    # use 'UNCLASSIFIED' as an explicit sentinel — never silently guess a
+    # specific client folder. The educated follow-up Q asks Jonathan which
+    # client this belongs to and the reply router can update the row.
+    classification = cls.get("kind", "unknown")
+    case_file = cls.get("case_file_guess") or "UNCLASSIFIED"
+    case_file_was_defaulted = cls.get("case_file_guess") is None
+    doc_date = cls.get("doc_date") or None
+    doc_date_quality = "from_doc" if cls.get("doc_date") else "upload_date_fallback"
     c = conn.cursor()
+    c.execute("""
+        INSERT INTO documents (case_file, original_filename, smart_filename, mime_type,
+                               content_hash, file_path, extracted_text, status,
+                               text_length, timestamp, doc_date_norm, doc_date_quality,
+                               classification, matter_code)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, 'ingested_from_telegram',
+                %s, NOW(), COALESCE(%s::date, CURRENT_DATE), %s, %s, %s)
+        ON CONFLICT (content_hash) WHERE content_hash IS NOT NULL
+          DO UPDATE SET file_path = EXCLUDED.file_path
+        RETURNING id
+    """, (case_file, fname, fname,
+          "image/jpeg" if file_kind == "photo" else file_kind,
+          content_hash, local_path, extracted_text, len(extracted_text),
+          doc_date, doc_date_quality, classification,
+          cls.get("matter_code_guess")))
+    doc_id = c.fetchone()[0]
+    result["doc_id"] = doc_id
+    result["classification"] = classification
+    result["case_file"] = case_file if not case_file_was_defaulted else None
+    result["matter_code_guess"] = cls.get("matter_code_guess")
+    result["confidence"] = cls.get("confidence", 0.0)
+    result["vendor_or_party"] = cls.get("vendor_or_party")
+    result["amount_php"] = cls.get("amount_php")
+    result["doc_date"] = cls.get("doc_date")
+
+    # 5. Log canonical-bible event in client_history (idempotent)
+    try:
+        c.execute("SELECT client_code FROM clients WHERE case_file = %s LIMIT 1", (case_file,))
+        cc_row = c.fetchone()
+        if not cc_row:
+            c.execute("SELECT DISTINCT client_code FROM matters WHERE case_file = %s LIMIT 1", (case_file,))
+            cc_row = c.fetchone()
+        client_code = cc_row[0] if cc_row else None
+        if client_code:
+            summary_bits = [f"{classification}"]
+            if cls.get("vendor_or_party"):
+                summary_bits.append(cls["vendor_or_party"][:50])
+            if cls.get("amount_php"):
+                summary_bits.append(f"₱{cls['amount_php']:,.2f}")
+            if cls.get("key_fact"):
+                summary_bits.append(cls["key_fact"][:80])
+            if case_file_was_defaulted:
+                summary_bits.append("PENDING client assignment")
+            summary = " · ".join(summary_bits)[:300]
+            matter_codes_arr = [cls["matter_code_guess"]] if cls.get("matter_code_guess") else []
+            c.execute("""
+                INSERT INTO client_history
+                  (client_code, case_file, matter_code, matter_codes, event_date,
+                   event_kind, source_table, source_id,
+                   what_summary, citation_ref, provenance)
+                VALUES (%s, %s, %s, %s, %s,
+                        'document_uploaded', 'documents', %s,
+                        %s, %s, 'inferred_strong')
+                ON CONFLICT (source_table, source_id) DO NOTHING
+            """, (client_code,
+                  case_file if not case_file_was_defaulted else None,
+                  cls.get("matter_code_guess"), matter_codes_arr,
+                  doc_date, str(doc_id), summary, f"doc#{doc_id}"))
+    except Exception as e:
+        print(f"  ⚠ client_history log failed: {e}")
+
+    # 6. Bind to currently-active inquiry (if any)
     c.execute("""
         SELECT id, intake_response_id, item_index, composed_html, kind
           FROM tg_inquiry_queue WHERE status='active' LIMIT 1
     """)
     active = c.fetchone()
     bind_note = ""
+    bound_id = None
     if active:
-        active_id = active[0]
+        bound_id = active[0]
+        result["bound_to_inquiry"] = bound_id
         c.execute("""
             UPDATE tg_inquiry_queue
                SET status='answered',
@@ -404,50 +554,58 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
                    notes = COALESCE(notes,'') || %s
              WHERE id = %s
         """, (f"\n[image uploaded: {fname}]\n" + extracted_text[:2000],
-              f" | image bound: {fname}", active_id))
-        bind_note = f" + bound to active inquiry #{active_id}"
-        # If it's an atomic intake_item, evaluate the OCR text as the answer
+              f" | image bound: {fname}", bound_id))
+        bind_note = f" + bound to active inquiry #{bound_id}"
         if active[1] and active[4] in ("intake_item", "intake_followup"):
             cur_d = psycopg2.connect(DSN); cur_d.autocommit = True
-            from psycopg2.extras import RealDictCursor
             cur_dx = cur_d.cursor(cursor_factory=RealDictCursor)
             cur_dx.execute("""
                 SELECT id, intake_response_id, item_index, composed_html, kind
                   FROM tg_inquiry_queue WHERE id = %s
-            """, (active_id,))
+            """, (bound_id,))
             row = cur_dx.fetchone()
             try:
                 evaluate_and_followup(cur_dx, row, extracted_text, token, verbose=False)
             except Exception as e:
                 print(f"  satisfaction-on-image-failed: {e}", flush=True)
             cur_dx.close(); cur_d.close()
+    c.close()
 
-    # 6. Insert into documents
-    # NB: `content_hash` has TWO PARTIAL unique indexes (WHERE content_hash IS NOT NULL).
-    # `ON CONFLICT (col)` needs a non-partial UNIQUE — so we either include the index
-    # predicate, or just catch the duplicate-key exception. Using `WHERE` form
-    # matches the partial index. Per 2026-05-20 Maribel-meeting silent-drop incident.
-    c.execute("""
-        INSERT INTO documents (case_file, original_filename, smart_filename, mime_type,
-                               content_hash, file_path, extracted_text, status,
-                               text_length, timestamp, doc_date_norm, doc_date_quality)
-        VALUES ('MWK-001', %s, %s, %s, %s, %s, %s, 'ingested_from_telegram',
-                %s, NOW(), CURRENT_DATE, 'parsed_by_telegram_upload')
-        ON CONFLICT (content_hash) WHERE content_hash IS NOT NULL
-          DO UPDATE SET file_path = EXCLUDED.file_path
-        RETURNING id
-    """, (fname, fname, "image/jpeg" if file_kind == "photo" else file_kind,
-          content_hash, local_path, extracted_text, len(extracted_text)))
-    doc_id = c.fetchone()[0]
-    c.close(); conn.close()
+    # 7. If not bound to an existing inquiry, queue an educated follow-up Q
+    # at priority 0 (fires immediately even in pull-only mode, since it's
+    # reactive to an upload Jonathan just did).
+    if not bound_id:
+        try:
+            from doc_classifier import format_educated_followup
+            composed, notes_json = format_educated_followup(
+                doc_id=doc_id,
+                classification=classification,
+                case_file_guess=cls.get("case_file_guess"),
+                matter_code_guess=cls.get("matter_code_guess"),
+                key_fact=cls.get("key_fact", ""),
+                vendor_or_party=cls.get("vendor_or_party"),
+                amount_php=cls.get("amount_php"),
+                doc_date=cls.get("doc_date"),
+                confidence=cls.get("confidence", 0.0),
+                needs_human_question=cls.get("needs_human_question", ""),
+            )
+            c2 = conn.cursor()
+            c2.execute("""
+                INSERT INTO tg_inquiry_queue
+                  (kind, audience, priority, source_table, source_id, matter_code,
+                   composed_html, notes)
+                VALUES ('intake_item', 'ops', 0, 'doc_classifier', %s, %s,
+                        %s, %s)
+                RETURNING id
+            """, (doc_id, cls.get("matter_code_guess"), composed, notes_json))
+            inq_id = c2.fetchone()[0]
+            result["followup_inquiry_id"] = inq_id
+            c2.close()
+        except Exception as e:
+            print(f"  ⚠ educated-followup queue failed: {e}")
+    conn.close()
 
-    # 7. Reply with confirmation + text preview
-    text_preview = extracted_text[:600] if extracted_text else "(no text extracted)"
-    tg_send(
-        f"📷 <b>Image ingested as doc#{doc_id}</b>{bind_note}\n\n"
-        f"<b>OCR preview:</b>\n<code>{text_preview.replace('<','&lt;').replace('>','&gt;')}</code>",
-        token, reply_to=reply_to)
-    return doc_id
+    return result
 
 
 def handle_timeline_command(token, matter_code, reply_to=None):
@@ -554,6 +712,75 @@ def handle_matters_command(token, reply_to=None):
     tg_send("\n".join(lines)[:3800], token, reply_to=reply_to)
 
 
+def handle_inbox_command(token, reply_to=None):
+    """Show what's queued without releasing anything. Per the 2026-05-20
+    pull-only contract: Jonathan sees what's pending on demand, no auto-fire.
+    Tight: one line per item, no preview clutter."""
+    import psycopg2 as _pg
+    conn = _pg.connect(DSN); conn.autocommit = True
+    c = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    c.execute("""
+        SELECT id, kind, priority, source_table, matter_code, notes
+          FROM tg_inquiry_queue
+         WHERE status='queued'
+         ORDER BY priority ASC, composed_at ASC
+         LIMIT 8
+    """)
+    items = c.fetchall()
+    c.execute("SELECT COUNT(*) AS n FROM tg_inquiry_queue WHERE status='queued'")
+    total = c.fetchone()["n"]
+    c.close(); conn.close()
+    if total == 0:
+        tg_send("📭 empty", token, reply_to=reply_to)
+        return
+    lines = [f"📥 <b>{total} queued</b>"]
+    for it in items:
+        prio = ("P0" if it["priority"] <= 0 else f"P{it['priority']//10}")
+        # Pull a short tag from notes JSON if available, else use source_table
+        tag = it["source_table"] or "?"
+        try:
+            n = json.loads(it["notes"] or "{}")
+            v = n.get("vendor") or n.get("vendor_or_party") or n.get("classification")
+            if v:
+                tag = f"{tag} · {str(v)[:30]}"
+        except Exception:
+            pass
+        mc = it["matter_code"] or "—"
+        lines.append(f"<code>#{it['id']}</code> {prio} · {it['kind']} · {tag} · {mc}")
+    lines.append("<code>/next</code> · <code>/digest</code>")
+    tg_send("\n".join(lines)[:3800], token, reply_to=reply_to)
+
+
+def handle_digest_command(token, reply_to=None):
+    """Run meta_agent inline + show top findings. Bypasses the queue entirely
+    so /digest produces a single message regardless of pull-only mode.
+    Tight: one line per finding."""
+    try:
+        sys.path.insert(0, "/root/landtek")
+        from meta_agent import run_cycle as _meta_run
+        findings = _meta_run(enqueue=False, json_out=False, verbose=False)
+    except Exception as e:
+        tg_send(f"⚠️ digest failed: {str(e)[:160]}", token, reply_to=reply_to)
+        return
+    failures = [f for f in (findings or []) if f.get("status") == "fail"]
+    if not failures:
+        tg_send("✅ no findings", token, reply_to=reply_to)
+        return
+    failures.sort(key=lambda f: (f.get("severity") or "P9", f.get("name") or ""))
+    lines = [f"🩺 <b>{len(failures)} finding(s)</b>"]
+    for f in failures[:10]:
+        sev = (f.get("severity") or "P?").upper()
+        name = (f.get("name") or "?")[:60]
+        msg = (f.get("message") or "").strip()[:80]
+        line = f"<b>{sev}</b> · {name}"
+        if msg:
+            line += f" — <i>{msg}</i>"
+        lines.append(line)
+    if len(failures) > 10:
+        lines.append(f"<i>+{len(failures) - 10} more</i>")
+    tg_send("\n".join(lines)[:3800], token, reply_to=reply_to)
+
+
 def fetch_updates(token, since_id):
     """Pull new Telegram updates after since_id."""
     r = requests.get(f"https://api.telegram.org/bot{token}/getUpdates",
@@ -582,6 +809,7 @@ def cycle(cur, token, verbose=False):
     updates = fetch_updates(token, last_id)
     new_max = last_id
     answer_recorded = False
+    force_promote = False
     for u in updates:
         new_max = max(new_max, u["update_id"])
         msg = u.get("message") or {}
@@ -620,6 +848,27 @@ def cycle(cur, token, verbose=False):
                 if verbose:
                     print(f"  ⚠ chat_notes insert failed: {_e}")
 
+        # ─── GREETING short-circuit ──────────────────────────────────────────
+        # Per Jonathan 2026-05-20: greetings get greetings. A bare "hey/hi/
+        # morning/yo" must NEVER trigger parse logic, queue promotion, or any
+        # digest. Just say hi (matching time-of-day) and continue.
+        _greeting_text = (msg.get("text") or "").strip().lower()
+        if _greeting_text and len(_greeting_text) <= 30 and re.match(
+            r"^(hey|hi|hello|morning|gm|good morning|yo|sup|good evening|"
+            r"good afternoon|ga|hey leo|hi leo|hello leo)[\s!.,]*$",
+            _greeting_text):
+            hour = datetime.now().hour
+            if hour < 11:
+                _g = "Morning."
+            elif hour < 17:
+                _g = "Hey."
+            else:
+                _g = "Evening."
+            tg_send(_g, token, reply_to=msg.get("message_id"))
+            if verbose:
+                print(f"  greeting → '{_g}' (no promote, no parse)")
+            continue
+
         # ─── IMAGE / PHOTO / DOCUMENT handler ─────────────────────────────
         # Per Jonathan 2026-05-17: must "scan a screenshot for text and context".
         # Telegram photos arrive as msg['photo'][] (multiple sizes); generic uploads
@@ -637,35 +886,35 @@ def cycle(cur, token, verbose=False):
                     file_id = msg["document"]["file_id"]
                     file_kind = msg["document"].get("mime_type", "unknown")
                     filename_hint = msg["document"].get("file_name") or file_kind
-                ingest_id = handle_uploaded_image(token, file_id, file_kind, caption, msg.get("message_id"))
+                ingest = handle_uploaded_image(token, file_id, file_kind, caption, msg.get("message_id"))
+                ingest_id = ingest.get("doc_id") if isinstance(ingest, dict) else ingest
                 if verbose:
-                    print(f"  handled {file_kind} upload → uploaded_files#{ingest_id}")
+                    print(f"  handled {file_kind} upload → doc#{ingest_id} "
+                          f"({(ingest or {}).get('classification','?')} · "
+                          f"{(ingest or {}).get('case_file','unclassified')} · "
+                          f"conf {(ingest or {}).get('confidence',0):.0%})")
 
-                # ── Client-facing receipt ack (P0 service-floor — every client upload
-                # gets an acknowledgment within 60s so they know the file landed).
-                # Routes through comms_send so it honors audience + the gate.
+                # Receipt-ack: only for CLIENT uploads. Ops uploads get the
+                # educated follow-up question (queued at priority 0 by
+                # handle_uploaded_image) as the single response — no double
+                # message. Per 2026-05-20 "human cadence" mandate.
                 sender_chat_id = str(chat.get("id"))
-                if sender_chat_id in ALLOWED_INBOUND_CHAT_IDS:
-                    from comms import comms_send, CLIENT_CHAT_IDS as _CC
-                    # Determine audience: if uploader is a client, ack to client only
-                    # (they need confirmation); ops sees it via the inbound log already.
-                    ack_audience = "client" if sender_chat_id in _CC else "ops"
-                    safe_name = (str(filename_hint)[:80]
+                from comms import CLIENT_CHAT_IDS as _CC
+                if (sender_chat_id in _CC) and ingest_id:
+                    from comms import comms_send
+                    safe_name = (str(filename_hint)[:60]
                                   .replace("&", "&amp;")
                                   .replace("<", "&lt;")
                                   .replace(">", "&gt;"))
-                    ack_text = (
-                        f"✓ Received <b>{safe_name}</b> "
-                        f"(filed under MWK-001, ref #{ingest_id}). "
-                        f"Leo is reviewing the file. You'll get a confirmation or "
-                        f"clarifying question shortly."
-                    )
+                    cf_for_ack = (ingest or {}).get("case_file") or "filing"
+                    ack_text = f"✓ Received <b>{safe_name}</b> · ref #{ingest_id} · {cf_for_ack}."
                     try:
-                        comms_send(ack_text, audience=ack_audience,
-                                    kind="ad_hoc", case_file="MWK-001",
+                        comms_send(ack_text, audience="client",
+                                    kind="ad_hoc",
+                                    case_file=(ingest or {}).get("case_file") or "MWK-001",
                                     reply_to=msg.get("message_id"))
                     except Exception as _e:
-                        print(f"  ⚠ receipt-ack failed: {_e}")
+                        print(f"  ⚠ client receipt-ack failed: {_e}")
             except Exception as e:
                 tg_send(f"⚠️ Image handler error: {str(e)[:200]}", token, reply_to=msg.get("message_id"))
                 if verbose:
@@ -676,6 +925,13 @@ def cycle(cur, token, verbose=False):
         if not text:
             continue
         # Slash commands handled separately by future handler; here we treat /skip and /done specially
+        if text.startswith("/next"):
+            # Bypass the post-answer cooldown and promote the next queued item
+            # immediately. Useful when Jonathan wants to power through the queue.
+            force_promote = True
+            if verbose:
+                print(f"  /next received — bypassing cooldown this cycle")
+            continue
         if text.startswith("/skip"):
             cur.execute("""
                 UPDATE tg_inquiry_queue SET status='skipped', response_text=%s, responded_at=NOW()
@@ -716,6 +972,18 @@ def cycle(cur, token, verbose=False):
             handle_matters_command(token, msg.get("message_id"))
             if verbose:
                 print(f"  handled /matters")
+            continue
+        # /inbox — show what's queued without releasing it
+        if text.startswith("/inbox"):
+            handle_inbox_command(token, msg.get("message_id"))
+            if verbose:
+                print(f"  handled /inbox")
+            continue
+        # /digest — run meta_agent inline + show findings (bypasses queue)
+        if text.startswith("/digest"):
+            handle_digest_command(token, msg.get("message_id"))
+            if verbose:
+                print(f"  handled /digest")
             continue
         # /priority <deadline_id> <P0-P5> — set Jonathan's priority signal on a deadline
         if text.startswith("/priority"):
@@ -807,6 +1075,98 @@ def cycle(cur, token, verbose=False):
         """)
         active = cur.fetchone()
         if not active:
+            continue
+
+        # ── Question guard ──
+        # If the message looks like Jonathan asking a question rather than
+        # answering the active inquiry, don't auto-record it as the answer.
+        # Otherwise legitimate questions get eaten ('Did emails come today?'
+        # → recorded as the answer to whatever was active, then queue
+        # promotes the next item — see 2026-05-20 7:57 PM failure).
+        if _looks_like_question(text):
+            preview = (active["composed_html"] or "")[:80].replace("\n", " ")
+            tg_send(
+                f"⏸ Looks like a question, not an answer to active inquiry "
+                f"#{active['id']}. Reply <code>/skip</code> to drop it first, "
+                f"then ask again. Active: <i>{preview}…</i>",
+                token, reply_to=msg.get("message_id"),
+                audience="ops", kind="ad_hoc")
+            if verbose:
+                print(f"  question detected, not recorded as answer to #{active['id']}")
+            continue
+
+        # ── Receipt-extractor reply router ──
+        # Active intake came from receipt_extractor; notes carry a JSON blob
+        # with vendor/total/date/category and either an assigned matter or a
+        # context-proposal. Accept: /confirm (use the assigned matter or the
+        # proposal), a bare matter_code (override), or /skip (handled upstream).
+        if active["source_table"] == "receipt_extractor":
+            import json as _json
+            import re as _re
+            import sys as _sys; _sys.path.insert(0, "/root/landtek")
+            from receipt_extractor import write_cost_from_receipt
+            ack_msg = None
+            assigned_matter = None
+            try:
+                try:
+                    note_obj = _json.loads(active["notes"] or "{}")
+                except Exception:
+                    note_obj = {}
+                doc_id = note_obj.get("doc_id")
+                vendor = note_obj.get("vendor", "?")
+                total = note_obj.get("total_php") or 0
+                proposed = note_obj.get("proposed_matter")
+                preassigned = note_obj.get("matter_code") or active.get("matter_code")
+                lower = text.strip().lower()
+
+                if lower == "/confirm":
+                    assigned_matter = preassigned or proposed
+                    if not assigned_matter:
+                        ack_msg = ("⚠️ /confirm with no preassigned or proposed matter. "
+                                   "Reply with a matter_code instead (e.g. <code>MWK-CV26360</code>).")
+                elif _re.match(r"^[A-Z][A-Z0-9-]{1,40}$", text.strip()):
+                    assigned_matter = text.strip()
+                else:
+                    ack_msg = ("⚠️ Couldn't parse. Reply <code>/confirm</code> to accept "
+                               "the proposed matter, a different matter_code, or "
+                               "<code>/skip</code>.")
+
+                if assigned_matter and not ack_msg:
+                    result_for_write = {
+                        "vendor": vendor,
+                        "total_php": total,
+                        "date": note_obj.get("date"),
+                        "category": note_obj.get("category", "misc"),
+                        "notes": "",
+                        "confidence": 0,  # not used in write
+                    }
+                    row_id = write_cost_from_receipt(assigned_matter, doc_id, result_for_write)
+                    # Backfill matter onto the document + client_history rows
+                    cur.execute("UPDATE documents SET matter_code = %s WHERE id = %s",
+                                (assigned_matter, doc_id))
+                    cur.execute("""
+                        UPDATE client_history
+                           SET matter_code = %s,
+                               matter_codes = ARRAY[%s]::text[],
+                               what_summary = REPLACE(what_summary, ' · PENDING matter assignment', '')
+                         WHERE source_table = 'receipt_extractor'
+                           AND source_id = %s
+                    """, (assigned_matter, assigned_matter, str(doc_id)))
+                    ack_msg = (f"✓ Receipt doc#{doc_id} ({vendor[:30]} · ₱{total:,.2f}) "
+                               f"logged to <code>{assigned_matter}</code> (row #{row_id})")
+            except Exception as e:
+                ack_msg = f"⚠️ Receipt-assign failed: {str(e)[:160]}"
+
+            cur.execute("""
+                UPDATE tg_inquiry_queue SET status='answered', response_text=%s, responded_at=NOW()
+                 WHERE id=%s
+            """, (text[:4000], active["id"]))
+            answer_recorded = True
+            if ack_msg:
+                tg_send(ack_msg, token, reply_to=msg.get("message_id"),
+                        audience="ops", kind="ad_hoc")
+            if verbose:
+                print(f"  receipt_extractor reply → {('assigned ' + assigned_matter) if assigned_matter else 'no assignment'}")
             continue
 
         # ── Legal-intake reply router (per [[feedback_facts_in_chat_are_first_class]]) ──
@@ -905,6 +1265,53 @@ def cycle(cur, token, verbose=False):
         if verbose:
             print(f"  active inquiry exists, waiting for reply")
         return  # something is active — wait
+
+    # ── Pull-only gate (per Jonathan 2026-05-20, "Leo must have human cadence"). ──
+    # Default ON. Proactive promotion blocked UNLESS:
+    #   - LEO_PULL_ONLY=0 (legacy reactive mode), OR
+    #   - /next was just typed (force_promote), OR
+    #   - the next queued item is priority<=0 (P0-jump: reactive to a Jonathan
+    #     action, e.g. upload follow-up; or time-critical, e.g. T-3 deadline).
+    # This keeps evidence + calendar baselines functional (their producers tag
+    # priority 0) while silencing gap_alerts and scheduled noise.
+    PULL_ONLY = os.getenv("LEO_PULL_ONLY", "1") == "1"
+    if PULL_ONLY and not force_promote:
+        cur.execute("""
+            SELECT COUNT(*) AS n
+              FROM tg_inquiry_queue
+             WHERE status='queued' AND priority <= 0
+        """)
+        urgent_n = cur.fetchone()["n"]
+        if urgent_n == 0:
+            if verbose:
+                cur.execute("SELECT COUNT(*) AS n FROM tg_inquiry_queue WHERE status='queued'")
+                queued_n = cur.fetchone()["n"]
+                print(f"  pull-only mode — {queued_n} queued waiting (use /next or /inbox)")
+            return
+
+    # Cooldown: after Jonathan answers an inquiry, give him a window to follow
+    # up before the queue bumps him to a new topic. Bypassed by /next or by
+    # an urgent (priority<=0) queued item. Per the 2026-05-20 topic-hop
+    # failure (Maribel → Vito Cruz fired 1 min after the Maribel answer).
+    COOLDOWN_AFTER_ANSWER_SEC = 180
+    if not force_promote:
+        cur.execute("""
+            SELECT EXTRACT(EPOCH FROM (NOW() - MAX(responded_at)))::int AS sec_since
+              FROM tg_inquiry_queue
+             WHERE responded_at IS NOT NULL
+        """)
+        row = cur.fetchone() or {}
+        sec_since = row.get("sec_since") if isinstance(row, dict) else row[0]
+        if sec_since is not None and sec_since < COOLDOWN_AFTER_ANSWER_SEC:
+            cur.execute("SELECT 1 FROM tg_inquiry_queue WHERE status='queued' AND priority <= 0 LIMIT 1")
+            has_urgent = cur.fetchone() is not None
+            if not has_urgent:
+                if verbose:
+                    remain = COOLDOWN_AFTER_ANSWER_SEC - sec_since
+                    print(f"  cooldown active ({sec_since}s since last answer, "
+                          f"{remain}s remaining) — not promoting")
+                return
+
     cur.execute("""
         SELECT id, composed_html, kind, audience, COALESCE(matter_code, 'MWK-001') AS case_file
           FROM tg_inquiry_queue
@@ -969,7 +1376,8 @@ def cycle(cur, token, verbose=False):
         from comms_recipients import audience_for_kind
         inquiry_audience = audience_for_kind(kind)
     inquiry_case = nxt.get("case_file") or "MWK-001"
-    ok, info, msg_id = tg_send(composed + audit_appended, token,
+    composed_safe = _unescape_literals(composed)
+    ok, info, msg_id = tg_send(composed_safe + audit_appended, token,
                                 audience=inquiry_audience, kind=kind,
                                 case_file=inquiry_case)
     if ok:

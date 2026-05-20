@@ -119,16 +119,20 @@ INVARIANTS = [
             WITH found AS (
               SELECT DISTINCT regexp_replace(
                        (regexp_matches(extracted_text, 'CTN\s*SL[\s\-]*\d{4}[\s\-]*\d{4}[\s\-]*\d{4}', 'g'))[1],
-                       '\s+', '', 'g'
+                       '[\s\-]+', '', 'g'
                      ) AS norm
                 FROM documents
                WHERE extracted_text ~ 'CTN\s*SL[\s\-]*\d{4}'
             )
             SELECT norm AS arta_case FROM found
              WHERE norm NOT IN (
-               SELECT regexp_replace(docket_number, '\s+', '', 'g')
-                 FROM matters WHERE docket_number IS NOT NULL
+               SELECT regexp_replace(ctn_no, '[\s\-]+', '', 'g')
+                 FROM arta_cases WHERE ctn_no IS NOT NULL
              )
+               AND norm NOT IN (
+                 SELECT regexp_replace(docket_number, '[\s\-]+', '', 'g')
+                   FROM matters WHERE docket_number IS NOT NULL
+               )
          """,
          msg="{n} ARTA case number(s) in corpus have no matter row."),
 
@@ -452,6 +456,7 @@ def run_cycle(enqueue=False, json_out=False, verbose=True):
         pass
 
     cur.close(); conn.close()
+    return findings
 
 
 def main():
