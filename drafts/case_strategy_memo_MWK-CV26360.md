@@ -29,7 +29,7 @@ The case rests on the **co-ownership void** (Civil Code Arts. 777, 493) that pre
 
 > **Calendar context:** a Mediation / Settlement Conference is currently calendared for **2026-06-02 at RTC Daet** under the existing administrative docket CV-26360 (see also `calendar_events.id=3` and `case_deadlines.id=3`). Whether the June 2 event survives the imminent reframed-complaint filing — or whether the new complaint will be filed before, after, or in place of attending mediation — is a strategic decision for the principal and Atty. Barandon, addressed in §IX.
 
-**Recommendation:** Proceed to pre-filing readiness completion within 30 days. Filing should occur after (i) Cesar's death certificate is authenticated, (ii) the 2005 SPA revocation primary is located or affidavit-substituted, (iii) all three plaintiff SPAs or the guardianship grant locks in standing, and (iv) the June 2 mediation outcome is known.
+**Recommendation:** Proceed to pre-filing readiness completion within 30 days. Filing should occur after (i) Cesar's death certificate is authenticated, (ii) the 2005 SPA revocation primary is located or affidavit-substituted, (iii) **the RTC Daet guardianship petition is granted (Atty. Botor; Jonathan as guardian) — the SPA pathway has been dropped per principal's 2026-05-20 decision; guardianship is the sole authority foundation**, and (iv) the June 2 mediation outcome is known.
 
 ---
 
@@ -217,14 +217,11 @@ Defendants will challenge joinder of 28+ private defendants plus John Does 1-200
 
 Defendants may challenge Jonathan's authority to sue on behalf of all three sisters.
 
-**Counter:** Authority is being established on two parallel tracks:
+**Counter — single pathway: Judicial Guardianship (per principal's 2026-05-20 decision).**
 
-- **SPA pathway (interim).** Each plaintiff has executed (or is executing) an SPA appointing Jonathan as Attorney-in-Fact (Exhibit A). Verification page authenticates this.
-- **Guardianship pathway (durable).** A separate **Petition for Judicial Guardianship of the Real Properties/Estates of Mary Worrick Keesey** is in progress before RTC Daet under Atty. Adan Botor. Jonathan is the proposed guardian. Once granted, the court-supervised guardianship provides authority that is **stronger than, survives the death of, and supersedes the SPA mechanism** — and forecloses any "incompetent grant of SPA" defense.
+A **Petition for Judicial Guardianship of the Real Properties/Estates of Mary Worrick Keesey** is in progress before RTC Daet under Atty. Adan Botor. Jonathan is the proposed guardian. The grant of that petition establishes court-supervised authority that is durable, survives the principals' physical absence from the Philippines, and is unassailable on capacity grounds. **The SPA pathway has been dropped** — the firm is not pursuing parallel SPA execution from the three sisters as an interim or backstop.
 
-The complaint can file under the SPA framing now and amend/supplement upon the guardianship order, OR await the guardianship order before filing. The preferred sequencing is a §IX strategic decision below.
-
-If any sister's SPA is not yet executed and the guardianship has not yet been granted, **filing must be delayed** until at least one authority is locked in.
+Implication: **CV-26360 filing is gated on the guardianship grant.** Filing earlier under any other authority frame would invite the Defense 5 challenge we are foreclosing by waiting. The May 22 Naga meeting (Atty. Botor + Atty. Barandon) is the critical-path lock-in for the guardianship filing date.
 
 ---
 
@@ -239,7 +236,7 @@ Reviewing the draft complaint against required filing elements:
 - ✓ Jurisdiction + venue properly pleaded under B.P. 129 / R.A. 11576
 - ✓ Eight causes of action with legal authorities
 - ✓ Prayer with specific relief items
-- ⚠ **Verification template** — *ready conditional on §VII item 2 (all three plaintiff SPAs executed); cannot be signed until authority chain is complete*
+- 🔴 **Verification template** — *cannot be signed by Jonathan-as-AIF; will be signed by Jonathan-as-Guardian once RTC Daet grants the guardianship petition. Filing is blocked until that grant issues.*
 - ✓ Annex framework with 13 exhibits/annexes identified
 - ✓ **Parallel authority track (Judicial Guardianship) drafted and in pre-filing review under separate counsel** — see §IX
 
@@ -270,7 +267,7 @@ Reviewing the draft complaint against required filing elements:
 In order of priority and dependency:
 
 1. **Authenticate Cesar M. De La Fuente's death certificate.** This is the single document that hardens Layer 6 — the post-mortem-instrument theory that is currently described as our cleanest factual fulcrum. Without it the strongest layer of the case is testimonial. *Owner: Atty. Barandon (PSA / civil registry request) or Jonathan if family records hold a copy. Deadline: 7 days.*
-2. **Confirm all three plaintiffs have executed the AIF SPA** (Patricia, Geraldine, Marcia). Without this the case cannot file under the SPA pathway. *Owner: Jonathan. Deadline: 7 days.*
+2. **Lock the guardianship petition filing date with Atty. Botor at the May 22 Naga meeting.** Per the 2026-05-20 strategic decision, guardianship is the sole authority foundation. CV-26360 filing is gated on the grant. Target: petition filed at RTC Daet within 7-10 days of the Naga meeting. *Owner: Jonathan + Atty. Botor + Atty. Barandon. Deadline: 2026-05-22 (Naga) → petition filed by 2026-06-01.*
 3. **Locate the 2005 formal SPA revocation instrument** in family records, Atty. Barandon's archive, or Camarines Norte notarial roll books. If unavailable within 14 days, document the substitute affidavit pathway. *Owner: Jonathan + Atty. Barandon. Deadline: 14 days.*
 4. **Atty. Barandon's red-line review** of the complaint draft — particularly Causes A, B, F, H for citation completeness and procedural form; also resolve §V Defense 1 string-cite. *Owner: Atty. Barandon. Deadline: 10 days.*
 5. **Reconcile the derivative-TCT count.** The system maps 26 verified/inferred derivatives from T-4497; the complaint claims 35-40. Either (a) plead the verified 26 with reservation to amend, or (b) locate the additional 9-14 via ROD records request. The current draft cannot ship until this is resolved. *Owner: Atty. Barandon (ROD request) + Leo (corpus mapping). Deadline: 14 days.*
@@ -366,14 +363,17 @@ Two reasonable paths; the call is yours. My read:
 - **Path X (file CV-26360 first):** mid-to-late June filing as the main memo proposes, on SPA authority. Pro: maintains pre-mediation momentum before June 2, places Balane on the defensive sooner. Con: invites Defense-5 capacity challenge that the guardianship would foreclose.
 - **Path Y (wait for guardianship grant):** delay CV-26360 filing until guardianship order issues. Pro: bulletproof authority foundation, integrated exhibit pack, no SPA-vulnerability. Con: timeline pushed; depends on how fast RTC Daet acts on a petition that hasn't yet been filed.
 
-**Recommended path: Hybrid with hard fallback date.**
+**Recommended path: Guardianship-first, sequential (per principal's 2026-05-20 decision).**
 
-1. Continue CV-26360 pre-filing work in parallel with guardianship preparation. **Target: guardianship petition filed at RTC Daet on or before 2026-05-30** (10 days from this memo's date).
-2. **If guardianship is filed and docketed by 2026-05-30:** wait for the docketing before filing CV-26360, so CV-26360 references the guardianship docket and the authority question is foreclosed at filing.
-3. **If guardianship slips past 2026-05-30:** file CV-26360 on or before 2026-06-15 under SPA framing (assuming all three plaintiff SPAs are executed per §VII item 2), expressly accepting the Defense 5 capacity exposure and reserving the right to amend the verification once the guardianship grant issues.
-4. Coordinate Barandon-Botor weekly meetings until both matters are docketed; the May 22 Naga meeting is the first of these. Use that meeting to either lock in the May 30 guardianship-filing date or trigger the fallback explicitly.
+The hybrid SPA fallback has been removed. The SPA pathway is dropped entirely; CV-26360 will file only after the guardianship grant issues.
 
-This path eliminates the "indefinite wait" failure mode by giving the hybrid recommendation a committed trigger date.
+1. **2026-05-22 (Naga meeting):** lock the guardianship petition's filing date with Atty. Botor + Atty. Barandon. Target: petition filed at RTC Daet within 7-10 days.
+2. **Guardianship filing (~2026-06-01 target):** Atty. Botor files the Petition for Judicial Guardianship at RTC Daet. Reference docket immediately upon issuance.
+3. **Guardianship grant (court timeline):** RTC Daet issues the order appointing Jonathan as guardian. This may take weeks-to-months depending on court calendar, contested-grant motions, etc. Counsel should set best-case (~6 weeks) and worst-case (~6 months) expectations with the principal.
+4. **CV-26360 filing (post-grant):** verification signed by Jonathan-as-Guardian. Complaint references the guardianship docket. Filing window: within 14 days of the guardianship grant.
+5. **June 2 mediation handling:** since CV-26360 won't be filed yet by then, the mediation reference in the administrative docket is informational — the parties may convene but no Reply timeline accrues from any new filing. Decide with Atty. Barandon whether to attend, postpone, or use the date to formally signal the guardianship-first sequencing.
+
+This path eliminates the Defense 5 capacity exposure entirely and accepts the longer timeline as the cost of an unassailable authority foundation.
 
 ---
 
