@@ -40,15 +40,21 @@ from title_chain_canon import (
 
 
 def _fetch_parents(cur, child_title, case_file=None):
-    """Pull parent_title rows from title_chain for a given child."""
+    """Pull parent_title rows from title_chain for a given child.
+
+    Includes subdivision_plan info via LEFT JOIN (deploy_219).
+    """
     sql = """
-        SELECT parent_title, provenance_level, source_doc_id, relationship
-          FROM title_chain
-         WHERE child_title = %s
+        SELECT tc.parent_title, tc.provenance_level, tc.source_doc_id, tc.relationship,
+               tc.subdivision_plan_id,
+               sp.plan_ref AS plan_ref, sp.normalized_ref AS plan_normalized_ref
+          FROM title_chain tc
+          LEFT JOIN subdivision_plans sp ON sp.id = tc.subdivision_plan_id
+         WHERE tc.child_title = %s
     """
     params = [child_title]
     if case_file:
-        sql += " AND (case_file = %s OR case_file IS NULL)"
+        sql += " AND (tc.case_file = %s OR tc.case_file IS NULL)"
         params.append(case_file)
     cur.execute(sql, params)
     return cur.fetchall()
@@ -143,6 +149,7 @@ def walk_ancestors(cur, start_title, matter="MWK-001", max_depth=10):
             "child": current,
             "provenance": chosen.get("provenance_level") or "?",
             "source": f"title_chain row" + (f" doc#{chosen['source_doc_id']}" if chosen.get("source_doc_id") else " (no source doc)"),
+            "subdivision_plan_ref": chosen.get("plan_normalized_ref") or chosen.get("plan_ref"),
             "notes": "; ".join(notes_parts),
         })
 
@@ -179,13 +186,14 @@ def render_chain_md(cur, start_title, matter="MWK-001"):
     lines.append("")
     lines.append("Per-edge provenance:")
     lines.append("")
-    lines.append("| Child | Parent | Provenance | Source | Notes |")
-    lines.append("|---|---|---|---|---|")
+    lines.append("| Child | Parent | Provenance | Subdivision plan | Source | Notes |")
+    lines.append("|---|---|---|---|---|---|")
     for e in chain:
         parent_disp = e["parent"] or "_(none)_"
         notes_disp = (e.get("notes") or "").replace("|", "/")
+        plan_ref = e.get("subdivision_plan_ref") or "—"
         lines.append(f"| `{e['child']}` | `{parent_disp}` | "
-                     f"`{e['provenance']}` | {e['source']} | {notes_disp} |")
+                     f"`{e['provenance']}` | `{plan_ref}` | {e['source']} | {notes_disp} |")
 
     # Add trunk metadata if the chain terminates at a known trunk
     root = chain[-1]["parent"] or chain[-1]["child"]
@@ -220,6 +228,8 @@ def chain_integrity_audit(cur, titles, matter="MWK-001"):
                 issues.append(f"`{e['child']}` → `{e['parent']}` is `{e['provenance']}` provenance")
             if "source_doc_id is NULL" in (e.get("notes") or ""):
                 issues.append(f"`{e['child']}` → `{e['parent']}` has no source doc")
+            if e.get("parent") and not e.get("subdivision_plan_ref"):
+                issues.append(f"`{e['child']}` → `{e['parent']}` has no linked subdivision plan")
         last = chain[-1] if chain else None
         if last and last.get("parent") and last["parent"] != operative_root_for(matter):
             issues.append(f"chain terminates at `{last['parent']}`, not operative root `{operative_root_for(matter)}`")
