@@ -28,12 +28,20 @@ def get_cursor():
 
 
 def query_one(cur, sql, *params):
-    cur.execute(sql, params)
+    # Only pass params if non-empty — otherwise psycopg2 misreads '%' chars
+    # in SQL (e.g. inside LIKE patterns) as parameter placeholders.
+    if params:
+        cur.execute(sql, params)
+    else:
+        cur.execute(sql)
     return cur.fetchone()
 
 
 def query_all(cur, sql, *params):
-    cur.execute(sql, params)
+    if params:
+        cur.execute(sql, params)
+    else:
+        cur.execute(sql)
     return cur.fetchall()
 
 
@@ -53,7 +61,10 @@ def assert_truthy(label, value):
 
 
 def assert_row_exists(cur, label, sql, *params):
-    cur.execute(sql, params)
+    if params:
+        cur.execute(sql, params)
+    else:
+        cur.execute(sql)
     r = cur.fetchone()
     if not r:
         raise TruthFailure(f"{label}: no row found for query: {sql} {params}")
