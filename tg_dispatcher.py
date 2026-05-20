@@ -41,6 +41,16 @@ def load_token():
     return None
 
 
+def _unescape_literals(text: str) -> str:
+    """Convert literal backslash-n / -t / -r sequences in composed_html into real
+    whitespace. Some LLM-driven producers serialize their reply as a JSON string
+    and store it raw, leaving \\n visible in Telegram. Intake bodies don't
+    legitimately need the literal escape, so this is safe to do unconditionally."""
+    if not text:
+        return text
+    return text.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", "\t")
+
+
 def tg_send(text, token, reply_to=None, case_file="MWK-001", audience="ops", kind="ad_hoc"):
     """Thin wrapper — delegates to comms.comms_send (the canonical chokepoint).
 
@@ -969,7 +979,8 @@ def cycle(cur, token, verbose=False):
         from comms_recipients import audience_for_kind
         inquiry_audience = audience_for_kind(kind)
     inquiry_case = nxt.get("case_file") or "MWK-001"
-    ok, info, msg_id = tg_send(composed + audit_appended, token,
+    composed_safe = _unescape_literals(composed)
+    ok, info, msg_id = tg_send(composed_safe + audit_appended, token,
                                 audience=inquiry_audience, kind=kind,
                                 case_file=inquiry_case)
     if ok:
