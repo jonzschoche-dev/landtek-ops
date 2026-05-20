@@ -471,7 +471,7 @@ def negotiate(claim_text, case_file=None, asked_by="cli", skip_challenger=False)
         cls_name = e.get("classification") or ""
         cls = CLASS_RANK.get(cls_name, 0)
         ex = EXEC_RANK.get(e.get("execution_status"), 1)
-        precision = 5 if e.get("direction", "").startswith("concept:") and e.get("quote") else 0
+        precision = 5 if e.get("direction", "").startswith(("concept:", "anchor:", "phrase:")) and e.get("quote") else 0
         # Stage-boost: notice/order docs get extra ranking for stage claims
         sb = STAGE_BOOST if cls_name in ("Notice", "Order", "Resolution") else 0
         # Deed-boost: deed docs get extra ranking for cancellation/sale claims
