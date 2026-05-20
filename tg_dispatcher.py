@@ -41,6 +41,35 @@ def load_token():
     return None
 
 
+_QUESTION_STARTERS = {
+    "did", "do", "does", "is", "are", "was", "were", "can", "could",
+    "will", "would", "should", "has", "have", "had", "may", "might",
+    "what", "whats", "what's", "when", "where", "who", "whos", "who's",
+    "why", "how", "which",
+    "tell", "show", "give", "find", "list", "check", "explain",
+    "any", "anything", "anyone",
+}
+
+
+def _looks_like_question(text: str) -> bool:
+    """Heuristic: does this look like Jonathan asking Leo something, rather
+    than an answer to the currently-active inquiry?
+
+    True for: 'Did emails come today?', 'What's the status', 'Tell me about Maribel'.
+    False for: 'She's the president of NIBDC', '50M', 'counsel_retainer | 12500 | ...',
+    '/confirm', 'next' — i.e. anything that looks like a fact, an option pick,
+    a parser-format reply, or a slash command (slash commands are filtered upstream)."""
+    if not text:
+        return False
+    t = text.strip()
+    if not t:
+        return False
+    if t.endswith("?"):
+        return True
+    first = t.split()[0].lower().rstrip(",.:!")
+    return first in _QUESTION_STARTERS
+
+
 def _unescape_literals(text: str) -> str:
     """Convert literal backslash-n / -t / -r sequences in composed_html into real
     whitespace. Some LLM-driven producers serialize their reply as a JSON string
@@ -817,6 +846,24 @@ def cycle(cur, token, verbose=False):
         """)
         active = cur.fetchone()
         if not active:
+            continue
+
+        # ── Question guard ──
+        # If the message looks like Jonathan asking a question rather than
+        # answering the active inquiry, don't auto-record it as the answer.
+        # Otherwise legitimate questions get eaten ('Did emails come today?'
+        # → recorded as the answer to whatever was active, then queue
+        # promotes the next item — see 2026-05-20 7:57 PM failure).
+        if _looks_like_question(text):
+            preview = (active["composed_html"] or "")[:80].replace("\n", " ")
+            tg_send(
+                f"⏸ Looks like a question, not an answer to active inquiry "
+                f"#{active['id']}. Reply <code>/skip</code> to drop it first, "
+                f"then ask again. Active: <i>{preview}…</i>",
+                token, reply_to=msg.get("message_id"),
+                audience="ops", kind="ad_hoc")
+            if verbose:
+                print(f"  question detected, not recorded as answer to #{active['id']}")
             continue
 
         # ── Legal-intake reply router (per [[feedback_facts_in_chat_are_first_class]]) ──
