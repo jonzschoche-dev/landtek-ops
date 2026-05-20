@@ -107,6 +107,28 @@ Leo tools Flask service: `/root/landtek/leo_tools/server.py` on port 8765. Expos
 `/api/get_entity`, `/api/fuzzy_find_entity`, `/api/get_thread`, `/api/list_threads`,
 `/api/query_documents`, `/api/pending_entity_types`. n8n calls these.
 
+## Session-start ritual (FIRST 3 TOOL CALLS, no exceptions)
+
+Within your first few tool calls — before editing any file in this repo:
+
+```bash
+/root/landtek/scripts/landtek_git_routine.sh start
+```
+
+That single command does the pull-rebase + dirty-state check + incoming-commit report per the full protocol below. If it exits with `⚠ Working tree dirty`, decide BEFORE pulling — commit, discard daemon-churn, or ask Jonathan. Do not blindly proceed.
+
+Before saying "done for now," run:
+
+```bash
+/root/landtek/scripts/landtek_git_routine.sh end
+```
+
+It surfaces uncommitted work + unpushed commits + worthy untracked files so the next agent picks up clean state.
+
+The full routine + rationale + handoff template lives in memory: `[[feedback_multi_agent_git_routine]]`.
+
+---
+
 ## Git push protocol (READ EVERY SESSION — multi-agent coordination)
 
 You are not the only Claude touching this repo. A Mac-side Claude (running in the

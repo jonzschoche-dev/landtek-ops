@@ -67,3 +67,7 @@ staging/.env
 # Daemon-written runtime state (churns constantly, never commit)
 system_state.json
 drafts/daily_digest_*.md
+
+# Sweep-loop heartbeat (daemon-written, changes every cycle)
+notifications/pending.txt
+notifications/blocked.txt
