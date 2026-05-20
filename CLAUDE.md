@@ -107,23 +107,28 @@ Leo tools Flask service: `/root/landtek/leo_tools/server.py` on port 8765. Expos
 `/api/get_entity`, `/api/fuzzy_find_entity`, `/api/get_thread`, `/api/list_threads`,
 `/api/query_documents`, `/api/pending_entity_types`. n8n calls these.
 
-## Session-start ritual (FIRST 3 TOOL CALLS, no exceptions)
+## Session-start protocol (automatic — read the hook output above)
 
-Within your first few tool calls — before editing any file in this repo:
+A SessionStart hook (configured in `.claude/settings.json`) has just run
+`scripts/landtek_git_routine.sh start` — its output is in your context above
+this CLAUDE.md.
+
+- If it reported **"Working tree clean / Up to date"** → proceed normally.
+- If it pulled new commits → **read the new files first** before any further work; the other agent (VPS or Mac) wrote them for a reason that may affect your task.
+- If it warned **"Working tree dirty before pull"** → STOP, surface the dirty files to Jonathan, decide together before any new work.
+
+A SessionEnd hook also fires automatically on `/quit` or window close — last-second warning if there's uncommitted or unpushed work.
+
+Manual triggers (use anytime during a session):
 
 ```bash
-/root/landtek/scripts/landtek_git_routine.sh start
+$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh check    # snapshot, no changes
+$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh end      # full handoff report
+$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh deploy <NN> "desc" path1 path2
+                                                            # safe commit + push
+# OR via slash command:
+/session-end
 ```
-
-That single command does the pull-rebase + dirty-state check + incoming-commit report per the full protocol below. If it exits with `⚠ Working tree dirty`, decide BEFORE pulling — commit, discard daemon-churn, or ask Jonathan. Do not blindly proceed.
-
-Before saying "done for now," run:
-
-```bash
-/root/landtek/scripts/landtek_git_routine.sh end
-```
-
-It surfaces uncommitted work + unpushed commits + worthy untracked files so the next agent picks up clean state.
 
 The full routine + rationale + handoff template lives in memory: `[[feedback_multi_agent_git_routine]]`.
 

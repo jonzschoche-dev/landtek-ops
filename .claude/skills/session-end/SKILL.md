@@ -6,4 +6,4 @@ disable-model-invocation: true
 
 Running session-end routine:
 
-!`/root/landtek/scripts/landtek_git_routine.sh end`
+!`$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh end`

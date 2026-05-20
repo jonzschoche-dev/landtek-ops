@@ -71,3 +71,6 @@ drafts/daily_digest_*.md
 # Sweep-loop heartbeat (daemon-written, changes every cycle)
 notifications/pending.txt
 notifications/blocked.txt
+
+# Per-machine Claude Code config (permissions allowlist, machine-specific paths)
+.claude/settings.local.json

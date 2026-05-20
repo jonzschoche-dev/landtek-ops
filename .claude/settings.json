@@ -2,9 +2,23 @@
   "hooks": {
     "SessionStart": [
       {
-        "type": "command",
-        "matcher": "startup",
-        "command": "/root/landtek/scripts/landtek_git_routine.sh start || true"
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh start || true"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/scripts/landtek_git_routine.sh end || true"
+          }
+        ]
       }
     ]
   }
