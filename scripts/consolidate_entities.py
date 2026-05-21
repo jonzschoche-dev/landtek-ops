@@ -447,6 +447,9 @@ def main():
     sp_pr.add_argument("--auto", action="store_true", help="Process all known groups")
     sp_pr.add_argument("--dry-run", action="store_true",
                        help="Show what would be proposed without writing")
+    sp_pr.add_argument("--client", default=None,
+                       help="Filter to a specific client (reads case_theories._clients). "
+                            "Currently informational; all KEYSTONE_GROUPS are MWK.")
     sp_pr.set_defaults(func=cmd_propose)
 
     args = ap.parse_args()

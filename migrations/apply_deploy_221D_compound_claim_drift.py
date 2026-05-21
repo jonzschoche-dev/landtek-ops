@@ -57,9 +57,9 @@ DECLARE
     drift_list JSONB;
 BEGIN
     FOR v_claim IN
-        SELECT id, claim_id AS cid, claim_text AS ctext, component_rows
-          FROM verified_claims
-         WHERE verification_lock = 'hard' AND auto_unlocked_at IS NULL
+        SELECT vc.id, vc.claim_id AS cid, vc.claim_text AS ctext, vc.component_rows
+          FROM verified_claims vc
+         WHERE vc.verification_lock = 'hard' AND vc.auto_unlocked_at IS NULL
     LOOP
         drift_list := '[]'::jsonb;
 

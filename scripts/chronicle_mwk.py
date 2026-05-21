@@ -517,8 +517,14 @@ def render_chronicle(events, run_date):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=None, help="Output path (default: drafts/chronicle_MWK_<date>.md)")
+    ap.add_argument("--client", default="MWK", help="Client id from case_theories._clients.CLIENTS (default: MWK)")
+    ap.add_argument("--out", default=None, help="Output path (default: drafts/chronicle_<client>_<date>.md)")
     args = ap.parse_args()
+    # NOTE: Currently MEMORY_KEYSTONES are MWK-specific. For other clients,
+    # add a parallel keystones list in case_theories/_clients.py and read it here.
+    # Reading the registry as a smoke check so the dependency is explicit:
+    from case_theories._clients import get
+    _ = get(args.client)
 
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
@@ -530,7 +536,7 @@ def main():
     attach_entities_from_doc_entities(cur, events)
 
     run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    out_path = args.out or f"/root/landtek/drafts/chronicle_MWK_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md"
+    out_path = args.out or f"/root/landtek/drafts/chronicle_{args.client}_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md"
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
 
     md = render_chronicle(events, run_date)
