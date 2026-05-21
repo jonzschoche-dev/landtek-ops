@@ -38,17 +38,20 @@ def status_check_allows_needs_manual_review(cur):
 
 
 def guard_has_run_at_least_once(cur):
+    """Verifies the guard has fingerprints in the proposals table at any status.
+    Earlier the test required status='needs_manual_review' but deploy_260 legitimately
+    consumes those into 'applied' — the guard's run is recorded in review_notes /
+    reviewed_by regardless of final status. The fingerprint is what matters."""
     cur.execute("""
         SELECT COUNT(*) AS n FROM doc_classification_proposals
-         WHERE status = 'needs_manual_review'
-           AND reviewed_by = 'entity_graph_guard'
-           AND review_notes ILIKE %s
+         WHERE (reviewed_by IN ('entity_graph_guard', 'entity_graph_guard_text')
+                OR review_notes ILIKE %s)
     """, ("%entity_graph_guard%",))
     n = cur.fetchone()["n"]
     if n < 1:
         raise TruthFailure(
-            "no proposals have status='needs_manual_review' from entity_graph_guard; "
-            "either the guard never ran or its output was reverted"
+            "no proposals carry entity_graph_guard fingerprint in any state; "
+            "either the guard never ran, or all its records were destroyed"
         )
 
 
