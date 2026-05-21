@@ -55,9 +55,24 @@ from case_theories._clients import get, all_ids
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 MIN_DOC_LINKS = 3  # noise floor for "this entity is in the client graph"
 STOPWORD_SURNAMES = {
+    # Honorifics / role tokens
     "atty", "judge", "hon", "mr", "ms", "mrs", "dr", "engr", "sr", "jr",
     "ii", "iii", "iv", "law", "office", "offices", "court", "jr.",
+    # Geographic place tokens (Philippines + general)
+    "norte", "sur", "este", "oeste", "luzon", "visayas", "mindanao",
+    "philippines", "manila", "quezon", "city", "province", "municipality",
+    "barangay", "brgy", "mercedes", "daet", "camarines", "san", "santa",
+    "santo", "poblacion", "vicente", "rural", "urban",
+    # Structural / non-person tokens that pollute name fields
+    "deeds", "registry", "republic", "government", "national", "regional",
+    "branch", "department", "section", "rule", "act", "republic",
+    "petition", "respondent", "complainant", "petitioner", "vs", "versus",
+    # Client-id artifacts (e.g., "MWK-001" gets tokenized to "mwk")
+    "mwk", "par", "arta", "tct", "oct", "rtc", "csc", "dilg", "carp",
 }
+
+# Even after stopword filter, surnames must be at least this distinctive
+MIN_SURNAME_LEN = 4
 
 
 def tokenize_name(name):
@@ -68,9 +83,22 @@ def tokenize_name(name):
     out = []
     for p in parts:
         p = re.sub(r"[^A-Za-z]", "", p).lower()
-        if len(p) >= 3 and p not in STOPWORD_SURNAMES:
+        if len(p) >= MIN_SURNAME_LEN and p not in STOPWORD_SURNAMES:
             out.append(p)
     return out
+
+
+def looks_like_person_name(name):
+    """Heuristic: does this look like a person's name vs an org/place/citation?
+    Rejects strings starting with 'RA No.', 'Section', 'Registry of', etc."""
+    if not name:
+        return False
+    n = name.lower().strip()
+    bad_prefixes = ("ra no", "ra ", "section ", "registry ", "republic ",
+                    "office of", "department of", "court of", "branch ",
+                    "civil case", "criminal case", "crim. case", "g.r. no",
+                    "tct ", "oct ", "ctn ", "psd-", "lrc ")
+    return not any(n.startswith(p) for p in bad_prefixes)
 
 
 def surname_of(name):
@@ -130,22 +158,24 @@ def gather_client_graph(cur, client_config):
 
 
 def find_overlap(doc_entities, client_full_names, client_surnames):
-    """Return list of overlap-evidence strings, empty if no overlap."""
+    """Return list of overlap-evidence strings, empty if no overlap.
+    Filters out place/structural/citation false positives."""
     evidence = []
     for de in doc_entities:
         cn = de["canonical_name"] or ""
-        if not cn:
+        if not cn or not looks_like_person_name(cn):
             continue
         # Surname-level match
         sn = surname_of(cn)
         if sn and sn in client_surnames:
             evidence.append(f"surname '{sn}' (doc:{cn!r})")
-        # Substring match — doc entity contained in a client name or vice versa
+        # Substring match — doc entity contained in a client name or vice versa.
+        # Both sides must look like person names; min length raised to 8.
         for cfn in client_full_names:
-            if not cfn:
+            if not cfn or not looks_like_person_name(cfn):
                 continue
-            if (cn.lower() in cfn.lower() and len(cn) >= 6) or \
-               (cfn.lower() in cn.lower() and len(cfn) >= 6):
+            if (cn.lower() in cfn.lower() and len(cn) >= 8) or \
+               (cfn.lower() in cn.lower() and len(cfn) >= 8):
                 evidence.append(f"name-overlap {cn!r}↔{cfn!r}")
                 break
     # De-duplicate while preserving order
