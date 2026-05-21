@@ -26,12 +26,14 @@ def make_test(client_id):
         if n_docs == 0 and client_id != "PAR":  # PAR is skeleton-only by design
             raise TruthFailure(f"{client_id}: case_file={c['case_file']!r} has 0 documents")
 
-        # matter_prefix
-        cur.execute("SELECT COUNT(*) AS n FROM matters WHERE matter_code LIKE %s",
-                    (c["matter_prefix"] + "%",))
-        n_matters = cur.fetchone()["n"]
-        if n_matters == 0 and client_id != "PAR":
-            raise TruthFailure(f"{client_id}: matter_prefix={c['matter_prefix']!r} has 0 matters")
+        # matter_prefix (Owner doesn't have one — its docs cross-link via matter_code
+        # to actual legal-client matters, it doesn't host its own matter namespace)
+        if c.get("matter_prefix"):
+            cur.execute("SELECT COUNT(*) AS n FROM matters WHERE matter_code LIKE %s",
+                        (c["matter_prefix"] + "%",))
+            n_matters = cur.fetchone()["n"]
+            if n_matters == 0 and client_id != "PAR":
+                raise TruthFailure(f"{client_id}: matter_prefix={c['matter_prefix']!r} has 0 matters")
 
         # keystone entities (skip None placeholders)
         for k, eid in (c.get("keystone_entities") or {}).items():
