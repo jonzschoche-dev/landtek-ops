@@ -417,9 +417,9 @@ def attach_entities_from_doc_entities(cur, events):
             ev["entities"].append((r["id"], r["canonical_name"]))
 
 
-def render_chronicle(events, run_date):
+def render_chronicle(events, run_date, client_label="Mary Worrick Keesey"):
     lines = []
-    lines.append(f"# Master Chronicle — Mary Worrick Keesey client")
+    lines.append(f"# Master Chronicle — {client_label} client")
     lines.append("")
     lines.append(f"**Generated:** {run_date} · Deterministic — every entry cites a source row.")
     lines.append(f"**Total events:** {len(events)}")
@@ -566,7 +566,7 @@ def main():
         else:
             out_path = args.out or f"/root/landtek/drafts/chronicle_{args.client}_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md"
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-        md = render_chronicle(scoped, run_date)
+        md = render_chronicle(scoped, run_date, client_label=client_config.get("label", args.client))
         if matter_code:
             # Inject matter-scope banner after the first H1
             banner = f"\n**Scope:** {matter_code} only (plus matter-agnostic keystones/annotations).\n"
