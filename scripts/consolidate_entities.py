@@ -77,23 +77,160 @@ KEYSTONE_GROUPS = [
     },
     {
         "label": "Patricia Keesey Zschoche",
-        "keystone_entity_id": 400,  # 'Patricia Keesey Zschoche' (verified, 92 mentions)
+        "keystone_entity_id": 400,
         "name_pattern": r"patricia",
-        # Exclude street references + clearly-different-person noise + the
-        # affidavit-document-title that got entity-extracted as a person
-        "ignore_patterns": [
-            r"road",                # 'Road Lot 3: Patricia Keesey Street' etc.
-            r"street",
-            r"affidavit",           # 'Affidavit for Delayed Registration of Birth — ...'
-        ],
+        "ignore_patterns": [r"road", r"street", r"affidavit"],
         "rationale": (
-            "Patricia Keesey Zschoche is the plaintiff in CV 26-360 and "
-            "Jonathan's mother. Massive OCR fragmentation: 45+ variants exist "
-            "ranging from 'Patricia Keesey Zschoche' to misreadings like "
-            "'Patricia Roche', 'Patricia Iceche', etc. Keystone #400 is the "
-            "canonical verified form (92 mentions). All Patricia variants merge "
-            "in; street-name references excluded."
+            "Patricia Keesey Zschoche — plaintiff in CV 26-360. 45+ OCR variants. "
+            "Keystone #400 (92 mentions). Excludes street-name + document-title refs."
         ),
+    },
+    {
+        "label": "Geraldine Keesey Hoppe",
+        "keystone_entity_id": 16,  # 'Geraldine K. Hoppe' (147 mentions)
+        "name_pattern": r"geraldine",
+        "ignore_patterns": [],
+        "rationale": (
+            "Geraldine K. Hoppe is Patricia's sister (per project_title_origins_mwk). "
+            "OCR fragmentation: Geraldine Keesey Hoppe, Geraldine Keesee Hoppe, "
+            "GERALDINE K. HOPPE, 'Geraldine Alice Teresita Keesey Hoppe' (full name), etc."
+        ),
+    },
+    # ─── Mercedes officials ─────────────────────────────────────────────────
+    {
+        "label": "Loida E. Macale (Mercedes)",
+        "keystone_entity_id": 39,  # 'Loida E. Macale' (155 mentions)
+        "name_pattern": r"loida",
+        # NOT the same as 'Loida T. Maca' which might be a different person — but
+        # given OCR noise we include it. The keystone has Maca/Macale variants.
+        "ignore_patterns": [],
+        "rationale": (
+            "Loida E. Macale — Mercedes side actor in ARTA-1210 correspondence. "
+            "Massive OCR fragmentation (155-mention keystone has 10 variants)."
+        ),
+    },
+    {
+        "label": "Engr. Erwin H. Balane (Mercedes MEO)",
+        "keystone_entity_id": 3060,  # 'Engr. Erwin Balane' (16 mentions)
+        "name_pattern": r"erwin.*balane|balane.*erwin",
+        "ignore_patterns": [],
+        "rationale": (
+            "Engr. Erwin H. Balane — Municipal Engineer, Mercedes MEO. Respondent "
+            "in MWK-ARTA-0690/0792 and witness in CV-26360. Multiple variants: "
+            "'Engr. Erwin Balane', 'Erwin H. Balane', 'Erwin Balane', "
+            "'Erwin Hansol Balane', 'Engr. Erwin H. Balane'."
+        ),
+    },
+    {
+        "label": "Gloria Balane",
+        "keystone_entity_id": 15,  # 'Gloria Balane' (125 mentions, verified)
+        "name_pattern": r"^gloria.*balane$",
+        "ignore_patterns": [],
+        "rationale": (
+            "Gloria Balane — defendant in CV-26360. Variants: 'Gloria Balane' "
+            "(125 mentions), 'Gloria H. Balane' (22 mentions). Same person; "
+            "middle initial preserved as alias."
+        ),
+    },
+    {
+        "label": "Efren Balane",
+        "keystone_entity_id": 3057,  # 'Efren Balane' (27 mentions)
+        "name_pattern": r"^efren.*balane$",
+        "ignore_patterns": [],
+        "rationale": (
+            "Efren Balane — Gloria's husband / co-defendant. Variants: "
+            "'Efren Balane' (27), 'Efren M. Balane' (15). Same person."
+        ),
+    },
+    # ─── 20 named transferees ───────────────────────────────────────────────
+    {
+        "label": "Arnel Mabeza (transferee)",
+        "keystone_entity_id": 1333,
+        "name_pattern": r"arnel.*mabeza|armel.*mabeza",
+        "ignore_patterns": [r"donata", r"joel"],  # other Mabezas — different people
+        "rationale": "Arnel Mabeza — named transferee under T-32917. 3 OCR variants.",
+    },
+    {
+        "label": "Cesar S. Ramirez (transferee)",
+        "keystone_entity_id": 621,
+        "name_pattern": r"cesar.*ramirez",
+        "ignore_patterns": [],
+        "rationale": "Cesar S. Ramirez — named transferee. 2 variants.",
+    },
+    {
+        "label": "Delfin Gaulit (transferee)",
+        "keystone_entity_id": 1295,
+        "name_pattern": r"delfin.*gaulit|delein.*gaulit",  # 'Delein' is OCR misread
+        "ignore_patterns": [r"eloisa"],  # Eloisa C. Gaulit is a different person
+        "rationale": "Delfin Gaulit — named transferee. 'Delein' variants are OCR misreads.",
+    },
+    {
+        "label": "Dolores Vela (transferee)",
+        "keystone_entity_id": 1274,
+        "name_pattern": r"dolores.*vela",
+        "ignore_patterns": [],  # Velante is different surname
+        "rationale": "Dolores Vela — named transferee. 'Dolores K. Vela' = same person.",
+    },
+    {
+        "label": "Edgardo Santiago (transferee)",
+        "keystone_entity_id": 1229,
+        "name_pattern": r"edgar.*santiago",
+        "ignore_patterns": [r"justice", r"ivle", r"reli"],  # others are different people
+        "rationale": "Edgardo Santiago — named transferee. 'Edgard' variant = same person.",
+    },
+    {
+        "label": "Elsa Iligan / Illigan (transferee)",
+        "keystone_entity_id": 1763,
+        "name_pattern": r"elsa.*ili[gn]an",  # match both Iligan and Illigan
+        "ignore_patterns": [],
+        "rationale": "Elsa O. Iligan — named transferee. Spelling varies between L/LL.",
+    },
+    {
+        "label": "Erlinda Tychingco (transferee)",
+        "keystone_entity_id": 1241,
+        "name_pattern": r"erl.nda.*tychingco",  # match Erlinda / Erllnda OCR
+        "ignore_patterns": [],
+        "rationale": "Erlinda Tychingco — named transferee. 'Erllnda' OCR misread.",
+    },
+    {
+        "label": "Jose Pascual Jr. (transferee)",
+        "keystone_entity_id": 72,
+        # Match Jose, José, "Just Pascual", "R. Jose Pascual", and Jr. forms; exclude Sr/Maribel/Bolen
+        "name_pattern": r"(jose|just|josé|r\.?\s*jose).*pascual",
+        "ignore_patterns": [r"sr\.", r"sr$", r"maribel", r"bolen"],
+        "rationale": (
+            "Jose Pascual Jr. — named transferee. Multiple OCR forms including "
+            "'Just Pascual', 'R. Jose Pascual'. Excludes Sr. (different person) "
+            "and other Pascuals."
+        ),
+    },
+    {
+        "label": "Librada B. Onrubio (transferee)",
+        "keystone_entity_id": 1552,
+        "name_pattern": r"librada.*onrubio",
+        "ignore_patterns": [],
+        "rationale": "Librada B. Onrubio — named transferee. Minor spacing variant.",
+    },
+    {
+        "label": "Maria V. Cereza (transferee)",
+        "keystone_entity_id": 1553,
+        "name_pattern": r"mar[il]a.*cereza",  # match Maria / Marla OCR misread
+        "ignore_patterns": [],
+        "rationale": "Maria V. Cereza — named transferee. Multiple OCR variants.",
+    },
+    {
+        "label": "Mariquita Era (transferee)",
+        "keystone_entity_id": 1262,
+        "name_pattern": r"mariquita.*era",
+        "ignore_patterns": [],
+        "rationale": "Mariquita Era — named transferee.",
+    },
+    {
+        "label": "Pedro Valledor (transferee)",
+        "keystone_entity_id": 1268,
+        "name_pattern": r"pedro.*valledor",
+        "ignore_patterns": [],  # Isabel/Maxima Valledor are different people
+        "rationale": "Pedro Valledor — named transferee. Excludes other Valledors.",
     },
 ]
 
