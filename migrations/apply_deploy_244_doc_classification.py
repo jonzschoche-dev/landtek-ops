@@ -71,7 +71,7 @@ def build_prompt(client_config, matter_rows):
     """Build a system prompt that lists valid matters + rules for this client."""
     matter_lines = []
     for mr in matter_rows:
-        desc = mr.get("matter_caption") or mr.get("matter_type") or ""
+        desc = mr.get("title") or mr.get("description") or mr.get("matter_type") or ""
         matter_lines.append(f"  {mr['matter_code']:<25s}  {desc[:80]}")
     matters_text = "\n".join(matter_lines)
 
@@ -173,7 +173,7 @@ def fetch_unclassified_docs(cur, client_config, limit=None):
 
 def fetch_matters(cur, client_config):
     cur.execute("""
-        SELECT matter_code, matter_type, matter_caption
+        SELECT matter_code, matter_type, title, description
           FROM matters
          WHERE matter_code LIKE %s
          ORDER BY matter_code
