@@ -229,8 +229,31 @@ KEYSTONE_GROUPS = [
         "label": "Pedro Valledor (transferee)",
         "keystone_entity_id": 1268,
         "name_pattern": r"pedro.*valledor",
-        "ignore_patterns": [],  # Isabel/Maxima Valledor are different people
+        "ignore_patterns": [],
         "rationale": "Pedro Valledor — named transferee. Excludes other Valledors.",
+    },
+    {
+        "label": "Mary Worrick Keesey (root)",
+        "keystone_entity_id": 25,  # 'Mary Worrick Keesey' (386 mentions — the actual MWK)
+        "name_pattern": r"(mary.*worrick|w.r.ick.*keesey|mary.*keesey)",
+        # Exclude 'Heirs of Mary Worrick' (it's a collective reference, not the
+        # individual person) and any document-title-like entries that got
+        # entity-extracted.
+        "ignore_patterns": [
+            r"heirs",          # 'Heirs of Mary Worrick' — collective
+            r"estate",         # estate-as-entity references
+            r"^worrick$",      # just the surname alone
+            r"helen",          # Helen Worrick (sister) — different person
+            r"alice",          # Alice Worrick (sister) — different person
+            r"manuel",         # Manuel Garrido (Helen's widower)
+        ],
+        "rationale": (
+            "Mary Worrick Keesey — root MWK estate entity (deceased 1988-03-17). "
+            "Keystone #25 (386 mentions, the canonical form). Variants include "
+            "'Mary Worick Keesey' (OCR), 'Mary Worrick Keesee' (Keesee/Keesey), "
+            "'KEESEY, MARY WORRICK' (formal allcaps), 'Mary Worrick' (no surname). "
+            "Excludes 'Heirs of Mary Worrick' (collective) + the sisters."
+        ),
     },
 ]
 
