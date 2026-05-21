@@ -67,8 +67,8 @@ CLIENTS = {
             "atty_daisy_bragais":        8878,
             "usec_genes_abot":           8879,
             # 20 named transferees (post-consolidation)
-            "alberto_victa":             None,  # not yet identified — populate when found
-            "ananias_apor":              None,
+            "alberto_victa":              856,
+            "ananias_apor":               859,
             "arnel_mabeza":              1333,
             "aurora_bernardo":           1551,
             "cesar_ramirez":              621,
@@ -82,10 +82,10 @@ CLIENTS = {
             "maria_cereza":              1553,
             "mariquita_era":             1262,
             "pedro_valledor":            1268,
-            "rosalina_hansol":           None,
-            "roscoe_leano":              None,
-            "ruben_ocan":                None,
-            "severino_tenorio_jr":       None,
+            "rosalina_hansol":           3411,  # canonical 'Rosalina M. Hansol' (filed under TCT T-50192)
+            "roscoe_leano":              1209,  # canonical 'Roscoe Leaño' (with ñ); fragments: #425, #4695, #5682
+            "ruben_ocan":                4474,  # canonical 'Ruben P. Ocan'; fragment: #1191
+            "severino_tenorio_jr":       1554,  # canonical 'Severino Tenorio Jr.'; fragments: #1350, #5394
         },
 
         # Pointer: where this client's per-matter case theories live
