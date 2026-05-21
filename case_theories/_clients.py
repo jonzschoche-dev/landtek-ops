@@ -151,8 +151,16 @@ CLIENTS = {
         "civil_case_mappings": {},          # TODO: as PAR civil cases are documented
 
         "keystone_entities": {
-            "allan_inocalla": None,        # TODO: find canonical entity id
-            # other key parties TBD
+            # Allan V. Inocalla — PAR principal. 19 mentions canonical.
+            # Aliases #8091, #8147, #8320 consolidated → #7983 in deploy_258.
+            "allan_inocalla":            7983,
+            # Shishir Allan Inocalla — Datu/martial-arts persona (may be same
+            # person as Allan; held separate canonical pending clarification).
+            # Aliases #8062, #8776 → #8708.
+            "shishir_allan_inocalla":    8708,
+            # Jesus V. Inocalla — sibling/co-petitioner across Inocalla cases
+            # (Civil Case 13-131220 etc). Alias #8158 → #8120.
+            "jesus_v_inocalla":          8120,
         },
 
         "case_theory_modules": [],         # TODO: per-matter PAR theories
