@@ -518,13 +518,17 @@ def render_chronicle(events, run_date):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--client", default="MWK", help="Client id from case_theories._clients.CLIENTS (default: MWK)")
-    ap.add_argument("--out", default=None, help="Output path (default: drafts/chronicle_<client>_<date>.md)")
+    ap.add_argument("--matter", default=None,
+                    help="Scope chronicle to a single matter_code (e.g., MWK-CV26360). "
+                         "Filter keeps events where the matter is in event.matters OR the event "
+                         "has no matter binding (memory keystones, ambient annotations).")
+    ap.add_argument("--all-matters", action="store_true",
+                    help="Generate one per-matter chronicle for every matter under the client's prefix.")
+    ap.add_argument("--out", default=None, help="Output path (default: drafts/chronicle_<client>[_<matter>]_<date>.md)")
     args = ap.parse_args()
-    # NOTE: Currently MEMORY_KEYSTONES are MWK-specific. For other clients,
-    # add a parallel keystones list in case_theories/_clients.py and read it here.
     # Reading the registry as a smoke check so the dependency is explicit:
     from case_theories._clients import get
-    _ = get(args.client)
+    client_config = get(args.client)
 
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
@@ -534,17 +538,49 @@ def main():
     events = load_events(cur)
     print(f"  → {len(events)} events loaded")
     attach_entities_from_doc_entities(cur, events)
-
     run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    out_path = args.out or f"/root/landtek/drafts/chronicle_{args.client}_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md"
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
 
-    md = render_chronicle(events, run_date)
-    Path(out_path).write_text(md)
-    print(f"\nChronicle written: {out_path}")
-    print(f"  lines: {len(md.splitlines())}")
-    print(f"  events: {len(events)}")
-    print(f"  years covered: {min(e['date'][:4] for e in events)} → {max(e['date'][:4] for e in events)}")
+    def write_for_matter(matter_code):
+        """Render a chronicle scoped to matter_code (or full if None)."""
+        if matter_code:
+            # Keep events that explicitly bind to this matter OR are matter-agnostic
+            # (memory keystones, annotations on parent titles) so the chronological
+            # context isn't lost.
+            scoped = [e for e in events
+                      if matter_code in e["matters"] or len(e["matters"]) == 0]
+        else:
+            scoped = events
+        if matter_code:
+            slug = matter_code.replace("/", "_")
+            out_path = args.out or f"/root/landtek/drafts/chronicle_{args.client}_{slug}_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md"
+        else:
+            out_path = args.out or f"/root/landtek/drafts/chronicle_{args.client}_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md"
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        md = render_chronicle(scoped, run_date)
+        if matter_code:
+            # Inject matter-scope banner after the first H1
+            banner = f"\n**Scope:** {matter_code} only (plus matter-agnostic keystones/annotations).\n"
+            md = md.replace("\n", banner + "\n", 1) if "\n" in md else md
+        Path(out_path).write_text(md)
+        print(f"  · {out_path}  ({len(scoped)} events, {len(md.splitlines())} lines)")
+        return out_path
+
+    if args.all_matters:
+        cur.execute("SELECT matter_code FROM matters WHERE matter_code LIKE %s ORDER BY matter_code",
+                    (client_config["matter_prefix"] + "%",))
+        matter_codes = [r["matter_code"] for r in cur.fetchall()]
+        print(f"\nGenerating per-matter chronicles for {len(matter_codes)} matters under {args.client}:")
+        for mc in matter_codes:
+            write_for_matter(mc)
+        # Also emit the master chronicle
+        print(f"\nGenerating master {args.client} chronicle:")
+        write_for_matter(None)
+    else:
+        out_path = write_for_matter(args.matter)
+        print(f"\nChronicle written: {out_path}")
+        print(f"  events: {len(events) if not args.matter else sum(1 for e in events if args.matter in e['matters'] or not e['matters'])}")
+        if events:
+            print(f"  years covered: {min(e['date'][:4] for e in events)} → {max(e['date'][:4] for e in events)}")
 
     cur.close()
     conn.close()
