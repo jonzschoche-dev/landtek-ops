@@ -42,13 +42,19 @@ def make_test(client_id):
             if not r:
                 raise TruthFailure(f"{client_id}: keystone {k!r}=#{eid} not in entities")
 
-        # operative_root (if set) must exist in titles
+        # operative_root (if set) must appear in titles OR title_chain
+        # (some operative roots like MWK's T-111 are 1912 originals with no
+        # registered TCT row but verified parentage in title_chain).
         op = c.get("operative_root")
         if op:
-            cur.execute("SELECT tct_number FROM titles WHERE tct_number = %s", (op,))
-            r = cur.fetchone()
-            if not r:
-                raise TruthFailure(f"{client_id}: operative_root={op!r} not in titles")
+            cur.execute("""
+                SELECT 1 FROM titles WHERE tct_number = %s
+                UNION ALL
+                SELECT 1 FROM title_chain WHERE parent_title = %s OR child_title = %s
+                LIMIT 1
+            """, (op, op, op))
+            if not cur.fetchone():
+                raise TruthFailure(f"{client_id}: operative_root={op!r} not in titles or title_chain")
     return fn
 
 
