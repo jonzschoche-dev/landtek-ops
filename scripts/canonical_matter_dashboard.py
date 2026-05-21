@@ -136,13 +136,7 @@ def render_matter(cur, matter_code):
         pass
 
     # Coverage footer
-    n_emails = sum(1 for _ in em_rows)
     n_res = len(res_rows)
-    n_docs_cur = cur.execute(
-        "SELECT COUNT(*) AS n FROM documents WHERE case_file IN ('MWK-001', 'Paracale-001') "
-        "AND EXISTS (SELECT 1 FROM matters m2 WHERE m2.matter_code = %s)",
-        (matter_code,)
-    )
     lines.append(f"_Coverage: {n_res} resolution(s), {len(em_rows)} recent email(s)._")
     lines.append("")
     lines.append("---")
@@ -159,6 +153,7 @@ def main():
     args = ap.parse_args()
 
     conn = psycopg2.connect(DSN)
+    conn.autocommit = True  # so failed queries don't poison subsequent ones
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     out_parts = []
