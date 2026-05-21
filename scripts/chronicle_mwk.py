@@ -31,12 +31,15 @@ Usage:
 """
 import argparse
 import re
+import sys
 from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 import psycopg2
 import psycopg2.extras
+
+sys.path.insert(0, "/root/landtek")
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
