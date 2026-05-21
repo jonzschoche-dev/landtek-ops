@@ -40,23 +40,51 @@ ARTA_DIRECTOR_RE = re.compile(
 )
 
 
+def resolve_canonical(cur, entity_id):
+    """Follow canonical_id chain to the root. Returns the canonical ID."""
+    seen = set()
+    cur_id = entity_id
+    while cur_id and cur_id not in seen:
+        seen.add(cur_id)
+        cur.execute("SELECT canonical_id FROM entities WHERE id=%s", (cur_id,))
+        r = cur.fetchone()
+        if not r or r["canonical_id"] is None:
+            return cur_id
+        cur_id = r["canonical_id"]
+    return cur_id
+
+
 def find_or_create_entity(cur, raw_name, entity_type="person"):
-    """Look up an entity by canonical_name or alias. Returns (id, created_bool)."""
+    """Look up an entity by canonical_name or alias. Prefer the most-complete-named
+    match across the canonical equivalence class. Returns (id, created_bool)."""
     if not raw_name:
         return None, False
-    # exact canonical
-    cur.execute("SELECT id FROM entities WHERE LOWER(canonical_name)=LOWER(%s) LIMIT 1", (raw_name,))
-    r = cur.fetchone()
-    if r:
-        return r["id"], False
-    # alias match
+    # Find all candidate matches (exact + alias + fuzzy-prefix)
+    candidates = set()
+    cur.execute("SELECT id FROM entities WHERE LOWER(canonical_name)=LOWER(%s)", (raw_name,))
+    for r in cur.fetchall():
+        candidates.add(r["id"])
     cur.execute("""SELECT e.id FROM entities e
                     JOIN entity_aliases a ON a.entity_id = e.id
-                   WHERE LOWER(a.alias)=LOWER(%s) LIMIT 1""", (raw_name,))
+                   WHERE LOWER(a.alias)=LOWER(%s)""", (raw_name,))
+    for r in cur.fetchall():
+        candidates.add(r["id"])
+    # Fuzzy: ILIKE %raw_name% on canonical_name (e.g. "Gay Belen" → "Atty. Gay Belen")
+    cur.execute("SELECT id FROM entities WHERE canonical_name ILIKE %s", (f"%{raw_name}%",))
+    for r in cur.fetchall():
+        candidates.add(r["id"])
+    if not candidates:
+        return None, False
+    # Resolve every candidate to its canonical root, then pick the root
+    # whose canonical_name is longest (proxy for most-complete spelling).
+    roots = set(resolve_canonical(cur, cid) for cid in candidates)
+    cur.execute("""SELECT id, canonical_name, mentions_count
+                     FROM entities
+                    WHERE id = ANY(%s)
+                 ORDER BY LENGTH(canonical_name) DESC, mentions_count DESC NULLS LAST
+                    LIMIT 1""", (list(roots),))
     r = cur.fetchone()
-    if r:
-        return r["id"], False
-    return None, False
+    return (r["id"] if r else None), False
 
 
 def set_adjudicator(cur, res_id, entity_id, notes_append=None):
