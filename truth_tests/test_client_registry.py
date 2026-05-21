@@ -45,7 +45,7 @@ def make_test(client_id):
         # operative_root (if set) must exist in titles
         op = c.get("operative_root")
         if op:
-            cur.execute("SELECT title_no FROM titles WHERE title_no = %s", (op,))
+            cur.execute("SELECT tct_number FROM titles WHERE tct_number = %s", (op,))
             r = cur.fetchone()
             if not r:
                 raise TruthFailure(f"{client_id}: operative_root={op!r} not in titles")
