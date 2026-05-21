@@ -168,7 +168,7 @@ EOF
     # Skip with: LANDTEK_SKIP_TRUTH_TESTS=1 (only for cases where the deploy
     # explicitly modifies a previously-locked truth — must be matched by a
     # truth_tests/ assertion update in the same deploy).
-    if [ -z "$LANDTEK_SKIP_TRUTH_TESTS" ] && [ -d "$REPO/truth_tests" ]; then
+    if [ -z "${LANDTEK_SKIP_TRUTH_TESTS:-}" ] && [ -d "$REPO/truth_tests" ]; then
       hdr "truth_tests pre-deploy gate"
       if [ "$SIDE" = "VPS" ]; then
         if ! python3 "$REPO/truth_tests/run_all.py"; then
