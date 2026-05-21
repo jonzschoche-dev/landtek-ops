@@ -182,11 +182,12 @@ def main():
         if hits:
             reasons.append(f"text-grep hit: {sorted(hits)[:5]}")
 
-        # Check 3: LLM reasoning tells on itself
-        if p["reasoning"]:
-            tell_hits = grep_text_for_surnames(p["reasoning"], surnames)
-            if tell_hits:
-                reasons.append(f"LLM-reasoning surfaces: {sorted(tell_hits)[:5]}")
+        # NOTE: An earlier draft of this script grep'd the LLM's `reasoning`
+        # field for keystone surnames. That was way too noisy — the LLM
+        # commonly names the client to explain WHY the doc is unrelated
+        # ("does NOT involve Mary Worrick Keesey"). A negative mention triggered
+        # a false-positive downgrade. Removed. The reasoning field is human
+        # context, not a signal source.
 
         if reasons:
             downgrades.append((p, reasons))
