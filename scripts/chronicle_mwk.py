@@ -227,14 +227,29 @@ def load_events(cur, client_config=None):
                 "provenance": k.get("provenance", "memory"),
             })
 
-    # --- Documents (client's case_file) with doc_date ---
-    cur.execute("""
-        SELECT id, doc_date, classification, execution_status, smart_filename,
-               matter_code, COALESCE(extracted_text, '') AS extracted_text
-          FROM documents
-         WHERE case_file = %s AND doc_date IS NOT NULL
-         ORDER BY doc_date, id
-    """, (case_file,))
+    # --- Documents (client's case_file OR matter-code cross-linked) with doc_date ---
+    # Cross-link rule: a doc in another case_file (e.g., 'Owner' for Jonathan's
+    # personal copies) but tagged with a matter_code under the client's prefix
+    # should still appear in the client's chronicle. This is how Owner-bucket
+    # MWK family material surfaces under Mary Worrick Keesey's timeline.
+    if matter_prefix:
+        cur.execute("""
+            SELECT id, doc_date, classification, execution_status, smart_filename,
+                   matter_code, COALESCE(extracted_text, '') AS extracted_text
+              FROM documents
+             WHERE doc_date IS NOT NULL
+               AND (case_file = %s OR matter_code LIKE %s)
+             ORDER BY doc_date, id
+        """, (case_file, matter_prefix + "%"))
+    else:
+        # Client has no matter namespace (e.g., OWNER) — case_file only
+        cur.execute("""
+            SELECT id, doc_date, classification, execution_status, smart_filename,
+                   matter_code, COALESCE(extracted_text, '') AS extracted_text
+              FROM documents
+             WHERE doc_date IS NOT NULL AND case_file = %s
+             ORDER BY doc_date, id
+        """, (case_file,))
     for r in cur.fetchall():
         events.append({
             "date": r["doc_date"].isoformat() if hasattr(r["doc_date"], "isoformat")
