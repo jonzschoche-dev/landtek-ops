@@ -82,16 +82,35 @@ def build_prompt(client_config, matter_rows):
     ghost = ", ".join(client_config.get("ghost_titles", []))
     op_root = client_config.get("operative_root", "")
 
+    # MWK title-chain canon (per CLAUDE.md). For non-MWK clients this should
+    # be pulled from the registry's trunk_titles / derivatives once populated.
+    MWK_CHAIN_TITLES = (
+        "T-4497 (mother), T-32916, T-32917, T-31298, T-38838, T-47655, "
+        "T-47656, T-47657, T-48335, T-48336, T-49037, T-49060, T-49061, "
+        "T-49062, T-52354, T-52536, T-52537, T-52538, T-52539, T-52540, "
+        "T-079-2021002127 (Balane defendant title, 2021 from cancelled T-52540)"
+    )
+    MWK_NOT_IN_CHAIN = "T-30683 (Manguisoc Mercedes — SEPARATE property), T-4494 (Cabanbanan San Vicente — SEPARATE)"
+
     return f"""You are classifying a Philippine legal document for the {client_config['label']} client (client_id={client_config['client_id']}).
 
-VALID MATTERS for {client_config['client_id']}:
+VALID MATTERS for {client_config['client_id']} (proposed_matter_code MUST be one of these or null):
 {matters_text}
 
 CIVIL CASE MAPPINGS:
 {cv_lines or "  (none)"}
 
 ARTA CTN RULE: CTN-SL-YYYY-NNNN-NNNN suffix → matter_code = "{arta_prefix}<4-digit suffix>".
-TITLE CHAIN: operative root = {op_root}; ghost titles = {ghost}.
+
+TITLE CHAIN (operative root = {op_root}; ghost = {ghost}):
+  IN CHAIN (these titles ARE part of {client_config['client_id']}'s case):
+    {MWK_CHAIN_TITLES}
+  NOT IN CHAIN (do NOT classify these as MWK chain — they are separate properties):
+    {MWK_NOT_IN_CHAIN}
+
+A doc about an IN-CHAIN title that doesn't tie to a specific litigation matter
+should be action="assign_matter" with matter_code="MWK-TCT4497" (chain-verification matter)
+OR "MWK-ESTATE" (estate-broad), whichever fits better.
 
 CLIENT'S CORE FACTS:
 - Plaintiff/heir: Patricia Keesey Zschoche (heir of Mary Worrick Keesey)
@@ -216,6 +235,8 @@ def main():
     ap.add_argument("--limit", type=int, default=None, help="Cap docs processed (testing)")
     ap.add_argument("--apply", action="store_true",
                     help="Actually call Haiku + write proposals (without this, dry-run only)")
+    ap.add_argument("--purge-proposed", action="store_true",
+                    help="Delete existing 'proposed' rows for this client before running (use after prompt changes)")
     args = ap.parse_args()
 
     conn = psycopg2.connect(DSN)
@@ -233,6 +254,11 @@ def main():
         return
 
     client_config = get(args.client)
+
+    if args.purge_proposed:
+        cur.execute("DELETE FROM doc_classification_proposals WHERE status='proposed' AND client_id=%s",
+                    (args.client,))
+        print(f"  purged {cur.rowcount} prior proposed rows for {args.client}")
     matters = fetch_matters(cur, client_config)
     print(f"  {len(matters)} valid matters for {args.client}")
 
