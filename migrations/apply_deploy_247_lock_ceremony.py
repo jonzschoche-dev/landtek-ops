@@ -61,36 +61,59 @@ TARGETS = [
 
 def show_target(cur, table, where, params, rationale, apply=False):
     cur.execute(f"""
-        SELECT id, verification_lock, content_hash, locked_at, locked_by
+        SELECT *
           FROM {table}
          WHERE {where}
     """, params)
     rows = cur.fetchall()
+    # Pick a friendly identifier for display
+    id_keys = {
+        "entities": "id",
+        "titles": "tct_number",
+        "title_chain": ("parent_title", "child_title"),
+        "instruments_on_title": "id",
+    }
+    idk = id_keys.get(table, "id")
+    def id_str(r):
+        if isinstance(idk, tuple):
+            return "/".join(str(r[k]) for k in idk)
+        return str(r[idk])
+
     print(f"\n  {table} WHERE {where % params}")
     print(f"    rationale: {rationale}")
     print(f"    rows matched: {len(rows)}")
     for r in rows:
-        already = (r["verification_lock"] == "hard")
+        already = (r.get("verification_lock") == "hard")
         marker = "🔒 ALREADY LOCKED" if already else "🔓 will lock"
-        print(f"      id={r['id']}  {marker}  (current_lock={r['verification_lock']!r})")
+        print(f"      {idk if not isinstance(idk, tuple) else '/'.join(idk)}={id_str(r)}  {marker}  (current_lock={r.get('verification_lock')!r})")
     if not apply:
         return 0
     locked = 0
     for r in rows:
-        if r["verification_lock"] == "hard":
+        if r.get("verification_lock") == "hard":
             continue
         # Locking flips the column. The lockdown trigger will:
         #  - require app.actor (we set it below)
         #  - compute content_hash
         #  - audit-log the change
-        cur.execute(f"""
-            UPDATE {table}
-               SET verification_lock = 'hard',
-                   locked_at = now(),
-                   locked_by = 'jonathan',
-                   lock_reason = %s
-             WHERE id = %s
-        """, (rationale, r["id"]))
+        if isinstance(idk, tuple):
+            cur.execute(f"""
+                UPDATE {table}
+                   SET verification_lock = 'hard',
+                       locked_at = now(),
+                       locked_by = 'jonathan',
+                       lock_reason = %s
+                 WHERE {idk[0]} = %s AND {idk[1]} = %s
+            """, (rationale, r[idk[0]], r[idk[1]]))
+        else:
+            cur.execute(f"""
+                UPDATE {table}
+                   SET verification_lock = 'hard',
+                       locked_at = now(),
+                       locked_by = 'jonathan',
+                       lock_reason = %s
+                 WHERE {idk} = %s
+            """, (rationale, r[idk]))
         locked += 1
     print(f"    ✓ locked: {locked}")
     return locked
