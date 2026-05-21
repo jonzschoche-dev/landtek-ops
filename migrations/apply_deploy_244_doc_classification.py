@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS doc_classification_proposals (
     model                 TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
     client_id             TEXT NOT NULL,
     status                TEXT NOT NULL DEFAULT 'proposed'
-                            CHECK (status IN ('proposed','approved','rejected','applied','superseded')),
+                            CHECK (status IN ('proposed','approved','rejected','applied','superseded','needs_manual_review')),
     reviewed_at           TIMESTAMPTZ,
     reviewed_by           TEXT,
     review_notes          TEXT,
