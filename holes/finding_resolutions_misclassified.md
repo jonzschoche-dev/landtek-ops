@@ -36,3 +36,19 @@ so they're already excluded from per-matter views. They appear only in
 deploy_243) which now reflects truth.
 
 Recorded: 2026-05-21
+
+## Post-245 adjudicator-coverage state
+
+Adjudicator FK coverage: 1/27 resolutions after deploy_245.
+
+| Resolution | adjudicator_name_raw | status |
+|---|---|---|
+| r#16 | "Gay Belen / Attorneys" | resolved → entity #4079 (Atty. Elaine Gay R. Belen) |
+| r#3, r#14 | (none) | ARTA docs; tail-regex for Director sign-off failed — needs LLM extraction |
+| r#17 | "Jaime Resoco" | not in entities; held pending source-grounding (no stub creation) |
+| r#18, r#23 | (none) | Flagged: misclassified Yuzon legal memos |
+| r#6, r#13, r#26, r#27 | "Jose Teodorico", "Karlo M. Dialogo", "Maria Eleanor" | held — depends on matter-linkage from deploy_244 batch first |
+
+The deploy_244 LLM batch may surface that r#6/r#13/r#26/r#27 belong to other clients
+(probably Inocalla family civil cases under Paracale-001). Once their matter scope is clarified,
+a follow-up adjudicator-id pass can run.
