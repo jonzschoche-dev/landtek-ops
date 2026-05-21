@@ -164,6 +164,36 @@ CLIENTS = {
 
         "next_forcing_function": None,
     },
+
+    # ─── OWNER — Jonathan Zschoche's personal/owner-bucket files ─────────
+    # Not a legal client in the representation sense; it's the case_file used
+    # for Jonathan's own documents (passport, birth records, family research,
+    # archive certifications). Introduced in deploy_081. Some Owner docs may
+    # also have matter_code values that cross-link to a real client matter
+    # (e.g., a Patricia passport copy may be MWK-ESTATE evidence even though
+    # the doc itself is filed under Owner).
+    "OWNER": {
+        "client_id": "OWNER",
+        "label": "Owner (Jonathan Zschoche)",
+        "owner_principal": "Jonathan Paul Zschoche",
+        "case_file": "Owner",
+        "matter_prefix": None,             # no matter_codes for Owner-only docs
+        "operative_root": None,
+        "ghost_titles": [],
+        "trunk_titles": [],
+        "arta_ctn_prefix_to_matter": None,
+        "civil_case_mappings": {},
+        "keystone_entities": {
+            "jonathan_zschoche": None,     # populate when canonical entity id known
+        },
+        "case_theory_modules": [],
+        "consolidation_groups_count": 0,
+        "memory_rules": [],
+        "chronicle_script": None,
+        "chronicle_keystones_var": None,
+        "truth_test_modules": [],
+        "next_forcing_function": None,
+    },
 }
 
 
