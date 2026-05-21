@@ -235,7 +235,14 @@ def main():
             continue
 
         ctn_nos, matter_codes = extract_ctns(text, valid_matters)
-        date = d["doc_date"].isoformat() if d["doc_date"] else parse_date(text)
+        # doc_date may come back as a date object OR a string depending on driver mode
+        dd = d["doc_date"]
+        if dd is None:
+            date = parse_date(text)
+        elif hasattr(dd, "isoformat"):
+            date = dd.isoformat()
+        else:
+            date = str(dd)
         adj_name = extract_adjudicator(text)
         forum = extract_forum(text)
         disposition = extract_disposition(text)
