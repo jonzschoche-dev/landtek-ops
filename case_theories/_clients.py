@@ -1,0 +1,192 @@
+"""_clients.py — Per-client configuration registry.
+
+Single source of truth for the data that varies between clients. Generic scripts
+(chronicle, gmail backfill, docs backfill, consolidate_entities) should read
+from CLIENTS[<id>] rather than hardcoding MWK-specific values.
+
+For COMPLEX per-client data (consolidation groups, case theory definitions,
+memory keystones), the registry POINTS to where that data lives — it does not
+copy it. This keeps each module responsible for its own content and avoids
+multi-place edits.
+
+Adding a new client:
+  1. Add an entry below with case_file, matter_prefix, and any known scalars
+  2. Add memory rule files per-client (memory/project_<...>_<client>.md)
+  3. Create case_theory modules (case_theories/<...>.py) as needed
+  4. Add per-client consolidation groups inside consolidate_entities.py
+     KEYSTONE_GROUPS (or use a per-client filter)
+  5. Add chronicle memory keystones inside the per-client chronicle module
+  6. Run the backfill scripts with --client <id> (once they accept that arg)
+
+See docs/CLIENT_ONBOARDING.md for the full sequence.
+"""
+
+CLIENTS = {
+    # ─── MWK — Mary Worrick Keesey estate ─────────────────────────────────
+    "MWK": {
+        "client_id": "MWK",
+        "label": "Mary Worrick Keesey",
+        "owner_principal": "Patricia Keesey Zschoche (heir)",
+
+        # Storage / namespace
+        "case_file": "MWK-001",
+        "matter_prefix": "MWK-",
+
+        # Title chain canon (mirrored to title_chain_canon.py — keep in sync)
+        "operative_root": "T-111",
+        "ghost_titles": ["OCT T-106", "T-106", "1-106", "F-106"],
+        "trunk_titles": ["T-111", "T-4497"],
+
+        # Filing convention mappings (consumed by gmail + docs backfills)
+        # CTN format: ARTA matters have suffix → matter_code lookup
+        "arta_ctn_prefix_to_matter": "MWK-ARTA-",  # MWK-ARTA-<suffix>
+
+        # Civil case + special case number → matter_code lookup
+        "civil_case_mappings": {
+            "26-360":  "MWK-CV26360",
+            "26360":   "MWK-CV26360",
+            "6839":    "MWK-CV6839",
+            "6922":    "MWK-PARALLEL-CV6922",
+            "9221":    "MWK-PARALLEL-CRIM9221",
+        },
+
+        # Keystone entity IDs — the canonical persons after consolidation
+        # (used for adjudicator linkage, lookup short-circuits, truth tests)
+        "keystone_entities": {
+            "mary_worrick_keesey":         25,
+            "patricia_keesey_zschoche":   400,
+            "geraldine_keesey_hoppe":      16,
+            "gloria_balane":               15,
+            "efren_balane":              3057,
+            "engr_erwin_balane":         3060,
+            "loida_macale":                39,
+            "cesar_de_la_fuente":        1348,
+            "alexander_pajarillo":       1635,
+            "atty_bonifacio_barandon":   3061,
+            "atty_rodolfo_del_rosario":  8877,
+            "atty_daisy_bragais":        8878,
+            "usec_genes_abot":           8879,
+            # 20 named transferees (post-consolidation)
+            "alberto_victa":             None,  # not yet identified — populate when found
+            "ananias_apor":              None,
+            "arnel_mabeza":              1333,
+            "aurora_bernardo":           1551,
+            "cesar_ramirez":              621,
+            "delfin_gaulit":             1295,
+            "dolores_vela":              1274,
+            "edgardo_santiago":          1229,
+            "elsa_iligan":               1763,
+            "erlinda_tychingco":         1241,
+            "jose_pascual_jr":             72,
+            "librada_onrubio":           1552,
+            "maria_cereza":              1553,
+            "mariquita_era":             1262,
+            "pedro_valledor":            1268,
+            "rosalina_hansol":           None,
+            "roscoe_leano":              None,
+            "ruben_ocan":                None,
+            "severino_tenorio_jr":       None,
+        },
+
+        # Pointer: where this client's per-matter case theories live
+        "case_theory_modules": [
+            "case_theories.civil_case_26_360",
+            "case_theories.transferees",  # generates 19 per-transferee theories
+        ],
+
+        # Pointer: which entries in consolidate_entities.KEYSTONE_GROUPS are MWK's
+        "consolidation_groups_count": 22,  # informational; all current entries are MWK
+
+        # Pointer: which memory rules belong to this client
+        "memory_rules": [
+            "feedback_multi_agent_git_routine",            # global
+            "project_title_origins_mwk",                    # MWK-specific
+            "project_civil_case_26_360_load_bearing_dates", # MWK-specific
+            "feedback_legal_act_validity_scrutiny",         # global discipline
+            "project_delia_macaso_transferee",              # MWK transferee detail
+        ],
+
+        # Generic chronicle script + per-client KEYSTONES list location
+        "chronicle_script": "scripts/chronicle_mwk.py",
+        "chronicle_keystones_var": "MEMORY_KEYSTONES",  # the constant in chronicle_mwk.py
+
+        # Truth tests for this client (added per deploy)
+        "truth_test_modules": [
+            "test_titles_keystone",          # T-4497 facts
+            "test_entities_keystone",        # Cesar #1348, Patricia exists
+            "test_chain_canon_alignment",    # OPERATIVE_ROOTS["MWK-001"] = "T-111"
+            "test_balane_chain_components",  # T-52540 → 079-2021002127 ↔ Psd-05-026197
+        ],
+
+        # Forcing function (currently active)
+        "next_forcing_function": {
+            "type": "mediation",
+            "matter_code": "MWK-CV26360",
+            "date": "2026-06-02",
+            "venue": "RTC Camarines Norte (Daet)",
+        },
+    },
+
+    # ─── PAR — Paracale (Allan V. Inocalla) ───────────────────────────────
+    # Stub. Populate as data lands. The 7 PAR-* matters already exist in
+    # the `matters` table; this entry tells the registry they belong to PAR.
+    "PAR": {
+        "client_id": "PAR",
+        "label": "Paracale (Allan V. Inocalla)",
+        "owner_principal": "Allan V. Inocalla",
+
+        "case_file": "Paracale-001",
+        "matter_prefix": "PAR-",
+
+        "operative_root": None,           # TODO: when PAR title chain is mapped
+        "ghost_titles": [],
+        "trunk_titles": [],
+
+        "arta_ctn_prefix_to_matter": None,  # Paracale matters aren't ARTA
+        "civil_case_mappings": {},          # TODO: as PAR civil cases are documented
+
+        "keystone_entities": {
+            "allan_inocalla": None,        # TODO: find canonical entity id
+            # other key parties TBD
+        },
+
+        "case_theory_modules": [],         # TODO: per-matter PAR theories
+        "consolidation_groups_count": 0,   # nothing PAR-specific yet
+        "memory_rules": [],                # TODO: project_title_origins_par.md
+        "chronicle_script": None,          # TODO: chronicle_par.py or generic
+        "chronicle_keystones_var": None,
+        "truth_test_modules": [],
+
+        "next_forcing_function": None,
+    },
+}
+
+
+def get(client_id):
+    """Return client config dict. KeyError if not registered."""
+    if client_id not in CLIENTS:
+        raise KeyError(f"Unknown client {client_id!r}. Registered: {list(CLIENTS)}")
+    return CLIENTS[client_id]
+
+
+def all_ids():
+    """Return list of registered client IDs."""
+    return list(CLIENTS.keys())
+
+
+def client_for_matter_code(matter_code):
+    """Reverse lookup: which client does this matter_code belong to?"""
+    if not matter_code:
+        return None
+    for cid, conf in CLIENTS.items():
+        if matter_code.startswith(conf["matter_prefix"]):
+            return cid
+    return None
+
+
+def client_for_case_file(case_file):
+    """Reverse lookup: which client does this case_file belong to?"""
+    for cid, conf in CLIENTS.items():
+        if conf["case_file"] == case_file:
+            return cid
+    return None
