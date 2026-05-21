@@ -40,8 +40,9 @@ KEYSTONE_GROUPS = [
     {
         "label": "Cesar de la Fuente",
         "keystone_entity_id": 1348,  # 'Cesar de La Fuente' verified KEYSTONE
-        "name_pattern": r"\bcesar\b.*\bfuente\b",
-        "ignore_patterns": [],  # nothing to exclude in this group
+        # Postgres POSIX regex uses \y for word boundary, not \b; simpler is .*
+        "name_pattern": r"cesar.*fuente",
+        "ignore_patterns": [],
         "rationale": (
             "Same person fragmented across 18+ canonical_name forms (Cesar M., Cesar N., "
             "Cesar Dela Fuente, Cesar De La Fuente, Mr. Cesar M., etc). Keystone is #1348 "
@@ -51,9 +52,9 @@ KEYSTONE_GROUPS = [
     },
     {
         "label": "Atty. Bonifacio Barandon",
-        "keystone_entity_id": None,  # determine at runtime — highest-mentions verified
-        "name_pattern": r"\bbarandon\b",
-        "ignore_patterns": [r"barandon\s+law"],  # 'Barandon Law Offices' is the firm, NOT the person
+        "keystone_entity_id": None,
+        "name_pattern": r"barandon",
+        "ignore_patterns": [r"barandon\s+law"],
         "rationale": (
             "Atty. Bonifacio T. Barandon Jr. is plaintiff's counsel in CV 26-360. "
             "Three entity records exist for the same person. 'Barandon Law Offices' is "
