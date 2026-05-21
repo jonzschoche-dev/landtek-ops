@@ -22,6 +22,11 @@ PINNED_ASSIGNMENTS = [
     (580, "MWK-CV26360", "Torralba CA-G.R. SP No. 181607"),
     (584, "MWK-CV26360", "Juntilla/Torralba/Cantor Civil Case 8563"),
     (527, "MWK-CV26360", "Mercedes Lot 403 CAD 1186-D"),
+    # deploy_255 additions — Donata King cascade
+    (406, "MWK-CV26360", "Gloria HANSOL Balane Toronto Consulate acknowledgement"),
+    (411, "MWK-CV26360", "Gloria H. Balane RPA Form — TCT 079-202100212 (contested defendant title)"),
+    (568, "MWK-TCT4497", "1913 SC Decision G.R. 8678 Marciana Moreno De Worrick chain primary"),
+    (586, "MWK-CV26360", "Civil Case 8563 RTC Daet Br.41 — Juntilla/Torralba v. Donata King/Mabeza"),
 ]
 
 
@@ -66,10 +71,43 @@ def transferee_keystones_resolved(cur):
         )
 
 
+def donata_king_consolidated(cur):
+    """deploy_255: #8365 Donata M. King → canonical = #3155 Donata Mabeza King."""
+    cur.execute("SELECT canonical_id FROM entities WHERE id = 8365")
+    r = cur.fetchone()
+    if not r:
+        raise TruthFailure("#8365 Donata M. King missing")
+    if r["canonical_id"] != 3155:
+        raise TruthFailure(
+            f"#8365 canonical_id={r['canonical_id']}, expected 3155 (Donata Mabeza King). "
+            "Deploy_255 was supposed to consolidate."
+        )
+
+
+def donata_and_joel_in_registry(cur):
+    """deploy_255: Donata King + Joel Mabeza added to MWK keystones."""
+    sys.path.insert(0, "/root/landtek")
+    from case_theories._clients import get
+    mwk = get("MWK")
+    ks = mwk.get("keystone_entities", {})
+    if ks.get("donata_mabeza_king") != 3155:
+        raise TruthFailure(
+            f"keystone 'donata_mabeza_king' = {ks.get('donata_mabeza_king')}, expected 3155"
+        )
+    if ks.get("joel_i_mabeza") != 8367:
+        raise TruthFailure(
+            f"keystone 'joel_i_mabeza' = {ks.get('joel_i_mabeza')}, expected 8367"
+        )
+
+
 TESTS = (
     [(f"audit_closure.doc{did}.{exp}", make_doc_assertion(did, exp, why))
      for did, exp, why in PINNED_ASSIGNMENTS]
-    + [("audit_closure.transferee_keystones_resolved", transferee_keystones_resolved)]
+    + [
+        ("audit_closure.transferee_keystones_resolved", transferee_keystones_resolved),
+        ("audit_closure.donata_king_consolidated", donata_king_consolidated),
+        ("audit_closure.donata_and_joel_in_registry", donata_and_joel_in_registry),
+    ]
 )
 
 

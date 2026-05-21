@@ -66,6 +66,11 @@ CLIENTS = {
             "atty_rodolfo_del_rosario":  8877,
             "atty_daisy_bragais":        8878,
             "usec_genes_abot":           8879,
+            # Balane-family co-defendants in Civil Case 8563 (predecessor of
+            # CA-G.R. SP No. 181607 / underlying CV26360). Surfaced via
+            # deploy_251/255 Torralba-Donata-Balane lineage investigation.
+            "donata_mabeza_king":        3155,
+            "joel_i_mabeza":             8367,
             # 20 named transferees (post-consolidation)
             "alberto_victa":              856,
             "ananias_apor":               859,
