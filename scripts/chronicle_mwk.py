@@ -202,34 +202,39 @@ def extract_titles_from_text(text):
     return set(TITLE_RE.findall(text))
 
 
-def load_events(cur):
-    """Union all dated events from all source tables + memory keystones."""
+def load_events(cur, client_config=None):
+    """Union all dated events from all source tables + memory keystones,
+    scoped to the given client_config (defaults to MWK behavior for back-compat)."""
     events = []
+    case_file = (client_config or {}).get("case_file", "MWK-001")
+    matter_prefix = (client_config or {}).get("matter_prefix", "MWK-")
+    client_id = (client_config or {}).get("client_id", "MWK")
 
-    # --- Memory keystones ---
-    for k in MEMORY_KEYSTONES:
-        events.append({
-            "date": k["date"],
-            "kind": "memory",
-            "title": k["title"],
-            "detail": k.get("detail", ""),
-            "source": k["source"],
-            "source_ref": k["source"],
-            "titles": set(k.get("titles") or []),
-            "entities": [],  # resolved via grep below
-            "entities_names": k.get("entities_names") or [],
-            "matters": set(k.get("matters") or []),
-            "provenance": k.get("provenance", "memory"),
-        })
+    # --- Memory keystones (currently MWK-only; other clients add their own keystones) ---
+    if client_id == "MWK":
+        for k in MEMORY_KEYSTONES:
+            events.append({
+                "date": k["date"],
+                "kind": "memory",
+                "title": k["title"],
+                "detail": k.get("detail", ""),
+                "source": k["source"],
+                "source_ref": k["source"],
+                "titles": set(k.get("titles") or []),
+                "entities": [],  # resolved via grep below
+                "entities_names": k.get("entities_names") or [],
+                "matters": set(k.get("matters") or []),
+                "provenance": k.get("provenance", "memory"),
+            })
 
-    # --- Documents (MWK-001) with doc_date ---
+    # --- Documents (client's case_file) with doc_date ---
     cur.execute("""
         SELECT id, doc_date, classification, execution_status, smart_filename,
                matter_code, COALESCE(extracted_text, '') AS extracted_text
           FROM documents
-         WHERE case_file = 'MWK-001' AND doc_date IS NOT NULL
+         WHERE case_file = %s AND doc_date IS NOT NULL
          ORDER BY doc_date, id
-    """)
+    """, (case_file,))
     for r in cur.fetchall():
         events.append({
             "date": r["doc_date"].isoformat() if hasattr(r["doc_date"], "isoformat")
@@ -247,16 +252,16 @@ def load_events(cur):
             "provenance": r["execution_status"] or "?",
         })
 
-    # --- Emails (linked to MWK matters) ---
+    # --- Emails (linked to this client's matters) ---
     cur.execute("""
         SELECT id, sent_at::date AS sent_date, from_name, from_addr, subject,
                matter_codes
           FROM gmail_messages
          WHERE cardinality(matter_codes) > 0
-           AND EXISTS (SELECT 1 FROM unnest(matter_codes) mc WHERE mc LIKE 'MWK-%')
+           AND EXISTS (SELECT 1 FROM unnest(matter_codes) mc WHERE mc LIKE %s)
            AND sent_at IS NOT NULL
          ORDER BY sent_at, id
-    """)
+    """, (matter_prefix + "%",))
     for r in cur.fetchall():
         sender = (r["from_name"] or r["from_addr"] or "?")[:40]
         events.append({
@@ -269,7 +274,7 @@ def load_events(cur):
             "titles": extract_titles_from_text(r["subject"] or ""),
             "entities": [],
             "entities_names": [],
-            "matters": set([m for m in (r["matter_codes"] or []) if m.startswith("MWK-")]),
+            "matters": set([m for m in (r["matter_codes"] or []) if m.startswith(matter_prefix)]),
             "provenance": "email_received" if "in" in (r.get("from_addr") or "") else "email",
         })
 
@@ -280,9 +285,9 @@ def load_events(cur):
                disposition_summary
           FROM resolutions
          WHERE resolution_date IS NOT NULL
-           AND EXISTS (SELECT 1 FROM unnest(affected_matter_codes) mc WHERE mc LIKE 'MWK-%')
+           AND EXISTS (SELECT 1 FROM unnest(affected_matter_codes) mc WHERE mc LIKE %s)
          ORDER BY resolution_date, id
-    """)
+    """, (matter_prefix + "%",))
     for r in cur.fetchall():
         events.append({
             "date": r["resolution_date"].isoformat() if hasattr(r["resolution_date"], "isoformat")
@@ -296,7 +301,7 @@ def load_events(cur):
             "titles": set(),
             "entities": [],
             "entities_names": [r["adjudicator_name_raw"]] if r["adjudicator_name_raw"] else [],
-            "matters": set([m for m in (r["affected_matter_codes"] or []) if m.startswith("MWK-")]),
+            "matters": set([m for m in (r["affected_matter_codes"] or []) if m.startswith(matter_prefix)]),
             "provenance": "resolution",
         })
 
@@ -307,9 +312,9 @@ def load_events(cur):
                affected_matter_codes, filed_by, addressed_to, status
           FROM escalations
          WHERE escalation_date IS NOT NULL
-           AND EXISTS (SELECT 1 FROM unnest(affected_matter_codes) mc WHERE mc LIKE 'MWK-%')
+           AND EXISTS (SELECT 1 FROM unnest(affected_matter_codes) mc WHERE mc LIKE %s)
          ORDER BY escalation_date, id
-    """)
+    """, (matter_prefix + "%",))
     for r in cur.fetchall():
         src = (f"doc#{r['escalation_doc_id']}" if r['escalation_doc_id']
                else f"gmail#{r['escalation_email_id']}" if r['escalation_email_id']
@@ -327,18 +332,20 @@ def load_events(cur):
             "titles": set(),
             "entities": [],
             "entities_names": [],
-            "matters": set([m for m in (r["affected_matter_codes"] or []) if m.startswith("MWK-")]),
+            "matters": set([m for m in (r["affected_matter_codes"] or []) if m.startswith(matter_prefix)]),
             "provenance": "escalation",
         })
 
-    # --- Instruments on titles (annotations) ---
+    # --- Instruments on titles (annotations) — scoped by source doc's case_file ---
     cur.execute("""
-        SELECT id, entry_date, parent_tct_number, instrument_type, executor_full_name,
-               pe_number, doc_id
-          FROM instruments_on_title
-         WHERE entry_date IS NOT NULL AND parent_tct_number IS NOT NULL
-         ORDER BY entry_date, id
-    """)
+        SELECT i.id, i.entry_date, i.parent_tct_number, i.instrument_type,
+               i.executor_full_name, i.pe_number, i.doc_id
+          FROM instruments_on_title i
+          LEFT JOIN documents d ON d.id = i.doc_id
+         WHERE i.entry_date IS NOT NULL AND i.parent_tct_number IS NOT NULL
+           AND (d.case_file = %s OR d.case_file IS NULL)
+         ORDER BY i.entry_date, i.id
+    """, (case_file,))
     for r in cur.fetchall():
         events.append({
             "date": r["entry_date"].isoformat() if hasattr(r["entry_date"], "isoformat")
@@ -537,8 +544,8 @@ def main():
     conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    print("Loading events from 7 sources (memory + 6 tables)…")
-    events = load_events(cur)
+    print(f"Loading events for client={args.client} from 7 sources (memory + 6 tables)…")
+    events = load_events(cur, client_config=client_config)
     print(f"  → {len(events)} events loaded")
     attach_entities_from_doc_entities(cur, events)
     run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
