@@ -61,6 +61,40 @@ KEYSTONE_GROUPS = [
             "the firm — keep distinct. Consolidate the three person-variants."
         ),
     },
+    {
+        "label": "Mayor Alexander L. Pajarillo",
+        "keystone_entity_id": 1635,  # 'Alexander Pajarillo' (47 mentions, verified)
+        "name_pattern": r"pajarillo",
+        # Exclude: Ma. Luisa R. Pajarillo (different person — different first name)
+        "ignore_patterns": [r"luisa", r"ma\."],
+        "rationale": (
+            "Mayor Alexander L. Pajarillo of Mercedes — adversary in multiple ARTA "
+            "matters. Currently 11 variants in entities (Alexander, Alexander L., "
+            "Hon. Alexander L., Mayor Alexander, etc.). All same person. "
+            "Ma. Luisa R. Pajarillo is a different person — kept distinct via "
+            "ignore_pattern."
+        ),
+    },
+    {
+        "label": "Patricia Keesey Zschoche",
+        "keystone_entity_id": 400,  # 'Patricia Keesey Zschoche' (verified, 92 mentions)
+        "name_pattern": r"patricia",
+        # Exclude street references + clearly-different-person noise + the
+        # affidavit-document-title that got entity-extracted as a person
+        "ignore_patterns": [
+            r"road",                # 'Road Lot 3: Patricia Keesey Street' etc.
+            r"street",
+            r"affidavit",           # 'Affidavit for Delayed Registration of Birth — ...'
+        ],
+        "rationale": (
+            "Patricia Keesey Zschoche is the plaintiff in CV 26-360 and "
+            "Jonathan's mother. Massive OCR fragmentation: 45+ variants exist "
+            "ranging from 'Patricia Keesey Zschoche' to misreadings like "
+            "'Patricia Roche', 'Patricia Iceche', etc. Keystone #400 is the "
+            "canonical verified form (92 mentions). All Patricia variants merge "
+            "in; street-name references excluded."
+        ),
+    },
 ]
 
 
