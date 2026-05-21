@@ -98,12 +98,12 @@ def gather_client_graph(cur, client_config):
 
     # 2. Transferees
     try:
-        cur.execute("""SELECT full_name FROM transferees
+        cur.execute("""SELECT canonical_name FROM transferees
                         WHERE case_file = %s""", (client_config["case_file"],))
         for r in cur.fetchall():
-            if r["full_name"]:
-                full_names.add(r["full_name"])
-                sn = surname_of(r["full_name"])
+            if r["canonical_name"]:
+                full_names.add(r["canonical_name"])
+                sn = surname_of(r["canonical_name"])
                 if sn:
                     surnames.add(sn)
     except psycopg2.errors.UndefinedTable:
