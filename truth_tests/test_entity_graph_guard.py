@@ -24,12 +24,6 @@ from _harness import assert_truthy, run, TruthFailure
 def status_check_allows_needs_manual_review(cur):
     """The status CHECK constraint must permit the new value."""
     cur.execute("""
-        SELECT consrc
-          FROM pg_constraint
-         WHERE conname = 'doc_classification_proposals_status_check'
-    """)
-    # Postgres ≥12 doesn't have consrc; use pg_get_constraintdef instead.
-    cur.execute("""
         SELECT pg_get_constraintdef(oid) AS def
           FROM pg_constraint
          WHERE conname = 'doc_classification_proposals_status_check'
