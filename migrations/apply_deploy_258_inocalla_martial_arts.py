@@ -69,7 +69,7 @@ def main():
     # A) Create PAR-MARTIAL-ARTS matter
     cur.execute("""
         INSERT INTO matters (matter_code, client_code, matter_type, title, description, status)
-        VALUES ('PAR-MARTIAL-ARTS', 'PAR', 'business',
+        VALUES ('PAR-MARTIAL-ARTS', 'Paracale-001', 'business',
                 'Inocalla family Arnis / Filipino martial arts business',
                 'Sport Arnis Canada, Maharlika Filipino Martial Arts World Federation, '
                 'Barangay Tanod training programs, Datu Shishir Inocalla cultural advocacy. '
