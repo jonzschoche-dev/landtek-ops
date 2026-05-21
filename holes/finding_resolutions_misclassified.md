@@ -9,7 +9,7 @@ problems, not by gaps in the regex.
 | Bucket | Source docs | Pattern |
 |---|---|---|
 | Inocalla family civil cases (RTC Manila Branches 15/16) | 630, 643, 653, 522, 511, 516, 650, 502, 503, 504, 501, 534 | Paracale-001 or no case_file. UNRELATED to MWK; some live under Paracale-001 by accident. |
-| Torralba & Juntilla v. Daet RTC (CA petitions) | 581, 582, 583, 585, 513 | tagged MWK-001 but appears to be tangential/precedent — NOT a Zschoche matter. |
+| ~~Torralba & Juntilla v. Daet RTC (CA petitions)~~ | ~~581, 582, 583, 585~~ | **CORRECTION 2026-05-21 (Jonathan): these ARE Balane-family litigation** — Princess Balane Torralba (entity #2391, 25 mentions) is the hub. Re-tagged to MWK-CV26360 in deploy_251. Doc 513 separated out as legitimately Inocalla. See `memory/feedback_torralba_balane_linkage.md`. |
 | Sanggunian Bayan Resolution 26-96 (1996 MWK estate donation) | 577, 389, 534 | tagged MWK-001 correctly; is MWK-relevant but does not name a specific matter_code. Belongs to MWK-CORP or MWK-ESTATE if we add one. |
 | SC NOTICES (generic) | 508, 504, 502, 503, 501 | no case_file. Need doc-classification pass to determine which matter each notice is from. |
 
