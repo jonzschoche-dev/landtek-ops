@@ -68,8 +68,8 @@ BATCH_2 = {
         "rationale": "17 documented sub-subdivisions of T-32917 (per CLAUDE.md)",
     },
     "title_chain": {
-        "where": """parent_tct IN ('T-4497','T-32916','T-32917')
-                    OR child_tct IN ('T-4497','T-32916','T-32917',
+        "where": """parent_title IN ('T-4497','T-32916','T-32917')
+                    OR child_title IN ('T-4497','T-32916','T-32917',
                        'T-31298','T-38838','T-47655','T-47656','T-47657',
                        'T-48335','T-48336','T-49037','T-49060','T-49061','T-49062',
                        'T-52354','T-52536','T-52537','T-52538','T-52539','T-52540')""",
