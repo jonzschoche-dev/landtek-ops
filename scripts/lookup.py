@@ -285,6 +285,34 @@ def lookup_matter(cur, matter_code):
             lines.append(f"- {fmt_res_row(r)}")
         lines.append("")
 
+    # Escalations chain (deploy_235)
+    escs = all_rows(cur, """
+        SELECT id, escalation_date, escalation_type, forum_from, forum_to,
+               source_resolution_id, escalation_doc_id, escalation_email_id,
+               response_doc_id, response_date, status, filed_by, addressed_to
+          FROM escalations WHERE %s = ANY(affected_matter_codes)
+         ORDER BY escalation_date NULLS LAST
+    """, (matter_code,))
+    if escs:
+        lines.append(f"## Procedural escalations / appeals ({len(escs)})")
+        lines.append("")
+        for e in escs:
+            src = f"res#{e['source_resolution_id']}" if e['source_resolution_id'] else "—"
+            esc_ref = (f"doc#{e['escalation_doc_id']}" if e['escalation_doc_id']
+                       else f"gmail#{e['escalation_email_id']}" if e['escalation_email_id']
+                       else "—")
+            resp = (f"→ doc#{e['response_doc_id']} ({e['response_date']})"
+                    if e['response_doc_id']
+                    else f"→ gmail#{e['response_email_id']}" if e.get('response_email_id')
+                    else "")
+            lines.append(f"- esc#{e['id']}  {e['escalation_date']}  "
+                         f"`{e['escalation_type']}`  ({src} → {esc_ref}) "
+                         f"to {(e['forum_to'] or '?')[:35]}  status=`{e['status']}` {resp}")
+            if e.get('filed_by'):
+                lines.append(f"    by: {e['filed_by']}"
+                             + (f" → {e['addressed_to']}" if e.get('addressed_to') else ""))
+        lines.append("")
+
     return "\n".join(lines)
 
 
