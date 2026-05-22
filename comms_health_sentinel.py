@@ -39,6 +39,70 @@ from comms import comms_send, _orig_post, _intercepting_post
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
+# Per deploy_266 (2026-05-22 noise incident): the sentinel was re-firing the
+# same P0 every 15 minutes for an unchanged condition (webhook drift). Dedup
+# state lives in this table; only NEW failures or info-changed conditions
+# alert, plus a 24h re-prompt while the condition persists. Recoveries get
+# a single ✓ line.
+ALERT_STATE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS comms_health_alert_state (
+    probe_name      text PRIMARY KEY,
+    last_status     text NOT NULL,
+    last_info       text,
+    last_alerted_at timestamptz,
+    last_seen_at    timestamptz NOT NULL DEFAULT now(),
+    consecutive_failure_count int NOT NULL DEFAULT 0
+);
+"""
+ALERT_REPROMPT_INTERVAL = timedelta(hours=24)
+
+
+def _ensure_alert_state_table(cur):
+    cur.execute(ALERT_STATE_SCHEMA)
+
+
+def _decide_alert(cur, name, ok, info):
+    """Compare current finding to last persisted state. Returns one of:
+      None              — no alert (status unchanged-OK or unchanged-FAIL within reprompt window)
+      'NEW_FAIL'        — first failure or info changed → alert
+      'REPROMPT'        — same failure persisted >24h → re-alert
+      'RECOVERED'       — was failing, now OK → send recovery line
+    Always updates the persisted state."""
+    cur.execute("""
+        SELECT last_status, last_info, last_alerted_at, consecutive_failure_count
+          FROM comms_health_alert_state WHERE probe_name = %s
+    """, (name,))
+    prev = cur.fetchone()
+    decision = None
+    if not ok:
+        same = (prev and prev[0] == 'fail' and (prev[1] or '') == (info or ''))
+        if not same:
+            decision = 'NEW_FAIL'
+        elif prev[2] and (datetime.now(timezone.utc) - prev[2]) > ALERT_REPROMPT_INTERVAL:
+            decision = 'REPROMPT'
+        new_count = (prev[3] if prev and prev[0] == 'fail' else 0) + 1
+    else:
+        if prev and prev[0] == 'fail':
+            decision = 'RECOVERED'
+        new_count = 0
+    cur.execute("""
+        INSERT INTO comms_health_alert_state
+          (probe_name, last_status, last_info, last_alerted_at,
+           last_seen_at, consecutive_failure_count)
+        VALUES (%s, %s, %s,
+                CASE WHEN %s IS NOT NULL THEN NOW() ELSE
+                    (SELECT last_alerted_at FROM comms_health_alert_state WHERE probe_name = %s) END,
+                NOW(), %s)
+        ON CONFLICT (probe_name) DO UPDATE SET
+          last_status = EXCLUDED.last_status,
+          last_info = EXCLUDED.last_info,
+          last_alerted_at = COALESCE(EXCLUDED.last_alerted_at,
+                                      comms_health_alert_state.last_alerted_at),
+          last_seen_at = NOW(),
+          consecutive_failure_count = EXCLUDED.consecutive_failure_count
+    """, (name, 'ok' if ok else 'fail', info, decision, name, new_count))
+    return decision
+
 
 def _load_token() -> str:
     with open("/root/landtek/.env") as f:
@@ -195,6 +259,7 @@ def main():
         return 1
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor()
+    _ensure_alert_state_table(cur)
 
     print(f"=== comms_health_sentinel  {datetime.now(timezone.utc).isoformat()}Z ===")
     findings = []  # (severity, name, ok, detail)
@@ -236,21 +301,51 @@ def main():
     if silent:
         print(f"  ⚠ {len(silent)} client inquiry(ies) silent >24h: {[s['id'] for s in silent]}")
 
-    # Build the failure list
-    failures = [(sev, name, info) for sev, name, ok, info in findings if not ok]
+    # Per deploy_266: route every finding through _decide_alert so unchanged
+    # conditions don't re-fire every 15 minutes. The decision tells us whether
+    # this round produces a NEW_FAIL alert, a REPROMPT (24h+ unfixed), or a
+    # RECOVERED line.
+    alert_failures = []     # (sev, name, info, decision) — to send THIS round
+    recoveries = []         # (name, info) — was failing, now OK
+    suppressed = []         # for the verbose log
+    for sev, name, ok, info in findings:
+        decision = _decide_alert(cur, name, ok, info)
+        if decision in ('NEW_FAIL', 'REPROMPT'):
+            alert_failures.append((sev, name, info, decision))
+        elif decision == 'RECOVERED':
+            recoveries.append((name, info))
+        elif not ok:
+            suppressed.append(name)
+    if suppressed:
+        print(f"  ⇣ suppressed {len(suppressed)} unchanged failure(s): {suppressed}")
 
-    # If anything failed, enqueue an ops gap_alert via comms_send
-    if failures or silent:
+    # Client-silence dedup: keep the existing one-time warning behavior by
+    # treating each inquiry_id as a probe_name. A new silent inquiry is
+    # NEW_FAIL once; re-running the sentinel won't re-fire for the same one.
+    silent_to_alert = []
+    for s in silent:
+        probe_key = f"client_silent_#{s['id']}"
+        info_str = f"{s['kind']} aud={s['audience']} age={s['age']}"
+        decision = _decide_alert(cur, probe_key, ok=False, info=info_str)
+        if decision in ('NEW_FAIL', 'REPROMPT'):
+            silent_to_alert.append(s)
+
+    if alert_failures or recoveries or silent_to_alert:
         lines = ["⚠️ <b>comms_health_sentinel — issues detected</b>",
                  f"<i>{datetime.now(timezone.utc).isoformat()}Z</i>", ""]
-        for sev, name, info in failures:
-            lines.append(f"  • <b>{sev}</b> {name}: {info}")
-        if silent:
+        for sev, name, info, decision in alert_failures:
+            tag = " (24h re-prompt)" if decision == 'REPROMPT' else ""
+            lines.append(f"  • <b>{sev}</b> {name}{tag}: {info}")
+        if silent_to_alert:
             lines.append("")
             lines.append("<b>Client inquiries silent &gt;24h:</b>")
-            for s in silent[:5]:
+            for s in silent_to_alert[:5]:
                 lines.append(f"  • inquiry #{s['id']} ({s['kind']}, audience={s['audience']}) "
                              f"— silent {s['age']}")
+        if recoveries:
+            lines.append("")
+            for name, info in recoveries:
+                lines.append(f"  ✓ {name} recovered: {info}")
         if n_expired:
             lines.append("")
             lines.append(f"<b>Auto-expired {n_expired} stale active:</b> {', '.join(expired_list[:5])}")
@@ -258,15 +353,16 @@ def main():
         ok, results = comms_send(body, audience="ops", kind="gap_alert",
                                   case_file="MWK-001")
         if ok:
-            print(f"  → ops alert sent")
+            print(f"  → ops alert sent ({len(alert_failures)} new/reprompt, "
+                  f"{len(recoveries)} recovered, {len(silent_to_alert)} silent)")
         else:
-            # CRITICAL: comms_health_sentinel itself can't reach ops.
-            # Last-resort: write to a file marker so a human can see.
             Path("/var/log/comms_health_sentinel_FATAL.log").write_text(
                 f"{datetime.now(timezone.utc).isoformat()}Z — ALL comms failed.\n"
                 f"findings: {findings}\nsilent: {silent}\n"
             )
             print(f"  ✗ FAILED to send ops alert — wrote FATAL log")
+    else:
+        print(f"  ✓ no new issues — nothing to alert")
 
     cur.close(); conn.close()
     return 0
