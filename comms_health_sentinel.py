@@ -140,7 +140,20 @@ def probe_bot_api(token) -> tuple[bool, str]:
 
 
 def probe_webhook_state(token) -> tuple[bool, str]:
-    """Confirm webhook is empty (polling mode) — prevent regression to dead n8n URL."""
+    """Confirm webhook is empty (polling mode) — prevent regression to dead n8n URL.
+
+    Per deploy_267 (2026-05-22): the polling-based tg_dispatcher is canonical
+    for inbound. A webhook on the bot blocks getUpdates from returning new
+    messages, so the dispatcher polls forever empty and Jonathan's replies
+    silently vanish. We've seen this drift happen at least twice. So when this
+    probe detects a webhook, it SELF-HEALS by calling deleteWebhook before
+    surfacing anything. If the delete succeeds, the probe returns ok=True
+    with a "auto-deleted drift" detail — deploy_266 dedup then converts this
+    into a single ✓ recovery line, not a continuous alert.
+
+    If a future migration makes n8n the canonical inbound path, this probe
+    needs to be updated to accept that webhook URL as healthy. Today the
+    dispatcher is polling-based, so the invariant is: NO webhook."""
     try:
         r = _orig_post(f"https://api.telegram.org/bot{token}/getWebhookInfo",
                        json={}, timeout=10)
@@ -148,9 +161,20 @@ def probe_webhook_state(token) -> tuple[bool, str]:
         if not (r.status_code == 200 and j.get("ok")):
             return False, f"getWebhookInfo failed: {j.get('description','no-desc')}"
         url = (j.get("result", {}) or {}).get("url", "")
-        if url:
-            return False, f"webhook is set: {url[:80]} — inbound replies may be lost"
-        return True, "polling mode (no webhook)"
+        if not url:
+            return True, "polling mode (no webhook)"
+        # Webhook drift detected — self-heal.
+        try:
+            dr = _orig_post(f"https://api.telegram.org/bot{token}/deleteWebhook",
+                            json={"drop_pending_updates": False}, timeout=10)
+            dj = dr.json() if dr.content else {}
+            if dr.status_code == 200 and dj.get("ok"):
+                return True, f"auto-deleted drift webhook: {url[:80]}"
+            return False, (f"webhook is set ({url[:60]}) and deleteWebhook failed: "
+                            f"{dj.get('description','?')[:80]} — inbound still blocked")
+        except Exception as de:
+            return False, (f"webhook is set ({url[:60]}) and deleteWebhook raised: "
+                            f"{str(de)[:80]} — inbound still blocked")
     except Exception as e:
         return False, f"exception: {str(e)[:150]}"
 
