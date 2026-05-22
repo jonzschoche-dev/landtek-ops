@@ -432,180 +432,186 @@ def handle_uploaded_image(token, file_id, file_kind, caption, reply_to=None):
     except Exception as e:
         extracted_text = f"OCR_FAILED: {str(e)[:200]}"
 
-    # 3. Classify via Haiku (with context: active matters + recent uploads)
+    # 3. Two-phase ingest:
+    #    3a. Insert documents with placeholder fields so we get a doc_id.
+    #    3b. Classify via doc_classification.classify_doc_inline → writes
+    #        proposal to doc_classification_proposals (canonical table per
+    #        deploy_244; consumed by the deploy_250 auto-apply runner).
+    #    3c. Backfill the documents row with whatever the classifier resolved.
+    # This replaces the pre-consolidation doc_classifier.py fork that wrote
+    # classification fields into tg_inquiry_queue.notes JSON — bypassing the
+    # canonical review/apply infrastructure.
     conn = psycopg2.connect(DSN); conn.autocommit = True
     from psycopg2.extras import RealDictCursor
     cd = conn.cursor(cursor_factory=RealDictCursor)
     cd.execute("""
-        SELECT matter_code, case_file, title FROM matters
-         WHERE status='active' ORDER BY case_file, matter_code LIMIT 60
-    """)
-    active_matters = cd.fetchall()
-    cd.execute("""
-        SELECT id, classification, case_file, LEFT(extracted_text, 200) AS key_fact
-          FROM documents
-         WHERE timestamp > NOW() - INTERVAL '15 minutes'
-         ORDER BY timestamp DESC LIMIT 5
-    """)
-    recent_uploads = cd.fetchall()
-    cd.close()
-
-    cls = {"kind": "unknown", "case_file_guess": None, "matter_code_guess": None,
-           "doc_date": None, "key_fact": "", "vendor_or_party": None,
-           "amount_php": None, "parties": [], "confidence": 0.0,
-           "needs_human_question": ""}
-    try:
-        import anthropic
-        from doc_classifier import classify_document
-        a_client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
-        cls.update(classify_document(a_client, doc_id_placeholder := -1,
-                                       extracted_text, active_matters, recent_uploads))
-    except Exception as e:
-        cls["needs_human_question"] = f"Classifier failed ({str(e)[:80]}) — what is this?"
-
-    # 4. Insert documents with classified fields (no more hardcoded MWK-001).
-    # When the classifier can't determine case_file (== could be any client),
-    # use 'UNCLASSIFIED' as an explicit sentinel — never silently guess a
-    # specific client folder. The educated follow-up Q asks Jonathan which
-    # client this belongs to and the reply router can update the row.
-    classification = cls.get("kind", "unknown")
-    case_file = cls.get("case_file_guess") or "UNCLASSIFIED"
-    case_file_was_defaulted = cls.get("case_file_guess") is None
-    doc_date = cls.get("doc_date") or None
-    doc_date_quality = "from_doc" if cls.get("doc_date") else "upload_date_fallback"
-    c = conn.cursor()
-    c.execute("""
         INSERT INTO documents (case_file, original_filename, smart_filename, mime_type,
                                content_hash, file_path, extracted_text, status,
-                               text_length, timestamp, doc_date_norm, doc_date_quality,
-                               classification, matter_code)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, 'ingested_from_telegram',
-                %s, NOW(), COALESCE(%s::date, CURRENT_DATE), %s, %s, %s)
+                               text_length, timestamp, doc_date_norm, doc_date_quality)
+        VALUES ('UNCLASSIFIED', %s, %s, %s, %s, %s, %s, 'ingested_from_telegram',
+                %s, NOW(), CURRENT_DATE, 'pending_classification')
         ON CONFLICT (content_hash) WHERE content_hash IS NOT NULL
           DO UPDATE SET file_path = EXCLUDED.file_path
         RETURNING id
-    """, (case_file, fname, fname,
-          "image/jpeg" if file_kind == "photo" else file_kind,
-          content_hash, local_path, extracted_text, len(extracted_text),
-          doc_date, doc_date_quality, classification,
-          cls.get("matter_code_guess")))
-    doc_id = c.fetchone()[0]
-    result["doc_id"] = doc_id
-    result["classification"] = classification
-    result["case_file"] = case_file if not case_file_was_defaulted else None
-    result["matter_code_guess"] = cls.get("matter_code_guess")
-    result["confidence"] = cls.get("confidence", 0.0)
-    result["vendor_or_party"] = cls.get("vendor_or_party")
-    result["amount_php"] = cls.get("amount_php")
-    result["doc_date"] = cls.get("doc_date")
+    """, (fname, fname, "image/jpeg" if file_kind == "photo" else file_kind,
+          content_hash, local_path, extracted_text, len(extracted_text)))
+    doc_id = cd.fetchone()["id"]
 
-    # 5. Log canonical-bible event in client_history (idempotent)
+    proposal_info = None
     try:
-        c.execute("SELECT client_code FROM clients WHERE case_file = %s LIMIT 1", (case_file,))
-        cc_row = c.fetchone()
+        import anthropic
+        from doc_classification import classify_doc_inline
+        a_client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+        proposal_info = classify_doc_inline(
+            anthropic_client=a_client,
+            cur=cd,
+            doc_id=doc_id,
+            filename=fname,
+            text=extracted_text,
+            current_case_file="UNCLASSIFIED",
+            current_matter_code=None,
+            client_id="MWK",  # default — multi-client routing follow-up
+        )
+    except Exception as e:
+        print(f"  ⚠ classify_doc_inline failed: {e}")
+
+    if proposal_info:
+        action = proposal_info["proposed_action"]
+        proposed_cf = proposal_info["proposed_case_file"]
+        if action in ("reclassify_case_file", "assign_matter", "flag_unrelated") and proposed_cf:
+            cd.execute("UPDATE documents SET case_file = %s WHERE id = %s",
+                        (proposed_cf, doc_id))
+        cd.execute("UPDATE documents SET classification = %s WHERE id = %s "
+                    "AND classification IS NULL",
+                    (action, doc_id))
+
+    # 4. Result dict the cycle loop reads to format the ack.
+    result = {
+        "doc_id": doc_id,
+        "classification": (proposal_info or {}).get("proposed_action"),
+        "case_file": (proposal_info or {}).get("proposed_case_file"),
+        "matter_code_guess": (proposal_info or {}).get("proposed_matter_code"),
+        "confidence": (proposal_info or {}).get("confidence", 0.0),
+        "bound_to_inquiry": None,
+        "proposal_id": (proposal_info or {}).get("proposal_id"),
+    }
+
+    # 5. Canonical-bible event in client_history (log first, infer later).
+    try:
+        case_file_resolved = (proposal_info or {}).get("proposed_case_file") or "UNCLASSIFIED"
+        cd.execute("SELECT client_code FROM clients WHERE case_file = %s LIMIT 1",
+                    (case_file_resolved,))
+        cc_row = cd.fetchone()
         if not cc_row:
-            c.execute("SELECT DISTINCT client_code FROM matters WHERE case_file = %s LIMIT 1", (case_file,))
-            cc_row = c.fetchone()
-        client_code = cc_row[0] if cc_row else None
+            cd.execute("SELECT DISTINCT client_code FROM matters WHERE case_file = %s LIMIT 1",
+                        (case_file_resolved,))
+            cc_row = cd.fetchone()
+        client_code = cc_row["client_code"] if cc_row else None
         if client_code:
-            summary_bits = [f"{classification}"]
-            if cls.get("vendor_or_party"):
-                summary_bits.append(cls["vendor_or_party"][:50])
-            if cls.get("amount_php"):
-                summary_bits.append(f"₱{cls['amount_php']:,.2f}")
-            if cls.get("key_fact"):
-                summary_bits.append(cls["key_fact"][:80])
-            if case_file_was_defaulted:
+            summary_bits = [str(result["classification"] or "doc")]
+            if result.get("matter_code_guess"):
+                summary_bits.append(f"→ {result['matter_code_guess']}")
+            if proposal_info and proposal_info.get("reasoning"):
+                summary_bits.append(proposal_info["reasoning"][:80])
+            if case_file_resolved == "UNCLASSIFIED":
                 summary_bits.append("PENDING client assignment")
             summary = " · ".join(summary_bits)[:300]
-            matter_codes_arr = [cls["matter_code_guess"]] if cls.get("matter_code_guess") else []
-            c.execute("""
+            matter_codes_arr = [result["matter_code_guess"]] if result.get("matter_code_guess") else []
+            cd.execute("""
                 INSERT INTO client_history
                   (client_code, case_file, matter_code, matter_codes, event_date,
                    event_kind, source_table, source_id,
                    what_summary, citation_ref, provenance)
-                VALUES (%s, %s, %s, %s, %s,
+                VALUES (%s, %s, %s, %s, NULL,
                         'document_uploaded', 'documents', %s,
                         %s, %s, 'inferred_strong')
                 ON CONFLICT (source_table, source_id) DO NOTHING
             """, (client_code,
-                  case_file if not case_file_was_defaulted else None,
-                  cls.get("matter_code_guess"), matter_codes_arr,
-                  doc_date, str(doc_id), summary, f"doc#{doc_id}"))
+                  case_file_resolved if case_file_resolved != "UNCLASSIFIED" else None,
+                  result.get("matter_code_guess"), matter_codes_arr,
+                  str(doc_id), summary, f"doc#{doc_id}"))
     except Exception as e:
         print(f"  ⚠ client_history log failed: {e}")
 
-    # 6. Bind to currently-active inquiry (if any)
-    c.execute("""
+    # 6. Bind to currently-active inquiry (if any).
+    cd.execute("""
         SELECT id, intake_response_id, item_index, composed_html, kind
           FROM tg_inquiry_queue WHERE status='active' LIMIT 1
     """)
-    active = c.fetchone()
-    bind_note = ""
-    bound_id = None
+    active = cd.fetchone()
     if active:
-        bound_id = active[0]
+        bound_id = active["id"]
         result["bound_to_inquiry"] = bound_id
-        c.execute("""
+        cd.execute("""
             UPDATE tg_inquiry_queue
                SET status='answered',
                    response_text = COALESCE(response_text,'') || %s,
                    responded_at = NOW(),
                    notes = COALESCE(notes,'') || %s
              WHERE id = %s
-        """, (f"\n[image uploaded: {fname}]\n" + extracted_text[:2000],
+        """, (f"\n[image uploaded: {fname}]\n" + (extracted_text or "")[:2000],
               f" | image bound: {fname}", bound_id))
-        bind_note = f" + bound to active inquiry #{bound_id}"
-        if active[1] and active[4] in ("intake_item", "intake_followup"):
-            cur_d = psycopg2.connect(DSN); cur_d.autocommit = True
-            cur_dx = cur_d.cursor(cursor_factory=RealDictCursor)
-            cur_dx.execute("""
-                SELECT id, intake_response_id, item_index, composed_html, kind
-                  FROM tg_inquiry_queue WHERE id = %s
-            """, (bound_id,))
-            row = cur_dx.fetchone()
+        if active["intake_response_id"] and active["kind"] in ("intake_item", "intake_followup"):
             try:
-                evaluate_and_followup(cur_dx, row, extracted_text, token, verbose=False)
+                evaluate_and_followup(cd, active, extracted_text or "", token, verbose=False)
             except Exception as e:
                 print(f"  satisfaction-on-image-failed: {e}", flush=True)
-            cur_dx.close(); cur_d.close()
-    c.close()
 
-    # 7. If not bound to an existing inquiry, queue an educated follow-up Q
-    # at priority 0 (fires immediately even in pull-only mode, since it's
-    # reactive to an upload Jonathan just did).
-    if not bound_id:
+    # 7. If not bound, queue educated follow-up at priority 0 with proposal_id
+    # in notes JSON so the dispatcher reply router can apply_proposal() on
+    # /confirm or a matter_code override.
+    if not result["bound_to_inquiry"] and proposal_info:
         try:
-            from doc_classifier import format_educated_followup
-            composed, notes_json = format_educated_followup(
-                doc_id=doc_id,
-                classification=classification,
-                case_file_guess=cls.get("case_file_guess"),
-                matter_code_guess=cls.get("matter_code_guess"),
-                key_fact=cls.get("key_fact", ""),
-                vendor_or_party=cls.get("vendor_or_party"),
-                amount_php=cls.get("amount_php"),
-                doc_date=cls.get("doc_date"),
-                confidence=cls.get("confidence", 0.0),
-                needs_human_question=cls.get("needs_human_question", ""),
-            )
-            c2 = conn.cursor()
-            c2.execute("""
+            composed = _format_proposal_followup(doc_id, proposal_info)
+            notes_obj = {
+                "kind": "doc_classification_review",
+                "doc_id": doc_id,
+                "proposal_id": proposal_info["proposal_id"],
+                "proposed_action": proposal_info["proposed_action"],
+                "proposed_matter_code": proposal_info["proposed_matter_code"],
+                "proposed_case_file": proposal_info["proposed_case_file"],
+                "confidence": proposal_info["confidence"],
+            }
+            cd.execute("""
                 INSERT INTO tg_inquiry_queue
                   (kind, audience, priority, source_table, source_id, matter_code,
                    composed_html, notes)
-                VALUES ('intake_item', 'ops', 0, 'doc_classifier', %s, %s,
+                VALUES ('intake_item', 'ops', 0, 'doc_classification', %s, %s,
                         %s, %s)
                 RETURNING id
-            """, (doc_id, cls.get("matter_code_guess"), composed, notes_json))
-            inq_id = c2.fetchone()[0]
-            result["followup_inquiry_id"] = inq_id
-            c2.close()
+            """, (doc_id, proposal_info["proposed_matter_code"],
+                  composed, json.dumps(notes_obj)))
+            result["followup_inquiry_id"] = cd.fetchone()["id"]
         except Exception as e:
-            print(f"  ⚠ educated-followup queue failed: {e}")
-    conn.close()
+            print(f"  ⚠ followup queue failed: {e}")
 
+    cd.close()
+    conn.close()
     return result
+
+
+def _format_proposal_followup(doc_id, p):
+    """Build the educated follow-up Q from a proposal dict. Tight two-line
+    format per 2026-05-20 cadence rules: header + action."""
+    action = p.get("proposed_action") or "unknown"
+    mc = p.get("proposed_matter_code")
+    cf = p.get("proposed_case_file")
+    conf = p.get("confidence", 0.0)
+    reasoning = (p.get("reasoning") or "")[:140]
+    head = f"📷 <b>#{doc_id}</b> · {action}"
+    if action == "assign_matter" and mc and conf >= 0.7:
+        body = f"→ <code>{mc}</code>  ·  <code>/confirm</code> or matter_code"
+    elif action == "assign_matter" and mc:
+        body = f"<i>{reasoning}</i>\n→ <code>{mc}</code> (conf {conf:.0%})  ·  <code>/confirm</code> or correct"
+    elif action == "reclassify_case_file" and cf:
+        body = f"<i>{reasoning}</i>\nclient: <code>{cf}</code>  ·  <code>/confirm</code> or correct"
+    elif action == "flag_unrelated":
+        body = f"<i>{reasoning}</i>\nNot MWK? Reply with the right case_file or <code>/skip</code>"
+    elif action == "keep_unscoped":
+        body = f"<i>{reasoning}</i>\n<code>/confirm</code> to keep unscoped, or assign a matter_code"
+    else:
+        body = "<code>/confirm</code> or matter_code"
+    return f"{head}\n{body}"[:400]
 
 
 def handle_timeline_command(token, matter_code, reply_to=None):
@@ -933,6 +939,23 @@ def cycle(cur, token, verbose=False):
                 print(f"  /next received — bypassing cooldown this cycle")
             continue
         if text.startswith("/skip"):
+            # Capture the row first so we can also reject a linked proposal
+            # (per Landtek mandate: explicit /skip must block auto-apply).
+            cur.execute("""
+                SELECT id, source_table, notes FROM tg_inquiry_queue WHERE status='active' LIMIT 1
+            """)
+            sr = cur.fetchone()
+            if sr and sr["source_table"] in ("doc_classification", "receipt_extractor"):
+                try:
+                    note_obj = json.loads(sr["notes"] or "{}")
+                    pid = note_obj.get("proposal_id")
+                    if pid:
+                        sys.path.insert(0, "/root/landtek")
+                        from doc_classification import reject_proposal
+                        reject_proposal(cur, pid, rejected_by="telegram_skip")
+                except Exception as _e:
+                    if verbose:
+                        print(f"  ⚠ proposal-reject on /skip failed: {_e}")
             cur.execute("""
                 UPDATE tg_inquiry_queue SET status='skipped', response_text=%s, responded_at=NOW()
                  WHERE status='active' RETURNING id
@@ -1096,66 +1119,75 @@ def cycle(cur, token, verbose=False):
             continue
 
         # ── Receipt-extractor reply router ──
-        # Active intake came from receipt_extractor; notes carry a JSON blob
-        # with vendor/total/date/category and either an assigned matter or a
-        # context-proposal. Accept: /confirm (use the assigned matter or the
-        # proposal), a bare matter_code (override), or /skip (handled upstream).
-        if active["source_table"] == "receipt_extractor":
-            import json as _json
+        # ── doc_classification / receipt_extractor review router ──
+        # Active intake came from an upload classifier (canonical source
+        # 'doc_classification' OR legacy 'receipt_extractor'). Notes carry a
+        # JSON blob with proposal_id (canonical) or vendor/total/date
+        # (legacy receipt-only). Accept: /confirm (apply proposal),
+        # bare matter_code (operator override → apply with override), /skip
+        # (handled upstream as 'skipped').
+        if active["source_table"] in ("doc_classification", "receipt_extractor"):
             import re as _re
             import sys as _sys; _sys.path.insert(0, "/root/landtek")
-            from receipt_extractor import write_cost_from_receipt
+            from doc_classification import apply_proposal, reject_proposal
             ack_msg = None
-            assigned_matter = None
             try:
                 try:
-                    note_obj = _json.loads(active["notes"] or "{}")
+                    note_obj = json.loads(active["notes"] or "{}")
                 except Exception:
                     note_obj = {}
                 doc_id = note_obj.get("doc_id")
-                vendor = note_obj.get("vendor", "?")
-                total = note_obj.get("total_php") or 0
-                proposed = note_obj.get("proposed_matter")
-                preassigned = note_obj.get("matter_code") or active.get("matter_code")
+                proposal_id = note_obj.get("proposal_id")
+                proposed_mc = (note_obj.get("proposed_matter_code")
+                                or note_obj.get("proposed_matter")  # legacy
+                                or note_obj.get("matter_code")      # legacy
+                                or active.get("matter_code"))
                 lower = text.strip().lower()
+                override_mc = None
 
                 if lower == "/confirm":
-                    assigned_matter = preassigned or proposed
-                    if not assigned_matter:
-                        ack_msg = ("⚠️ /confirm with no preassigned or proposed matter. "
+                    if not proposal_id and not proposed_mc:
+                        ack_msg = ("⚠️ /confirm with no proposal_id and no proposed matter. "
                                    "Reply with a matter_code instead (e.g. <code>MWK-CV26360</code>).")
                 elif _re.match(r"^[A-Z][A-Z0-9-]{1,40}$", text.strip()):
-                    assigned_matter = text.strip()
+                    override_mc = text.strip()
                 else:
-                    ack_msg = ("⚠️ Couldn't parse. Reply <code>/confirm</code> to accept "
-                               "the proposed matter, a different matter_code, or "
-                               "<code>/skip</code>.")
+                    ack_msg = ("⚠️ Couldn't parse. Reply <code>/confirm</code>, a matter_code, "
+                               "or <code>/skip</code>.")
 
-                if assigned_matter and not ack_msg:
-                    result_for_write = {
-                        "vendor": vendor,
-                        "total_php": total,
-                        "date": note_obj.get("date"),
-                        "category": note_obj.get("category", "misc"),
-                        "notes": "",
-                        "confidence": 0,  # not used in write
-                    }
-                    row_id = write_cost_from_receipt(assigned_matter, doc_id, result_for_write)
-                    # Backfill matter onto the document + client_history rows
-                    cur.execute("UPDATE documents SET matter_code = %s WHERE id = %s",
-                                (assigned_matter, doc_id))
-                    cur.execute("""
-                        UPDATE client_history
-                           SET matter_code = %s,
-                               matter_codes = ARRAY[%s]::text[],
-                               what_summary = REPLACE(what_summary, ' · PENDING matter assignment', '')
-                         WHERE source_table = 'receipt_extractor'
-                           AND source_id = %s
-                    """, (assigned_matter, assigned_matter, str(doc_id)))
-                    ack_msg = (f"✓ Receipt doc#{doc_id} ({vendor[:30]} · ₱{total:,.2f}) "
-                               f"logged to <code>{assigned_matter}</code> (row #{row_id})")
+                if not ack_msg:
+                    if proposal_id:
+                        # Canonical path — apply via doc_classification_proposals
+                        applied_doc_id, applied_mc = apply_proposal(
+                            cur, proposal_id,
+                            applied_by="telegram_confirm",
+                            override_matter_code=override_mc)
+                        if applied_doc_id:
+                            ack_msg = (f"✓ doc#{applied_doc_id} → "
+                                        f"<code>{applied_mc or '(unscoped)'}</code>")
+                        else:
+                            ack_msg = "⚠️ proposal not found"
+                    else:
+                        # Legacy receipt_extractor path — no proposal_id, raw
+                        # matter assignment. Backfill documents.matter_code.
+                        assigned = override_mc or proposed_mc
+                        if assigned and doc_id:
+                            cur.execute("UPDATE documents SET matter_code = %s WHERE id = %s",
+                                        (assigned, doc_id))
+                            cur.execute("""
+                                UPDATE client_history
+                                   SET matter_code = %s,
+                                       matter_codes = ARRAY[%s]::text[],
+                                       what_summary = REPLACE(what_summary,
+                                                       ' · PENDING matter assignment', '')
+                                 WHERE source_table IN ('receipt_extractor','documents')
+                                   AND source_id = %s
+                            """, (assigned, assigned, str(doc_id)))
+                            ack_msg = f"✓ doc#{doc_id} → <code>{assigned}</code>"
+                        else:
+                            ack_msg = "⚠️ no doc_id in notes — can't apply"
             except Exception as e:
-                ack_msg = f"⚠️ Receipt-assign failed: {str(e)[:160]}"
+                ack_msg = f"⚠️ apply failed: {str(e)[:160]}"
 
             cur.execute("""
                 UPDATE tg_inquiry_queue SET status='answered', response_text=%s, responded_at=NOW()
@@ -1166,7 +1198,7 @@ def cycle(cur, token, verbose=False):
                 tg_send(ack_msg, token, reply_to=msg.get("message_id"),
                         audience="ops", kind="ad_hoc")
             if verbose:
-                print(f"  receipt_extractor reply → {('assigned ' + assigned_matter) if assigned_matter else 'no assignment'}")
+                print(f"  {active['source_table']} reply → {ack_msg[:80]}")
             continue
 
         # ── Legal-intake reply router (per [[feedback_facts_in_chat_are_first_class]]) ──

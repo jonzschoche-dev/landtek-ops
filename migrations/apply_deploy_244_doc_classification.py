@@ -23,9 +23,7 @@ Usage:
   python3 migrations/apply_deploy_244_doc_classification.py --client MWK --apply
 """
 import argparse
-import json
 import os
-import re
 import sys
 
 import anthropic
@@ -33,8 +31,12 @@ import psycopg2
 import psycopg2.extras
 
 sys.path.insert(0, "/root/landtek")
-from case_theories._clients import get, all_ids
-from llm_billing import anthropic_call
+from case_theories._clients import get
+# Canonical classification logic — consolidated 2026-05-21. Was previously
+# inlined here AND duplicated in doc_classifier.py (removed). Single source
+# of truth lives in doc_classification.py now; both this batch CLI and the
+# Telegram-upload inline path import from there.
+from doc_classification import build_prompt, classify_doc, upsert_proposal
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
@@ -67,110 +69,6 @@ CREATE INDEX IF NOT EXISTS idx_doc_class_doc ON doc_classification_proposals(doc
 """
 
 
-def build_prompt(client_config, matter_rows):
-    """Build a system prompt that lists valid matters + rules for this client."""
-    matter_lines = []
-    for mr in matter_rows:
-        desc = mr.get("title") or mr.get("description") or mr.get("matter_type") or ""
-        matter_lines.append(f"  {mr['matter_code']:<25s}  {desc[:80]}")
-    matters_text = "\n".join(matter_lines)
-
-    cv_map = client_config.get("civil_case_mappings") or {}
-    cv_lines = "\n".join(f"  CV {k} -> {v}" for k, v in cv_map.items())
-
-    arta_prefix = client_config.get("arta_ctn_prefix_to_matter", "")
-    ghost = ", ".join(client_config.get("ghost_titles", []))
-    op_root = client_config.get("operative_root", "")
-
-    # MWK title-chain canon (per CLAUDE.md). For non-MWK clients this should
-    # be pulled from the registry's trunk_titles / derivatives once populated.
-    MWK_CHAIN_TITLES = (
-        "T-4497 (mother), T-32916, T-32917, T-31298, T-38838, T-47655, "
-        "T-47656, T-47657, T-48335, T-48336, T-49037, T-49060, T-49061, "
-        "T-49062, T-52354, T-52536, T-52537, T-52538, T-52539, T-52540, "
-        "T-079-2021002127 (Balane defendant title, 2021 from cancelled T-52540)"
-    )
-    MWK_NOT_IN_CHAIN = "T-30683 (Manguisoc Mercedes — SEPARATE property), T-4494 (Cabanbanan San Vicente — SEPARATE)"
-
-    return f"""You are classifying a Philippine legal document for the {client_config['label']} client (client_id={client_config['client_id']}).
-
-VALID MATTERS for {client_config['client_id']} (proposed_matter_code MUST be one of these or null):
-{matters_text}
-
-CIVIL CASE MAPPINGS:
-{cv_lines or "  (none)"}
-
-ARTA CTN RULE: CTN-SL-YYYY-NNNN-NNNN suffix → matter_code = "{arta_prefix}<4-digit suffix>".
-
-TITLE CHAIN (operative root = {op_root}; ghost = {ghost}):
-  IN CHAIN (these titles ARE part of {client_config['client_id']}'s case):
-    {MWK_CHAIN_TITLES}
-  NOT IN CHAIN (do NOT classify these as MWK chain — they are separate properties):
-    {MWK_NOT_IN_CHAIN}
-
-A doc about an IN-CHAIN title that doesn't tie to a specific litigation matter
-should be action="assign_matter" with matter_code="MWK-TCT4497" (chain-verification matter)
-OR "MWK-ESTATE" (estate-broad), whichever fits better.
-
-CLIENT'S CORE FACTS:
-- Plaintiff/heir: Patricia Keesey Zschoche (heir of Mary Worrick Keesey)
-- Adversary: Cesar de la Fuente (deceased 2017), Gloria Balane, Engr. Erwin Balane
-- Counsel for client: Atty. Bonifacio Jr. Barandon (Barandon Law Offices, Daet)
-- Mother title: TCT T-4497 (parent T-111, ghost OCT T-106)
-- Properties: Brgy 3 Daet, San Roque, Mercedes-area subdivisions
-- Forum: RTC Daet Branch (Civil Case 26-360), ARTA, RD Camarines Norte, CSC, OP
-
-Read the document text and decide:
-
-1. If the document IS about this client AND references one of the valid matters,
-   set action="assign_matter" and proposed_matter_code=<that code>.
-
-2. If the document mentions parties/places/titles that are NOT this client's
-   (e.g., Inocalla family in Manila, Torralba & Juntilla v. Daet RTC criminal
-   case, Paracale-specific names), set action="flag_unrelated" and
-   proposed_case_file=<best guess like "Paracale-001" or null>.
-
-3. If the document IS about this client but doesn't tie to a specific matter
-   (e.g., a 1996 estate-broad Sanggunian resolution), set action="keep_unscoped"
-   and proposed_matter_code=null.
-
-4. If the document's current case_file is wrong but you can identify the correct
-   one (e.g., a doc tagged MWK-001 that's actually an Inocalla family case),
-   set action="reclassify_case_file" and proposed_case_file=<correct value>.
-
-Output JSON ONLY (no markdown, no prose):
-{{"action": "assign_matter|reclassify_case_file|flag_unrelated|keep_unscoped",
-  "matter_code": "MWK-... or null",
-  "case_file": "MWK-001|Paracale-001|null",
-  "confidence": 0.0-1.0,
-  "reasoning": "1-2 sentences",
-  "source_quote": "<short verbatim from doc text>"}}"""
-
-
-def classify_doc(client, system_prompt, doc_id, filename, text):
-    """One Haiku call. Returns parsed JSON or None."""
-    user_msg = f"DOC #{doc_id}\nFilename: {filename or '(none)'}\n\nText (first 5000 chars):\n{(text or '')[:5000]}"
-    msg = anthropic_call(
-        client,
-        called_from="doc_classifier",
-        purpose="classify_for_matter",
-        case_file="MWK-001",
-        model="claude-haiku-4-5-20251001",
-        max_tokens=400,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_msg}],
-    )
-    out = msg.content[0].text.strip()
-    out = re.sub(r"^```(?:json)?\s*|\s*```$", "", out)
-    m = re.search(r"\{.*\}", out, re.DOTALL)
-    if not m:
-        return None
-    try:
-        return json.loads(m.group(0))
-    except json.JSONDecodeError:
-        return None
-
-
 def fetch_unclassified_docs(cur, client_config, limit=None):
     """Pull docs that have no matter_code AND are either this client's case_file
     OR have no case_file at all (orphan candidates)."""
@@ -190,42 +88,8 @@ def fetch_unclassified_docs(cur, client_config, limit=None):
     return cur.fetchall()
 
 
-def fetch_matters(cur, client_config):
-    cur.execute("""
-        SELECT matter_code, matter_type, title, description
-          FROM matters
-         WHERE matter_code LIKE %s
-         ORDER BY matter_code
-    """, (client_config["matter_prefix"] + "%",))
-    return cur.fetchall()
-
-
-def upsert_proposal(cur, doc_id, current, proposal, client_id):
-    """Insert a 'proposed' row; if one already exists with status='proposed',
-    supersede it."""
-    cur.execute("""
-        UPDATE doc_classification_proposals
-           SET status = 'superseded'
-         WHERE doc_id = %s AND status = 'proposed'
-    """, (doc_id,))
-    cur.execute("""
-        INSERT INTO doc_classification_proposals
-            (doc_id, current_case_file, current_matter_code,
-             proposed_case_file, proposed_matter_code, proposed_action,
-             confidence, reasoning, source_quote, client_id)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (
-        doc_id,
-        current["case_file"],
-        current["matter_code"],
-        proposal.get("case_file"),
-        proposal.get("matter_code"),
-        proposal["action"],
-        float(proposal.get("confidence", 0)),
-        proposal.get("reasoning"),
-        (proposal.get("source_quote") or "")[:500],
-        client_id,
-    ))
+# fetch_matters and upsert_proposal now live in doc_classification.py
+from doc_classification import fetch_matters
 
 
 def main():
