@@ -31,6 +31,7 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.request
 
 import psycopg2
@@ -110,8 +111,8 @@ def fetch_image_bytes(file_path, drive_file_id, drive_link=None):
     raise RuntimeError("no fetchable source (file_path, drive_link path, drive_file_id all empty/missing)")
 
 
-def gemini_caption(api_key, image_bytes, mime_type):
-    """Call Gemini Vision. Return caption string."""
+def gemini_caption(api_key, image_bytes, mime_type, max_retries=3):
+    """Call Gemini Vision. Return caption string. Retries with backoff on 429."""
     payload = {
         "contents": [{
             "parts": [
@@ -128,22 +129,37 @@ def gemini_caption(api_key, image_bytes, mime_type):
         },
     }
     url = GEMINI_URL_TEMPLATE.format(model=GEMINI_MODEL, key=api_key)
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        data = json.loads(resp.read())
-    cands = data.get("candidates", [])
-    if not cands:
-        raise RuntimeError(f"no candidates from Gemini: {data}")
-    parts = cands[0].get("content", {}).get("parts", [])
-    text = "".join(p.get("text", "") for p in parts).strip()
-    if not text:
-        raise RuntimeError(f"empty caption from Gemini: {data}")
-    return text
+    last_exc = None
+    for attempt in range(max_retries):
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read())
+            cands = data.get("candidates", [])
+            if not cands:
+                raise RuntimeError(f"no candidates from Gemini: {data}")
+            parts = cands[0].get("content", {}).get("parts", [])
+            text = "".join(p.get("text", "") for p in parts).strip()
+            if not text:
+                raise RuntimeError(f"empty caption from Gemini: {data}")
+            return text
+        except urllib.error.HTTPError as e:
+            last_exc = e
+            if e.code == 429 and attempt < max_retries - 1:
+                wait = 5 * (attempt + 1)
+                print(f"    (429 rate-limited; sleeping {wait}s and retrying)")
+                time.sleep(wait)
+                continue
+            raise
+        except Exception as e:
+            last_exc = e
+            raise
+    raise last_exc
 
 
 def ensure_schema(cur):
@@ -246,7 +262,7 @@ def main():
         success += 1
         snippet = caption[:90].replace("\n", " ")
         print(f"  doc#{doc_id} OK ({src}, {len(img):,}B) → {snippet}...")
-        time.sleep(0.4)  # gentle rate limit
+        time.sleep(1.5)  # Gemini free tier is ~60 RPM; stay under
 
     cur.close()
     conn.close()
