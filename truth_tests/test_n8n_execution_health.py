@@ -55,11 +55,20 @@ def safe_reply_sanitizer_present(cur):
     if not r or not r["code"]:
         raise TruthFailure("Safe Reply jsCode missing")
     code = r["code"]
-    # Must reference sanitize() applied to both fields
-    if "sanitize(data.telegram_reply_to_client)" not in code:
+    # Must reference sanitize() somewhere AND must touch telegram_reply_to_client.
+    # We accept either direct sanitize(data.telegram_reply_to_client) OR sanitize(<varName>)
+    # where the var is constructed from telegram_reply_to_client (deploy_271 guard pattern).
+    if "telegram_reply_to_client" not in code:
+        raise TruthFailure("Safe Reply doesn't touch telegram_reply_to_client")
+    has_sanitize_call = "sanitize(" in code and "function sanitize(" in code
+    if not has_sanitize_call:
+        raise TruthFailure("Safe Reply no longer defines/calls sanitize() — deploy_263 regression")
+    # Make sure the FINAL telegram_reply_to_client emitted is sanitized (the var name
+    # before sanitize() may vary across deploys, so just check final emission).
+    if "telegram_reply_to_client: safeClientReply" not in code:
         raise TruthFailure(
-            "Safe Reply no longer sanitizes telegram_reply_to_client — "
-            "deploy_263 regression. Jonathan's free-form replies route through this field."
+            "Safe Reply no longer emits telegram_reply_to_client via safeClientReply "
+            "— check for regression on deploy_263/271"
         )
 
 

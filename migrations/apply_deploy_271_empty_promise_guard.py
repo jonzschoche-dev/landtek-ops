@@ -91,13 +91,22 @@ function isDocRequest(text) {
 }
 function extractKeyword(text) {
   if (!text) return null;
-  // Drop common stopwords + verbs, find the longest distinctive noun.
-  const stop = new Set(['need','help','about','have','find','show','pull','document','documents','documentation','docs','paper','papers','record','records','file','files','property','retriev','retrieving','retrieved','retrieve','please','want','know','i','can','you','the','any','our','for','from','this','with','that','sustainable']);
-  const words = (text.toLowerCase().match(/\b[a-zA-Z][a-zA-Z-]{3,}\b/g) || []);
-  // Sort by length desc, prefer non-stopwords
-  const candidates = words.filter(w => !stop.has(w));
-  candidates.sort((a, b) => b.length - a.length);
-  return candidates[0] || null;
+  // Prefer proper nouns (capitalized words past the first word).
+  const stop = new Set(['need','help','about','have','find','show','pull','document','documents','documentation','docs','paper','papers','record','records','file','files','property','retriev','retrieving','retrieved','retrieve','please','want','know','can','you','the','any','our','for','from','this','with','that','sustainable','development','community','plans','plan','project','about','have','know','jonathan','leo']);
+  const tokens = text.match(/[A-Za-z][a-zA-Z-]+/g) || [];
+  if (!tokens.length) return null;
+  // Skip the first token (sentence-start capitalization is unreliable).
+  const rest = tokens.slice(1);
+  // Pass 1: proper nouns (capitalized, length >= 4, not stopword)
+  const propers = rest.filter(w => /^[A-Z]/.test(w) && w.length >= 4 && !stop.has(w.toLowerCase()));
+  if (propers.length) {
+    propers.sort((a, b) => b.length - a.length);
+    return propers[0];
+  }
+  // Pass 2: any distinctive word, length >= 5 (raised from 4)
+  const others = tokens.filter(w => w.length >= 5 && !stop.has(w.toLowerCase()));
+  others.sort((a, b) => b.length - a.length);
+  return others[0] || null;
 }
 
 let clientReply = data.telegram_reply_to_client || '';
