@@ -83,11 +83,20 @@ def get_drive():
     return _drive_client
 
 
-def fetch_image_bytes(file_path, drive_file_id):
-    """Return (bytes, source) or raise."""
+def fetch_image_bytes(file_path, drive_file_id, drive_link=None):
+    """Return (bytes, source) or raise. Tries:
+       1. file_path on disk
+       2. drive_link if it's actually a local path (legacy schema where the
+          email-ingest pipeline stored the local upload path here)
+       3. Drive API with drive_file_id
+    """
     if file_path and os.path.exists(file_path):
         with open(file_path, "rb") as f:
-            return f.read(), "local"
+            return f.read(), "local(file_path)"
+    # Legacy: some rows store the local upload path in drive_link (email ingest)
+    if drive_link and drive_link.startswith("/") and os.path.exists(drive_link):
+        with open(drive_link, "rb") as f:
+            return f.read(), "local(drive_link)"
     if drive_file_id:
         from googleapiclient.http import MediaIoBaseDownload
         svc = get_drive()
@@ -98,7 +107,7 @@ def fetch_image_bytes(file_path, drive_file_id):
         while not done:
             _, done = downloader.next_chunk()
         return buf.getvalue(), "drive"
-    raise RuntimeError("no file_path and no drive_file_id")
+    raise RuntimeError("no fetchable source (file_path, drive_link path, drive_file_id all empty/missing)")
 
 
 def gemini_caption(api_key, image_bytes, mime_type):
@@ -179,7 +188,7 @@ def main():
     elif not args.recaption:
         where.append("(vision_caption IS NULL OR vision_caption = '')")
     sql = f"""
-        SELECT id, mime_type, file_path, drive_file_id,
+        SELECT id, mime_type, file_path, drive_file_id, drive_link,
                COALESCE(smart_filename, original_filename, '') AS fn,
                COALESCE(extracted_text, '') AS extracted_text
           FROM documents
@@ -201,7 +210,7 @@ def main():
     for r in rows:
         doc_id = r["id"]
         try:
-            img, src = fetch_image_bytes(r["file_path"], r["drive_file_id"])
+            img, src = fetch_image_bytes(r["file_path"], r["drive_file_id"], r.get("drive_link"))
         except Exception as e:
             print(f"  doc#{doc_id} FETCH FAIL: {e}")
             fail += 1
