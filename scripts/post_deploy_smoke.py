@@ -166,11 +166,12 @@ def check_trigger_wired():
 
 def check_workflow_history_in_sync():
     """workflow_entity (draft) MUST match workflow_history (executing version).
-    n8n v2.16 runs from workflow_history; drift here causes silent failures."""
+    n8n v2.16 runs from workflow_history; drift here causes silent failures.
+    Compare parsed JSON to ignore whitespace/key-ordering differences."""
     conn = psycopg2.connect(DSN)
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("""
-        SELECT (we.nodes::text) AS draft, (wh.nodes::text) AS published
+        SELECT we.nodes AS draft, wh.nodes AS published
           FROM workflow_entity we
           LEFT JOIN workflow_history wh ON wh."workflowId" = we.id
          WHERE we.id = %s
@@ -180,9 +181,31 @@ def check_workflow_history_in_sync():
     conn.close()
     if not r or not r["published"]:
         return False, "workflow_history has no row — n8n won't execute anything"
-    if r["draft"] != r["published"]:
-        return False, "workflow_entity (draft) != workflow_history (executing) — run sync_workflow_history.py"
-    return True, "draft==published"
+    # Canonical JSON: sorted keys, no extra whitespace
+    def canon(obj):
+        if isinstance(obj, str):
+            obj = json.loads(obj)
+        return json.dumps(obj, sort_keys=True, separators=(",", ":"))
+    draft_c = canon(r["draft"])
+    pub_c = canon(r["published"])
+    if draft_c != pub_c:
+        # Find first diverging key to help debugging
+        # Look at nodes count and Gemini URL specifically
+        try:
+            d_nodes = r["draft"] if isinstance(r["draft"], list) else json.loads(r["draft"])
+            p_nodes = r["published"] if isinstance(r["published"], list) else json.loads(r["published"])
+            d_gemini = next((n for n in d_nodes if n.get("name") == "Gemini Embed"), {})
+            p_gemini = next((n for n in p_nodes if n.get("name") == "Gemini Embed"), {})
+            d_url = (d_gemini.get("parameters") or {}).get("url", "")[:40]
+            p_url = (p_gemini.get("parameters") or {}).get("url", "")[:40]
+            return False, (
+                f"draft({len(d_nodes)} nodes, gemini='{d_url}') != "
+                f"published({len(p_nodes)} nodes, gemini='{p_url}') — "
+                "run sync_workflow_history.py"
+            )
+        except Exception:
+            return False, "draft != published — run sync_workflow_history.py"
+    return True, f"draft==published ({len(draft_c)} chars)"
 
 
 def check_webhook_secret_matches():
