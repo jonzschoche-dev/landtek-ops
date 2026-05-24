@@ -65,7 +65,7 @@ function sanitize(text) {
   return t.trim();
 }
 
-// EMPTY PROMISE GUARD (deploy_271)
+// EMPTY PROMISE GUARD (deploy_271, extended deploy_271b)
 const FORBIDDEN_PATTERNS = [
   /^on it[.!\s]*$/i,
   /^on it[ -]+search/i,
@@ -73,15 +73,20 @@ const FORBIDDEN_PATTERNS = [
   /let me look/i,
   /let me check/i,
   /checking (now|our|the)/i,
-  /i'?ll (pull|get back|look|find|check)/i,
+  /i'?ll (pull|get back|look|find|check|search|retrieve)/i,
+  /i (will|am going to|am about to) (pull|search|look|check|retrieve)/i,
   /one moment/i,
   /give me a (sec|moment|minute)/i,
   /pulling up/i,
   /will follow up/i,
-  /^(checking|searching|looking)[.\s]*$/i
+  /^(checking|searching|looking)[.\s]*$/i,
+  /searching for [^.]+ now/i,
+  /will (search|look|check|retrieve|pull)/i
 ];
 function isEmptyPromise(text) {
-  if (!text) return false;
+  // EMPTY text counts as an empty promise — Gemini sometimes emits the
+  // actual placeholder OUTSIDE the JSON and leaves the JSON field empty.
+  if (!text || text.trim() === '') return true;
   if (text.length > 250) return false; // long replies probably had content
   return FORBIDDEN_PATTERNS.some(re => re.test(text));
 }
@@ -119,10 +124,10 @@ if (isEmptyPromise(clientReply) && isDocRequest(rawText) && hasNoActions) {
   const kw = extractKeyword(rawText);
   if (kw) {
     try {
+      const url = 'http://localhost:8765/api/query_documents?keyword=' + encodeURIComponent(kw) + '&limit=5';
       const r = await this.helpers.httpRequest({
         method: 'GET',
-        url: 'http://localhost:8765/api/query_documents',
-        qs: { keyword: kw, limit: 5 },
+        url: url,
         json: true,
         timeout: 8000,
       });
@@ -150,11 +155,22 @@ if (isEmptyPromise(clientReply) && isDocRequest(rawText) && hasNoActions) {
   }
 }
 
-const safeClientReply = (clientReply && clientReply.trim() !== "")
-  ? sanitize(clientReply)
-  : !data.rowNumber
-    ? "Hello! I'm LeoLandTek, the Landtek property management assistant. Please share your full name, contact number, and how we can help you today. Someone from our team will follow up shortly."
-    : "Thank you. I've noted your message and will process it accordingly.";
+// FINAL FALLBACK: if clientReply is still empty for ANY reason, Telegram
+// will reject with HTTP 400 "message text is empty". Force a non-empty
+// fallback so we never send an empty message (deploy_271b).
+let _finalReply = clientReply;
+if (!_finalReply || _finalReply.trim() === "") {
+  if (!data.rowNumber) {
+    _finalReply = "Hello! I'm LeoLandTek, the Landtek property management assistant. Please share your full name, contact number, and how we can help you today. Someone from our team will follow up shortly.";
+  } else if (isDocRequest(rawText)) {
+    _finalReply = "I couldn't process that doc lookup. Please re-ask with a specific keyword (party name, TCT number, or matter code).";
+    guardFired = true;
+    guardNote = (guardNote ? guardNote + ' | ' : '') + '[empty_promise_guard] FINAL fallback — clientReply stayed empty through guard path';
+  } else {
+    _finalReply = "Acknowledged. I'm processing your message — give me a moment.";
+  }
+}
+const safeClientReply = sanitize(_finalReply);
 
 let safeJonathanSummary = (data.telegram_summary_for_jonathan &&
                            data.telegram_summary_for_jonathan.trim() !== "")
