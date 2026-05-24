@@ -134,13 +134,14 @@ def cross_reference():
     if not ref:
         return jsonify({"error":"missing reference parameter"}), 400
     c = db(); cur = c.cursor()
-    cur.execute("""SELECT id, case_file, smart_filename, document_title, classification, created_at
+    cur.execute("""SELECT id, case_file, smart_filename, document_title, classification, created_at, drive_link, matter_code
                    FROM documents
                    WHERE extracted_text ILIKE %s OR analyst_memo::text ILIKE %s
                    ORDER BY created_at DESC NULLS LAST LIMIT 30""",
                 (f'%{ref}%', f'%{ref}%'))
     items = [{"doc_id":r[0],"case_file":r[1],"file":r[2],"title":r[3],
-              "type":r[4],"created_at":str(r[5])} for r in cur.fetchall()]
+              "type":r[4],"created_at":str(r[5]),
+              "drive_link":r[6],"matter_code":r[7]} for r in cur.fetchall()]
     cur.close(); c.close()
     return jsonify({"reference":ref,"count":len(items),"documents":items})
 
@@ -150,13 +151,14 @@ def party():
     if not name:
         return jsonify({"error":"missing name parameter"}), 400
     c = db(); cur = c.cursor()
-    cur.execute("""SELECT id, case_file, smart_filename, document_title, classification, created_at
+    cur.execute("""SELECT id, case_file, smart_filename, document_title, classification, created_at, drive_link, matter_code
                    FROM documents
                    WHERE extracted_text ILIKE %s
                    ORDER BY created_at DESC NULLS LAST LIMIT 30""",
                 (f'%{name}%',))
     items = [{"doc_id":r[0],"case_file":r[1],"file":r[2],"title":r[3],
-              "type":r[4],"created_at":str(r[5])} for r in cur.fetchall()]
+              "type":r[4],"created_at":str(r[5]),
+              "drive_link":r[6],"matter_code":r[7]} for r in cur.fetchall()]
     cur.close(); c.close()
     return jsonify({"party":name,"count":len(items),"documents":items})
 
@@ -209,7 +211,7 @@ def query_documents():
     wc = (" WHERE " + " AND ".join(where)) if where else ""
     sql = f"""
         SELECT id, case_file, classification, smart_filename, document_title,
-               doc_date, document_date, summary, created_at
+               doc_date, document_date, summary, created_at, drive_link, matter_code
         FROM documents{wc}
         ORDER BY COALESCE(doc_date, document_date, TO_CHAR(created_at, 'YYYY-MM-DD')) DESC NULLS LAST
         LIMIT %s
@@ -229,6 +231,8 @@ def query_documents():
         "date": str(r[5] or r[6] or ''),
         "summary": (r[7] or '')[:400],
         "indexed": str(r[8]),
+        "drive_link": r[9],
+        "matter_code": r[10],
     } for r in rows]
 
     
