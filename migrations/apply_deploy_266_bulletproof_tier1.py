@@ -266,24 +266,66 @@ def main():
         # STEP 4: DOCKER HEALTHCHECK
         print("\n[4/5] Docker healthcheck")
         healthcheck_changed = patch_docker_healthcheck()
-        print("  Restarting n8n via docker compose...")
-        r = subprocess.run(["docker", "compose", "-f", "/root/n8n/docker-compose.yml",
-                            "up", "-d", "n8n"], capture_output=True, text=True)
-        print(f"  compose up: rc={r.returncode}")
-        if r.stderr:
-            print(f"    {r.stderr.strip()[:300]}")
+        # Only restart n8n if compose file actually changed; n8n re-reads
+        # workflows from DB on each execution so DB changes don't require restart.
+        if healthcheck_changed:
+            print("  compose changed; restarting n8n...")
+            r = subprocess.run(["docker", "compose", "-f", "/root/n8n/docker-compose.yml",
+                                "up", "-d", "n8n"], capture_output=True, text=True)
+            print(f"  compose up: rc={r.returncode}")
+            if r.stderr:
+                print(f"    {r.stderr.strip()[:300]}")
+        else:
+            print("  no restart needed (DB changes pick up on next execution)")
 
         # STEP 5: SMOKE TEST + AUTO-ROLLBACK
+        # Wait for n8n to report healthy before running smoke. Container needs
+        # ~30-60s to fully start including webhook re-registration with Telegram.
         print("\n[5/5] Post-deploy smoke test")
-        print("  Waiting 15s for n8n to come up...")
         import time
-        time.sleep(15)
+        print("  Waiting for n8n to report healthy + webhook registered (up to 90s)...")
+        deadline = time.time() + 90
+        last_msg = ""
+        while time.time() < deadline:
+            r = subprocess.run(
+                ["docker", "inspect", "n8n-n8n-1", "--format", "{{.State.Health.Status}}"],
+                capture_output=True, text=True,
+            )
+            health = r.stdout.strip()
+            # Also check webhook is registered
+            wh_ok = False
+            try:
+                import urllib.request, json as _json, os as _os
+                token = None
+                with open(BACKUP_DIR.replace("workflow_backups", ".env"), "r") if False else open("/root/landtek/.env") as f:
+                    for line in f:
+                        if line.startswith("TG_BOT_TOKEN=") or line.startswith("TELEGRAM_BOT_TOKEN="):
+                            token = line.split("=", 1)[1].strip().strip('"\'')
+                            break
+                if token:
+                    with urllib.request.urlopen(
+                        f"https://api.telegram.org/bot{token}/getWebhookInfo", timeout=5
+                    ) as resp:
+                        data = _json.loads(resp.read())
+                    wh_ok = bool(data.get("result", {}).get("url"))
+            except Exception:
+                pass
+            last_msg = f"health={health} webhook_registered={wh_ok}"
+            if health == "healthy" and wh_ok:
+                print(f"  ready: {last_msg}")
+                break
+            time.sleep(5)
+        else:
+            print(f"  WARN: didn't fully ready in 90s ({last_msg}) — running smoke anyway")
+
         smoke = subprocess.run(
-            ["python3", "/root/landtek/scripts/post_deploy_smoke.py",
-             "--text", "/ping deploy_266 smoke", "--timeout", "90"],
+            ["python3", "/root/landtek/scripts/post_deploy_smoke.py"],
             capture_output=True, text=True,
         )
-        print("  smoke stdout:", smoke.stdout.strip().replace("\n", "\n  "))
+        print("  --- smoke output ---")
+        print("  " + smoke.stdout.strip().replace("\n", "\n  "))
+        if smoke.stderr.strip():
+            print("  stderr: " + smoke.stderr.strip()[:300])
         if smoke.returncode != 0:
             print(f"  smoke FAILED (rc={smoke.returncode}) - AUTO-ROLLBACK")
             subprocess.run(["python3", "/root/landtek/scripts/backup_workflow.py",
