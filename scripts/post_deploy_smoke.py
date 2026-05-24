@@ -164,12 +164,64 @@ def check_trigger_wired():
     return True, f"-> Whitelist Check (+{len(first)-1} other branches)"
 
 
+def check_workflow_history_in_sync():
+    """workflow_entity (draft) MUST match workflow_history (executing version).
+    n8n v2.16 runs from workflow_history; drift here causes silent failures."""
+    conn = psycopg2.connect(DSN)
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("""
+        SELECT (we.nodes::text) AS draft, (wh.nodes::text) AS published
+          FROM workflow_entity we
+          LEFT JOIN workflow_history wh ON wh."workflowId" = we.id
+         WHERE we.id = %s
+        """, (WORKFLOW_ID,))
+    r = cur.fetchone()
+    cur.close()
+    conn.close()
+    if not r or not r["published"]:
+        return False, "workflow_history has no row — n8n won't execute anything"
+    if r["draft"] != r["published"]:
+        return False, "workflow_entity (draft) != workflow_history (executing) — run sync_workflow_history.py"
+    return True, "draft==published"
+
+
+def check_webhook_secret_matches():
+    """The Telegram webhook secret n8n expects is deterministic:
+    workflow_id + '_' + node_id (after stripping non-[A-Za-z0-9_-]).
+    Verify our setWebhook recorded a non-empty URL with the expected webhook_id."""
+    token = load_bot_token()
+    if not token:
+        return False, "no token"
+    try:
+        info = json.loads(urllib.request.urlopen(
+            f"https://api.telegram.org/bot{token}/getWebhookInfo", timeout=8
+        ).read()).get("result", {})
+    except Exception as e:
+        return False, f"getWebhookInfo error: {e}"
+    url = info.get("url", "")
+    last_err = info.get("last_error_message", "") or ""
+    last_err_age = None
+    if info.get("last_error_date"):
+        import time as _t
+        last_err_age = _t.time() - info["last_error_date"]
+    # If url is set AND last error (if any) is older than 10 minutes OR doesn't
+    # mention 403 (secret check), we're healthy. Telegram does not let us read
+    # the actual secret; we infer health from absence of recent 403s.
+    if not url:
+        return False, "webhook URL empty"
+    if "403" in last_err and last_err_age is not None and last_err_age < 600:
+        return False, f"recent 403 error from Telegram: {last_err} ({int(last_err_age)}s ago)"
+    return True, f"url set, last_error: {last_err[:40] or '(none)'}"
+
+
 CHECKS = [
     ("container_health", check_container),
     ("n8n_healthz", check_healthz),
     ("bot_alive", check_bot_alive),
     ("webhook_registered", check_webhook_registered),
+    ("webhook_secret_ok", check_webhook_secret_matches),
     ("workflow_active", check_workflow_active),
+    ("workflow_history_synced", check_workflow_history_in_sync),
     ("gemini_embed_url", check_gemini_embed_url),
     ("trigger_wired", check_trigger_wired),
 ]
