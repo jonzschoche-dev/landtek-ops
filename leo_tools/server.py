@@ -35,6 +35,13 @@ except Exception as _e:
     print(f"WARN: slash endpoints not registered: {_e}", file=_sys.stderr)
 
 try:
+    from files_public import bp as _files_public_bp
+    app.register_blueprint(_files_public_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: files_public (/files/c/) blueprint not registered: {_e}", file=_sys.stderr)
+
+try:
     from onboarding_endpoints import bp as _onb_bp
     app.register_blueprint(_onb_bp)
 except Exception as _e:
