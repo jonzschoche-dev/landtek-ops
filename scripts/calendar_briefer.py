@@ -374,7 +374,26 @@ def job_daily_brief(cur, token, dry_run=False, force=False):
     """)
     proposed_deadlines = cur.fetchall()
 
-    if not today_events and not tomorrow_events and not past_due and not unfollowed and not proposed_deadlines:
+    # Documents needing classification (triage queue from deploy_279)
+    triage_count = 0
+    triage_sample = []
+    try:
+        cur.execute("SELECT COUNT(*) AS n FROM documents_needing_classification")
+        triage_count = cur.fetchone()["n"]
+        if triage_count:
+            cur.execute("""
+                SELECT id, smart_filename, original_filename,
+                       LEFT(preview, 80) AS preview
+                  FROM documents_needing_classification
+                 LIMIT 5
+            """)
+            triage_sample = cur.fetchall()
+    except Exception:
+        # view may not exist yet on first run pre-deploy_279
+        pass
+
+    if (not today_events and not tomorrow_events and not past_due
+        and not unfollowed and not proposed_deadlines and not triage_count):
         log(f"  daily brief {brief_date}: nothing to send")
         return 0
 
@@ -417,6 +436,15 @@ def job_daily_brief(cur, token, dry_run=False, force=False):
                 f"{p['deadline_kind'] or 'deadline'} [{p['related_case'] or '?'}]  ←{src}"
             )
             lines.append(f"      → event#{p['id']} — review & confirm anchor date")
+    if triage_count:
+        lines.append("")
+        lines.append(f"📁 <b>Documents needing classification ({triage_count})</b>")
+        lines.append("    No matter linked — every doc should be placed somewhere.")
+        for t in triage_sample:
+            name = (t['smart_filename'] or t['original_filename'] or '(unnamed)')[:60]
+            lines.append(f"  • doc#{t['id']}  {name}")
+        if triage_count > len(triage_sample):
+            lines.append(f"      … +{triage_count - len(triage_sample)} more")
 
     msg = "\n".join(lines)
     if dry_run:
