@@ -105,8 +105,7 @@ def main():
         if new_content != old["content"]:
             cur.execute("""
                 UPDATE chat_notes
-                   SET content = %s,
-                       updated_at = now()
+                   SET content = %s
                  WHERE id = 156
             """, (new_content,))
             print(f"    ✓ note#156 content corrected")
