@@ -503,7 +503,7 @@ def upsert_extractions(cur, extractions: list[Extraction], *, dry_run: bool = Fa
                 e.deadline_kind, e.confidence, e.raw_clause,
             ),
         )
-        new_id = cur.fetchone()[0]
+        new_id = cur.fetchone()["id"]
         inserted += 1
         print(f"    ✓ #{new_id} {e.title}  [{e.status}/{e.deadline_kind} conf={e.confidence}]")
     return {"inserted": inserted, "skipped": skipped}
