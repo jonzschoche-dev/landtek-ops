@@ -252,6 +252,60 @@ def job_followup_asks(cur, token, dry_run=False):
     return sent
 
 
+# ─── Job 3.5: critical-deadline push (new auto-extracted) ────────────────
+def job_push_critical_deadlines(cur, token, dry_run=False):
+    """Push any newly-extracted proposed appeal/filing deadlines within 21 days.
+
+    Only push high-confidence (>=0.65) deadlines once. Dedupe via
+    calendar_briefs_sent.brief_type='critical_deadline'."""
+    cur.execute("""
+        SELECT id, title, start_at, related_case, deadline_kind, description,
+               extraction_confidence, source_doc_id, source_email_id, raw_clause
+          FROM calendar_events
+         WHERE source = 'deadline_extractor'
+           AND status = 'proposed'
+           AND deadline_kind IN ('appeal', 'filing')
+           AND extraction_confidence >= 0.65
+           AND start_at BETWEEN now() - INTERVAL '3 days' AND now() + INTERVAL '21 days'
+         ORDER BY start_at
+         LIMIT 6
+    """)
+    rows = cur.fetchall()
+    sent = 0
+    for r in rows:
+        if already_sent(cur, r["id"], "critical_deadline"):
+            continue
+        days_out = (r["start_at"].astimezone(MANILA_TZ).date()
+                    - datetime.now(MANILA_TZ).date()).days
+        src = (f"doc#{r['source_doc_id']}" if r["source_doc_id"]
+               else (f"email#{r['source_email_id']}" if r["source_email_id"] else ""))
+        kind_label = {"appeal": "APPEAL", "filing": "FILING"}.get(r["deadline_kind"], r["deadline_kind"] or "DEADLINE")
+
+        def esc(s):
+            return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        urgency = "🚨🚨" if days_out <= 5 else ("⚠️" if days_out <= 14 else "🔔")
+        msg = (
+            f"{urgency} <b>{kind_label} deadline auto-detected — {days_out}d out</b>\n\n"
+            f"<b>{esc(r['title'])}</b>\n"
+            f"🗂 {esc(r['related_case'] or '?')}\n"
+            f"📎 source: {src}\n"
+            f"🎯 confidence: {r['extraction_confidence']}\n\n"
+            f"Verbatim:\n  <i>\"{esc((r['raw_clause'] or '')[:300])}\"</i>\n\n"
+            f"Status: <b>PROPOSED</b> — confirm anchor date (when was this received?). "
+            f"Reply with 'confirm event#{r['id']}' to promote to scheduled, or "
+            f"'cancel event#{r['id']}' to dismiss."
+        )
+        if dry_run:
+            log(f"  [DRY] would push critical deadline event#{r['id']}")
+            continue
+        ok, err = send_telegram(token, JONATHAN_CHAT_ID, msg)
+        mark_sent(cur, r["id"], "critical_deadline", ok, err)
+        log(f"  critical deadline event#{r['id']} ok={ok}")
+        sent += 1
+    return sent
+
+
 # ─── Job 4: 7am Manila daily brief ───────────────────────────────────────
 def job_daily_brief(cur, token, dry_run=False, force=False):
     now_utc = datetime.now(timezone.utc)
@@ -308,7 +362,19 @@ def job_daily_brief(cur, token, dry_run=False, force=False):
     """)
     unfollowed = cur.fetchall()
 
-    if not today_events and not tomorrow_events and not past_due and not unfollowed:
+    # Proposed deadlines (auto-extracted, need operator confirmation), next 45 days
+    cur.execute("""
+        SELECT id, title, start_at, related_case, deadline_kind,
+               extraction_confidence, source_doc_id, source_email_id
+          FROM calendar_events
+         WHERE status = 'proposed'
+           AND start_at BETWEEN now() AND now() + INTERVAL '45 days'
+         ORDER BY start_at
+         LIMIT 8
+    """)
+    proposed_deadlines = cur.fetchall()
+
+    if not today_events and not tomorrow_events and not past_due and not unfollowed and not proposed_deadlines:
         log(f"  daily brief {brief_date}: nothing to send")
         return 0
 
@@ -339,6 +405,18 @@ def job_daily_brief(cur, token, dry_run=False, force=False):
         lines.append(f"<b>Awaiting your post-event note ({len(unfollowed)})</b>")
         for u in unfollowed:
             lines.append(f"  • {u['title']}")
+    if proposed_deadlines:
+        lines.append("")
+        lines.append(f"⚠️ <b>Proposed deadlines awaiting confirmation ({len(proposed_deadlines)})</b>")
+        for p in proposed_deadlines:
+            days_out = (p["start_at"].date() - brief_date).days
+            src = f"doc#{p['source_doc_id']}" if p['source_doc_id'] else (f"email#{p['source_email_id']}" if p['source_email_id'] else "")
+            lines.append(
+                f"  • {p['start_at'].astimezone(MANILA_TZ).strftime('%a %d %b')} "
+                f"({'+' if days_out >= 0 else ''}{days_out}d) — "
+                f"{p['deadline_kind'] or 'deadline'} [{p['related_case'] or '?'}]  ←{src}"
+            )
+            lines.append(f"      → event#{p['id']} — review & confirm anchor date")
 
     msg = "\n".join(lines)
     if dry_run:
@@ -355,7 +433,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--force-daily", action="store_true",
                     help="Send the daily brief regardless of time-of-day or already-sent")
-    ap.add_argument("--only", choices=["complete", "prep", "followup", "daily"],
+    ap.add_argument("--only", choices=["complete", "prep", "followup", "daily", "critical"],
                     help="Run only one job")
     args = ap.parse_args()
 
@@ -376,6 +454,8 @@ def main():
         summary["prep_briefs"] = job_prep_briefs(cur, token, args.dry_run)
     if args.only in (None, "followup"):
         summary["followups"] = job_followup_asks(cur, token, args.dry_run)
+    if args.only in (None, "critical"):
+        summary["critical_deadlines"] = job_push_critical_deadlines(cur, token, args.dry_run)
     if args.only in (None, "daily"):
         summary["daily_brief"] = job_daily_brief(cur, token, args.dry_run, args.force_daily)
 
