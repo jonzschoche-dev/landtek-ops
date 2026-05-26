@@ -112,6 +112,16 @@ CREATE INDEX IF NOT EXISTS idx_calendar_source_doc   ON calendar_events(source_d
 CREATE INDEX IF NOT EXISTS idx_calendar_source_email ON calendar_events(source_email_id) WHERE source_email_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_calendar_deadline_kind ON calendar_events(deadline_kind)  WHERE deadline_kind  IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_calendar_proposed     ON calendar_events(start_at)        WHERE status = 'proposed';
+
+-- 5. Extend brief_type to allow 'critical_deadline' (new brief type from briefer)
+ALTER TABLE calendar_briefs_sent
+  DROP CONSTRAINT IF EXISTS calendar_briefs_sent_brief_type_check;
+ALTER TABLE calendar_briefs_sent
+  ADD  CONSTRAINT calendar_briefs_sent_brief_type_check
+       CHECK (brief_type = ANY (ARRAY[
+         'prep_2h','followup_post','auto_completed','daily_morning',
+         'conflict_alert','manual_followup_logged','critical_deadline'
+       ]));
 """
 
 
