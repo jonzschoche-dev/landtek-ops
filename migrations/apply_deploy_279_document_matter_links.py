@@ -72,22 +72,22 @@ KNOWN_MATTERS = [
 # Python-side for backfill. Keep both copies in sync.
 TEXT_MAPPINGS = [
     # CTN SL-YYYY-MMDD-NNNN — last 4 digits identify the ARTA matter
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(0690)\\b", "MWK-ARTA-0690"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(0747)\\b", "MWK-ARTA-0747"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(0792)\\b", "MWK-ARTA-0792"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1210)\\b", "MWK-ARTA-1210"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1212)\\b", "MWK-ARTA-1212"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1319)\\b", "MWK-ARTA-1319"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1321)\\b", "MWK-ARTA-1321"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1378)\\b", "MWK-ARTA-1378"),
-    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1891)\\b", "MWK-ARTA-1891"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(0690)\\y", "MWK-ARTA-0690"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(0747)\\y", "MWK-ARTA-0747"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(0792)\\y", "MWK-ARTA-0792"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1210)\\y", "MWK-ARTA-1210"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1212)\\y", "MWK-ARTA-1212"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1319)\\y", "MWK-ARTA-1319"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1321)\\y", "MWK-ARTA-1321"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1378)\\y", "MWK-ARTA-1378"),
+    ("CTN[\\s-]*SL[-\\s]*\\d{4}[-\\s]*\\d{4}[-\\s]*(1891)\\y", "MWK-ARTA-1891"),
     # Civil cases
     ("Civil\\s+Case\\s+(No\\.?\\s+)?26[-\\s]?360", "MWK-CV26360"),
     ("Civil\\s+Case\\s+(No\\.?\\s+)?6839", "MWK-CV6839"),
     ("Civil\\s+Case\\s+(No\\.?\\s+)?13[-\\s]?131220", "PAR-CV13-131220"),
     # Title patterns
-    ("\\bT[-\\s]?4497\\b", "MWK-TCT4497"),
-    ("TCT\\s+(No\\.?\\s+)?T?[-\\s]?4497\\b", "MWK-TCT4497"),
+    ("\\yT[-\\s]?4497\\y", "MWK-TCT4497"),
+    ("TCT\\s+(No\\.?\\s+)?T?[-\\s]?4497\\y", "MWK-TCT4497"),
     # Estate-side identifiers
     ("Mary\\s+Worrick\\s+Keesey", "MWK-ESTATE"),
     ("Heirs?\\s+of\\s+Mary\\s+Worrick\\s+Keesey", "MWK-ESTATE"),
@@ -314,12 +314,6 @@ def main() -> int:
     for r in cur.fetchall():
         print(f"    {r['relation_kind']:>14}  rows={r['n']:>4}  docs={r['docs']:>4}  matters={r['matters']:>3}")
 
-    cur.execute("""
-        SELECT COUNT(*) AS total_docs,
-               COUNT(*) FILTER (WHERE doc_id IN (SELECT doc_id FROM document_matter_links)) AS linked_docs
-          FROM documents
-    """)
-    # Actually simpler:
     cur.execute("SELECT COUNT(*) AS total FROM documents")
     total = cur.fetchone()["total"]
     cur.execute("SELECT COUNT(DISTINCT doc_id) AS n FROM document_matter_links")
