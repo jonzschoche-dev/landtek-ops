@@ -86,7 +86,7 @@ def main():
             print(f"    · already exists #{existing['id']}  {canonical_name}")
             continue
         cur.execute("""
-            INSERT INTO entities (canonical_name, entity_type, provenance_level, role, mentions_count, created_at, updated_at)
+            INSERT INTO entities (canonical_name, type, provenance_level, role, mentions_count, created_at, updated_at)
             VALUES (%s, %s, %s, %s, 1, now(), now())
             RETURNING id
         """, (canonical_name, entity_type, provenance, role))
