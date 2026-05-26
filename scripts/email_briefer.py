@@ -211,6 +211,13 @@ def job_critical_push(cur, token, dry_run=False, window_min=30):
         if not (is_crit_sender or is_crit_subject):
             continue
 
+        def esc(s):
+            if not s:
+                return ""
+            return (str(s).replace("&", "&amp;")
+                          .replace("<", "&lt;")
+                          .replace(">", "&gt;"))
+
         mc_str = ", ".join(r["matter_codes"] or []) or "(unlinked — check)"
         manila_ts = r["ingested_at"].astimezone(MANILA_TZ).strftime("%H:%M")
         reason = []
@@ -220,11 +227,10 @@ def job_critical_push(cur, token, dry_run=False, window_min=30):
             reason.append("critical subject")
         msg = (
             f"📧 <b>Inbound — {manila_ts}</b>\n\n"
-            f"<b>From:</b> {(r['from_name'] or from_addr)[:80]}\n"
-            f"<b>Subject:</b> {subject[:120]}\n"
-            f"<b>Matter:</b> {mc_str}\n"
-            f"<b>Why pushed:</b> {' + '.join(reason)}\n\n"
-            f"<a href=\"https://leo.hayuma.org/files/email/{r['id']}\">Open in dashboard</a>"
+            f"<b>From:</b> {esc((r['from_name'] or from_addr))[:80]}\n"
+            f"<b>Subject:</b> {esc(subject)[:120]}\n"
+            f"<b>Matter:</b> {esc(mc_str)}\n"
+            f"<b>Why pushed:</b> {esc(' + '.join(reason))}"
         )
         if dry_run:
             log(f"  [DRY] critical push email#{r['id']} subject={subject[:60]!r}")
@@ -269,19 +275,24 @@ def job_daily_digest(cur, token, dry_run=False, force=False):
     lines = [f"📬 <b>Inbox digest — {brief_date.strftime('%a %b %-d')}</b>"]
     lines.append(f"Last 24h: {len(rows)} ingested ({len(linked)} linked, {len(unlinked)} unlinked)")
 
+    def esc(s):
+        if not s:
+            return ""
+        return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+
     if linked:
         lines.append("")
         lines.append(f"<b>Matter-linked ({len(linked)})</b>")
         for r in linked[:8]:
             mc = ", ".join(r["matter_codes"] or [])
-            lines.append(f"  • [{mc}] {(r['subject'] or '(no subject)')[:80]}")
-            lines.append(f"      from {(r['from_name'] or r['from_addr'] or '?')[:50]}")
+            lines.append(f"  • [{esc(mc)}] {esc(r['subject'] or '(no subject)')[:80]}")
+            lines.append(f"      from {esc(r['from_name'] or r['from_addr'] or '?')[:50]}")
     if unlinked:
         lines.append("")
         lines.append(f"<b>Unlinked ({len(unlinked)})</b> — may need manual review")
         for r in unlinked[:6]:
-            lines.append(f"  • {(r['subject'] or '(no subject)')[:100]}")
-            lines.append(f"      from {(r['from_name'] or r['from_addr'] or '?')[:50]}")
+            lines.append(f"  • {esc(r['subject'] or '(no subject)')[:100]}")
+            lines.append(f"      from {esc(r['from_name'] or r['from_addr'] or '?')[:50]}")
 
     msg = "\n".join(lines)
     if dry_run:
