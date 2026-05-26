@@ -163,7 +163,9 @@ CLIENTS = {
             "jesus_v_inocalla":          8120,
         },
 
-        "case_theory_modules": [],         # TODO: per-matter PAR theories
+        "case_theory_modules": [
+            "case_theories.par_capacuan_tsx_listing",
+        ],
         "consolidation_groups_count": 0,   # nothing PAR-specific yet
         "memory_rules": [],                # TODO: project_title_origins_par.md
         "chronicle_script": None,          # TODO: chronicle_par.py or generic
