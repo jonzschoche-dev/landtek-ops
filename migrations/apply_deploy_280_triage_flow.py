@@ -198,24 +198,24 @@ CREATE TRIGGER trg_documents_autolink
 # ---------------------------------------------------------------------------
 
 SERVICE_UNIT = f"""[Unit]
-Description=LandTek doc triage pusher — surface 1 unclassified doc to Telegram
+Description=LandTek doc triage pusher — surface batch of unclassified docs to Telegram
 After=network-online.target
 
 [Service]
 Type=oneshot
 WorkingDirectory={REPO_ROOT}
 Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
-ExecStart=/usr/bin/python3 {PUSHER_PATH} --working-hours-only
+ExecStart=/usr/bin/python3 {PUSHER_PATH} --working-hours-only --batch 3
 StandardOutput=append:/var/log/landtek-doc-triage.log
 StandardError=append:/var/log/landtek-doc-triage.log
 """
 
 TIMER_UNIT = f"""[Unit]
-Description=Run LandTek doc triage pusher every 2h
+Description=Run LandTek doc triage pusher every 1h (batch of 3)
 
 [Timer]
 OnBootSec=5min
-OnUnitActiveSec=2h
+OnUnitActiveSec=1h
 AccuracySec=2min
 Unit={TIMER_NAME}.service
 
