@@ -93,11 +93,13 @@ BEGIN
     sender_lower := LOWER(COALESCE(NEW.from_addr,''));
 
     -- Sender-based defaults
-    IF sender_lower LIKE '%barandon_lawoffice%' THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
-    IF sender_lower LIKE '%colenacious%'        THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
-    IF sender_lower LIKE '%dilgcamarinesnorte%' THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
-    IF sender_lower LIKE '%litigationdivision@arta%' THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
-    IF sender_lower LIKE '%lourdestotanes%'     THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
+    -- NB: use array_append, NOT `mc_set || 'X'` — the latter triggers a
+    -- "malformed array literal" error when mc_set is text[] (fixed deploy_282).
+    IF sender_lower LIKE '%barandon_lawoffice%' THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
+    IF sender_lower LIKE '%colenacious%'        THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
+    IF sender_lower LIKE '%dilgcamarinesnorte%' THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
+    IF sender_lower LIKE '%litigationdivision@arta%' THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
+    IF sender_lower LIKE '%lourdestotanes%'     THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
 
     -- CTN SL-YYYY-MMDD-NNNN → MWK-ARTA-<4-digit suffix>
     FOR m IN
@@ -109,22 +111,22 @@ BEGIN
         IF length(suffix) = 3 THEN suffix := '0' || suffix; END IF;
         candidate := 'MWK-ARTA-' || suffix;
         IF NOT (candidate = ANY(mc_set)) THEN
-            mc_set := mc_set || candidate;
+            mc_set := array_append(mc_set, candidate);
         END IF;
     END LOOP;
 
     -- Known Civil Case patterns
     IF haystack ~* '(civil\s+case|cv|case)\s+(no\.?)?\s*-?\s*26-?360' THEN
-        IF NOT ('MWK-CV26360' = ANY(mc_set)) THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
+        IF NOT ('MWK-CV26360' = ANY(mc_set)) THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
     END IF;
     IF haystack ~* '(civil\s+case|cv|case)\s+(no\.?)?\s*-?\s*6839' THEN
-        IF NOT ('MWK-CV6839' = ANY(mc_set)) THEN mc_set := mc_set || 'MWK-CV6839'; END IF;
+        IF NOT ('MWK-CV6839' = ANY(mc_set)) THEN mc_set := array_append(mc_set, 'MWK-CV6839'::text); END IF;
     END IF;
     IF haystack ~* '(civil\s+case|cv|case)\s+(no\.?)?\s*-?\s*13-?131220' THEN
-        IF NOT ('PAR-CV13-131220' = ANY(mc_set)) THEN mc_set := mc_set || 'PAR-CV13-131220'; END IF;
+        IF NOT ('PAR-CV13-131220' = ANY(mc_set)) THEN mc_set := array_append(mc_set, 'PAR-CV13-131220'::text); END IF;
     END IF;
     IF haystack ~* '(civil\s+case|cv|case)\s+(no\.?)?\s*-?\s*8563' THEN
-        IF NOT ('MWK-CV26360' = ANY(mc_set)) THEN mc_set := mc_set || 'MWK-CV26360'; END IF;
+        IF NOT ('MWK-CV26360' = ANY(mc_set)) THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
     END IF;
 
     -- Filter against valid matters
