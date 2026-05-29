@@ -185,9 +185,17 @@ def build_message(doc: dict, suggestions: list[dict]) -> str:
         for s in suggestions:
             lines.append(f"  • <code>{esc(s['matter_code'])}</code>  ({s['shared_entities']} shared entities, {s['shared_docs']} docs)")
 
+    # Use the top heuristic suggestion as the example matter — NOT a hardcoded
+    # default. Hardcoding "MWK-CV26360" made every triage push (incl. mining and
+    # racing docs) look like Leo wanted everything in the civil case. If there's
+    # no confident suggestion, use a neutral placeholder so we never bias the
+    # operator toward a wrong matter. (fixed deploy_291)
+    example_matter = suggestions[0]["matter_code"] if suggestions else "MATTER-CODE"
+
     lines.append("")
     lines.append("<b>Reply with one of:</b>")
-    lines.append(f"  • <code>file {doc['id']} to MWK-CV26360</code>  (or any matter)")
+    lines.append(f"  • <code>file {doc['id']} to {esc(example_matter)}</code>"
+                 + ("  (top suggestion above — or any matter)" if suggestions else "  (replace MATTER-CODE with the right matter)"))
     lines.append(f"  • <code>skip {doc['id']}</code>  (defer 7 days)")
     lines.append(f"  • <code>unrelated {doc['id']}</code>  (mark as not case-relevant)")
     lines.append("")
