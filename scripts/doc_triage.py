@@ -107,12 +107,57 @@ def ensure_schema(cur) -> None:
     """)
 
 
+# Stopword presence is the strongest signal of "this OCR text is real English."
+# A 2000-char window of legible text contains these words dozens of times.
+# Pure garbage OCR (mojibake like "TASC0 dici. Auicikrboün") contains zero.
+_ENGLISH_STOPWORDS = {
+    "the", "and", "of", "to", "in", "for", "on", "as", "by", "with",
+    "this", "that", "is", "was", "were", "have", "has", "had", "are",
+    "be", "been", "or", "not", "a", "an", "from", "at",
+    # PH-legal-doc anchors
+    "republic", "philippines", "court", "case", "page", "honorable",
+}
+
+
+def _is_legible(text: str, *, min_ratio: float = 0.18, min_hits: int = 10) -> bool:
+    """True if the first 2000 chars look like real English-like text.
+
+    Heuristic: stopword RATIO (not absolute count). A genuine PH-legal doc
+    has 25–35% of its tokens as stopwords. Garbage OCR (mojibake from poor
+    scans like doc#604: 'TASC0 dici. Auicikrboün') still extracts SOME real
+    words mixed with the noise — doc#604 scored 37 stopwords absolute, which
+    a naive count-based threshold would let through. But the RATIO
+    (37/355 = 10.4%) cleanly separates it from real text (doc#624 = 33%).
+
+    Threshold of 18% catches doc#604-class mojibake while letting real text
+    through even on docs with unusual content. We also require a minimum
+    absolute count of 10 to handle very-short docs where ratio is noisy."""
+    if not text:
+        return False
+    sample = text[:2000].lower()
+    import re
+    tokens = re.findall(r"[a-z]+", sample)
+    if len(tokens) < 20:
+        return False
+    hits = sum(1 for t in tokens if t in _ENGLISH_STOPWORDS)
+    return hits >= min_hits and (hits / len(tokens)) >= min_ratio
+
+
 def pick_candidate(cur, exclude: set[int]) -> dict | None:
-    """Pick the oldest doc with no matter linkage that wasn't pushed in last 7d."""
+    """Pick the oldest unclassified doc whose OCR text is legible enough to triage.
+
+    Garbage-OCR docs (mojibake from poor source scans — e.g. doc#604 typewritten
+    land records that even Drive native OCR can't decipher) get skipped here so
+    Leo never asks a human to classify a doc whose preview reads as gibberish.
+    They sit in a 're-OCR needed' bucket surfaced via a separate channel.
+
+    Implementation: query a small batch in date order, filter in Python by
+    `_is_legible()` (stopword-presence check), return the first legible one.
+    Tuning happens in Python, not SQL — easier to evolve. (deploy_292)"""
     cur.execute("""
         SELECT d.id, d.case_file, d.matter_code, d.smart_filename, d.original_filename,
                d.created_at, d.drive_file_id,
-               LEFT(COALESCE(d.extracted_text, ''), 400) AS preview,
+               LEFT(COALESCE(d.extracted_text, ''), 2400) AS preview_raw,
                LENGTH(COALESCE(d.extracted_text, '')) AS text_len
           FROM documents d
          WHERE NOT EXISTS (
@@ -125,10 +170,15 @@ def pick_candidate(cur, exclude: set[int]) -> dict | None:
                )
            AND d.id <> ALL(%s)
          ORDER BY d.created_at ASC NULLS LAST, d.id ASC
-         LIMIT 1
+         LIMIT 30
     """, (DEDUP_INTERVAL_DAYS, list(exclude) or [0]))
-    row = cur.fetchone()
-    return dict(row) if row else None
+    for row in cur.fetchall():
+        if _is_legible(row["preview_raw"] or ""):
+            d = dict(row)
+            d["preview"] = (row["preview_raw"] or "")[:400]
+            d.pop("preview_raw", None)
+            return d
+    return None
 
 
 def heuristic_suggest(cur, doc_id: int, top_n: int = 3) -> list[dict]:
