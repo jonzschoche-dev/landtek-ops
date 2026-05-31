@@ -204,6 +204,34 @@ CLIENTS = {
         "truth_test_modules": [],
         "next_forcing_function": None,
     },
+
+    # ─── ARCHIVE — Out-of-scope documents (deploy_293) ────────────────────
+    # System-level bucket for docs that are not part of any active client matter.
+    # Example: Fortunato.pdf (doc#604) — an old typewritten land record about
+    # the Tabco/Basco family that was accidentally swept into the corpus.
+    # Sub-matters use the ARCHIVE-* prefix and have status='archived'. These
+    # docs are excluded from the orphan triage queue and from active-matter
+    # views, but remain searchable for historical reference.
+    "ARCHIVE": {
+        "client_id": "ARCHIVE",
+        "label": "Archive (out-of-scope documents)",
+        "owner_principal": None,           # no legal principal — system bucket
+        "case_file": "Archive",
+        "matter_prefix": "ARCHIVE-",
+        "operative_root": None,
+        "ghost_titles": [],
+        "trunk_titles": [],
+        "arta_ctn_prefix_to_matter": None,
+        "civil_case_mappings": {},
+        "keystone_entities": {},
+        "case_theory_modules": [],
+        "consolidation_groups_count": 0,
+        "memory_rules": [],
+        "chronicle_script": None,
+        "chronicle_keystones_var": None,
+        "truth_test_modules": [],
+        "next_forcing_function": None,
+    },
 }
 
 
