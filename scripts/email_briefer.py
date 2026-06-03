@@ -258,22 +258,47 @@ def job_daily_digest(cur, token, dry_run=False, force=False):
     if not force and cur.fetchone():
         return 0
 
-    # Last 24h
+    # Last 24h — split into linked vs unlinked AND apply sender disposition filter (deploy_296).
+    # email_sender_disposition.disposition='archive' suppresses from the digest entirely.
     cur.execute("""
-        SELECT id, ingested_at, from_addr, from_name, subject, matter_codes
-          FROM gmail_messages
-         WHERE ingested_at >= now() - INTERVAL '24 hours'
-         ORDER BY ingested_at DESC
+        WITH e AS (
+          SELECT id, ingested_at, from_addr, from_name, subject, matter_codes,
+                 -- extract bare email if from_addr is "Name <addr>" form
+                 LOWER(COALESCE(
+                   (regexp_match(from_addr, '<([^>]+)>'))[1],
+                   from_addr
+                 )) AS bare_addr,
+                 LOWER(SPLIT_PART(COALESCE(
+                   (regexp_match(from_addr, '<([^>]+)>'))[1],
+                   from_addr
+                 ), '@', 2)) AS bare_domain
+            FROM gmail_messages
+           WHERE ingested_at >= now() - INTERVAL '24 hours'
+        )
+        SELECT e.*,
+               d.disposition AS sender_disposition
+          FROM e
+          LEFT JOIN email_sender_disposition d
+            ON d.sender_address = e.bare_addr
+            OR d.sender_domain  = e.bare_domain
+         ORDER BY e.ingested_at DESC
     """)
     rows = cur.fetchall()
     if not rows:
         return 0
 
-    linked = [r for r in rows if (r["matter_codes"] or [])]
-    unlinked = [r for r in rows if not (r["matter_codes"] or [])]
+    archived = [r for r in rows if r["sender_disposition"] == "archive"]
+    visible  = [r for r in rows if r["sender_disposition"] != "archive"]
+    linked   = [r for r in visible if (r["matter_codes"] or [])]
+    unlinked = [r for r in visible if not (r["matter_codes"] or [])]
 
     lines = [f"📬 <b>Inbox digest — {brief_date.strftime('%a %b %-d')}</b>"]
-    lines.append(f"Last 24h: {len(rows)} ingested ({len(linked)} linked, {len(unlinked)} unlinked)")
+    lines.append(
+        f"Last 24h: {len(rows)} ingested "
+        f"({len(linked)} linked, {len(unlinked)} unlinked"
+        + (f", {len(archived)} archived noise" if archived else "")
+        + ")"
+    )
 
     def esc(s):
         if not s:
@@ -293,6 +318,13 @@ def job_daily_digest(cur, token, dry_run=False, force=False):
         for r in unlinked[:6]:
             lines.append(f"  • {esc(r['subject'] or '(no subject)')[:100]}")
             lines.append(f"      from {esc(r['from_name'] or r['from_addr'] or '?')[:50]}")
+    if archived:
+        # Show a one-line summary so Jonathan knows the suppression is happening,
+        # with a sample of who got filtered. Add archive_email_sender.py for more.
+        sample = ", ".join(sorted({(r["bare_domain"] or r["bare_addr"] or "?") for r in archived[:5]}))
+        lines.append("")
+        lines.append(f"<i>+{len(archived)} archived noise (incl. {esc(sample)[:120]}). "
+                     f"To add: <code>archive_email_sender.py domain.com</code></i>")
 
     msg = "\n".join(lines)
     if dry_run:
