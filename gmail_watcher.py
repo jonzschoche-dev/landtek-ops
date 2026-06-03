@@ -257,6 +257,44 @@ def main():
             received_at = datetime.strptime(date_str[:31].strip(), "%a, %d %b %Y %H:%M:%S %z") if date_str else None
         except: received_at = None
 
+        # DEPLOY_297_INGEST_GATE — refuse archive-disposition senders.
+        # bare_addr/bare_domain extraction mirrors email_briefer's SQL join logic.
+        import re as _re
+        _bare_addr = (_re.search(r"<([^>]+)>", from_addr or "") or [None, from_addr or ""])[1].lower()
+        _bare_domain = _bare_addr.split("@", 1)[-1] if "@" in _bare_addr else ""
+        cur.execute(
+            """
+            SELECT disposition FROM email_sender_disposition
+             WHERE (sender_address = %s OR sender_domain = %s)
+               AND disposition = 'archive'
+             LIMIT 1
+            """,
+            (_bare_addr, _bare_domain),
+        )
+        _disp = cur.fetchone()
+        if _disp:
+            # Archived sender — write a stub to gmail_messages_archived for audit
+            # and skip gmail_messages entirely. The autolink trigger never fires
+            # for noise; the digest never sees it.
+            cur.execute(
+                """
+                INSERT INTO gmail_messages_archived
+                  (message_id, thread_id, from_addr, to_addrs, cc_addrs, subject,
+                   body_plain, body_html, sent_at, received_at, labels,
+                   has_attachments, attachment_refs, raw_payload,
+                   archived_reason, archived_by)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,%s)
+                ON CONFLICT (message_id) DO NOTHING
+                """,
+                (m["id"], thread_id, from_addr, to_addrs, cc_addrs, subject,
+                 plain[:50000], html[:50000] if html else None, received_at, received_at,
+                 labels, bool(attachments), json.dumps(attachments) if attachments else None,
+                 json.dumps({"category": category, "auto_archived": True}),
+                 "ingestion_gate", "gmail_watcher"),
+            )
+            archived_at_gate = (archived_at_gate if 'archived_at_gate' in dir() else 0) + 1  # noqa
+            continue
+
         cur.execute("""
             INSERT INTO gmail_messages
               (message_id, thread_id, from_addr, to_addrs, cc_addrs, subject,
