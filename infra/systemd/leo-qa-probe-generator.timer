@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Opus probe generator every 30 minutes
+Requires=leo-qa-probe-generator.service
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=30min
+AccuracySec=30s
+Persistent=true
+Unit=leo-qa-probe-generator.service
+
+[Install]
+WantedBy=timers.target
