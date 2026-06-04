@@ -7,23 +7,25 @@ For each, looks at the execution_data for any chat_id field value that is
 NOT in {sim range, Jonathan, 0/sentinel}.
 
 If a real-recipient chat_id is found:
-  1. Stops leo-simulator.service immediately (self-defense).
-  2. Pages Jonathan via tg_send with source='watchdog' (rate-limit exempt).
-  3. Records the incident to sim_leak_incidents.
+  1. Pages Jonathan via tg_send with source='watchdog' (rate-limit exempt).
+  2. Records the incident to sim_leak_incidents.
+
+The simulator is NOT auto-stopped. Per Jonathan's directive, the simulator
+must run continuously to sharpen Leo — no pauses. Detection + visibility is
+the goal here; Jonathan decides whether to intervene.
 
 Why this exists:
   deploy_300 added a chat_id='0' guard to every Telegram send node in the
   workflow, which is watertight per the controlled test. This sentinel is
   belt-and-suspenders: if any new send node is added that omits the guard,
   if an n8n version upgrade changes expression semantics, or if a tool node
-  ever directly invokes the Telegram bot API, this catches it within ~1 min
-  and halts the bleeding.
+  ever directly invokes the Telegram bot API, this surfaces it within ~1 min
+  so Jonathan can decide.
 """
 from __future__ import annotations
 import json
 import os
 import re
-import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -69,17 +71,6 @@ def ensure_incident_table(cur):
             acted         text NOT NULL
         )
     """)
-
-
-def stop_simulator_now() -> str:
-    try:
-        r = subprocess.run(
-            ["systemctl", "stop", "leo-simulator.service"],
-            capture_output=True, text=True, timeout=10,
-        )
-        return "stopped" if r.returncode == 0 else f"stop_failed:{r.stderr.strip()[:80]}"
-    except Exception as e:
-        return f"stop_exception:{e}"
 
 
 def alert(text: str):
@@ -145,8 +136,7 @@ def main():
         cur.close(); conn.close()
         return
 
-    # LEAK DETECTED — stop simulator immediately and page.
-    action = stop_simulator_now()
+    # LEAK DETECTED — page Jonathan; the simulator keeps running per directive.
     # Dedupe by (exec, chat) so multiple regex hits don't multi-page.
     seen = set()
     fresh = []
@@ -157,16 +147,29 @@ def main():
         seen.add(k)
         fresh.append((eid, sender, cid, excerpt))
 
+    # Suppress duplicate alerts for already-reported (exec, chat_id) pairs in last 10 min.
+    cur.execute(
+        """SELECT execution_id, leaked_chat_id
+             FROM sim_leak_incidents
+            WHERE detected_at > now() - interval '10 minutes'""")
+    already = {(r["execution_id"], r["leaked_chat_id"]) for r in cur.fetchall()}
+    fresh = [t for t in fresh if (str(t[0]), t[2]) not in already]
+    if not fresh:
+        print(f"[sim_sentinel] leak(s) detected but already alerted within 10min — skipping page",
+              flush=True)
+        cur.close(); conn.close()
+        return
+
     for eid, sender, cid, excerpt in fresh:
         cur.execute(
             "INSERT INTO sim_leak_incidents (execution_id, sim_sender_id, leaked_chat_id, excerpt, acted) "
             "VALUES (%s, %s, %s, %s, %s)",
-            (str(eid), sender, cid, excerpt[:600], action),
+            (str(eid), sender, cid, excerpt[:600], "alert_only_simulator_left_running"),
         )
 
     summary = (
-        f"🚨 <b>SIM LEAK SENTINEL TRIPPED</b>\n\n"
-        f"action: <code>{action}</code>\n"
+        f"🚨 <b>SIM LEAK DETECTED</b>\n\n"
+        f"<i>Simulator left running per directive. You decide whether to intervene.</i>\n\n"
         f"sim execs with real chat_ids: {len(fresh)}\n\n"
         + "\n".join(
             f"  exec {eid}  sim={sender}  →  leaked chat_id {cid}"
@@ -174,7 +177,7 @@ def main():
         )
     )
     alert(summary)
-    print(f"[sim_sentinel] LEAK — stopped service ({action}) and paged Jonathan; {len(fresh)} leak(s)",
+    print(f"[sim_sentinel] LEAK — alerted Jonathan; simulator left running; {len(fresh)} new leak(s)",
           flush=True)
     cur.close(); conn.close()
 
