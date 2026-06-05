@@ -64,7 +64,10 @@ def ensure_schema(cur):
 def check_one(path: str, max_stale_min: int) -> tuple[bool, datetime | None]:
     p = Path(path)
     if not p.exists():
-        return (True, None)
+        # Missing log file. For crons with daily-ish cadence (max_stale > 60min),
+        # this is normal until the cron has fired its first scheduled time.
+        # Only alert on missing logs for sub-hourly crons (where missing = real problem).
+        return (max_stale_min <= 60, None)
     mtime = datetime.fromtimestamp(p.stat().st_mtime, tz=timezone.utc)
     now = datetime.now(timezone.utc)
     stale = (now - mtime) > timedelta(minutes=max_stale_min)
