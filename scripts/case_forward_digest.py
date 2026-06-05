@@ -20,10 +20,7 @@ from datetime import datetime, timezone, timedelta
 import psycopg2, psycopg2.extras
 
 sys.path.insert(0, "/root/landtek/scripts")
-try:
-    from tg_send import send as tg_send
-except Exception:
-    tg_send = None
+from report_publisher import push_strict
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 JONATHAN = "6513067717"
@@ -205,32 +202,50 @@ def main():
         print("[case_forward] nothing actionable — suppressing")
         return
 
-    parts = [f"📋 <b>Case Forward — {datetime.now(timezone.utc):%Y-%m-%d}</b>", ""]
+    # STRICT RAILS (deploy_329): one-line headline → Telegram; full detail → report file.
+    # Headline = the ONE THING. Everything else goes in the report.
+    headline = f"📋 Case Forward — {datetime.now(timezone.utc):%m-%d}"
+    if next_action:
+        label, _ = next_action
+        # Strip emoji + brackets for the headline
+        headline = f"📋 {label[:200]}"
+    elif health:
+        headline = f"📋 Case Forward — {health[:200]}"
+    elif advances:
+        headline = f"📋 Case Forward — {advances[0][:200]}"
+    elif stalled:
+        headline = f"📋 Case Forward — {len(stalled)} item(s) stalled ≥3d"
+    else:
+        # Nothing actionable AND nothing moving AND no health issue → suppress
+        print("[case_forward] truly nothing to report — suppressing")
+        return
 
+    # Build the full report (markdown) — everything goes here
+    report = [f"## Case Forward — {datetime.now(timezone.utc):%Y-%m-%d %H:%M UTC}", ""]
     if next_action:
         label, action = next_action
-        parts.append(f"<b>THE ONE THING TODAY:</b>")
-        parts.append(f"  {label}")
-        parts.append(f"  <code>{action[:200]}</code>")
-        parts.append("")
-
+        report.append(f"### The One Thing Today")
+        report.append(f"**{label}**")
+        report.append("")
+        report.append(f"```")
+        report.append(action)
+        report.append(f"```")
+        report.append("")
     if advances:
-        parts.append(f"<b>WHAT MOVED YESTERDAY:</b>")
+        report.append(f"### What Moved Yesterday")
         for a in advances:
-            parts.append(f"  ✓ {a}")
-        parts.append("")
-
+            report.append(f"- ✓ {a}")
+        report.append("")
     if stalled:
-        parts.append(f"<b>STALLED ≥3 DAYS:</b>")
+        report.append(f"### Stalled ≥3 Days")
         for s in stalled:
-            parts.append(s)
-        parts.append("")
-
+            report.append(s)
+        report.append("")
     if health:
-        parts.append(f"<b>HEALTH:</b> {health}")
-        parts.append("")
-
-    # Footer queue counts
+        report.append(f"### Health")
+        report.append(health)
+        report.append("")
+    # Queue counts as footer
     cur.execute("""
         SELECT
           (SELECT COUNT(*) FROM evidence_trail_proposals WHERE status='pending') AS evid,
@@ -238,17 +253,18 @@ def main():
           (SELECT COUNT(*) FROM doc_role_proposals WHERE status='pending' AND confidence >= 0.75) AS doc_role
     """)
     q = cur.fetchone()
-    parts.append(f"<i>Pending review: {q['evid']} evidence, {q['leo']} improvement, {q['doc_role']} doc_role</i>")
+    report.append(f"### Pending Review")
+    report.append(f"- {q['evid']} evidence_trail proposals")
+    report.append(f"- {q['leo']} leo_improvement proposals")
+    report.append(f"- {q['doc_role']} doc_role proposals (≥0.75 confidence)")
 
-    text = "\n".join(parts)
-    print(text)
-    if tg_send is not None:
-        try:
-            tg_send(JONATHAN, text, source="watchdog",
-                    recipient_name="Jonathan", override_rate_limit=True)
-            print("[case_forward] pushed")
-        except Exception as e:
-            print(f"[case_forward] send failed: {e}")
+    push_strict(
+        headline=headline,
+        body_md="\n".join(report),
+        source="watchdog",
+        slug=f"case-forward-{datetime.now(timezone.utc):%Y%m%d}",
+    )
+    print(f"[case_forward] pushed headline + report link")
 
 
 if __name__ == "__main__":
