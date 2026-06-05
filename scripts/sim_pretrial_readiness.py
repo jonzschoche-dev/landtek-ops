@@ -60,7 +60,9 @@ def main():
         overall["total"] += total
         overall["passes"] += passes
         pct = round(100.0 * passes / total, 1)
-        label = f"{r['category']:14s} ({r['intent'][:12]})"
+        cat = (r["category"] or "—")
+        intent = (r["intent"] or "—")
+        label = f"{cat:14s} ({intent[:12]})"
         print(f"  {label:30s}  {bar(pct)}  {pct:5.1f}% ({passes:3d}/{total:3d})  {glyph_for(pct)}")
     if overall["total"]:
         opct = round(100.0 * overall["passes"] / overall["total"], 1)
@@ -92,7 +94,9 @@ def main():
         overall_r["total"] += total
         overall_r["passes"] += passes
         pct = round(100.0 * passes / total, 1)
-        label = f"{r['category']:14s} ({r['intent'][:12]})"
+        cat = (r["category"] or "—")
+        intent = (r["intent"] or "—")
+        label = f"{cat:14s} ({intent[:12]})"
         print(f"  {label:30s}  {bar(pct)}  {pct:5.1f}% ({passes:3d}/{total:3d})  {glyph_for(pct)}")
     if overall_r["total"]:
         opct = round(100.0 * overall_r["passes"] / overall_r["total"], 1)
