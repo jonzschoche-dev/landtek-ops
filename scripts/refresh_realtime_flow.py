@@ -55,6 +55,42 @@ def fetch_flow(cur) -> dict:
                      FROM v_active_priority_signals_7d LIMIT 10""")
     f["signals"] = cur.fetchall()
 
+    # Obligations at risk (deploy_326)
+    try:
+        cur.execute("""SELECT id, client_code, short_label, due_by, status, risk_window,
+                              priority, obligation_kind
+                         FROM v_obligations_at_risk LIMIT 10""")
+        f["obligations_at_risk"] = cur.fetchall()
+    except Exception:
+        f["obligations_at_risk"] = []
+
+    # Open obligations grouped by client
+    try:
+        cur.execute("""SELECT client_code, client_name, total_open, blocked, imminent, overdue,
+                              obligations
+                         FROM v_open_obligations_by_client""")
+        f["obligations_by_client"] = cur.fetchall()
+    except Exception:
+        f["obligations_by_client"] = []
+
+    # Current project phase per case
+    try:
+        cur.execute("""SELECT case_file, phase_label, description, current_focus,
+                              success_criteria, exit_signals
+                         FROM v_current_phase_per_case""")
+        f["active_phases"] = cur.fetchall()
+    except Exception:
+        f["active_phases"] = []
+
+    # Open client needs
+    try:
+        cur.execute("""SELECT client_code, client_name, need_kind, short_label,
+                              priority, description
+                         FROM v_open_client_needs""")
+        f["client_needs"] = cur.fetchall()
+    except Exception:
+        f["client_needs"] = []
+
     # Pending decisions
     cur.execute("SELECT COUNT(*) FROM leo_improvement_proposals WHERE status='pending'")
     f["leo_proposals_pending"] = cur.fetchone()["count"]
@@ -147,6 +183,50 @@ def render(f: dict) -> str:
             L.append(f"  … +{len(f['signals'])-6} more")
         L.append("")
 
+    # CURRENT PROJECT PHASE PER CASE (deploy_326)
+    if f.get("active_phases"):
+        L.append("CURRENT PROJECT PHASE PER CASE:")
+        for p in f["active_phases"]:
+            L.append(f"  [{p['case_file']}]  phase: {p['phase_label']}")
+            if p['description']:
+                L.append(f"    {p['description'][:160]}")
+            if p['success_criteria']:
+                L.append(f"    success: {p['success_criteria'][:140]}")
+        L.append("")
+
+    # LANDTEK OBLIGATIONS — what we owe each client
+    if f.get("obligations_by_client"):
+        L.append("LANDTEK OBLIGATIONS — what we owe each client:")
+        for c in f["obligations_by_client"]:
+            risk_flags = []
+            if c['overdue']:  risk_flags.append(f"{c['overdue']} OVERDUE")
+            if c['imminent']: risk_flags.append(f"{c['imminent']} imminent")
+            if c['blocked']:  risk_flags.append(f"{c['blocked']} blocked")
+            flags = " · ".join(risk_flags) if risk_flags else "all on track"
+            cname = (c['client_name'] or c['client_code'])[:40]
+            L.append(f"  {cname}  ({c['total_open']} open  ·  {flags})")
+            for ob in (c['obligations'] or [])[:4]:
+                due = ob.get('due_by') or "no due date"
+                if hasattr(due, 'strftime'): due = due.strftime("%Y-%m-%d")
+                L.append(f"    [{ob['id']}] [{ob['kind']}] {ob['label']}  (due {due}, p{ob['priority']}, {ob['status']})")
+        L.append("")
+
+    # OBLIGATIONS AT RISK
+    if f.get("obligations_at_risk"):
+        L.append("⚠️  OBLIGATIONS AT RISK (overdue or due within 14 days):")
+        for o in f["obligations_at_risk"][:8]:
+            due = o['due_by'].strftime("%Y-%m-%d %H:%M") if o.get('due_by') else "?"
+            L.append(f"  [{o['id']}] [{o['risk_window']}] [{o['client_code']}] {o['short_label']}  (due {due})")
+        L.append("")
+
+    # OPEN CLIENT NEEDS
+    if f.get("client_needs"):
+        L.append("OPEN CLIENT NEEDS — what each client expects from us:")
+        for n in f["client_needs"][:10]:
+            cname = (n['client_name'] or n['client_code'])[:30]
+            L.append(f"  [{n['client_code']}] (p{n['priority']}) [{n['need_kind']}] {n['short_label']}")
+        L.append("")
+
     # PENDING DECISIONS
     L.append("PENDING DECISIONS — awaiting Jonathan's review:")
     L.append(f"  - Leo improvement proposals:        {f['leo_proposals_pending']}")
@@ -175,6 +255,13 @@ def render(f: dict) -> str:
     L.append("  'what do I need for [EVENT]?' / 'prep status for [EVENT]?'")
     L.append("    → consult OPEN PREP REQUIREMENTS for that event_id;")
     L.append("    → list the open + blocked items with their LT-NNNN doc citations.")
+    L.append("  'what does [CLIENT] need?' / 'what do we owe [CLIENT]?'")
+    L.append("    → surface LANDTEK OBLIGATIONS for that client_code;")
+    L.append("    → list the OPEN CLIENT NEEDS;")
+    L.append("    → if any obligations are at risk, lead with those.")
+    L.append("  'what phase are we in on [CASE]?' / 'where are we on [matter]?'")
+    L.append("    → cite CURRENT PROJECT PHASE for that case_file;")
+    L.append("    → state success criteria + current focus.")
     L.append("  'what shifted?' / 'any updates?' / 'what's new?'")
     L.append("    → lead with PRIORITY SIGNALS (last 7d, unacked first);")
     L.append("    → follow with PENDING DECISIONS counts.")
@@ -182,7 +269,9 @@ def render(f: dict) -> str:
     L.append("    → list UPCOMING EVENTS in date order with readiness %.")
     L.append("  'status?' / 'what's going on?'")
     L.append("    → 3-line summary: top upcoming event, top pending decision count,")
-    L.append("    → most recent priority signal.")
+    L.append("    → highest-priority obligation at risk, most recent priority signal.")
+    L.append("  'are we keeping our promises?' / 'what's our obligation status?'")
+    L.append("    → summarize OBLIGATIONS AT RISK + total open obligations + breached.")
     return "\n".join(L)
 
 
