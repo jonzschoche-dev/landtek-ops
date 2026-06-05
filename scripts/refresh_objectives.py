@@ -23,30 +23,45 @@ WORKFLOW_ID = "vSDQv1vfn6627bnA"
 def fetch_objectives(cur) -> dict:
     f = {"refreshed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}
     cur.execute("SELECT * FROM v_case_objectives ORDER BY case_file")
-    f["cases"] = cur.fetchall()
+    raw_cases = cur.fetchall()
+    f["cases"] = [
+        (r["case_file"], r["total_transferees"], r["leads"], r["awaiting_action"],
+         r["in_process"], r["total_claims"], r["open_claims"],
+         r["open_obligations"], r["emails_7d"])
+        for r in raw_cases
+    ]
     cur.execute("""
         SELECT case_file, id, canonical_name, accion_status, current_possession,
                action_needed, doc_eval_total, doc_eval_gaps
           FROM v_transferee_action_state
          ORDER BY case_file, accion_status, canonical_name
     """)
-    f["transferees"] = cur.fetchall()
+    raw_t = cur.fetchall()
+    f["transferees"] = [
+        (r["case_file"], r["id"], r["canonical_name"], r["accion_status"],
+         r["current_possession"], r["action_needed"], r["doc_eval_total"], r["doc_eval_gaps"])
+        for r in raw_t
+    ]
     # Recent gmail not yet matter-tagged
     cur.execute("""
-        SELECT COUNT(*) FROM gmail_messages
+        SELECT COUNT(*) AS n FROM gmail_messages
          WHERE received_at > now() - interval '14 days'
            AND (case_file IS NULL OR case_file = '')
     """)
-    f["emails_untagged_14d"] = cur.fetchone()[0]
-    # Total transfer evaluations with gaps
+    f["emails_untagged_14d"] = cur.fetchone()["n"]
+    # Total transfer evaluations: actual schema has 'present'/'missing'/'gap'/'unclear'
     cur.execute("""
-        SELECT COUNT(*) FILTER (WHERE status='gap') AS gaps,
-               COUNT(*) FILTER (WHERE status='satisfied') AS satisfied,
+        SELECT COUNT(*) FILTER (WHERE status IN ('gap','missing')) AS gaps,
+               COUNT(*) FILTER (WHERE status = 'present') AS satisfied,
+               COUNT(*) FILTER (WHERE status = 'unclear') AS unclear,
                COUNT(*) AS total
           FROM transfer_doc_status
     """)
     r = cur.fetchone()
-    f["transfer_evals"] = {"gaps": r[0], "satisfied": r[1], "total": r[2]}
+    f["transfer_evals"] = {
+        "gaps": r["gaps"], "satisfied": r["satisfied"],
+        "unclear": r["unclear"], "total": r["total"],
+    }
     return f
 
 
@@ -97,7 +112,9 @@ def render(f: dict) -> str:
             L.append("")
 
     L.append(f"EMAILS UNTAGGED (last 14d, no case_file assigned):  {f['emails_untagged_14d']}")
-    L.append(f"TRANSFER EVALUATIONS:  {f['transfer_evals']['satisfied']} satisfied + {f['transfer_evals']['gaps']} gaps of {f['transfer_evals']['total']}")
+    L.append(f"TRANSFER EVALUATIONS:  {f['transfer_evals']['satisfied']} present, "
+             f"{f['transfer_evals']['gaps']} gaps, {f['transfer_evals']['unclear']} unclear "
+             f"(of {f['transfer_evals']['total']})")
     L.append("")
     L.append("USAGE — when asked:")
     L.append("  'who are the 20 transferees / how are they posturing?' → TRANSFEREES section above")
