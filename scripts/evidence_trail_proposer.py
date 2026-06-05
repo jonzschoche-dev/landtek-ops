@@ -17,10 +17,7 @@ import json, os, re, sys, urllib.request
 import psycopg2, psycopg2.extras
 
 sys.path.insert(0, "/root/landtek/scripts")
-try:
-    from tg_send import send as tg_send
-except Exception:
-    tg_send = None
+from report_publisher import push_strict
 
 DSN          = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 JONATHAN     = "6513067717"

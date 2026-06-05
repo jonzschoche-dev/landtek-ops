@@ -39,10 +39,7 @@ import psycopg2
 import psycopg2.extras
 
 sys.path.insert(0, "/root/landtek/scripts")
-try:
-    from tg_send import send as tg_send
-except Exception:
-    tg_send = None
+from report_publisher import push_strict
 
 DSN          = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 WORKFLOW_ID  = "vSDQv1vfn6627bnA"
@@ -279,28 +276,34 @@ def telegram_digest(cur, top_n: int = 3):
          ORDER BY proposed_at DESC LIMIT {top_n}
     """)
     rows = cur.fetchall()
-    if not rows or tg_send is None:
+    if not rows:
         return 0
-    parts = ["📈 <b>Leo Improvement Proposals</b>\n"]
+    n = len(rows)
+    headline = f"✨ {n} new Opus proposal(s) for Leo — review queue"
+    report = ["## Pending Leo Improvement Proposals", ""]
     for r in rows:
-        baseline = (f"{int(100*r['baseline_pass_rate'])}%"
-                    if r["baseline_pass_rate"] is not None else "?")
-        tgt_count = len(r["target_probes"] or [])
-        parts.append(
-            f"\n<b>#{r['id']}</b> — <i>{r['failure_pattern']}</i>\n"
-            f"  targets {tgt_count} probes (currently {baseline} pass)\n"
-            f"  <i>{(r['rationale'] or '')[:240]}</i>\n"
-            f"  expect: <i>{(r['expected_impact'] or '')[:140]}</i>\n"
-            f"  review: <code>python3 scripts/leo_proposal_apply.py {r['id']}</code>"
-        )
-    text = "".join(parts)
-    try:
-        tg_send(JONATHAN, text, source="watchdog",
-                recipient_name="Jonathan", override_rate_limit=True)
-    except Exception as e:
-        print(f"[proposer] telegram digest failed: {e}", flush=True)
-        return 0
-    return len(rows)
+        baseline = (f"{int(100*r['baseline_pass_rate'])}%" if r['baseline_pass_rate'] is not None else "?")
+        tgt_count = len(r['target_probes'] or [])
+        report.append(f"### Proposal #{r['id']}")
+        report.append(f"**Pattern**: {r['failure_pattern']}")
+        report.append(f"**Baseline pass rate**: {baseline} (over {tgt_count} probes)")
+        report.append(f"**Rationale**: {r['rationale']}")
+        if r.get('expected_impact'):
+            report.append(f"**Expected impact**: {r['expected_impact']}")
+        report.append("")
+        report.append("```bash")
+        report.append(f"python3 scripts/leo_proposal_apply.py {r['id']} --dry  # preview")
+        report.append(f"python3 scripts/leo_proposal_apply.py {r['id']}        # apply")
+        report.append("```")
+        report.append("")
+    push_strict(
+        headline=headline,
+        body_md="
+".join(report),
+        source="watchdog",
+        slug="leo-proposals-pending",
+    )
+    return n
 
 
 def main():
