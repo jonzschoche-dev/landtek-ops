@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""sim_pretrial_readiness.py — phone-friendly trial-readiness scorecard.
+"""sim_pretrial_readiness.py — trial-readiness scorecard split by intent.
 
-Per-category health from 24h sim runs + pretrial timeline + filing gaps
-+ improvement loop state. One screen, ~20 second read.
+Two top-level views:
+  1. BONAFIDE ENGAGEMENT — how well Leo helps authorized users
+     (intent = engage_helpfully OR verify_facts)
+  2. REFUSAL POSTURE     — how well Leo blocks impersonators/strangers
+     (intent = refuse_unauthorized OR gracefully_onboard)
 
-Replaces parts of sim_daily_digest for the morning push (the existing
-daily digest stays for backward-compatible monitoring).
-
-Run on-demand:
-    python3 /root/landtek/scripts/sim_pretrial_readiness.py
+This separates the two distinct quality dimensions so phrasing-driven
+refusal noise can't mask whether Leo is getting smarter at helping
+Jonathan.
 """
 from __future__ import annotations
 import os, sys
@@ -17,20 +18,7 @@ import psycopg2
 import psycopg2.extras
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
-
-PRETRIAL_TARGET = datetime(2026, 8, 1, tzinfo=timezone.utc)  # approximate — adjust as confirmed
-
-CATEGORY_DISPLAY = [
-    ("mandate",          "Mandate invariants"),
-    ("security",         "Impersonation defense"),
-    ("evidence_trail",   "Title chain literacy"),
-    ("filing_discipline","Evidence trail navigation"),
-    ("phrasing",         "Refusal phrasing"),
-    ("capability",       "Capability honesty"),
-    ("onboarding",       "Onboarding flow"),
-    ("infrastructure",   "System health"),
-    ("business",         "Business health"),
-]
+PRETRIAL_TARGET = datetime(2026, 8, 1, tzinfo=timezone.utc)
 
 
 def bar(pct, width=12):
@@ -38,37 +26,82 @@ def bar(pct, width=12):
     return "█" * fill + "░" * (width - fill)
 
 
+def glyph_for(pct):
+    return "✓" if pct >= 90 else ("⚠️" if pct >= 50 else "✗")
+
+
 def main():
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     title = f"📋 Pretrial Readiness — {datetime.now(timezone.utc):%Y-%m-%d %H:%M UTC}"
-    print(f"\n┌{'─'*76}┐\n│ {title:<74} │\n└{'─'*76}┘")
+    print(f"\n┌{'─'*78}┐\n│ {title:<76} │\n└{'─'*78}┘")
 
-    print("\n┌─── HEALTH BY DIMENSION (last 24h) ───────────────────────────────────────────────┐")
+    # ── BONAFIDE ENGAGEMENT ────────────────────────────────────────────
+    print("\n┌─── BONAFIDE ENGAGEMENT (Leo helping authorized users) ─────────────────────────┐")
     cur.execute("""
-        SELECT COALESCE(p.category, 'other') AS category,
+        SELECT p.category,
+               p.intent,
                COUNT(*) AS total,
                COUNT(*) FILTER (WHERE s.passed) AS passes
           FROM leo_qa_probes p
           LEFT JOIN leo_qa_sim_payloads s
             ON s.probe_id = p.id AND s.posted_at > now() - interval '24 hours'
          WHERE p.active = true
-         GROUP BY p.category
+           AND p.intent IN ('engage_helpfully','verify_facts','honest_disclosure')
+         GROUP BY p.category, p.intent
+         ORDER BY total DESC NULLS LAST
     """)
-    rows = {r["category"]: r for r in cur.fetchall()}
-    for cat, label in CATEGORY_DISPLAY:
-        r = rows.get(cat) or {"total": 0, "passes": 0}
+    bonafide = cur.fetchall()
+    overall = {"total": 0, "passes": 0}
+    for r in bonafide:
         total, passes = r["total"] or 0, r["passes"] or 0
-        if total == 0:
-            print(f"  {label:30s}  not measured                            —")
-            continue
+        if total == 0: continue
+        overall["total"] += total
+        overall["passes"] += passes
         pct = round(100.0 * passes / total, 1)
-        glyph = "✓" if pct >= 90 else ("⚠️" if pct >= 50 else "✗")
-        print(f"  {label:30s}  {bar(pct)}  {pct:5.1f}% ({passes:3d}/{total:3d})  {glyph}")
-
+        label = f"{r['category']:14s} ({r['intent'][:12]})"
+        print(f"  {label:30s}  {bar(pct)}  {pct:5.1f}% ({passes:3d}/{total:3d})  {glyph_for(pct)}")
+    if overall["total"]:
+        opct = round(100.0 * overall["passes"] / overall["total"], 1)
+        print(f"  {'─'*78}")
+        print(f"  {'OVERALL BONAFIDE':30s}  {bar(opct)}  {opct:5.1f}% "
+              f"({overall['passes']:3d}/{overall['total']:3d})  {glyph_for(opct)}")
     print("└──────────────────────────────────────────────────────────────────────────────────┘")
 
+    # ── REFUSAL POSTURE ────────────────────────────────────────────────
+    print("\n┌─── REFUSAL POSTURE (Leo blocking impersonators / strangers) ──────────────────┐")
+    cur.execute("""
+        SELECT p.category,
+               p.intent,
+               COUNT(*) AS total,
+               COUNT(*) FILTER (WHERE s.passed) AS passes
+          FROM leo_qa_probes p
+          LEFT JOIN leo_qa_sim_payloads s
+            ON s.probe_id = p.id AND s.posted_at > now() - interval '24 hours'
+         WHERE p.active = true
+           AND p.intent IN ('refuse_unauthorized','gracefully_onboard')
+         GROUP BY p.category, p.intent
+         ORDER BY total DESC NULLS LAST
+    """)
+    refusal = cur.fetchall()
+    overall_r = {"total": 0, "passes": 0}
+    for r in refusal:
+        total, passes = r["total"] or 0, r["passes"] or 0
+        if total == 0: continue
+        overall_r["total"] += total
+        overall_r["passes"] += passes
+        pct = round(100.0 * passes / total, 1)
+        label = f"{r['category']:14s} ({r['intent'][:12]})"
+        print(f"  {label:30s}  {bar(pct)}  {pct:5.1f}% ({passes:3d}/{total:3d})  {glyph_for(pct)}")
+    if overall_r["total"]:
+        opct = round(100.0 * overall_r["passes"] / overall_r["total"], 1)
+        print(f"  {'─'*78}")
+        print(f"  {'OVERALL REFUSAL':30s}  {bar(opct)}  {opct:5.1f}% "
+              f"({overall_r['passes']:3d}/{overall_r['total']:3d})  {glyph_for(opct)}")
+    print("└──────────────────────────────────────────────────────────────────────────────────┘")
+
+    # ── PRETRIAL TIMELINE ──────────────────────────────────────────────
     print("\n┌─── PRETRIAL TIMELINE ─────────────────────────────────────────────────────────────┐")
     days_to_pretrial = (PRETRIAL_TARGET - datetime.now(timezone.utc)).days
     cur.execute("SELECT COUNT(*) FROM claims WHERE status = 'open'")
@@ -85,48 +118,65 @@ def main():
     well_supported = cur.fetchone()["n"]
     cur.execute("SELECT COUNT(*) FROM v_filing_gaps")
     gaps = cur.fetchone()["count"]
+    cur.execute("SELECT COUNT(*) FROM evidence_trail_proposals WHERE status='pending'")
+    proposals_pending = cur.fetchone()["count"]
     print(f"  Days to pretrial (target):                {days_to_pretrial}")
     print(f"  Active claims (open):                     {open_claims}")
     print(f"  Claims with ≥2 primary exhibits:          {well_supported}")
     print(f"  Claims with filing gaps:                  {gaps}")
-    print(f"    └─ see: scripts/list_filing_gaps.py")
+    print(f"  Evidence proposals pending review:        {proposals_pending}")
     print("└──────────────────────────────────────────────────────────────────────────────────┘")
 
-    print("\n┌─── SECURITY POSTURE ─────────────────────────────────────────────────────────────┐")
+    # ── BONAFIDE TREND (last 3 days, engage_helpfully + verify_facts) ─
+    print("\n┌─── BONAFIDE TREND — last 3 days ─────────────────────────────────────────────────┐")
     cur.execute("""
-        SELECT COUNT(*) FROM sim_leak_incidents
-         WHERE detected_at > now() - interval '24 hours'
+        SELECT date_trunc('day', s.posted_at)::date AS day,
+               COUNT(*) AS total,
+               COUNT(*) FILTER (WHERE s.passed) AS passes
+          FROM leo_qa_sim_payloads s
+          JOIN leo_qa_probes p ON p.id = s.probe_id
+         WHERE p.intent IN ('engage_helpfully','verify_facts','honest_disclosure')
+           AND s.posted_at > now() - interval '3 days'
+         GROUP BY 1 ORDER BY 1
     """)
-    leaks = cur.fetchone()["count"]
-    print(f"  Sim leaks (24h):                          {leaks}    {'✓' if leaks == 0 else '🚨'}")
+    rows = cur.fetchall()
+    if not rows:
+        print("  (no bonafide probe data yet)")
+    else:
+        for r in rows:
+            pct = round(100.0 * r["passes"] / max(r["total"], 1), 1)
+            print(f"  {str(r['day']):<12s}  {bar(pct)}  {pct:5.1f}% ({r['passes']:3d}/{r['total']:3d})")
+        if len(rows) >= 2:
+            first = round(100.0 * rows[0]["passes"] / max(rows[0]["total"], 1), 1)
+            last  = round(100.0 * rows[-1]["passes"] / max(rows[-1]["total"], 1), 1)
+            arrow = "↑" if last > first + 1 else ("↓" if last < first - 1 else "→")
+            print(f"  slope: {first}% → {last}% {arrow}{last-first:+.1f}pp")
+    print("└──────────────────────────────────────────────────────────────────────────────────┘")
+
+    # ── LATEST BONAFIDE FAILS (most actionable) ───────────────────────
+    print("\n┌─── LATEST BONAFIDE FAILS (Leo should have helped but didn't) ────────────────────┐")
     cur.execute("""
-        SELECT COUNT(*) AS n
-          FROM leo_qa_sim_payloads s JOIN leo_qa_probes p ON p.id=s.probe_id
-         WHERE p.category IN ('security','mandate')
-           AND s.posted_at > now() - interval '24 hours'
+        SELECT p.name, s.posted_at::timestamp(0) AS at,
+               LEFT(s.prompt_text, 55) AS prompt,
+               LEFT(s.leo_reply_text, 180) AS reply,
+               LEFT(s.fail_reason, 60) AS fail
+          FROM leo_qa_sim_payloads s
+          JOIN leo_qa_probes p ON p.id = s.probe_id
+         WHERE p.intent IN ('engage_helpfully','verify_facts')
            AND NOT s.passed
+           AND s.posted_at > now() - interval '24 hours'
+           AND s.leo_reply_text IS NOT NULL
+           AND s.leo_reply_text != ''
+         ORDER BY s.id DESC LIMIT 5
     """)
-    security_fails = cur.fetchone()["n"]
-    print(f"  Security/mandate fails (24h):             {security_fails}    "
-          f"{'✓' if security_fails < 5 else ('⚠️' if security_fails < 20 else '✗')}")
-    print("└──────────────────────────────────────────────────────────────────────────────────┘")
-
-    print("\n┌─── IMPROVEMENT LOOP STATE ───────────────────────────────────────────────────────┐")
-    cur.execute("SELECT COUNT(*) AS n FROM leo_improvement_proposals WHERE status='pending'")
-    pending = cur.fetchone()["n"]
-    cur.execute("SELECT COUNT(*) AS n FROM leo_improvement_proposals WHERE status='applied'")
-    applied = cur.fetchone()["n"]
-    cur.execute("SELECT COUNT(*) AS n FROM leo_improvement_proposals WHERE status='verified' AND verified_at > now() - interval '24 hours'")
-    verified_today = cur.fetchone()["n"]
-    cur.execute("""
-        SELECT COUNT(*) FILTER (WHERE active) AS active
-          FROM leo_qa_probes WHERE rail='sim'
-    """)
-    library = cur.fetchone()["active"]
-    print(f"  Pending proposals:                        {pending}")
-    print(f"  Applied (awaiting verify):                {applied}")
-    print(f"  Verified in last 24h:                     {verified_today}")
-    print(f"  Sim probe library (active):               {library}")
+    fails = cur.fetchall()
+    if not fails:
+        print("  (none in last 24h — bonafide replies all passing or no data)")
+    for f in fails:
+        print(f"  • {f['name']:60s}")
+        print(f"      Q: {f['prompt']!r}")
+        print(f"      A: {f['reply'][:140]!r}")
+        print(f"      ✗ {f['fail']}")
     print("└──────────────────────────────────────────────────────────────────────────────────┘")
     print()
     cur.close(); conn.close()
