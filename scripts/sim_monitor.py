@@ -259,6 +259,11 @@ def main():
         )
         push = classification in ("regression", "change")
 
+        # deploy_328 noise reduction: only fire Telegram alerts on REGRESSION.
+        # CHANGE classification just updates state silently. STABLE never fires.
+        # Result: Jonathan's phone only buzzes when something genuinely breaks.
+        push_to_phone = (classification == "regression")
+
         cur.execute("""
             UPDATE sim_monitor_state
                SET last_check_at        = now(),
@@ -268,11 +273,11 @@ def main():
                    last_signature       = %s::jsonb,
                    last_pushed_at       = CASE WHEN %s THEN now() ELSE last_pushed_at END
              WHERE id = 1
-        """, (new_interval, new_interval, new_stable, json.dumps(sig), push))
+        """, (new_interval, new_interval, new_stable, json.dumps(sig), push_to_phone))
         conn.commit()
 
-        print(f"[monitor] {classification}: {reason} | interval {state['current_interval_min']}m → {new_interval}m | stable_run {new_stable}")
-        if push:
+        print(f"[monitor] {classification}: {reason} | interval {state['current_interval_min']}m → {new_interval}m | stable_run {new_stable} | push={push_to_phone}")
+        if push_to_phone:
             alert(format_alert(classification, reason, sig, prev_sig,
                                new_interval, state["current_interval_min"]))
     except Exception:

@@ -94,16 +94,42 @@ def health_ok(cur) -> bool:
 
 
 def pick_due_scenario(cur):
-    """Pick the simulator probe whose last_run_at is oldest (round-robin)."""
-    cur.execute(
-        """
-        SELECT id, name, definition, severity
-          FROM leo_qa_probes
-         WHERE rail = 'sim' AND active = true
-         ORDER BY COALESCE(last_run_at, 'epoch'::timestamptz) ASC, id ASC
-         LIMIT 1
-        """
-    )
+    """Pick a probe with variety bias (deploy_328).
+
+    Strategy: 80% of the time, pick from the oldest-last-run quartile
+    (round-robin). 20% of the time, pick randomly from the active library —
+    so Jonathan sees varied probe content in the digest instead of the
+    same 6 names cycling.
+
+    Also weights NEVER-RUN probes (last_run_at IS NULL) heavily so new
+    probes get exercised quickly.
+    """
+    import random
+    if random.random() < 0.20:
+        # Random selection across the entire library
+        cur.execute("""
+            SELECT id, name, definition, severity
+              FROM leo_qa_probes
+             WHERE rail = 'sim' AND active = true
+             ORDER BY random() LIMIT 1
+        """)
+    else:
+        # Oldest-last-run quartile (NULL ranks highest as "epoch")
+        cur.execute("""
+            WITH ranked AS (
+              SELECT id, name, definition, severity,
+                     ROW_NUMBER() OVER (ORDER BY
+                       COALESCE(last_run_at, 'epoch'::timestamptz) ASC,
+                       id ASC) AS rn,
+                     COUNT(*) OVER () AS total
+                FROM leo_qa_probes
+               WHERE rail = 'sim' AND active = true
+            )
+            SELECT id, name, definition, severity
+              FROM ranked
+             WHERE rn <= GREATEST(total / 4, 5)
+             ORDER BY random() LIMIT 1
+        """)
     return cur.fetchone()
 
 
