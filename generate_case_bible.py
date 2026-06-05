@@ -476,8 +476,41 @@ def project_forward_omnibus(cur, case_file):
     return upcoming[:10]
 
 
-def detect_gaps(events, deadlines):
-    """Anomaly detection over the timeline. Returns list of findings."""
+PER_CLIENT_KNOWN_GAPS = {
+    "MWK-001": [
+        ("2005 Revocation of SPA (Cesar dela Fuente)",
+         "Currently testimonial via Judicial Affidavit doc#441. Primary notarized "
+         "instrument missing — single biggest evidence gap on the void-SPA theory."),
+        ("Mary Worrick Keesey death certificate (PSA-issued, ~1988)",
+         "Testimonial only via project memory; PSA-certified primary document not in corpus."),
+        ("Cesar dela Fuente death certificate (2017)",
+         "Referenced in LandBank's CV-6839 filing (doc#364); primary PSA certificate not yet ingested."),
+        ("The 2016 Deed of Sale (Cesar → buyer that led to T-52540 cancellation)",
+         "The void deed at issue in CV 26-360. Not directly in corpus per current scan."),
+    ],
+    "Paracale-001": [
+        # Allan's known evidence gaps go here as they surface. Empty until
+        # Allan's case theory enumerates load-bearing missing instruments
+        # (e.g., PAR-VITO-CRUZ judgment certified copy, PAR-TCT1616 mother title).
+    ],
+    "Owner": [],
+}
+
+# Per-client orphan-event probe (replaces the MWK-specific T-4497/Cesar hint).
+PER_CLIENT_ORPHAN_HINT = {
+    "MWK-001":      "what touched T-4497 or what did Cesar do",
+    "Paracale-001": "what touched PAR-TCT1616 or what did Allan Inocalla do",
+    "Owner":        "what's in the family-history archive",
+}
+
+
+def detect_gaps(events, deadlines, case_file="MWK-001"):
+    """Anomaly detection over the timeline. Returns list of findings.
+
+    Parameterized by case_file so per-client known-evidence-gaps surface in
+    the gap report without cross-contaminating other clients' bibles. Each
+    client's BIBLE_KNOWN_GAPS list lives in PER_CLIENT_KNOWN_GAPS[case_file].
+    """
     findings = []
     # 1. Year-gap detection: contiguous years where no events exist (suggests missing records)
     years_with_events = sorted({e["primary_date"].year for e in events if e["primary_date"]})
@@ -520,24 +553,16 @@ def detect_gaps(events, deadlines):
                if e.get("event_kind_canonical") == "legal_act"
                and not e.get("title_refs") and not e.get("party_refs")]
     if orphans:
+        hint = PER_CLIENT_ORPHAN_HINT.get(case_file, "what touched the case")
         findings.append({
             "kind": "orphan_legal_acts",
             "severity": "medium",
             "detail": (f"{len(orphans)} legal-act events have no linked TCT or party "
-                       "(can't be queried by 'what touched T-4497' or 'what did Cesar do')."),
+                       f"(can't be queried by '{hint}')."),
         })
 
-    # 5. Critical missing primary instruments (known gaps from project memory)
-    known_gaps = [
-        ("2005 Revocation of SPA (Cesar dela Fuente)",
-         "Currently testimonial via Judicial Affidavit doc#441. Primary notarized instrument missing — single biggest evidence gap on the void-SPA theory."),
-        ("Mary Worrick Keesey death certificate (PSA-issued, ~1988)",
-         "Testimonial only via project memory; PSA-certified primary document not in corpus."),
-        ("Cesar dela Fuente death certificate (2017)",
-         "Referenced in LandBank's CV-6839 filing (doc#364); primary PSA certificate not yet ingested."),
-        ("The 2016 Deed of Sale (Cesar → buyer that led to T-52540 cancellation)",
-         "The void deed at issue in CV 26-360. Not directly in corpus per current scan."),
-    ]
+    # 5. Critical missing primary instruments (per-client known gaps).
+    known_gaps = PER_CLIENT_KNOWN_GAPS.get(case_file, [])
     for label, why in known_gaps:
         findings.append({
             "kind": "missing_primary_instrument",
@@ -571,15 +596,98 @@ def shorten_matter_tag(mc):
 # Client display names — used for omnibus header
 CLIENT_DISPLAY_NAMES = {
     "MWK-001":      "Heirs of Mary Worrick Keesey (MWK-001)",
-    "Paracale-001": "Paracale Estate (Paracale-001)",
+    "Paracale-001": "Paracale Estate of Allan V. Inocalla (Paracale-001)",
     "Owner":        "Owner File (Owner)",
 }
 
 
+# ── Per-client critical-facts framing for the year-narrative LLM ────────
+# THIS IS THE LOAD-BEARING ANTI-CROSS-CONTAMINATION DICTIONARY.
+# Each entry tells the narrative-LLM:
+#   - what client we're writing for
+#   - which matter codes are in scope
+#   - which factual invariants must not be violated
+#   - which adjacent matters to NOT bleed into the narrative
+# Symptom of bad framing: a Paracale-001 bible whose narrative reads
+# "# MWK-ESTATE Master Case Bible — 2021 Summary". See drafts/
+# bible_OMNIBUS_Paracale-001_2026-06-05.md pre-fix.
+BIBLE_NARRATIVE_CRITICAL_FACTS = {
+    "MWK-001": (
+        "## CRITICAL FACTS — these MUST be respected (Opus audit gate enforced)\n\n"
+        "- **MWK-001 / MWK-ESTATE is the TOP-LEVEL parent.** CV-26360, CV-6839, "
+        "TCT-4497 chain verification, ARTA matters, and tax/title administration "
+        "are SIBLING subtracks. Do NOT collapse estate work into CV-26360.\n"
+        "- **Cesar N. dela Fuente died 21 June 2017** (cited in LandBank's filing "
+        "in CV-6839, doc#364). ANY narrative attributing legal action to Cesar after "
+        "21 June 2017 is IMPOSSIBLE and a data error. Omit him from 2018+ attribution; "
+        "attribute to Patricia/Jonathan/Atty. Barandon or the holding office instead.\n"
+        "- **Civil Case 26-360 venue: RTC Camarines Norte BRANCH 64** (never MTC "
+        "Mercedes; MTC reference is residue from a draft caption). Mediation set for "
+        "2 June 2026 at RTC Daet 1 PM.\n"
+        "- **CV-6839 (just-compensation vs LandBank)** is its own track, applying "
+        "ONLY to the agrarian/CARP title set {T-30681, T-30682, T-30683, T-4494, "
+        "T-4501, T-4502, T-4503, T-14}. Do NOT mix with T-4497 chain.\n"
+        "- **TCT-4497 chain** is the contested-Balane chain "
+        "(T-4497 → T-32916/32917/31298 → T-079-2021002126). Title-chain certification "
+        "work is ESTATE administration, NOT Balane litigation, unless a pleading cites it.\n"
+        "- **Patricia Keesey Zschoche** (spelling KEESEY — verified against 307 corpus "
+        "occurrences including her birth certificate and the RTC Order caption).\n"
+        "- **Two distinct Pajarillos:** Alexander L. Pajarillo (Mayor of Mercedes, "
+        "ARTA-0747 respondent — our matter) and Amado V. Pajarillo (deceased "
+        "landowner in parallel CV-6922 — NOT our matter). Do not conflate.\n"
+        "- **Parallel-tracking matters CV-6922 (Pajarillo Heirs vs DAR) and Crim-9221 "
+        "(People vs Eduardo Ibana)** are observed, not litigated by MWK. Do not "
+        "narrate them as MWK actions. Only mention if a doc# directly references them.\n"
+        "- **ARTA dockets:** 0690, 0747, 0792, 1210, 1212, 1319, 1321, 1378, 1891, DILG. "
+        "All 10 exist. Do not invent dockets or assume typos.\n"
+        "- **DO NOT bleed in PAR / Paracale / Inocalla / Capacuan / Vito Cruz / Golden Sand. "
+        "Those are a different client's matters.**\n"
+    ),
+    "Paracale-001": (
+        "## CRITICAL FACTS — these MUST be respected\n\n"
+        "- **Client: Allan V. Inocalla** (Paracale-001). The matters in scope are the "
+        "PAR-* set: PAR-CAPACUAN, PAR-CASE-88750 (Inocalla estate mineral rights), "
+        "PAR-COMPLAINT-ACE, PAR-CV13-131220, PAR-GOLDEN-SAND (Golden Sand Beach Resort), "
+        "PAR-TCT1616 (title-chain verification), PAR-VITO-CRUZ (judgment won, "
+        "pending title reconveyance), and AUTO-PARACALE_001.\n"
+        "- **DO NOT bleed in MWK / Mary Worrick Keesey / Patricia Keesey Zschoche / "
+        "Cesar de la Fuente / Gloria Balane / T-4497 / CV-26360 / CV-6839 / ARTA. "
+        "Those are a DIFFERENT CLIENT's matters and have no place in a Paracale narrative.**\n"
+        "- **PAR-CAPACUAN** = Capacuan mining/asset dispute, linked to Paracale Gold "
+        "Corporation (PGC) TSX-V listing tracking — see case_theories/par_capacuan_tsx_listing.py.\n"
+        "- **PAR-VITO-CRUZ** has a final judgment in Allan's favor; the open work is "
+        "title reconveyance, NOT relitigation.\n"
+        "- **PAR-CV13-131220** was declared unrelated by the principal on 2026-05-20; "
+        "mention only if a doc explicitly references it for record-keeping.\n"
+        "- Allan's matters are in Paracale / Camarines Norte / Manila NCR jurisdictions. "
+        "If an event has no PAR-* matter tag, attribute it to PAR-* only via doc# citation.\n"
+        "- Inocalla family members: Allan V. Inocalla (principal), Jesus V. Inocalla "
+        "(sibling co-petitioner), Shishir Allan Inocalla (martial-arts persona — may be "
+        "the same person, held separate canonical pending clarification). Francisco V. "
+        "Inocalla appears in Civil Case 98-88750 collateral material.\n"
+    ),
+    "Owner": (
+        "## CRITICAL FACTS — Owner bucket\n\n"
+        "- **Owner = Jonathan Paul Zschoche's personal/family file** (passports, "
+        "birth records, family research, archive certifications).\n"
+        "- This is NOT a legal matter in the representation sense. Narratives should "
+        "be factual and family-historical, not litigation-flavored.\n"
+        "- Some Owner docs cross-link to MWK matters (e.g., Patricia's passport copy "
+        "may be MWK-ESTATE evidence). Cross-references are fine; do not import MWK "
+        "litigation framing into Owner narratives.\n"
+    ),
+}
+
+
 # ── LLM narrative synthesis (Layer D narrative weaving) ────────────────
-def synthesize_year_narratives(events):
+def synthesize_year_narratives(events, case_file="MWK-001"):
     """Group events by year, send each year's enriched events to Haiku for a
     paragraph narrative. Returns {year: narrative_text}.
+
+    Parameterized by case_file so the per-client critical-facts framing
+    (BIBLE_NARRATIVE_CRITICAL_FACTS[case_file]) gates the LLM and prevents
+    cross-client contamination (e.g., a Paracale-001 bible whose narrative
+    leaks MWK-ESTATE framing).
 
     Cost-disciplined per [[feedback_cost_discipline]]:
       - Haiku only (no Sonnet/Opus)
@@ -682,37 +790,13 @@ def synthesize_year_narratives(events):
                           + (f" ({titles})" if titles else "")
                           + f" [prov: {prov}]")
 
+        client_display = CLIENT_DISPLAY_NAMES.get(case_file, case_file)
+        critical_facts = BIBLE_NARRATIVE_CRITICAL_FACTS.get(case_file, "")
         prompt = (
-            f"You are a senior paralegal writing a Master Case Bible for the heirs "
-            f"of Mary Worrick Keesey (MWK-001), a Philippine property estate.\n\n"
-            f"## CRITICAL FACTS — these MUST be respected (Opus audit gate enforced)\n\n"
-            f"- **MWK-001 / MWK-ESTATE is the TOP-LEVEL parent.** CV-26360, CV-6839, "
-            f"TCT-4497 chain verification, ARTA matters, and tax/title administration "
-            f"are SIBLING subtracks. Do NOT collapse estate work into CV-26360.\n"
-            f"- **Cesar N. dela Fuente died 21 June 2017** (cited in LandBank's filing "
-            f"in CV-6839, doc#364). ANY narrative attributing legal action to Cesar after "
-            f"21 June 2017 is IMPOSSIBLE and a data error. Omit him from 2018+ attribution; "
-            f"attribute to Patricia/Jonathan/Atty. Barandon or the holding office instead.\n"
-            f"- **Civil Case 26-360 venue: RTC Camarines Norte BRANCH 64** (never MTC "
-            f"Mercedes; MTC reference is residue from a draft caption). Mediation set for "
-            f"2 June 2026 at RTC Daet 1 PM.\n"
-            f"- **CV-6839 (just-compensation vs LandBank)** is its own track, applying "
-            f"ONLY to the agrarian/CARP title set {{T-30681, T-30682, T-30683, T-4494, "
-            f"T-4501, T-4502, T-4503, T-14}}. Do NOT mix with T-4497 chain.\n"
-            f"- **TCT-4497 chain** is the contested-Balane chain "
-            f"(T-4497 → T-32916/32917/31298 → T-079-2021002126). Title-chain certification "
-            f"work is ESTATE administration, NOT Balane litigation, unless a pleading cites it.\n"
-            f"- **Patricia Keesee Zschoche** (caption spelling — KEESEE for the plaintiff "
-            f"caption; KEESEY also appears in family-name usage. Use KEESEE for the case caption).\n"
-            f"- **Two distinct Pajarillos:** Alexander L. Pajarillo (Mayor of Mercedes, "
-            f"ARTA-0747 respondent — our matter) and Amado V. Pajarillo (deceased "
-            f"landowner in parallel CV-6922 — NOT our matter). Do not conflate.\n"
-            f"- **Parallel-tracking matters CV-6922 (Pajarillo Heirs vs DAR) and Crim-9221 "
-            f"(People vs Eduardo Ibana)** are observed, not litigated by MWK. Do not "
-            f"narrate them as MWK actions. Only mention if a doc# directly references them.\n"
-            f"- **ARTA dockets:** 0690, 0747, 0792, 1210, 1212, 1319, 1321, 1378, 1891, DILG. "
-            f"All 10 exist. Do not invent dockets or assume typos.\n\n"
-            f"## TASK\n\n"
+            f"You are a senior paralegal writing a Master Case Bible for "
+            f"{client_display}, a Philippine property matter.\n\n"
+            + critical_facts
+            + f"\n## TASK\n\n"
             f"Below are all events recorded in {year}"
             + (f" (showing first {len(sample)} of {len(year_events)})" if len(year_events) > 50 else "")
             + ". Write a SINGLE paragraph (5-9 sentences max) summarizing this year:\n"
@@ -733,7 +817,7 @@ def synthesize_year_narratives(events):
         try:
             msg = anthropic_call(
                 client, called_from="generate_case_bible", purpose="year_narrative",
-                case_file="MWK-001",
+                case_file=case_file,
                 model="claude-haiku-4-5-20251001",
                 max_tokens=600,
                 system="You are a senior paralegal. Concise, evidence-cited, no fluff.",
@@ -958,8 +1042,10 @@ def render_markdown(matter, events, deadlines, coverage, projected, gaps,
     undated = [e for e in events if not e["primary_date"]]
     dated.sort(key=lambda e: (e["primary_date"], e["id"]))
 
-    # Pre-compute LLM narratives for each year (cached/deduped at year level)
-    year_narratives = synthesize_year_narratives(dated)
+    # Pre-compute LLM narratives for each year (cached/deduped at year level).
+    # Pass case_file to engage the per-client critical-facts framing and
+    # prevent cross-client contamination in the narrative text.
+    year_narratives = synthesize_year_narratives(dated, case_file=matter.get("case_file") or "MWK-001")
 
     for year, year_events_iter in groupby(dated, key=lambda e: e["primary_date"].year):
         year_events = list(year_events_iter)
@@ -1236,7 +1322,7 @@ def main():
         projected = project_forward(matter)
     print(f"  [3/6] projected {len(projected)} forward events"
           + (f" across {len(all_matters)} matters" if omnibus_mode else f" from stage='{matter.get('current_stage')}'"))
-    gaps = detect_gaps(events, deadlines)
+    gaps = detect_gaps(events, deadlines, case_file=matter.get("case_file") or "MWK-001")
     print(f"  [4/6] detected {len(gaps)} gap(s)/anomaly(ies)")
 
     md = render_markdown(matter, events, deadlines, coverage, projected, gaps,
