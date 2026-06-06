@@ -261,6 +261,24 @@ Opus-driven improvement proposer. **Always on; never auto-stops.**
   not null, treat as that role's privileges for read access. Shape impersonators (NULL
   role) stay refused.
 
+**Rule S14 — Telegram messages must be human-readable, one-point, one-at-a-time**
+(established 2026-06-07 by Jonathan; enforced in `scripts/tg_send.py`):
+
+1. **Plain language only.** No HTML tags, no markdown bold/italic, no `<code>` blocks,
+   no bullet lists, no numbered lists. If you wouldn't say it to someone across a
+   table, don't put it in a Telegram message.
+2. **One point per message.** Every message says one thing. If there's a second
+   thing to say, it waits.
+3. **No double-tap to Jonathan.** After any outbound message lands in his Telegram
+   (chat_id `6513067717`), the next outbound message to him is BLOCKED until he
+   replies. Background processes do not get to chain alerts into his phone.
+   Override only on true P0 (override_pacing=True), and only the source that
+   requests the override owns the consequence.
+
+`scripts/tg_send.py` enforces all three: `sanitize_for_human()` strips markup
+and caps at 280 chars; `_is_jonathan_awaiting_reply()` blocks chains. Violations
+log to `outbound_blocks` with reason `S14_*`.
+
 **Workflow safety gates** (deploy_300 + deploy_308):
 - Every Telegram-send node in the workflow rewrites `chatId` to `'0'` when the
   Trigger sender starts with `999000`. Telegram returns 400 chat-not-found, the
