@@ -98,6 +98,7 @@ def main():
                 "expected_any": p.get("expected_any") or [],
                 "forbidden_substrings": p.get("forbidden") or [],
                 "harm_if_broken": p.get("harm_if_broken"),
+                "remediation_hint": p.get("remediation_hint"),
             }
             cur.execute(
                 """

@@ -154,6 +154,11 @@ def main():
             print(json.dumps(summary, indent=2))
         else:
             print(f"\n# session {session_id} done: {passed}/{len(probes)} passed")
+            if failed:
+                print(
+                    f"  → improve: python3 scripts/simulator_improvement_loop.py "
+                    f"--session {session_id} --full"
+                )
         sys.exit(0 if failed == 0 else 1)
     finally:
         cur.close()

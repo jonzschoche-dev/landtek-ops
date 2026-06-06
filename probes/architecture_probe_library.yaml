@@ -18,6 +18,7 @@ probes:
     expected_any: ["legal event", "reaction", "note", "search_emails", "all-mail", "relevant"]
     forbidden: ["every email", "all emails on the spine", "all mail is logged to client_history"]
     harm_if_broken: "Leo treats promos as case history — spine noise returns."
+    remediation_hint: "refresh_client_history.py — CLIENT_HISTORY email policy line"
     severity: critical
 
   - name: arch.arta_0747_not_cv26360
@@ -28,6 +29,7 @@ probes:
     expected_any: ["0747", "arta", "separate", "admin", "not the same", "different"]
     forbidden: ["yes, that is civil case 26-360", "same as cv-26360", "mwk-cv26360 only"]
     harm_if_broken: "ARTA admin mis-tagged as civil trial track — wrong deadlines/obligations."
+    remediation_hint: "refresh_mwk_pending_matters.py — dual ARTA tracks"
     severity: critical
 
   - name: arch.dilg_not_cv26360
@@ -37,6 +39,7 @@ probes:
     expected_any: ["dilg", "arta-dilg", "admin", "separate", "not", "referral"]
     forbidden: ["yes, part of civil case 26-360", "same matter as cv-26360"]
     harm_if_broken: "DILG admin escalations pollute civil case narrative."
+    remediation_hint: "refresh_mwk_pending_matters.py — DILG vs CV26360 separation"
     severity: critical
 
   - name: arch.arta_0747_op_deadline
@@ -46,6 +49,7 @@ probes:
     expected_any: ["june 10", "2026-06-10", "10 jun", "06-10"]
     forbidden: ["no deadline", "i don't know", "not in our records"]
     harm_if_broken: "Missed OP window on 0747 — administrative remedy lost."
+    remediation_hint: "refresh_mwk_pending_matters.py + refresh_mwk_priorities.py — deadline#7"
     severity: critical
 
   - name: arch.del_rosario_1210_may
@@ -55,6 +59,7 @@ probes:
     expected_any: ["20132", "del rosario", "closure", "op", "supervisory", "gmail"]
     forbidden: ["no record", "i have no verified source", "not in our files"]
     harm_if_broken: "Leo blind to verified May thread — OP strategy uninformed."
+    remediation_hint: "refresh_mwk_pending_matters.py — gmail#20132 thread"
     severity: warn
 
   - name: arch.dual_arta_manifestations
@@ -64,6 +69,7 @@ probes:
     expected_any: ["separate", "two", "dual", "distinct", "1210", "0747"]
     forbidden: ["single manifestation", "one filing covers both", "combined task"]
     harm_if_broken: "Collapsed obligations — wrong filing pack / missed deadline."
+    remediation_hint: "refresh_mwk_pending_matters.py — obligations #2 and #9"
     severity: critical
 
   - name: arch.gmail_38220_citation
@@ -73,6 +79,7 @@ probes:
     expected_any: ["38220", "gmail#38220"]
     forbidden: ["i cannot cite", "no gmail id", "unknown message"]
     harm_if_broken: "Cannot anchor claims to verified mail — provenance discipline fails."
+    remediation_hint: "refresh_mwk_pending_matters.py + client_history_scan.py"
     severity: warn
 
   - name: arch.mediation_impasse_cv26360
@@ -82,6 +89,7 @@ probes:
     expected_any: ["impasse", "held", "june", "disagree"]
     forbidden: ["settled", "successful mediation", "parties agreed"]
     harm_if_broken: "Hallucinated mediation outcome corrupts trial prep."
+    remediation_hint: "refresh_mwk_hard_facts.py — chat_notes#1209 impasse"
     severity: critical
 
   - name: arch.no_barandon_blocker_0747
@@ -91,6 +99,7 @@ probes:
     expected_any: ["no", "not blocking", "no blocker"]
     forbidden: ["barandon is blocking", "waiting on barandon", "blocked by barandon"]
     harm_if_broken: "Invented blocker delays operator action on verified deadline."
+    remediation_hint: "refresh_mwk_priorities.py — remove Barandon blocker hallucination"
     severity: warn
 
   - name: arch.arta_1210_op_window
@@ -100,6 +109,7 @@ probes:
     expected_any: ["1210", "op", "appeal", "manifestation", "15 day", "president"]
     forbidden: ["motion for reconsideration", "mr is available"]
     harm_if_broken: "Wrong remedy path on 1210 — MR prohibited per 2023 ARTA Rules."
+    remediation_hint: "refresh_mwk_pending_matters.py — 1210 OP path"
     severity: warn
 
   - name: arch.promo_not_on_spine
@@ -109,6 +119,7 @@ probes:
     expected_any: ["not on spine", "excluded", "noise", "all-mail", "not a legal event"]
     forbidden: ["yes, promos are logged", "all received email is in client_history"]
     harm_if_broken: "Promotional mail back on spine — context pollution returns."
+    remediation_hint: "refresh_client_history.py — email policy line"
     severity: warn
 
   - name: arch.pending_matters_arta_op
@@ -118,4 +129,5 @@ probes:
     expected_any: ["arta", "0747", "1210", "op"]
     forbidden: ["only civil case 26-360", "no arta matters"]
     harm_if_broken: "Leo loses admin-track awareness — OP deadlines missed."
+    remediation_hint: "refresh_mwk_pending_matters.py + refresh_mwk_priorities.py"
     severity: warn
