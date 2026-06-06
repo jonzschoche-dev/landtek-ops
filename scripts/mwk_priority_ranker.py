@@ -313,7 +313,12 @@ def render_leo_const(queue: list[dict]) -> str:
         "LOWER rank_score = MORE urgent. Do NOT rank by date alone.",
         "",
     ]
-    for it in queue[:12]:
+    # Surface admin track in Leo const (ARTA/OP buried at P2 otherwise)
+    admin = [it for it in queue if (it.get("matter_code") or "").startswith("MWK-ARTA")
+             or (it.get("matter_code") or "").startswith("MWK-OP")]
+    rest = [it for it in queue if it not in admin]
+    show = (admin[:6] + rest[:6])[:12]
+    for it in show:
         due = f" due={it['due_date']}" if it.get("due_date") else ""
         L.append(
             f"  #{it['rank']} score={it['rank_score']} [{it['tier']}] "

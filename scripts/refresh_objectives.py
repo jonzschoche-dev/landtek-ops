@@ -22,6 +22,21 @@ WORKFLOW_ID = "vSDQv1vfn6627bnA"
 
 def fetch_objectives(cur) -> dict:
     f = {"refreshed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}
+    cur.execute("""
+        SELECT matter_code, docket_number, current_stage, next_event, status
+          FROM matters
+         WHERE case_file = 'MWK-001' AND status = 'active'
+           AND (matter_code LIKE 'MWK-ARTA%' OR matter_code LIKE 'MWK-OP%'
+                OR matter_code LIKE 'MWK-CV%')
+         ORDER BY matter_code
+    """)
+    raw_matters = cur.fetchall()
+    f["matter_rows"] = [
+        (r["matter_code"], r.get("docket_number"), r.get("current_stage"),
+         (r.get("next_event") or "")[:80])
+        for r in raw_matters
+    ]
+
     cur.execute("SELECT * FROM v_case_objectives ORDER BY case_file")
     raw_cases = cur.fetchall()
     f["cases"] = [
@@ -67,6 +82,14 @@ def fetch_objectives(cur) -> dict:
 
 def render(f: dict) -> str:
     L = ["", f"OBJECTIVES — per-matter live state (refreshed {f['refreshed_at']}, every 5 min):", ""]
+    if f.get("matter_rows"):
+        L.append("REGISTERED MATTERS — MWK-001 (ARTA / OP / Civil, from matters table):")
+        for mc, dock, stage, nxt in f["matter_rows"]:
+            L.append(f"  {mc} | {dock or '—'} | {stage or '—'}")
+            if nxt:
+                L.append(f"    next: {nxt}")
+        L.append("")
+
     L.append("ACTIVE MATTERS (operational snapshot):")
     if not f["cases"]:
         L.append("  (none in DB)")
@@ -119,7 +142,7 @@ def render(f: dict) -> str:
     L.append("USAGE — when asked:")
     L.append("  'who are the 20 transferees / how are they posturing?' → TRANSFEREES section above")
     L.append("  'where does Gloria Balane stand?' → find her in TRANSFEREES, cite accion_status + action_needed")
-    L.append("  'what matters are active?' → ACTIVE MATTERS table")
+    L.append("  'what matters are active?' / 'pending ARTA?' / 'OP cases?' → REGISTERED MATTERS above")
     L.append("  'how many transfer evaluations are gaps?' → TRANSFER EVALUATIONS line")
     L.append("  'any emails I haven't tagged?' → EMAILS UNTAGGED line + offer to triage")
     return "\n".join(L)

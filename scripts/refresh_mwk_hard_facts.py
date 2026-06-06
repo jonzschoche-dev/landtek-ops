@@ -99,7 +99,8 @@ def render_facts(d: dict) -> str:
     lines = [
         "",
         f"MWK CV-26360 HARD FACTS (verified-only, refreshed {at}):",
-        "RULE: Act ONLY on items below. If not listed → say 'not on record' — DO NOT infer.",
+        "SCOPE: Civil Case 26-360 only. For ARTA/OP pending cases → MWK_PENDING_MATTERS_TEXT.",
+        "RULE: Act ONLY on items below for CV-26360. If not listed → say 'not on record'.",
         "",
     ]
     m = d.get("matter")
