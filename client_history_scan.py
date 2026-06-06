@@ -85,42 +85,39 @@ def scan_documents(cur):
 OPERATOR_CLIENT = "Owner"  # Jonathan mailbox — all sent/received emails log here at minimum
 
 
-def scan_gmail(cur):
-    """Every email in gmail_messages → one client_history event (SENT + RECEIVED).
-
-    deploy_352: log ALL rows. Matter-linked mail keeps client_code (MWK-001 etc.);
-    unlinked promotional/system mail logs under Owner so the mailbox is searchable.
-    """
-    cur.execute("""
-        SELECT id, case_file, client_code, matter_codes, sent_at, received_at,
-               from_addr, to_addrs, subject, labels, has_attachments,
-               relevance_status
-          FROM gmail_messages
-         ORDER BY id
-    """)
-    msgs = cur.fetchall()
-    n = 0
-    for m in msgs:
-        matter_codes = list(m["matter_codes"] or [])
-        client_code = resolve_client_code(
-            cur,
-            case_file=m["case_file"],
-            matter_codes=matter_codes,
-            existing=m["client_code"],
-        ) or OPERATOR_CLIENT
-        case_file = m["case_file"]
-        if not case_file and matter_codes:
-            cur.execute(
-                "SELECT case_file FROM matters WHERE matter_code = %s LIMIT 1",
-                (matter_codes[0],),
-            )
-            r = cur.fetchone()
-            case_file = r["case_file"] if r else None
-        direction = "SENT" if "SENT" in (m["labels"] or []) else "RECEIVED"
-        evt_dt = m["sent_at"] or m["received_at"]
-        evt_date = evt_dt.date() if evt_dt else None
-        matter_code = gmail_history_matter_code(matter_codes)
-        goal_note = ""
+def _log_gmail_to_history(
+    cur,
+    m: dict,
+    *,
+    source_table: str,
+    citation_prefix: str,
+    client_code_existing: str | None = None,
+    relevance_status: str | None = None,
+    archived_reason: str | None = None,
+    link_correspondence: bool = True,
+) -> None:
+    """Write one gmail row (active or archived) into canonical client_history."""
+    matter_codes = list(m["matter_codes"] or [])
+    client_code = resolve_client_code(
+        cur,
+        case_file=m.get("case_file"),
+        matter_codes=matter_codes,
+        existing=client_code_existing,
+    ) or OPERATOR_CLIENT
+    case_file = m.get("case_file")
+    if not case_file and matter_codes:
+        cur.execute(
+            "SELECT case_file FROM matters WHERE matter_code = %s LIMIT 1",
+            (matter_codes[0],),
+        )
+        r = cur.fetchone()
+        case_file = r["case_file"] if r else None
+    direction = "SENT" if "SENT" in (m.get("labels") or []) else "RECEIVED"
+    evt_dt = m.get("sent_at") or m.get("received_at")
+    evt_date = evt_dt.date() if evt_dt else None
+    matter_code = gmail_history_matter_code(matter_codes)
+    goal_note = ""
+    if link_correspondence and source_table == "gmail_messages":
         cur.execute("""
             SELECT link_type, link_key, relation
               FROM correspondence_links
@@ -132,27 +129,79 @@ def scan_gmail(cur):
         if goal_links:
             parts = [f"{gl['link_type']}:{gl['link_key']}({gl['relation']})" for gl in goal_links]
             goal_note = f" [goals: {', '.join(parts)}]"
-        upsert_event(cur, {
-            "client_code": client_code,
-            "case_file": case_file,
-            "matter_code": matter_code,
-            "event_date": evt_date,
-            "event_datetime": evt_dt,
-            "event_kind": f"email_{direction.lower()}",
-            "source_table": "gmail_messages",
-            "source_id": str(m["id"]),
-            "who_from": m["from_addr"] or "—",
-            "who_to": ", ".join(m["to_addrs"] or [])[:200],
-            "what_summary": (
-                f"📧 {direction} — {(m['subject'] or '(no subject)')[:120]}{goal_note}"
-            ),
-            "citation_ref": (
-                f"gmail#{m['id']} status={m.get('relevance_status') or '?'}"
-                + (f" matter={matter_code}" if matter_code else "")
-            ),
-            "attachments": "yes" if m["has_attachments"] else None,
-            "provenance": "verified",
-        })
+    archive_note = f" [archived: {(archived_reason or 'noise')[:40]}]" if archived_reason else ""
+    status = relevance_status or ("archived" if source_table == "gmail_messages_archived" else "?")
+    upsert_event(cur, {
+        "client_code": client_code,
+        "case_file": case_file,
+        "matter_code": matter_code,
+        "event_date": evt_date,
+        "event_datetime": evt_dt,
+        "event_kind": f"email_{direction.lower()}",
+        "source_table": source_table,
+        "source_id": str(m["id"]),
+        "who_from": m.get("from_addr") or "—",
+        "who_to": ", ".join(m.get("to_addrs") or [])[:200],
+        "what_summary": (
+            f"📧 {direction} — {(m.get('subject') or '(no subject)')[:120]}{goal_note}{archive_note}"
+        ),
+        "citation_ref": (
+            f"{citation_prefix}#{m['id']} status={status}"
+            + (f" matter={matter_code}" if matter_code else "")
+        ),
+        "attachments": "yes" if m.get("has_attachments") else None,
+        "provenance": "verified" if source_table == "gmail_messages" else "archived",
+    })
+
+
+def scan_gmail(cur):
+    """Every email in gmail_messages → one client_history event (SENT + RECEIVED)."""
+    cur.execute("""
+        SELECT id, case_file, client_code, matter_codes, sent_at, received_at,
+               from_addr, to_addrs, subject, labels, has_attachments,
+               relevance_status
+          FROM gmail_messages
+         ORDER BY id
+    """)
+    n = 0
+    for m in cur.fetchall():
+        _log_gmail_to_history(
+            cur, m,
+            source_table="gmail_messages",
+            citation_prefix="gmail",
+            client_code_existing=m.get("client_code"),
+            relevance_status=m.get("relevance_status"),
+        )
+        n += 1
+    return n
+
+
+def scan_gmail_archived(cur):
+    """Every email in gmail_messages_archived → canonical client_history (deploy_353)."""
+    cur.execute("""
+        SELECT EXISTS (
+          SELECT 1 FROM information_schema.tables
+           WHERE table_schema = 'public' AND table_name = 'gmail_messages_archived'
+        ) AS ok
+    """)
+    if not cur.fetchone()["ok"]:
+        return 0
+    cur.execute("""
+        SELECT id, case_file, matter_codes, sent_at, received_at,
+               from_addr, to_addrs, subject, labels, has_attachments,
+               archived_reason
+          FROM gmail_messages_archived
+         ORDER BY id
+    """)
+    n = 0
+    for m in cur.fetchall():
+        _log_gmail_to_history(
+            cur, m,
+            source_table="gmail_messages_archived",
+            citation_prefix="gmail_archived",
+            archived_reason=m.get("archived_reason"),
+            link_correspondence=False,
+        )
         n += 1
     return n
 
@@ -402,6 +451,7 @@ def run_scan():
         totals = {
             "documents":           scan_documents(cur),
             "gmail":               scan_gmail(cur),
+            "gmail_archived":      scan_gmail_archived(cur),
             "chat_notes":          scan_chat_notes(cur),
             "transactions":        scan_transactions(cur),
             "deadlines":           scan_deadlines(cur),
