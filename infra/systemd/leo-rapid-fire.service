@@ -1,0 +1,15 @@
+[Unit]
+Description=LandTek rapid-fire architecture simulator (burst session)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+Environment="SIM_POLL_TIMEOUT=90"
+ExecStart=/usr/bin/python3 /root/landtek/scripts/rapid_fire_simulator.py --pack architecture --burst 12 --interval 5
+StandardOutput=append:/var/log/leo-rapid-fire.log
+StandardError=append:/var/log/leo-rapid-fire.log
+
+[Install]
+WantedBy=multi-user.target

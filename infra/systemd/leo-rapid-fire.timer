@@ -1,0 +1,10 @@
+[Unit]
+Description=Run architecture rapid-fire simulator twice daily
+
+[Timer]
+OnBootSec=10min
+OnCalendar=*-*-* 06,18:00:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
