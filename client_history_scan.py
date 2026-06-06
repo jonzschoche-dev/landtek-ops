@@ -82,20 +82,21 @@ def scan_documents(cur):
     return n
 
 
-def scan_gmail(cur):
-    """Every email (INBOX + SENT) → one event.
+OPERATOR_CLIENT = "Owner"  # Jonathan mailbox — all sent/received emails log here at minimum
 
-    deploy_342: include rows with client_code or matter_codes[], not only case_file.
+
+def scan_gmail(cur):
+    """Every email in gmail_messages → one client_history event (SENT + RECEIVED).
+
+    deploy_352: log ALL rows. Matter-linked mail keeps client_code (MWK-001 etc.);
+    unlinked promotional/system mail logs under Owner so the mailbox is searchable.
     """
     cur.execute("""
         SELECT id, case_file, client_code, matter_codes, sent_at, received_at,
                from_addr, to_addrs, subject, labels, has_attachments,
                relevance_status
           FROM gmail_messages
-         WHERE client_code IS NOT NULL
-            OR case_file IS NOT NULL
-            OR cardinality(COALESCE(matter_codes, '{}'::text[])) > 0
-            OR landtek_thread_id IS NOT NULL
+         ORDER BY id
     """)
     msgs = cur.fetchall()
     n = 0
@@ -106,9 +107,7 @@ def scan_gmail(cur):
             case_file=m["case_file"],
             matter_codes=matter_codes,
             existing=m["client_code"],
-        )
-        if not client_code:
-            continue
+        ) or OPERATOR_CLIENT
         case_file = m["case_file"]
         if not case_file and matter_codes:
             cur.execute(

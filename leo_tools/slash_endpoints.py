@@ -465,6 +465,66 @@ def api_email_pull():
                     "stdout": r.stdout[-500:], "stderr": r.stderr[-300:]})
 
 
+@bp.route("/api/email_search", methods=["POST", "GET"])
+def api_email_search():
+    """Search all logged gmail_messages (sent + received)."""
+    payload = request.get_json(silent=True) or {}
+    q = (payload.get("q") or request.args.get("q") or "").strip() or None
+    matter = (payload.get("matter") or request.args.get("matter") or "").strip() or None
+    client = (payload.get("client") or request.args.get("client") or "").strip() or None
+    direction = (payload.get("direction") or request.args.get("direction") or "all").lower()
+    days = payload.get("days") or request.args.get("days")
+    limit = int(payload.get("limit") or request.args.get("limit") or 20)
+    send = payload.get("send", False) if request.method == "POST" else (request.args.get("send", "0") == "1")
+
+    import subprocess
+    cmd = ["python3", "/root/landtek/scripts/search_emails.py", "--json", "--limit", str(limit)]
+    if q:
+        cmd.append(q)
+    if matter:
+        cmd += ["--matter", matter]
+    if client:
+        cmd += ["--client", client]
+    if direction in ("sent", "received"):
+        cmd += ["--direction", direction]
+    if days:
+        cmd += ["--days", str(int(days))]
+
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    rows = []
+    if r.returncode == 0 and r.stdout.strip():
+        try:
+            rows = json.loads(r.stdout)
+        except json.JSONDecodeError:
+            pass
+
+    text = None
+    if send and rows:
+        lines = [f"📧 <b>Email search</b> — {len(rows)} hit(s)", ""]
+        if q:
+            lines.append(f"<i>query: {q}</i>")
+        for row in rows[:15]:
+            mc = ", ".join(row.get("matter_codes") or []) or "—"
+            attach = " 📎" if row.get("has_attachments") else ""
+            lines.append(
+                f"<code>{row['citation']}</code> {row.get('date') or '?'} "
+                f"[{row.get('direction')}] [{mc}]{attach}"
+            )
+            lines.append(f"  {(row.get('subject') or '')[:90]}")
+            lines.append("")
+        text = "\n".join(lines)
+        tg_send(text)
+
+    return jsonify({
+        "ok": r.returncode == 0,
+        "q": q,
+        "count": len(rows),
+        "results": rows,
+        "sent": bool(send and text),
+        "stderr": (r.stderr or "")[-300:] if r.returncode != 0 else None,
+    })
+
+
 @bp.route("/api/dedupe", methods=["POST", "GET"])
 def api_dedupe():
     import subprocess

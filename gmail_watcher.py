@@ -361,6 +361,18 @@ def main():
             tag = "✓" if fail_c == 0 else ("⚠" if ok_c > 0 else "✗")
             print(f"  {tag} TG digest → {_name} ({_cid}): {ok_c} ok / {fail_c} fail")
 
+    # Append new mail to client_history spine (deploy_352 — every sent/received logged).
+    if not args.dry_run and (inserted or updated):
+        import subprocess
+        root = os.path.dirname(os.path.abspath(__file__))
+        try:
+            subprocess.run(
+                [sys.executable, os.path.join(root, "client_history_scan.py")],
+                check=False, capture_output=True, text=True, timeout=120,
+            )
+        except Exception as e:
+            print(f"  ⚠ client_history_scan after pull: {e!r}")
+
     cur.close(); conn.close()
 
 
