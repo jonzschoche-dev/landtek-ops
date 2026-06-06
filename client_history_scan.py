@@ -18,19 +18,11 @@ import sys
 
 sys.path.insert(0, "/root/landtek")
 from landtek_core import db
-
-
-def resolve_client_for_case(cur, case_file):
-    """Map a case_file → client_code via clients.case_file or matters lookup."""
-    if not case_file:
-        return None
-    cur.execute("SELECT client_code FROM clients WHERE case_file = %s LIMIT 1", (case_file,))
-    r = cur.fetchone()
-    if r:
-        return r["client_code"]
-    cur.execute("SELECT DISTINCT client_code FROM matters WHERE case_file = %s LIMIT 1", (case_file,))
-    r = cur.fetchone()
-    return r["client_code"] if r else None
+from correspondence_spine import (
+    gmail_history_matter_code,
+    resolve_client_code,
+    resolve_client_for_case,
+)
 
 
 def upsert_event(cur, row):
@@ -91,26 +83,60 @@ def scan_documents(cur):
 
 
 def scan_gmail(cur):
-    """Every email (INBOX + SENT) → one event."""
+    """Every email (INBOX + SENT) → one event.
+
+    deploy_342: include rows with client_code or matter_codes[], not only case_file.
+    """
     cur.execute("""
-        SELECT id, case_file, sent_at, received_at, from_addr, to_addrs, subject,
-               labels, has_attachments
+        SELECT id, case_file, client_code, matter_codes, sent_at, received_at,
+               from_addr, to_addrs, subject, labels, has_attachments,
+               relevance_status
           FROM gmail_messages
-         WHERE case_file IS NOT NULL OR landtek_thread_id IS NOT NULL
+         WHERE client_code IS NOT NULL
+            OR case_file IS NOT NULL
+            OR cardinality(COALESCE(matter_codes, '{}'::text[])) > 0
+            OR landtek_thread_id IS NOT NULL
     """)
     msgs = cur.fetchall()
     n = 0
     for m in msgs:
-        client_code = resolve_client_for_case(cur, m["case_file"])
+        matter_codes = list(m["matter_codes"] or [])
+        client_code = resolve_client_code(
+            cur,
+            case_file=m["case_file"],
+            matter_codes=matter_codes,
+            existing=m["client_code"],
+        )
         if not client_code:
             continue
+        case_file = m["case_file"]
+        if not case_file and matter_codes:
+            cur.execute(
+                "SELECT case_file FROM matters WHERE matter_code = %s LIMIT 1",
+                (matter_codes[0],),
+            )
+            r = cur.fetchone()
+            case_file = r["case_file"] if r else None
         direction = "SENT" if "SENT" in (m["labels"] or []) else "RECEIVED"
         evt_dt = m["sent_at"] or m["received_at"]
         evt_date = evt_dt.date() if evt_dt else None
+        matter_code = gmail_history_matter_code(matter_codes)
+        goal_note = ""
+        cur.execute("""
+            SELECT link_type, link_key, relation
+              FROM correspondence_links
+             WHERE gmail_id = %s
+               AND link_type IN ('company_obligation','client_goal')
+             LIMIT 3
+        """, (m["id"],))
+        goal_links = cur.fetchall()
+        if goal_links:
+            parts = [f"{gl['link_type']}:{gl['link_key']}({gl['relation']})" for gl in goal_links]
+            goal_note = f" [goals: {', '.join(parts)}]"
         upsert_event(cur, {
             "client_code": client_code,
-            "case_file": m["case_file"],
-            "matter_code": None,
+            "case_file": case_file,
+            "matter_code": matter_code,
             "event_date": evt_date,
             "event_datetime": evt_dt,
             "event_kind": f"email_{direction.lower()}",
@@ -118,8 +144,13 @@ def scan_gmail(cur):
             "source_id": str(m["id"]),
             "who_from": m["from_addr"] or "—",
             "who_to": ", ".join(m["to_addrs"] or [])[:200],
-            "what_summary": f"📧 {direction} — {(m['subject'] or '(no subject)')[:140]}",
-            "citation_ref": f"gmail#{m['id']} labels={','.join(m['labels'] or [])[:60]}",
+            "what_summary": (
+                f"📧 {direction} — {(m['subject'] or '(no subject)')[:120]}{goal_note}"
+            ),
+            "citation_ref": (
+                f"gmail#{m['id']} status={m.get('relevance_status') or '?'}"
+                + (f" matter={matter_code}" if matter_code else "")
+            ),
             "attachments": "yes" if m["has_attachments"] else None,
             "provenance": "verified",
         })

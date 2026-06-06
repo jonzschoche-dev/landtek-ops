@@ -1,0 +1,11 @@
+[Unit]
+Description=Run correspondence matcher every 15 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+AccuracySec=30s
+Unit=landtek-correspondence-matcher.service
+
+[Install]
+WantedBy=timers.target
