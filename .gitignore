@@ -78,3 +78,6 @@ notifications/blocked.txt
 # Pre-merge snapshots from the multi-agent git routine (see feedback_multi_agent_git_routine.md)
 *.mac-backup-*
 *.vps-backup-*
+
+# Generated derivative outputs — regenerable from producers
+drafts/
