@@ -296,6 +296,66 @@ def scan_title_transfers(cur):
     return n
 
 
+def scan_chat_notes(cur):
+    """Operator/Telegram facts → client_history (deploy_345).
+
+    tg_dispatcher auto-writes inbound text to chat_notes; this scanner closes the
+    loop into the append-only event ledger. Skips archived sim pollution.
+    """
+    cur.execute("""
+        SELECT cn.id, cn.created_at, cn.sender_name, cn.content, cn.summary,
+               cn.topic, cn.related_case, cn.client_id, cn.importance,
+               cn.provenance_level, cn.telegram_msg_id, c.client_code
+          FROM chat_notes cn
+          LEFT JOIN clients c ON c.id = cn.client_id
+         WHERE cn.archived IS NOT TRUE
+           AND cn.importance >= 4
+           AND cn.topic IN ('legal_strategy', 'deadlines', 'evidence', 'communications')
+    """)
+    n = 0
+    for r in cur.fetchall():
+        client_code = r["client_code"]
+        case_file = r["related_case"]
+        if not client_code and case_file:
+            client_code = resolve_client_for_case(cur, case_file)
+        if not client_code:
+            continue
+        matter_code = None
+        blob = f"{r['content'] or ''} {r['summary'] or ''}".upper()
+        if "26-360" in blob or "26360" in blob or "CV26360" in blob.replace("-", ""):
+            matter_code = "MWK-CV26360"
+        elif case_file:
+            cur.execute("""
+                SELECT matter_code FROM matters
+                 WHERE case_file = %s AND status = 'active'
+                 ORDER BY matter_code LIMIT 1
+            """, (case_file,))
+            mrow = cur.fetchone()
+            matter_code = mrow["matter_code"] if mrow else None
+        evt_dt = r["created_at"]
+        evt_date = evt_dt.date() if evt_dt else None
+        summary = (r["summary"] or r["content"] or "")[:240]
+        tg_ref = f" tg_msg={r['telegram_msg_id']}" if r["telegram_msg_id"] else ""
+        upsert_event(cur, {
+            "client_code": client_code,
+            "case_file": case_file,
+            "matter_code": matter_code,
+            "event_date": evt_date,
+            "event_datetime": evt_dt,
+            "event_kind": f"chat_{r['topic'] or 'note'}",
+            "source_table": "chat_notes",
+            "source_id": str(r["id"]),
+            "who_from": r["sender_name"] or "—",
+            "who_to": None,
+            "what_summary": f"💬 {summary}",
+            "citation_ref": f"chat_notes#{r['id']}{tg_ref}",
+            "attachments": None,
+            "provenance": r["provenance_level"] or "inferred_strong",
+        })
+        n += 1
+    return n
+
+
 def scan_intakes(cur):
     cur.execute("""
         SELECT sir.id, sir.deadline_id, sir.timing, sir.fired_at, sir.status,
@@ -342,6 +402,7 @@ def run_scan():
         totals = {
             "documents":           scan_documents(cur),
             "gmail":               scan_gmail(cur),
+            "chat_notes":          scan_chat_notes(cur),
             "transactions":        scan_transactions(cur),
             "deadlines":           scan_deadlines(cur),
             "instruments_on_title":scan_instruments_on_title(cur),

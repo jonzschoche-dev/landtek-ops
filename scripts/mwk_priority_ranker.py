@@ -212,23 +212,34 @@ def fetch_obligations(cur) -> list[dict]:
     return items
 
 
+def _fraud_title(indicator_type: str, tct: str) -> str:
+    labels = {
+        "post_death_registration": "Post-death RD registration",
+        "posthumous_execution": "Posthumous execution (verify date)",
+        "inconsistent_entries": "Duplicate RD entries",
+    }
+    return f"Fraud exhibit: {labels.get(indicator_type, indicator_type)} on {tct}"
+
+
 def fetch_fraud_exhibits(cur) -> list[dict]:
     cur.execute("""
-        SELECT id, tct_number, indicator_type, severity, description
+        SELECT id, tct_number, indicator_type, severity, description, affected_entry
           FROM fraud_indicators
          WHERE severity IN ('critical', 'high')
            AND tct_number IN ('T-52540', 'T-4497', 'T-079-2021002126', 'T-079-2021002127')
+           AND indicator_type NOT IN ('inconsistent_entries')
     """)
     items = []
     for r in cur.fetchall():
         tier = "P0" if r["severity"] == "critical" else "P1"
+        entry = f" Entry {r['affected_entry']}" if r.get("affected_entry") else ""
         items.append({
             "rank_score": rank_score(tier, days_override=10),
             "tier": tier,
             "source": "fraud_indicator",
             "source_id": str(r["id"]),
             "matter_code": "MWK-CV26360",
-            "title": f"Fraud exhibit: {r['indicator_type']} on {r['tct_number']}",
+            "title": _fraud_title(r["indicator_type"], r["tct_number"]) + entry,
             "due_date": None,
             "status": "open",
             "consensus": "leo_only",
