@@ -102,6 +102,12 @@ CV26360_MENTION_RE = re.compile(
     re.I,
 )
 
+DILG_SENDER_RE = re.compile(
+    r"(dilgcamarinesnorte|fldomingo@dilg|@dilg\.gov|region\d*dilg|"
+    r"dilgr\d*records|dilg5records|dilg_?records)",
+    re.I,
+)
+
 
 def parse_arta_matter_codes_from_text(haystack: str) -> list[str]:
     """Extract MWK-ARTA-#### codes from CTN SL docket references in email text."""
@@ -142,6 +148,13 @@ def sanitize_gmail_matter_codes(
             out.append(mc)
     if CV26360_MENTION_RE.search(haystack) and "MWK-CV26360" not in out:
         out.append("MWK-CV26360")
+    # DILG admin track — not Civil 26-360 unless explicitly cited above.
+    if (
+        not arta_codes
+        and DILG_SENDER_RE.search(from_addr or "")
+        and "MWK-ARTA-DILG" not in out
+    ):
+        out.append("MWK-ARTA-DILG")
     if valid_matter_codes is not None:
         out = [mc for mc in out if mc in valid_matter_codes]
     return out

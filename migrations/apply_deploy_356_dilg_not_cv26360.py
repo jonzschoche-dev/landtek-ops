@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""deploy_355 — ARTA autolink: CTN suffix only, not blanket CV-26360.
+"""deploy_356 — DILG mail is admin track (MWK-ARTA-DILG / CTN), not CV-26360.
 
-Removes litigationdivision@arta → MWK-CV26360 trigger rule.
-Backfills matter_codes from CTN SL text; strips CV26360 unless 26-360 cited.
-Fixes correspondence_links + client_history matter_code on affected gmail rows.
+Removes dilgcamarinesnorte → MWK-CV26360 trigger rule.
+Re-sanitizes DILG-tagged gmail rows; fixes correspondence_links + client_history.
+Companion fix: scripts/email_briefer.py SENDER_DEFAULT_MATTER (was re-tagging CV26360).
 """
 import os
 import sys
@@ -15,6 +15,7 @@ from correspondence_spine import (
 )
 from landtek_core import db
 
+# deploy_355 trigger minus DILG → CV26360 (deploy_356)
 TRIGGER_SQL = r"""
 CREATE OR REPLACE FUNCTION gmail_autolink_matters()
 RETURNS TRIGGER AS $$
@@ -34,7 +35,6 @@ BEGIN
     IF cardinality(COALESCE(NEW.matter_codes, '{}'::text[])) = 0 THEN
         IF sender_lower LIKE '%barandon_lawoffice%' THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
         IF sender_lower LIKE '%colenacious%'        THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
-        -- deploy_355/356: no blanket litigationdivision@arta or DILG → CV26360
         IF sender_lower LIKE '%lourdestotanes%'     THEN mc_set := array_append(mc_set, 'MWK-CV26360'::text); END IF;
 
         FOR m IN
@@ -68,7 +68,7 @@ BEGIN
             IF cardinality(COALESCE(valid_codes, '{}'::text[])) > 0 THEN
                 NEW.matter_codes := valid_codes;
                 NEW.relevance_reasons := COALESCE(NEW.relevance_reasons, '{}'::text[])
-                                         || ARRAY['deploy_355:trigger_autolink'];
+                                         || ARRAY['deploy_356:trigger_autolink'];
             END IF;
         END IF;
     END IF;
@@ -130,14 +130,14 @@ def _sync_links(cur, gmail_id: int, matter_codes: list[str]) -> None:
             INSERT INTO correspondence_links
               (gmail_id, link_type, link_key, relation, rationale, assessed_by)
             VALUES (%s, 'matter', %s, 'unclear',
-                    'deploy_355: matter_codes sanitized from CTN / 26-360 mention', 'deploy_355')
+                    'deploy_356: DILG/admin matter — not CV-26360 unless cited', 'deploy_356')
             ON CONFLICT (gmail_id, link_type, link_key) DO NOTHING
             """,
             (gmail_id, mc),
         )
 
 
-def _sync_client_history(cur, gmail_id: int, matter_codes: list[str], relevance_status: str) -> None:
+def _sync_client_history(cur, gmail_id: int, matter_codes: list[str]) -> None:
     primary = gmail_history_matter_code(matter_codes)
     if not primary:
         return
@@ -167,11 +167,11 @@ def main():
         valid = {r["matter_code"] for r in cur.fetchall()}
 
         cur.execute("""
-            SELECT id, from_addr, subject, body_plain, matter_codes, relevance_status
+            SELECT id, from_addr, subject, body_plain, matter_codes
               FROM gmail_messages
              WHERE 'MWK-CV26360' = ANY(matter_codes)
-                OR from_addr ILIKE '%litigationdivision@arta%'
-                OR subject ~* 'CTN\\s*SL'
+                OR from_addr ~* 'dilg'
+                OR subject ~* '\\mDILG\\M'
              ORDER BY id
         """)
         rows = cur.fetchall()
@@ -193,35 +193,39 @@ def main():
                    SET matter_codes = %s::text[],
                        relevance_status = CASE
                          WHEN cardinality(%s::text[]) > 0 THEN 'matter_linked'
-                         ELSE relevance_status
+                         ELSE 'unlinked'
                        END
                  WHERE id = %s
                 """,
                 (new, new, row["id"]),
             )
             _sync_links(cur, row["id"], new)
-            _sync_client_history(cur, row["id"], new, row["relevance_status"])
+            _sync_client_history(cur, row["id"], new)
             fixed.append((row["id"], old, new))
 
         cur.execute("""
             INSERT INTO deploy_log (deploy_id, summary) VALUES (
-              'deploy_355',
-              'ARTA autolink fix: CTN suffix → MWK-ARTA-#### only; CV26360 when 26-360 cited. '
-              'Stripped blanket litigationdivision@arta → CV26360 rule; backfilled matter_codes + links.'
+              'deploy_356',
+              'DILG decoupled from CV-26360: trigger + sanitize → MWK-ARTA-DILG or CTN suffix; '
+              'CV26360 only when 26-360 cited. email_briefer sender defaults fixed.'
             )
             ON CONFLICT (deploy_id) DO UPDATE SET summary = EXCLUDED.summary
         """)
 
-    print(f"✓ deploy_355: trigger updated; {len(fixed)} gmail row(s) sanitized")
-    for gid, old, new in fixed:
+    print(f"✓ deploy_356: DILG not CV-26360 — {len(fixed)} gmail row(s) sanitized")
+    for gid, old, new in fixed[:20]:
         print(f"  gmail#{gid}: {old} → {new}")
+    if len(fixed) > 20:
+        print(f"  … and {len(fixed) - 20} more")
 
     with db() as cur:
         cur.execute("""
-            SELECT id, matter_codes FROM gmail_messages WHERE id = 38220
+            SELECT id, matter_codes FROM gmail_messages
+             WHERE from_addr ILIKE '%dilgcamarinesnorte%'
+             ORDER BY id
         """)
-        r = cur.fetchone()
-        print(f"  verify gmail#38220: {list(r['matter_codes'] or [])}")
+        for r in cur.fetchall():
+            print(f"  dilg camnorte gmail#{r['id']}: {list(r['matter_codes'] or [])}")
 
 
 if __name__ == "__main__":
