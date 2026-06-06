@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""client_history_scan — append every event from every source into client_history.
+"""client_history_scan — append verified events into client_history.
+
+Gmail: legal events only (correspondence_spine.is_legal_event_email) — mail that
+may require a reaction or note for case development. Full mailbox remains in
+gmail_messages / v_gmail_canonical for audit search.
 
 Idempotent. Run after every ingest pass (or on a 30-min timer). Re-scans skip
 rows already in client_history (UNIQUE on source_table + source_id).
@@ -18,19 +22,12 @@ import sys
 
 sys.path.insert(0, "/root/landtek")
 from landtek_core import db
-
-
-def resolve_client_for_case(cur, case_file):
-    """Map a case_file → client_code via clients.case_file or matters lookup."""
-    if not case_file:
-        return None
-    cur.execute("SELECT client_code FROM clients WHERE case_file = %s LIMIT 1", (case_file,))
-    r = cur.fetchone()
-    if r:
-        return r["client_code"]
-    cur.execute("SELECT DISTINCT client_code FROM matters WHERE case_file = %s LIMIT 1", (case_file,))
-    r = cur.fetchone()
-    return r["client_code"] if r else None
+from correspondence_spine import (
+    gmail_history_matter_code,
+    is_relevant_for_canonical_history,
+    resolve_client_code,
+    resolve_client_for_case,
+)
 
 
 def upsert_event(cur, row):
@@ -90,41 +87,116 @@ def scan_documents(cur):
     return n
 
 
+OPERATOR_CLIENT = "Owner"  # fallback when matter-linked mail has no explicit client_code
+
+
+def _log_gmail_to_history(
+    cur,
+    m: dict,
+    *,
+    source_table: str,
+    citation_prefix: str,
+    client_code_existing: str | None = None,
+    relevance_status: str | None = None,
+    archived_reason: str | None = None,
+    link_correspondence: bool = True,
+) -> None:
+    """Write one gmail row (active or archived) into canonical client_history."""
+    matter_codes = list(m["matter_codes"] or [])
+    client_code = resolve_client_code(
+        cur,
+        case_file=m.get("case_file"),
+        matter_codes=matter_codes,
+        existing=client_code_existing,
+    ) or OPERATOR_CLIENT
+    case_file = m.get("case_file")
+    if not case_file and matter_codes:
+        cur.execute(
+            "SELECT case_file FROM matters WHERE matter_code = %s LIMIT 1",
+            (matter_codes[0],),
+        )
+        r = cur.fetchone()
+        case_file = r["case_file"] if r else None
+    direction = "SENT" if "SENT" in (m.get("labels") or []) else "RECEIVED"
+    evt_dt = m.get("sent_at") or m.get("received_at")
+    evt_date = evt_dt.date() if evt_dt else None
+    matter_code = gmail_history_matter_code(matter_codes)
+    goal_note = ""
+    if link_correspondence and source_table == "gmail_messages":
+        cur.execute("""
+            SELECT link_type, link_key, relation
+              FROM correspondence_links
+             WHERE gmail_id = %s
+               AND link_type IN ('company_obligation','client_goal')
+             LIMIT 3
+        """, (m["id"],))
+        goal_links = cur.fetchall()
+        if goal_links:
+            parts = [f"{gl['link_type']}:{gl['link_key']}({gl['relation']})" for gl in goal_links]
+            goal_note = f" [goals: {', '.join(parts)}]"
+    archive_note = f" [archived: {(archived_reason or 'noise')[:40]}]" if archived_reason else ""
+    status = relevance_status or ("archived" if source_table == "gmail_messages_archived" else "?")
+    upsert_event(cur, {
+        "client_code": client_code,
+        "case_file": case_file,
+        "matter_code": matter_code,
+        "event_date": evt_date,
+        "event_datetime": evt_dt,
+        "event_kind": f"email_{direction.lower()}",
+        "source_table": source_table,
+        "source_id": str(m["id"]),
+        "who_from": m.get("from_addr") or "—",
+        "who_to": ", ".join(m.get("to_addrs") or [])[:200],
+        "what_summary": (
+            f"📧 {direction} — {(m.get('subject') or '(no subject)')[:120]}{goal_note}{archive_note}"
+        ),
+        "citation_ref": (
+            f"{citation_prefix}#{m['id']} status={status}"
+            + (f" matter={matter_code}" if matter_code else "")
+        ),
+        "attachments": "yes" if m.get("has_attachments") else None,
+        "provenance": "verified" if source_table == "gmail_messages" else "archived",
+    })
+
+
 def scan_gmail(cur):
-    """Every email (INBOX + SENT) → one event."""
+    """Legal-event emails → canonical client_history (SENT + RECEIVED)."""
     cur.execute("""
-        SELECT id, case_file, sent_at, received_at, from_addr, to_addrs, subject,
-               labels, has_attachments
+        SELECT id, case_file, client_code, matter_codes, sent_at, received_at,
+               from_addr, to_addrs, subject, body_plain, labels, has_attachments,
+               relevance_status, raw_payload
           FROM gmail_messages
-         WHERE case_file IS NOT NULL OR landtek_thread_id IS NOT NULL
+         ORDER BY id
     """)
-    msgs = cur.fetchall()
     n = 0
-    for m in msgs:
-        client_code = resolve_client_for_case(cur, m["case_file"])
-        if not client_code:
+    for m in cur.fetchall():
+        raw = m.get("raw_payload") or {}
+        category = raw.get("category") if isinstance(raw, dict) else None
+        if not is_relevant_for_canonical_history(
+            from_addr=m.get("from_addr"),
+            subject=m.get("subject"),
+            body_plain=m.get("body_plain"),
+            relevance_status=m.get("relevance_status"),
+            client_code=m.get("client_code"),
+            case_file=m.get("case_file"),
+            matter_codes=list(m.get("matter_codes") or []),
+            raw_category=category,
+        ):
             continue
-        direction = "SENT" if "SENT" in (m["labels"] or []) else "RECEIVED"
-        evt_dt = m["sent_at"] or m["received_at"]
-        evt_date = evt_dt.date() if evt_dt else None
-        upsert_event(cur, {
-            "client_code": client_code,
-            "case_file": m["case_file"],
-            "matter_code": None,
-            "event_date": evt_date,
-            "event_datetime": evt_dt,
-            "event_kind": f"email_{direction.lower()}",
-            "source_table": "gmail_messages",
-            "source_id": str(m["id"]),
-            "who_from": m["from_addr"] or "—",
-            "who_to": ", ".join(m["to_addrs"] or [])[:200],
-            "what_summary": f"📧 {direction} — {(m['subject'] or '(no subject)')[:140]}",
-            "citation_ref": f"gmail#{m['id']} labels={','.join(m['labels'] or [])[:60]}",
-            "attachments": "yes" if m["has_attachments"] else None,
-            "provenance": "verified",
-        })
+        _log_gmail_to_history(
+            cur, m,
+            source_table="gmail_messages",
+            citation_prefix="gmail",
+            client_code_existing=m.get("client_code"),
+            relevance_status=m.get("relevance_status"),
+        )
         n += 1
     return n
+
+
+def scan_gmail_archived(cur):
+    """Archived noise mailbox — audit table only, not canonical history (deploy_354)."""
+    return 0
 
 
 def scan_transactions(cur):
@@ -265,6 +337,67 @@ def scan_title_transfers(cur):
     return n
 
 
+def scan_chat_notes(cur):
+    """Operator/Telegram facts → client_history (deploy_345).
+
+    tg_dispatcher auto-writes inbound text to chat_notes; this scanner closes the
+    loop into the append-only event ledger. Skips archived sim pollution.
+    """
+    cur.execute("""
+        SELECT cn.id, cn.created_at, cn.sender_name, cn.content, cn.summary,
+               cn.topic, cn.related_case, cn.client_id, cn.importance,
+               cn.provenance_level, cn.telegram_msg_id, c.client_code
+          FROM chat_notes cn
+          LEFT JOIN clients c ON c.id = cn.client_id
+         WHERE cn.archived IS NOT TRUE
+           AND cn.provenance_level = 'verified'
+           AND cn.importance >= 4
+           AND cn.topic IN ('legal_strategy', 'deadlines', 'evidence', 'communications')
+    """)
+    n = 0
+    for r in cur.fetchall():
+        client_code = r["client_code"]
+        case_file = r["related_case"]
+        if not client_code and case_file:
+            client_code = resolve_client_for_case(cur, case_file)
+        if not client_code:
+            continue
+        matter_code = None
+        blob = f"{r['content'] or ''} {r['summary'] or ''}".upper()
+        if "26-360" in blob or "26360" in blob or "CV26360" in blob.replace("-", ""):
+            matter_code = "MWK-CV26360"
+        elif case_file:
+            cur.execute("""
+                SELECT matter_code FROM matters
+                 WHERE case_file = %s AND status = 'active'
+                 ORDER BY matter_code LIMIT 1
+            """, (case_file,))
+            mrow = cur.fetchone()
+            matter_code = mrow["matter_code"] if mrow else None
+        evt_dt = r["created_at"]
+        evt_date = evt_dt.date() if evt_dt else None
+        summary = (r["summary"] or r["content"] or "")[:240]
+        tg_ref = f" tg_msg={r['telegram_msg_id']}" if r["telegram_msg_id"] else ""
+        upsert_event(cur, {
+            "client_code": client_code,
+            "case_file": case_file,
+            "matter_code": matter_code,
+            "event_date": evt_date,
+            "event_datetime": evt_dt,
+            "event_kind": f"chat_{r['topic'] or 'note'}",
+            "source_table": "chat_notes",
+            "source_id": str(r["id"]),
+            "who_from": r["sender_name"] or "—",
+            "who_to": None,
+            "what_summary": f"💬 {summary}",
+            "citation_ref": f"chat_notes#{r['id']}{tg_ref}",
+            "attachments": None,
+            "provenance": r["provenance_level"] or "inferred_strong",
+        })
+        n += 1
+    return n
+
+
 def scan_intakes(cur):
     cur.execute("""
         SELECT sir.id, sir.deadline_id, sir.timing, sir.fired_at, sir.status,
@@ -311,6 +444,8 @@ def run_scan():
         totals = {
             "documents":           scan_documents(cur),
             "gmail":               scan_gmail(cur),
+            "gmail_archived":      scan_gmail_archived(cur),
+            "chat_notes":          scan_chat_notes(cur),
             "transactions":        scan_transactions(cur),
             "deadlines":           scan_deadlines(cur),
             "instruments_on_title":scan_instruments_on_title(cur),

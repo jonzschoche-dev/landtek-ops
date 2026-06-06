@@ -1,0 +1,133 @@
+# Architecture probe library (deploy_357)
+#
+# Rapid-fire inquiries that stress-test spine discipline, matter tagging,
+# email policy, and ARTA/OP admin vs civil-case separation.
+#
+# Graded by substring rules ($0). Fired via:
+#   python3 scripts/rapid_fire_simulator.py --pack architecture
+
+pack: architecture
+
+probes:
+
+  - name: arch.email_legal_event_policy
+    sender_id: "999000001"
+    prompt: |
+      Jonathan: what emails belong on client_history vs the full mailbox?
+      When is mail a legal event?
+    expected_any: ["legal event", "reaction", "note", "search_emails", "all-mail", "relevant"]
+    forbidden: ["every email", "all emails on the spine", "all mail is logged to client_history"]
+    harm_if_broken: "Leo treats promos as case history — spine noise returns."
+    remediation_hint: "refresh_client_history.py — CLIENT_HISTORY email policy line"
+    severity: critical
+
+  - name: arch.arta_0747_not_cv26360
+    sender_id: "999000001"
+    prompt: |
+      The ARTA resolution NOC for CTN SL-2025-1021-0747 (gmail#38220) —
+      is that the same as Civil Case 26-360?
+    expected_any: ["0747", "arta", "separate", "admin", "not the same", "different"]
+    forbidden: ["yes, that is civil case 26-360", "same as cv-26360", "mwk-cv26360 only"]
+    harm_if_broken: "ARTA admin mis-tagged as civil trial track — wrong deadlines/obligations."
+    remediation_hint: "refresh_mwk_pending_matters.py — dual ARTA tracks"
+    severity: critical
+
+  - name: arch.dilg_not_cv26360
+    sender_id: "999000001"
+    prompt: |
+      Is DILG Cam Norte correspondence currently part of Civil Case 26-360?
+    expected_any: ["dilg", "arta-dilg", "admin", "separate", "not", "referral"]
+    forbidden: ["yes, part of civil case 26-360", "same matter as cv-26360"]
+    harm_if_broken: "DILG admin escalations pollute civil case narrative."
+    remediation_hint: "refresh_mwk_pending_matters.py — DILG vs CV26360 separation"
+    severity: critical
+
+  - name: arch.arta_0747_op_deadline
+    sender_id: "999000001"
+    prompt: |
+      What is the OP appeal / manifestation deadline for ARTA-0747 after the May resolution NOC?
+    expected_any: ["june 10", "2026-06-10", "10 jun", "06-10"]
+    forbidden: ["no deadline", "i don't know", "not in our records"]
+    harm_if_broken: "Missed OP window on 0747 — administrative remedy lost."
+    remediation_hint: "refresh_mwk_pending_matters.py + refresh_mwk_priorities.py — deadline#7"
+    severity: critical
+
+  - name: arch.del_rosario_1210_may
+    sender_id: "999000001"
+    prompt: |
+      What did Del Rosario say in May about ARTA-1210? Cite the email if you can.
+    expected_any: ["20132", "del rosario", "closure", "op", "supervisory", "gmail"]
+    forbidden: ["no record", "i have no verified source", "not in our files"]
+    harm_if_broken: "Leo blind to verified May thread — OP strategy uninformed."
+    remediation_hint: "refresh_mwk_pending_matters.py — gmail#20132 thread"
+    severity: warn
+
+  - name: arch.dual_arta_manifestations
+    sender_id: "999000001"
+    prompt: |
+      Are ARTA-1210 and ARTA-0747 a single combined OP manifestation or two separate tracks?
+    expected_any: ["separate", "two", "dual", "distinct", "1210", "0747"]
+    forbidden: ["single manifestation", "one filing covers both", "combined task"]
+    harm_if_broken: "Collapsed obligations — wrong filing pack / missed deadline."
+    remediation_hint: "refresh_mwk_pending_matters.py — obligations #2 and #9"
+    severity: critical
+
+  - name: arch.gmail_38220_citation
+    sender_id: "999000001"
+    prompt: |
+      Cite the gmail id for the 0747 resolution notice of closure from ARTA Litigation.
+    expected_any: ["38220", "gmail#38220"]
+    forbidden: ["i cannot cite", "no gmail id", "unknown message"]
+    harm_if_broken: "Cannot anchor claims to verified mail — provenance discipline fails."
+    remediation_hint: "refresh_mwk_pending_matters.py + client_history_scan.py"
+    severity: warn
+
+  - name: arch.mediation_impasse_cv26360
+    sender_id: "999000001"
+    prompt: |
+      What was the outcome of mediation in Civil Case 26-360?
+    expected_any: ["impasse", "held", "june", "disagree"]
+    forbidden: ["settled", "successful mediation", "parties agreed"]
+    harm_if_broken: "Hallucinated mediation outcome corrupts trial prep."
+    remediation_hint: "refresh_mwk_hard_facts.py — chat_notes#1209 impasse"
+    severity: critical
+
+  - name: arch.no_barandon_blocker_0747
+    sender_id: "999000001"
+    prompt: |
+      Is Atty. Barandon blocking the ARTA-0747 OP appeal filing?
+    expected_any: ["no", "not blocking", "no blocker"]
+    forbidden: ["barandon is blocking", "waiting on barandon", "blocked by barandon"]
+    harm_if_broken: "Invented blocker delays operator action on verified deadline."
+    remediation_hint: "refresh_mwk_priorities.py — remove Barandon blocker hallucination"
+    severity: warn
+
+  - name: arch.arta_1210_op_window
+    sender_id: "999000001"
+    prompt: |
+      For ARTA-1210, what is the supervisory review / OP path after the May resolution NOC?
+    expected_any: ["1210", "op", "appeal", "manifestation", "15 day", "president"]
+    forbidden: ["motion for reconsideration", "mr is available"]
+    harm_if_broken: "Wrong remedy path on 1210 — MR prohibited per 2023 ARTA Rules."
+    remediation_hint: "refresh_mwk_pending_matters.py — 1210 OP path"
+    severity: warn
+
+  - name: arch.promo_not_on_spine
+    sender_id: "999000001"
+    prompt: |
+      Are Redfin or newsletter promos in Leo's canonical client_history?
+    expected_any: ["not on spine", "excluded", "noise", "all-mail", "not a legal event"]
+    forbidden: ["yes, promos are logged", "all received email is in client_history"]
+    harm_if_broken: "Promotional mail back on spine — context pollution returns."
+    remediation_hint: "refresh_client_history.py — email policy line"
+    severity: warn
+
+  - name: arch.pending_matters_arta_op
+    sender_id: "999000001"
+    prompt: |
+      List the active ARTA and OP admin matters for MWK — not the civil trial track.
+    expected_any: ["arta", "0747", "1210", "op"]
+    forbidden: ["only civil case 26-360", "no arta matters"]
+    harm_if_broken: "Leo loses admin-track awareness — OP deadlines missed."
+    remediation_hint: "refresh_mwk_pending_matters.py + refresh_mwk_priorities.py"
+    severity: warn

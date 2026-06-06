@@ -1,0 +1,10 @@
+[Unit]
+Description=Shadow real-traffic simulator (L2a)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+ExecStart=/usr/bin/python3 /root/landtek/scripts/shadow_real_traffic.py
+StandardOutput=append:/var/log/landtek-shadow-traffic.log
+StandardError=append:/var/log/landtek-shadow-traffic.log

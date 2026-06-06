@@ -1,0 +1,13 @@
+[Unit]
+Description=LandTek — Opus-driven probe generator (deploy_299)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+EnvironmentFile=/root/landtek/.env
+ExecStart=/usr/bin/python3 /root/landtek/scripts/leo_qa_probe_generator.py
+StandardOutput=append:/var/log/leo-qa-probe-generator.log
+StandardError=append:/var/log/leo-qa-probe-generator.log
+TimeoutStartSec=300

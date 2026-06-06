@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek correspondence matcher (email to goals/duties)
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/correspondence_matcher.py
+StandardOutput=append:/var/log/landtek/correspondence_matcher.log
+StandardError=append:/var/log/landtek/correspondence_matcher.log

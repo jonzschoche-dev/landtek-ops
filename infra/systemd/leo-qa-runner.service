@@ -1,0 +1,10 @@
+[Unit]
+Description=Leo QA runner — retroactive probes (L2b)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+ExecStart=/usr/bin/python3 /root/landtek/scripts/leo_qa_runner.py
+StandardOutput=append:/var/log/leo-qa-runner.log
+StandardError=append:/var/log/leo-qa-runner.log

@@ -27,6 +27,7 @@ JONATHAN_TG_ID = "6513067717"  # legacy reference; outbound now uses comms_recip
 import sys as _sys
 _sys.path.insert(0, "/root/landtek")
 from comms_recipients import MWK_001_RECIPIENTS
+from correspondence_spine import resolve_client_code
 
 # ── Category detection patterns ────────────────────────────────────────
 CATEGORY_PATTERNS = [
@@ -242,6 +243,7 @@ def main():
 
         category, conf = classify_email(subject, plain, from_addr)
         case_file = correlate_case(f"{subject} {plain}", by_case)
+        client_code = resolve_client_code(cur, case_file=case_file)
         stats[category] = stats.get(category, 0) + 1
 
         # Bill metadata if applicable
@@ -299,18 +301,19 @@ def main():
             INSERT INTO gmail_messages
               (message_id, thread_id, from_addr, to_addrs, cc_addrs, subject,
                body_plain, body_html, sent_at, received_at, labels,
-               has_attachments, attachment_refs, case_file,
+               has_attachments, attachment_refs, case_file, client_code,
                relevance_score, relevance_reasons, raw_payload)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s::jsonb)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s::jsonb)
             ON CONFLICT (message_id) DO UPDATE SET
               case_file = COALESCE(EXCLUDED.case_file, gmail_messages.case_file),
+              client_code = COALESCE(EXCLUDED.client_code, gmail_messages.client_code),
               labels = EXCLUDED.labels,
               attachment_refs = EXCLUDED.attachment_refs
             RETURNING (xmax = 0) AS is_new
         """, (m["id"], thread_id, from_addr, to_addrs, cc_addrs, subject,
               plain[:50000], html[:50000] if html else None, received_at, received_at,
               labels, bool(attachments), json.dumps(attachments) if attachments else None,
-              case_file, conf, [category],
+              case_file, client_code, conf, [category],
               json.dumps({"category": category, "bill_metadata": bill_meta})))
         is_new = cur.fetchone()["is_new"]
         if is_new: inserted += 1
@@ -395,6 +398,18 @@ def main():
         for _name, _cid, ok_c, fail_c in per_recipient_results:
             tag = "✓" if fail_c == 0 else ("⚠" if ok_c > 0 else "✗")
             print(f"  {tag} TG digest → {_name} ({_cid}): {ok_c} ok / {fail_c} fail")
+
+    # Append new mail to client_history spine (deploy_352 — every sent/received logged).
+    if not args.dry_run and (inserted or updated):
+        import subprocess
+        root = os.path.dirname(os.path.abspath(__file__))
+        try:
+            subprocess.run(
+                [sys.executable, os.path.join(root, "client_history_scan.py")],
+                check=False, capture_output=True, text=True, timeout=120,
+            )
+        except Exception as e:
+            print(f"  ⚠ client_history_scan after pull: {e!r}")
 
     cur.close(); conn.close()
 

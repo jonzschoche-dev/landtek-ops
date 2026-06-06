@@ -57,7 +57,7 @@ CRITICAL_SUBJECT_RE = re.compile(
 
 # Inline matter-code linkage rules (mirrors deploy_226/261)
 CTN_RE = re.compile(
-    r"\bCTN\s*[-:]?\s*SL\s*[-]?\s*(\d{4})\s*[-]?\s*(\d{4})\s*[-]?\s*(\d{3,4})\b",
+    r"\bCTN\s*s?\s*[-:]?\s*SL\s*[-]?\s*(\d{4})\s*[-]?\s*(\d{4})\s*[-]?\s*(\d{3,4})\b",
     re.IGNORECASE,
 )
 CV_KNOWN = {
@@ -72,8 +72,7 @@ CV_KNOWN = {
 SENDER_DEFAULT_MATTER = {
     "barandon_lawoffice@yahoo.com": "MWK-CV26360",
     "colenacious@yahoo.com":        "MWK-CV26360",
-    "dilgcamarinesnorte2020@gmail.com": "MWK-CV26360",
-    "litigationdivision@arta.gov.ph":   "MWK-CV26360",
+    "dilgcamarinesnorte2020@gmail.com": "MWK-ARTA-DILG",
     "lourdestotanes@yahoo.com":     "MWK-CV26360",
 }
 
@@ -133,31 +132,18 @@ def ensure_schema(cur):
 
 
 def derive_matters(from_addr, subject, body):
-    """Apply same regex/sender rules as deploy_261. Returns set of matter_codes."""
-    out = set()
-    haystack = " ".join([from_addr or "", subject or "", body or ""])
-    sender_lower = (from_addr or "").lower()
+    """Shared sanitize rules (correspondence_spine.sanitize_gmail_matter_codes)."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from correspondence_spine import sanitize_gmail_matter_codes
 
-    # Sender-based default
-    for k, mc in SENDER_DEFAULT_MATTER.items():
-        if k in sender_lower:
-            out.add(mc)
-
-    # CTN SL → MWK-ARTA-<suffix>
-    for m in CTN_RE.finditer(haystack):
-        suffix = m.group(3)
-        if len(suffix) == 3:
-            suffix = "0" + suffix
-        out.add(f"MWK-ARTA-{suffix}")
-
-    # Civil Case known numbers
-    cv = re.compile(r"\b(?:Civil\s+Case|CV|Case)\s*(?:No\.?)?\s*[-]?\s*(\d{1,4})[-]?(\d{1,4})\b", re.IGNORECASE)
-    for m in cv.finditer(haystack):
-        candidates = [f"{m.group(1)}-{m.group(2)}", f"{m.group(1)}{m.group(2)}"]
-        for c in candidates:
-            if c in CV_KNOWN:
-                out.add(CV_KNOWN[c])
-    return out
+    return set(
+        sanitize_gmail_matter_codes(
+            from_addr=from_addr,
+            subject=subject,
+            body_plain=body,
+            matter_codes=[],
+        )
+    )
 
 
 def fetch_valid_matter_codes(cur):

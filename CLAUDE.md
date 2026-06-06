@@ -221,6 +221,111 @@ n8n at port 5678 (workflow ID `vSDQv1vfn6627bnA` = "Leos Workflow"). Triggered b
 bot @LeoLandTekBot. Tool nodes hit the leo-tools Flask above. Thread #5 scope discipline
 is enforced via `thread_scope_sql` predicate.
 
+## Leo Simulator + Smartness Loop (deploys 298–309)
+
+Adversarial QA harness that drives Leo with ~4,320 synthetic Telegram messages per day,
+grades his replies against expected/forbidden substrings, and feeds failures into an
+Opus-driven improvement proposer. **Always on; never auto-stops.**
+
+**Operational map:**
+
+| Component | Where | Cadence |
+|---|---|---|
+| Simulator daemon | `systemctl status leo-simulator.service` | 20s cycle |
+| Probe generator (Opus writes 5 new probes/cycle) | `leo-qa-probe-generator.timer` | every 30 min |
+| Leak sentinel (alert-only) | crontab → `scripts/sim_leak_sentinel.py` | every 60s |
+| Improvement proposer (Opus drafts patches) | crontab → `scripts/leo_improvement_proposer.py` | every 4h |
+| Auto-verifier (measures attributable improvement) | crontab → `scripts/leo_proposal_auto_verify.py` | every 30 min |
+| Daily digest to Jonathan | crontab → `scripts/sim_daily_digest.py` | 23:00 UTC |
+
+**Sim sender registry** (`authorized_users` rows 4–8):
+
+| telegram_user_id | persona | `sim_target_role` | what it probes |
+|---|---|---|---|
+| 999000001 | sim-jonathan | `owner` | Leo's behavior with the operator |
+| 999000002 | sim-stranger | `unauthorized` | refusal path |
+| 999000003 | sim-allan-shape | NULL (impersonator) | Allan impersonation defense |
+| 999000004 | sim-kristyle-shape | NULL (impersonator) | Kristyle impersonation defense |
+| 999000005 | sim-jane-doe-new | `new_prospect` | onboarding flow |
+
+**Four hard rules in AI Agent systemMessage** (sim safety, MUST NOT remove):
+- **Rule S1** — if `sender.id` starts with `999000`, NO write tools fire (chat_note,
+  calendar_event, landscape_update, etc.). Reply text only.
+- **Rule S2** — identity integrity: tool-call `sender_id` MUST equal
+  `$('Telegram Trigger').first().json.message.from.id` — never substitute with a
+  looked-up real telegram_id of someone the prompt mentions by name.
+- **Rule S3** — never fabricate incident counts ("9th recorded time") or "see notes N,
+  N, N" references. If you need prior history, query `chat_notes` for the exact
+  sender_id; if zero rows, say "no prior records."
+- **Rule S4** — sim auth elevation: when sender is in sim range AND `sim_target_role` is
+  not null, treat as that role's privileges for read access. Shape impersonators (NULL
+  role) stay refused.
+
+**Rule S14 — Telegram messages must be human-readable, one-point, one-at-a-time**
+(established 2026-06-07 by Jonathan; enforced in `scripts/tg_send.py`):
+
+1. **Plain language only.** No HTML tags, no markdown bold/italic, no `<code>` blocks,
+   no bullet lists, no numbered lists. If you wouldn't say it to someone across a
+   table, don't put it in a Telegram message.
+2. **One point per message.** Every message says one thing. If there's a second
+   thing to say, it waits.
+3. **No double-tap to Jonathan.** After any outbound message lands in his Telegram
+   (chat_id `6513067717`), the next outbound message to him is BLOCKED until he
+   replies. Background processes do not get to chain alerts into his phone.
+   Override only on true P0 (override_pacing=True), and only the source that
+   requests the override owns the consequence.
+
+`scripts/tg_send.py` enforces all three: `sanitize_for_human()` strips markup
+and caps at 280 chars; `_is_jonathan_awaiting_reply()` blocks chains. Violations
+log to `outbound_blocks` with reason `S14_*`.
+
+**Workflow safety gates** (deploy_300 + deploy_308):
+- Every Telegram-send node in the workflow rewrites `chatId` to `'0'` when the
+  Trigger sender starts with `999000`. Telegram returns 400 chat-not-found, the
+  node fails with `onError=continueRegularOutput`, exec continues to Log Leo
+  Interaction. **No sim message ever reaches a real chat_id.**
+
+**Tables:**
+- `leo_qa_probes` — probe library (rail in `truth|mandate|business_health|sim`)
+- `leo_qa_sim_payloads` — every sim tick's record + reply + grading
+- `leo_qa_runs` — historical run rollup
+- `leo_qa_violations` — open/close failure incidents
+- `leo_improvement_proposals` — Opus-drafted patches (pending → applied → verified)
+- `leo_workflow_snapshots` — pre-patch nodes JSON for rollback
+- `sim_leak_incidents` — if sentinel ever sees a non-sim chat_id touched by a sim exec
+- Views: `leo_qa_24h`, `leo_qa_sim_24h`
+
+**Operator quick commands:**
+
+```bash
+# Status (phone-friendly)
+python3 /root/landtek/scripts/sim_status.py            # snapshot
+python3 /root/landtek/scripts/sim_status.py allan      # drill down by keyword
+python3 /root/landtek/scripts/sim_trend.py             # 7-day learning trend
+
+# Smartness loop
+python3 scripts/leo_proposal_apply.py <id>             # apply an Opus proposal
+python3 scripts/leo_proposal_apply.py <id> --dry       # preview
+python3 scripts/leo_proposal_apply.py --rollback <snap_id>
+python3 scripts/leo_proposal_verify.py <id>            # measure delta after apply
+
+# Force a probe to run next (sets last_run_at to NULL)
+psql … -c "UPDATE leo_qa_probes SET last_run_at = NULL WHERE name = '…'"
+
+# Pause / resume (Jonathan ONLY — sentinel does not auto-stop)
+systemctl stop leo-simulator.service
+systemctl start leo-simulator.service
+```
+
+**Do not, ever:**
+- Remove Rules S1/S2/S3/S4 without replacing them — 287 chat_notes were
+  corrupted in 3 hours when these weren't present (deploy_306 cleanup).
+- Add a new Telegram-send node to the workflow without applying the
+  `chatId = sim-guard ? '0' : <orig>` wrap (see `scripts/sim_gate.py`).
+- Auto-apply Opus proposals — Jonathan retains the only decision point.
+- Auto-stop the simulator on leak detection — "no pauses" is a directive
+  (the sentinel is alert-only).
+
 ## Current operational state (snapshot)
 
 - 388 documents indexed, 329 with drive_file_id
@@ -241,4 +346,7 @@ is enforced via `thread_scope_sql` predicate.
 - Don't present inference-grade data as fact in legal output
 - Don't make up TCT relationships — verify via title_chain WHERE provenance_level='verified'
 - Don't assume Cabanbanan/San Vicente land is part of the T-4497 case (it's a separate matter)
+- Don't assume T-30683 (Manguisoc Mercedes) is a T-4497 derivative — it's a separate matter
+- MMK ≠ MWK invariant — never conflate Mary Worrick Keesey with MMK
 - Don't run unauthenticated Gemini calls in tight loops (use the fallback key on 429)
+- Don't break the simulator's safety gates — read the "Leo Simulator + Smartness Loop" section above

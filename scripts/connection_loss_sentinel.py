@@ -179,6 +179,14 @@ def main():
         exec_id = str(e["id"])
         info = analyze_exec(cur, exec_id)
 
+        # deploy_311: skip sim execs — they have their own grader + leak sentinel.
+        # Silence/error on a sim sender (999000001-005) is expected behavior when
+        # Reply nodes are gated to chat_id=0 (deploy_300). Paging on these would
+        # bombard Jonathan with non-actionable noise.
+        sender_id = (info or {}).get("sender_id") or ""
+        if sender_id.startswith("999000"):
+            continue
+
         # Error executions — page even though memory-tail is fail-safe (new class)
         if e["status"] == "error" and not already_alerted(cur, exec_id, "exec_error"):
             error_hits.append((exec_id, info))
