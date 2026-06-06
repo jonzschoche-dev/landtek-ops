@@ -30,10 +30,10 @@ def main():
         CREATE OR REPLACE VIEW v_client_goals AS
         SELECT ('obligation_' || o.id::text) AS goal_id,
                COALESCE(
-                 NULLIF(o.client_code, ''),
                  CASE WHEN o.case_file = 'MWK-001' THEN 'MWK-001'
                       WHEN o.case_file = 'Paracale-001' THEN 'Paracale-001'
-                      ELSE o.client_code END
+                      ELSE NULL END,
+                 NULLIF(o.client_code, '')
                ) AS client_code,
                'landtek_duty'::text AS goal_kind,
                o.short_label,

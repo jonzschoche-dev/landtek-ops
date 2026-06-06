@@ -75,9 +75,16 @@ def rank_score(tier: str, *, due: date | None = None, days_override: int | None 
     return t * 1000 + time_part
 
 
+STAGE_TO_MATTER = {
+    "pretrial": "MWK-CV26360",
+    "send_demand_letter": "MWK-TCT4497",
+    "mediation": "MWK-CV26360",
+}
+
+
 def fetch_deadlines(cur) -> list[dict]:
     cur.execute("""
-        SELECT id, title, due_date, status, priority_tier, stage_key, matter_code,
+        SELECT id, title, due_date, status, priority_tier, stage_key,
                priority_consensus_state, priority_leo, priority_jonathan
           FROM case_deadlines
          WHERE case_file = %s AND status IN ('pending', 'at_risk')
@@ -86,12 +93,14 @@ def fetch_deadlines(cur) -> list[dict]:
     for r in cur.fetchall():
         tier = r["priority_tier"] or r["priority_leo"] or "P3"
         due = r["due_date"]
+        sk = r.get("stage_key") or ""
+        matter = STAGE_TO_MATTER.get(sk)
         items.append({
             "rank_score": rank_score(tier, due=due),
             "tier": tier,
             "source": "deadline",
             "source_id": str(r["id"]),
-            "matter_code": r.get("matter_code"),
+            "matter_code": matter,
             "title": r["title"],
             "due_date": due.isoformat() if due else None,
             "status": r["status"],
