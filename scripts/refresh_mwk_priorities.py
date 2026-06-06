@@ -43,7 +43,7 @@ def patch_const(code: str, body: str) -> tuple[str, bool]:
     if ret_anchor in code and "${MWK_PRIORITIES_TEXT}" not in code:
         code = code.replace(
             ret_anchor,
-            "\n${isSimulation ? '' : MWK_PRIORITIES_TEXT}\n" + ret_anchor,
+            "\n${MWK_PRIORITIES_TEXT}\n" + ret_anchor,
             1,
         )
     return (code, True)

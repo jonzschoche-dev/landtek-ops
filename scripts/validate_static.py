@@ -90,11 +90,24 @@ def validate(nodes) -> tuple[list[str], list[str]]:
                 passes.append(f"const_present:{c}")
             else:
                 fails.append(f"CONST MISSING: const {c} not in Context Builder jsCode")
-        # Sim-strip pattern (deploy_331/332/334)
+        # Sim-strip pattern (deploy_331 heavy blocks only; deploy_360 arch blocks always on)
         if "isSimulation" in code:
             passes.append("sim_strip_present")
         else:
             fails.append("SIM STRIP MISSING: isSimulation gate not in Context Builder")
+        arch_blocks = [
+            "OBJECTIVES_TEXT",
+            "CLIENT_HISTORY_TEXT",
+            "MWK_PENDING_MATTERS_TEXT",
+            "MWK_PRIORITIES_TEXT",
+            "MWK_CV26360_HARD_FACTS_TEXT",
+        ]
+        for block in arch_blocks:
+            bad = f"${{isSimulation ? '' : {block}}}"
+            if bad in code:
+                fails.append(f"ARCH SIM STRIP: {block} must inject during simulation (deploy_360)")
+            elif f"${{{block}}}" in code:
+                passes.append(f"arch_always_on:{block}")
 
     # Telegram send-node sim gates (deploy_300)
     # Look at the raw chatId / jsonBody value — n8n stores 999 as the

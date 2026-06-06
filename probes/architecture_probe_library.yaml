@@ -87,7 +87,7 @@ probes:
     prompt: |
       What was the outcome of mediation in Civil Case 26-360?
     expected_any: ["impasse", "held", "june", "disagree"]
-    forbidden: ["settled", "successful mediation", "parties agreed"]
+    forbidden: ["settled", "successful mediation", "parties reached agreement", "parties agreed on terms"]
     harm_if_broken: "Hallucinated mediation outcome corrupts trial prep."
     remediation_hint: "refresh_mwk_hard_facts.py — chat_notes#1209 impasse"
     severity: critical

@@ -160,8 +160,8 @@ def patch_const(code: str, body: str) -> tuple[str, bool]:
     new_const = f"\n\nconst {const} = `{body}`;\n"
     code = code[:end] + new_const + code[end:]
 
-    inject = "${isSimulation ? '' : MWK_PENDING_MATTERS_TEXT}"
-    agent_anchor = "${isSimulation ? '' : MWK_PRIORITIES_TEXT}"
+    inject = "${MWK_PENDING_MATTERS_TEXT}"
+    agent_anchor = "${MWK_PRIORITIES_TEXT}"
     if agent_anchor in code and inject not in code:
         code = code.replace(agent_anchor, f"{inject}\n\n{agent_anchor}", 1)
     return (code, True)

@@ -165,7 +165,7 @@ def patch_const(code: str, body: str) -> tuple[str, bool]:
     new_const = f"\n\nconst MWK_CV26360_HARD_FACTS_TEXT = `{body}`;\n"
     code = code[:end] + new_const + code[end:]
     ret_anchor = "`;\n\nreturn [{"
-    inject = "${isSimulation ? '' : MWK_CV26360_HARD_FACTS_TEXT}"
+    inject = "${MWK_CV26360_HARD_FACTS_TEXT}"
     if ret_anchor in code and inject not in code:
         code = code.replace(
             ret_anchor,

@@ -169,7 +169,7 @@ def patch_const(code: str, body: str) -> tuple[str, bool]:
     if ret_anchor in code and "${OBJECTIVES_TEXT}" not in code:
         code = code.replace(
             ret_anchor,
-            "\n${isSimulation ? '' : OBJECTIVES_TEXT}\n" + ret_anchor, 1
+            "\n${OBJECTIVES_TEXT}\n" + ret_anchor, 1
         )
     return (code, True)
 

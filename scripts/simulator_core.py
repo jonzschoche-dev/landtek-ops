@@ -166,19 +166,50 @@ def post_synthetic_webhook(sender_id: str, sender_name: str, text: str) -> dict:
     return update
 
 
-def wait_for_reply(cur, sender_id: str, since_ts) -> dict | None:
+def wait_for_reply(
+    cur,
+    sender_id: str,
+    since_ts,
+    *,
+    prompt_text: str | None = None,
+) -> dict | None:
+    """Wait for Leo reply. When prompt_text is set, match leo_interactions.question
+    so rapid-fire bursts on one sim sender do not grade the wrong reply."""
     deadline = time.time() + POLL_TIMEOUT
+    prompt_key = None
+    if prompt_text:
+        # Use first non-empty line — stable key for LIKE match on question column.
+        for line in prompt_text.splitlines():
+            line = line.strip()
+            if line:
+                prompt_key = line[:160]
+                break
     while time.time() < deadline:
-        cur.execute(
-            """
-            SELECT id, timestamp, sender_id, reply_text, execution_id
-              FROM leo_interactions
-             WHERE sender_id = %s
-               AND timestamp >= %s
-             ORDER BY id DESC LIMIT 1
-            """,
-            (sender_id, since_ts),
-        )
+        if prompt_key:
+            cur.execute(
+                """
+                SELECT id, timestamp, sender_id, reply_text, execution_id
+                  FROM leo_interactions
+                 WHERE sender_id = %s
+                   AND timestamp >= %s
+                   AND question LIKE %s
+                   AND reply_text IS NOT NULL
+                   AND btrim(reply_text) <> ''
+                 ORDER BY id DESC LIMIT 1
+                """,
+                (sender_id, since_ts, f"%{prompt_key}%"),
+            )
+        else:
+            cur.execute(
+                """
+                SELECT id, timestamp, sender_id, reply_text, execution_id
+                  FROM leo_interactions
+                 WHERE sender_id = %s
+                   AND timestamp >= %s
+                 ORDER BY id DESC LIMIT 1
+                """,
+                (sender_id, since_ts),
+            )
         r = cur.fetchone()
         if r and r["reply_text"]:
             return r
@@ -304,7 +335,7 @@ def run_one_probe(cur, probe, *, session_id: int | None = None) -> dict:
     prompt_text = scenario_def["prompt_text"]
     ts_before = now_utc()
     sent = post_synthetic_webhook(sender_id, sender_name, prompt_text)
-    reply = wait_for_reply(cur, sender_id, ts_before)
+    reply = wait_for_reply(cur, sender_id, ts_before, prompt_text=prompt_text)
     passed, fail_reason = grade(
         (reply or {}).get("reply_text", ""),
         scenario_def.get("expected_substrings"),

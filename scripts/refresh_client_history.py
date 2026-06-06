@@ -56,7 +56,9 @@ def render(f: dict) -> str:
     L = [
         "",
         f"CLIENT HISTORY — canonical chronological state (refreshed {f['at']}, every 10 min):",
-        "  Email on spine = legal events only (may require reaction or note for case development).",
+        "  EMAIL POLICY: client_history = verified legal events only (not the full mailbox).",
+        "  A legal event email may require reaction OR be noted for case development.",
+        "  Promotional mail (Redfin, newsletters) is NOT on spine — excluded noise; not a legal event.",
         "  Full mailbox search: search_emails.py or /api/email_search (--all-mail for promos).",
         "",
     ]
@@ -118,7 +120,7 @@ def patch_const(code: str, body: str) -> tuple[str, bool]:
     if ret_anchor in code and "${CLIENT_HISTORY_TEXT}" not in code:
         code = code.replace(
             ret_anchor,
-            "\n${isSimulation ? '' : CLIENT_HISTORY_TEXT}\n" + ret_anchor, 1
+            "\n${CLIENT_HISTORY_TEXT}\n" + ret_anchor, 1
         )
     return (code, True)
 
