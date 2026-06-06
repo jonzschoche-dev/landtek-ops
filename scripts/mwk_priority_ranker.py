@@ -207,7 +207,7 @@ def fetch_obligations(cur) -> list[dict]:
             "due_date": due.isoformat() if due else None,
             "status": r["status"],
             "consensus": "leo_only",
-            "why": (r["description"] or "")[:160],
+            "why": f"Open obligation: {r['short_label']}",
             "action_owner": "landtek",
         })
     return items

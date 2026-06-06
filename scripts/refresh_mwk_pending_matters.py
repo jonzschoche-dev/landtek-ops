@@ -116,12 +116,12 @@ def render_pending(d: dict) -> str:
         lines.append("")
 
     if d["obligations"]:
-        lines.append("── OPEN OBLIGATIONS (landtek_obligations) ──")
+        lines.append("── OPEN OBLIGATIONS (labels only — descriptions may contain stale seeds) ──")
         for o in d["obligations"]:
             mc = o.get("matter_code") or "(unlinked)"
             lines.append(
-                f"  #{o['id']} P{o['priority']} [{mc}] {o['short_label']}: "
-                f"{(o.get('description') or '')[:160]}"
+                f"  #{o['id']} P{o['priority']} [{mc}] {o['short_label']} "
+                f"(status={o['status']})"
             )
         lines.append("")
 
