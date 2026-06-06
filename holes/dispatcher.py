@@ -136,9 +136,13 @@ def dispatch(force_routine: Optional[str] = None, auto_remediate: bool = False) 
             last = _last_ok_run(cur, r.name)
             if not _is_due(r.cadence, last):
                 continue
+        if getattr(r, "version", "").startswith("v0-stub"):
+            continue
         print(f"→ {r.name} ({r.cadence})", flush=True)
         try:
             result = r.run(auto_remediate=auto_remediate)
+        except NotImplementedError as e:
+            result = {"routine": r.name, "status": "skipped", "error": str(e)[:200]}
         except Exception as e:
             result = {"routine": r.name, "status": "failed", "error": f"{type(e).__name__}: {e}"[:300]}
         run_results.append(result)

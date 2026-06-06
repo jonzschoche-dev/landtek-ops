@@ -1,0 +1,10 @@
+[Unit]
+Description=Push P0 holes findings to Telegram
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+ExecStart=/usr/bin/python3 -m holes.p0_pusher
+StandardOutput=append:/var/log/holes-p0-pusher.log
+StandardError=append:/var/log/holes-p0-pusher.log

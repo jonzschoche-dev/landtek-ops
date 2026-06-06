@@ -141,8 +141,9 @@ def main():
                 shutil.copy2(src, f"/etc/systemd/system/{name}")
 
     subprocess.run(["systemctl", "daemon-reload"], check=False)
-    subprocess.run(["systemctl", "enable", "leo-rapid-fire.timer"], check=False)
-    subprocess.run(["systemctl", "start", "leo-rapid-fire.timer"], check=False)
+    # Timer installed but disabled — L4 bursts are on-demand, not scheduled.
+    subprocess.run(["systemctl", "disable", "leo-rapid-fire.timer"], check=False)
+    subprocess.run(["systemctl", "stop", "leo-rapid-fire.timer"], check=False)
 
     print(
         f"✓ deploy_357: rapid-fire simulator "
@@ -150,7 +151,7 @@ def main():
         f"total={len(probes)}"
     )
     print("  CLI: python3 scripts/rapid_fire_simulator.py --pack architecture --burst 12")
-    print("  Timer: leo-rapid-fire.timer (architecture burst 2×/day)")
+    print("  Timer: leo-rapid-fire.timer installed DISABLED (use rapid_fire on-demand)")
 
 
 if __name__ == "__main__":

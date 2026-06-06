@@ -1,0 +1,10 @@
+[Unit]
+Description=Lean mandate micro-probes (L3)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+ExecStart=/usr/bin/python3 /root/landtek/scripts/micro_probe_runner.py
+StandardOutput=append:/var/log/landtek-micro-probe.log
+StandardError=append:/var/log/landtek-micro-probe.log

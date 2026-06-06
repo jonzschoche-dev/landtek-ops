@@ -1,0 +1,10 @@
+[Unit]
+Description=Holes routine dispatcher (L1 simulator)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+ExecStart=/usr/bin/python3 -m holes.dispatcher
+StandardOutput=append:/var/log/holes-dispatcher.log
+StandardError=append:/var/log/holes-dispatcher.log
