@@ -131,7 +131,7 @@ def main():
               (client_code, subject_type, subject_id, hat, assessment_text,
                implication, confidence, provenance_level, assessed_by)
             VALUES (
-              'MWK-001', 'deploy_log', 'deploy_350', 'legal',
+              'MWK-001', 'assertion', 'dual_arta_manifestations', 'legal',
               %s,
               'Leo must track and report each manifestation by docket. '
               'Do not merge into one task or invent blockers.',
