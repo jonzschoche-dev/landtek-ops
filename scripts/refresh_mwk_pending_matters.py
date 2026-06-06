@@ -50,12 +50,13 @@ def fetch_pending(cur) -> dict:
     obligations = cur.fetchall()
 
     cur.execute("""
-        SELECT id, smart_filename, doc_date_norm, execution_status
+        SELECT id, smart_filename, doc_date_norm, execution_status, matter_code
           FROM documents
          WHERE case_file = 'MWK-001'
            AND (smart_filename ILIKE '%OP%ARTA%'
                 OR smart_filename ILIKE '%PETITION%OP%'
-                OR id IN (702, 703, 972))
+                OR smart_filename ILIKE '%manifestation%'
+                OR id IN (702, 703, 972, 624, 828))
          ORDER BY id
     """)
     op_docs = cur.fetchall()
@@ -107,11 +108,12 @@ def render_pending(d: dict) -> str:
         lines.append("")
 
     if d["op_docs"]:
-        lines.append("── OP / ARTA-1210 PRIMARY DOCS (corpus) ──")
+        lines.append("── OP / ARTA MANIFESTATION DOCS (1210 + 0747) ──")
         for doc in d["op_docs"]:
+            mc = doc.get("matter_code") or "—"
             lines.append(
-                f"  doc#{doc['id']} [{doc.get('execution_status') or '?'}] "
-                f"{(doc.get('smart_filename') or '')[:70]}"
+                f"  doc#{doc['id']} [{mc}] [{doc.get('execution_status') or '?'}] "
+                f"{(doc.get('smart_filename') or '')[:65]}"
             )
         lines.append("")
 
@@ -126,9 +128,15 @@ def render_pending(d: dict) -> str:
         lines.append("")
 
     arta_n = len(by_track.get("ARTA", []))
+    manifest_obls = [
+        o for o in d["obligations"]
+        if o.get("short_label") and "manifestation" in o["short_label"].lower()
+    ]
+    manifest_ids = ", ".join(f"#{o['id']}" for o in manifest_obls) or "—"
     lines.append(
         f"SUMMARY: {arta_n} active ARTA dockets; "
-        f"OP track includes MWK-ARTA-1210 (Bagong Pilipinas) + MWK-OP-PETITION if registered."
+        f"two OP manifestations (obligation {manifest_ids}): ARTA-1210 + ARTA-0747; "
+        f"MWK-OP-PETITION supervisory track (doc#702/#703)."
     )
     lines.append("Resolved/closed ARTA (-0690, -0792) are NOT listed — status=closed in DB.")
     return "\n".join(lines)
