@@ -29,6 +29,16 @@ def fetch_evidence(cur) -> dict:
          ORDER BY priority DESC, id
     """)
     claims = cur.fetchall()
+    cur.execute("""
+        SELECT c.short_label, d.id AS doc_id, d.lt_number, et.weight, et.relation_kind
+          FROM evidence_trail et
+          JOIN claims c ON c.id = et.claim_id
+          JOIN documents d ON d.id = et.supporting_doc_id
+         WHERE et.provenance_level = 'verified'
+           AND c.case_file = 'MWK-001'
+         ORDER BY c.priority DESC, et.weight
+    """)
+    verified_exhibits = cur.fetchall()
     cur.execute("SELECT claim_id, short_label, primary_count, strong_or_better FROM v_filing_gaps")
     gaps = cur.fetchall()
     cur.execute("""
@@ -41,7 +51,8 @@ def fetch_evidence(cur) -> dict:
     roles = cur.fetchall()
     cur.execute("SELECT COUNT(*) FROM documents WHERE lt_number IS NOT NULL")
     docs_total = cur.fetchone()["count"]
-    return {"claims": claims, "gaps": gaps, "roles": roles, "docs_total": docs_total}
+    return {"claims": claims, "gaps": gaps, "roles": roles, "docs_total": docs_total,
+            "verified_exhibits": verified_exhibits}
 
 
 def render_facts(d: dict) -> str:
@@ -80,11 +91,18 @@ def render_facts(d: dict) -> str:
             lines.append(f"  not_yet_assessed         {unassessed}")
         lines.append("")
 
-    lines.append("When asked \"what's our evidence on X?\" or \"which exhibits prove Y?\":")
-    lines.append("  - Cite by LT-NNNN, never by guessed filename.")
-    lines.append("  - If the claim has no linked docs in the trail above, say \"no exhibits linked yet\" — DO NOT guess.")
-    lines.append("  - If asked about a specific LT-NNNN: if it's not in DOC INVENTORY above as one of the doc_roles, look up the document but mark provenance_level appropriately.")
-    lines.append("  - NEVER fabricate LT-NNNN identifiers.")
+    if d.get("verified_exhibits"):
+        lines.append("VERIFIED EXHIBITS ONLY (provenance_level=verified — cite these as facts):")
+        for ex in d["verified_exhibits"]:
+            lt = ex.get("lt_number") or f"doc#{ex['doc_id']}"
+            lines.append(f"  [{ex['short_label']}] {ex['weight']} {lt} ({ex['relation_kind']})")
+        lines.append("")
+
+    lines.append("HARD-FACTS RULE (deploy_347):")
+    lines.append("  - State as FACT only exhibits in VERIFIED EXHIBITS above or doc# with execution_status executed/government_issued.")
+    lines.append("  - Claim→exhibit links with inferred_strong provenance = HYPOTHESIS — say 'not verified on record'.")
+    lines.append("  - If no verified exhibit: say 'no verified exhibit linked' — DO NOT guess.")
+    lines.append("  - NEVER fabricate LT-NNNN or doc# identifiers.")
     return "\n".join(lines)
 
 

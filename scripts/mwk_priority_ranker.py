@@ -37,6 +37,7 @@ TIER_NUM = {"P0": 0, "P1": 1, "P2": 2, "P3": 3, "P4": 4, "P5": 5}
 
 # Matter stage → strategic tier (substance over admin)
 STAGE_TIER = {
+    "mediation_impasse_trial_pending": "P0",
     "mediation_held_pending_outcome": "P0",
     "post_pretrial_pending_trial_schedule": "P0",
     "pretrial_scheduled": "P0",
@@ -321,7 +322,8 @@ def render_leo_const(queue: list[dict]) -> str:
         )
     L.append("")
     L.append("When Jonathan asks 'what should we focus on for MWK?' → answer from this queue.")
-    L.append("Consensus leo_only items: infer tier but flag if human confirmation missing.")
+    L.append("HARD-FACTS RULE: cite only verified sources (doc#, chat_notes# with provenance=verified).")
+    L.append("Items here are triage hints — if not in MWK_CV26360_HARD_FACTS_TEXT, do NOT state as fact.")
     return "\n".join(L)
 
 

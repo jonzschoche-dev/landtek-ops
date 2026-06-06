@@ -309,6 +309,7 @@ def scan_chat_notes(cur):
           FROM chat_notes cn
           LEFT JOIN clients c ON c.id = cn.client_id
          WHERE cn.archived IS NOT TRUE
+           AND cn.provenance_level = 'verified'
            AND cn.importance >= 4
            AND cn.topic IN ('legal_strategy', 'deadlines', 'evidence', 'communications')
     """)

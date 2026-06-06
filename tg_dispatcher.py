@@ -836,19 +836,22 @@ def cycle(cur, token, verbose=False):
         _inbound_text = (msg.get("text") or msg.get("caption") or "").strip()
         if _inbound_text:
             _tg_msg_id = msg.get("message_id")
+            # Operator Telegram = verified hard fact (deploy_347). Agent paraphrases stay inferred.
+            _prov = ("verified" if sender_chat_id_str == JONATHAN_TG else "inferred_strong")
+            _sender = ((msg.get("from", {}).get("first_name", "")
+                        + " " + msg.get("from", {}).get("last_name", "")).strip()
+                       or "(unknown sender)")
+            if sender_chat_id_str == JONATHAN_TG:
+                _sender = "Jonathan Zschoche"
             try:
                 cur.execute("""
                     INSERT INTO chat_notes (
                         telegram_msg_id, sender_id, sender_name, content,
                         topic, importance, provenance_level
-                    ) VALUES (%s, %s, %s, %s, 'misc', 3, 'inferred_strong')
+                    ) VALUES (%s, %s, %s, %s, 'misc', 3, %s)
                     ON CONFLICT DO NOTHING
                 """, (str(_tg_msg_id) if _tg_msg_id else None,
-                      sender_chat_id_str,
-                      (msg.get("from", {}).get("first_name", "")
-                       + " " + msg.get("from", {}).get("last_name", "")).strip()
-                      or "(unknown sender)",
-                      _inbound_text[:4000]))
+                      sender_chat_id_str, _sender, _inbound_text[:4000], _prov))
             except Exception as _e:
                 # Never let chat_notes failure block dispatcher flow
                 if verbose:
