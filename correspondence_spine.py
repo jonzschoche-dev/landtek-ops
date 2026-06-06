@@ -92,10 +92,68 @@ def compute_relevance_status(
     return "unlinked"
 
 
+CTN_SL_SUFFIX_RE = re.compile(
+    r"\bCTN\s*s?\s*[-:]?\s*SL\s*[-]?\s*\d{4}\s*[-]?\s*\d{4}\s*[-]?\s*(\d{3,4})\b",
+    re.I,
+)
+
+CV26360_MENTION_RE = re.compile(
+    r"(civil\s+case|cv|case)\s+(no\.?)?\s*-?\s*26-?360",
+    re.I,
+)
+
+
+def parse_arta_matter_codes_from_text(haystack: str) -> list[str]:
+    """Extract MWK-ARTA-#### codes from CTN SL docket references in email text."""
+    seen: list[str] = []
+    for m in CTN_SL_SUFFIX_RE.finditer(haystack or ""):
+        suffix = m.group(1)
+        if len(suffix) == 3:
+            suffix = "0" + suffix
+        code = f"MWK-ARTA-{suffix}"
+        if code not in seen:
+            seen.append(code)
+    return seen
+
+
+def sanitize_gmail_matter_codes(
+    *,
+    from_addr: str | None,
+    subject: str | None,
+    body_plain: str | None,
+    matter_codes: list[str] | None,
+    valid_matter_codes: set[str] | None = None,
+) -> list[str]:
+    """Derive matter_codes from CTN text; CV26360 only when 26-360 is mentioned.
+
+    deploy_355: ARTA Litigation Division mail is tagged by CTN suffix, not
+    blanket-linked to Civil Case 26-360.
+    """
+    haystack = f"{from_addr or ''} {subject or ''} {body_plain or ''}"
+    arta_codes = parse_arta_matter_codes_from_text(haystack)
+    preserved = [
+        mc
+        for mc in (matter_codes or [])
+        if mc and mc != "MWK-CV26360" and not mc.startswith("MWK-ARTA-")
+    ]
+    out: list[str] = []
+    for mc in arta_codes + preserved:
+        if mc not in out:
+            out.append(mc)
+    if CV26360_MENTION_RE.search(haystack) and "MWK-CV26360" not in out:
+        out.append("MWK-CV26360")
+    if valid_matter_codes is not None:
+        out = [mc for mc in out if mc in valid_matter_codes]
+    return out
+
+
 def gmail_history_matter_code(matter_codes: list[str] | None) -> str | None:
-    """Pick primary matter for client_history.matter_code (first linked)."""
+    """Pick primary matter for client_history — prefer ARTA admin over civil."""
     if not matter_codes:
         return None
+    for mc in matter_codes:
+        if mc and mc.startswith("MWK-ARTA-"):
+            return mc
     return matter_codes[0]
 
 

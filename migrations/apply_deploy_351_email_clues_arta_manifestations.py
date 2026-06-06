@@ -48,7 +48,6 @@ def main():
                    client_code = COALESCE(client_code, 'MWK-001'),
                    relevance_status = 'matter_linked'
              WHERE id = 38220
-               AND NOT (matter_codes @> ARRAY['MWK-ARTA-0747']::text[])
         """)
 
         cur.execute("""
