@@ -48,13 +48,20 @@ def search(
     days: int | None,
     client_code: str | None,
     limit: int,
-    include_archived: bool = True,
+    include_archived: bool = False,
+    relevant_only: bool = True,
 ) -> list[dict]:
-    canonical = _use_canonical_view(cur) and include_archived
+    cur.execute("""
+        SELECT 1 FROM information_schema.views
+         WHERE table_schema = 'public' AND table_name = 'v_gmail_relevant'
+    """)
+    use_relevant_view = relevant_only and bool(cur.fetchone())
+    use_full_canonical = include_archived and _use_canonical_view(cur)
+    canonical = use_relevant_view or use_full_canonical
     clauses = ["1=1"]
     params: list = []
 
-    if canonical and not include_archived:
+    if use_full_canonical and not include_archived:
         clauses.append("mailbox_status = 'active'")
     if matter_code:
         clauses.append("%s = ANY(matter_codes)")
@@ -95,7 +102,18 @@ def search(
             like = f"%{q}%"
             params.extend([like, like, like])
 
-    if canonical:
+    if use_relevant_view:
+        sql = f"""
+            SELECT id, source_table, citation, mailbox_status, direction, mail_at,
+                   from_addr, subject, client_code, matter_codes, has_attachments,
+                   relevance_status, NULL::text AS archived_reason,
+                   left(body_plain, 400) AS body_snip
+              FROM v_gmail_relevant
+             WHERE {' AND '.join(clauses)}
+             ORDER BY mail_at DESC NULLS LAST
+             LIMIT %s
+        """
+    elif canonical:
         sql = f"""
             SELECT id, source_table, citation, mailbox_status, direction, mail_at,
                    from_addr, subject, client_code, matter_codes, has_attachments,
@@ -111,7 +129,7 @@ def search(
             SELECT id, 'gmail_messages'::text AS source_table,
                    'gmail#' || id::text AS citation,
                    'active'::text AS mailbox_status,
-                   CASE WHEN 'SENT' = ANY(COALESCE(labels, '{}'::text[]))
+                   CASE WHEN 'SENT' = ANY(COALESCE(labels, '{{}}'::text[]))
                         THEN 'SENT' ELSE 'RECEIVED' END AS direction,
                    COALESCE(received_at, sent_at) AS mail_at,
                    from_addr, subject, client_code, matter_codes, has_attachments,
@@ -156,6 +174,8 @@ def main():
     ap.add_argument("--days", type=int, help="only emails within last N days")
     ap.add_argument("--limit", type=int, default=25)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--all-mail", action="store_true",
+                    help="include unlinked/archived noise (default: relevant only)")
     args = ap.parse_args()
 
     query = " ".join(args.terms) if args.terms else None
@@ -173,6 +193,8 @@ def main():
             days=args.days,
             client_code=args.client,
             limit=args.limit,
+            include_archived=args.all_mail,
+            relevant_only=not args.all_mail,
         )
     finally:
         cur.close()

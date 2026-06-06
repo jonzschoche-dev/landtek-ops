@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""client_history_scan — append every event from every source into client_history.
+"""client_history_scan — append verified events into client_history.
+
+Gmail: legal events only (correspondence_spine.is_legal_event_email) — mail that
+may require a reaction or note for case development. Full mailbox remains in
+gmail_messages / v_gmail_canonical for audit search.
 
 Idempotent. Run after every ingest pass (or on a 30-min timer). Re-scans skip
 rows already in client_history (UNIQUE on source_table + source_id).
@@ -20,6 +24,7 @@ sys.path.insert(0, "/root/landtek")
 from landtek_core import db
 from correspondence_spine import (
     gmail_history_matter_code,
+    is_relevant_for_canonical_history,
     resolve_client_code,
     resolve_client_for_case,
 )
@@ -82,7 +87,7 @@ def scan_documents(cur):
     return n
 
 
-OPERATOR_CLIENT = "Owner"  # Jonathan mailbox — all sent/received emails log here at minimum
+OPERATOR_CLIENT = "Owner"  # fallback when matter-linked mail has no explicit client_code
 
 
 def _log_gmail_to_history(
@@ -155,16 +160,29 @@ def _log_gmail_to_history(
 
 
 def scan_gmail(cur):
-    """Every email in gmail_messages → one client_history event (SENT + RECEIVED)."""
+    """Legal-event emails → canonical client_history (SENT + RECEIVED)."""
     cur.execute("""
         SELECT id, case_file, client_code, matter_codes, sent_at, received_at,
-               from_addr, to_addrs, subject, labels, has_attachments,
-               relevance_status
+               from_addr, to_addrs, subject, body_plain, labels, has_attachments,
+               relevance_status, raw_payload
           FROM gmail_messages
          ORDER BY id
     """)
     n = 0
     for m in cur.fetchall():
+        raw = m.get("raw_payload") or {}
+        category = raw.get("category") if isinstance(raw, dict) else None
+        if not is_relevant_for_canonical_history(
+            from_addr=m.get("from_addr"),
+            subject=m.get("subject"),
+            body_plain=m.get("body_plain"),
+            relevance_status=m.get("relevance_status"),
+            client_code=m.get("client_code"),
+            case_file=m.get("case_file"),
+            matter_codes=list(m.get("matter_codes") or []),
+            raw_category=category,
+        ):
+            continue
         _log_gmail_to_history(
             cur, m,
             source_table="gmail_messages",
@@ -177,33 +195,8 @@ def scan_gmail(cur):
 
 
 def scan_gmail_archived(cur):
-    """Every email in gmail_messages_archived → canonical client_history (deploy_353)."""
-    cur.execute("""
-        SELECT EXISTS (
-          SELECT 1 FROM information_schema.tables
-           WHERE table_schema = 'public' AND table_name = 'gmail_messages_archived'
-        ) AS ok
-    """)
-    if not cur.fetchone()["ok"]:
-        return 0
-    cur.execute("""
-        SELECT id, case_file, matter_codes, sent_at, received_at,
-               from_addr, to_addrs, subject, labels, has_attachments,
-               archived_reason
-          FROM gmail_messages_archived
-         ORDER BY id
-    """)
-    n = 0
-    for m in cur.fetchall():
-        _log_gmail_to_history(
-            cur, m,
-            source_table="gmail_messages_archived",
-            citation_prefix="gmail_archived",
-            archived_reason=m.get("archived_reason"),
-            link_correspondence=False,
-        )
-        n += 1
-    return n
+    """Archived noise mailbox — audit table only, not canonical history (deploy_354)."""
+    return 0
 
 
 def scan_transactions(cur):

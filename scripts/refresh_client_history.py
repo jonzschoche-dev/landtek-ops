@@ -53,7 +53,13 @@ def fetch(cur) -> dict:
 
 
 def render(f: dict) -> str:
-    L = ["", f"CLIENT HISTORY — canonical chronological state (refreshed {f['at']}, every 10 min):", ""]
+    L = [
+        "",
+        f"CLIENT HISTORY — canonical chronological state (refreshed {f['at']}, every 10 min):",
+        "  Email on spine = legal events only (may require reaction or note for case development).",
+        "  Full mailbox search: search_emails.py or /api/email_search (--all-mail for promos).",
+        "",
+    ]
     if not f["summaries"]:
         L.append("  (no client_history records)")
         return "\n".join(L)
