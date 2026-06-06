@@ -129,14 +129,14 @@ MEMORY_KEYSTONES = [
         "date": "2005-08-15",
         "type": "memory",
         "title": "SPA to Cesar de la Fuente REVOKED",
-        "detail": "Testimonial only via doc#441. Primary revocation instrument MISSING — "
-                  "single biggest evidence gap on the void-SPA theory. KEYSTONE claim "
-                  "for the void chain in MWK-CV26360.",
+        "detail": "Ida Buenaventura SPA (doc#91) disowns all SPAs not in favor of Ida — "
+                  "revokes Cesar's 1992 SPA. Corroborated doc#292/#430 (Aug 15 2005), "
+                  "doc#441 (testimonial). KEYSTONE for void chain in MWK-CV26360.",
         "titles": [],
-        "entities_names": ["Cesar de la Fuente"],
+        "entities_names": ["Cesar de la Fuente", "Ida M. Buenaventura"],
         "matters": ["MWK-CV26360"],
-        "provenance": "testimonial (doc#441 Judicial Affidavit)",
-        "source": "doc#441",
+        "provenance": "verified (doc#91 primary instrument)",
+        "source": "doc#91",
     },
     {
         "date": "2016-09-01",

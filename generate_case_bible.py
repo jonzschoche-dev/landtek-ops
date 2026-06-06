@@ -478,9 +478,6 @@ def project_forward_omnibus(cur, case_file):
 
 PER_CLIENT_KNOWN_GAPS = {
     "MWK-001": [
-        ("2005 Revocation of SPA (Cesar dela Fuente)",
-         "Currently testimonial via Judicial Affidavit doc#441. Primary notarized "
-         "instrument missing — single biggest evidence gap on the void-SPA theory."),
         ("Mary Worrick Keesey death certificate (PSA-issued, ~1988)",
          "Testimonial only via project memory; PSA-certified primary document not in corpus."),
         ("Cesar dela Fuente death certificate (2017)",
@@ -635,7 +632,8 @@ BIBLE_NARRATIVE_CRITICAL_FACTS = {
         "defendant). Specific outcome (settlement / impasse / continuance) pending "
         "capture.\n"
         "- **T-52540 void-chain fraud framing (verified):** Cesar's underlying deed "
-        "executed pre-death (2016-09-29); SPA revoked 2005. Subdivision and transfer "
+        "executed pre-death (2016-09-29); SPA to Cesar revoked via Ida Buenaventura "
+        "SPA doc#91 disown clause (Aug 2005). Subdivision and transfer "
         "*registration* at RD (Entries 2021003235/3236, Nov 2021) occurred post-death "
         "(Cesar died 2017-06-21). Do NOT narrate as posthumous deed execution.\n"
         "- **Balane defendant family** (verified via Jonathan / Rule S13): Gloria H. "
