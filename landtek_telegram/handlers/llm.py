@@ -42,7 +42,7 @@ DB_GROUP = "-5138695222"
 JONATHAN = "6513067717"
 KRISTYLE = "5992075757"
 
-SYSTEM_PROMPT_GROUP = """You are Leo, the LandTek operations assistant.
+SYSTEM_PROMPT_GROUP_TEMPLATE = """You are Leo, the LandTek operations assistant.
 
 You are in the DB group chat. Participants:
   - Jonathan Zschoche (the operator)
@@ -64,13 +64,12 @@ labeled the first document", "we just put the affidavit in folder AFF-1"),
 propose the structured command back: "Sounds like AFF-1. What's the matter
 — 4497 case, ARTA-1210, or another?"
 
-Active matters (use the canonical code in any tool call):
-  MWK-TCT4497 (the 4497 case / mother title), MWK-CV26360 (civil case /
-  Balane), MWK-OP-PETITION (OP case), MWK-ESTATE, MWK-GUARDIANSHIP,
-  MWK-ARTA-1210, MWK-ARTA-0747, MWK-ARTA-1212, MWK-ARTA-1378,
-  MWK-ARTA-1319, MWK-ARTA-1321, MWK-ARTA-1891, MWK-ARTA-0690,
-  MWK-ARTA-0792, PAR-CAPACUAN, PAR-GOLDEN-SAND, PAR-VITO-CRUZ,
-  PAR-TCT1616.
+ALL ACTIVE MATTERS (canonical codes — recognize ALL of these; "6839"
+means MWK-CV6839, "26360" means MWK-CV26360, etc.):
+{matters_block}
+
+CURRENT VAULT STATE — recently registered entries:
+{vault_state_block}
 
 Style:
   Plain English. No markdown bold, no bullet lists, no formal headers.
@@ -79,12 +78,21 @@ Style:
   Never reply with a generic template like "How can I assist you?" — that
   is a failure mode. Read the actual message and respond to it.
 
+CRITICAL — do not lie about actions:
+  You CANNOT directly register vault entries through chat — the deterministic
+  vault command path does that. NEVER say "I'll log it" or "I'll record CORR-001"
+  or "logging now" unless the message contains a structured command that the
+  vault handler can parse. Instead say: "Once you (or Jonathan) confirm the
+  exact section, number, and matter, that gets registered through the vault
+  command — type something like 'vault CORR-1 letter to Judge Dizon for
+  MWK-CV6839' and it goes in."
+
 If the sender's message is operational filing work, help them do it. If
 it's a status/observation ("Kristyle has logged the first document"),
 acknowledge naturally and ask the next useful question."""
 
-SYSTEM_PROMPT_PRIVATE_JONATHAN = """You are Leo, the LandTek operations
-assistant, in private chat with Jonathan Zschoche (operator).
+SYSTEM_PROMPT_PRIVATE_JONATHAN_TEMPLATE = """You are Leo, the LandTek
+operations assistant, in private chat with Jonathan Zschoche (operator).
 
 He owns LandTek; you serve him directly. No defensive gating, no "I can't
 share that" — he authorized everyone else in this system.
@@ -99,10 +107,18 @@ vault_find, vault_queue, vault_missing, vault_last via HTTP endpoints on
 path. The DB group chat (chat_id -5138695222) is where you coordinate
 vault entries with Kristyle (filing assistant).
 
-Active matter for which pretrial is set August 1: Civil Case 26-360
-(Zschoche v. Balane), TCT T-4497 derivative chain. Counsel: Atty.
-Barandon Jr. (RTC matter only — ARTA matters are filed by Jonathan as
-AIF for Patricia Keesey Zschoche).
+ALL MATTERS Jonathan manages (recognize ALL of these — "6839" means
+MWK-CV6839, "1210" means MWK-ARTA-1210, etc.):
+{matters_block}
+
+CURRENT VAULT STATE — recently registered entries:
+{vault_state_block}
+
+CRITICAL — do not lie about actions:
+  You CANNOT directly register vault entries through chat. NEVER say "I'll
+  log it" / "I'll record" / "logging now" unless you literally see the
+  structured command in the message. Coach Jonathan to send the vault
+  command if a registration is needed.
 
 When unsure, ask one short clarifying question."""
 
@@ -115,6 +131,57 @@ def _reply(chat_id, text):
                     override_pacing=True, override_rate_limit=True,
                     human_readable=False)
     return ok
+
+
+def _live_matters_block():
+    """Pull every matter from the matters table — live, not hardcoded.
+    Returns a string block to inject into the system prompt."""
+    try:
+        conn = psycopg2.connect(PG_DSN)
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT matter_code, case_file, status
+              FROM matters
+             WHERE matter_code NOT LIKE 'AUTO-%' AND matter_code NOT LIKE 'ARCHIVE-%'
+             ORDER BY case_file NULLS LAST, matter_code
+        """)
+        rows = cur.fetchall()
+        cur.close(); conn.close()
+    except Exception:
+        return "(matter list unavailable — query failed)"
+    by_book = {}
+    for r in rows:
+        book = r["case_file"] or "unfiled"
+        by_book.setdefault(book, []).append(f"{r['matter_code']} ({r['status']})")
+    lines = []
+    for book, codes in sorted(by_book.items()):
+        lines.append(f"  {book}: " + "; ".join(codes))
+    return "\n".join(lines) if lines else "(no matters)"
+
+
+def _live_vault_state(limit=8):
+    """Last N vault entries so Leo knows what's already registered."""
+    try:
+        conn = psycopg2.connect(PG_DSN)
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT vault_section, vault_number, smart_filename, case_file
+              FROM documents
+             WHERE master_form = 'physical'
+             ORDER BY id DESC
+             LIMIT %s
+        """, (limit,))
+        rows = cur.fetchall()
+        cur.close(); conn.close()
+    except Exception:
+        return "(vault state unavailable)"
+    if not rows:
+        return "  (vault is empty — no entries yet)"
+    return "\n".join(
+        f"  {r['vault_section']}-{r['vault_number']:03d}: "
+        f"{(r['smart_filename'] or '')[:90]}"
+        for r in rows
+    )
 
 
 def _recent_context(chat_id, limit=8):
@@ -196,13 +263,19 @@ def handle(row):
     if not text:
         return {"handler": "llm", "outcome": "skip_empty", "reply_sent": False}
 
+    # Build live blocks at call time so matters and vault state are always fresh
+    matters_block = _live_matters_block()
+    vault_block = _live_vault_state()
+
     if chat_id == DB_GROUP:
-        system_prompt = SYSTEM_PROMPT_GROUP
+        system_prompt = SYSTEM_PROMPT_GROUP_TEMPLATE.format(
+            matters_block=matters_block, vault_state_block=vault_block)
     elif sender_id == JONATHAN:
-        system_prompt = SYSTEM_PROMPT_PRIVATE_JONATHAN
+        system_prompt = SYSTEM_PROMPT_PRIVATE_JONATHAN_TEMPLATE.format(
+            matters_block=matters_block, vault_state_block=vault_block)
     else:
-        # Default to the group prompt for any other authorized chat (Kristyle direct)
-        system_prompt = SYSTEM_PROMPT_GROUP
+        system_prompt = SYSTEM_PROMPT_GROUP_TEMPLATE.format(
+            matters_block=matters_block, vault_state_block=vault_block)
 
     context = _recent_context(chat_id)
     reply, err = _call_anthropic(system_prompt, text, context)
