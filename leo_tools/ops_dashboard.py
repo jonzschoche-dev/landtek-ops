@@ -33,6 +33,14 @@ KEY_TIMERS = [
     ("n8n-n8n-1", "n8n container"),
 ]
 
+# Legal clients only — exclude Owner (Jonathan's bucket), Archive, triage stubs.
+LEGAL_CLIENT_WHERE = """
+  c.status = 'Active'
+  AND c.case_file IS NOT NULL AND c.case_file != ''
+  AND c.case_file NOT IN ('Owner', 'Archive')
+  AND COALESCE(c.client_code, '') NOT IN ('Owner', 'Archive', 'PENDING_TRIAGE')
+"""
+
 MWK_LANES = [
     ("MWK-ARTA-0747", "ARTA admin", "resolution_noc_op_appeal_window"),
     ("MWK-ARTA-1210", "ARTA admin", "complaint_filed_awaiting_response"),
@@ -292,10 +300,15 @@ def home():
              LIMIT 8
         """, default=[])
 
-    portfolio = _safe_fetch(cur, conn, """
+    portfolio = _safe_fetch(cur, conn, f"""
         SELECT
           (SELECT COUNT(*) FROM documents) AS total_docs,
-          (SELECT COUNT(*) FROM clients WHERE case_file IS NOT NULL AND case_file != '') AS clients,
+          (SELECT COUNT(*) FROM clients c WHERE {LEGAL_CLIENT_WHERE}) AS clients,
+          (SELECT COUNT(*) FROM clients c
+            WHERE c.case_file IS NOT NULL AND c.case_file != ''
+              AND (c.case_file IN ('Owner', 'Archive')
+                   OR c.client_code IN ('Owner', 'Archive', 'PENDING_TRIAGE')
+                   OR c.status = 'Archived')) AS system_rows,
           (SELECT COUNT(*) FROM matters WHERE status = 'active') AS active_matters,
           (SELECT COUNT(*) FROM v_gmail_relevant) AS spine_emails,
           (SELECT COUNT(*) FROM v_correspondence_triage) AS triage_backlog,
@@ -474,7 +487,8 @@ def home():
 
     portfolio_cards = "".join([
         _stat_card("Total docs", portfolio.get("total_docs", "?")),
-        _stat_card("Clients", portfolio.get("clients", "?")),
+        _stat_card("Clients", portfolio.get("clients", "?"),
+                   f"{portfolio.get('system_rows', 0)} system rows hidden"),
         _stat_card("Active matters", portfolio.get("active_matters", "?")),
         _stat_card("Spine emails", portfolio.get("spine_emails", "?"), "v_gmail_relevant"),
     ])
@@ -543,7 +557,7 @@ def home():
 def clients():
     conn = _db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    rows = _safe_fetch(cur, conn, """
+    rows = _safe_fetch(cur, conn, f"""
         SELECT c.case_file, c.name, c.client_code, c.priority_level, c.status,
                (SELECT COUNT(*) FROM documents d WHERE d.case_file = c.case_file) AS doc_count,
                (SELECT MAX(COALESCE(d.timestamp, d.created_at)) FROM documents d
@@ -559,7 +573,7 @@ def clients():
                (SELECT events_7d FROM v_client_history_summary h
                  WHERE h.client_code = c.client_code LIMIT 1) AS events_7d
           FROM clients c
-         WHERE c.case_file IS NOT NULL AND c.case_file != ''
+         WHERE {LEGAL_CLIENT_WHERE}
          ORDER BY c.name
     """, default=[])
     cur.close()
@@ -581,7 +595,7 @@ def clients():
         )
     body = f"""
 <h1>Clients</h1>
-<p class="lead">Portfolio drill-down — docs, matters, phase, spine activity.</p>
+<p class="lead">Active legal clients only (MWK, Paracale) — Owner/Archive/triage excluded.</p>
 <div class="card">
 <table>
   <tr><th>Client</th><th>Case file</th><th>Docs</th><th>Matters</th><th>Obl.</th><th>Needs</th>
