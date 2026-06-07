@@ -181,13 +181,15 @@ def main():
     nodes = deepcopy(nodes)
 
     print("[deploy_363] snapshot ...")
+    conns_for_snap = (conns_raw if isinstance(conns_raw, str)
+                       else json.dumps(conns_raw))
     cur.execute("""
         INSERT INTO leo_workflow_snapshots
             (workflow_id, reason, nodes_json, connections_json)
         VALUES (%s, %s, %s, %s)
         RETURNING id
     """, (WORKFLOW_ID, "pre-deploy_363 Rule M fluid rewrite",
-          json.dumps(nodes), conns_raw))
+          json.dumps(nodes), conns_for_snap))
     snap_id = cur.fetchone()[0]
     print(f"  snapshot id: {snap_id}")
 
