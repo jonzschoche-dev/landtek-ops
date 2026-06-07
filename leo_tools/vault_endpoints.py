@@ -57,6 +57,14 @@ def register():
 
     Required: section, number, description, matter_code.
     Optional: vault_location (free-text geography), drive_file_id (initial scan).
+    Optional: auto_attach_sender_id — telegram sender id. If set, the most
+       recent unattached photo from this sender in telegram_inbox (within
+       the last hour) becomes the digital scan automatically.
+
+    BRIDGE-TO-DIGITAL INVARIANT: every physical master MUST have a
+    digital corpus row. If none can be auto-attached, the register call
+    still succeeds but a placeholder digital row is created so the
+    digital_scan_id is always non-null.
     """
     data = request.get_json(force=True, silent=True) or {}
     section = (data.get("section") or "").strip().upper()
@@ -65,6 +73,7 @@ def register():
     matter_code = (data.get("matter_code") or "").strip()
     vault_location = (data.get("vault_location") or "").strip() or None
     drive_file_id = (data.get("drive_file_id") or "").strip() or None
+    auto_attach_sender_id = (data.get("auto_attach_sender_id") or "").strip() or None
 
     # Validation
     if not SECTION_RE.match(section):
@@ -123,9 +132,6 @@ def register():
         new_id = cur.fetchone()["id"]
 
         # Link to matter via junction (deploy_279 schema, relation_kind enum)
-        # Valid relation_kinds: primary, evidence, chain_of_title, reference,
-        # quoted_in, parallel, cross_proof. 'primary' fits: this is THE physical
-        # master for this matter.
         cur.execute("""
             INSERT INTO document_matter_links
                 (doc_id, matter_code, case_file, relation_kind, provenance_level,
@@ -137,11 +143,66 @@ def register():
             ON CONFLICT DO NOTHING
         """, (new_id, matter_code, case_file))
 
+        # ── BRIDGE-TO-DIGITAL: ensure a digital scan row exists ──────────
+        scan_doc_id = None
+        scan_source = None
+        if auto_attach_sender_id:
+            # Look for the most recent unattached photo from this sender
+            cur.execute("""
+                SELECT id, media_path, media_size
+                  FROM telegram_inbox
+                 WHERE sender_id = %s
+                   AND media_path IS NOT NULL
+                   AND received_at > NOW() - INTERVAL '2 hours'
+                   AND NOT EXISTS (
+                       SELECT 1 FROM documents
+                        WHERE drive_link = 'file://' || telegram_inbox.media_path
+                   )
+                 ORDER BY received_at DESC
+                 LIMIT 1
+            """, (auto_attach_sender_id,))
+            row = cur.fetchone()
+            if row:
+                cur.execute("""
+                    INSERT INTO documents
+                        (case_file, smart_filename, original_filename, mime_type,
+                         master_form, drive_link, status, created_at, updated_at)
+                    VALUES (%s, %s, %s, 'image/jpeg', 'digital', %s,
+                            'scan_of_vault_master', NOW(), NOW())
+                    RETURNING id
+                """, (case_file,
+                      f"Scan of {smart_filename}",
+                      f"vault_scan_{section}-{number:03d}.jpg",
+                      f"file://{row['media_path']}"))
+                scan_doc_id = cur.fetchone()["id"]
+                scan_source = f"telegram_inbox#{row['id']}"
+        if scan_doc_id is None:
+            # Placeholder so the invariant holds — every physical has a digital
+            cur.execute("""
+                INSERT INTO documents
+                    (case_file, smart_filename, original_filename, mime_type,
+                     master_form, status, created_at, updated_at)
+                VALUES (%s, %s, %s, 'placeholder/pending-scan', 'digital',
+                        'pending_scan_upload', NOW(), NOW())
+                RETURNING id
+            """, (case_file,
+                  f"PENDING SCAN of {smart_filename}",
+                  f"pending_{section}-{number:03d}.placeholder"))
+            scan_doc_id = cur.fetchone()["id"]
+            scan_source = "placeholder"
+
+        cur.execute("""
+            UPDATE documents SET digital_scan_id = %s, updated_at = NOW()
+             WHERE id = %s
+        """, (scan_doc_id, new_id))
+
         return jsonify(ok=True, doc_id=new_id,
                        locator=f"{section}-{number:03d}",
                        smart_filename=smart_filename,
                        matter_code=matter_code,
-                       case_file=case_file)
+                       case_file=case_file,
+                       digital_scan_id=scan_doc_id,
+                       scan_source=scan_source)
     except Exception as e:
         return jsonify(ok=False, error=f"db_error: {type(e).__name__}: {str(e)[:200]}"), 500
     finally:

@@ -211,12 +211,22 @@ def _do_vault(text, chat_id, sender_name):
     if len(desc) < 3:
         desc = f"{section} entry {number}"
 
-    result = _http_post("/api/vault/register", {
+    # Pass sender_id so the endpoint auto-attaches a recent photo as the scan
+    sender_id = row.get("sender_id") if isinstance(row, dict) else None
+    body = {
         "section": section, "number": number,
         "description": desc, "matter_code": matter,
-    })
+    }
+    if sender_id:
+        body["auto_attach_sender_id"] = sender_id
+    result = _http_post("/api/vault/register", body)
     if result.get("ok"):
-        _reply(chat_id, f"Logged {result['locator']} — {desc}, matter {matter}.")
+        scan_note = ""
+        if result.get("scan_source") and result["scan_source"] != "placeholder":
+            scan_note = " Photo attached as the digital scan."
+        elif result.get("scan_source") == "placeholder":
+            scan_note = " No scan attached yet — send the photo when you have it."
+        _reply(chat_id, f"Logged {result['locator']} — {desc}, matter {matter}.{scan_note}")
         return {"handler": "vault", "outcome": f"registered:{result.get('doc_id')}",
                 "reply_sent": True}
     err = result.get("error", "unknown")
