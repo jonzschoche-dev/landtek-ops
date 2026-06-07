@@ -122,13 +122,17 @@ def register():
               f"drive_file_id:{drive_file_id}" if drive_file_id else None))
         new_id = cur.fetchone()["id"]
 
-        # Link to matter via junction (deploy_279 schema)
+        # Link to matter via junction (deploy_279 schema, relation_kind enum)
+        # Valid relation_kinds: primary, evidence, chain_of_title, reference,
+        # quoted_in, parallel, cross_proof. 'primary' fits: this is THE physical
+        # master for this matter.
         cur.execute("""
             INSERT INTO document_matter_links
                 (doc_id, matter_code, case_file, relation_kind, provenance_level,
                  linked_by, note, created_at, updated_at)
-            VALUES (%s, %s, %s, 'vault_registration', 'verified',
-                    'vault_register_endpoint', 'created by Kristyle via vault command',
+            VALUES (%s, %s, %s, 'primary', 'verified',
+                    'vault_register_endpoint',
+                    'physical master vaulted via vault command',
                     NOW(), NOW())
             ON CONFLICT DO NOTHING
         """, (new_id, matter_code, case_file))
