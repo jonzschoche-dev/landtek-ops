@@ -237,7 +237,9 @@ def t_query_documents(args):
     limit = max(1, min(int(args.get("limit", 10)), 30))
 
     conn, cur = _db()
-    conditions = ["d.master_form = 'digital'", "d.status NOT LIKE 'placeholder%'"]
+    # NOTE: %% needed because psycopg2 parses % as parameter placeholder
+    conditions = ["d.master_form = 'digital'",
+                  "d.status NOT LIKE 'placeholder%%'"]
     params = []
     if name:
         conditions.append("d.smart_filename ILIKE %s")
