@@ -38,8 +38,12 @@ except Exception:
 sys.path.insert(0, "/root/landtek")
 try:
     from landtek_telegram.leo_tools import LEO_TOOLS, run_tool
+    print(f"[llm] ✓ leo_tools loaded: {len(LEO_TOOLS)} tools available",
+          file=sys.stderr)
 except Exception as _e:
-    print(f"[llm] WARN: leo_tools not loaded: {_e}", file=sys.stderr)
+    import traceback
+    print(f"[llm] ✗ leo_tools NOT LOADED: {_e}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
     LEO_TOOLS, run_tool = [], None
 
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -100,7 +104,46 @@ YOUR MEMORY — STRICT:
   "we'll register that as CORR-003". Discussion is not registration.
   Only the live vault state shown above is registered.
 
-YOUR TOOLS — USE THEM (deploy_379):
+### TOOL-FIRST RULE (deploy_380) — MANDATORY ###
+
+Before you EVER ask Kristyle or Jonathan a clarifying question about a
+document, matter, or vault entry, you MUST call at least one tool. No
+exceptions.
+
+When a message describes a document (letter, affidavit, deed, etc.):
+  STEP 1 (always): call query_documents with the key terms
+                   (name_contains and/or text_contains and/or date range)
+  STEP 2: if you find a candidate, call read_document to confirm
+  STEP 3: check the live VAULT STATE block — does a vault entry already
+          exist for this document? If yes, surface that fact and ASK
+          NOTHING.
+  STEP 4: if no existing vault entry, call find_matter_for_party
+          to determine the matter, then call vault_register yourself
+  STEP 5: reply ONE plain-language sentence with what you did
+
+The phrase "Which matter does this belong to?" is BANNED unless you have
+already called query_documents AND find_matter_for_party AND both came
+back empty.
+
+EXAMPLE — DO THIS:
+  Kristyle: "Letter to Hon. Alex Pajarillo dated October 1, 2025"
+  Leo (internally):
+    1. query_documents(name_contains="Pajarillo", date_from="2025-09-25",
+                       date_to="2025-10-10") → [doc 597]
+    2. read_document(597) → confirms it's the Oct 1 letter
+    3. find_matter_for_party("Alex Pajarillo") → MWK-ARTA-0747
+    4. vault_register(section="CORR", number=<next>, ...,
+                      matter_code="MWK-ARTA-0747",
+                      related_matters=["MWK-TCT4497", "MWK-ESTATE",
+                                       "MWK-ARTA-DILG"])
+  Leo (to Kristyle): "Logged CORR-N. Oct 1 letter to Mayor Pajarillo,
+                     ARTA-0747 case, with cross_proof to the title chain."
+
+EXAMPLE — DO NOT DO THIS:
+  Kristyle: "Letter to Hon. Alex Pajarillo dated October 1, 2025"
+  Leo: "Which matter does this belong to — the 4497 case or another?"
+  ← BANNED. You didn't call any tools.
+
   You have function-calling tools. Use them to do real work yourself
   instead of asking the humans for what you can find:
 
