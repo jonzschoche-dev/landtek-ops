@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from landtek_telegram.handlers import vault as vault_handler
 from landtek_telegram.handlers import fallback as fallback_handler
+from landtek_telegram.handlers import llm as llm_handler
 
 PG_DSN = os.environ.get("LANDTEK_TG_PG_DSN",
                         "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
@@ -75,13 +76,14 @@ def _decide_handler(row):
     if not text:
         return "skip_no_content", None
 
-    # Vault handler claims any text it can interpret
+    # Vault handler claims explicit deterministic vault commands
     intent = vault_handler._classify_intent(text)
     if intent != "none":
         return "vault", vault_handler
 
-    # Otherwise fallback (never-ghost ack)
-    return "fallback", fallback_handler
+    # Everything else from a human → LLM handler (real conversation)
+    # llm_handler degrades to a one-line acknowledgment if the API is down.
+    return "llm", llm_handler
 
 
 def _process_one(conn, row):
