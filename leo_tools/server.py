@@ -55,6 +55,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: channel adapters not registered: {_e}", file=_sys.stderr)
 
+try:
+    from vault_endpoints import bp as _vault_bp
+    app.register_blueprint(_vault_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: vault endpoints not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 
