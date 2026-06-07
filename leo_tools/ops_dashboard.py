@@ -63,8 +63,13 @@ def _layout(title: str, body: str, active: str = "home") -> str:
     nav = [
         ("home", "/", "Home"),
         ("clients", "/clients", "Clients"),
-        ("participants", "/participants", "Participants"),
+        ("participants", "/participants", "People"),
         ("mwk", "/mwk", "MWK"),
+        ("email", "/email", "Email"),
+        ("events", "/events", "Events"),
+        ("work", "/work", "Work"),
+        ("ingestion", "/ingestion", "Ingestion"),
+        ("history", "/history", "History"),
         ("health", "/health", "Health"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
@@ -377,6 +382,21 @@ def _participants_table(rows: list[dict], show_scope: bool = True) -> str:
     return hdr + "".join(out)
 
 
+def _badge_relevance(status: str | None) -> str:
+    s = (status or "unknown").lower()
+    cls = "badge-off"
+    if s in ("goal_linked", "assessed", "matter_linked"):
+        cls = "badge-ok"
+    elif s in ("unlinked", "client_only"):
+        cls = "badge-warn"
+    return f'<span class="badge {cls}">{_esc(status or "—")}</span>'
+
+
+def _badge_risk(risk: str | None) -> str:
+    m = {"overdue": "badge-bad", "imminent": "badge-bad", "approaching": "badge-warn"}
+    return f'<span class="badge {m.get(risk or "", "badge-off")}">{_esc(risk or "—")}</span>'
+
+
 def _badge_timer(row: dict) -> str:
     unit = row["unit"]
     active = row.get("active", "")
@@ -538,6 +558,22 @@ def home():
          WHERE onboarding_state = 'awaiting_jonathan_approval'
     """, default={"n": 0}, one=True)
 
+    hist_summary = _safe_fetch(cur, conn, """
+        SELECT client_code, events_7d, events_30d,
+               most_recent_event::date AS last_event
+          FROM v_client_history_summary
+         ORDER BY events_7d DESC NULLS LAST
+         LIMIT 4
+    """, default=[])
+
+    spine_recent = _safe_fetch(cur, conn, """
+        SELECT id, mail_at::date AS d, client_code, direction,
+               LEFT(subject, 80) AS subj
+          FROM v_gmail_relevant
+         ORDER BY mail_at DESC NULLS LAST
+         LIMIT 5
+    """, default=[])
+
     cur.close()
     conn.close()
 
@@ -655,14 +691,41 @@ def home():
                    '<a href="/ops/participants">participants</a>'),
     ])
 
+    hist_rows = "".join(
+        f"<tr><td>{_esc(h['client_code'])}</td><td>{h.get('events_7d') or 0}</td>"
+        f"<td>{h.get('events_30d') or 0}</td><td>{h.get('last_event') or '—'}</td></tr>"
+        for h in hist_summary
+    ) or '<tr><td colspan="4" class="empty">No spine events</td></tr>'
+
+    spine_rows = "".join(
+        f"<tr><td>{r['d']}</td><td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r.get('direction') or '—')}</td>"
+        f"<td>{_esc(r.get('subj') or '—')}</td></tr>"
+        for r in spine_recent
+    ) or '<tr><td colspan="4" class="empty">No spine emails</td></tr>'
+
+    quick_nav = """
+<div class="grid grid-4" style="margin-bottom:16px">
+  <div class="card"><h2>Email</h2><p class="muted" style="margin:0 0 8px">Spine vs triage backlog</p>
+    <a href="/ops/email">Open email hub →</a></div>
+  <div class="card"><h2>Events</h2><p class="muted" style="margin:0 0 8px">30d calendar + prep %</p>
+    <a href="/ops/events">Open events →</a></div>
+  <div class="card"><h2>Work queue</h2><p class="muted" style="margin:0 0 8px">Obligations, needs, actions</p>
+    <a href="/ops/work">Open work →</a></div>
+  <div class="card"><h2>History</h2><p class="muted" style="margin:0 0 8px">Verified client_history spine</p>
+    <a href="/ops/history">Open timeline →</a></div>
+</div>
+"""
+
     body = f"""
 <h1>Morning briefing</h1>
 <p class="lead">Portfolio, Leo pulse, deadlines — live SQL, no LLM.</p>
 {''.join(alerts) if alerts else '<div class="alert alert-ok">No critical alerts</div>'}
 <form class="searchbar" action="/ops/search" method="get" style="margin-bottom:20px">
-  <input name="q" placeholder="Search docs, notes, entities…" minlength="2" required>
+  <input name="q" placeholder="Search docs, emails, notes, matters…" minlength="2" required>
   <button type="submit">Search</button>
 </form>
+{quick_nav}
 <div class="section-title">Portfolio</div>
 <div class="grid grid-4" style="margin-bottom:8px">{portfolio_cards}</div>
 <div class="section-title">Operations</div>
@@ -683,6 +746,16 @@ def home():
   </div>
   <div class="card"><h2>Client needs</h2>
     <table><tr><th>P</th><th>Client</th><th>Need</th><th>Kind</th></tr>{need_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Spine activity (7d / 30d)</h2>
+    <table><tr><th>Client</th><th>7d</th><th>30d</th><th>Last event</th></tr>{hist_rows}</table>
+    <p style="margin:10px 0 0"><a href="/ops/history">Full timeline →</a></p>
+  </div>
+  <div class="card"><h2>Latest spine emails</h2>
+    <table><tr><th>Date</th><th>Client</th><th>Dir</th><th>Subject</th></tr>{spine_rows}</table>
+    <p style="margin:10px 0 0"><a href="/ops/email">Email hub →</a></p>
   </div>
 </div>
 <div class="card" style="margin-top:16px"><h2>Recent Leo activity</h2>
@@ -778,6 +851,29 @@ def client_detail(case_file: str):
         case_file=case_file,
     )
 
+    phase = _safe_fetch(cur, conn, """
+        SELECT phase_label, current_focus, success_criteria
+          FROM v_current_phase_per_case WHERE case_file = %s LIMIT 1
+    """, (case_file,), default=None, one=True)
+
+    needs = _safe_fetch(cur, conn, """
+        SELECT short_label, priority, need_kind FROM v_open_client_needs
+         WHERE client_code = %s ORDER BY priority DESC LIMIT 8
+    """, (client.get("client_code"),), default=[])
+
+    history = _safe_fetch(cur, conn, """
+        SELECT event_date, event_kind_canonical, LEFT(what_short, 100) AS what_short, citation_ref
+          FROM v_client_recent_history
+         WHERE client_code = %s
+         ORDER BY COALESCE(event_datetime, event_date::timestamptz) DESC NULLS LAST
+         LIMIT 12
+    """, (client.get("client_code"),), default=[])
+
+    hist_sum = _safe_fetch(cur, conn, """
+        SELECT events_7d, events_30d, total_events_lifetime, most_recent_event::date AS last_event
+          FROM v_client_history_summary WHERE client_code = %s LIMIT 1
+    """, (client.get("client_code"),), default=None, one=True)
+
     cur.close()
     conn.close()
 
@@ -795,16 +891,64 @@ def client_detail(case_file: str):
         for o in obligations
     ) or '<tr><td colspan="4" class="empty">None</td></tr>'
 
+    n_rows = "".join(
+        f"<tr><td>P{n['priority']}</td><td>{_esc(n['short_label'])}</td>"
+        f"<td>{_esc(n.get('need_kind') or '—')}</td></tr>"
+        for n in needs
+    ) or '<tr><td colspan="3" class="empty">None</td></tr>'
+
+    h_rows = "".join(
+        f"<tr><td>{r.get('event_date') or '—'}</td>"
+        f"<td>{_esc(r.get('event_kind_canonical') or '—')}</td>"
+        f"<td>{_esc(r.get('what_short') or '—')}</td>"
+        f"<td><code>{_esc(r.get('citation_ref') or '—')}</code></td></tr>"
+        for r in history
+    ) or '<tr><td colspan="4" class="empty">No spine events in last 30d</td></tr>'
+
+    phase_block = ""
+    if phase:
+        phase_block = f"""
+<div class="card" style="margin-bottom:16px"><h2>Current phase</h2>
+  <p><strong>{_esc(phase.get('phase_label') or '—')}</strong></p>
+  <p class="muted" style="margin:4px 0">{_esc(phase.get('current_focus') or '')}</p>
+  <p class="muted" style="margin:0;font-size:12px">Success: {_esc((phase.get('success_criteria') or '')[:200])}</p>
+</div>
+"""
+
+    hist_stats = ""
+    if hist_sum:
+        hist_stats = (
+            f"{hist_sum.get('events_7d') or 0} events 7d · "
+            f"{hist_sum.get('events_30d') or 0} 30d · "
+            f"{hist_sum.get('total_events_lifetime') or 0} lifetime"
+        )
+
     body = f"""
 <h1>{_esc(client.get('name') or case_file)}</h1>
-<p class="lead"><code>{_esc(case_file)}</code> · <a href="/files/?case={_esc(case_file)}">Browse files</a>
-  · <a href="/ops/mwk">MWK lanes</a> (if MWK)</p>
+<p class="lead"><code>{_esc(case_file)}</code> · <code>{_esc(client.get('client_code') or '—')}</code>
+  · <a href="/files/?case={_esc(case_file)}">Browse files</a>
+  · <a href="/ops/mwk">MWK lanes</a> · <a href="/ops/history?client={_esc(client.get('client_code') or '')}">History</a></p>
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("Spine events 7d", hist_sum.get('events_7d', '—') if hist_sum else '—', hist_stats or 'client_history')}
+  {_stat_card("Open obligations", len(obligations))}
+  {_stat_card("Active matters", len(matters))}
+  {_stat_card("Open needs", len(needs))}
+</div>
+{phase_block}
 <div class="grid grid-2">
   <div class="card"><h2>Active matters</h2>
     <table><tr><th>Matter</th><th>Stage</th><th>Deadline</th><th>Next</th></tr>{m_rows}</table>
   </div>
   <div class="card"><h2>Open obligations</h2>
     <table><tr><th>P</th><th>Label</th><th>Matter</th><th>Status</th></tr>{o_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Client needs</h2>
+    <table><tr><th>P</th><th>Need</th><th>Kind</th></tr>{n_rows}</table>
+  </div>
+  <div class="card"><h2>Spine timeline (30d)</h2>
+    <table><tr><th>Date</th><th>Kind</th><th>What</th><th>Citation</th></tr>{h_rows}</table>
   </div>
 </div>
 <div class="card" style="margin-top:16px"><h2>Participants &amp; clearances</h2>
@@ -972,6 +1116,26 @@ def matter_detail(matter_code: str):
     """, (f"%{matter_code.split('-')[-1]}%",))
     deadlines = cur.fetchall()
 
+    arta = _safe_fetch(cur, conn, """
+        SELECT ctn_no, status, last_activity, forum, respondents, subject_summary,
+               email_count, attachment_count, next_deadline, next_action
+          FROM arta_cases WHERE matter_code = %s
+    """, (matter_code,), default=None, one=True)
+
+    resolutions = _safe_fetch(cur, conn, """
+        SELECT resolution_date, forum, disposition, source_doc_id,
+               LEFT(COALESCE(disposition_summary, ''), 90) AS summary
+          FROM resolutions WHERE %s = ANY(affected_matter_codes)
+         ORDER BY resolution_date DESC NULLS LAST LIMIT 8
+    """, (matter_code,), default=[])
+
+    obligations = _safe_fetch(cur, conn, """
+        SELECT short_label, priority, status, due_by
+          FROM landtek_obligations
+         WHERE matter_code = %s AND status IN ('open','in_progress','blocked')
+         ORDER BY priority DESC
+    """, (matter_code,), default=[])
+
     cur.close()
     conn.close()
 
@@ -986,10 +1150,44 @@ def matter_detail(matter_code: str):
         for r in deadlines
     ) or '<tr><td colspan="3" class="empty">None</td></tr>'
 
+    obl_rows = "".join(
+        f"<tr><td>P{o['priority']}</td><td>{_esc(o['short_label'])}</td>"
+        f"<td>{_esc(str(o.get('due_by') or '—')[:10])}</td>"
+        f"<td>{_esc(o['status'])}</td></tr>"
+        for o in obligations
+    ) or '<tr><td colspan="4" class="empty">None</td></tr>'
+
+    res_rows = "".join(
+        f"<tr><td>{r.get('resolution_date') or '—'}</td><td>{_esc(r.get('forum') or '—')}</td>"
+        f"<td><code>{_esc(r.get('disposition') or '—')}</code></td>"
+        f"<td>{'doc#' + str(r['source_doc_id']) if r.get('source_doc_id') else '—'}</td>"
+        f"<td>{_esc(r.get('summary') or '—')}</td></tr>"
+        for r in resolutions
+    ) or '<tr><td colspan="5" class="empty">No resolutions logged</td></tr>'
+
+    arta_block = ""
+    if arta:
+        respondents = arta.get("respondents") or []
+        resp = ", ".join(respondents) if respondents else "—"
+        arta_block = f"""
+<div class="card" style="margin-bottom:16px"><h2>ARTA case meta</h2>
+  <table>
+    <tr><td>CTN</td><td><code>{_esc(arta.get('ctn_no'))}</code></td></tr>
+    <tr><td>Status</td><td>{_esc(arta.get('status'))}</td></tr>
+    <tr><td>Forum</td><td>{_esc(arta.get('forum') or '—')}</td></tr>
+    <tr><td>Respondents</td><td>{_esc(resp[:120])}</td></tr>
+    <tr><td>Last activity</td><td>{_esc(arta.get('last_activity') or '—')}</td></tr>
+    <tr><td>Email / attachments</td><td>{arta.get('email_count') or 0} / {arta.get('attachment_count') or 0}</td></tr>
+    <tr><td>Next deadline</td><td>{_esc(arta.get('next_deadline') or '—')} — {_esc(arta.get('next_action') or '')}</td></tr>
+  </table>
+</div>
+"""
+
     body = f"""
 <h1>{_esc(matter_code)}</h1>
 <p class="lead">{_esc(m.get('title') or '')} · <a href="/files/?case={_esc(m.get('case_file') or '')}">Files</a>
-  · {doc_n} docs tagged</p>
+  · <a href="/ops/events">Events</a> · {doc_n} docs tagged</p>
+{arta_block}
 <div class="grid grid-2">
   <div class="card">
     <h2>Matter row</h2>
@@ -1002,12 +1200,21 @@ def matter_detail(matter_code: str):
     </table>
     <p style="margin-top:10px;font-size:13px">{_esc(m.get('next_event') or '')}</p>
   </div>
+  <div class="card"><h2>Open obligations</h2>
+    <table><tr><th>P</th><th>Label</th><th>Due</th><th>Status</th></tr>{obl_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
   <div class="card"><h2>Deadlines (title match)</h2>
     <table><tr><th>Due</th><th>Title</th><th>Status</th></tr>{dl_rows}</table>
+  </div>
+  <div class="card"><h2>Resolutions</h2>
+    <table><tr><th>Date</th><th>Forum</th><th>Disposition</th><th>Doc</th><th>Summary</th></tr>{res_rows}</table>
   </div>
 </div>
 <div class="card" style="margin-top:16px"><h2>Recent email (spine / tagged)</h2>
   <table><tr><th>ID</th><th>Date</th><th>From</th><th>Subject</th></tr>{em_rows}</table>
+  <p style="margin:10px 0 0"><a href="/ops/email?matter={_esc(matter_code)}">All email for this matter →</a></p>
 </div>
 """
     return _layout(matter_code, body, active="mwk")
@@ -1181,6 +1388,493 @@ def health_page():
     return _layout("Health", body, active="health")
 
 
+@bp.route("/email")
+def email_hub():
+    client_filter = request.args.get("client", "").strip()
+    matter_filter = request.args.get("matter", "").strip()
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    stats = _safe_fetch(cur, conn, """
+        SELECT
+          (SELECT COUNT(*) FROM v_gmail_relevant) AS spine_total,
+          (SELECT COUNT(*) FROM v_correspondence_triage) AS triage_total,
+          (SELECT COUNT(*) FROM v_gmail_relevant
+            WHERE mail_at > now() - interval '7 days') AS spine_7d,
+          (SELECT COUNT(*) FROM v_correspondence_triage
+            WHERE COALESCE(received_at, sent_at) > now() - interval '7 days') AS triage_7d,
+          (SELECT COUNT(*) FROM v_correspondence_triage
+            WHERE relevance_status = 'unlinked') AS unlinked,
+          (SELECT COUNT(*) FROM v_correspondence_triage
+            WHERE relevance_status = 'client_only') AS client_only,
+          (SELECT COUNT(*) FROM gmail_messages
+            WHERE relevance_status IN ('goal_linked','assessed')) AS goal_linked
+    """, default={}, one=True) or {}
+
+    spine_params = []
+    spine_where = ""
+    if client_filter:
+        spine_where = "WHERE client_code = %s"
+        spine_params.append(client_filter)
+    elif matter_filter:
+        spine_where = "WHERE %s = ANY(matter_codes)"
+        spine_params.append(matter_filter)
+
+    spine = _safe_fetch(cur, conn, f"""
+        SELECT id, mail_at::date AS d, client_code, direction,
+               LEFT(subject, 100) AS subj, relevance_status, citation
+          FROM v_gmail_relevant {spine_where}
+         ORDER BY mail_at DESC NULLS LAST LIMIT 20
+    """, tuple(spine_params), default=[])
+
+    triage_params = []
+    triage_where = ""
+    if client_filter:
+        triage_where = "WHERE client_code = %s"
+        triage_params.append(client_filter)
+    elif matter_filter:
+        triage_where = "WHERE %s = ANY(matter_codes)"
+        triage_params.append(matter_filter)
+
+    triage = _safe_fetch(cur, conn, f"""
+        SELECT gmail_id, sent_at::date AS d, client_code, relevance_status,
+               link_count, LEFT(subject_short, 100) AS subj, from_addr
+          FROM v_correspondence_triage {triage_where}
+         ORDER BY COALESCE(received_at, sent_at) DESC NULLS LAST LIMIT 25
+    """, tuple(triage_params), default=[])
+
+    by_client = _safe_fetch(cur, conn, """
+        SELECT client_code, COUNT(*) AS n
+          FROM v_correspondence_triage
+         WHERE client_code IS NOT NULL
+         GROUP BY client_code ORDER BY n DESC LIMIT 8
+    """, default=[])
+
+    cur.close()
+    conn.close()
+
+    filter_note = ""
+    if client_filter:
+        filter_note = f' · filtered: client <code>{_esc(client_filter)}</code>'
+    elif matter_filter:
+        filter_note = f' · filtered: matter <code>{_esc(matter_filter)}</code>'
+
+    spine_rows = "".join(
+        f"<tr><td><code>{_esc(r.get('citation') or r['id'])}</code></td>"
+        f"<td>{r['d']}</td><td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r.get('direction') or '—')}</td>"
+        f"<td>{_esc(r.get('subj') or '—')}</td>"
+        f"<td>{_badge_relevance(r.get('relevance_status'))}</td></tr>"
+        for r in spine
+    ) or '<tr><td colspan="6" class="empty">No spine emails</td></tr>'
+
+    triage_rows = "".join(
+        f"<tr><td>gmail#{r['gmail_id']}</td><td>{r['d']}</td>"
+        f"<td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc((r.get('from_addr') or '')[:40])}</td>"
+        f"<td>{_esc(r.get('subj') or '—')}</td>"
+        f"<td>{_badge_relevance(r.get('relevance_status'))}</td>"
+        f"<td>{r.get('link_count') or 0}</td></tr>"
+        for r in triage
+    ) or '<tr><td colspan="7" class="empty">Triage queue empty</td></tr>'
+
+    client_rows = "".join(
+        f"<tr><td>{_esc(c['client_code'])}</td><td>{c['n']}</td>"
+        f"<td><a href=\"/ops/email?client={_esc(c['client_code'])}\">filter</a></td></tr>"
+        for c in by_client
+    ) or '<tr><td colspan="3" class="empty">—</td></tr>'
+
+    body = f"""
+<h1>Email</h1>
+<p class="lead">Spine = verified legal events in <code>client_history</code>.
+  Triage = correspondence needing client/matter/goal linkage{filter_note}</p>
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("Spine (total)", stats.get("spine_total", "?"), f"{stats.get('spine_7d', 0)} in 7d")}
+  {_stat_card("Triage backlog", stats.get("triage_total", "?"), f"{stats.get('triage_7d', 0)} in 7d")}
+  {_stat_card("Unlinked", stats.get("unlinked", "?"), "needs client")}
+  {_stat_card("Goal-linked", stats.get("goal_linked", "?"), "assessed mail")}
+</div>
+<div class="grid grid-2">
+  <div class="card"><h2>Spine — recent legal events</h2>
+    <table><tr><th>Citation</th><th>Date</th><th>Client</th><th>Dir</th><th>Subject</th><th>Status</th></tr>
+    {spine_rows}</table>
+  </div>
+  <div class="card"><h2>Triage — needs linkage</h2>
+    <table><tr><th>ID</th><th>Date</th><th>Client</th><th>From</th><th>Subject</th><th>Status</th><th>Links</th></tr>
+    {triage_rows}</table>
+  </div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Triage by client</h2>
+  <table><tr><th>Client</th><th>Backlog</th><th></th></tr>{client_rows}</table>
+</div>
+"""
+    return _layout("Email", body, active="email")
+
+
+@bp.route("/events")
+def events_hub():
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    events = _safe_fetch(cur, conn, """
+        SELECT id, case_file, short_label, scheduled_for::date AS d, priority,
+               readiness_pct, req_open, req_blocked, req_done, req_total,
+               LEFT(expected_outcome, 80) AS outcome
+          FROM v_upcoming_events_30d
+         ORDER BY scheduled_for ASC NULLS LAST
+    """, default=[])
+
+    signals = _safe_fetch(cur, conn, """
+        SELECT occurred_at::date AS d, signal_kind, short_text,
+               acknowledged_at IS NULL AS unacked
+          FROM v_active_priority_signals_7d
+         ORDER BY occurred_at DESC LIMIT 10
+    """, default=[])
+
+    deadlines = _safe_fetch(cur, conn, """
+        SELECT due_date, title, status, case_file
+          FROM case_deadlines
+         WHERE status != 'completed' AND due_date >= CURRENT_DATE - interval '3 days'
+         ORDER BY due_date ASC LIMIT 12
+    """, default=[])
+
+    cur.close()
+    conn.close()
+
+    ev_rows = []
+    for e in events:
+        ready = e.get("readiness_pct") or 0
+        ready_cls = "badge-ok" if ready >= 80 else ("badge-warn" if ready >= 50 else "badge-bad")
+        ev_rows.append(
+            f"<tr><td>{e['d']}</td><td>{_esc(e.get('case_file') or '—')}</td>"
+            f"<td>{_esc(e.get('short_label') or '—')}</td><td>P{e['priority']}</td>"
+            f"<td><span class='badge {ready_cls}'>{ready}%</span></td>"
+            f"<td>{e.get('req_open') or 0} open · {e.get('req_blocked') or 0} blocked</td>"
+            f"<td class='muted'>{_esc(e.get('outcome') or '')}</td></tr>"
+        )
+    ev_html = "".join(ev_rows) or '<tr><td colspan="7" class="empty">No events in next 30 days</td></tr>'
+
+    sig_parts = []
+    for s in signals:
+        ack = (
+            '<span class="badge badge-warn">unacked</span>'
+            if s.get("unacked")
+            else '<span class="badge badge-ok">acked</span>'
+        )
+        sig_parts.append(
+            f"<tr><td>{s['d']}</td><td>{_esc(s.get('signal_kind') or '—')}</td>"
+            f"<td>{_esc(s.get('short_text') or '—')}</td><td>{ack}</td></tr>"
+        )
+    sig_rows = "".join(sig_parts) or '<tr><td colspan="4" class="empty">No signals</td></tr>'
+
+    dl_rows = "".join(
+        f"<tr><td>{_esc(r['due_date'])}</td><td>{_esc(r.get('case_file') or '—')}</td>"
+        f"<td>{_esc(r['title'])}</td><td>{_esc(r['status'])}</td></tr>"
+        for r in deadlines
+    ) or '<tr><td colspan="4" class="empty">None</td></tr>'
+
+    blocked = sum(e.get("req_blocked") or 0 for e in events)
+    low_ready = sum(1 for e in events if (e.get("readiness_pct") or 0) < 50)
+
+    body = f"""
+<h1>Events &amp; prep</h1>
+<p class="lead">Next 30 days — readiness from <code>prep_requirements</code>.</p>
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("Events 30d", len(events))}
+  {_stat_card("Blocked prep", blocked)}
+  {_stat_card("Low readiness", low_ready, "&lt;50% ready")}
+  {_stat_card("Priority signals 7d", len(signals))}
+</div>
+<div class="card"><h2>Upcoming events</h2>
+  <table><tr><th>Date</th><th>Case</th><th>Event</th><th>P</th><th>Ready</th><th>Prep</th><th>Outcome</th></tr>
+  {ev_html}</table>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Priority signals (7d)</h2>
+    <table><tr><th>Date</th><th>Kind</th><th>Text</th><th>Ack</th></tr>{sig_rows}</table>
+  </div>
+  <div class="card"><h2>Case deadlines</h2>
+    <table><tr><th>Due</th><th>Case</th><th>Title</th><th>Status</th></tr>{dl_rows}</table>
+  </div>
+</div>
+"""
+    return _layout("Events", body, active="events")
+
+
+@bp.route("/work")
+def work_hub():
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    obligations = _safe_fetch(cur, conn, """
+        SELECT id, short_label, client_code, priority, due_by, status, risk_window
+          FROM v_obligations_at_risk
+         ORDER BY priority DESC, due_by ASC NULLS LAST
+         LIMIT 30
+    """, default=[])
+
+    by_client = _safe_fetch(cur, conn, """
+        SELECT client_code, client_name, total_open, blocked, imminent, overdue
+          FROM v_open_obligations_by_client
+    """, default=[])
+
+    needs = _safe_fetch(cur, conn, """
+        SELECT client_name, short_label, priority, need_kind, created_at::date AS d
+          FROM v_open_client_needs ORDER BY priority DESC LIMIT 20
+    """, default=[])
+
+    actions = _safe_fetch(cur, conn, """
+        SELECT id, case_file, description, due_date, priority, status
+          FROM action_items WHERE status = 'Open'
+         ORDER BY
+           CASE priority WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END,
+           due_date ASC NULLS LAST
+         LIMIT 25
+    """, default=[])
+
+    cur.close()
+    conn.close()
+
+    obl_rows = "".join(
+        f"<tr><td>P{r['priority']}</td><td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r['short_label'])}</td>"
+        f"<td>{_esc(str(r.get('due_by') or '—')[:10])}</td>"
+        f"<td>{_badge_risk(r.get('risk_window'))}</td>"
+        f"<td>{_esc(r.get('status') or '—')}</td></tr>"
+        for r in obligations
+    ) or '<tr><td colspan="6" class="empty">None at risk</td></tr>'
+
+    client_rows = "".join(
+        f"<tr><td>{_esc(r.get('client_name') or r['client_code'])}</td>"
+        f"<td>{r['total_open']}</td><td>{r.get('blocked') or 0}</td>"
+        f"<td>{r.get('imminent') or 0}</td><td>{r.get('overdue') or 0}</td></tr>"
+        for r in by_client
+    ) or '<tr><td colspan="5" class="empty">—</td></tr>'
+
+    need_rows = "".join(
+        f"<tr><td>P{n['priority']}</td><td>{_esc(n.get('client_name') or '—')}</td>"
+        f"<td>{_esc(n['short_label'])}</td><td>{_esc(n.get('need_kind') or '—')}</td>"
+        f"<td>{n.get('d') or '—'}</td></tr>"
+        for n in needs
+    ) or '<tr><td colspan="5" class="empty">None</td></tr>'
+
+    act_rows = "".join(
+        f"<tr><td>P{_esc(str(a.get('priority') or '—'))}</td>"
+        f"<td>{_esc(a.get('case_file') or '—')}</td>"
+        f"<td>{_esc((a.get('description') or '')[:120])}</td>"
+        f"<td>{_esc(str(a.get('due_date') or '—')[:10])}</td></tr>"
+        for a in actions
+    ) or '<tr><td colspan="4" class="empty">No open actions</td></tr>'
+
+    overdue = sum(r.get("overdue") or 0 for r in by_client)
+
+    body = f"""
+<h1>Work queue</h1>
+<p class="lead">What LandTek owes clients — obligations, needs, and Leo action items.</p>
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("At risk", len(obligations))}
+  {_stat_card("Overdue (all)", overdue)}
+  {_stat_card("Client needs", len(needs))}
+  {_stat_card("Open actions", len(actions))}
+</div>
+<div class="card"><h2>Obligations at risk (14d window)</h2>
+  <table><tr><th>P</th><th>Client</th><th>Label</th><th>Due</th><th>Risk</th><th>Status</th></tr>
+  {obl_rows}</table>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>By client</h2>
+    <table><tr><th>Client</th><th>Open</th><th>Blocked</th><th>14d</th><th>Overdue</th></tr>
+    {client_rows}</table>
+  </div>
+  <div class="card"><h2>Client needs</h2>
+    <table><tr><th>P</th><th>Client</th><th>Need</th><th>Kind</th><th>Since</th></tr>
+    {need_rows}</table>
+  </div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Open action items</h2>
+  <table><tr><th>P</th><th>Case</th><th>Description</th><th>Due</th></tr>{act_rows}</table>
+</div>
+"""
+    return _layout("Work", body, active="work")
+
+
+@bp.route("/ingestion")
+def ingestion_hub():
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    stats = _safe_fetch(cur, conn, """
+        SELECT
+          (SELECT COUNT(*) FROM documents) AS total,
+          (SELECT COUNT(*) FROM documents_needing_classification) AS unclassified,
+          (SELECT COUNT(*) FROM documents
+            WHERE COALESCE(timestamp, created_at) > now() - interval '24 hours') AS docs_24h,
+          (SELECT COUNT(*) FROM documents
+            WHERE COALESCE(timestamp, created_at) > now() - interval '7 days') AS docs_7d,
+          (SELECT COUNT(*) FROM document_matter_links) AS matter_links,
+          (SELECT COUNT(DISTINCT doc_id) FROM document_matter_links) AS linked_docs
+    """, default={}, one=True) or {}
+
+    unclassified = _safe_fetch(cur, conn, """
+        SELECT id, case_file, original_filename, created_at::date AS d, ingest_source,
+               LEFT(preview, 80) AS preview
+          FROM documents_needing_classification
+         ORDER BY created_at DESC LIMIT 25
+    """, default=[])
+
+    recent = _safe_fetch(cur, conn, """
+        SELECT id, case_file, matter_code, original_filename,
+               COALESCE(timestamp, created_at)::date AS d, ingest_source
+          FROM documents
+         ORDER BY COALESCE(timestamp, created_at) DESC NULLS LAST LIMIT 20
+    """, default=[])
+
+    by_case = _safe_fetch(cur, conn, f"""
+        SELECT c.case_file, c.name,
+               (SELECT COUNT(*) FROM documents d WHERE d.case_file = c.case_file) AS docs,
+               (SELECT COUNT(*) FROM documents_needing_classification dnc
+                 WHERE dnc.case_file = c.case_file) AS unclass
+          FROM clients c
+         WHERE {LEGAL_CLIENT_WHERE}
+         ORDER BY unclass DESC, docs DESC
+    """, default=[])
+
+    cur.close()
+    conn.close()
+
+    unclass_rows = "".join(
+        f"<tr><td>{r['id']}</td><td>{_esc(r.get('case_file') or '—')}</td>"
+        f"<td><a href=\"/files/{r['id']}\">{_esc((r.get('original_filename') or '')[:60])}</a></td>"
+        f"<td>{r['d']}</td><td>{_esc(r.get('ingest_source') or '—')}</td>"
+        f"<td class='muted'>{_esc(r.get('preview') or '')}</td></tr>"
+        for r in unclassified
+    ) or '<tr><td colspan="6" class="empty">All docs classified</td></tr>'
+
+    recent_rows = "".join(
+        f"<tr><td>{r['d']}</td><td>{r['id']}</td><td>{_esc(r.get('case_file') or '—')}</td>"
+        f"<td>{_esc(r.get('matter_code') or '—')}</td>"
+        f"<td>{_esc((r.get('original_filename') or '')[:50])}</td>"
+        f"<td>{_esc(r.get('ingest_source') or '—')}</td></tr>"
+        for r in recent
+    ) or '<tr><td colspan="6" class="empty">—</td></tr>'
+
+    case_rows = "".join(
+        f"<tr><td><a href=\"/ops/client/{_esc(r['case_file'])}\">{_esc(r['name'])}</a></td>"
+        f"<td>{r['docs']}</td><td>{r['unclass']}</td>"
+        f"<td><a href=\"/files/?case={_esc(r['case_file'])}\">files</a></td></tr>"
+        for r in by_case
+    ) or '<tr><td colspan="4" class="empty">—</td></tr>'
+
+    link_pct = _pct(stats.get("linked_docs", 0), stats.get("total", 0))
+
+    body = f"""
+<h1>Ingestion</h1>
+<p class="lead">Document pipeline — uploads, matter links, classification gaps.</p>
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("Total docs", stats.get("total", "?"))}
+  {_stat_card("Unclassified", stats.get("unclassified", "?"), "no matter links")}
+  {_stat_card("Ingested 24h", stats.get("docs_24h", "?"), f"{stats.get('docs_7d', 0)} in 7d")}
+  {_stat_card("Matter-linked", link_pct, f"{stats.get('linked_docs', 0)} / {stats.get('total', 0)} docs")}
+</div>
+<div class="card"><h2>Needs classification</h2>
+  <table><tr><th>ID</th><th>Case</th><th>File</th><th>Date</th><th>Source</th><th>Preview</th></tr>
+  {unclass_rows}</table>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Recent ingest</h2>
+    <table><tr><th>Date</th><th>ID</th><th>Case</th><th>Matter</th><th>File</th><th>Source</th></tr>
+    {recent_rows}</table>
+  </div>
+  <div class="card"><h2>By client</h2>
+    <table><tr><th>Client</th><th>Docs</th><th>Unclassified</th><th></th></tr>{case_rows}</table>
+  </div>
+</div>
+"""
+    return _layout("Ingestion", body, active="ingestion")
+
+
+@bp.route("/history")
+def history_hub():
+    client_filter = request.args.get("client", "").strip()
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    summaries = _safe_fetch(cur, conn, """
+        SELECT client_code, total_events_lifetime, events_30d, events_7d,
+               most_recent_event::date AS last_event
+          FROM v_client_history_summary
+         ORDER BY events_7d DESC NULLS LAST
+    """, default=[])
+
+    params = []
+    hist_where = ""
+    if client_filter:
+        hist_where = "WHERE client_code = %s"
+        params.append(client_filter)
+
+    events = _safe_fetch(cur, conn, f"""
+        SELECT client_code, event_date, event_kind_canonical, who_from,
+               LEFT(what_short, 120) AS what_short, citation_ref, source_table
+          FROM v_client_recent_history {hist_where}
+         ORDER BY COALESCE(event_datetime, event_date::timestamptz) DESC NULLS LAST
+         LIMIT 50
+    """, tuple(params), default=[])
+
+    by_kind = _safe_fetch(cur, conn, """
+        SELECT event_kind_canonical, COUNT(*) AS n
+          FROM v_client_recent_history
+         WHERE event_kind_canonical IS NOT NULL
+         GROUP BY event_kind_canonical ORDER BY n DESC LIMIT 12
+    """, default=[])
+
+    cur.close()
+    conn.close()
+
+    sum_rows = "".join(
+        f"<tr><td><a href=\"/ops/history?client={_esc(s['client_code'])}\">{_esc(s['client_code'])}</a></td>"
+        f"<td>{s.get('events_7d') or 0}</td><td>{s.get('events_30d') or 0}</td>"
+        f"<td>{s.get('total_events_lifetime') or 0}</td>"
+        f"<td>{s.get('last_event') or '—'}</td></tr>"
+        for s in summaries
+    ) or '<tr><td colspan="5" class="empty">No history</td></tr>'
+
+    ev_rows = "".join(
+        f"<tr><td>{r.get('event_date') or '—'}</td><td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r.get('event_kind_canonical') or '—')}</td>"
+        f"<td>{_esc(r.get('who_from') or '—')}</td>"
+        f"<td>{_esc(r.get('what_short') or '—')}</td>"
+        f"<td><code>{_esc(r.get('citation_ref') or '—')}</code></td>"
+        f"<td class='muted'>{_esc(r.get('source_table') or '')}</td></tr>"
+        for r in events
+    ) or '<tr><td colspan="7" class="empty">No events in last 30d</td></tr>'
+
+    kind_rows = "".join(
+        f"<tr><td>{_esc(k['event_kind_canonical'])}</td><td>{k['n']}</td></tr>"
+        for k in by_kind
+    ) or '<tr><td colspan="2" class="empty">—</td></tr>'
+
+    filter_note = f' — <code>{_esc(client_filter)}</code>' if client_filter else ""
+
+    body = f"""
+<h1>Client history spine</h1>
+<p class="lead">Verified legal events only — promos excluded. Last 30 days{filter_note}.
+  {('<a href="/ops/history">Show all clients</a>' if client_filter else '')}</p>
+<div class="grid grid-2">
+  <div class="card"><h2>Per-client summary</h2>
+    <table><tr><th>Client</th><th>7d</th><th>30d</th><th>Lifetime</th><th>Last</th></tr>{sum_rows}</table>
+  </div>
+  <div class="card"><h2>Event kinds (30d)</h2>
+    <table><tr><th>Kind</th><th>Count</th></tr>{kind_rows}</table>
+  </div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Timeline</h2>
+  <table><tr><th>Date</th><th>Client</th><th>Kind</th><th>Who</th><th>What</th><th>Citation</th><th>Source</th></tr>
+  {ev_rows}</table>
+</div>
+"""
+    return _layout("History", body, active="history")
+
+
 @bp.route("/search")
 def search_page():
     q = request.args.get("q", "").strip()
@@ -1189,19 +1883,50 @@ def search_page():
     like = f"%{q}%"
     conn = _db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("""
+
+    docs = _safe_fetch(cur, conn, """
         SELECT id, case_file, original_filename, classification
           FROM documents
          WHERE original_filename ILIKE %s OR extracted_text ILIKE %s
          ORDER BY id DESC LIMIT 25
-    """, (like, like))
-    docs = cur.fetchall()
-    cur.execute("""
+    """, (like, like), default=[])
+
+    notes = _safe_fetch(cur, conn, """
         SELECT id, case_file, LEFT(content, 120) AS snippet
           FROM chat_notes WHERE content ILIKE %s
          ORDER BY id DESC LIMIT 15
-    """, (like,))
-    notes = cur.fetchall()
+    """, (like,), default=[])
+
+    emails = _safe_fetch(cur, conn, """
+        SELECT id, mail_at::date AS d, client_code, LEFT(subject, 90) AS subj, citation
+          FROM v_gmail_relevant
+         WHERE subject ILIKE %s OR body_plain ILIKE %s OR from_addr ILIKE %s
+         ORDER BY mail_at DESC NULLS LAST LIMIT 15
+    """, (like, like, like), default=[])
+
+    matters = _safe_fetch(cur, conn, """
+        SELECT matter_code, case_file, current_stage, status
+          FROM matters
+         WHERE matter_code ILIKE %s OR title ILIKE %s OR current_stage ILIKE %s
+         ORDER BY matter_code LIMIT 15
+    """, (like, like, like), default=[])
+
+    obligations = _safe_fetch(cur, conn, """
+        SELECT id, client_code, short_label, status, due_by::date AS due
+          FROM landtek_obligations
+         WHERE short_label ILIKE %s OR description ILIKE %s
+         ORDER BY priority DESC LIMIT 15
+    """, (like, like), default=[])
+
+    history = _safe_fetch(cur, conn, """
+        SELECT client_code, event_date, event_kind_canonical,
+               LEFT(what_short, 100) AS what_short, citation_ref
+          FROM v_client_recent_history
+         WHERE what_short ILIKE %s OR who_from ILIKE %s
+         ORDER BY COALESCE(event_datetime, event_date::timestamptz) DESC NULLS LAST
+         LIMIT 15
+    """, (like, like), default=[])
+
     cur.close()
     conn.close()
 
@@ -1216,14 +1941,62 @@ def search_page():
         for r in notes
     ) or '<tr><td colspan="3" class="empty">No notes</td></tr>'
 
+    e_rows = "".join(
+        f"<tr><td><code>{_esc(r.get('citation') or r['id'])}</code></td><td>{r['d']}</td>"
+        f"<td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r.get('subj') or '—')}</td></tr>"
+        for r in emails
+    ) or '<tr><td colspan="4" class="empty">No spine emails</td></tr>'
+
+    m_rows = "".join(
+        f"<tr><td><a href=\"/ops/matter/{_esc(r['matter_code'])}\">{_esc(r['matter_code'])}</a></td>"
+        f"<td>{_esc(r.get('case_file') or '—')}</td>"
+        f"<td>{_esc(r.get('current_stage') or '—')}</td>"
+        f"<td>{_esc(r.get('status') or '—')}</td></tr>"
+        for r in matters
+    ) or '<tr><td colspan="4" class="empty">No matters</td></tr>'
+
+    o_rows = "".join(
+        f"<tr><td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r['short_label'])}</td><td>{r.get('due') or '—'}</td>"
+        f"<td>{_esc(r.get('status') or '—')}</td></tr>"
+        for r in obligations
+    ) or '<tr><td colspan="4" class="empty">No obligations</td></tr>'
+
+    h_rows = "".join(
+        f"<tr><td>{r.get('event_date') or '—'}</td><td>{_esc(r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(r.get('event_kind_canonical') or '—')}</td>"
+        f"<td>{_esc(r.get('what_short') or '—')}</td>"
+        f"<td><code>{_esc(r.get('citation_ref') or '—')}</code></td></tr>"
+        for r in history
+    ) or '<tr><td colspan="5" class="empty">No history events</td></tr>'
+
+    total = len(docs) + len(notes) + len(emails) + len(matters) + len(obligations) + len(history)
+
     body = f"""
 <h1>Search: {_esc(q)}</h1>
-<p class="lead"><a href="/api/search?q={_esc(q)}">JSON API</a></p>
+<p class="lead">{total} results · <a href="/api/search?q={_esc(q)}">JSON API</a></p>
 <div class="grid grid-2">
-  <div class="card"><h2>Documents</h2>
+  <div class="card"><h2>Documents ({len(docs)})</h2>
     <table><tr><th>ID</th><th>Case</th><th>File</th></tr>{d_rows}</table>
   </div>
-  <div class="card"><h2>Chat notes</h2>
+  <div class="card"><h2>Spine emails ({len(emails)})</h2>
+    <table><tr><th>Citation</th><th>Date</th><th>Client</th><th>Subject</th></tr>{e_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Matters ({len(matters)})</h2>
+    <table><tr><th>Matter</th><th>Case</th><th>Stage</th><th>Status</th></tr>{m_rows}</table>
+  </div>
+  <div class="card"><h2>Obligations ({len(obligations)})</h2>
+    <table><tr><th>Client</th><th>Label</th><th>Due</th><th>Status</th></tr>{o_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>History spine ({len(history)})</h2>
+    <table><tr><th>Date</th><th>Client</th><th>Kind</th><th>What</th><th>Citation</th></tr>{h_rows}</table>
+  </div>
+  <div class="card"><h2>Chat notes ({len(notes)})</h2>
     <table><tr><th>ID</th><th>Case</th><th>Snippet</th></tr>{n_rows}</table>
   </div>
 </div>
