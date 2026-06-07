@@ -1,0 +1,21 @@
+[Unit]
+Description=LandTek Telegram router (polls inbox, dispatches to handlers)
+After=network.target docker.service postgresql.service landtek-tg-inbox.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/landtek
+EnvironmentFile=/root/landtek/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=LANDTEK_TG_PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
+Environment=LANDTEK_TG_POLL_SECONDS=2
+ExecStart=/usr/bin/python3 /root/landtek/landtek_telegram/router.py
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
