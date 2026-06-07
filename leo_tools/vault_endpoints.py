@@ -122,12 +122,16 @@ def register():
               f"drive_file_id:{drive_file_id}" if drive_file_id else None))
         new_id = cur.fetchone()["id"]
 
-        # Link to matter via junction
+        # Link to matter via junction (deploy_279 schema)
         cur.execute("""
-            INSERT INTO document_matter_links (doc_id, matter_code, link_type, confidence, created_at)
-            VALUES (%s, %s, 'vault_registration', 1.0, NOW())
+            INSERT INTO document_matter_links
+                (doc_id, matter_code, case_file, relation_kind, provenance_level,
+                 linked_by, note, created_at, updated_at)
+            VALUES (%s, %s, %s, 'vault_registration', 'verified',
+                    'vault_register_endpoint', 'created by Kristyle via vault command',
+                    NOW(), NOW())
             ON CONFLICT DO NOTHING
-        """, (new_id, matter_code))
+        """, (new_id, matter_code, case_file))
 
         return jsonify(ok=True, doc_id=new_id,
                        locator=f"{section}-{number:03d}",
