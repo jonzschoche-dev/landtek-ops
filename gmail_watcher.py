@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Gmail watcher — pull new messages, classify, file appropriately (deploy 119).
+"""Gmail watcher — need-only onboarding for the legal KB (deploy 119 / 369).
+
+Default: fetch only legal-relevant Gmail signals + SENT, onboard rows that
+pass should_onboard_email(). Promos/system mail is skipped entirely — not
+stored in gmail_messages or gmail_messages_archived.
 
 Usage:
-  python3 gmail_watcher.py                              # incremental pull (since last_ingested)
+  python3 gmail_watcher.py                              # need-only incremental pull
   python3 gmail_watcher.py --query 'ARTA OR DILG'       # focused pull
   python3 gmail_watcher.py --since 2026-04-01           # explicit since
   python3 gmail_watcher.py --max 200                    # cap
+  python3 gmail_watcher.py --full-inbox                 # legacy: mirror all mail
 
-Categories assigned:
+Categories assigned (onboarded mail only):
   legal_correspondence, bill, receipt, bank_statement, client_inquiry,
   system_alert, personal, promotional, uncategorized
 """
@@ -27,7 +32,12 @@ JONATHAN_TG_ID = "6513067717"  # legacy reference; outbound now uses comms_recip
 import sys as _sys
 _sys.path.insert(0, "/root/landtek")
 from comms_recipients import MWK_001_RECIPIENTS
-from correspondence_spine import is_kb_pollution_email, resolve_client_code
+from correspondence_spine import (
+    build_gmail_need_query,
+    is_kb_pollution_email,
+    resolve_client_code,
+    should_onboard_email,
+)
 
 # ── Category detection patterns ────────────────────────────────────────
 CATEGORY_PATTERNS = [
@@ -175,6 +185,11 @@ def main():
     ap.add_argument("--max", type=int, default=200)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--send-tg", action="store_true")
+    ap.add_argument(
+        "--full-inbox",
+        action="store_true",
+        help="legacy mirror-all mode (not recommended — pollutes KB)",
+    )
     args = ap.parse_args()
 
     svc = gmail_client()
@@ -187,18 +202,23 @@ def main():
         cur.execute("SELECT max(received_at) AS m FROM gmail_messages")
         m = cur.fetchone()["m"]
         since = (m - timedelta(days=1)).strftime("%Y/%m/%d") if m else "2025/01/01"
-    # Build base query
-    base_q = args.query or ""
-    if since:
-        base_q = f"after:{since.replace('-', '/')} " + base_q if base_q else f"after:{since.replace('-', '/')}"
+
+    since_slash = since.replace("-", "/") if since else None
+    if args.query:
+        base_q = args.query
+        if since_slash:
+            base_q = f"after:{since_slash} {base_q}".strip()
+    elif args.full_inbox:
+        base_q = f"after:{since_slash}" if since_slash else ""
+    else:
+        base_q = build_gmail_need_query(since_slash or "2025/01/01")
 
     # TWO-STREAM PULL per architecture review 2026-05-16:
-    # Default `q=after:DATE` returns newest first across all labels — with a 500 cap
-    # SENT items can fall off the bottom. Do an explicit `in:sent` pull as well so
-    # we never miss outbound case correspondence.
+    # Need-query stream for inbound legal mail; explicit in:sent for outbound case mail.
+    sent_q = f"in:sent after:{since_slash}" if since_slash else "in:sent"
     streams = [
-        ("default", base_q),
-        ("sent",    f"in:sent {base_q}".strip()),
+        ("need", base_q),
+        ("sent", sent_q),
     ]
     print(f"  base query: {base_q!r}  max per stream: {args.max}")
 
@@ -220,6 +240,11 @@ def main():
     stats = {}
     inserted = updated = skipped = 0
     actionable = []  # for Telegram digest
+    active_threads: set[str] = set()
+    cur.execute(
+        "SELECT DISTINCT thread_id FROM gmail_messages WHERE thread_id IS NOT NULL"
+    )
+    active_threads = {r["thread_id"] for r in cur.fetchall() if r.get("thread_id")}
 
     for i, m in enumerate(msgs[:args.max]):
         full = svc.users().messages().get(userId="me", id=m["id"], format="full").execute()
@@ -244,14 +269,31 @@ def main():
                 })
 
         category, conf = classify_email(subject, plain, from_addr)
-        is_noise = is_kb_pollution_email(
+        is_sent = bool(labels and "SENT" in labels)
+        case_file = correlate_case(f"{subject} {plain}", by_case)
+        thread_in_kb = bool(thread_id and thread_id in active_threads)
+        onboard = args.full_inbox or should_onboard_email(
             from_addr=from_addr,
             subject=subject,
             body_plain=plain,
+            to_addrs=to_addrs,
+            cc_addrs=cc_addrs,
+            case_file=case_file,
             raw_category=category,
+            is_sent=is_sent,
+            thread_in_active_kb=thread_in_kb,
         )
-        case_file = None if is_noise else correlate_case(f"{subject} {plain}", by_case)
-        client_code = None if is_noise else resolve_client_code(cur, case_file=case_file)
+        if not onboard:
+            skipped += 1
+            stats["skipped_not_needed"] = stats.get("skipped_not_needed", 0) + 1
+            if args.dry_run:
+                print(
+                    f"  [DRY SKIP] {date_str[:25]:25s}  "
+                    f"{(subject or '')[:70]}"
+                )
+            continue
+
+        client_code = resolve_client_code(cur, case_file=case_file)
         stats[category] = stats.get(category, 0) + 1
 
         # Bill metadata if applicable
@@ -259,42 +301,16 @@ def main():
 
         # Upsert
         if args.dry_run:
-            tag = "NOISE" if is_noise else category
-            print(f"  [DRY] {date_str[:25]:25s}  [{tag:18s}]  {(subject or '')[:70]}  case={case_file or '—'}")
+            print(
+                f"  [DRY ONBOARD] {date_str[:25]:25s}  [{category:18s}]  "
+                f"{(subject or '')[:70]}  case={case_file or '—'}"
+            )
             inserted += 1
             continue
 
         try:
             received_at = datetime.strptime(date_str[:31].strip(), "%a, %d %b %Y %H:%M:%S %z") if date_str else None
         except: received_at = None
-
-        if is_noise:
-            cur.execute("""
-                INSERT INTO gmail_messages_archived
-                  (message_id, thread_id, from_addr, to_addrs, cc_addrs, subject,
-                   body_plain, body_html, sent_at, received_at, labels,
-                   has_attachments, attachment_refs, case_file,
-                   relevance_score, relevance_reasons, raw_payload,
-                   archived_reason, archived_by)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s::jsonb,%s,%s)
-                ON CONFLICT (message_id) DO UPDATE SET
-                  labels = EXCLUDED.labels,
-                  archived_at = now(),
-                  archived_reason = EXCLUDED.archived_reason,
-                  archived_by = EXCLUDED.archived_by
-                RETURNING (xmax = 0) AS is_new
-            """, (m["id"], thread_id, from_addr, to_addrs, cc_addrs, subject,
-                  plain[:50000], html[:50000] if html else None, received_at, received_at,
-                  labels, bool(attachments), json.dumps(attachments) if attachments else None,
-                  None, conf, ["ingestion_gate", category],
-                  json.dumps({"category": category, "bill_metadata": bill_meta}),
-                  "ingestion_gate", "gmail_watcher"))
-            is_new = cur.fetchone()["is_new"]
-            if is_new:
-                inserted += 1
-            else:
-                updated += 1
-            continue
 
         cur.execute("""
             INSERT INTO gmail_messages
@@ -315,8 +331,12 @@ def main():
               case_file, client_code, conf, [category],
               json.dumps({"category": category, "bill_metadata": bill_meta})))
         is_new = cur.fetchone()["is_new"]
-        if is_new: inserted += 1
-        else: updated += 1
+        if is_new:
+            inserted += 1
+            if thread_id:
+                active_threads.add(thread_id)
+        else:
+            updated += 1
 
         # Surface actionable items
         if category in ("bill", "legal_correspondence") and conf >= 0.5:
@@ -334,8 +354,14 @@ def main():
     try:
         cur.execute("""INSERT INTO system_heartbeat (source, status, metadata)
                        VALUES ('gmail-watcher', 'ok', %s::jsonb)""",
-                    (json.dumps({"inserted": inserted, "updated": updated,
-                                  "by_category": stats, "query": q}),))
+                    (json.dumps({
+                        "inserted": inserted,
+                        "updated": updated,
+                        "skipped": skipped,
+                        "by_category": stats,
+                        "query": base_q,
+                        "need_only": not args.full_inbox,
+                    }),))
     except Exception: pass
 
     print(f"\n  inserted: {inserted}  updated: {updated}  skipped: {skipped}")

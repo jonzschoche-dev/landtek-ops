@@ -223,6 +223,112 @@ LEGAL_ACTION_RE = re.compile(
 )
 
 
+NEEDED_CATEGORIES = frozenset({
+    "legal_correspondence", "bill", "receipt", "bank_statement", "client_inquiry",
+})
+
+# Gmail API pre-filter — reduces fetch volume before per-message gate.
+GMAIL_NEED_SIGNALS = [
+    "from:arta.gov.ph",
+    "from:litigationdivision",
+    "from:dilg",
+    "from:barandon",
+    "from:botor",
+    "from:pajarillo",
+    "from:macale",
+    "from:landbank",
+    "from:registryofdeeds",
+    "from:lra.gov",
+    "from:op.gov",
+    "subject:ARTA",
+    'subject:"CTN SL"',
+    "subject:manifestation",
+    "subject:hearing",
+    "subject:complaint",
+    "subject:resolution",
+    "subject:mediation",
+    "subject:Macale",
+    "subject:Mercedes",
+    "subject:Worrick",
+    "subject:Paracale",
+    "subject:TCT",
+    "subject:CV-26360",
+    "subject:26-360",
+    "subject:affidavit",
+    "subject:motion",
+    "subject:petition",
+    "subject:appeal",
+]
+
+
+def build_gmail_need_query(since: str) -> str:
+    """Gmail search query — only fetch mail likely needed for the legal KB."""
+    since_q = since.replace("-", "/")
+    or_clause = " OR ".join(GMAIL_NEED_SIGNALS)
+    return f"after:{since_q} ({or_clause})"
+
+
+def should_onboard_email(
+    *,
+    from_addr: str | None = None,
+    subject: str | None = None,
+    body_plain: str | None = None,
+    to_addrs: list[str] | None = None,
+    cc_addrs: list[str] | None = None,
+    relevance_status: str | None = None,
+    matter_codes: list[str] | None = None,
+    case_file: str | None = None,
+    raw_category: str | None = None,
+    is_sent: bool = False,
+    thread_in_active_kb: bool = False,
+) -> bool:
+    """True when email should enter gmail_messages (active KB).
+
+    Need-only policy: legal actors/actions, firm bills, client inquiries,
+    outbound case mail, or continuation of an already-onboarded thread.
+    Everything else is skipped — no active row, no archive row.
+    """
+    if is_kb_pollution_email(
+        from_addr=from_addr,
+        subject=subject,
+        body_plain=body_plain,
+        relevance_status=relevance_status,
+        matter_codes=matter_codes,
+        raw_category=raw_category,
+    ):
+        return False
+
+    if thread_in_active_kb:
+        return True
+    if matter_codes:
+        return True
+    if case_file:
+        return True
+
+    sender = from_addr or ""
+    text = f"{subject or ''}\n{(body_plain or '')[:6000]}"
+    addr_blob = " ".join((to_addrs or []) + (cc_addrs or []))
+
+    if LEGAL_ACTOR_RE.search(sender) or LEGAL_ACTOR_RE.search(addr_blob):
+        return True
+    if LEGAL_ACTION_RE.search(text):
+        return True
+
+    if raw_category in NEEDED_CATEGORIES:
+        if raw_category == "legal_correspondence":
+            return bool(
+                LEGAL_ACTOR_RE.search(sender)
+                or LEGAL_ACTION_RE.search(text)
+                or case_file
+            )
+        return True
+
+    if is_sent:
+        return bool(LEGAL_ACTION_RE.search(text) or LEGAL_ACTOR_RE.search(addr_blob))
+
+    return False
+
+
 def is_kb_pollution_email(
     *,
     from_addr: str | None = None,
