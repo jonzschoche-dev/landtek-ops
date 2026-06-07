@@ -327,6 +327,10 @@ def render_leo_const(queue: list[dict]) -> str:
         )
     L.append("")
     L.append("When Jonathan asks 'what should we focus on for MWK?' → answer from this queue.")
+    L.append(
+        "ARTA-0747 OP appeal (obligation #9): no blocker — Barandon is NOT blocking this admin track; "
+        "owner=landtek. Do not report 'waiting on Barandon' for 0747 OP filing."
+    )
     L.append("HARD-FACTS RULE: cite only verified sources (doc#, chat_notes# with provenance=verified).")
     L.append("Items here are triage hints — if not in MWK_CV26360_HARD_FACTS_TEXT, do NOT state as fact.")
     return "\n".join(L)

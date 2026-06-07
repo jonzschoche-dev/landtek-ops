@@ -138,6 +138,11 @@ def render_pending(d: dict) -> str:
         f"two OP manifestations (obligation {manifest_ids}): ARTA-1210 + ARTA-0747; "
         f"MWK-OP-PETITION supervisory track (doc#702/#703)."
     )
+    lines.append(
+        "ARTA-0747 OP appeal (obligation #9, due 2026-06-10): NO verified blocker — "
+        "Atty. Barandon is plaintiff counsel on CV-26360 only; he is NOT blocking "
+        "the ARTA-0747 OP filing. Filing owner=landtek."
+    )
     lines.append("Resolved/closed ARTA (-0690, -0792) are NOT listed — status=closed in DB.")
     return "\n".join(lines)
 
