@@ -18,7 +18,10 @@ from _harness import run, TruthFailure
 from case_theories._clients import CLIENTS
 
 REGISTERED = {c["case_file"] for c in CLIENTS.values() if c.get("case_file")}
-TOLERATED = {"unknown", "Unknown", ""}
+# 'Archive' is the system bucket for documents/matters demoted out of active
+# triage (deploy_293 Fortunato-out-of-triage + AUTO-ARCHIVE matter). It's a real
+# domain value, not corruption — tolerated but unowned by any CLIENTS row.
+TOLERATED = {"unknown", "Unknown", "", "Archive"}
 
 
 def case_file_domain_invariant(cur):
