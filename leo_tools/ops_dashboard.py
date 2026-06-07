@@ -63,6 +63,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
     nav = [
         ("home", "/", "Home"),
         ("clients", "/clients", "Clients"),
+        ("participants", "/participants", "Participants"),
         ("mwk", "/mwk", "MWK"),
         ("health", "/health", "Health"),
         ("files", "/files/", "Files"),
@@ -250,6 +251,132 @@ def _pct(n, d) -> str:
     return f"{round(100 * n / d, 1)}%"
 
 
+GLOBAL_STAFF_ROLES = {"owner", "filing_assistant", "operator"}
+
+
+def _clearance_chips(row: dict) -> str:
+    chips = []
+    role = row.get("role") or row.get("approved_role") or "unknown"
+    chips.append(f'<span class="badge badge-off">{_esc(role)}</span>')
+    if row.get("can_admin"):
+        chips.append('<span class="badge badge-warn">admin</span>')
+    if row.get("can_verify"):
+        chips.append('<span class="badge badge-ok">verify</span>')
+    if row.get("can_transcribe"):
+        chips.append('<span class="badge badge-off">transcribe</span>')
+    if row.get("db_scope"):
+        chips.append(f'<span class="badge badge-sim">{_esc(row["db_scope"])}</span>')
+    if row.get("onboarding_state") == "awaiting_jonathan_approval":
+        chips.append('<span class="badge badge-warn">pending</span>')
+    elif row.get("authorized") is False:
+        chips.append('<span class="badge badge-bad">blocked</span>')
+    elif row.get("authorized") is True:
+        chips.append('<span class="badge badge-ok">authorized</span>')
+    return " ".join(chips)
+
+
+def _participant_scope_label(row: dict) -> str:
+    if row.get("scope") == "all_clients":
+        return "All clients"
+    parts = [p for p in (row.get("case_file"), row.get("client_code")) if p]
+    return " · ".join(dict.fromkeys(parts)) or "—"
+
+
+def _fetch_participants(cur, conn, client_code: str | None = None, case_file: str | None = None) -> list[dict]:
+    """Merge authorized_users, channel_users, and client registry into one roster."""
+    by_tg: dict[str, dict] = {}
+
+    def _merge(row: dict):
+        tg = str(row.get("telegram_user_id") or "").strip()
+        if not tg or tg.startswith("999"):
+            return
+        prev = by_tg.get(tg)
+        if prev:
+            for k, v in row.items():
+                if v is not None and v != "" and (prev.get(k) in (None, "", False)):
+                    prev[k] = v
+            return
+        by_tg[tg] = row
+
+    auth_rows = _safe_fetch(cur, conn, """
+        SELECT au.name, au.role, au.telegram_user_id,
+               au.can_transcribe, au.can_verify, au.can_admin,
+               true AS authorized, 'authorized_users' AS source,
+               c.case_file, c.client_code
+          FROM authorized_users au
+          LEFT JOIN clients c ON c.telegram_id = au.telegram_user_id
+         WHERE au.active AND au.role <> 'sim_driver'
+    """, default=[])
+    for r in auth_rows:
+        scope = "all_clients" if r["role"] in GLOBAL_STAFF_ROLES else "client"
+        db_scope = "full" if r.get("can_admin") else ("verify" if r.get("can_verify") else "chat+files")
+        _merge({**r, "scope": scope, "db_scope": db_scope})
+
+    reg_rows = _safe_fetch(cur, conn, """
+        SELECT c.name, COALESCE(c.role, 'contact') AS role, c.telegram_id AS telegram_user_id,
+               c.authorized, c.case_file, c.client_code, 'clients' AS source
+          FROM clients c
+         WHERE c.telegram_id IS NOT NULL AND c.telegram_id <> ''
+    """, default=[])
+    for r in reg_rows:
+        _merge({**r, "scope": "client", "db_scope": "client portal"})
+
+    ch_rows = _safe_fetch(cur, conn, """
+        SELECT cu.display_name AS name,
+               COALESCE(cu.approved_role, cu.role, 'unknown') AS role,
+               cu.channel_user_id AS telegram_user_id,
+               cu.authorized, cu.onboarding_state,
+               cu.approved_scope_case AS case_file,
+               cu.mapped_client_code AS client_code,
+               'channel_users' AS source,
+               ch.name AS channel
+          FROM channel_users cu
+          JOIN channels ch ON ch.id = cu.channel_id
+    """, default=[])
+    for r in ch_rows:
+        scope = "all_clients" if r["role"] in GLOBAL_STAFF_ROLES else "client"
+        _merge({**r, "scope": scope, "db_scope": "telegram channel"})
+
+    rows = list(by_tg.values())
+    rows = _filter_participants(rows, client_code, case_file)
+    rows.sort(key=lambda r: (0 if r.get("scope") == "all_clients" else 1, r.get("name") or ""))
+    return rows
+
+
+def _filter_participants(rows: list[dict], client_code: str | None = None, case_file: str | None = None) -> list[dict]:
+    if not client_code and not case_file:
+        return rows
+    scoped = []
+    for r in rows:
+        if r.get("scope") == "all_clients":
+            scoped.append(r)
+            continue
+        if client_code and r.get("client_code") == client_code:
+            scoped.append(r)
+            continue
+        if case_file and r.get("case_file") == case_file:
+            scoped.append(r)
+    return scoped
+
+
+def _participants_table(rows: list[dict], show_scope: bool = True) -> str:
+    if not rows:
+        return '<tr><td colspan="5" class="empty">No participants</td></tr>'
+    out = []
+    scope_col = "<th>Scope</th>" if show_scope else ""
+    for r in rows:
+        scope_td = f"<td>{_esc(_participant_scope_label(r))}</td>" if show_scope else ""
+        tg = r.get("telegram_user_id") or "—"
+        out.append(
+            f"<tr><td>{_esc(r.get('name') or '—')}</td>"
+            f"<td><code>{_esc(tg)}</code></td>"
+            f"<td>{_esc(r.get('source') or '—')}</td>"
+            f"<td>{_clearance_chips(r)}</td>{scope_td}</tr>"
+        )
+    hdr = f"<tr><th>Name</th><th>Telegram</th><th>Source</th><th>Clearance</th>{scope_col}</tr>"
+    return hdr + "".join(out)
+
+
 def _badge_timer(row: dict) -> str:
     unit = row["unit"]
     active = row.get("active", "")
@@ -406,6 +533,11 @@ def home():
          LIMIT 6
     """, default=[])
 
+    pending_participants = _safe_fetch(cur, conn, """
+        SELECT COUNT(*) AS n FROM channel_users
+         WHERE onboarding_state = 'awaiting_jonathan_approval'
+    """, default={"n": 0}, one=True)
+
     cur.close()
     conn.close()
 
@@ -424,6 +556,11 @@ def home():
     if portfolio.get("triage_backlog", 0) > 500:
         alerts.append(
             f'<div class="alert alert-warn">{portfolio["triage_backlog"]} emails in correspondence triage backlog</div>'
+        )
+    if pending_participants and pending_participants.get("n"):
+        alerts.append(
+            f'<div class="alert alert-warn">{pending_participants["n"]} participant(s) awaiting approval — '
+            f'<a href="/ops/participants">Participants</a></div>'
         )
     for tr in _timer_rows():
         if tr["unit"] == "leo-rapid-fire.timer" and tr["enabled"] == "enabled":
@@ -514,6 +651,8 @@ def home():
         _stat_card("Arch sim", sim_line, "latest burst"),
         _stat_card("Cost 7d", f"${cost_logged:.2f}" if cost_logged else f"~${cost_est:.0f}/d est", cost_sub),
         _stat_card("Avg rating 30d", leo.get("avg_rating") or "—", "from rated interactions"),
+        _stat_card("Pending access", pending_participants.get("n", 0) if pending_participants else 0,
+                   '<a href="/ops/participants">participants</a>'),
     ])
 
     body = f"""
@@ -633,6 +772,12 @@ def client_detail(case_file: str):
     """, (case_file,))
     obligations = cur.fetchall()
 
+    participants = _fetch_participants(
+        cur, conn,
+        client_code=client.get("client_code"),
+        case_file=case_file,
+    )
+
     cur.close()
     conn.close()
 
@@ -662,8 +807,87 @@ def client_detail(case_file: str):
     <table><tr><th>P</th><th>Label</th><th>Matter</th><th>Status</th></tr>{o_rows}</table>
   </div>
 </div>
+<div class="card" style="margin-top:16px"><h2>Participants &amp; clearances</h2>
+  <p class="muted" style="margin:0 0 10px;font-size:13px">
+    Staff with global access shown for every client. Client-scoped users see only their matter/files.
+  </p>
+  <table>{_participants_table(participants, show_scope=True)}</table>
+</div>
 """
     return _layout(client.get("name") or case_file, body, active="clients")
+
+
+@bp.route("/participants")
+def participants_hub():
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    client_rows = _safe_fetch(cur, conn, f"""
+        SELECT case_file, name, client_code
+          FROM clients c
+         WHERE {LEGAL_CLIENT_WHERE}
+         ORDER BY name
+    """, default=[])
+
+    pending = _safe_fetch(cur, conn, """
+        SELECT display_name, channel_user_id, onboarding_state,
+               COALESCE(onboarding_responses->>'inferred_name', '') AS inferred,
+               COALESCE(onboarding_responses->>'matter_description', '') AS matter_desc
+          FROM channel_users
+         WHERE onboarding_state = 'awaiting_jonathan_approval'
+         ORDER BY last_seen_at DESC NULLS LAST
+    """, default=[])
+
+    all_participants = _fetch_participants(cur, conn)
+    cur.close()
+    conn.close()
+
+    staff = [p for p in all_participants if p.get("scope") == "all_clients"]
+    sections = []
+    for cl in client_rows:
+        scoped = _filter_participants(
+            all_participants,
+            client_code=cl["client_code"],
+            case_file=cl["case_file"],
+        )
+        sections.append(f"""
+<div class="card" style="margin-bottom:16px">
+  <h2><a href="/ops/client/{_esc(cl['case_file'])}">{_esc(cl['name'])}</a>
+    <span class="muted">({_esc(cl['case_file'])})</span></h2>
+  <table>{_participants_table(scoped, show_scope=False)}</table>
+</div>
+""")
+
+    staff_block = f"""
+<div class="card" style="margin-bottom:16px">
+  <h2>LandTek staff — all-client access</h2>
+  <table>{_participants_table(staff, show_scope=False)}</table>
+</div>
+""" if staff else ""
+
+    pending_rows = "".join(
+        f"<tr><td>{_esc(p.get('display_name') or p.get('inferred') or '?')}</td>"
+        f"<td><code>{_esc(p.get('channel_user_id'))}</code></td>"
+        f"<td>{_esc((p.get('matter_desc') or '')[:120])}</td></tr>"
+        for p in pending
+    ) or '<tr><td colspan="3" class="empty">None awaiting approval</td></tr>'
+
+    body = f"""
+<h1>Participants</h1>
+<p class="lead">Each client can have many people — roles, Telegram IDs, and DB/file scope.
+  Sources: <code>authorized_users</code>, <code>channel_users</code>, <code>clients</code>.</p>
+<div class="grid grid-3" style="margin-bottom:16px">
+  {_stat_card("Legal clients", len(client_rows))}
+  {_stat_card("Distinct people", len(all_participants))}
+  {_stat_card("Pending approval", len(pending))}
+</div>
+{staff_block}
+{''.join(sections)}
+<div class="card"><h2>Awaiting Jonathan approval</h2>
+  <table><tr><th>Name</th><th>Telegram</th><th>What they asked for</th></tr>{pending_rows}</table>
+</div>
+"""
+    return _layout("Participants", body, active="participants")
 
 
 @bp.route("/mwk")
