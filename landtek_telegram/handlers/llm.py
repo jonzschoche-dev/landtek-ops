@@ -34,6 +34,14 @@ try:
 except Exception:
     tg_send = None
 
+# Import Leo's tool definitions + dispatcher
+sys.path.insert(0, "/root/landtek")
+try:
+    from landtek_telegram.leo_tools import LEO_TOOLS, run_tool
+except Exception as _e:
+    print(f"[llm] WARN: leo_tools not loaded: {_e}", file=sys.stderr)
+    LEO_TOOLS, run_tool = [], None
+
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 MODEL = os.environ.get("LANDTEK_LLM_MODEL", "claude-sonnet-4-5-20250929")
 PG_DSN = os.environ.get("LANDTEK_TG_PG_DSN",
@@ -92,19 +100,38 @@ YOUR MEMORY — STRICT:
   "we'll register that as CORR-003". Discussion is not registration.
   Only the live vault state shown above is registered.
 
-NO PROMISES OF ACTION YOU CAN'T TAKE:
-  You CANNOT register a vault entry yourself. Never say "I'll label this
-  X", "I'll log this", "I'll record it", "I'll register that under Y",
-  "logging now", "labeling as Z", or any variant. These phrases are
-  BANNED — they are lies about your capabilities.
+YOUR TOOLS — USE THEM (deploy_379):
+  You have function-calling tools. Use them to do real work yourself
+  instead of asking the humans for what you can find:
 
-  Instead say: "That would be CORR-003 (the next available correspondence
-  number). Send 'vault CORR-3 letter to Salvador Dela Fuente for the estate
-  case' and the system will register it. Or tell Jonathan to confirm and
-  I'll have it set up." Coach them to send the deterministic command.
+  - query_documents : search the digital corpus by name/date/keyword/matter
+  - read_document   : full classification + date + text excerpt for a doc id
+  - search_drive    : find files in the LANDTEK Drive (for newly uploaded)
+  - vault_register  : CREATE a vault entry directly — section, number,
+                      description, matter_code, related_matters[]
+  - vault_find / vault_queue / vault_missing / vault_last : vault state
+  - find_matter_for_party : given a person/org name, find which matters
+                            they appear in across the corpus
+  - link_documents  : cross-reference two documents (reply_to, related, etc.)
 
-  The ONLY thing that creates a vault entry is the vault command being
-  parsed by the deterministic handler. You do not have that power.
+  When Kristyle says "letter from Jonathan to Mayor Pajarillo dated
+  October 1, 2025", your job (no questions to humans first):
+    1. query_documents(name_contains="Pajarillo", date_from="2025-09-25",
+                       date_to="2025-10-10")  → find the doc
+    2. read_document(doc_id=...) to confirm
+    3. find_matter_for_party(name="Alex Pajarillo") if matter unclear
+    4. vault_register(section="CORR", number=<next available>,
+                      description="...", matter_code="MWK-ARTA-0747",
+                      related_matters=["MWK-TCT4497", "MWK-ESTATE",
+                                       "MWK-ARTA-DILG"])
+    5. Reply ONE plain-language line confirming what you logged.
+
+  YOU CAN REGISTER VAULT ENTRIES NOW. The old rule about coaching
+  humans to send vault commands is SUPERSEDED. Just call vault_register
+  with the right arguments after you've done the research.
+
+  Only ask the human when you genuinely can't determine something from
+  the tools — and then ONE short question, not a quiz.
 
 CRITICAL — do not lie about actions:
   You CANNOT directly register vault entries through chat — the deterministic
@@ -269,26 +296,18 @@ def _recent_context(chat_id, limit=8):
     return combined[-limit*2:]
 
 
-def _call_anthropic(system_prompt, user_text, context_lines):
-    """Make one HTTP call to Anthropic Messages API. No SDK dependency."""
+def _call_anthropic_once(system_prompt, messages, max_tokens=600):
+    """Single Anthropic API call. Returns (full_response_payload, error)."""
     if not ANTHROPIC_KEY:
         return None, "no_api_key"
-    # Build a single user turn with the conversation history inline
-    history = "\n".join(
-        f"  [{r['dir']}] {r['who']}: {(r['text'] or '')[:200]}"
-        for r in context_lines
-    )
-    user_block = (
-        (f"Recent conversation in this chat:\n{history}\n\n" if history else "") +
-        f"The latest message just arrived. Respond to it directly in plain "
-        f"English, one short paragraph. Latest message:\n{user_text}"
-    )
     body = {
         "model": MODEL,
-        "max_tokens": 400,
+        "max_tokens": max_tokens,
         "system": system_prompt,
-        "messages": [{"role": "user", "content": user_block}],
+        "messages": messages,
     }
+    if LEO_TOOLS:
+        body["tools"] = LEO_TOOLS
     req = urllib.request.Request(
         "https://api.anthropic.com/v1/messages",
         data=json.dumps(body).encode("utf-8"),
@@ -300,18 +319,76 @@ def _call_anthropic(system_prompt, user_text, context_lines):
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            payload = json.loads(r.read().decode("utf-8"))
-        parts = payload.get("content") or []
-        for p in parts:
-            if p.get("type") == "text":
-                return p.get("text", "").strip(), None
-        return None, "no_text_in_response"
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode("utf-8")), None
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="replace")[:300]
         return None, f"http_{e.code}: {err_body}"
     except Exception as e:
         return None, f"call_failed: {type(e).__name__}: {str(e)[:200]}"
+
+
+def _call_anthropic(system_prompt, user_text, context_lines):
+    """Multi-turn Anthropic call with tool use. Leo can search the corpus,
+    read documents, register vault entries, etc. via tools.
+
+    Loops up to MAX_TOOL_ROUNDS times, executing every tool_use block the
+    model emits and feeding results back in.
+    """
+    MAX_TOOL_ROUNDS = 6
+
+    history = "\n".join(
+        f"  [{r['dir']}] {r['who']}: {(r['text'] or '')[:200]}"
+        for r in context_lines
+    )
+    user_block = (
+        (f"Recent conversation in this chat:\n{history}\n\n" if history else "") +
+        f"The latest message just arrived. Use your tools as needed to "
+        f"answer it correctly. Respond in plain English, one short "
+        f"paragraph. Latest message:\n{user_text}"
+    )
+    messages = [{"role": "user", "content": user_block}]
+
+    for round_idx in range(MAX_TOOL_ROUNDS):
+        payload, err = _call_anthropic_once(system_prompt, messages)
+        if payload is None:
+            return None, err
+
+        content = payload.get("content", [])
+        stop_reason = payload.get("stop_reason")
+
+        # If model wants to call tools, execute them and continue
+        tool_uses = [c for c in content if c.get("type") == "tool_use"]
+        text_parts = [c for c in content if c.get("type") == "text"]
+
+        if not tool_uses:
+            # Done — return the text
+            final = "\n".join(p.get("text", "") for p in text_parts).strip()
+            return (final or "(no reply)"), None
+
+        # Append assistant turn (with tool_use blocks) verbatim
+        messages.append({"role": "assistant", "content": content})
+
+        # Execute each tool and build tool_result blocks
+        tool_results = []
+        for tu in tool_uses:
+            name = tu.get("name")
+            tu_id = tu.get("id")
+            inp = tu.get("input") or {}
+            print(f"[leo:tool] {name}({json.dumps(inp)[:120]})", file=sys.stderr)
+            if run_tool is None:
+                result_text = "Tools unavailable (run_tool not loaded)"
+            else:
+                result_text = run_tool(name, inp)
+            print(f"[leo:tool] {name} -> {str(result_text)[:200]}", file=sys.stderr)
+            tool_results.append({
+                "type": "tool_result",
+                "tool_use_id": tu_id,
+                "content": str(result_text)[:8000],
+            })
+        messages.append({"role": "user", "content": tool_results})
+
+    return ("(tool loop exhausted)", None)
 
 
 def handle(row):
