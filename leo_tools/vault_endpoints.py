@@ -118,15 +118,48 @@ def _find_corpus_match(cur, section, description, matter_code, case_file):
         # at least one name match required
         where_pieces.append("(" + " OR ".join(patterns) + ")")
 
+    # First pull: classification-correct docs (guaranteed inclusion).
+    # These get priority regardless of name/keyword matches.
+    classification_rows = []
+    expected_clf = SECTION_CLASSIFICATIONS.get(section, [])
+    if expected_clf:
+        clf_args = []
+        clf_args.extend(expected_clf)
+        clf_q = f"""
+            SELECT id, smart_filename, doc_date, classification, drive_link,
+                   extracted_text
+              FROM documents
+             WHERE master_form = 'digital'
+               AND classification IN ({','.join(['%s'] * len(expected_clf))})
+             {"AND (case_file = %s OR case_file IS NULL)" if case_file else ""}
+             ORDER BY doc_date DESC NULLS LAST
+             LIMIT 25
+        """
+        if case_file:
+            clf_args.append(case_file)
+        cur.execute(clf_q, clf_args)
+        classification_rows = list(cur.fetchall())
+
+    # Second pull: keyword / name match candidates
     sql = f"""
         SELECT id, smart_filename, doc_date, classification, drive_link,
                extracted_text
           FROM documents
          WHERE {' AND '.join(where_pieces)}
-         LIMIT 12
+         ORDER BY doc_date DESC NULLS LAST
+         LIMIT 25
     """
     cur.execute(sql, args)
-    rows = cur.fetchall()
+    keyword_rows = list(cur.fetchall())
+
+    # Merge unique
+    seen_ids = set()
+    rows = []
+    for r in classification_rows + keyword_rows:
+        if r["id"] in seen_ids:
+            continue
+        seen_ids.add(r["id"])
+        rows.append(r)
     if not rows:
         return None, 0.0, []
 
