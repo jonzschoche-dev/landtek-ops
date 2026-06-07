@@ -185,11 +185,18 @@ def _find_corpus_match(cur, section, description, matter_code, case_file):
         filename_kw_hit = 1 if any(kw.lower().replace(" ", "_") in filename
                                     or kw.lower() in filename
                                     for kw in SECTION_KEYWORDS.get(section, [])) else 0
+        # Tiebreakers — signed PDFs beat working .docx, dated beats undated
+        is_pdf = filename.endswith(".pdf")
+        is_docx = filename.endswith(".docx") or filename.endswith(".doc")
+        has_doc_date = 1 if r.get("doc_date") else 0
+        format_bonus = (2 if is_pdf else 0) + (-2 if is_docx else 0)
         total = (classification_hit * 8 +     # heaviest — IS this thing
                  filename_kw_hit * 4 +         # strong — filename signals type
                  name_hits * 2 +
                  kw_hits +
-                 date_hits * 2)
+                 date_hits * 2 +
+                 format_bonus +                # prefer PDF over docx
+                 has_doc_date * 2)             # dated docs over undated
         scored.append({
             "doc_id": r["id"],
             "smart_filename": r["smart_filename"],
