@@ -268,6 +268,12 @@ def register():
     vault_location = (data.get("vault_location") or "").strip() or None
     drive_file_id = (data.get("drive_file_id") or "").strip() or None
     auto_attach_sender_id = (data.get("auto_attach_sender_id") or "").strip() or None
+    # Multi-matter: array of matter_codes this doc is materially relevant to
+    # beyond the primary. Default empty — caller can add via subsequent
+    # /api/vault/cross_link calls.
+    related_matters = data.get("related_matters") or []
+    if isinstance(related_matters, str):
+        related_matters = [m.strip() for m in related_matters.split(",") if m.strip()]
 
     # Validation
     if not SECTION_RE.match(section):
@@ -325,7 +331,7 @@ def register():
               f"drive_file_id:{drive_file_id}" if drive_file_id else None))
         new_id = cur.fetchone()["id"]
 
-        # Link to matter via junction (deploy_279 schema, relation_kind enum)
+        # Link to PRIMARY matter via junction (deploy_279 schema, relation_kind enum)
         cur.execute("""
             INSERT INTO document_matter_links
                 (doc_id, matter_code, case_file, relation_kind, provenance_level,
@@ -336,6 +342,26 @@ def register():
                     NOW(), NOW())
             ON CONFLICT DO NOTHING
         """, (new_id, matter_code, case_file))
+
+        # Link to additional RELATED matters (multi-matter relevance)
+        for rm in related_matters:
+            if rm == matter_code:
+                continue
+            # Validate the related matter exists
+            cur.execute("SELECT case_file FROM matters WHERE matter_code = %s", (rm,))
+            mrow = cur.fetchone()
+            if not mrow:
+                continue
+            cur.execute("""
+                INSERT INTO document_matter_links
+                    (doc_id, matter_code, case_file, relation_kind, provenance_level,
+                     linked_by, note, created_at, updated_at)
+                VALUES (%s, %s, %s, 'cross_proof', 'verified',
+                        'vault_register_endpoint',
+                        'multi-matter relevance declared at vault registration',
+                        NOW(), NOW())
+                ON CONFLICT DO NOTHING
+            """, (new_id, rm, mrow["case_file"]))
 
         # ── BRIDGE-TO-DIGITAL: find or create the digital scan row ──────
         # Order of preference:
