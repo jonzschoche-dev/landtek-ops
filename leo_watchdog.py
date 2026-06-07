@@ -77,11 +77,29 @@ def http_post_json(url, data, timeout=10):
 
 
 def tg_send_message(token, chat_id, text, parse_mode=""):
-    """Send Telegram DM. Direct API call — works regardless of n8n state."""
-    data = {"chat_id": chat_id, "text": text[:4000]}
-    if parse_mode:
-        data["parse_mode"] = parse_mode
-    return http_post_json(f"https://api.telegram.org/bot{token}/sendMessage", data)
+    """Send Telegram DM via the Rule S14 chokepoint (scripts/tg_send.py).
+
+    Token arg retained for signature compat but unused — chokepoint reads
+    bot token from env/.env. Sanitizer strips HTML/markdown/lists; pacing
+    blocks chained sends to Jonathan unless override_pacing=True. Returns
+    a dict shape similar to the old direct API call so callers keep working.
+
+    n8n-postgres-1 (which tg_send.py depends on) is a separate container
+    from n8n-n8n-1, so the chokepoint works even when Leo's workflow is down.
+    """
+    try:
+        sys.path.insert(0, "/root/landtek/scripts")
+        from tg_send import send as _chokepoint_send  # noqa: E402
+        ok, info = _chokepoint_send(
+            chat_id=chat_id,
+            text=text[:4000],
+            source="watchdog",
+            recipient_name="Jonathan",
+            parse_mode=None,  # plain text — Rule S14
+        )
+        return {"ok": ok, "result": info} if ok else {"_error": str(info)[:300]}
+    except Exception as e:
+        return {"_error": f"chokepoint_failed: {type(e).__name__}: {str(e)[:200]}"}
 
 
 def tg_set_webhook(token, url):
