@@ -33,6 +33,125 @@ bp = Blueprint("vault", __name__, url_prefix="/api/vault")
 KNOWN_MATTER_PREFIXES = ("MWK-", "PAR-", "AUTO-", "ARCHIVE-")
 SECTION_RE = re.compile(r"^[A-Z]{2,5}$")
 
+# Section → keyword hints that boost corpus-search confidence
+SECTION_KEYWORDS = {
+    "SPA":  ["special power of attorney", "spa", "attorney-in-fact",
+             "attorney in fact", "apostille"],
+    "AFF":  ["affidavit"],
+    "DEED": ["deed of", "deed of sale", "deed of donation", "deed of absolute"],
+    "TCT":  ["transfer certificate of title", "tct"],
+    "TAX":  ["tax declaration", "tax receipt", "real property tax"],
+    "PSA":  ["birth certificate", "death certificate", "marriage certificate"],
+    "CRT":  ["pleading", "manifestation", "order", "stamped received"],
+    "RES":  ["resolution", "decision", "ruling"],
+    "CONT": ["contract", "lease", "memorandum of agreement", "mortgage"],
+    "CORR": ["letter", "correspondence", "inquiry", "request"],
+}
+
+# Stopwords + section-name noise that shouldn't drive matching
+_STOP = set("""a an and as at be by for from has have he her his i in is it
+its of on or our she that the their this to was with you your we
+under upon dated re subject regarding letter document file folder
+matter case section number entry document zschoche""".split())
+
+_NAME_RE = re.compile(r"\b([A-Z][a-z'\-]{2,}(?:\s+[A-Z][a-z'\-]{2,}){0,3})\b")
+_DATE_RE = re.compile(
+    r"\b(\d{4}-\d{2}-\d{2}|\d{1,2}\s+\w+\s+\d{4}|"
+    r"\w+\s+\d{1,2},?\s+\d{4})\b", re.IGNORECASE)
+
+
+def _tokenize_description(description, section):
+    """Pull proper names + dates + section keywords as searchable tokens."""
+    names = set(_NAME_RE.findall(description or ""))
+    names = {n for n in names if n.lower() not in _STOP and len(n) >= 4}
+    dates = set(_DATE_RE.findall(description or ""))
+    kw_hits = []
+    for kw in SECTION_KEYWORDS.get(section, []):
+        if kw.lower() in (description or "").lower():
+            kw_hits.append(kw)
+    return {"names": sorted(names), "dates": sorted(dates), "keywords": kw_hits}
+
+
+def _find_corpus_match(cur, section, description, matter_code, case_file):
+    """Search corpus for an existing digital match. Returns (best_doc_id,
+    confidence:0-1, candidates:list). Confidence 0.8+ is auto-link
+    threshold."""
+    tokens = _tokenize_description(description, section)
+    name_tokens = [t for t in tokens["names"] if len(t) >= 4][:4]
+    if not name_tokens and not tokens["keywords"]:
+        return None, 0.0, []
+
+    # Build ILIKE patterns — at least one name OR a section keyword must hit
+    patterns = []
+    args = []
+    if name_tokens:
+        for n in name_tokens:
+            patterns.append("(extracted_text ILIKE %s OR smart_filename ILIKE %s)")
+            args.extend([f"%{n}%", f"%{n}%"])
+    kw_patterns = []
+    for kw in (tokens["keywords"] or SECTION_KEYWORDS.get(section, []))[:3]:
+        kw_patterns.append("(extracted_text ILIKE %s OR smart_filename ILIKE %s)")
+        args.extend([f"%{kw}%", f"%{kw}%"])
+
+    where_pieces = ["master_form = 'digital'"]
+    if case_file:
+        where_pieces.append("(case_file = %s OR case_file IS NULL)")
+        args.insert(0, case_file)
+    if kw_patterns:
+        where_pieces.append("(" + " OR ".join(kw_patterns) + ")")
+    if patterns:
+        # at least one name match required
+        where_pieces.append("(" + " OR ".join(patterns) + ")")
+
+    sql = f"""
+        SELECT id, smart_filename, doc_date, classification, drive_link,
+               extracted_text
+          FROM documents
+         WHERE {' AND '.join(where_pieces)}
+         LIMIT 12
+    """
+    cur.execute(sql, args)
+    rows = cur.fetchall()
+    if not rows:
+        return None, 0.0, []
+
+    # Score candidates: # of name hits + keyword hits + date hits
+    scored = []
+    for r in rows:
+        haystack = ((r.get("extracted_text") or "") + " " +
+                    (r.get("smart_filename") or "")).lower()
+        name_hits = sum(1 for n in name_tokens if n.lower() in haystack)
+        kw_hits = sum(1 for k in (tokens["keywords"] or
+                                  SECTION_KEYWORDS.get(section, []))
+                      if k.lower() in haystack)
+        date_hits = sum(1 for d in tokens["dates"]
+                        if d.lower() in haystack)
+        total = name_hits * 2 + kw_hits + date_hits * 2
+        scored.append({
+            "doc_id": r["id"],
+            "smart_filename": r["smart_filename"],
+            "doc_date": str(r["doc_date"]) if r["doc_date"] else None,
+            "classification": r["classification"],
+            "drive_link": r["drive_link"],
+            "score": total,
+            "name_hits": name_hits,
+            "kw_hits": kw_hits,
+            "date_hits": date_hits,
+        })
+    scored.sort(key=lambda x: x["score"], reverse=True)
+
+    # Confidence: top score, normalized by max possible from tokens
+    max_possible = len(name_tokens) * 2 + 3 + len(tokens["dates"]) * 2 or 1
+    top = scored[0]
+    confidence = min(1.0, top["score"] / max_possible)
+    # Only count as "strong" if it has at least one name hit + one other hit
+    # (prevents matching on section keyword alone)
+    if top["name_hits"] >= 1 and (top["kw_hits"] >= 1 or top["date_hits"] >= 1):
+        if confidence >= 0.6:
+            return top["doc_id"], confidence, scored[:5]
+    # Otherwise return candidates without auto-link
+    return None, confidence, scored[:5]
+
 
 def _db():
     conn = psycopg2.connect(PG_DSN)
@@ -143,11 +262,27 @@ def register():
             ON CONFLICT DO NOTHING
         """, (new_id, matter_code, case_file))
 
-        # ── BRIDGE-TO-DIGITAL: ensure a digital scan row exists ──────────
+        # ── BRIDGE-TO-DIGITAL: find or create the digital scan row ──────
+        # Order of preference:
+        #   1. SEARCH CORPUS for existing digital match (deterministic, scored)
+        #   2. AUTO-ATTACH recent photo from sender (Telegram inbox)
+        #   3. PLACEHOLDER (real gap — surfaces for follow-up)
         scan_doc_id = None
         scan_source = None
-        if auto_attach_sender_id:
-            # Look for the most recent unattached photo from this sender
+        scan_candidates = []
+        scan_confidence = None
+
+        # Step 1: corpus search
+        best, conf, candidates = _find_corpus_match(
+            cur, section, description, matter_code, case_file)
+        scan_candidates = candidates
+        scan_confidence = conf
+        if best is not None:
+            scan_doc_id = best
+            scan_source = f"corpus_match:doc#{best}:confidence={conf:.2f}"
+
+        # Step 2: recent photo from sender (only if no strong corpus match)
+        if scan_doc_id is None and auto_attach_sender_id:
             cur.execute("""
                 SELECT id, media_path, media_size
                   FROM telegram_inbox
@@ -161,8 +296,8 @@ def register():
                  ORDER BY received_at DESC
                  LIMIT 1
             """, (auto_attach_sender_id,))
-            row = cur.fetchone()
-            if row:
+            photo_row = cur.fetchone()
+            if photo_row:
                 cur.execute("""
                     INSERT INTO documents
                         (case_file, smart_filename, original_filename, mime_type,
@@ -173,11 +308,12 @@ def register():
                 """, (case_file,
                       f"Scan of {smart_filename}",
                       f"vault_scan_{section}-{number:03d}.jpg",
-                      f"file://{row['media_path']}"))
+                      f"file://{photo_row['media_path']}"))
                 scan_doc_id = cur.fetchone()["id"]
-                scan_source = f"telegram_inbox#{row['id']}"
+                scan_source = f"telegram_photo:inbox#{photo_row['id']}"
+
+        # Step 3: placeholder
         if scan_doc_id is None:
-            # Placeholder so the invariant holds — every physical has a digital
             cur.execute("""
                 INSERT INTO documents
                     (case_file, smart_filename, original_filename, mime_type,
@@ -202,7 +338,9 @@ def register():
                        matter_code=matter_code,
                        case_file=case_file,
                        digital_scan_id=scan_doc_id,
-                       scan_source=scan_source)
+                       scan_source=scan_source,
+                       scan_confidence=scan_confidence,
+                       scan_candidates=scan_candidates)
     except Exception as e:
         return jsonify(ok=False, error=f"db_error: {type(e).__name__}: {str(e)[:200]}"), 500
     finally:

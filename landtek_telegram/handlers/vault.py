@@ -221,11 +221,23 @@ def _do_vault(text, chat_id, sender_name):
         body["auto_attach_sender_id"] = sender_id
     result = _http_post("/api/vault/register", body)
     if result.get("ok"):
+        source = result.get("scan_source") or ""
         scan_note = ""
-        if result.get("scan_source") and result["scan_source"] != "placeholder":
-            scan_note = " Photo attached as the digital scan."
-        elif result.get("scan_source") == "placeholder":
-            scan_note = " No scan attached yet — send the photo when you have it."
+        if source.startswith("corpus_match:"):
+            # Extract doc id from "corpus_match:doc#NNN:confidence=0.85"
+            try:
+                doc_id = source.split("doc#")[1].split(":")[0]
+                conf = source.split("confidence=")[1]
+                scan_note = (f" Found a matching digital copy already in the "
+                             f"corpus (doc {doc_id}, confidence {conf}) and "
+                             f"linked it as the scan.")
+            except Exception:
+                scan_note = " Found a matching digital copy and linked it."
+        elif source.startswith("telegram_photo:"):
+            scan_note = " Your photo is linked as the digital scan."
+        elif source == "placeholder":
+            scan_note = (" No matching digital copy in the corpus yet — "
+                         "send the photo or PDF and it will attach.")
         _reply(chat_id, f"Logged {result['locator']} — {desc}, matter {matter}.{scan_note}")
         return {"handler": "vault", "outcome": f"registered:{result.get('doc_id')}",
                 "reply_sent": True}
