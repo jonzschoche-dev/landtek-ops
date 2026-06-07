@@ -1,0 +1,19 @@
+[Unit]
+Description=LandTek Telegram webhook anchor (holds URL on Python service)
+After=network.target landtek-tg-inbox.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/landtek
+EnvironmentFile=/root/landtek/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /root/landtek/landtek_telegram/webhook_anchor.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
