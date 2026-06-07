@@ -71,12 +71,18 @@ means MWK-CV6839, "26360" means MWK-CV26360, etc.):
 CURRENT VAULT STATE — recently registered entries:
 {vault_state_block}
 
-Style:
-  Plain English. No markdown bold, no bullet lists, no formal headers.
+FORMAT — STRICT:
+  Plain English prose ONLY. No markdown. No asterisks. No headers like
+  "Section:" or "Locator:". No bullet lists. No numbered lists. No emojis.
+  No 👉 or any other character to point at something. No instructional
+  scaffolding like "Reply with your answer." Talk like a coworker across
+  a desk.
   One point per message. Warm but professional. Brief.
   When you don't know, say "I don't have that yet" — never invent.
   Never reply with a generic template like "How can I assist you?" — that
   is a failure mode. Read the actual message and respond to it.
+  NEVER guess a next-available locator. The NEXT AVAILABLE NUMBER block
+  above is the truth — use it.
 
 CRITICAL — do not lie about actions:
   You CANNOT directly register vault entries through chat — the deterministic
@@ -159,8 +165,14 @@ def _live_matters_block():
     return "\n".join(lines) if lines else "(no matters)"
 
 
-def _live_vault_state(limit=8):
-    """Last N vault entries so Leo knows what's already registered."""
+def _live_vault_state(limit=12):
+    """Recent vault entries + computed next-available number per section.
+
+    The next-available block is what Leo MUST reference when suggesting a
+    locator. Don't make him guess — give him the answer.
+    """
+    SECTIONS = ["TCT", "DEED", "SPA", "AFF", "TAX", "PSA", "ID",
+                "CRT", "RES", "CONT", "CORR", "MISC"]
     try:
         conn = psycopg2.connect(PG_DSN)
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -171,17 +183,36 @@ def _live_vault_state(limit=8):
              ORDER BY id DESC
              LIMIT %s
         """, (limit,))
-        rows = cur.fetchall()
+        recent = cur.fetchall()
+        # Next-available per section
+        cur.execute("""
+            SELECT vault_section,
+                   COALESCE(MAX(vault_number), 0) + 1 AS next_num
+              FROM documents
+             WHERE master_form = 'physical'
+             GROUP BY vault_section
+        """)
+        next_map = {r["vault_section"]: r["next_num"] for r in cur.fetchall()}
         cur.close(); conn.close()
     except Exception:
         return "(vault state unavailable)"
-    if not rows:
-        return "  (vault is empty — no entries yet)"
-    return "\n".join(
-        f"  {r['vault_section']}-{r['vault_number']:03d}: "
-        f"{(r['smart_filename'] or '')[:90]}"
-        for r in rows
-    )
+
+    lines = ["NEXT AVAILABLE NUMBER per section (use these when suggesting a locator):"]
+    for s in SECTIONS:
+        n = next_map.get(s, 1)
+        lines.append(f"  {s}: next = {s}-{n:03d}")
+    if recent:
+        lines.append("")
+        lines.append("Recent entries (most recent first):")
+        for r in recent:
+            lines.append(
+                f"  {r['vault_section']}-{r['vault_number']:03d}: "
+                f"{(r['smart_filename'] or '')[:90]}"
+            )
+    else:
+        lines.append("")
+        lines.append("(no entries yet — every section starts at 001)")
+    return "\n".join(lines)
 
 
 def _recent_context(chat_id, limit=8):
