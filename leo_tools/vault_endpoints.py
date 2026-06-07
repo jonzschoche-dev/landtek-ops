@@ -48,6 +48,21 @@ SECTION_KEYWORDS = {
     "CORR": ["letter", "correspondence", "inquiry", "request"],
 }
 
+# Section → classification values in the documents.classification column
+# that are EXACT-MATCH boosts for corpus search.
+SECTION_CLASSIFICATIONS = {
+    "SPA":  ["Special Power of Attorney", "Power of Attorney"],
+    "AFF":  ["Affidavit"],
+    "DEED": ["Deed"],
+    "TCT":  ["Title (TCT/OCT)"],
+    "TAX":  ["Tax Document"],
+    "PSA":  ["Birth Certificate", "Death Certificate", "Marriage Certificate"],
+    "CRT":  ["Court Filing", "Pleading", "Manifestation"],
+    "RES":  ["Resolution", "Decision", "Court Order"],
+    "CONT": ["Contract"],
+    "CORR": ["Letter", "Correspondence", "Government Submission"],
+}
+
 # Stopwords + section-name noise that shouldn't drive matching
 _STOP = set("""a an and as at be by for from has have he her his i in is it
 its of on or our she that the their this to was with you your we
@@ -115,7 +130,9 @@ def _find_corpus_match(cur, section, description, matter_code, case_file):
     if not rows:
         return None, 0.0, []
 
-    # Score candidates: # of name hits + keyword hits + date hits
+    # Score candidates: classification match (heaviest) + name + kw + date
+    expected_classifications = [c.lower() for c
+                                in SECTION_CLASSIFICATIONS.get(section, [])]
     scored = []
     for r in rows:
         haystack = ((r.get("extracted_text") or "") + " " +
@@ -126,7 +143,20 @@ def _find_corpus_match(cur, section, description, matter_code, case_file):
                       if k.lower() in haystack)
         date_hits = sum(1 for d in tokens["dates"]
                         if d.lower() in haystack)
-        total = name_hits * 2 + kw_hits + date_hits * 2
+        # Classification match — the single strongest signal that this doc
+        # IS the kind of thing the vault entry represents
+        clf = (r.get("classification") or "").lower()
+        classification_hit = 1 if clf and clf in expected_classifications else 0
+        # filename keyword match (e.g. "special_power_of_attorney.pdf" for SPA)
+        filename = (r.get("smart_filename") or "").lower()
+        filename_kw_hit = 1 if any(kw.lower().replace(" ", "_") in filename
+                                    or kw.lower() in filename
+                                    for kw in SECTION_KEYWORDS.get(section, [])) else 0
+        total = (classification_hit * 8 +     # heaviest — IS this thing
+                 filename_kw_hit * 4 +         # strong — filename signals type
+                 name_hits * 2 +
+                 kw_hits +
+                 date_hits * 2)
         scored.append({
             "doc_id": r["id"],
             "smart_filename": r["smart_filename"],
@@ -134,22 +164,27 @@ def _find_corpus_match(cur, section, description, matter_code, case_file):
             "classification": r["classification"],
             "drive_link": r["drive_link"],
             "score": total,
+            "classification_hit": classification_hit,
+            "filename_kw_hit": filename_kw_hit,
             "name_hits": name_hits,
             "kw_hits": kw_hits,
             "date_hits": date_hits,
         })
     scored.sort(key=lambda x: x["score"], reverse=True)
 
-    # Confidence: top score, normalized by max possible from tokens
-    max_possible = len(name_tokens) * 2 + 3 + len(tokens["dates"]) * 2 or 1
+    # Confidence: top score normalized. Max possible includes the heavy bonuses.
+    max_possible = (8 + 4 + len(name_tokens) * 2 + 3 + len(tokens["dates"]) * 2) or 1
     top = scored[0]
     confidence = min(1.0, top["score"] / max_possible)
-    # Only count as "strong" if it has at least one name hit + one other hit
-    # (prevents matching on section keyword alone)
-    if top["name_hits"] >= 1 and (top["kw_hits"] >= 1 or top["date_hits"] >= 1):
-        if confidence >= 0.6:
-            return top["doc_id"], confidence, scored[:5]
-    # Otherwise return candidates without auto-link
+    # Auto-link requires EITHER classification match + 1 other hit,
+    # OR filename match + name hit + date hit.
+    auto_link = False
+    if top["classification_hit"] and (top["name_hits"] or top["filename_kw_hit"]):
+        auto_link = True
+    elif top["filename_kw_hit"] and top["name_hits"] and top["date_hits"]:
+        auto_link = True
+    if auto_link and confidence >= 0.4:
+        return top["doc_id"], confidence, scored[:5]
     return None, confidence, scored[:5]
 
 
