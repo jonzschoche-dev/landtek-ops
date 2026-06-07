@@ -337,18 +337,19 @@ def main():
     connections = deepcopy(connections)
 
     print(f"[deploy_362] snapshotting current state to leo_workflow_snapshots ...")
+    # Existing table from deploy_305 uses nodes_json / connections_json column names
     cur.execute("""
         CREATE TABLE IF NOT EXISTS leo_workflow_snapshots (
-            id          serial PRIMARY KEY,
-            workflow_id text NOT NULL,
-            reason      text NOT NULL,
-            nodes       jsonb NOT NULL,
-            connections jsonb NOT NULL,
-            taken_at    timestamptz NOT NULL DEFAULT now()
+            id               serial PRIMARY KEY,
+            workflow_id      text NOT NULL,
+            reason           text NOT NULL,
+            nodes_json       jsonb NOT NULL,
+            connections_json jsonb NOT NULL,
+            taken_at         timestamptz NOT NULL DEFAULT now()
         )
     """)
     cur.execute("""
-        INSERT INTO leo_workflow_snapshots (workflow_id, reason, nodes, connections)
+        INSERT INTO leo_workflow_snapshots (workflow_id, reason, nodes_json, connections_json)
         VALUES (%s, %s, %s, %s)
         RETURNING id
     """, (WORKFLOW_ID, "pre-deploy_362 vault tools",
