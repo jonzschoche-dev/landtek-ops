@@ -256,13 +256,15 @@ def home():
     obligations = []
     try:
         cur.execute("""
-            SELECT id, short_label, status, priority, due_by, matter_code, client_code
+            SELECT id, short_label, status, priority, due_by, client_code,
+                   NULL::text AS matter_code
               FROM v_obligations_at_risk
              ORDER BY priority DESC, due_by ASC NULLS LAST
              LIMIT 8
         """)
         obligations = cur.fetchall()
     except Exception:
+        conn.rollback()
         cur.execute("""
             SELECT id, short_label, status, priority, due_by, matter_code, client_code
               FROM landtek_obligations
@@ -335,7 +337,8 @@ def home():
 
     obl_rows = "".join(
         f"<tr><td>P{r['priority']}</td><td>{_esc(r['short_label'])}</td>"
-        f"<td>{_esc(r.get('matter_code') or '—')}</td><td>{_esc(r.get('due_by') or '—')}</td></tr>"
+        f"<td>{_esc(r.get('matter_code') or r.get('client_code') or '—')}</td>"
+        f"<td>{_esc(str(r.get('due_by') or '—')[:10])}</td></tr>"
         for r in obligations
     ) or '<tr><td colspan="4" class="empty">None at risk</td></tr>'
 
