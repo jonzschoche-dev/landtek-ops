@@ -222,10 +222,10 @@ def _timer_rows() -> list[dict]:
     return rows
 
 
-def _safe_fetch(cur, conn, sql: str, params=(), default=None):
+def _safe_fetch(cur, conn, sql: str, params=(), default=None, one: bool = False):
     try:
         cur.execute(sql, params)
-        return cur.fetchall() if default is None else cur.fetchone()
+        return cur.fetchone() if one else cur.fetchall()
     except Exception:
         conn.rollback()
         return default
@@ -306,7 +306,7 @@ def home():
             WHERE status = 'open' AND expires_at > now()) AS open_inquiries,
           (SELECT COUNT(*) FROM unauth_attempts
             WHERE attempted_at > now() - interval '24 hours') AS unauth_24h
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     ops = _safe_fetch(cur, conn, """
         SELECT
@@ -315,7 +315,7 @@ def home():
           (SELECT COUNT(*) FROM documents_needing_classification) AS unclassified,
           (SELECT COUNT(*) FROM conversations
             WHERE timestamp > now() - interval '24 hours') AS conv_24h
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     leo = _safe_fetch(cur, conn, """
         SELECT
@@ -337,7 +337,7 @@ def home():
           ROUND(AVG(rating) FILTER (
             WHERE rating IS NOT NULL AND timestamp > now() - interval '30 days'), 1) AS avg_rating
           FROM leo_interactions
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     qa = _safe_fetch(cur, conn, """
         SELECT
@@ -346,7 +346,7 @@ def home():
           COUNT(*) FILTER (WHERE posted_at > now() - interval '1 hour') AS runs_1h,
           COUNT(*) FILTER (WHERE posted_at > now() - interval '1 hour' AND passed) AS pass_1h
           FROM leo_qa_sim_payloads
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     n8n_exec = _safe_fetch(cur, conn, """
         SELECT
@@ -356,17 +356,18 @@ def home():
           FROM execution_entity
          WHERE "workflowId" = 'vSDQv1vfn6627bnA'
            AND "startedAt" > now() - interval '24 hours'
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     open_holes_row = _safe_fetch(cur, conn,
-        "SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'", default={"n": 0})
+        "SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'",
+        default={"n": 0}, one=True)
     open_holes = open_holes_row["n"] if open_holes_row else 0
 
     sim_sess = _safe_fetch(cur, conn, """
         SELECT passed, failed, burst_size, completed_at
           FROM simulator_sessions WHERE status = 'done'
          ORDER BY started_at DESC LIMIT 1
-    """, default=None)
+    """, default=None, one=True)
 
     recent = _safe_fetch(cur, conn, """
         SELECT id, timestamp, sender_name, LEFT(question, 70) AS q,
@@ -780,7 +781,8 @@ def health_page():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     open_holes_row = _safe_fetch(cur, conn,
-        "SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'", default={"n": 0})
+        "SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'",
+        default={"n": 0}, one=True)
     open_holes = open_holes_row["n"] if open_holes_row else 0
 
     holes = _safe_fetch(cur, conn, """
@@ -818,13 +820,13 @@ def health_page():
           COUNT(*) FILTER (WHERE active) AS active_probes,
           COUNT(*) FILTER (WHERE NOT active) AS retired_probes
           FROM leo_qa_probes WHERE rail = 'sim'
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     qa_payload = _safe_fetch(cur, conn, """
         SELECT COUNT(*) FILTER (WHERE posted_at > now() - interval '24 hours') AS runs,
                COUNT(*) FILTER (WHERE posted_at > now() - interval '24 hours' AND passed) AS passed
           FROM leo_qa_sim_payloads
-    """, default={}) or {}
+    """, default={}, one=True) or {}
 
     holes_runs = _safe_fetch(cur, conn, """
         SELECT routine_name, status, findings_count, p0_count, run_at::date AS d
@@ -838,12 +840,12 @@ def health_page():
           FROM execution_entity
          WHERE "workflowId" = 'vSDQv1vfn6627bnA'
            AND "startedAt" > now() - interval '24 hours'
-    """, default={"err": 0, "total": 0, "ok": 0})
+    """, default={"err": 0, "total": 0, "ok": 0}, one=True)
 
     leaks = _safe_fetch(cur, conn, """
         SELECT COUNT(*) AS n FROM real_traffic_violations
          WHERE detected_at > now() - interval '7 days'
-    """, default={"n": 0})
+    """, default={"n": 0}, one=True)
 
     cur.close()
     conn.close()
