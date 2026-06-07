@@ -27,7 +27,7 @@ JONATHAN_TG_ID = "6513067717"  # legacy reference; outbound now uses comms_recip
 import sys as _sys
 _sys.path.insert(0, "/root/landtek")
 from comms_recipients import MWK_001_RECIPIENTS
-from correspondence_spine import resolve_client_code
+from correspondence_spine import is_kb_pollution_email, resolve_client_code
 
 # ── Category detection patterns ────────────────────────────────────────
 CATEGORY_PATTERNS = [
@@ -77,6 +77,8 @@ def gmail_client():
 
 def classify_email(subject, body, from_addr):
     """Return (category, confidence). Multi-vote across patterns."""
+    if is_kb_pollution_email(from_addr=from_addr, subject=subject, body_plain=body):
+        return ("promotional", 0.95)
     text = f"{subject or ''}\n{(body or '')[:4000]}\n{from_addr or ''}"
     scores = {}
     for cat, pattern, weight in CATEGORY_PATTERNS:
@@ -242,8 +244,14 @@ def main():
                 })
 
         category, conf = classify_email(subject, plain, from_addr)
-        case_file = correlate_case(f"{subject} {plain}", by_case)
-        client_code = resolve_client_code(cur, case_file=case_file)
+        is_noise = is_kb_pollution_email(
+            from_addr=from_addr,
+            subject=subject,
+            body_plain=plain,
+            raw_category=category,
+        )
+        case_file = None if is_noise else correlate_case(f"{subject} {plain}", by_case)
+        client_code = None if is_noise else resolve_client_code(cur, case_file=case_file)
         stats[category] = stats.get(category, 0) + 1
 
         # Bill metadata if applicable
@@ -251,13 +259,42 @@ def main():
 
         # Upsert
         if args.dry_run:
-            print(f"  [DRY] {date_str[:25]:25s}  [{category:18s}]  {(subject or '')[:70]}  case={case_file or '—'}")
+            tag = "NOISE" if is_noise else category
+            print(f"  [DRY] {date_str[:25]:25s}  [{tag:18s}]  {(subject or '')[:70]}  case={case_file or '—'}")
             inserted += 1
             continue
 
         try:
             received_at = datetime.strptime(date_str[:31].strip(), "%a, %d %b %Y %H:%M:%S %z") if date_str else None
         except: received_at = None
+
+        if is_noise:
+            cur.execute("""
+                INSERT INTO gmail_messages_archived
+                  (message_id, thread_id, from_addr, to_addrs, cc_addrs, subject,
+                   body_plain, body_html, sent_at, received_at, labels,
+                   has_attachments, attachment_refs, case_file,
+                   relevance_score, relevance_reasons, raw_payload,
+                   archived_reason, archived_by)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s::jsonb,%s,%s)
+                ON CONFLICT (message_id) DO UPDATE SET
+                  labels = EXCLUDED.labels,
+                  archived_at = now(),
+                  archived_reason = EXCLUDED.archived_reason,
+                  archived_by = EXCLUDED.archived_by
+                RETURNING (xmax = 0) AS is_new
+            """, (m["id"], thread_id, from_addr, to_addrs, cc_addrs, subject,
+                  plain[:50000], html[:50000] if html else None, received_at, received_at,
+                  labels, bool(attachments), json.dumps(attachments) if attachments else None,
+                  None, conf, ["ingestion_gate", category],
+                  json.dumps({"category": category, "bill_metadata": bill_meta}),
+                  "ingestion_gate", "gmail_watcher"))
+            is_new = cur.fetchone()["is_new"]
+            if is_new:
+                inserted += 1
+            else:
+                updated += 1
+            continue
 
         cur.execute("""
             INSERT INTO gmail_messages

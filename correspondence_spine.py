@@ -170,12 +170,33 @@ def gmail_history_matter_code(matter_codes: list[str] | None) -> str | None:
     return matter_codes[0]
 
 
-# Promotional / system noise — never a legal event on the spine.
+# Promotional / system noise — never a legal event on the spine or active KB.
 NOISE_SENDER_RE = re.compile(
-    r"(redfin\.com|agoda|kayak@|supergut|pelicanparts|ocregister|"
+    r"(redfin\.com|realtor\.com|nerdwallet|agoda|kayak@|supergut|pelicanparts|"
+    r"ocregister|hiive\.com|samsung|pelicanparts\.com|agoda-emails\.com|"
     r"newsletter|noreply@sg\.newsletter|harvardonline@|ifexphilippines|"
     r"github\.com|google-gemini|openai\.com|anthropic\.com|godaddy|"
-    r"accounts\.google\.com|no-reply@tm\.openai)",
+    r"accounts\.google\.com|no-reply@tm\.openai|mail\.beehiiv|substack\.com|"
+    r"constantcontact|mailchimp|sendgrid\.net|amazonses\.com|"
+    r"listings@|marketing@|promo@|deals@|offers@)",
+    re.I,
+)
+
+NOISE_CATEGORIES = frozenset({
+    "promotional", "system_alert", "personal",
+})
+
+NOISE_SUBJECT_RE = re.compile(
+    r"(new in tucson|price decrease|home for you|\d+\s+other updates|"
+    r"special offer|%\s*off|unsubscribe|view in browser|weekly digest|"
+    r"your receipt from apple|security alert(?!.*(?:filing|court))|"
+    r"intro interest|credit card offer|deal of the day)",
+    re.I,
+)
+
+PROMO_BODY_RE = re.compile(
+    r"(unsubscribe|view this email in your browser|manage preferences|"
+    r"you(?:'re| are) receiving this (?:email|message) because)",
     re.I,
 )
 
@@ -202,6 +223,48 @@ LEGAL_ACTION_RE = re.compile(
 )
 
 
+def is_kb_pollution_email(
+    *,
+    from_addr: str | None = None,
+    subject: str | None = None,
+    body_plain: str | None = None,
+    relevance_status: str | None = None,
+    matter_codes: list[str] | None = None,
+    raw_category: str | None = None,
+) -> bool:
+    """True when email pollutes the active KB (triage, matcher, Leo context).
+
+    Noise is archived out of gmail_messages — never linked, never on spine.
+    Legal mail with agency/counsel signals overrides promo-shaped subjects.
+    """
+    if relevance_status == "noise":
+        return True
+
+    sender = from_addr or ""
+    text = f"{subject or ''}\n{(body_plain or '')[:6000]}"
+    has_legal_signal = bool(
+        LEGAL_ACTOR_RE.search(sender)
+        or LEGAL_ACTION_RE.search(text)
+        or (matter_codes and len(matter_codes) > 0)
+    )
+
+    if NOISE_SENDER_RE.search(sender) and not has_legal_signal:
+        return True
+    if raw_category in NOISE_CATEGORIES and not has_legal_signal:
+        return True
+    if NOISE_SUBJECT_RE.search(subject or "") and not has_legal_signal:
+        return True
+    if (
+        PROMO_BODY_RE.search(text)
+        and not has_legal_signal
+        and not LEGAL_ACTOR_RE.search(sender)
+    ):
+        return True
+    if NOISE_SENDER_RE.search(text) and not has_legal_signal:
+        return True
+    return False
+
+
 def is_legal_event_email(
     *,
     from_addr: str | None = None,
@@ -221,25 +284,30 @@ def is_legal_event_email(
     Includes: matter-linked mail, agency/counsel correspondence, filings,
     orders, hearings, manifestations. Excludes: promotional/system noise.
     """
+    if is_kb_pollution_email(
+        from_addr=from_addr,
+        subject=subject,
+        body_plain=body_plain,
+        relevance_status=relevance_status,
+        matter_codes=matter_codes,
+        raw_category=raw_category,
+    ):
+        return False
+
     if matter_codes:
         return True
     if case_file:
         return True
-    if client_code:
+    if client_code and raw_category not in ("promotional", "system_alert", "personal"):
         return True
-    if relevance_status and relevance_status != "unlinked":
+    if relevance_status and relevance_status not in ("unlinked", "noise"):
         return True
 
     sender = from_addr or ""
-    if NOISE_SENDER_RE.search(sender):
-        return False
-    if raw_category in ("promotional", "bill", "receipt", "bank_statement", "system_alert"):
+    if raw_category in ("bill", "receipt", "bank_statement"):
         return False
 
     text = f"{subject or ''}\n{(body_plain or '')[:6000]}"
-    if NOISE_SENDER_RE.search(text) and not LEGAL_ACTION_RE.search(text):
-        return False
-
     if LEGAL_ACTOR_RE.search(sender):
         return True
     if LEGAL_ACTION_RE.search(text):
@@ -252,3 +320,41 @@ def is_legal_event_email(
 def is_relevant_for_canonical_history(**kwargs) -> bool:
     """Alias — canonical history = legal events only."""
     return is_legal_event_email(**kwargs)
+
+
+def archive_gmail_noise(cur, row: dict, *, reason: str, archived_by: str) -> bool:
+    """Move one active gmail row to gmail_messages_archived; scrub KB refs."""
+    gid = row["id"]
+    cur.execute(
+        "DELETE FROM client_history WHERE source_table = 'gmail_messages' AND source_id = %s",
+        (str(gid),),
+    )
+    cur.execute("DELETE FROM correspondence_links WHERE gmail_id = %s", (gid,))
+    cur.execute(
+        """
+        INSERT INTO gmail_messages_archived (
+            id, message_id, thread_id, from_addr, from_name, to_addrs, cc_addrs,
+            subject, body_plain, body_html, sent_at, received_at, labels,
+            has_attachments, attachment_refs, document_id, case_file,
+            landtek_thread_id, relevance_score, relevance_reasons, ingested_at,
+            provenance_level, raw_payload, matter_codes, archived_at, archived_reason,
+            archived_by
+        )
+        SELECT
+            id, message_id, thread_id, from_addr, from_name, to_addrs, cc_addrs,
+            subject, body_plain, body_html, sent_at, received_at, labels,
+            has_attachments, attachment_refs, document_id, case_file,
+            landtek_thread_id, relevance_score,
+            COALESCE(relevance_reasons, '{}'::text[]) || ARRAY[%s],
+            ingested_at, provenance_level, raw_payload, matter_codes,
+            now(), %s, %s
+          FROM gmail_messages WHERE id = %s
+        ON CONFLICT (message_id) DO UPDATE SET
+            archived_at = now(),
+            archived_reason = EXCLUDED.archived_reason,
+            archived_by = EXCLUDED.archived_by
+        """,
+        (reason, reason, archived_by, gid),
+    )
+    cur.execute("DELETE FROM gmail_messages WHERE id = %s", (gid,))
+    return True

@@ -28,7 +28,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 from correspondence_spine import (  # noqa: E402
+    archive_gmail_noise,
     compute_relevance_status,
+    is_kb_pollution_email,
     resolve_client_code,
 )
 
@@ -72,12 +74,32 @@ def _keyword_hit(haystack: str, label: str) -> bool:
     return False
 
 
+def _raw_category(row: dict) -> str | None:
+    raw = row.get("raw_payload") or {}
+    return raw.get("category") if isinstance(raw, dict) else None
+
+
 def match_one(cur, row: dict) -> dict:
     """Link a single gmail row. Returns stats dict."""
-    stats = {"matters": 0, "obligations": 0, "needs": 0}
+    stats = {"matters": 0, "obligations": 0, "needs": 0, "archived_noise": 0}
     gid = row["id"]
     subject = row.get("subject") or ""
     body = (row.get("body_plain") or "")[:8000]
+    if is_kb_pollution_email(
+        from_addr=row.get("from_addr"),
+        subject=subject,
+        body_plain=body,
+        relevance_status=row.get("relevance_status"),
+        matter_codes=list(row.get("matter_codes") or []),
+        raw_category=_raw_category(row),
+    ):
+        archive_gmail_noise(
+            cur, row,
+            reason="correspondence_matcher_noise",
+            archived_by="correspondence_matcher",
+        )
+        stats["archived_noise"] = 1
+        return stats
     haystack = f"{subject} {body}"
     matter_codes = list(row.get("matter_codes") or [])
     case_file = row.get("case_file")
@@ -216,7 +238,7 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     rows = fetch_batch(cur, full=args.full, gmail_id=args.gmail_id, hours=args.hours)
-    totals = {"emails": 0, "matters": 0, "obligations": 0, "needs": 0}
+    totals = {"emails": 0, "matters": 0, "obligations": 0, "needs": 0, "archived_noise": 0}
 
     for row in rows:
         s = match_one(cur, row)
@@ -224,10 +246,12 @@ def main():
         totals["matters"] += s["matters"]
         totals["obligations"] += s["obligations"]
         totals["needs"] += s["needs"]
+        totals["archived_noise"] += s.get("archived_noise", 0)
 
     log(
         f"processed={totals['emails']} matter_links={totals['matters']} "
-        f"obligation_links={totals['obligations']} need_links={totals['needs']}"
+        f"obligation_links={totals['obligations']} need_links={totals['needs']} "
+        f"archived_noise={totals['archived_noise']}"
     )
     cur.close()
     conn.close()
