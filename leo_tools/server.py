@@ -62,6 +62,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: vault endpoints not registered: {_e}", file=_sys.stderr)
 
+try:
+    from ops_dashboard import bp as _ops_bp
+    app.register_blueprint(_ops_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: ops dashboard not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 
