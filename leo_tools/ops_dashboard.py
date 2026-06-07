@@ -1,4 +1,4 @@
-"""LandTek ops dashboard — Jonathan control room (v0).
+"""LandTek ops dashboard — Jonathan control room.
 
 Mount at /ops/ on leo_tools (port 8765). SQL-only views — no LLM.
 """
@@ -104,7 +104,10 @@ h1 { font-size:22px; margin:0 0 4px; }
 .grid { display:grid; gap:16px; }
 .grid-2 { grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }
 .grid-3 { grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.grid-4 { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
 .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+.section-title { font-size:15px; font-weight:600; margin:24px 0 10px; color:var(--text); }
+.muted { color:var(--muted); }
 .card h2 { font-size:14px; margin:0 0 10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
 table { width:100%; border-collapse:collapse; font-size:13px; }
 th,td { padding:8px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
@@ -219,6 +222,26 @@ def _timer_rows() -> list[dict]:
     return rows
 
 
+def _safe_fetch(cur, conn, sql: str, params=(), default=None):
+    try:
+        cur.execute(sql, params)
+        return cur.fetchall() if default is None else cur.fetchone()
+    except Exception:
+        conn.rollback()
+        return default
+
+
+def _stat_card(title: str, value, sub: str = "") -> str:
+    sub_html = f'<div class="stat-sub">{sub}</div>' if sub else ""
+    return f'<div class="card"><h2>{_esc(title)}</h2><div class="stat">{_esc(value)}</div>{sub_html}</div>'
+
+
+def _pct(n, d) -> str:
+    if not d:
+        return "—"
+    return f"{round(100 * n / d, 1)}%"
+
+
 def _badge_timer(row: dict) -> str:
     unit = row["unit"]
     active = row.get("active", "")
@@ -243,67 +266,131 @@ def home():
     conn = _db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    cur.execute("""
+    deadlines = _safe_fetch(cur, conn, """
         SELECT id, title, due_date, status, case_file
           FROM case_deadlines
          WHERE status != 'completed' AND due_date IS NOT NULL
            AND due_date >= CURRENT_DATE - interval '3 days'
          ORDER BY due_date ASC
          LIMIT 8
-    """)
-    deadlines = cur.fetchall()
+    """, default=[])
 
-    obligations = []
-    try:
-        cur.execute("""
-            SELECT id, short_label, status, priority, due_by, client_code,
-                   NULL::text AS matter_code
-              FROM v_obligations_at_risk
-             ORDER BY priority DESC, due_by ASC NULLS LAST
-             LIMIT 8
-        """)
-        obligations = cur.fetchall()
-    except Exception:
-        conn.rollback()
-        cur.execute("""
-            SELECT id, short_label, status, priority, due_by, matter_code, client_code
+    obligations = _safe_fetch(cur, conn, """
+        SELECT id, short_label, status, priority, due_by, client_code, risk_window,
+               NULL::text AS matter_code
+          FROM v_obligations_at_risk
+         ORDER BY priority DESC, due_by ASC NULLS LAST
+         LIMIT 8
+    """, default=[])
+    if not obligations:
+        obligations = _safe_fetch(cur, conn, """
+            SELECT id, short_label, status, priority, due_by, matter_code, client_code,
+                   NULL::text AS risk_window
               FROM landtek_obligations
              WHERE status IN ('open', 'in_progress', 'blocked')
              ORDER BY priority DESC, due_by ASC NULLS LAST
              LIMIT 8
-        """)
-        obligations = cur.fetchall()
+        """, default=[])
 
-    cur.execute("SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'")
-    open_holes = cur.fetchone()["n"]
+    portfolio = _safe_fetch(cur, conn, """
+        SELECT
+          (SELECT COUNT(*) FROM documents) AS total_docs,
+          (SELECT COUNT(*) FROM clients WHERE case_file IS NOT NULL AND case_file != '') AS clients,
+          (SELECT COUNT(*) FROM matters WHERE status = 'active') AS active_matters,
+          (SELECT COUNT(*) FROM v_gmail_relevant) AS spine_emails,
+          (SELECT COUNT(*) FROM v_correspondence_triage) AS triage_backlog,
+          (SELECT COUNT(*) FROM v_open_client_needs) AS open_needs,
+          (SELECT COUNT(*) FROM v_obligations_at_risk WHERE risk_window = 'overdue') AS overdue_obl,
+          (SELECT COUNT(*) FROM action_items WHERE status = 'Open') AS open_actions,
+          (SELECT COUNT(*) FROM pending_inquiries
+            WHERE status = 'open' AND expires_at > now()) AS open_inquiries,
+          (SELECT COUNT(*) FROM unauth_attempts
+            WHERE attempted_at > now() - interval '24 hours') AS unauth_24h
+    """, default={}) or {}
 
-    cur.execute("""
+    ops = _safe_fetch(cur, conn, """
+        SELECT
+          (SELECT COUNT(*) FROM documents
+            WHERE COALESCE(timestamp, created_at) > now() - interval '24 hours') AS docs_24h,
+          (SELECT COUNT(*) FROM documents_needing_classification) AS unclassified,
+          (SELECT COUNT(*) FROM conversations
+            WHERE timestamp > now() - interval '24 hours') AS conv_24h
+    """, default={}) or {}
+
+    leo = _safe_fetch(cur, conn, """
+        SELECT
+          COUNT(*) FILTER (WHERE timestamp > now() - interval '24 hours') AS int_24h,
+          COUNT(*) FILTER (WHERE timestamp > now() - interval '24 hours'
+                            AND sender_id LIKE '999000%') AS sim_24h,
+          COUNT(*) FILTER (WHERE timestamp > now() - interval '24 hours'
+                            AND sender_id NOT LIKE '999000%') AS real_24h,
+          COUNT(*) FILTER (WHERE timestamp > now() - interval '7 days'
+                            AND sender_id LIKE '999000%') AS sim_7d,
+          COUNT(*) FILTER (WHERE timestamp > now() - interval '7 days'
+                            AND sender_id NOT LIKE '999000%') AS real_7d,
+          COUNT(*) FILTER (WHERE tokens_in IS NOT NULL) AS logged_tokens,
+          COUNT(*) AS total_logged,
+          COALESCE(SUM(est_cost_cents) FILTER (
+            WHERE timestamp > now() - interval '7 days'), 0) AS cost_cents_7d,
+          COALESCE(SUM(tokens_in) FILTER (
+            WHERE timestamp > now() - interval '7 days'), 0) AS tok_in_7d,
+          ROUND(AVG(rating) FILTER (
+            WHERE rating IS NOT NULL AND timestamp > now() - interval '30 days'), 1) AS avg_rating
+          FROM leo_interactions
+    """, default={}) or {}
+
+    qa = _safe_fetch(cur, conn, """
+        SELECT
+          COUNT(*) FILTER (WHERE posted_at > now() - interval '24 hours') AS runs_24h,
+          COUNT(*) FILTER (WHERE posted_at > now() - interval '24 hours' AND passed) AS pass_24h,
+          COUNT(*) FILTER (WHERE posted_at > now() - interval '1 hour') AS runs_1h,
+          COUNT(*) FILTER (WHERE posted_at > now() - interval '1 hour' AND passed) AS pass_1h
+          FROM leo_qa_sim_payloads
+    """, default={}) or {}
+
+    n8n_exec = _safe_fetch(cur, conn, """
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'error') AS err,
+          COUNT(*) FILTER (WHERE status = 'success') AS ok
+          FROM execution_entity
+         WHERE "workflowId" = 'vSDQv1vfn6627bnA'
+           AND "startedAt" > now() - interval '24 hours'
+    """, default={}) or {}
+
+    open_holes_row = _safe_fetch(cur, conn,
+        "SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'", default={"n": 0})
+    open_holes = open_holes_row["n"] if open_holes_row else 0
+
+    sim_sess = _safe_fetch(cur, conn, """
         SELECT passed, failed, burst_size, completed_at
           FROM simulator_sessions WHERE status = 'done'
          ORDER BY started_at DESC LIMIT 1
-    """)
-    sim_sess = cur.fetchone()
+    """, default=None)
 
-    cur.execute("""
-        SELECT
-          COUNT(*) FILTER (WHERE sender_id LIKE '999000%') AS sim_n,
-          COUNT(*) FILTER (WHERE sender_id NOT LIKE '999000%') AS real_n,
-          COUNT(*) AS total
+    recent = _safe_fetch(cur, conn, """
+        SELECT id, timestamp, sender_name, LEFT(question, 70) AS q,
+               LEFT(reply_text, 90) AS reply,
+               CASE WHEN sender_id LIKE '999000%' THEN 'sim' ELSE 'real' END AS kind,
+               rating
           FROM leo_interactions
-         WHERE timestamp > now() - interval '7 days'
-    """)
-    traffic = cur.fetchone()
+         ORDER BY timestamp DESC LIMIT 10
+    """, default=[])
 
-    cur.execute("""
-        SELECT COUNT(*) AS n FROM documents WHERE timestamp > now() - interval '24 hours'
-    """)
-    docs_24h = cur.fetchone()["n"]
+    events = _safe_fetch(cur, conn, """
+        SELECT case_file, short_label, scheduled_for::date AS d, priority,
+               readiness_pct, req_open
+          FROM v_upcoming_events_30d
+         ORDER BY scheduled_for ASC NULLS LAST
+         LIMIT 6
+    """, default=[])
 
-    try:
-        cur.execute("SELECT COUNT(*) AS n FROM documents_needing_classification")
-        unclassified = cur.fetchone()["n"]
-    except Exception:
-        unclassified = None
+    needs = _safe_fetch(cur, conn, """
+        SELECT client_name, short_label, priority, need_kind
+          FROM v_open_client_needs
+         ORDER BY priority DESC, created_at DESC
+         LIMIT 6
+    """, default=[])
 
     cur.close()
     conn.close()
@@ -316,17 +403,31 @@ def home():
         alerts.append(f'<div class="alert alert-warn">{open_holes} open holes finding(s) — <a href="/ops/health">Health</a></div>')
     if not n8n_ok:
         alerts.append('<div class="alert alert-bad">n8n health check failed</div>')
+    if portfolio.get("overdue_obl"):
+        alerts.append(
+            f'<div class="alert alert-warn">{portfolio["overdue_obl"]} overdue obligation(s)</div>'
+        )
+    if portfolio.get("triage_backlog", 0) > 500:
+        alerts.append(
+            f'<div class="alert alert-warn">{portfolio["triage_backlog"]} emails in correspondence triage backlog</div>'
+        )
     for tr in _timer_rows():
         if tr["unit"] == "leo-rapid-fire.timer" and tr["enabled"] == "enabled":
             alerts.append('<div class="alert alert-bad">Rapid-fire timer is ENABLED — should be on-demand only</div>')
 
     if sim_sess:
-        p, f, b = sim_sess["passed"] or 0, sim_sess["failed"] or 0, sim_sess["burst_size"] or 0
-        sim_line = f"{p}/{b} pass" if b else "—"
+        sim_line = f"{sim_sess['passed'] or 0}/{sim_sess['burst_size'] or 0} pass"
     else:
         sim_line = "no sessions"
 
-    est_daily_usd = round((traffic["sim_n"] or 0) * 0.08 + (traffic["real_n"] or 0) * 0.08, 2)
+    n8n_total = n8n_exec.get("total") or 0
+    cost_logged = (leo.get("cost_cents_7d") or 0) / 100
+    cost_est = round(n8n_total * 0.08, 2) if not cost_logged else cost_logged
+    cost_sub = (
+        f"${cost_logged:.2f} logged · {leo.get('tok_in_7d') or 0:,} tok in"
+        if leo.get("logged_tokens")
+        else f"~${cost_est:.0f}/day est · {leo.get('logged_tokens') or 0} rows w/ tokens"
+    )
 
     dl_rows = "".join(
         f"<tr><td>{_esc(r['due_date'])}</td><td>{_esc(r['title'])}</td>"
@@ -335,39 +436,103 @@ def home():
         for r in deadlines
     ) or '<tr><td colspan="4" class="empty">No upcoming deadlines</td></tr>'
 
-    obl_rows = "".join(
-        f"<tr><td>P{r['priority']}</td><td>{_esc(r['short_label'])}</td>"
-        f"<td>{_esc(r.get('matter_code') or r.get('client_code') or '—')}</td>"
-        f"<td>{_esc(str(r.get('due_by') or '—')[:10])}</td></tr>"
-        for r in obligations
-    ) or '<tr><td colspan="4" class="empty">None at risk</td></tr>'
+    obl_parts = []
+    for r in obligations:
+        risk_badge = ""
+        if r.get("risk_window") == "overdue":
+            risk_badge = f' <span class="badge badge-bad">{_esc(r["risk_window"])}</span>'
+        obl_parts.append(
+            f"<tr><td>P{r['priority']}</td><td>{_esc(r['short_label'])}</td>"
+            f"<td>{_esc(r.get('matter_code') or r.get('client_code') or '—')}</td>"
+            f"<td>{_esc(str(r.get('due_by') or '—')[:10])}{risk_badge}</td></tr>"
+        )
+    obl_rows = "".join(obl_parts) or '<tr><td colspan="4" class="empty">None at risk</td></tr>'
+
+    ev_rows = "".join(
+        f"<tr><td>{r['d']}</td><td>{_esc(r.get('case_file') or '—')}</td>"
+        f"<td>{_esc(r['short_label'])}</td><td>P{r['priority']}</td>"
+        f"<td>{r.get('readiness_pct') or '—'}%</td><td>{r.get('req_open') or 0}</td></tr>"
+        for r in events
+    ) or '<tr><td colspan="6" class="empty">No events in next 30 days</td></tr>'
+
+    need_rows = "".join(
+        f"<tr><td>P{r['priority']}</td><td>{_esc(r.get('client_name') or '—')}</td>"
+        f"<td>{_esc(r['short_label'])}</td><td>{_esc(r.get('need_kind') or '—')}</td></tr>"
+        for r in needs
+    ) or '<tr><td colspan="4" class="empty">None open</td></tr>'
+
+    act_rows = "".join(
+        f"<tr><td>{str(r['timestamp'])[:16]}</td>"
+        f"<td><span class='badge {'badge-sim' if r['kind']=='sim' else 'badge-ok'}'>{r['kind']}</span></td>"
+        f"<td>{_esc(r.get('sender_name') or '?')}</td>"
+        f"<td>{_esc(r.get('q') or '—')}</td>"
+        f"<td>{_esc(r.get('reply') or '—')}</td>"
+        f"<td>{r['rating'] or '—'}</td></tr>"
+        for r in recent
+    ) or '<tr><td colspan="6" class="empty">No interactions yet</td></tr>'
+
+    portfolio_cards = "".join([
+        _stat_card("Total docs", portfolio.get("total_docs", "?")),
+        _stat_card("Clients", portfolio.get("clients", "?")),
+        _stat_card("Active matters", portfolio.get("active_matters", "?")),
+        _stat_card("Spine emails", portfolio.get("spine_emails", "?"), "v_gmail_relevant"),
+    ])
+
+    ops_cards = "".join([
+        _stat_card("Docs 24h", ops.get("docs_24h", "?"), f"{ops.get('conv_24h', 0)} conversations"),
+        _stat_card("Unclassified", ops.get("unclassified", "?"), '<a href="/files/">open files</a>'),
+        _stat_card("Email triage", portfolio.get("triage_backlog", "?"), "needs linkage"),
+        _stat_card("Client needs", portfolio.get("open_needs", "?")),
+        _stat_card("Open actions", portfolio.get("open_actions", "?")),
+        _stat_card("Open inquiries", portfolio.get("open_inquiries", "?"),
+                   f"{portfolio.get('unauth_24h', 0)} unauth 24h"),
+    ])
+
+    leo_cards = "".join([
+        _stat_card("Watchdog", wd.upper()),
+        _stat_card("n8n", "OK" if n8n_ok else "DOWN",
+                   f"{_pct(n8n_exec.get('err', 0), n8n_total)} err · {n8n_total} exec 24h"),
+        _stat_card("Leo 24h", f"{leo.get('real_24h', 0)} real",
+                   f"{leo.get('sim_24h', 0)} sim · 7d: {leo.get('real_7d', 0)}r/{leo.get('sim_7d', 0)}s"),
+        _stat_card("QA shadow 24h", _pct(qa.get("pass_24h", 0), qa.get("runs_24h", 0)),
+                   f"{qa.get('pass_24h', 0)}/{qa.get('runs_24h', 0)} · 1h: {_pct(qa.get('pass_1h', 0), qa.get('runs_1h', 0))}"),
+        _stat_card("Arch sim", sim_line, "latest burst"),
+        _stat_card("Cost 7d", f"${cost_logged:.2f}" if cost_logged else f"~${cost_est:.0f}/d est", cost_sub),
+        _stat_card("Avg rating 30d", leo.get("avg_rating") or "—", "from rated interactions"),
+    ])
 
     body = f"""
 <h1>Morning briefing</h1>
-<p class="lead">Deadlines, obligations, system pulse — no LLM, live from Postgres.</p>
+<p class="lead">Portfolio, Leo pulse, deadlines — live SQL, no LLM.</p>
 {''.join(alerts) if alerts else '<div class="alert alert-ok">No critical alerts</div>'}
 <form class="searchbar" action="/ops/search" method="get" style="margin-bottom:20px">
   <input name="q" placeholder="Search docs, notes, entities…" minlength="2" required>
   <button type="submit">Search</button>
 </form>
-<div class="grid grid-3" style="margin-bottom:16px">
-  <div class="card"><h2>Watchdog</h2><div class="stat">{_esc(wd.upper())}</div></div>
-  <div class="card"><h2>n8n</h2><div class="stat">{'OK' if n8n_ok else 'DOWN'}</div></div>
-  <div class="card"><h2>Architecture sim</h2><div class="stat">{_esc(sim_line)}</div>
-    <div class="stat-sub">latest session</div></div>
-  <div class="card"><h2>Traffic 7d</h2><div class="stat">{traffic['real_n']} real</div>
-    <div class="stat-sub">{traffic['sim_n']} sim · ~${est_daily_usd*7:.0f} est/week</div></div>
-  <div class="card"><h2>Docs 24h</h2><div class="stat">{docs_24h}</div></div>
-  <div class="card"><h2>Unclassified</h2><div class="stat">{unclassified if unclassified is not None else '?'}</div>
-    <div class="stat-sub"><a href="/files/">open files</a></div></div>
-</div>
+<div class="section-title">Portfolio</div>
+<div class="grid grid-4" style="margin-bottom:8px">{portfolio_cards}</div>
+<div class="section-title">Operations</div>
+<div class="grid grid-3" style="margin-bottom:8px">{ops_cards}</div>
+<div class="section-title">Leo &amp; quality</div>
+<div class="grid grid-3" style="margin-bottom:16px">{leo_cards}</div>
 <div class="grid grid-2">
   <div class="card"><h2>Upcoming deadlines</h2>
     <table><tr><th>Due</th><th>Title</th><th>Case</th><th>Status</th></tr>{dl_rows}</table>
   </div>
   <div class="card"><h2>Obligations at risk</h2>
-    <table><tr><th>P</th><th>Label</th><th>Matter</th><th>Due</th></tr>{obl_rows}</table>
+    <table><tr><th>P</th><th>Label</th><th>Client</th><th>Due</th></tr>{obl_rows}</table>
   </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Events next 30d</h2>
+    <table><tr><th>Date</th><th>Case</th><th>Event</th><th>P</th><th>Ready%</th><th>Open prep</th></tr>{ev_rows}</table>
+  </div>
+  <div class="card"><h2>Client needs</h2>
+    <table><tr><th>P</th><th>Client</th><th>Need</th><th>Kind</th></tr>{need_rows}</table>
+  </div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Recent Leo activity</h2>
+  <table><tr><th>When</th><th>Kind</th><th>Sender</th><th>Question</th><th>Reply</th><th>★</th></tr>{act_rows}</table>
 </div>
 """
     return _layout("Home", body, active="home")
@@ -377,17 +542,25 @@ def home():
 def clients():
     conn = _db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("""
+    rows = _safe_fetch(cur, conn, """
         SELECT c.case_file, c.name, c.client_code, c.priority_level, c.status,
                (SELECT COUNT(*) FROM documents d WHERE d.case_file = c.case_file) AS doc_count,
-               (SELECT MAX(timestamp) FROM documents d WHERE d.case_file = c.case_file) AS last_doc,
+               (SELECT MAX(COALESCE(d.timestamp, d.created_at)) FROM documents d
+                 WHERE d.case_file = c.case_file) AS last_doc,
                (SELECT COUNT(*) FROM landtek_obligations o
-                 WHERE o.case_file = c.case_file AND o.status IN ('open','in_progress','blocked')) AS open_obl
+                 WHERE o.case_file = c.case_file AND o.status IN ('open','in_progress','blocked')) AS open_obl,
+               (SELECT COUNT(*) FROM matters m
+                 WHERE m.case_file = c.case_file AND m.status = 'active') AS matter_count,
+               (SELECT phase_label FROM v_current_phase_per_case p
+                 WHERE p.case_file = c.case_file LIMIT 1) AS phase,
+               (SELECT COUNT(*) FROM v_open_client_needs n
+                 WHERE n.client_code = c.client_code) AS open_needs,
+               (SELECT events_7d FROM v_client_history_summary h
+                 WHERE h.client_code = c.client_code LIMIT 1) AS events_7d
           FROM clients c
          WHERE c.case_file IS NOT NULL AND c.case_file != ''
          ORDER BY c.name
-    """)
-    rows = cur.fetchall()
+    """, default=[])
     cur.close()
     conn.close()
 
@@ -397,18 +570,22 @@ def clients():
         trs.append(
             f"<tr><td><a href=\"/ops/client/{_esc(cf)}\">{_esc(r['name'] or cf)}</a></td>"
             f"<td><code>{_esc(cf)}</code></td>"
-            f"<td>{r['doc_count']}</td><td>{r['open_obl']}</td>"
+            f"<td>{r['doc_count']}</td><td>{r['matter_count']}</td><td>{r['open_obl']}</td>"
+            f"<td>{r.get('open_needs') or 0}</td>"
+            f"<td>{_esc((r.get('phase') or '—')[:24])}</td>"
+            f"<td>{r.get('events_7d') or 0}</td>"
             f"<td>{_esc((r['priority_level'] or '')[:8])}</td>"
             f"<td>{_esc(str(r['last_doc'])[:10] if r['last_doc'] else '—')}</td>"
             f"<td><a href=\"/files/?case={_esc(cf)}\">files</a></td></tr>"
         )
     body = f"""
 <h1>Clients</h1>
-<p class="lead">All case files — doc counts, obligations, jump to files.</p>
+<p class="lead">Portfolio drill-down — docs, matters, phase, spine activity.</p>
 <div class="card">
 <table>
-  <tr><th>Client</th><th>Case file</th><th>Docs</th><th>Open obl.</th><th>Priority</th><th>Last doc</th><th></th></tr>
-  {''.join(trs) if trs else '<tr><td colspan="7" class="empty">No clients</td></tr>'}
+  <tr><th>Client</th><th>Case file</th><th>Docs</th><th>Matters</th><th>Obl.</th><th>Needs</th>
+      <th>Phase</th><th>Events 7d</th><th>Prio</th><th>Last doc</th><th></th></tr>
+  {''.join(trs) if trs else '<tr><td colspan="11" class="empty">No clients</td></tr>'}
 </table>
 </div>
 """
@@ -481,9 +658,15 @@ def mwk_hub():
     lanes_html = []
     for code, track, _default_stage in MWK_LANES:
         cur.execute("""
-            SELECT matter_code, current_stage, next_deadline, next_event, docket_number
-              FROM matters WHERE matter_code = %s
-        """, (code,))
+            SELECT m.matter_code, m.current_stage, m.next_deadline, m.next_event, m.docket_number,
+                   (SELECT COUNT(*) FROM documents d WHERE d.matter_code = m.matter_code) AS doc_n,
+                   (SELECT COUNT(*) FROM landtek_obligations o
+                     WHERE o.matter_code = m.matter_code
+                       AND o.status IN ('open','in_progress','blocked')) AS open_obl,
+                   (SELECT COUNT(*) FROM gmail_messages g
+                     WHERE %s = ANY(g.matter_codes)) AS email_n
+              FROM matters m WHERE m.matter_code = %s
+        """, (code, code))
         m = cur.fetchone()
         cls = "lane"
         if "CV" in code:
@@ -498,7 +681,8 @@ def mwk_hub():
         lanes_html.append(f"""
 <div class="{cls}">
   <strong><a href="/ops/matter/{_esc(code)}">{_esc(code)}</a></strong>
-  <span class="badge badge-off">{_esc(track)}</span><br>
+  <span class="badge badge-off">{_esc(track)}</span>
+  <span class="muted"> · {m.get('doc_n', 0)} docs · {m.get('open_obl', 0)} obl · {m.get('email_n', 0)} email</span><br>
   <span class="muted">Stage:</span> {_esc(m.get('current_stage') or '—')}<br>
   <span class="muted">Deadline:</span> {_esc(m.get('next_deadline') or '—')}<br>
   <span class="muted">Docket:</span> {_esc(m.get('docket_number') or '—')}<br>
@@ -594,28 +778,73 @@ def matter_detail(matter_code: str):
 def health_page():
     conn = _db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'")
-    open_holes = cur.fetchone()["n"]
-    cur.execute("""
+
+    open_holes_row = _safe_fetch(cur, conn,
+        "SELECT COUNT(*) AS n FROM holes_findings WHERE status = 'open'", default={"n": 0})
+    open_holes = open_holes_row["n"] if open_holes_row else 0
+
+    holes = _safe_fetch(cur, conn, """
         SELECT routine_name, severity, LEFT(description, 100) AS desc, created_at
           FROM holes_findings WHERE status = 'open'
          ORDER BY created_at DESC LIMIT 10
-    """)
-    holes = cur.fetchall()
-    cur.execute("""
+    """, default=[])
+
+    hole_sev = _safe_fetch(cur, conn, """
+        SELECT severity, COUNT(*) AS n FROM holes_findings
+         WHERE status = 'open' GROUP BY severity ORDER BY severity
+    """, default=[])
+
+    sessions = _safe_fetch(cur, conn, """
         SELECT id, passed, failed, burst_size, completed_at::date AS d
           FROM simulator_sessions WHERE status = 'done'
          ORDER BY started_at DESC LIMIT 5
-    """)
-    sessions = cur.fetchall()
-    cur.execute("""
+    """, default=[])
+
+    sim_24h = _safe_fetch(cur, conn, """
+        SELECT id, pack, started_at::date AS d, burst_size, passed, failed, pass_pct
+          FROM v_simulator_sessions_24h ORDER BY started_at DESC LIMIT 8
+    """, default=[])
+
+    probe_trend = _safe_fetch(cur, conn, """
+        SELECT probe_name, passes, fails, sessions, last_fail::date AS last_fail
+          FROM v_simulator_probe_trend
+         WHERE fails > 0
+         ORDER BY fails DESC, sessions DESC
+         LIMIT 8
+    """, default=[])
+
+    qa = _safe_fetch(cur, conn, """
+        SELECT
+          COUNT(*) FILTER (WHERE active) AS active_probes,
+          COUNT(*) FILTER (WHERE NOT active) AS retired_probes
+          FROM leo_qa_probes WHERE rail = 'sim'
+    """, default={}) or {}
+
+    qa_payload = _safe_fetch(cur, conn, """
+        SELECT COUNT(*) FILTER (WHERE posted_at > now() - interval '24 hours') AS runs,
+               COUNT(*) FILTER (WHERE posted_at > now() - interval '24 hours' AND passed) AS passed
+          FROM leo_qa_sim_payloads
+    """, default={}) or {}
+
+    holes_runs = _safe_fetch(cur, conn, """
+        SELECT routine_name, status, findings_count, p0_count, run_at::date AS d
+          FROM holes_runs ORDER BY run_at DESC LIMIT 6
+    """, default=[])
+
+    n8n_exec = _safe_fetch(cur, conn, """
         SELECT COUNT(*) FILTER (WHERE status='error') AS err,
-               COUNT(*) AS total
+               COUNT(*) AS total,
+               COUNT(*) FILTER (WHERE status='success') AS ok
           FROM execution_entity
          WHERE "workflowId" = 'vSDQv1vfn6627bnA'
            AND "startedAt" > now() - interval '24 hours'
-    """)
-    n8n_exec = cur.fetchone()
+    """, default={"err": 0, "total": 0, "ok": 0})
+
+    leaks = _safe_fetch(cur, conn, """
+        SELECT COUNT(*) AS n FROM real_traffic_violations
+         WHERE detected_at > now() - interval '7 days'
+    """, default={"n": 0})
+
     cur.close()
     conn.close()
 
@@ -633,22 +862,52 @@ def health_page():
         for h in holes
     ) or '<tr><td colspan="3" class="empty">None open</td></tr>'
 
+    sev_rows = "".join(
+        f"<tr><td>{_esc(s['severity'])}</td><td>{s['n']}</td></tr>"
+        for s in hole_sev
+    ) or '<tr><td colspan="2" class="empty">0 open</td></tr>'
+
     sess_rows = "".join(
         f"<tr><td>#{s['id']}</td><td>{s['d']}</td><td>{s['passed']}/{s['burst_size']}</td>"
         f"<td>{s['failed']} fail</td></tr>"
         for s in sessions
     ) or '<tr><td colspan="4" class="empty">—</td></tr>'
 
+    sim24_rows = "".join(
+        f"<tr><td>#{s['id']}</td><td>{_esc(s.get('pack') or '—')}</td><td>{s['d']}</td>"
+        f"<td>{s['passed']}/{s['burst_size']}</td><td>{s.get('pass_pct') or '—'}%</td></tr>"
+        for s in sim_24h
+    ) or '<tr><td colspan="5" class="empty">No bursts in 24h</td></tr>'
+
+    trend_rows = "".join(
+        f"<tr><td><code>{_esc(p['probe_name'])}</code></td><td>{p['passes']}</td>"
+        f"<td>{p['fails']}</td><td>{p['sessions']}</td><td>{p.get('last_fail') or '—'}</td></tr>"
+        for p in probe_trend
+    ) or '<tr><td colspan="5" class="empty">No failing probes</td></tr>'
+
+    run_rows = "".join(
+        f"<tr><td>{_esc(r['routine_name'])}</td><td>{_esc(r['status'])}</td>"
+        f"<td>{r.get('findings_count') or 0}</td><td>{r.get('p0_count') or 0}</td>"
+        f"<td>{r['d']}</td></tr>"
+        for r in holes_runs
+    ) or '<tr><td colspan="5" class="empty">No runs logged</td></tr>'
+
     err_pct = round(100 * (n8n_exec["err"] or 0) / max(n8n_exec["total"] or 1, 1), 1)
+    qa_runs = qa_payload.get("runs") or 0
+    qa_pass = qa_payload.get("passed") or 0
 
     body = f"""
 <h1>Health & triggers</h1>
-<p class="lead">Timers, n8n, simulator sessions, open holes.</p>
-<div class="grid grid-3" style="margin-bottom:16px">
-  <div class="card"><h2>Open holes</h2><div class="stat">{open_holes}</div></div>
-  <div class="card"><h2>n8n errors 24h</h2><div class="stat">{err_pct}%</div>
-    <div class="stat-sub">{n8n_exec['err']}/{n8n_exec['total']} execs</div></div>
-  <div class="card"><h2>Watchdog</h2><div class="stat">{_esc(_watchdog_state().upper())}</div></div>
+<p class="lead">Timers, simulators, holes, n8n — full ops telemetry.</p>
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("Open holes", open_holes)}
+  {_stat_card("n8n errors 24h", f"{err_pct}%", f"{n8n_exec['err']}/{n8n_exec['total']} execs")}
+  {_stat_card("Watchdog", _watchdog_state().upper())}
+  {_stat_card("QA shadow 24h", _pct(qa_pass, qa_runs), f"{qa_pass}/{qa_runs} payloads")}
+  {_stat_card("Probe library", qa.get("active_probes", "?"), f"{qa.get('retired_probes', 0)} retired")}
+  {_stat_card("Leak incidents 7d", leaks.get("n", 0), "real_traffic_violations")}
+  {_stat_card("n8n success 24h", n8n_exec.get("ok", 0), f"of {n8n_exec.get('total', 0)} total")}
+  {_stat_card("Arch bursts 24h", len(sim_24h), "v_simulator_sessions_24h")}
 </div>
 <div class="card"><h2>Systemd timers</h2>
 <table><tr><th>Label</th><th>Unit</th><th>Status</th><th>Enabled</th><th>Next</th></tr>
@@ -658,8 +917,24 @@ def health_page():
   <div class="card"><h2>Open hole details</h2>
     <table><tr><th>Sev</th><th>Routine</th><th>Description</th></tr>{hole_rows}</table>
   </div>
-  <div class="card"><h2>Simulator sessions</h2>
+  <div class="card"><h2>Holes by severity</h2>
+    <table><tr><th>Severity</th><th>Count</th></tr>{sev_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Architecture sim — 24h</h2>
+    <table><tr><th>ID</th><th>Pack</th><th>Date</th><th>Pass</th><th>%</th></tr>{sim24_rows}</table>
+  </div>
+  <div class="card"><h2>Probe failures (trend)</h2>
+    <table><tr><th>Probe</th><th>Pass</th><th>Fail</th><th>Sessions</th><th>Last fail</th></tr>{trend_rows}</table>
+  </div>
+</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Simulator sessions (all)</h2>
     <table><tr><th>ID</th><th>Date</th><th>Pass</th><th>Fail</th></tr>{sess_rows}</table>
+  </div>
+  <div class="card"><h2>Holes routine runs</h2>
+    <table><tr><th>Routine</th><th>Status</th><th>Findings</th><th>P0</th><th>Date</th></tr>{run_rows}</table>
   </div>
 </div>
 """
