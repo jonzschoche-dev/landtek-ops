@@ -105,7 +105,16 @@ def main():
     while not _shutdown:
         try:
             conn = psycopg2.connect(PG_DSN)
-            conn.autocommit = False
+            # CRITICAL: autocommit so we NEVER hold a transaction (and its table
+            # lock) open across a slow handler call. Handlers can take many
+            # seconds (LLM tool-use loop) or hang; if the SELECT's transaction
+            # were still open during that call it would sit "idle in transaction"
+            # holding a ROW SHARE lock, and the media_downloader's periodic
+            # ALTER TABLE (ACCESS EXCLUSIVE) would queue behind it and freeze the
+            # whole telegram_inbox table for every reader/writer. (Root cause of
+            # the 2026-06-08 Telegram choke.) With autocommit each statement is
+            # its own transaction; no lock is ever held across handler work.
+            conn.autocommit = True
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             cur.execute("""
                 SELECT id, update_id, update_type, chat_id, chat_type, chat_title,
@@ -114,17 +123,21 @@ def main():
                  WHERE processed_at IS NULL
                  ORDER BY id
                  LIMIT 25
-                 FOR UPDATE SKIP LOCKED
             """)
             rows = cur.fetchall()
             if not rows:
-                conn.rollback()
                 cur.close(); conn.close()
                 time.sleep(POLL_INTERVAL)
                 continue
 
             for row in rows:
+                if _shutdown:
+                    break
                 outcome, err = _process_one(conn, row)
+                # Single-statement, guarded mark-processed. Runs in its own
+                # autocommit transaction (no lock held across the handler above).
+                # The `AND processed_at IS NULL` guard keeps it idempotent if a
+                # row is ever claimed twice.
                 cur.execute("""
                     UPDATE telegram_inbox
                        SET processed_at = NOW(),
@@ -132,14 +145,13 @@ def main():
                            handler = %s,
                            handler_outcome = %s,
                            error_msg = %s
-                     WHERE id = %s
+                     WHERE id = %s AND processed_at IS NULL
                 """, (WORKER_NAME,
                       (outcome.split(":", 1)[0] if outcome else "unknown"),
                       outcome, err, row["id"]))
                 print(f"[router] inbox#{row['id']} chat={row.get('chat_id')} "
                       f"sender={row.get('sender_id')} text={(row.get('text_content') or '')[:50]!r} "
                       f"-> {outcome}")
-            conn.commit()
             cur.close(); conn.close()
         except Exception as e:
             print(f"[router] loop error: {e}", file=sys.stderr)

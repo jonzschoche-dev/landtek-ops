@@ -86,15 +86,40 @@ def _fetch_telegram_file(file_id):
         return None, None, f"{type(e).__name__}: {str(e)[:200]}"
 
 
+_MEDIA_COLS = ("media_file_id", "media_type", "media_path", "media_size", "media_error")
+
+
 def _ensure_columns(cur):
+    """Make sure the media columns + pending index exist.
+
+    MUST be called once at startup only, never inside the poll loop. An
+    unconditional `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` still requests an
+    ACCESS EXCLUSIVE lock on every call; if anything else holds a conflicting
+    lock at that moment, the ALTER queues for the exclusive lock and — because
+    Postgres lock queues are FIFO — every subsequent INSERT/SELECT queues behind
+    it, freezing the whole table. (This, run every 5s, was the amplifier in the
+    2026-06-08 Telegram choke.) So: check first, only ALTER when a column is
+    actually missing, and bound the wait with lock_timeout so it can never hang.
+    """
     cur.execute("""
-        ALTER TABLE telegram_inbox
-            ADD COLUMN IF NOT EXISTS media_file_id text,
-            ADD COLUMN IF NOT EXISTS media_type    text,
-            ADD COLUMN IF NOT EXISTS media_path    text,
-            ADD COLUMN IF NOT EXISTS media_size    int,
-            ADD COLUMN IF NOT EXISTS media_error   text
-    """)
+        SELECT count(*) FROM information_schema.columns
+         WHERE table_name = 'telegram_inbox'
+           AND column_name = ANY(%s)
+    """, (list(_MEDIA_COLS),))
+    have = cur.fetchone()[0]
+    if have < len(_MEDIA_COLS):
+        cur.execute("SET lock_timeout = '3s'")
+        try:
+            cur.execute("""
+                ALTER TABLE telegram_inbox
+                    ADD COLUMN IF NOT EXISTS media_file_id text,
+                    ADD COLUMN IF NOT EXISTS media_type    text,
+                    ADD COLUMN IF NOT EXISTS media_path    text,
+                    ADD COLUMN IF NOT EXISTS media_size    int,
+                    ADD COLUMN IF NOT EXISTS media_error   text
+            """)
+        finally:
+            cur.execute("RESET lock_timeout")
     cur.execute("""
         CREATE INDEX IF NOT EXISTS telegram_inbox_media_pending_idx
             ON telegram_inbox (id)
@@ -128,11 +153,20 @@ def _backfill_media_file_ids(cur):
 def main():
     os.makedirs(MEDIA_DIR, exist_ok=True)
     print(f"[media] dir={MEDIA_DIR} poll={POLL}s")
+    # One-time schema ensure at startup — NEVER inside the loop (see
+    # _ensure_columns docstring). Guarded + lock_timeout-bounded so it cannot
+    # freeze the table even on a cold DB.
+    try:
+        c0 = psycopg2.connect(PG_DSN); c0.autocommit = True
+        _ensure_columns(c0.cursor())
+        c0.close()
+        print("[media] schema ensured")
+    except Exception as e:
+        print(f"[media] schema ensure failed (continuing): {e}", file=sys.stderr)
     while True:
         try:
             conn = psycopg2.connect(PG_DSN); conn.autocommit = True
             cur = conn.cursor()
-            _ensure_columns(cur)
             _backfill_media_file_ids(cur)
             cur.execute("""
                 SELECT id, media_file_id, media_type
