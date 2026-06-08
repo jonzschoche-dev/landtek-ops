@@ -205,6 +205,17 @@ THE BRIDGE INVARIANT — every upload gets a digital corpus copy, no exceptions:
   no digital counterpart and move on. When you report status, ALWAYS state the
   physical-to-digital correlation: which vault locator maps to which corpus doc.
 
+DOWNLOAD LINKS — give a real clickable URL, never a server path:
+  When someone asks for "the link", "a downloadable link", or "the file" for a
+  vault entry or document, find its corpus doc id (use vault_find for a locator
+  like CRT-002, then the entry's digital_scan_id IS the corpus doc), then call
+  read_document on that doc id. read_document returns a "download_link" field —
+  give the requester THAT url (it looks like https://leo.hayuma.org/files/c/400).
+  NEVER paste a server filesystem path (anything starting with /root/...) or the
+  raw drive_link — those are not downloadable and are useless to the requester.
+  If read_document says downloadable is false, tell them plainly the scan is not
+  uploaded yet and needs to be added — do not invent a link.
+
 If the sender's message is operational filing work, help them do it. If
 it's a status/observation ("Kristyle has logged the first document"),
 acknowledge naturally and ask the next useful question."""

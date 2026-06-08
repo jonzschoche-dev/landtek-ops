@@ -288,6 +288,7 @@ def t_read_document(args):
     conn, cur = _db()
     cur.execute("""
         SELECT id, smart_filename, doc_date, classification, drive_link,
+               file_path, drive_file_id,
                LEFT(extracted_text, 1500) AS excerpt
           FROM documents WHERE id = %s
     """, (doc_id,))
@@ -301,12 +302,24 @@ def t_read_document(args):
     cur.close(); conn.close()
     if not r:
         return f"No document with id {doc_id}"
+    # A document is downloadable iff the public proxy can serve it — i.e. it has
+    # a local file_path or a drive_file_id. The canonical downloadable URL is
+    # always https://leo.hayuma.org/files/c/<id>; give THAT to humans, never the
+    # raw drive_link (which may be a server filesystem path).
+    downloadable = bool(r["file_path"] or r["drive_file_id"])
+    download_link = f"https://leo.hayuma.org/files/c/{r['id']}" if downloadable else None
     return json.dumps({
         "id": r["id"],
         "smart_filename": r["smart_filename"],
         "doc_date": str(r["doc_date"]) if r["doc_date"] else None,
         "classification": r["classification"],
-        "drive_link": r["drive_link"],
+        "download_link": download_link,
+        "downloadable": downloadable,
+        "download_note": ("Give this download_link to the requester."
+                          if downloadable else
+                          "NOT downloadable yet — no scan file on record. Tell the "
+                          "requester the scan still needs to be uploaded; do NOT "
+                          "hand out a server file path."),
         "linked_matters": [{"kind": m["relation_kind"], "code": m["matter_code"]} for m in matters],
         "excerpt": r["excerpt"],
     }, indent=2)
