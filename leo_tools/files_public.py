@@ -119,6 +119,76 @@ def serve(doc_id):
     )
 
 
+@bp.route("/vault")
+def vault_table():
+    """Live HTML table: every physical vault entry <-> its digital corpus copy
+    and a download link. Public (same as the file proxy), mobile-friendly, and
+    always current. Leo links here when anyone asks for "the vault table" or the
+    physical<->digital correlation, instead of trying to paste a table into chat.
+    """
+    import html
+    conn = _db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT d.vault_section, d.vault_number, d.smart_filename,
+               d.digital_scan_id, s.smart_filename, s.doc_date,
+               (s.file_path IS NOT NULL OR s.drive_file_id IS NOT NULL) AS dl
+          FROM documents d
+          LEFT JOIN documents s ON s.id = d.digital_scan_id
+         WHERE d.master_form = 'physical' AND d.vault_section IS NOT NULL
+         ORDER BY d.vault_section, d.vault_number
+        """
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    body = []
+    linked = 0
+    for sec, num, pname, scan_id, dname, ddate, dl in rows:
+        locator = f"{sec}-{num:03d}"
+        # physical_name usually starts with the locator — strip it for clarity
+        desc = (pname or "").strip()
+        if desc.upper().startswith(locator):
+            desc = desc[len(locator):].strip()
+        desc = html.escape(desc[:90])
+        dname_e = html.escape((dname or "")[:60])
+        ddate_e = html.escape(str(ddate) if ddate else "")
+        if scan_id and dl:
+            link = (f'<a href="/files/c/{scan_id}">open / download</a>'
+                    f' <span class="muted">(doc#{scan_id})</span>')
+            linked += 1
+        elif scan_id:
+            link = f'<span class="warn">linked but no scan uploaded (doc#{scan_id})</span>'
+        else:
+            link = '<span class="warn">no digital copy yet</span>'
+        body.append(
+            f"<tr><td class='loc'>{locator}</td><td>{desc}</td>"
+            f"<td>{dname_e}<br><span class='muted'>{ddate_e}</span></td>"
+            f"<td>{link}</td></tr>"
+        )
+
+    page = f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LandTek Vault &harr; Digital Corpus</title>
+<style>
+ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;color:#1a1a1a;background:#fafafa}}
+ h1{{font-size:18px;margin:0 0 4px}} .sub{{color:#666;font-size:13px;margin-bottom:14px}}
+ table{{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
+ th,td{{text-align:left;padding:9px 10px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}}
+ th{{background:#f4f4f6;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#555}}
+ td.loc{{font-weight:600;white-space:nowrap}} a{{color:#0a58ca;text-decoration:none}} a:hover{{text-decoration:underline}}
+ .muted{{color:#999;font-size:11px}} .warn{{color:#b54708;font-size:12px}}
+</style></head><body>
+<h1>LandTek Physical Vault &harr; Digital Corpus</h1>
+<div class="sub">{len(rows)} vault entries &middot; {linked} with a downloadable digital copy &middot; live view</div>
+<table><thead><tr><th>Vault</th><th>Document</th><th>Digital copy</th><th>Link</th></tr></thead>
+<tbody>{''.join(body)}</tbody></table>
+</body></html>"""
+    return Response(page, mimetype="text/html")
+
+
 @bp.route("/<int:doc_id>/info")
 def info(doc_id):
     """Metadata JSON so Leo or n8n can confirm what the URL serves."""

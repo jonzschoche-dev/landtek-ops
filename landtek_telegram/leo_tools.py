@@ -261,7 +261,7 @@ def t_query_documents(args):
         params.append(matter_code)
     sql = f"""
         SELECT DISTINCT d.id, d.smart_filename, d.doc_date, d.classification,
-               d.drive_link, LEFT(d.extracted_text, 250) AS snippet
+               d.file_path, d.drive_file_id, LEFT(d.extracted_text, 250) AS snippet
           FROM documents d {join}
          WHERE {' AND '.join(conditions)}
          ORDER BY d.doc_date DESC NULLS LAST, d.id DESC
@@ -272,12 +272,18 @@ def t_query_documents(args):
     cur.close(); conn.close()
     out = []
     for r in rows:
+        # The downloadable URL is ALWAYS the proxy (never the raw drive_link /
+        # server path). We deliberately do NOT return drive_link here so Leo
+        # cannot paste a /root/... filesystem path into chat.
+        downloadable = bool(r["file_path"] or r["drive_file_id"])
         out.append({
             "id": r["id"],
             "smart_filename": (r["smart_filename"] or "")[:100],
             "doc_date": str(r["doc_date"]) if r["doc_date"] else None,
             "classification": r["classification"],
-            "drive_link": r["drive_link"],
+            "download_link": (f"https://leo.hayuma.org/files/c/{r['id']}"
+                              if downloadable else None),
+            "downloadable": downloadable,
             "snippet": (r["snippet"] or "")[:200],
         })
     return f"Found {len(out)} documents:\n" + json.dumps(out, indent=2)
