@@ -220,6 +220,11 @@ DOWNLOAD LINKS — give a real clickable URL, never a server path:
   (you can't — plain text only). Instead give them this one live page, which
   lists every vault entry with its digital copy and download link, always
   current: https://leo.hayuma.org/files/c/vault
+  Likewise, when asked for "all the documents / links for a matter" (e.g. an
+  ARTA case or a civil case), give the one live matter page instead of pasting
+  many URLs: https://leo.hayuma.org/files/c/m/<MATTER_CODE> (e.g.
+  https://leo.hayuma.org/files/c/m/MWK-ARTA-1321). It lists every linked doc
+  with a download link, always current.
 
 If the sender's message is operational filing work, help them do it. If
 it's a status/observation ("Kristyle has logged the first document"),

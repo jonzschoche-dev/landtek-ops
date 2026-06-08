@@ -189,6 +189,66 @@ def vault_table():
     return Response(page, mimetype="text/html")
 
 
+@bp.route("/m/<matter_code>")
+def matter_table(matter_code):
+    """Live HTML table of every document linked to a matter, with download
+    links. Public, mobile-friendly. Leo links here when asked for "all the
+    documents / links for ARTA-NNNN" instead of pasting URLs into chat."""
+    import html
+    conn = _db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT d.id, COALESCE(NULLIF(d.smart_filename,''), d.original_filename),
+               d.doc_date, d.classification,
+               (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) AS dl
+          FROM documents d
+          JOIN document_matter_links l ON l.doc_id = d.id
+         WHERE l.matter_code = %s
+         ORDER BY d.doc_date NULLS LAST, d.id
+        """,
+        (matter_code,),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    body = []
+    avail = 0
+    for did, fname, ddate, cls, dl in rows:
+        nm = html.escape((fname or f"doc {did}")[:78])
+        dt = html.escape(str(ddate) if ddate else "")
+        cl = html.escape((cls or "")[:24])
+        if dl:
+            link = f'<a href="/files/c/{did}">download</a>'
+            avail += 1
+        else:
+            link = '<span class="warn">no scan yet</span>'
+        body.append(
+            f"<tr><td>{dt}</td><td>{nm}<br><span class='muted'>{cl} · doc#{did}</span></td>"
+            f"<td>{link}</td></tr>"
+        )
+    title = html.escape(matter_code)
+    page = f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title} — documents</title>
+<style>
+ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#fafafa;color:#1a1a1a}}
+ h1{{font-size:18px;margin:0 0 4px}} .sub{{color:#666;font-size:13px;margin-bottom:14px}}
+ table{{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
+ th,td{{text-align:left;padding:9px 10px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}}
+ th{{background:#f4f4f6;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#555}}
+ a{{color:#0a58ca;text-decoration:none}} a:hover{{text-decoration:underline}}
+ .muted{{color:#999;font-size:11px}} .warn{{color:#b54708;font-size:12px}}
+</style></head><body>
+<h1>{title} — documents</h1>
+<div class="sub">{len(rows)} documents · {avail} downloadable · live view</div>
+<table><thead><tr><th>Date</th><th>Document</th><th>File</th></tr></thead>
+<tbody>{''.join(body) or '<tr><td colspan=3>No documents linked to this matter.</td></tr>'}</tbody></table>
+</body></html>"""
+    return Response(page, mimetype="text/html")
+
+
 @bp.route("/<int:doc_id>/info")
 def info(doc_id):
     """Metadata JSON so Leo or n8n can confirm what the URL serves."""
