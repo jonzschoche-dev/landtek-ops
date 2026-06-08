@@ -97,12 +97,19 @@ FORMAT — STRICT:
   above is the truth — use it.
 
 YOUR MEMORY — STRICT:
-  The CURRENT VAULT STATE block above is the ENTIRE truth about what is
-  registered in the vault. Nothing else. If a locator (like CORR-003) is
-  not in that block, it does NOT EXIST in the vault yet — even if
-  someone earlier in the conversation said "let's call it CORR-003" or
-  "we'll register that as CORR-003". Discussion is not registration.
-  Only the live vault state shown above is registered.
+  The CURRENT VAULT STATE block above is the COMPLETE, live list of every
+  registered vault entry — it is pulled fresh from the database each message
+  and lists ALL entries, not a sample. It also shows, for each entry, the
+  linked digital corpus doc number (the physical<->digital correlation). Trust
+  it: if a locator IS in that block it IS registered (with the digital link
+  shown); if it is NOT in that block it is not registered yet — regardless of
+  what anyone said earlier in the chat ("let's call it CORR-003"). Discussion
+  is not registration. When someone asks how the vault and the digital corpus
+  correlate, ANSWER FROM THIS BLOCK — do not invent table names (there is no
+  "vault_items" table and no "LT-NNNN" id; a vault entry is a documents row
+  with master_form='physical', and its digital copy is the documents row whose
+  id is shown as the linked corpus doc#). If you need to double-check live, call
+  vault_find — never guess.
 
 ### TOOL-FIRST RULE (deploy_380) — MANDATORY ###
 
@@ -176,14 +183,27 @@ EXAMPLE — DO NOT DO THIS:
   Only ask the human when you genuinely can't determine something from
   the tools — and then ONE short question, not a quiz.
 
-CRITICAL — do not lie about actions:
-  You CANNOT directly register vault entries through chat — the deterministic
-  vault command path does that. NEVER say "I'll log it" or "I'll record CORR-001"
-  or "logging now" unless the message contains a structured command that the
-  vault handler can parse. Instead say: "Once you (or Jonathan) confirm the
-  exact section, number, and matter, that gets registered through the vault
-  command — type something like 'vault CORR-1 letter to Judge Dizon for
-  MWK-CV6839' and it goes in."
+CRITICAL — only claim what you actually did:
+  You CAN register vault entries yourself by calling the vault_register tool
+  (it writes to the database and returns ok with the doc id and the linked
+  digital corpus doc number). That is the supported path. BUT only say "logged
+  CORR-N" / "registered" / "linked the scan" AFTER the vault_register tool has
+  actually returned ok in this same turn. If you have not called the tool, or
+  it did not return ok, do NOT claim the entry exists — say what you are about
+  to do or what you still need. Never fabricate a locator, a doc number, a
+  registration, or a digital-copy link that the tools did not return to you.
+
+THE BRIDGE INVARIANT — every upload gets a digital corpus copy, no exceptions:
+  Every physical document Kristyle or any employee/client logs MUST end up with
+  a corresponding digital copy in the corpus, linked to its vault entry — no
+  exceptions, unless the upload is clearly an error. So for every document:
+  (1) call query_documents / search_drive to FIND the existing digital scan;
+  (2) when you register it, the vault entry links to that digital corpus doc;
+  (3) if NO digital copy exists yet, say so plainly ("I registered CORR-N but
+  there is no digital scan in the corpus yet — it needs to be uploaded") so the
+  gap is visible and gets filled. Never silently register a physical entry with
+  no digital counterpart and move on. When you report status, ALWAYS state the
+  physical-to-digital correlation: which vault locator maps to which corpus doc.
 
 If the sender's message is operational filing work, help them do it. If
 it's a status/observation ("Kristyle has logged the first document"),
@@ -263,31 +283,37 @@ def _live_matters_block():
     return "\n".join(lines) if lines else "(no matters)"
 
 
-def _live_vault_state(limit=12):
-    """Recent vault entries + computed next-available number per section.
+def _live_vault_state(limit=None):
+    """COMPLETE vault state with physical<->digital corpus correlation.
 
-    The next-available block is what Leo MUST reference when suggesting a
-    locator. Don't make him guess — give him the answer.
+    This block is authoritative — Leo treats it as the full vault truth — so
+    it MUST be complete (every registered entry, no truncation) and MUST show,
+    for each physical entry, whether its digital corpus copy is linked. That
+    correlation (physical locator -> digital corpus doc#) is the core thing
+    Jonathan needs Leo to surface. The next-available block keeps Leo from
+    guessing a locator.
     """
     SECTIONS = ["TCT", "DEED", "SPA", "AFF", "TAX", "PSA", "ID",
                 "CRT", "RES", "CONT", "CORR", "MISC"]
     try:
         conn = psycopg2.connect(PG_DSN)
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # EVERY registered physical entry, ordered by section+number, WITH the
+        # digital correlation. No LIMIT — completeness prevents the "it's not in
+        # my block so it doesn't exist" hallucination.
         cur.execute("""
-            SELECT vault_section, vault_number, smart_filename, case_file
+            SELECT vault_section, vault_number, smart_filename, case_file,
+                   digital_scan_id
               FROM documents
-             WHERE master_form = 'physical'
-             ORDER BY id DESC
-             LIMIT %s
-        """, (limit,))
-        recent = cur.fetchall()
-        # Next-available per section
+             WHERE master_form = 'physical' AND vault_section IS NOT NULL
+             ORDER BY vault_section, vault_number
+        """)
+        entries = cur.fetchall()
         cur.execute("""
             SELECT vault_section,
                    COALESCE(MAX(vault_number), 0) + 1 AS next_num
               FROM documents
-             WHERE master_form = 'physical'
+             WHERE master_form = 'physical' AND vault_section IS NOT NULL
              GROUP BY vault_section
         """)
         next_map = {r["vault_section"]: r["next_num"] for r in cur.fetchall()}
@@ -299,16 +325,22 @@ def _live_vault_state(limit=12):
     for s in SECTIONS:
         n = next_map.get(s, 1)
         lines.append(f"  {s}: next = {s}-{n:03d}")
-    if recent:
-        lines.append("")
-        lines.append("Recent entries (most recent first):")
-        for r in recent:
+    lines.append("")
+    if entries:
+        lines.append(f"ALL {len(entries)} REGISTERED VAULT ENTRIES "
+                     "(physical locator -> digital corpus correlation). "
+                     "This is the COMPLETE list — if a locator is here it IS "
+                     "registered; if it is NOT here it is not registered yet:")
+        for r in entries:
+            if r["digital_scan_id"]:
+                corr = f"LINKED to digital corpus doc#{r['digital_scan_id']}"
+            else:
+                corr = "NO DIGITAL COPY LINKED YET — must find/ingest the scan"
             lines.append(
                 f"  {r['vault_section']}-{r['vault_number']:03d}: "
-                f"{(r['smart_filename'] or '')[:90]}"
+                f"{(r['smart_filename'] or '')[:70]}  [{corr}]"
             )
     else:
-        lines.append("")
         lines.append("(no entries yet — every section starts at 001)")
     return "\n".join(lines)
 
@@ -339,8 +371,12 @@ def _recent_context(chat_id, limit=8):
     return combined[-limit*2:]
 
 
-def _call_anthropic_once(system_prompt, messages, max_tokens=600):
-    """Single Anthropic API call. Returns (full_response_payload, error)."""
+def _call_anthropic_once(system_prompt, messages, max_tokens=600, include_tools=True):
+    """Single Anthropic API call. Returns (full_response_payload, error).
+
+    include_tools=False omits the tool definitions — used for the forced final
+    summarization call so the model must answer in text instead of looping.
+    """
     if not ANTHROPIC_KEY:
         return None, "no_api_key"
     body = {
@@ -349,7 +385,7 @@ def _call_anthropic_once(system_prompt, messages, max_tokens=600):
         "system": system_prompt,
         "messages": messages,
     }
-    if LEO_TOOLS:
+    if LEO_TOOLS and include_tools:
         body["tools"] = LEO_TOOLS
     req = urllib.request.Request(
         "https://api.anthropic.com/v1/messages",
@@ -378,7 +414,7 @@ def _call_anthropic(system_prompt, user_text, context_lines):
     Loops up to MAX_TOOL_ROUNDS times, executing every tool_use block the
     model emits and feeding results back in.
     """
-    MAX_TOOL_ROUNDS = 6
+    MAX_TOOL_ROUNDS = 8
 
     history = "\n".join(
         f"  [{r['dir']}] {r['who']}: {(r['text'] or '')[:200]}"
@@ -431,7 +467,26 @@ def _call_anthropic(system_prompt, user_text, context_lines):
             })
         messages.append({"role": "user", "content": tool_results})
 
-    return ("(tool loop exhausted)", None)
+    # Tool budget exhausted without a final text answer. Force ONE last call
+    # with NO tools so the model must synthesize what it gathered into a real
+    # plain-English reply — never ship the canned "(tool loop exhausted)".
+    messages.append({
+        "role": "user",
+        "content": ("Stop calling tools now. Using only what you have already "
+                    "gathered above, answer the latest message in one short, "
+                    "plain-English paragraph. If you could not find something, "
+                    "say so plainly — do not invent anything."),
+    })
+    payload, err = _call_anthropic_once(system_prompt, messages, include_tools=False)
+    if payload:
+        final = "\n".join(
+            c.get("text", "") for c in payload.get("content", [])
+            if c.get("type") == "text"
+        ).strip()
+        if final:
+            return final, None
+    return ("I dug into that but couldn't pull it together cleanly just yet — "
+            "let me take another run at it.", None)
 
 
 def handle(row):
