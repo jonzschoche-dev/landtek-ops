@@ -554,6 +554,18 @@ def t_vault_bind_scan(args):
             cur.close(); conn.close()
             return f"doc#{scan} not found."
     elif drive_id:
+        # Reuse an existing ingest of this exact Drive file (don't duplicate).
+        cur.execute("SELECT id FROM documents WHERE drive_link=%s ORDER BY id LIMIT 1",
+                    (f"drive://{drive_id}",))
+        existing = cur.fetchone()
+        if existing:
+            scan = existing["id"]
+            cur.execute("""UPDATE documents SET digital_scan_id=%s,
+                status='vault_registered', updated_at=NOW() WHERE id=%s""", (scan, master))
+            conn.commit(); cur.close(); conn.close()
+            return json.dumps({"locator": f"{section}-{number:03d}", "linked_scan_doc": scan,
+                               "download": f"https://leo.hayuma.org/files/c/{scan}",
+                               "ok": True, "note": "reused existing ingest"}, indent=2)
         try:
             from googleapiclient.http import MediaIoBaseDownload
             svc = _drive_client()
