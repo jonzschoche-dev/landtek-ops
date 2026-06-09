@@ -80,18 +80,42 @@ LEO_TOOLS = [
     {
         "name": "search_drive",
         "description": (
-            "Search the LANDTEK Google Drive for files (recently uploaded "
-            "files often aren't ingested into the corpus yet). Returns "
-            "drive_id, name, modifiedTime. Use when query_documents returns "
-            "nothing."
+            "Search the LANDTEK Google Drive — by BOTH filename AND the text "
+            "INSIDE the files (Google indexes PDF/Doc content). Use this when "
+            "query_documents finds nothing, OR to find a document by what it is "
+            "about even when the filename is wrong/misleading (Drive filenames "
+            "here often do NOT match their contents). Search by the distinctive "
+            "term: a person ('Fortuno', 'Macale'), a doc type ('adverse claim', "
+            "'rejoinder'), or a docket ('1210', 'PSD-12802'). Returns drive_id, "
+            "name, modifiedTime. Then call read_drive on a hit to confirm what it "
+            "actually says before trusting it. Image-only scans have no text and "
+            "won't match a content search."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "name_contains": {"type": "string", "description": "substring of filename"},
+                "query": {"type": "string", "description": "distinctive term to find in the filename OR the file's text content"},
+                "name_contains": {"type": "string", "description": "(alias for query) substring to match"},
                 "limit":         {"type": "integer", "description": "max results (default 10)"},
             },
-            "required": ["name_contains"],
+            "required": [],
+        },
+    },
+    {
+        "name": "read_drive",
+        "description": (
+            "Read the actual TEXT of a Google Drive file by its drive_id (from "
+            "search_drive). Use this to CONFIRM what a Drive file really is before "
+            "linking it — the filename here is unreliable, the content is truth. "
+            "Returns the first part of the extracted text. (Empty result = an "
+            "image-only scan with no text layer.)"
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "drive_id": {"type": "string", "description": "the Drive file id from search_drive"},
+            },
+            "required": ["drive_id"],
         },
     },
     {
@@ -331,31 +355,85 @@ def t_read_document(args):
     }, indent=2)
 
 
+def _drive_client():
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+    creds = service_account.Credentials.from_service_account_file(
+        DRIVE_CREDS_PATH,
+        scopes=["https://www.googleapis.com/auth/drive.readonly"])
+    return build("drive", "v3", credentials=creds, cache_discovery=False)
+
+
 def t_search_drive(args):
-    name = args["name_contains"]
+    q = (args.get("query") or args.get("name_contains") or "").strip()
     limit = int(args.get("limit", 10))
+    if not q:
+        return "search_drive needs a 'query' term."
+    q_esc = q.replace("'", "\\'")
     try:
-        from google.oauth2 import service_account
-        from googleapiclient.discovery import build
-        creds = service_account.Credentials.from_service_account_file(
-            DRIVE_CREDS_PATH,
-            scopes=["https://www.googleapis.com/auth/drive.readonly"])
-        svc = build("drive", "v3", credentials=creds, cache_discovery=False)
-        resp = svc.files().list(
-            q=f"name contains '{name}' and trashed = false",
-            pageSize=limit, orderBy="modifiedTime desc",
-            fields="files(id, name, modifiedTime, mimeType, size)",
-            supportsAllDrives=True, includeItemsFromAllDrives=True).execute()
-        files = resp.get("files", [])
-        return json.dumps([{
-            "drive_id": f["id"],
-            "name": f.get("name", ""),
-            "modified": f.get("modifiedTime", "")[:19],
-            "mime": f.get("mimeType", ""),
-            "size": f.get("size"),
-        } for f in files], indent=2)
+        svc = _drive_client()
+        out, seen = [], set()
+        # Search BOTH filename and full-text content; merge, de-dupe.
+        for clause in (f"name contains '{q_esc}'", f"fullText contains '{q_esc}'"):
+            resp = svc.files().list(
+                q=f"({clause}) and trashed = false",
+                pageSize=limit, orderBy="modifiedTime desc",
+                fields="files(id, name, modifiedTime, mimeType, size)",
+                supportsAllDrives=True, includeItemsFromAllDrives=True).execute()
+            for f in resp.get("files", []):
+                if f["id"] in seen:
+                    continue
+                seen.add(f["id"])
+                out.append({
+                    "drive_id": f["id"],
+                    "name": f.get("name", ""),
+                    "matched": "filename" if "name contains" in clause else "content",
+                    "modified": f.get("modifiedTime", "")[:19],
+                    "mime": f.get("mimeType", "").split(".")[-1],
+                })
+        if not out:
+            return (f"No Drive files match '{q}' by name or content. "
+                    "It may be an image-only scan (no searchable text) or not uploaded yet.")
+        return f"Found {len(out)} Drive files for '{q}':\n" + json.dumps(out[:limit*2], indent=2)
     except Exception as e:
         return f"Drive search failed: {e}"
+
+
+def t_read_drive(args):
+    """Download a Drive file and return its extracted text so Leo can CONFIRM
+    what it actually is (filenames here lie)."""
+    import io, subprocess, tempfile, os
+    drive_id = (args.get("drive_id") or "").strip()
+    if not drive_id:
+        return "read_drive needs a drive_id."
+    try:
+        from googleapiclient.http import MediaIoBaseDownload
+        svc = _drive_client()
+        meta = svc.files().get(fileId=drive_id, fields="name,mimeType",
+                               supportsAllDrives=True).execute()
+        mime = meta.get("mimeType", "")
+        if mime == "application/vnd.google-apps.document":
+            txt = svc.files().export(fileId=drive_id, mimeType="text/plain").execute().decode("utf-8", "ignore")
+        else:
+            req = svc.files().get_media(fileId=drive_id, supportsAllDrives=True)
+            buf = io.BytesIO(); dl = MediaIoBaseDownload(buf, req)
+            done = False
+            while not done:
+                _, done = dl.next_chunk()
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tf:
+                tf.write(buf.getvalue()); path = tf.name
+            try:
+                txt = subprocess.run(["pdftotext", "-layout", path, "-"],
+                                     capture_output=True, text=True, timeout=45).stdout
+            finally:
+                os.unlink(path)
+        txt = (txt or "").strip()
+        if not txt:
+            return json.dumps({"name": meta.get("name"), "text": "",
+                               "note": "no text — image-only scan; cannot confirm content from text"})
+        return json.dumps({"name": meta.get("name"), "text_excerpt": txt[:1800]}, indent=2)
+    except Exception as e:
+        return f"read_drive failed: {e}"
 
 
 def t_vault_register(args):
@@ -427,6 +505,7 @@ TOOL_FUNCTIONS = {
     "query_documents":       t_query_documents,
     "read_document":         t_read_document,
     "search_drive":          t_search_drive,
+    "read_drive":            t_read_drive,
     "vault_register":        t_vault_register,
     "vault_find":            t_vault_find,
     "vault_queue":           t_vault_queue,
