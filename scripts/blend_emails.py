@@ -57,6 +57,122 @@ def pdf_text(data):
         return ""
 
 
+def fresh_attachment_id(svc, msg_id, filename):
+    """Walk a message's parts to recover a current attachmentId for a filename
+    (the stored one can be stale)."""
+    try:
+        msg = svc.users().messages().get(userId="me", id=msg_id, format="full").execute()
+    except Exception:
+        return None
+    stack = [msg.get("payload", {})]
+    while stack:
+        p = stack.pop()
+        if p.get("filename") == filename and p.get("body", {}).get("attachmentId"):
+            return p["body"]["attachmentId"]
+        stack.extend(p.get("parts", []) or [])
+    return None
+
+
+def merge_into(cur, stub, canon):
+    """A hollow stub turned out to duplicate an existing canonical doc. Repoint
+    its high-value citations to the canonical doc (no broken references), then
+    quarantine the stub so it's never served as evidence. The stub ROW stays
+    (so any FK still resolves) but leaves master_form='digital'."""
+    # evidence_trail / proposals: move, dropping any that would duplicate
+    for tbl in ("evidence_trail", "evidence_trail_proposals"):
+        cur.execute(f"""UPDATE {tbl} e SET supporting_doc_id=%s
+                         WHERE supporting_doc_id=%s
+                           AND NOT EXISTS (SELECT 1 FROM {tbl} e2
+                               WHERE e2.claim_id=e.claim_id AND e2.supporting_doc_id=%s)""",
+                    (canon, stub, canon))
+        cur.execute(f"DELETE FROM {tbl} WHERE supporting_doc_id=%s", (stub,))
+    cur.execute("""INSERT INTO document_matter_links (doc_id, matter_code)
+                   SELECT %s, matter_code FROM document_matter_links WHERE doc_id=%s
+                   ON CONFLICT DO NOTHING""", (canon, stub))
+    cur.execute("DELETE FROM document_matter_links WHERE doc_id=%s", (stub,))
+    cur.execute("""INSERT INTO document_titles (doc_id, tct_number, mentions, source)
+                   SELECT %s, tct_number, mentions, source FROM document_titles WHERE doc_id=%s
+                   ON CONFLICT DO NOTHING""", (canon, stub))
+    cur.execute("DELETE FROM document_titles WHERE doc_id=%s", (stub,))
+    cur.execute("UPDATE gmail_messages SET document_id=%s WHERE document_id=%s", (canon, stub))
+    cur.execute("""UPDATE email_documents e SET doc_id=%s WHERE doc_id=%s
+                    AND NOT EXISTS (SELECT 1 FROM email_documents e2
+                        WHERE e2.message_id=e.message_id AND e2.doc_id=%s)""", (canon, stub, canon))
+    cur.execute("DELETE FROM email_documents WHERE doc_id=%s", (stub,))
+    cur.execute("UPDATE documents SET ingest_status='quarantined_dup', ingest_source=%s WHERE id=%s",
+                (f"dup_of:{canon}", stub))
+
+
+def recover_hollow(cur, svc, limit=0, only_ids=None, latest_ok=False):
+    """Refill hollow rows (no bytes) IN PLACE from their source email attachment,
+    preserving the doc id so existing citations/links stay valid. SAFETY: only
+    recover when the filename matches EXACTLY ONE email attachment — ambiguous
+    names (image.png appears in many emails) are skipped, never mislinked."""
+    cur.execute("""SELECT id, original_filename FROM documents
+        WHERE master_form='digital' AND coalesce(file_path,'')='' AND coalesce(drive_file_id,'')=''
+          AND original_filename IS NOT NULL ORDER BY id""")
+    docs = [d for d in cur.fetchall() if not only_ids or d["id"] in only_ids]
+    recovered, merged, failed = [], [], []
+    for d in docs:
+        if limit and len(recovered) >= limit:
+            break
+        fn = d["original_filename"]
+        # SAFE match: a unique filename, OR the same file (identical size) across
+        # several emails. Only DIFFERENT-size collisions are truly ambiguous.
+        cur.execute("""SELECT g.message_id, g.sent_at, g.received_at, g.matter_codes,
+                              a AS ref, (a->>'size') sz
+                         FROM gmail_messages g, jsonb_array_elements(g.attachment_refs) a
+                        WHERE g.has_attachments AND lower(a->>'filename')=lower(%s)
+                          AND a->>'attachmentId' IS NOT NULL
+                        ORDER BY coalesce(g.sent_at,g.received_at) DESC NULLS LAST""", (fn,))
+        matches = cur.fetchall()
+        if not matches:
+            failed.append((d["id"], fn, "no email match")); continue
+        sizes = {mm["sz"] for mm in matches}
+        if len(sizes) > 1 and not latest_ok:
+            failed.append((d["id"], fn, f"ambiguous ({len(matches)} differing versions)")); continue
+        m = matches[0]  # most recent (matches ordered DESC by date)
+        src = "gmail_attachment_latest" if len(sizes) > 1 else "gmail_attachment"
+        ref = m["ref"]; mime = ref.get("mime") or "application/pdf"
+        data = None
+        for aid in (ref.get("attachmentId"), fresh_attachment_id(svc, m["message_id"], fn)):
+            if not aid:
+                continue
+            try:
+                a = svc.users().messages().attachments().get(
+                    userId="me", messageId=m["message_id"], id=aid).execute()
+                data = base64.urlsafe_b64decode(a["data"]); break
+            except Exception:
+                continue
+        if not data:
+            failed.append((d["id"], fn, "fetch fail")); continue
+        chash = hashlib.sha256(data).hexdigest()
+        cur.execute("SELECT id FROM documents WHERE content_hash=%s AND id<>%s LIMIT 1",
+                    (chash, d["id"]))
+        canon = cur.fetchone()
+        if canon:
+            merge_into(cur, d["id"], canon["id"])
+            merged.append((d["id"], canon["id"], fn)); continue
+        path = os.path.join(STORE, f"{m['message_id']}__{safe_name(fn)}")
+        with open(path, "wb") as fh:
+            fh.write(data)
+        txt = pdf_text(data) if "pdf" in mime else ""
+        ed = m["sent_at"] or m["received_at"]
+        cur.execute("""UPDATE documents SET file_path=%s, content_hash=coalesce(content_hash,%s),
+              mime_type=coalesce(nullif(mime_type,''),%s),
+              extracted_text=coalesce(nullif(extracted_text,''),%s),
+              ingest_source=%s, doc_date=coalesce(doc_date,%s)
+            WHERE id=%s""", (path, chash, mime, (txt or None), src,
+                             (str(ed) if ed else None), d["id"]))
+        cur.execute("""INSERT INTO email_documents (message_id, doc_id, role, filename)
+              VALUES (%s,%s,'recovered',%s) ON CONFLICT DO NOTHING""", (m["message_id"], d["id"], fn))
+        for mc in (m["matter_codes"] or []):
+            cur.execute("INSERT INTO document_matter_links (doc_id, matter_code) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+                        (d["id"], mc))
+        recovered.append((d["id"], fn, f"{len(txt)}c text" if txt else "ocr_pending"))
+    return recovered, merged, failed
+
+
 def find_existing(cur, content_hash):
     """Dedup by CONTENT only. Filename dedup is banned — generic names like
     'image.png' collapse distinct files onto one doc (a mislink)."""
@@ -158,10 +274,29 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--message")
     ap.add_argument("--all", action="store_true")
+    ap.add_argument("--recover-hollow", action="store_true",
+                    help="refill hollow rows in place from their source email attachment")
+    ap.add_argument("--ids", help="comma-separated doc ids to recover (with --recover-hollow)")
+    ap.add_argument("--latest-ok", action="store_true",
+                    help="for ambiguous (multi-version) filenames, recover the most recent")
     args = ap.parse_args()
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     ensure_schema(cur)
+
+    if getattr(args, "recover_hollow", False):
+        only = {int(x) for x in args.ids.split(",")} if args.ids else None
+        svc = gmail_client()
+        rec, merged, fail = recover_hollow(cur, svc, limit=args.limit, only_ids=only,
+                                           latest_ok=getattr(args, "latest_ok", False))
+        print(f"[recover] {len(rec)} refilled in place · {len(merged)} merged into canonical (dedup) · {len(fail)} not recovered")
+        for did, fn, note in rec:
+            print(f"    ↻ doc#{did}  {fn[:50]}  ({note})")
+        for did, canon, fn in merged:
+            print(f"    ⇒ doc#{did} merged into canonical doc#{canon}  {fn[:40]}")
+        for did, fn, why in fail[:25]:
+            print(f"    · skip doc#{did}  {fn[:42]}  ({why})")
+        cur.close(); conn.close(); return
 
     where = ("has_attachments=true AND attachment_refs IS NOT NULL "
              "AND (coalesce(relevance_score,0)>=0.5 OR relevance_status IN ('relevant','confirmed','kept'))")

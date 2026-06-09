@@ -55,33 +55,45 @@ def main():
 
     cur.execute("ANALYZE documents")  # defeat stale-stats (we got bitten by this)
 
-    total = one(cur, "SELECT count(*) FROM documents WHERE master_form='digital'")
-    add("COMPLETE", "INFO", f"{total} digital documents in corpus")
+    CANON = "master_form='digital' AND coalesce(ingest_status,'') NOT IN ('quarantined_dup','quarantined_ghost')"
+    total = one(cur, f"SELECT count(*) FROM documents WHERE {CANON}")
+    quarantined = one(cur, "SELECT count(*) FROM documents WHERE ingest_status IN ('quarantined_dup','quarantined_ghost')")
+    add("COMPLETE", "INFO", f"{total} canonical documents in corpus"
+        + (f" ({quarantined} quarantined dups excluded)" if quarantined else ""))
 
     # ── COMPLETE: reachability ────────────────────────────────────────────────
-    cur.execute("""SELECT id, file_path, drive_file_id,
-                          COALESCE(NULLIF(smart_filename,''), original_filename)
-                     FROM documents WHERE master_form='digital'""")
+    # Reachable = the AI can access content: a file, a Drive copy, OR real text.
+    # FAIL only when there is NO content at all (a true ghost). A doc with text
+    # but no downloadable original is readable-but-not-an-exhibit (a WARN).
+    cur.execute(f"""SELECT id, file_path, drive_file_id,
+                          COALESCE(NULLIF(smart_filename,''), original_filename),
+                          length(coalesce(extracted_text,''))
+                     FROM documents WHERE {CANON}""")
     rows = cur.fetchall()
-    no_locator, broken_path = [], []
-    for did, fp, drive, nm in rows:
+    no_content, text_only, broken_path = [], [], []
+    for did, fp, drive, nm, txt in rows:
         has_disk = bool(fp) and os.path.exists(fp)
+        downloadable = has_disk or bool(drive)
         if fp and not has_disk and not drive:
             broken_path.append((did, fp))
-        if not (has_disk or drive):
-            no_locator.append((did, nm))
-    if no_locator:
-        add("COMPLETE", "FAIL", f"{len(no_locator)} docs are UNREACHABLE (no working file_path, no drive_file_id)",
-            "; ".join(f"#{d}:{(n or '')[:30]}" for d, n in no_locator[:8]))
+        if not downloadable and (txt or 0) < 120:
+            no_content.append((did, nm))
+        elif not downloadable:
+            text_only.append((did, nm))
+    if no_content:
+        add("COMPLETE", "FAIL", f"{len(no_content)} docs have NO content (ghosts — no file, no Drive, no text)",
+            "; ".join(f"#{d}:{(n or '')[:30]}" for d, n in no_content[:8]))
     else:
-        add("COMPLETE", "PASS", "every doc has a working locator (disk or Drive)")
+        add("COMPLETE", "PASS", "every canonical doc has accessible content (file, Drive, or text)")
+    if text_only:
+        add("COMPLETE", "WARN", f"{len(text_only)} docs are readable (text) but have no downloadable original — fine for reasoning, not as an exhibit")
     if broken_path:
         add("COMPLETE", "WARN", f"{len(broken_path)} docs have a file_path that no longer exists on disk (no Drive fallback)",
             "; ".join(f"#{d}" for d, _ in broken_path[:10]))
 
     # ── READ: extracted_text present + not a shell ───────────────────────────
-    empty = one(cur, "SELECT count(*) FROM documents WHERE master_form='digital' AND (extracted_text IS NULL OR length(trim(extracted_text))=0)")
-    shells = one(cur, """SELECT count(*) FROM documents WHERE master_form='digital'
+    empty = one(cur, f"SELECT count(*) FROM documents WHERE {CANON} AND (extracted_text IS NULL OR length(trim(extracted_text))=0)")
+    shells = one(cur, f"""SELECT count(*) FROM documents WHERE {CANON}
                           AND length(coalesce(extracted_text,'')) BETWEEN 1 AND 120""")
     add("READ", "FAIL" if empty else "PASS",
         f"{empty} docs have NO extracted_text (AI is blind to them)" if empty else "every doc has extracted_text")
