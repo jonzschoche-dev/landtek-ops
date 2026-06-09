@@ -40,6 +40,26 @@ DRIVE_CREDS_PATH = "/root/landtek/google-creds.json"
 
 LEO_TOOLS = [
     {
+        "name": "semantic_search",
+        "description": (
+            "Search the corpus by MEANING (vector search) — finds the right "
+            "document even when its filename is wrong or you only know what it's "
+            "ABOUT. Use this FIRST for 'find the X document / the letter about Y' "
+            "questions; it catches things keyword search misses. Returns docs with "
+            "download links, ranked by relevance. If it returns nothing, that does "
+            "NOT mean the doc is absent (coverage is still partial) — also try "
+            "query_documents and search_drive."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "what the document is about, in natural language"},
+                "limit": {"type": "integer", "description": "max results (default 6)"},
+            },
+            "required": ["query"],
+        },
+    },
+    {
         "name": "query_documents",
         "description": (
             "Search the digital document corpus. Returns matching docs with "
@@ -607,7 +627,100 @@ def t_vault_bind_scan(args):
                        "ok": True}, indent=2)
 
 
+def _env_key(name):
+    """Read a key from the environment, falling back to /root/landtek/.env so the
+    tool works regardless of how the router service was started."""
+    v = os.environ.get(name)
+    if v:
+        return v
+    try:
+        for line in open("/root/landtek/.env"):
+            line = line.strip()
+            if line.startswith(name + "="):
+                return line.split("=", 1)[1].strip().strip('"').strip("'")
+    except Exception:
+        pass
+    return None
+
+
+def t_semantic_search(args):
+    """Search the corpus by MEANING (vector search over Qdrant) — robust to wrong
+    or misleading filenames, which keyword search is not. Returns the best-matching
+    documents with their download links. DEGRADES to keyword search automatically
+    if the vector layer is unreachable — it never errors out, so Leo never freezes
+    on it. (Coverage is currently partial — a miss here does NOT mean 'not in the
+    corpus'; also try query_documents / search_drive.)"""
+    query = (args.get("query") or "").strip()
+    limit = int(args.get("limit", 6))
+    if not query:
+        return "semantic_search needs a query."
+    gk = _env_key("GEMINI_API_KEY")
+    qurl = _env_key("QDRANT_URL")
+    qkey = _env_key("QDRANT_KEY")
+    if not (gk and qurl and qkey):
+        return ("(semantic layer not configured — using keyword search)\n"
+                + t_query_documents({"text_contains": query, "limit": limit}))
+    try:
+        ebody = json.dumps({
+            "model": "models/gemini-embedding-001",
+            "content": {"parts": [{"text": query}]},
+            "taskType": "RETRIEVAL_QUERY",
+            "outputDimensionality": 768,
+        }).encode()
+        ereq = urllib.request.Request(
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"gemini-embedding-001:embedContent?key={gk}",
+            data=ebody, headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(ereq, timeout=20) as r:
+            vec = json.loads(r.read().decode())["embedding"]["values"]
+        sbody = json.dumps({
+            "vector": vec, "limit": limit * 4,
+            "with_payload": ["doc_id_postgres", "smart_filename", "case_file"],
+        }).encode()
+        sreq = urllib.request.Request(
+            f"{qurl}/collections/landtek_documents/points/search",
+            data=sbody,
+            headers={"api-key": qkey, "Content-Type": "application/json"},
+            method="POST")
+        with urllib.request.urlopen(sreq, timeout=20) as r:
+            hits = json.loads(r.read().decode())["result"]
+    except Exception as e:
+        kw = t_query_documents({"text_contains": query, "limit": limit})
+        return (f"(semantic layer unavailable: {str(e)[:70]} — fell back to "
+                f"keyword search)\n{kw}")
+
+    # Dedup to doc-level (keep best chunk score per doc), drop orphan points.
+    best = {}
+    for h in hits:
+        p = h.get("payload") or {}
+        did = p.get("doc_id_postgres")
+        if did is None:
+            continue
+        did = int(did)
+        if did not in best or h["score"] > best[did]["score"]:
+            best[did] = {"doc_id": did, "score": round(h["score"], 3),
+                         "name": (p.get("smart_filename") or "")[:80]}
+    out = sorted(best.values(), key=lambda x: -x["score"])[:limit]
+    if not out:
+        return (f"Semantic search returned nothing for {query!r}. It may not be "
+                "embedded yet — try query_documents or search_drive by a key term.")
+    # Enrich with downloadable links from Postgres.
+    try:
+        conn, cur = _db()
+        cur.execute("SELECT id, (file_path IS NOT NULL OR drive_file_id IS NOT NULL) AS dl "
+                    "FROM documents WHERE id = ANY(%s)", ([d["doc_id"] for d in out],))
+        dlmap = {r["id"]: r["dl"] for r in cur.fetchall()}
+        cur.close(); conn.close()
+        for d in out:
+            d["download_link"] = (f"https://leo.hayuma.org/files/c/{d['doc_id']}"
+                                  if dlmap.get(d["doc_id"]) else None)
+    except Exception:
+        pass
+    return f"Semantic matches for {query!r} (ranked by meaning):\n" + json.dumps(out, indent=2)
+
+
 TOOL_FUNCTIONS = {
+    "semantic_search":       t_semantic_search,
     "query_documents":       t_query_documents,
     "read_document":         t_read_document,
     "search_drive":          t_search_drive,
