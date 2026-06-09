@@ -409,3 +409,119 @@ def _render_matrix(case_file):
 {''.join(cards) or '<div class=claim>No claims defined for this matter yet.</div>'}
 </body></html>"""
     return Response(page, mimetype="text/html")
+
+
+# ─── Annex Assembler ─────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, os.path.dirname(__file__))
+
+
+def _doc_bytes(doc_id):
+    """(bytes, mime, name) for a doc from local file_path or Drive."""
+    conn = _db()
+    cur = conn.cursor()
+    cur.execute("SELECT file_path, drive_file_id, mime_type, "
+                "COALESCE(NULLIF(smart_filename,''), original_filename) "
+                "FROM documents WHERE id=%s", (doc_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if not row:
+        return None, None, f"doc {doc_id}"
+    fp, drive_id, mime, name = row
+    name = name or f"doc-{doc_id}"
+    if fp and os.path.exists(fp):
+        with open(fp, "rb") as fh:
+            return fh.read(), (mime or "application/pdf"), name
+    if drive_id:
+        from googleapiclient.http import MediaIoBaseDownload
+        svc = _drive()
+        buf = io.BytesIO()
+        req = svc.files().get_media(fileId=drive_id, supportsAllDrives=True)
+        dl = MediaIoBaseDownload(buf, req, chunksize=1024 * 1024)
+        done = False
+        while not done:
+            _, done = dl.next_chunk()
+        buf.seek(0)
+        return buf.read(), (mime or "application/pdf"), name
+    return None, None, name
+
+
+def _matter_annex_items(case_file):
+    """Ordered CONFIRMED exhibits for a case_file -> annex items A,B,C...
+    Ordered by claim priority desc, then weight (primary>strong>moderate)."""
+    conn = _db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT et.supporting_doc_id, c.short_label, et.weight, et.relation_kind,
+               COALESCE(NULLIF(d.smart_filename,''), d.original_filename)
+          FROM evidence_trail et
+          JOIN claims c ON c.id = et.claim_id
+          JOIN documents d ON d.id = et.supporting_doc_id
+         WHERE c.case_file = %s
+         ORDER BY c.priority DESC NULLS LAST,
+                  CASE et.weight WHEN 'primary' THEN 0 WHEN 'strong' THEN 1
+                                 WHEN 'moderate' THEN 2 ELSE 3 END,
+                  et.supporting_doc_id
+    """, (case_file,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    items, seen = [], set()
+    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for doc_id, label, weight, rel, name in rows:
+        if doc_id in seen:
+            continue
+        seen.add(doc_id)
+        i = len(items)
+        tag = letters[i] if i < 26 else f"A{i - 25}"
+        items.append({"label": tag, "doc_id": doc_id,
+                      "desc": f"{name or ('doc ' + str(doc_id))} — {rel} ({label})"})
+    return items
+
+
+@bp.route("/annex/m/<case_file>")
+def annex_bundle(case_file):
+    import html
+    items = _matter_annex_items(case_file)
+    rows = "".join(
+        f"<tr><td class='loc'>Annex {it['label']}</td>"
+        f"<td><a href='/files/c/{it['doc_id']}'>{html.escape(it['desc'][:84])}</a> "
+        f"<span class='muted'>#{it['doc_id']}</span></td></tr>"
+        for it in items
+    ) or "<tr><td colspan=2>No confirmed exhibits for this matter yet.</td></tr>"
+    title = html.escape(case_file)
+    page = f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annex bundle &mdash; {title}</title>
+<style>
+ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#f4f5f7;color:#1a1a1a}}
+ h1{{font-size:18px;margin:0 0 4px}} .sub{{color:#666;font-size:13px;margin-bottom:14px}}
+ .btn{{display:inline-block;background:#0a58ca;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;font-size:14px;margin-bottom:16px}}
+ table{{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
+ th,td{{text-align:left;padding:9px 10px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}}
+ td.loc{{font-weight:600;white-space:nowrap}} a{{color:#0a58ca;text-decoration:none}}
+ .muted{{color:#999;font-size:11px}}
+</style></head><body>
+<h1>Annex bundle &mdash; {title}</h1>
+<div class="sub">{len(items)} confirmed exhibits, in filing order (priority &rarr; weight).</div>
+<a class="btn" href="/files/c/annex/m/{title}/pdf">&#11015; Assemble all into one ordered PDF (with annex separators)</a>
+<table><tbody>{rows}</tbody></table>
+</body></html>"""
+    return Response(page, mimetype="text/html")
+
+
+@bp.route("/annex/m/<case_file>/pdf")
+def annex_pdf(case_file):
+    import annex_assembler
+    items = _matter_annex_items(case_file)
+    if not items:
+        return Response("no confirmed exhibits for this matter", status=404,
+                        mimetype="text/plain")
+    pdf, manifest = annex_assembler.assemble(
+        items, _doc_bytes, title=f"{case_file} annexes", draft=True)
+    return Response(
+        pdf, mimetype="application/pdf",
+        headers={"Content-Disposition": f'inline; filename="{case_file}_annexes_DRAFT.pdf"',
+                 "X-Annex-Count": str(len(items))},
+    )
