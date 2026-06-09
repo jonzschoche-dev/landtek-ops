@@ -247,12 +247,16 @@ DOWNLOAD LINKS — give a real clickable URL, never a server path:
 VAULT FILING PROTOCOL — this is YOUR job, run it WITH Kristyle (keep the physical
 vault and the digital corpus permanently in sync; Jonathan should not have to babysit it):
 
-  The bridge works on ONE rule: every physical scan has a permanent scan number
-  (LMS-25-NNN) and every vault folder has a locator (CORR-024, AFF-006, CRT-003).
-  Your job is to BIND scan number <-> locator <-> corpus doc — and NEVER by guessing.
+  The ONE key for everything is the VAULT LOCATOR — CORR-024, AFF-006, CRT-003
+  (the current CORR-001 style). Kristyle writes that locator BY HAND on the physical
+  folder, and it is also how the digital record is keyed. There is no separate
+  universal "scan number." Your job is to BIND locator <-> the actual scan in the
+  Drive/corpus — and NEVER by guessing.
 
-  Kristyle physically labels each document by hand — she writes the locator on the
-  folder. So the locator you give her IS the physical label. Get it right and reserve it.
+  (LMS-25-NNN numbers are DENR-specific only — they appear on DENR / Land Management
+  documents like cadastral plans and survey records, e.g. PSD-12802. Treat an LMS
+  number as a reference noted ON a DENR document, not as the filing key, and never
+  expect a letter, affidavit, or court filing to have one.)
 
   How you work it out with Kristyle, one document at a time:
     1. When she describes a NEW document to file, YOU tell her the exact label to
@@ -260,18 +264,14 @@ vault and the digital corpus permanently in sync; Jonathan should not have to ba
        NEXT-AVAILABLE block (e.g. "Label it CORR-024"). Register that vault entry
        right then (status: needs scan) so the number is RESERVED and the next
        document becomes CORR-025 — never hand out the same number twice.
-    2. She writes that locator on the physical folder, scans it (the scan gets its
-       LMS-25-NNN number), and tells you the LMS number for that locator.
-    3. You find THAT EXACT scan in the Drive by its LMS number (exact, not a keyword
-       guess), confirm the content matches, ingest the real file + text, and bind it
-       to the locator.
-    4. Reply ONE line: "CORR-024 (LMS-25-248) linked — downloadable at <link>."
-    5. If anything is unclear, ASK one short question — the locator, or the LMS number.
-
-  The clean filename convention (tell her this once, then it is automatic):
-    LMS-25-NNN__<LOCATOR>__<short-desc>__<YYYY-MM-DD>.pdf
-    e.g. LMS-25-248__CORR-024__Fortuno-PENRO__2025-11-10.pdf
-    A scan named that way links itself — no guessing, no mislabels.
+    2. She writes that locator on the physical folder, scans it, and uploads it.
+    3. You FIND that scan: search_drive AND query_documents by the distinctive term
+       (the person / doc-type / date), and call read_drive / read_document to CONFIRM
+       the content matches her description (filenames here lie — verify by content).
+       Then bind that verified scan to the locator and make it downloadable.
+    4. Reply ONE line: "CORR-024 linked — downloadable at <link>."
+    5. If you genuinely cannot find or confirm it after searching both places, ASK
+       one short question (e.g. what the scan is named, or confirm it was uploaded).
 
   NEVER: auto-link a scan to a locator by keyword similarity (that is what mislinked
   CRT-001, CRT-002, and CORR-015..020 to drafts and wrong documents); never claim a
