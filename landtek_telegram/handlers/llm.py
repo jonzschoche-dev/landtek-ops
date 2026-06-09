@@ -175,8 +175,11 @@ EXAMPLE — DO NOT DO THIS:
                       is wrong — search by the person / doc-type / docket term)
   - read_drive      : read the actual text of a Drive file to confirm what it is
                       (filenames here are unreliable; the content is the truth)
-  - vault_register  : CREATE a vault entry directly — section, number,
-                      description, matter_code, related_matters[]
+  - vault_register  : CREATE a vault entry (reserve the locator). It does NOT
+                      auto-attach a scan anymore (it kept linking the wrong doc).
+  - vault_bind_scan : bind the CORRECT scan to a locator (or FIX a wrong link) —
+                      pass doc_id (a corpus doc) or drive_id (a Drive file it
+                      ingests). Only after you've CONFIRMED the content is right.
   - vault_find / vault_queue / vault_missing / vault_last : vault state
   - find_matter_for_party : given a person/org name, find which matters
                             they appear in across the corpus
@@ -268,7 +271,10 @@ vault and the digital corpus permanently in sync; Jonathan should not have to ba
     3. You FIND that scan: search_drive AND query_documents by the distinctive term
        (the person / doc-type / date), and call read_drive / read_document to CONFIRM
        the content matches her description (filenames here lie — verify by content).
-       Then bind that verified scan to the locator and make it downloadable.
+       Then call vault_bind_scan (with doc_id if it's a corpus doc, or drive_id if
+       it's only in the Drive) to bind that verified scan and make it downloadable.
+       If a locator is already linked to the WRONG document, fix it the same way —
+       confirm the right scan, then vault_bind_scan re-points it.
     4. Reply ONE line: "CORR-024 linked — downloadable at <link>."
     5. If you genuinely cannot find or confirm it after searching both places, ASK
        one short question (e.g. what the scan is named, or confirm it was uploaded).

@@ -121,10 +121,12 @@ LEO_TOOLS = [
     {
         "name": "vault_register",
         "description": (
-            "Create a new physical-master vault entry. Use this when you've "
-            "determined the section, number, matter, and description from "
-            "the conversation. The system will auto-link the digital scan "
-            "by corpus search."
+            "Create a new physical-master vault entry (reserve the locator). Use "
+            "this when you've determined the section, number, matter, and "
+            "description. It registers the folder as 'needs scan' and does NOT "
+            "auto-attach a scan (auto-matching kept linking the wrong document). "
+            "After registering, FIND the correct scan by content and bind it with "
+            "vault_bind_scan."
         ),
         "input_schema": {
             "type": "object",
@@ -137,6 +139,27 @@ LEO_TOOLS = [
                                     "description": "other matters this doc is materially relevant to"},
             },
             "required": ["section", "number", "description", "matter_code"],
+        },
+    },
+    {
+        "name": "vault_bind_scan",
+        "description": (
+            "Bind the CORRECT scan to a vault locator — also used to FIX a wrong "
+            "link. Pass doc_id (an existing corpus document) OR drive_id (a Drive "
+            "file, which gets ingested properly and made downloadable). ONLY call "
+            "this after you've confirmed by READING it (read_document/read_drive) "
+            "that the scan really is that document. This is how you complete the "
+            "physical<->digital bridge — never trust a filename, verify content first."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "section":  {"type": "string", "description": "vault section, e.g. CORR"},
+                "number":   {"type": "integer", "description": "vault number, e.g. 28"},
+                "doc_id":   {"type": "integer", "description": "existing corpus doc id to bind (if already in corpus)"},
+                "drive_id": {"type": "string", "description": "Drive file id to ingest + bind (if only in the Drive)"},
+            },
+            "required": ["section", "number"],
         },
     },
     {
@@ -501,12 +524,84 @@ def t_link_documents(args):
     return f"Created document_links #{link_id}: {args['from_doc_id']} -{args['link_type']}-> {args['to_doc_id']}"
 
 
+def t_vault_bind_scan(args):
+    """Bind the CORRECT, content-verified scan to a vault locator (also used to
+    FIX a wrong link). Pass doc_id (an existing corpus doc) OR drive_id (a Drive
+    file, which is ingested properly: downloaded, text-extracted, made
+    downloadable). Only call this AFTER you've confirmed by reading it that the
+    scan is the right document."""
+    import io, os, subprocess
+    section = (args.get("section") or "").strip().upper()
+    try:
+        number = int(args.get("number"))
+    except (TypeError, ValueError):
+        return "vault_bind_scan needs section + number."
+    doc_id = args.get("doc_id")
+    drive_id = (args.get("drive_id") or "").strip() or None
+    conn, cur = _db()
+    cur.execute("""SELECT id FROM documents WHERE master_form='physical'
+        AND vault_section=%s AND vault_number=%s""", (section, number))
+    m = cur.fetchone()
+    if not m:
+        cur.close(); conn.close()
+        return f"No vault entry {section}-{number:03d} exists."
+    master = m["id"]
+
+    if doc_id:
+        scan = int(doc_id)
+        cur.execute("SELECT 1 FROM documents WHERE id=%s", (scan,))
+        if not cur.fetchone():
+            cur.close(); conn.close()
+            return f"doc#{scan} not found."
+    elif drive_id:
+        try:
+            from googleapiclient.http import MediaIoBaseDownload
+            svc = _drive_client()
+            meta = svc.files().get(fileId=drive_id, fields="name",
+                                   supportsAllDrives=True).execute()
+            req = svc.files().get_media(fileId=drive_id, supportsAllDrives=True)
+            buf = io.BytesIO(); dl = MediaIoBaseDownload(buf, req)
+            done = False
+            while not done:
+                _, done = dl.next_chunk()
+            d = "/root/landtek/uploads/MWK-001/drive_scans"
+            os.makedirs(d, exist_ok=True)
+            path = os.path.join(d, f"drive_{drive_id}.pdf")
+            with open(path, "wb") as f:
+                f.write(buf.getvalue())
+            txt = subprocess.run(["pdftotext", "-layout", path, "-"],
+                                 capture_output=True, text=True, timeout=60).stdout
+            cur.execute("""INSERT INTO documents (case_file, smart_filename,
+                    original_filename, mime_type, master_form, file_path, drive_link,
+                    classification, extracted_text, status, created_at, updated_at)
+                VALUES ('MWK-001', %s, %s, 'application/pdf', 'digital', %s, %s,
+                    'Document', %s, 'ingested_via_bind', NOW(), NOW()) RETURNING id""",
+                (meta.get("name"), meta.get("name"), path, f"drive://{drive_id}",
+                 txt[:200000]))
+            scan = cur.fetchone()["id"]
+        except Exception as e:
+            cur.close(); conn.close()
+            return f"Failed to ingest Drive file: {str(e)[:200]}"
+    else:
+        cur.close(); conn.close()
+        return "vault_bind_scan needs doc_id or drive_id."
+
+    cur.execute("""UPDATE documents SET digital_scan_id=%s,
+        status='vault_registered', updated_at=NOW() WHERE id=%s""", (scan, master))
+    conn.commit()
+    cur.close(); conn.close()
+    return json.dumps({"locator": f"{section}-{number:03d}", "linked_scan_doc": scan,
+                       "download": f"https://leo.hayuma.org/files/c/{scan}",
+                       "ok": True}, indent=2)
+
+
 TOOL_FUNCTIONS = {
     "query_documents":       t_query_documents,
     "read_document":         t_read_document,
     "search_drive":          t_search_drive,
     "read_drive":            t_read_drive,
     "vault_register":        t_vault_register,
+    "vault_bind_scan":       t_vault_bind_scan,
     "vault_find":            t_vault_find,
     "vault_queue":           t_vault_queue,
     "vault_missing":         t_vault_missing,

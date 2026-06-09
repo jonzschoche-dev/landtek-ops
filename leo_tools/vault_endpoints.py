@@ -373,75 +373,37 @@ def register():
         scan_candidates = []
         scan_confidence = None
 
-        # Step 1: corpus search
+        # Corpus search — SUGGEST ONLY, never auto-attach. The keyword matcher
+        # has repeatedly bound the WRONG document (CRT-001/002, CORR-015..020/028,
+        # AFF-001/003/007 all got mislinked to drafts or unrelated docs). So we no
+        # longer auto-attach anything, and we no longer create placeholder shells.
+        # The entry is registered as 'needs scan'; Leo confirms the correct scan
+        # by CONTENT (search_drive/query_documents + read_drive/read_document) and
+        # binds it explicitly with /api/vault/attach_scan.
         best, conf, candidates = _find_corpus_match(
             cur, section, description, matter_code, case_file)
         scan_candidates = candidates
         scan_confidence = conf
-        if best is not None:
-            scan_doc_id = best
-            scan_source = f"corpus_match:doc#{best}:confidence={conf:.2f}"
-
-        # Step 2: recent photo from sender (only if no strong corpus match)
-        if scan_doc_id is None and auto_attach_sender_id:
-            cur.execute("""
-                SELECT id, media_path, media_size
-                  FROM telegram_inbox
-                 WHERE sender_id = %s
-                   AND media_path IS NOT NULL
-                   AND received_at > NOW() - INTERVAL '2 hours'
-                   AND NOT EXISTS (
-                       SELECT 1 FROM documents
-                        WHERE drive_link = 'file://' || telegram_inbox.media_path
-                   )
-                 ORDER BY received_at DESC
-                 LIMIT 1
-            """, (auto_attach_sender_id,))
-            photo_row = cur.fetchone()
-            if photo_row:
-                cur.execute("""
-                    INSERT INTO documents
-                        (case_file, smart_filename, original_filename, mime_type,
-                         master_form, drive_link, status, created_at, updated_at)
-                    VALUES (%s, %s, %s, 'image/jpeg', 'digital', %s,
-                            'scan_of_vault_master', NOW(), NOW())
-                    RETURNING id
-                """, (case_file,
-                      f"Scan of {smart_filename}",
-                      f"vault_scan_{section}-{number:03d}.jpg",
-                      f"file://{photo_row['media_path']}"))
-                scan_doc_id = cur.fetchone()["id"]
-                scan_source = f"telegram_photo:inbox#{photo_row['id']}"
-
-        # Step 3: placeholder
-        if scan_doc_id is None:
-            cur.execute("""
-                INSERT INTO documents
-                    (case_file, smart_filename, original_filename, mime_type,
-                     master_form, status, created_at, updated_at)
-                VALUES (%s, %s, %s, 'placeholder/pending-scan', 'digital',
-                        'pending_scan_upload', NOW(), NOW())
-                RETURNING id
-            """, (case_file,
-                  f"PENDING SCAN of {smart_filename}",
-                  f"pending_{section}-{number:03d}.placeholder"))
-            scan_doc_id = cur.fetchone()["id"]
-            scan_source = "placeholder"
 
         cur.execute("""
-            UPDATE documents SET digital_scan_id = %s, updated_at = NOW()
+            UPDATE documents SET status = 'vault_registered_needs_scan',
+                   updated_at = NOW()
              WHERE id = %s
-        """, (scan_doc_id, new_id))
+        """, (new_id,))
 
         return jsonify(ok=True, doc_id=new_id,
                        locator=f"{section}-{number:03d}",
                        smart_filename=smart_filename,
                        matter_code=matter_code,
                        case_file=case_file,
-                       digital_scan_id=scan_doc_id,
-                       scan_source=scan_source,
-                       scan_confidence=scan_confidence,
-                       scan_candidates=scan_candidates)
+                       digital_scan_id=None,
+                       needs_scan=True,
+                       note=("Registered with NO scan attached. Auto-matching is "
+                             "OFF — it kept linking the wrong document. CONFIRM the "
+                             "correct scan by its CONTENT, then bind it with "
+                             "attach_scan. Treat scan_suggestions as hints only."),
+                       scan_suggestions=scan_candidates,
+                       scan_confidence=scan_confidence)
     except Exception as e:
         return jsonify(ok=False, error=f"db_error: {type(e).__name__}: {str(e)[:200]}"), 500
     finally:
