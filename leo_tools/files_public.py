@@ -269,3 +269,143 @@ def info(doc_id):
     keys = ["id", "case_file", "matter_code", "smart_filename", "original_filename",
             "mime_type", "drive_file_id", "file_path", "document_title", "summary"]
     return jsonify(dict(zip(keys, row)))
+
+
+# ─── Evidence Matrix ─────────────────────────────────────────────────────────
+@bp.route("/matrix")
+def evidence_matrix_index():
+    return _render_matrix(None)
+
+
+@bp.route("/matrix/<case_file>")
+def evidence_matrix_case(case_file):
+    return _render_matrix(case_file)
+
+
+def _render_matrix(case_file):
+    """Live evidence matrix: each claim/allegation with its CONFIRMED exhibits
+    (accepted into evidence_trail) vs SUGGESTED exhibits (pending Opus proposals,
+    confidence-scored). This is the 'annexes existing vs suggested' tracker."""
+    import html, json
+    conn = _db()
+    cur = conn.cursor()
+    q = ("SELECT id, case_file, short_label, claim_text, claim_kind, "
+         "required_to_prove, status, priority FROM claims")
+    params = ()
+    if case_file:
+        q += " WHERE case_file = %s"
+        params = (case_file,)
+    q += " ORDER BY priority DESC NULLS LAST, id"
+    cur.execute(q, params)
+    claims = cur.fetchall()
+
+    cur.execute("SELECT claim_id, supporting_doc_id, relation_kind, weight, "
+                "provenance_level, narrative FROM evidence_trail")
+    confirmed = {}
+    for cid, doc, rel, wt, prov, narr in cur.fetchall():
+        confirmed.setdefault(cid, []).append((doc, rel, wt, prov, narr))
+
+    cur.execute("SELECT claim_id, supporting_doc_id, relation_kind, weight, "
+                "confidence, rationale FROM evidence_trail_proposals "
+                "WHERE status = 'pending'")
+    suggested = {}
+    for cid, doc, rel, wt, conf, rat in cur.fetchall():
+        suggested.setdefault(cid, []).append((doc, rel, wt, conf, rat))
+
+    docids = set()
+    for d in list(confirmed.values()) + list(suggested.values()):
+        for t in d:
+            docids.add(t[0])
+    names = {}
+    if docids:
+        cur.execute("SELECT id, COALESCE(NULLIF(smart_filename,''), original_filename), "
+                    "(file_path IS NOT NULL OR drive_file_id IS NOT NULL) "
+                    "FROM documents WHERE id = ANY(%s)", (list(docids),))
+        for did, nm, dl in cur.fetchall():
+            names[did] = (nm or f"doc {did}", dl)
+    cur.close(); conn.close()
+
+    def doclink(did):
+        nm, dl = names.get(did, (f"doc {did}", False))
+        nm = html.escape(nm[:54])
+        if dl:
+            return f'<a href="/files/c/{did}">{nm}</a> <span class="muted">#{did}</span>'
+        return f'{nm} <span class="warn">#{did} no scan</span>'
+
+    PROV = {"verified": "verified", "inferred_strong": "inferred",
+            "inferred_weak": "weak"}
+    cards = []
+    n_conf = n_sugg = 0
+    for cid, cf, label, text, kind, req, status, prio in claims:
+        elems = req
+        if isinstance(elems, str):
+            try:
+                elems = json.loads(elems)
+            except Exception:
+                elems = [elems]
+        elems = elems or []
+        cfm = confirmed.get(cid, [])
+        sug = suggested.get(cid, [])
+        n_conf += len(cfm)
+        n_sugg += len(sug)
+
+        conf_rows = "".join(
+            f"<tr><td>{doclink(doc)}</td><td class='rel'>{html.escape(rel or '')}</td>"
+            f"<td>{html.escape(wt or '')}</td>"
+            f"<td><span class='prov prov-{PROV.get(prov,'weak')}'>{PROV.get(prov, prov or '?')}</span></td></tr>"
+            for doc, rel, wt, prov, narr in cfm
+        ) or "<tr><td colspan=4 class='warn'>No exhibits confirmed yet — gap.</td></tr>"
+
+        sug_rows = "".join(
+            f"<tr><td>{doclink(doc)}</td><td class='rel'>{html.escape(rel or '')}</td>"
+            f"<td>{html.escape(wt or '')}</td><td>{('%.2f' % conf) if conf is not None else ''}</td>"
+            f"<td class='muted'>{html.escape((rat or '')[:70])}</td></tr>"
+            for doc, rel, wt, conf, rat in sug
+        ) or "<tr><td colspan=5 class='muted'>No pending suggestions.</td></tr>"
+
+        elem_html = "".join(f"<li>{html.escape(str(e))}</li>" for e in elems)
+        cards.append(f"""
+<div class="claim">
+  <div class="chead"><span class="pill">{html.escape(kind or '')}</span>
+    <span class="lbl">{html.escape(label or ('claim ' + str(cid)))}</span>
+    <span class="muted">&middot; {html.escape(cf or '')} &middot; priority {prio}</span></div>
+  <div class="ctext">{html.escape(text or '')}</div>
+  <div class="req"><b>Must prove:</b><ul>{elem_html or '<li class=muted>&mdash;</li>'}</ul></div>
+  <div class="grid">
+   <div class="col"><div class="ch ch-conf">CONFIRMED &mdash; filed / accepted ({len(cfm)})</div>
+     <table><thead><tr><th>Exhibit</th><th>Role</th><th>Weight</th><th>Proof</th></tr></thead>
+     <tbody>{conf_rows}</tbody></table></div>
+   <div class="col"><div class="ch ch-sugg">SUGGESTED &mdash; review &amp; accept ({len(sug)})</div>
+     <table><thead><tr><th>Exhibit</th><th>Role</th><th>Weight</th><th>Conf</th><th>Why</th></tr></thead>
+     <tbody>{sug_rows}</tbody></table></div>
+  </div>
+</div>""")
+
+    scope = html.escape(case_file) if case_file else "all matters"
+    page = f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence Matrix &mdash; {scope}</title>
+<style>
+ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#f4f5f7;color:#1a1a1a}}
+ h1{{font-size:19px;margin:0 0 3px}} .sub{{color:#666;font-size:13px;margin-bottom:16px}}
+ .claim{{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.12);padding:14px;margin-bottom:16px}}
+ .chead{{font-size:15px;margin-bottom:6px}} .lbl{{font-weight:700}}
+ .ctext{{font-size:13px;color:#333;margin-bottom:8px}}
+ .req{{font-size:12px;color:#444;margin-bottom:10px}} .req ul{{margin:3px 0 0 18px;padding:0}}
+ .grid{{display:flex;gap:14px;flex-wrap:wrap}} .col{{flex:1;min-width:280px}}
+ .ch{{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:5px 8px;border-radius:5px 5px 0 0}}
+ .ch-conf{{background:#e7f5ec;color:#11703a}} .ch-sugg{{background:#fff4e5;color:#9a5b00}}
+ table{{border-collapse:collapse;width:100%;background:#fff}}
+ th,td{{text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:12px;vertical-align:top}}
+ th{{background:#fafafa;font-size:10px;text-transform:uppercase;color:#666}}
+ a{{color:#0a58ca;text-decoration:none}} a:hover{{text-decoration:underline}}
+ .muted{{color:#999;font-size:11px}} .warn{{color:#b54708}} .rel{{text-transform:capitalize}}
+ .pill{{font-size:10px;padding:2px 6px;border-radius:10px;background:#eef;color:#334;margin-right:6px;text-transform:uppercase}}
+ .prov{{font-size:10px;padding:1px 6px;border-radius:8px}}
+ .prov-verified{{background:#d6f0df;color:#11703a}} .prov-inferred{{background:#fde9c8;color:#9a5b00}} .prov-weak{{background:#f3d6d6;color:#a11}}
+</style></head><body>
+<h1>Evidence Matrix &mdash; {scope}</h1>
+<div class="sub">{len(claims)} claims &middot; {n_conf} confirmed exhibits &middot; {n_sugg} suggested (pending review) &middot; live view</div>
+{''.join(cards) or '<div class=claim>No claims defined for this matter yet.</div>'}
+</body></html>"""
+    return Response(page, mimetype="text/html")
