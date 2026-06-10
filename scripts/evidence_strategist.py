@@ -33,6 +33,9 @@ MAX_ROUNDS = 22
 REL_OK     = ("proves", "corroborates", "impeaches", "contextualizes")
 WT_OK      = ("primary", "strong", "moderate", "weak")
 CONN_OK    = ("direct_support", "corroboration", "impeachment", "gap_filler", "deeper_link")
+# CLIENT ISOLATION — the strategist builds the Keesey (MWK-001) case; it must never
+# pull another client's docs (e.g. Paracale-001 / Inocalla) as MWK evidence.
+CLIENT_SCOPE = "(case_file='MWK-001' OR case_file IS NULL)"
 
 
 def envk(name):
@@ -51,12 +54,12 @@ def envk(name):
 
 # ───────────────────────── corpus tools (mostly pure SQL) ─────────────────────
 def t_keyword_search(cur, query, limit=12):
-    cur.execute("""
+    cur.execute(f"""
         SELECT id, COALESCE(NULLIF(smart_filename,''), original_filename) nm,
                substring(extracted_text from greatest(1, position(lower(%s) in lower(extracted_text)) - 60)
                          for 220) snip
           FROM documents
-         WHERE master_form='digital' AND extracted_text ILIKE %s
+         WHERE master_form='digital' AND {CLIENT_SCOPE} AND extracted_text ILIKE %s
          ORDER BY id LIMIT %s
     """, (query, f"%{query}%", limit))
     return [{"doc_id": r["id"], "name": r["nm"], "snippet": (r["snip"] or "").replace("\n", " ")}
@@ -115,7 +118,8 @@ def t_entity_docs(cur, name):
                COALESCE(NULLIF(d.smart_filename,''), d.original_filename) nm
           FROM entities e JOIN doc_entities de ON de.entity_id=e.id
           JOIN documents d ON d.id=de.doc_id
-         WHERE e.canonical_name ILIKE %s OR e.aliases::text ILIKE %s
+         WHERE (e.canonical_name ILIKE %s OR e.aliases::text ILIKE %s)
+           AND (d.case_file='MWK-001' OR d.case_file IS NULL)
          ORDER BY de.doc_id LIMIT 30
     """, (f"%{name}%", f"%{name}%"))
     return [{"entity": r["canonical_name"], "type": r["type"], "doc_id": r["doc_id"],
@@ -158,17 +162,20 @@ def t_semantic_search(cur, query, k=8):
                                   task_type="RETRIEVAL_QUERY", output_dimensionality=768)
         vec = emb["embedding"]
         qc = QdrantClient(url=envk("QDRANT_URL"), api_key=envk("QDRANT_KEY"), timeout=20)
-        hits = qc.search(collection_name="landtek_documents", query_vector=vec, limit=k * 2)
-        seen, out = set(), []
+        hits = qc.search(collection_name="landtek_documents", query_vector=vec, limit=k * 4)
+        seen, cand = set(), []
         for h in hits:
             did = (h.payload or {}).get("doc_id_postgres")
-            if did is None or did in seen:
+            if did is None or int(did) in seen:
                 continue
-            seen.add(did)
-            out.append({"doc_id": did, "score": round(h.score, 3),
-                        "snippet": (h.payload or {}).get("text", "")[:160]})
-            if len(out) >= k:
-                break
+            seen.add(int(did))
+            cand.append((int(did), round(h.score, 3), (h.payload or {}).get("text", "")[:160]))
+        # CLIENT ISOLATION — Qdrant indexes every client; keep only MWK-001 / NULL.
+        if cand:
+            cur.execute("SELECT id, case_file FROM documents WHERE id = ANY(%s)", ([c[0] for c in cand],))
+            cf = {r["id"]: r["case_file"] for r in cur.fetchall()}
+            cand = [c for c in cand if cf.get(c[0]) == "MWK-001" or cf.get(c[0]) is None]
+        out = [{"doc_id": d, "score": s, "snippet": sn} for d, s, sn in cand[:k]]
         return out or {"note": "no semantic hits; use keyword_search"}
     except Exception as e:
         return {"error": f"semantic unavailable ({type(e).__name__}); use keyword_search instead"}
