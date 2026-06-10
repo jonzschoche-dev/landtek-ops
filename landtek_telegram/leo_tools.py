@@ -77,6 +77,7 @@ LEO_TOOLS = [
                 "date_to":       {"type": "string", "description": "YYYY-MM-DD upper bound on doc_date"},
                 "classification": {"type": "string", "description": "Letter, Court Filing, SPA, Affidavit, etc."},
                 "matter_code":   {"type": "string", "description": "limit to docs linked to this matter"},
+                "client":        {"type": "string", "description": "client scope — defaults to MWK-001 (Keesey). Allan Inocalla / Paracale is Paracale-001, a SEPARATE client; only set this to deliberately work a different client. Never mix clients."},
                 "limit":         {"type": "integer", "description": "max results (default 10)"},
             },
             "required": [],
@@ -308,6 +309,13 @@ def t_query_documents(args):
     conditions = ["d.master_form = 'digital'",
                   "d.status NOT LIKE 'placeholder%%'"]
     params = []
+    # CLIENT ISOLATION — never return another client's documents. Default to MWK
+    # (Keesey); Inocalla is a SEPARATE client (INOCALLA-001). NULL = treat as MWK.
+    client = (args.get("client") or "MWK-001")
+    if client == "MWK-001":
+        conditions.append("(d.case_file = 'MWK-001' OR d.case_file IS NULL)")
+    else:
+        conditions.append("d.case_file = %s"); params.append(client)
     if name:
         conditions.append("d.smart_filename ILIKE %s")
         params.append(f"%{name}%")
@@ -700,6 +708,19 @@ def t_semantic_search(args):
         if did not in best or h["score"] > best[did]["score"]:
             best[did] = {"doc_id": did, "score": round(h["score"], 3),
                          "name": (p.get("smart_filename") or "")[:80]}
+    # CLIENT ISOLATION — drop any hit that belongs to another client. Qdrant indexes
+    # every client's vectors, so without this an MWK query can surface Inocalla docs.
+    client = (args.get("client") or "MWK-001")
+    if best:
+        try:
+            conn, cur = _db()
+            cur.execute("SELECT id, case_file FROM documents WHERE id = ANY(%s)", (list(best.keys()),))
+            cf = {r["id"]: r["case_file"] for r in cur.fetchall()}
+            cur.close(); conn.close()
+            best = {d: v for d, v in best.items()
+                    if cf.get(d) == client or (client == "MWK-001" and cf.get(d) is None)}
+        except Exception:
+            pass
     out = sorted(best.values(), key=lambda x: -x["score"])[:limit]
     if not out:
         return (f"Semantic search returned nothing for {query!r}. It may not be "
