@@ -11,13 +11,14 @@ never needs the exact RPM hardcoded. Runs forever — also canonicalizes future
 uploads. Progress tracked in corpus_backfill_state so restarts resume cleanly.
 """
 from __future__ import annotations
-import io, os, sys, time, uuid
+import gc, io, os, sys, time, uuid
 import psycopg2, psycopg2.extras
+import fitz  # PyMuPDF — local Tesseract OCR (no quota)
 
 DSN  = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 COLL = "landtek_documents"
 NS   = uuid.UUID("6f1d2c3a-0000-4000-8000-000000000001")  # stable point-id namespace
-OCR_PACE, EMB_PACE, IDLE, BACKOFF_MAX = 12.0, 2.0, 120.0, 600.0
+OCR_PACE, EMB_PACE, IDLE, BACKOFF_MAX = 3.0, 2.0, 120.0, 600.0  # OCR is local now; pace is just a CPU breather for this 1-core box
 OCR_PROMPT = (
     "Transcribe ALL text in this document VERBATIM, preserving line order and structure. "
     "Include headers, footers, stamps, captions, and legible handwriting. Mark any span you "
@@ -91,20 +92,22 @@ def do_ocr(cur, row):
             VALUES (%s,1,true,%s) ON CONFLICT (doc_id) DO UPDATE SET ocr_done=true,
             last_error=excluded.last_error, updated_at=now()""", (row["id"], f"unsupported mime {mime}"))
         return "skip"
-    gf = genai.upload_file(path, mime_type=mime)
-    while gf.state.name == "PROCESSING":
-        time.sleep(2); gf = genai.get_file(gf.name)
-    if gf.state.name != "ACTIVE":
-        raise RuntimeError(f"upload state {gf.state.name}")
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    resp = model.generate_content([OCR_PROMPT, gf])
+    # LOCAL OCR via PyMuPDF+Tesseract — no quota. Memory-careful (this box is tiny):
+    # one page at a time at modest DPI, gc between pages, cap pages per doc.
     try:
-        genai.delete_file(gf.name)
-    except Exception:
-        pass
-    if tmp and os.path.exists(path):
-        os.remove(path)
-    text = (resp.text or "").strip()
+        d = fitz.open(path)
+        parts = []
+        for i in range(min(d.page_count, 15)):
+            page = d[i]
+            tp = page.get_textpage_ocr(dpi=120, full=True)
+            parts.append(page.get_text("text", textpage=tp))
+            del tp, page
+            gc.collect()
+        d.close()
+        text = "\n".join(parts).strip()
+    finally:
+        if tmp and os.path.exists(path):
+            os.remove(path)
     if len(text) < 20:
         cur.execute("""INSERT INTO corpus_backfill_state (doc_id, ocr_attempts, last_error)
             VALUES (%s,1,'empty ocr') ON CONFLICT (doc_id) DO UPDATE SET
@@ -186,6 +189,18 @@ def main():
     while True:
         try:
             # embed first — fast, high-count SEARCHABLE win; OCR'd docs re-enter here later
+            # OCR FIRST — local Tesseract, no quota, so findability never waits on
+            # the (rate-walled) embedding step.
+            quarantine_unfetchable(cur)
+            row = next_ocr(cur)
+            if row:
+                r = do_ocr(cur, row)
+                if r.startswith("ocr") or r == "empty":
+                    done_ocr += 1 if r.startswith("ocr") else 0
+                    log(f"OCR doc#{row['id']}: {r}  (ocr done={done_ocr})")
+                    time.sleep(OCR_PACE)
+                # 'skip' did no work -> loop on immediately
+                continue
             row = next_embed(cur)
             if row:
                 do_embed(cur, row)
@@ -194,17 +209,6 @@ def main():
                     log(f"embedded {done_emb} (doc#{row['id']})")
                 backoff = BACKOFF_MAX / 10
                 time.sleep(EMB_PACE); continue
-            quarantine_unfetchable(cur)
-            row = next_ocr(cur)
-            if row:
-                r = do_ocr(cur, row)
-                if r.startswith("ocr") or r == "empty":
-                    done_ocr += 1 if r.startswith("ocr") else 0
-                    log(f"OCR doc#{row['id']}: {r}  (ocr done={done_ocr})")
-                    backoff = BACKOFF_MAX / 10
-                    time.sleep(OCR_PACE)
-                # 'skip' made no API call -> loop on immediately
-                continue
             log(f"idle — nothing to backfill (ocr={done_ocr}, emb={done_emb})")
             time.sleep(IDLE)
         except Exception as e:
