@@ -105,6 +105,14 @@ def do_ocr(cur, row):
             gc.collect()
         d.close()
         text = "\n".join(parts).strip()
+    except Exception as e:
+        # un-openable (HEIC, corrupt, etc.) — count the attempt so we move on
+        # instead of looping forever on one bad file.
+        cur.execute("""INSERT INTO corpus_backfill_state (doc_id, ocr_attempts, last_error)
+            VALUES (%s,1,%s) ON CONFLICT (doc_id) DO UPDATE SET
+            ocr_attempts=corpus_backfill_state.ocr_attempts+1, last_error=excluded.last_error,
+            updated_at=now()""", (row["id"], f"open/ocr fail: {type(e).__name__}"[:80]))
+        return "skip"
     finally:
         if tmp and os.path.exists(path):
             os.remove(path)
@@ -141,9 +149,10 @@ def quarantine_unfetchable(cur):
     cur.execute(f"""UPDATE documents SET ingest_status='quarantined_nobytes'
         WHERE {CANON} AND id IN (
           SELECT doc_id FROM corpus_backfill_state
-           WHERE ocr_attempts>=3 AND NOT ocr_done AND last_error='no local bytes')""")
+           WHERE ocr_attempts>=3 AND NOT ocr_done
+             AND (last_error='no local bytes' OR last_error LIKE 'open/ocr fail%'))""")
     if cur.rowcount:
-        log(f"quarantined {cur.rowcount} unfetchable docs (no bytes after 3 tries)")
+        log(f"quarantined {cur.rowcount} un-OCR-able docs (no bytes / un-openable after 3 tries)")
 
 
 def next_ocr(cur):
