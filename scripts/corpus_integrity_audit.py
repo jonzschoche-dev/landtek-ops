@@ -55,9 +55,9 @@ def main():
 
     cur.execute("ANALYZE documents")  # defeat stale-stats (we got bitten by this)
 
-    CANON = "master_form='digital' AND coalesce(ingest_status,'') NOT IN ('quarantined_dup','quarantined_ghost')"
+    CANON = "master_form='digital' AND coalesce(ingest_status,'') NOT IN ('quarantined_dup','quarantined_ghost','quarantined_nobytes')"
     total = one(cur, f"SELECT count(*) FROM documents WHERE {CANON}")
-    quarantined = one(cur, "SELECT count(*) FROM documents WHERE ingest_status IN ('quarantined_dup','quarantined_ghost')")
+    quarantined = one(cur, "SELECT count(*) FROM documents WHERE ingest_status IN ('quarantined_dup','quarantined_ghost','quarantined_nobytes')")
     add("COMPLETE", "INFO", f"{total} canonical documents in corpus"
         + (f" ({quarantined} quarantined dups excluded)" if quarantined else ""))
 

@@ -131,6 +131,18 @@ def do_embed(cur, row):
     return "embedded"
 
 
+def quarantine_unfetchable(cur):
+    """Self-healing finish line: a doc whose bytes can't be fetched after 3 tries
+    (dead file_path + invalid Drive id) can never be OCR'd — quarantine it so READ
+    can reach zero instead of grinding forever."""
+    cur.execute(f"""UPDATE documents SET ingest_status='quarantined_nobytes'
+        WHERE {CANON} AND id IN (
+          SELECT doc_id FROM corpus_backfill_state
+           WHERE ocr_attempts>=3 AND NOT ocr_done AND last_error='no local bytes')""")
+    if cur.rowcount:
+        log(f"quarantined {cur.rowcount} unfetchable docs (no bytes after 3 tries)")
+
+
 def next_ocr(cur):
     cur.execute(f"""SELECT d.id, d.file_path, d.drive_file_id, d.mime_type FROM documents d
         LEFT JOIN corpus_backfill_state s ON s.doc_id=d.id
@@ -182,6 +194,7 @@ def main():
                     log(f"embedded {done_emb} (doc#{row['id']})")
                 backoff = BACKOFF_MAX / 10
                 time.sleep(EMB_PACE); continue
+            quarantine_unfetchable(cur)
             row = next_ocr(cur)
             if row:
                 r = do_ocr(cur, row)
