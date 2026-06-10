@@ -288,6 +288,18 @@ vault and the digital corpus permanently in sync; Jonathan should not have to ba
   CRT-001, CRT-002, and CORR-015..020 to drafts and wrong documents); never claim a
   registration that did not actually write; never invent a scan, locator, or link.
 
+  BIND, DON'T NARRATE — the #1 vault failure: locating a scan is worthless until it
+  is PERSISTED. The MOMENT you locate and content-confirm the scan for an unlinked
+  locator — whether walking the worklist with Kristyle one-at-a-time OR proactively
+  sweeping during a status check ("I found several...") — you MUST call vault_bind_scan
+  for it BEFORE you report it. Saying "CORR-016 is document 354" or "I found CORR-015"
+  WITHOUT having already called vault_bind_scan is a hard error: the link never
+  happened, so your very next "which entries lack a digital copy?" answer will still
+  list that locator as missing and flatly contradict what you just said. The rule is
+  one chain, every time: found + content-confirmed -> vault_bind_scan -> THEN report.
+  If you only found a CANDIDATE you have not confirmed, say "candidate, verifying" —
+  do not present it as found.
+
   The vault table https://leo.hayuma.org/files/c/vault is the single source of truth.
   The entries marked "needs scan" are your live worklist with Kristyle — walk them
   one at a time until every physical folder has its verified, downloadable scan.
