@@ -40,6 +40,25 @@ DRIVE_CREDS_PATH = "/root/landtek/google-creds.json"
 
 LEO_TOOLS = [
     {
+        "name": "case_evidence",
+        "description": (
+            "The VERIFIED case foundation for a Keesey (MWK) case question: returns "
+            "the matching claim(s), the truth_negotiator VERDICT (verified/uncertain/"
+            "refuted), and the CONFIRMED evidence documents with download links — "
+            "already cited and curated. Call this FIRST for any question about the "
+            "case theory (why Balane's title is void, the SPA revocation, whether a "
+            "title is a separate matter, etc.). It is more complete than re-searching "
+            "and will not miss the key proof documents."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "topic": {"type": "string", "description": "what the question is about, e.g. 'Balane title void', 'Cesar SPA revocation', 'T-30683 separate matter'"},
+            },
+            "required": ["topic"],
+        },
+    },
+    {
         "name": "semantic_search",
         "description": (
             "Search the corpus by MEANING (vector search) — finds the right "
@@ -442,10 +461,36 @@ def t_search_drive(args):
                     "modified": f.get("modifiedTime", "")[:19],
                     "mime": f.get("mimeType", "").split(".")[-1],
                 })
+        # CLIENT ISOLATION — the Drive holds every client's files. Cross-reference
+        # each hit against the corpus's client tag and hide other clients' files
+        # (e.g. an Inocalla/Paracale 'Labo' file must not show up in a Keesey search).
+        client = (args.get("client") or "MWK-001")
+        other = {}
+        if out:
+            try:
+                conn, cur = _db()
+                cur.execute("SELECT drive_file_id, case_file FROM documents WHERE drive_file_id = ANY(%s)",
+                            ([o["drive_id"] for o in out],))
+                cfmap = {r["drive_file_id"]: r["case_file"] for r in cur.fetchall()}
+                cur.close(); conn.close()
+                kept = []
+                for o in out:
+                    cf = cfmap.get(o["drive_id"])
+                    if cf and cf != client:
+                        other[cf] = other.get(cf, 0) + 1
+                    else:
+                        kept.append(o)
+                out = kept
+            except Exception:
+                pass
+        note = ""
+        if other:
+            note = ("\n\nNOTE: " + ", ".join(f"{n} file(s) belong to {c}" for c, n in other.items())
+                    + " — a DIFFERENT CLIENT, hidden from this search. Do not use them here.")
         if not out:
-            return (f"No Drive files match '{q}' by name or content. "
-                    "It may be an image-only scan (no searchable text) or not uploaded yet.")
-        return f"Found {len(out)} Drive files for '{q}':\n" + json.dumps(out[:limit*2], indent=2)
+            return (f"No Drive files for '{q}' in this client.{note} "
+                    "It may be an image-only scan, not uploaded, or another client's file.")
+        return f"Found {len(out)} Drive files for '{q}' (client {client}):\n" + json.dumps(out[:limit*2], indent=2) + note
     except Exception as e:
         return f"Drive search failed: {e}"
 
@@ -740,7 +785,45 @@ def t_semantic_search(args):
     return f"Semantic matches for {query!r} (ranked by meaning):\n" + json.dumps(out, indent=2)
 
 
+def t_case_evidence(args):
+    """The VERIFIED case foundation (truth layer) for a topic/claim: the
+    truth_negotiator verdict + the CONFIRMED evidence_trail exhibits with download
+    links. Use this FIRST for any question about a Keesey case claim — it is already
+    cited and more complete than re-searching the corpus (which can miss key docs)."""
+    topic = (args.get("topic") or args.get("query") or "").strip().lower()
+    words = [w.strip(".,()") for w in topic.replace("/", " ").split() if len(w.strip(".,()")) >= 4]
+    conn, cur = _db()
+    cur.execute("SELECT id, short_label, claim_text FROM claims WHERE case_file='MWK-001' ORDER BY priority DESC NULLS LAST, id")
+    claims = cur.fetchall()
+    sel = [c for c in claims if any(w in (c["claim_text"] + " " + (c["short_label"] or "")).lower() for w in words)] if words else claims
+    if not sel:
+        sel = claims
+    cur.execute("SELECT claim_id, verdict, citation_tag FROM claim_truth_verdicts")
+    verd = {r["claim_id"]: (r["verdict"], r["citation_tag"]) for r in cur.fetchall()}
+    out = []
+    for c in sel[:4]:
+        cur.execute("""SELECT e.supporting_doc_id did, e.relation_kind rk, e.weight wt,
+                          COALESCE(NULLIF(d.smart_filename,''), d.original_filename) nm,
+                          (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) dl
+                       FROM evidence_trail e JOIN documents d ON d.id=e.supporting_doc_id
+                      WHERE e.claim_id=%s
+                      ORDER BY CASE e.weight WHEN 'primary' THEN 0 WHEN 'strong' THEN 1 WHEN 'moderate' THEN 2 ELSE 3 END""",
+                    (c["id"],))
+        ex = [{"doc_id": r["did"], "as": r["rk"], "weight": r["wt"], "name": (r["nm"] or "")[:58],
+               "download_link": (f"https://leo.hayuma.org/files/c/{r['did']}" if r["dl"] else None)}
+              for r in cur.fetchall()]
+        vd, ct = verd.get(c["id"], ("not yet checked", ""))
+        out.append({"claim": c["short_label"], "statement": c["claim_text"],
+                    "truth_verdict": vd, "citation_tag": ct, "confirmed_evidence": ex})
+    cur.close(); conn.close()
+    if not out:
+        return "No matching case claim. Use semantic_search / query_documents."
+    return ("VERIFIED case foundation (truth layer — cite these, they are confirmed):\n"
+            + json.dumps(out, indent=2))
+
+
 TOOL_FUNCTIONS = {
+    "case_evidence":         t_case_evidence,
     "semantic_search":       t_semantic_search,
     "query_documents":       t_query_documents,
     "read_document":         t_read_document,

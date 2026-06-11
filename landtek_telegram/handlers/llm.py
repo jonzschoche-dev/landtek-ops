@@ -131,6 +131,14 @@ affidavit for Patricia's birth registration — that specific affidavit is an MW
 document; his own Paracale-001 case files are not. Judge by the document's client,
 not by a name that appears in it.
 
+FOR CASE-THEORY QUESTIONS, USE THE TRUTH LAYER FIRST. If the question is about the
+case theory — why a title is void, whether the SPA was revoked, whether a parcel is
+a separate matter, what proves a claim — call case_evidence(topic) BEFORE anything
+else. It returns the truth_negotiator's VERDICT plus the CONFIRMED, cited evidence
+documents. That is the indisputable layer: cite those docs and their verdict. Plain
+corpus search can MISS key proof documents (it has before) — case_evidence will not.
+Only fall through to the searches below for documents not covered by a claim.
+
 SEARCH PROPERLY BEFORE EVER SAYING "NOT FOUND" (three places, not one):
   1. semantic_search FIRST — it finds documents by MEANING ("affidavit of adverse
      claim from Patricia", "the mayor's october letter"), so it catches things even
