@@ -512,17 +512,22 @@ def _call_anthropic_once(system_prompt, messages, max_tokens=600, include_tools=
     body = {
         "model": MODEL,
         "max_tokens": max_tokens,
-        "system": system_prompt,
+        # PROMPT CACHING: the ~4k-token system prompt is static and re-sent on every
+        # call + every tool round. Marking it (and the tool schemas) cacheable cuts
+        # that repeated input cost ~90% on cache hits. No behaviour change.
+        "system": [{"type": "text", "text": system_prompt,
+                    "cache_control": {"type": "ephemeral"}}],
         "messages": messages,
     }
     if LEO_TOOLS and include_tools:
-        body["tools"] = LEO_TOOLS
+        body["tools"] = LEO_TOOLS[:-1] + [{**LEO_TOOLS[-1], "cache_control": {"type": "ephemeral"}}]
     req = urllib.request.Request(
         "https://api.anthropic.com/v1/messages",
         data=json.dumps(body).encode("utf-8"),
         headers={
             "x-api-key": ANTHROPIC_KEY,
             "anthropic-version": "2023-06-01",
+            "anthropic-beta": "prompt-caching-2024-07-31",
             "content-type": "application/json",
         },
         method="POST",
