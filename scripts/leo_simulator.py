@@ -60,6 +60,17 @@ def main():
                 time.sleep(HEALTH_PAUSE_SEC)
                 continue
 
+            try:  # cost governor: synthetic load stops at the daily cap (never re-drains the balance)
+                import sys as _s
+                _s.path.insert(0, "/root/landtek/scripts")
+                import cost_governor as _cg
+                if not _cg.can_afford("sim"):
+                    print(f"[leo_simulator] over daily LLM cap (${_cg.today_spend():.2f}) — pausing", flush=True)
+                    cur.close(); conn.close()
+                    time.sleep(HEALTH_PAUSE_SEC); continue
+            except Exception:
+                pass
+
             probe = pick_probe(cur)
             if not probe:
                 cur.close()

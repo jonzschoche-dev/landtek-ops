@@ -11,7 +11,8 @@ Run as systemd service landtek-truth-loop.
 import os, sys, time
 sys.path.insert(0, "/root/landtek/scripts")
 import truth_qa  # loads .env, llm, BANK, grade
-import truth_judge  # Opus senior-litigator grader (lawyer-grade)
+import truth_judge  # senior-litigator grader (lawyer-grade)
+import cost_governor  # daily spend cap — QA throttles itself, never burns the balance
 import psycopg2, psycopg2.extras
 from landtek_telegram.handlers import llm
 
@@ -55,6 +56,9 @@ def main():
                 sysp = llm.SYSTEM_PROMPT_PRIVATE_JONATHAN_TEMPLATE.format(
                     matters_block=llm._live_matters_block(), vault_state_block=llm._live_vault_state())
                 built = time.time()
+            if not cost_governor.can_afford("qa"):
+                log(f"over daily LLM cap (${cost_governor.today_spend():.2f}) — holding probes")
+                time.sleep(PACE); continue
             case = bank[i % len(bank)]
             try:
                 reply, err = llm._call_anthropic(sysp, case["q"], [])

@@ -534,7 +534,15 @@ def _call_anthropic_once(system_prompt, messages, max_tokens=600, include_tools=
     )
     try:
         with urllib.request.urlopen(req, timeout=60) as r:
-            return json.loads(r.read().decode("utf-8")), None
+            payload = json.loads(r.read().decode("utf-8"))
+        try:  # cost governor: log real token usage (incl. cache) — never blocks the reply
+            import sys as _s
+            _s.path.insert(0, "/root/landtek/scripts")
+            import cost_governor as _cg
+            _cg.record(MODEL, payload.get("usage", {}), "leo")
+        except Exception:
+            pass
+        return payload, None
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="replace")[:300]
         return None, f"http_{e.code}: {err_body}"
