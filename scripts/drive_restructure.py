@@ -44,6 +44,20 @@ def ensure_folder(parent_id, name, apply):
     return f["id"]
 
 
+def client_from_name(name):
+    """Fallback client detection for untagged files (e.g. Google-Doc drafts not in
+    the corpus): infer from distinctive names in the filename."""
+    n = (name or "").lower()
+    if any(k in n for k in ("inocalla", "paracale", "bombita", "vicente", "panganiban",
+                            "gumamela", "capacuan", "pgc", "nibdc")):
+        return "Allan Inocalla - LTC-001"
+    if any(k in n for k in ("keesey", "worrick", "patricia", "balane", "mercedes",
+                            "zschoche", "de la fuente", "dela fuente", "botor", "macale",
+                            "pajarillo", "4497", "26-360", "1378", "1210", "guardianship")):
+        return "Heirs of Mary Worrick Keesey- LTC-002"
+    return None
+
+
 def category(classification, doc_date, fname=""):
     # classification is often NULL on loose scans — the FILENAME usually says the type.
     c = ((classification or "") + " " + (fname or "")).lower()
@@ -66,6 +80,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default="root", help="root | ScannerPro | Drafts")
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--into", help="force all files into this client subfolder (overrides category, e.g. Drafts)")
     ap.add_argument("--limit", type=int, default=0)
     args = ap.parse_args()
 
@@ -92,10 +107,12 @@ def main():
         cf = (r or {}).get("case_file")
         folder_name = CLIENT_FOLDER.get(cf)
         if not folder_name or folder_name not in client_ids:
+            folder_name = client_from_name(f["name"])  # fallback for untagged drafts
+        if not folder_name or folder_name not in client_ids:
             print(f"  SKIP  {f['name'][:46]:46}  (client={cf or 'untagged'})")
             skipped += 1
             continue
-        path = category((r or {}).get("classification"), (r or {}).get("doc_date"), f["name"])
+        path = [args.into] if args.into else category((r or {}).get("classification"), (r or {}).get("doc_date"), f["name"])
         parent = client_ids[folder_name]
         for seg in path:
             parent = ensure_folder(parent, seg, args.apply)
