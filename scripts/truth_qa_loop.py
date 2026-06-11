@@ -15,7 +15,7 @@ import truth_judge  # Opus senior-litigator grader (lawyer-grade)
 import psycopg2, psycopg2.extras
 from landtek_telegram.handlers import llm
 
-PACE = 360          # seconds between probes (~10 probes/hr -> full bank ~hourly, ~240/day)
+PACE = 1800         # 30 min between probes (cost-tuned: ~48/day, full bank every ~5h)
 PROMPT_TTL = 3600   # rebuild the system prompt hourly (matters/vault state change)
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 

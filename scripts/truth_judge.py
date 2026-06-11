@@ -9,7 +9,9 @@ counsel. Returns a letter grade + specific defects.
 import json, os, re, urllib.request
 import psycopg2, psycopg2.extras
 
-OPUS_MODEL = "claude-opus-4-5-20251101"
+# Cost-tuned: Sonnet-4.5 is a sharp legal grader at ~12x lower cost than Opus.
+# Override with TRUTH_JUDGE_MODEL if a probe needs Opus-grade scrutiny.
+OPUS_MODEL = os.environ.get("TRUTH_JUDGE_MODEL", "claude-sonnet-4-5-20250929")
 OPUS_URL = "https://api.anthropic.com/v1/messages"
 
 
