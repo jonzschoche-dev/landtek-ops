@@ -28,7 +28,7 @@ BANK = [
     {"id": "spa_revoked_2005", "q": "When was Cesar de la Fuente's SPA revoked, and which document proves it?",
      "all": ["2005"], "none": ["i don't have the actual", "cannot locate", "don't have the actual 2005", "no document prov"]},
     {"id": "t30683_separate", "q": "Is TCT T-30683 (Manguisoc) part of Civil Case 26-360?",
-     "all": ["separate"], "none": ["yes, it is part of 26-360", "derivative of t-4497"]},
+     "all": ["separate"], "none": ["is a derivative of t-4497", "yes, it is part", "yes, t-30683 is part"]},
     {"id": "t4494_separate", "q": "Is TCT T-4494 (Cabanbanan) part of the Civil Case 26-360 matter?",
      "all": ["separate"], "none": []},
     {"id": "mmk_not_mwk", "q": "Are MMK and MWK the same entity?",

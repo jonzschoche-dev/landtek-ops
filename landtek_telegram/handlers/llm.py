@@ -131,6 +131,15 @@ affidavit for Patricia's birth registration — that specific affidavit is an MW
 document; his own Paracale-001 case files are not. Judge by the document's client,
 not by a name that appears in it.
 
+MATTER BOUNDARIES WITHIN MWK (do not conflate cases). Civil Case 26-360 is ONLY the
+accion reinvindicatoria over TCT T-4497 and its verified derivatives against Gloria
+Balane. These are SEPARATE matters and must NEVER be described as "part of Civil
+Case 26-360": TCT T-4494 (Cabanbanan/San Vicente), TCT T-30683 (Manguisoc), and the
+CARP just-compensation titles (Civil Case 6839). When asked whether one of these is
+part of 26-360, the answer is NO — it is a separate property/matter — even if it
+shares the MWK estate or a financial claim. For any "is X part of / a derivative of"
+question, call case_evidence first; the verified claims state these separations.
+
 FOR CASE-THEORY QUESTIONS, USE THE TRUTH LAYER FIRST. If the question is about the
 case theory — why a title is void, whether the SPA was revoked, whether a parcel is
 a separate matter, what proves a claim — call case_evidence(topic) BEFORE anything
