@@ -312,6 +312,15 @@ def _render_matrix(case_file):
     for cid, doc, rel, wt, conf, rat in cur.fetchall():
         suggested.setdefault(cid, []).append((doc, rel, wt, conf, rat))
 
+    # truth layer: the truth_negotiator's verdict per claim (verified/uncertain/refuted)
+    verdicts = {}
+    try:
+        cur.execute("SELECT claim_id, verdict, citation_tag FROM claim_truth_verdicts")
+        for cid, vd, ct in cur.fetchall():
+            verdicts[cid] = (vd or "", ct or "")
+    except Exception:
+        pass
+
     docids = set()
     for d in list(confirmed.values()) + list(suggested.values()):
         for t in d:
@@ -364,10 +373,16 @@ def _render_matrix(case_file):
         ) or "<tr><td colspan=5 class='muted'>No pending suggestions.</td></tr>"
 
         elem_html = "".join(f"<li>{html.escape(str(e))}</li>" for e in elems)
+        vd, ct = verdicts.get(cid, ("", ""))
+        vcls = {"verified": "v-ok", "uncertain": "v-warn", "refuted": "v-bad",
+                "unsourced": "v-warn", "uncitable_draft": "v-bad"}.get(vd, "v-none")
+        vbadge = (f'<span class="verdict {vcls}">TRUTH: {html.escape(vd.upper())} '
+                  f'{html.escape(ct)}</span>' if vd else "")
         cards.append(f"""
 <div class="claim">
   <div class="chead"><span class="pill">{html.escape(kind or '')}</span>
     <span class="lbl">{html.escape(label or ('claim ' + str(cid)))}</span>
+    {vbadge}
     <span class="muted">&middot; {html.escape(cf or '')} &middot; priority {prio}</span></div>
   <div class="ctext">{html.escape(text or '')}</div>
   <div class="req"><b>Must prove:</b><ul>{elem_html or '<li class=muted>&mdash;</li>'}</ul></div>
@@ -403,6 +418,8 @@ def _render_matrix(case_file):
  .pill{{font-size:10px;padding:2px 6px;border-radius:10px;background:#eef;color:#334;margin-right:6px;text-transform:uppercase}}
  .prov{{font-size:10px;padding:1px 6px;border-radius:8px}}
  .prov-verified{{background:#d6f0df;color:#11703a}} .prov-inferred{{background:#fde9c8;color:#9a5b00}} .prov-weak{{background:#f3d6d6;color:#a11}}
+ .verdict{{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;letter-spacing:.03em}}
+ .v-ok{{background:#11703a;color:#fff}} .v-warn{{background:#9a5b00;color:#fff}} .v-bad{{background:#a11;color:#fff}} .v-none{{background:#eee;color:#888}}
 </style></head><body>
 <h1>Evidence Matrix &mdash; {scope}</h1>
 <div class="sub">{len(claims)} claims &middot; {n_conf} confirmed exhibits &middot; {n_sugg} suggested (pending review) &middot; live view</div>
