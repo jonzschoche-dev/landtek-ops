@@ -11,6 +11,7 @@ Run as systemd service landtek-truth-loop.
 import os, sys, time
 sys.path.insert(0, "/root/landtek/scripts")
 import truth_qa  # loads .env, llm, BANK, grade
+import truth_judge  # Opus senior-litigator grader (lawyer-grade)
 import psycopg2, psycopg2.extras
 from landtek_telegram.handlers import llm
 
@@ -38,9 +39,11 @@ def main():
     cur.execute("""CREATE TABLE IF NOT EXISTS truth_qa_results (
         id serial PRIMARY KEY, case_id text, passed bool, fails text, reply text,
         run_at timestamptz DEFAULT now())""")
-    cur.execute("""SELECT DISTINCT ON (case_id) case_id, passed FROM truth_qa_results
-                   ORDER BY case_id, run_at DESC""")
-    last_pass = {r["case_id"]: r["passed"] for r in cur.fetchall()}
+    for col, typ in (("grade", "text"), ("legal_pass", "bool"), ("defects", "text"), ("one_line", "text")):
+        cur.execute(f"ALTER TABLE truth_qa_results ADD COLUMN IF NOT EXISTS {col} {typ}")
+    cur.execute("""SELECT DISTINCT ON (case_id) case_id, coalesce(legal_pass, passed) lp
+                     FROM truth_qa_results ORDER BY case_id, run_at DESC""")
+    last_pass = {r["case_id"]: r["lp"] for r in cur.fetchall()}
 
     sysp, built = None, 0.0
     bank = truth_qa.BANK
@@ -57,16 +60,24 @@ def main():
                 reply, err = llm._call_anthropic(sysp, case["q"], [])
             except Exception as e:
                 reply, err = None, f"{type(e).__name__}: {e}"
-            fails = truth_qa.grade(case, reply)
-            passed = not fails
-            cur.execute("INSERT INTO truth_qa_results (case_id, passed, fails, reply) VALUES (%s,%s,%s,%s)",
-                        (case["id"], passed, "; ".join(fails) or None, (reply or err or "")[:2000]))
-            # regression: was passing, now fails -> one alert on the transition
-            if last_pass.get(case["id"]) is True and not passed:
-                log(f"REGRESSION {case['id']}: {'; '.join(fails)}")
-                alert(f"Truth-layer regression: '{case['id']}' now failing ({'; '.join(fails)[:120]}). Check truth_qa_results.")
-            last_pass[case["id"]] = passed
-            log(f"{'PASS' if passed else 'FAIL'} {case['id']}" + (f" — {'; '.join(fails)}" if fails else ""))
+            fails = truth_qa.grade(case, reply)              # fast substring tripwire
+            jg = truth_judge.judge(case["q"], reply or "", conn)  # lawyer-grade verdict
+            grade = jg.get("grade", "?")
+            legal_pass = bool(jg.get("pass"))
+            defects = "; ".join(jg.get("defects", []))[:600]
+            one_line = (jg.get("one_line") or "")[:300]
+            cur.execute("""INSERT INTO truth_qa_results
+                (case_id, passed, fails, reply, grade, legal_pass, defects, one_line)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (case["id"], not fails, "; ".join(fails) or None, (reply or err or "")[:2000],
+                 grade, legal_pass, defects or None, one_line or None))
+            # regression: was court-ready (A/B), now isn't -> one alert on the transition
+            if last_pass.get(case["id"]) is True and not legal_pass:
+                log(f"REGRESSION {case['id']} -> grade {grade}: {one_line}")
+                alert(f"Truth-layer regression: '{case['id']}' dropped to grade {grade}. "
+                      f"{one_line[:140]} Check truth_qa_results.")
+            last_pass[case["id"]] = legal_pass
+            log(f"{grade} {'PASS' if legal_pass else 'FAIL'} {case['id']}: {one_line[:90]}")
             i += 1
             if i % len(bank) == 0:
                 npass = sum(1 for v in last_pass.values() if v)
