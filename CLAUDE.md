@@ -1,12 +1,16 @@
-# ⚡ READ FIRST: /root/landtek/DIRECTIVE.md
+# ⚡ READ FIRST: MASTER_PLAN.md
 
-This is the authoritative 48-hour playbook (May 12-14, 2026).
-Run `cat /root/landtek/DIRECTIVE.md` before answering anything ambiguous from Jonathan.
-The directive defines:
-- What "go", "status", "extract X", "verify Y", "draft Z" mean
-- The accuracy posture (gemini-2.5-flash only, quality 0.8, 2-pass cross-validation)
-- Hard stops + safe operations
-- The North Star deliverables by May 14 noon Manila
+`MASTER_PLAN.md` is the single source of truth for current direction, status, and the north
+star. Read it before answering anything ambiguous from Jonathan. It is the **only** authoritative
+plan — **update it in place; never create parallel directive / roadmap / status / deployment-plan
+docs.** That sprawl, plus stale "READ FIRST" pointers into it, is exactly what kept dragging
+sessions back to a May-2026 reality (the old DIRECTIVE.md "48-hour playbook, May 12-14" was the
+worst offender). On 2026-06-12 the 9 prior planning docs were consolidated into `MASTER_PLAN.md`
+and moved to `archive/planning-2026-06/`.
+
+**North star (as of 2026-06-12): Aug 12, 2026 — Jonathan testifies as Patricia's witness** in Civil
+Case 26-360 (MTC Mercedes, Summary Procedure); live Summary-Judgment motion + Balane judicial-
+affidavit fight. (NOT the old "Aug 1 pre-trial"; pre-trial was May 13, passed.) See `MASTER_PLAN.md` §1.
 
 ---
 
