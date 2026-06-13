@@ -299,8 +299,15 @@ def main():
         handler = HANDLERS.get(kind)
         start = now_utc()
         if handler is None:
-            record_run(cur, probe["id"], "error", 0, {"reason": f"no handler for kind={kind}"})
-            stats["errored"] += 1
+            # synthetic_telegram_prompt / fabricated_inbound need the webhook-injection
+            # eval path (v2). The live leo-simulator IS that synthetic path; this runner
+            # owns the creditless reply-integrity probes (the 3 handlers above). Skip the
+            # v2 kinds cleanly instead of recording a false 'error' every tick.
+            if kind in ("synthetic_telegram_prompt", "fabricated_inbound"):
+                stats["skipped"] += 1
+            else:
+                record_run(cur, probe["id"], "error", 0, {"reason": f"no handler for kind={kind}"})
+                stats["errored"] += 1
             continue
         try:
             violations = handler(cur, probe)
