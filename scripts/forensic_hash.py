@@ -83,7 +83,7 @@ def _is_pdf(path):
 def ahash(img, n=8):
     """64-bit average hash from a PIL grayscale image."""
     small = img.resize((n, n))
-    px = list(small.getdata())
+    px = list(small.tobytes())   # 'L' mode → one byte per pixel; avoids the getdata deprecation
     avg = sum(px) / len(px)
     bits = 0
     for i, p in enumerate(px):

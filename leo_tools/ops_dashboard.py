@@ -351,21 +351,20 @@ _REQUIREMENTS = [
 # pillar: (n, name, status, progress%, next-step)
 _PILLARS = [
     (1, "Evidence &amp; Knowledge", "built", 85, "citations + immutable assertions live"),
-    (2, "Legal Case Mgmt", "active", 70, "chain-of-title + Balane spine; geospatial engine added"),
+    (2, "Legal Case Mgmt", "active", 80, "chain-of-title + Balane spine + geospatial (engine/parcels/vision/map); next: georeference + per-lot segmentation"),
     (3, "Finance &amp; Accounting", "early", 30, "ledger + P&amp;L/ROI views live; bill-extraction next"),
     (4, "Property Mgmt", "planned", 0, "v2.0 — tenants/rent/leases"),
     (5, "Proactive Intelligence", "partial", 40, "agentic calendar next"),
     (6, "Forensic &amp; Compliance", "early", 45, "hashing + dup detection live; signature-val next"),
-    (7, "Platform &amp; Access", "partial", 45, "RBAC formalization + omnichannel"),
+    (7, "Platform &amp; Access", "partial", 55, "email channel feed built; RBAC formalization + WhatsApp/Messenger next"),
 ]
 _COLD_INFRA = [
     ("Cost-metering bridge", True), ("/ops/spend cockpit", True),
     ("leo_qa_runner finish", True), ("activate_stack.sh runbook", True),
     ("Survey-geometry engine", True), ("Trajectory dashboard", True),
     ("Forensic hashing", True), ("Finance schema", True),
-    ("Spatial DB + parcels", False), ("Map endpoint", False),
-    ("Survey vision-extract (Gemini)", False), ("Model-routing ladder", False),
-    ("Email channel", False),
+    ("Parcels + map endpoint", True), ("Survey vision-extract (Gemini)", True),
+    ("Model-routing ladder", True), ("Email channel feed", True),
 ]
 _SHIP_GATES = [
     ("Anthropic credit top-up", "blocked", "unlocks Leo + vision-extract + classify + routing + bill-extract"),
