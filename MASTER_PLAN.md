@@ -58,10 +58,25 @@
 ## 6. Roadmap (rebaselined to Aug 12 — legal deliverable first)
 
 1. **✅ in progress — Balane SJ/testimony pack** (spine → exhibit list → cross-exam outline). The only calendar-bound work; everything else yields to it.
-2. **Cost governance** — make the simulator's n8n spend visible + capped (the $40/day leak). Closes the Principle-8 violation.
-3. **Data integrity** — drain `pending_classification` on case-relevant docs; close title-chain holes; finish-process the live filings (exhibit-tier).
-4. **⚠️ Confirm/resolve carried-over blockers (status UNVERIFIED):** Bible Opus-audit "NO-GO / 5 existential fixes," outstanding demand-letter, DSN consolidation, auth-gate completion, heartbeat dashboard, auto-rollback sentinel. *Re-verify each before acting — do not assume still-open or still-closed.*
-5. **Web workspace v1** — deferred (peacetime; removes the single-cockpit/Termius dependency once the live matter is clear).
+2. **✅ Cost governance — DONE (deploy_427).** `scripts/anthropic_spend_bridge.py` records n8n/simulator token usage into `llm_spend`, so `cost_governor.can_afford()` now gates on TOTAL burn. Validated: 25 sim execs = $2.82 (~$0.11/probe, ~32k input tokens each — *that* was the ~$40/day). Live cockpit panel at `/ops/spend` (deploy_428). The cap becomes real the moment the bridge timer is enabled (see Activation).
+3. **Data integrity** — title-chain holes + live-filing exhibit-tier still open. **Corpus backlog (re-assessed 2026-06-13):** 938 docs at `pending_classification` = 703 OCR-able digital docs the backfill daemon isn't draining (idle despite eligible — needs a runtime look at its Qdrant-seed startup) + ~54 needing Drive/Gmail re-fetch + ~50 unsupported formats (.eml/.docx/zip/corrupt). **No automated `pending→classified` transition exists** (only one-shot `scannerpro_ingest.py` sets it); the missing classify step is LLM-dependent = credit-gated. This is an *operational* drain, not a creditless build.
+4. **Carried-over "blockers" — RE-VERIFIED 2026-06-13 (mostly de-haunted):** heartbeat dashboard ✅ exists (`/ops/health` + `/ops/spend`); auth-gate ✅ exists (`leo_tools/server.py`, `channel_adapters.py`; `/files/c/` is intentionally public); DSN "fragmentation" benign (3 env-var names → one DB); Bible pipeline built (`generate_case_bible.py` + `opus_validate_bible.py`) — only the Opus audit *verdict* is unverified (needs an Opus run = credit-gated); **auto-rollback sentinel genuinely not built** (mitigated by the truth_tests deploy gate + manual `git revert` — low priority). `leo_qa_runner` v2-stub kinds fixed (deploy_429).
+5. **Web workspace v1** — deferred (peacetime; the server-rendered Flask cockpit at `/ops` suffices for now; removes the Termius dependency only when the live matter is clear).
+
+## 6.5 Activation — flip the stack ON when credits land (architecture is in place)
+
+Everything is built cold and **inert**: the spend-bridge timer is disabled, the synthetic loops
+are paused/disabled, Leo answers only once `ANTHROPIC_API_KEY` has balance. Construction cost $0;
+only activation consumes tokens. One safe, ordered, idempotent step — run on the VPS from `/root/landtek`:
+
+    ./scripts/activate_stack.sh                  # DRY RUN — prints the plan, changes nothing
+    ./scripts/activate_stack.sh --go             # bridge FIRST, then truth-loop + fullstack-loop
+    ./scripts/activate_stack.sh --go --with-sim  # ALSO re-enable the simulator (opt-in; the big burner)
+
+Order is enforced for a reason: the **cost-metering bridge goes live before the loops**, or they burn
+invisibly again (the outage). The simulator is opt-in (~$47/day, ~1 verified improvement per 1,744
+probes — decide per §7 first; consider a wider cycle / lower `LANDTEK_DAILY_LLM_CAP`). After running,
+confirm `/ops/spend` shows recorded n8n spend + the cap enforcing, and that Leo replies.
 
 ## 7. Open decisions for Jonathan (still live)
 
@@ -77,6 +92,7 @@
 - **2026-05-13** — pre-trial held; case advanced to motion practice (phase change, not a slip).
 - **2026-06-02** — mediation held; May-2026 docs had targeted a "v1.0 by June 2" cut — not cut; north star reset to **Aug 12** (trial testimony).
 - **2026-06-13** — droplet upgraded 1 GB→2 GB RAM / 33→67 GB / +2 GB swap ($16/mo); load 1.8→0.5, freezes resolved. VPS git resynced **381→423** (had drifted 42 commits behind, phantom-dirty — running code already matched origin, only HEAD was stale). `notifications/pending.txt` gitignored to stop the recurring dirty-tree-blocks-pull friction that caused the drift.
+- **2026-06-13** — **stack-completion build (deploys 427–430), architecture-first / zero API spend:** cost-metering bridge (`anthropic_spend_bridge.py` → `llm_spend`; validated 25 execs = $2.82) + `/ops/spend` cockpit + `leo_qa_runner` v2-stub fix + `activate_stack.sh` runbook + carried-over blockers re-verified (mostly de-haunted). Synthetic loops removed from `fullstack_engineer` CRITICAL so SRE no longer auto-resurrects the paused sim. The stack is built + inert; it flips on via `activate_stack.sh` once credits are topped.
 - *(append entries as milestones move — cause + new date)*
 
 ## 9. Sources & related
