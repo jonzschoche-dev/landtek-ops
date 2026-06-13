@@ -71,6 +71,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("ingestion", "/ingestion", "Ingestion"),
         ("history", "/history", "History"),
         ("health", "/health", "Health"),
+        ("trajectory", "/trajectory", "Trajectory"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
@@ -336,6 +337,149 @@ def spend_panel():
 <p class="muted" style="margin-top:16px">Spend recorded by <code>scripts/anthropic_spend_bridge.py</code> (n8n) + the Leo handler (python); cap = <code>LANDTEK_DAILY_LLM_CAP</code>.</p>
 """
     return _layout("Spend", body, active="spend")
+
+
+# ── Trajectory / mission-control config (single source = MASTER_PLAN §4A; update as pillars advance) ──
+_REQUIREMENTS = [
+    ("Grounded", "ok", "truth_negotiator + _safe views + provenance grading"),
+    ("Durable", "ok", "verified rows survive (claim verdicts, P-1617 title row)"),
+    ("Complete corpus", "warn", None),   # % filled live below
+    ("Proactive", "warn", "daily_digest + sentinels exist; QA loops paused for cost"),
+    ("Affordable", "ok", "cost bridge + daily cap + /ops/spend (the $40/day leak sealed)"),
+]
+# pillar: (n, name, status, progress%, next-step)
+_PILLARS = [
+    (1, "Evidence &amp; Knowledge", "built", 85, "citations + immutable assertions live"),
+    (2, "Legal Case Mgmt", "active", 70, "chain-of-title + Balane spine; geospatial engine added"),
+    (3, "Finance &amp; Accounting", "planned", 10, "ledger schema scaffolding next"),
+    (4, "Property Mgmt", "planned", 0, "v2.0 — tenants/rent/leases"),
+    (5, "Proactive Intelligence", "partial", 40, "agentic calendar next"),
+    (6, "Forensic &amp; Compliance", "early", 25, "EXIF + perceptual/content hashing"),
+    (7, "Platform &amp; Access", "partial", 45, "RBAC formalization + omnichannel"),
+]
+_COLD_INFRA = [
+    ("Cost-metering bridge", True), ("/ops/spend cockpit", True),
+    ("leo_qa_runner finish", True), ("activate_stack.sh runbook", True),
+    ("Survey-geometry engine", True), ("Trajectory dashboard", True),
+    ("Spatial DB + parcels", False), ("Map endpoint", False),
+    ("Survey vision-extract (Gemini)", False), ("Model-routing ladder", False),
+    ("Finance schema", False), ("Forensic hashing", False), ("Email channel", False),
+]
+_SHIP_GATES = [
+    ("Anthropic credit top-up", "blocked", "unlocks Leo + vision-extract + classify + routing + bill-extract"),
+    ("Corpus drain (938 pending)", "open", "operational + classify is LLM-gated"),
+    ("Geospatial vision-extract", "open", "Gemini free-tier; feeds the parcel parser"),
+    ("Auto-rollback sentinel", "open", "low priority — truth_tests gate + manual revert cover it"),
+]
+_STATUS_BADGE = {"built": "badge-ok", "active": "badge-ok", "ok": "badge-ok",
+                 "partial": "badge-warn", "early": "badge-warn", "warn": "badge-warn", "open": "badge-warn",
+                 "planned": "badge-off", "blocked": "badge-bad"}
+
+
+def _bar(pct: int) -> str:
+    color = "#059669" if pct >= 80 else ("#2563eb" if pct >= 40 else "#d97706")
+    return (f'<div style="background:#e5e7eb;border-radius:6px;height:8px;margin-top:6px;overflow:hidden">'
+            f'<div style="background:{color};height:8px;width:{max(0,min(100,pct))}%"></div></div>')
+
+
+@bp.route("/trajectory")
+def trajectory():
+    """Mission control: every pillar's status, the cold-infra build progress, the gates
+    between here and a flawless ship, and live health — one screen for 'where are we?'"""
+    import sys as _s
+    _s.path.insert(0, "/root/landtek/scripts")
+    try:
+        import cost_governor as cg
+        spend_today = round(sum(cg.today_spend_by_source().values()), 2)
+        cap = float(cg.DAILY_CAP)
+    except Exception:
+        spend_today, cap = 0.0, 8.0
+
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    corpus = _safe_fetch(cur, conn, """
+        SELECT count(*) AS total,
+               count(*) FILTER (WHERE ingest_status='classified') AS classified,
+               count(*) FILTER (WHERE ingest_status='pending_classification') AS pending,
+               count(*) FILTER (WHERE master_form='digital' AND coalesce(ingest_status,'') NOT IN
+                     ('quarantined_dup','quarantined_ghost','quarantined_nobytes')) AS canonical
+          FROM documents
+    """, default={}, one=True) or {}
+    cur.close(); conn.close()
+
+    try:
+        deploy = subprocess.run(["git", "-C", "/root/landtek", "log", "-1", "--pretty=%s"],
+                                capture_output=True, text=True, timeout=5).stdout.strip()
+        deploy_tag = (deploy.split(":")[0] if deploy.startswith("deploy_") else "—")
+    except Exception:
+        deploy_tag = "—"
+
+    try:
+        days_to_ship = (datetime(2026, 8, 12, tzinfo=timezone.utc) - datetime.now(timezone.utc)).days
+    except Exception:
+        days_to_ship = "—"
+
+    overall = round(sum(p[3] for p in _PILLARS) / len(_PILLARS))
+    corpus_pct = _pct(corpus.get("canonical", 0), corpus.get("total", 1))
+
+    # requirements row (fill the corpus % live)
+    req_cards = ""
+    for name, status, note in _REQUIREMENTS:
+        if name == "Complete corpus":
+            note = f"{corpus.get('canonical',0)}/{corpus.get('total',0)} canonical · {corpus.get('pending',0)} pending"
+        req_cards += (f'<div class="card"><h2>{name}</h2>'
+                      f'<span class="badge {_STATUS_BADGE.get(status,"badge-off")}">{status}</span>'
+                      f'<div class="stat-sub" style="margin-top:6px">{_esc(note or "")}</div></div>')
+
+    pillar_cards = ""
+    for n, name, status, pct, nxt in _PILLARS:
+        pillar_cards += (f'<div class="card"><h2>Pillar {n} — {name}</h2>'
+                         f'<span class="badge {_STATUS_BADGE.get(status,"badge-off")}">{status}</span>'
+                         f'<span class="stat-sub" style="float:right">{pct}%</span>{_bar(pct)}'
+                         f'<div class="stat-sub" style="margin-top:8px">next: {_esc(nxt)}</div></div>')
+
+    done = sum(1 for _, ok in _COLD_INFRA if ok)
+    infra_chips = " ".join(
+        f'<span class="badge {"badge-ok" if ok else "badge-off"}">{"✓" if ok else "○"} {_esc(label)}</span>'
+        for label, ok in _COLD_INFRA)
+
+    gate_rows = "".join(
+        f'<tr><td><span class="badge {_STATUS_BADGE.get(st,"badge-off")}">{st}</span></td>'
+        f'<td>{_esc(name)}</td><td class="muted">{_esc(note)}</td></tr>'
+        for name, st, note in _SHIP_GATES)
+
+    body = f"""
+<h1>Trajectory to Ship</h1>
+<p class="lead">North star: <b>Aug 12, 2026</b> — Jonathan testifies (Civil Case 26-360). Build is architecture-first; the intelligence layer lights up on credit top-up.</p>
+<div class="grid grid-4">
+  {_stat_card("Overall readiness", f"{overall}%", "weighted across 7 pillars")}
+  {_stat_card("Days to north star", days_to_ship, "Aug 12, 2026")}
+  {_stat_card("Cold infra", f"{done}/{len(_COLD_INFRA)}", "scaffolding built")}
+  {_stat_card("Latest deploy", deploy_tag, "git HEAD")}
+</div>
+
+<div class="section-title">5 Readiness Requirements</div>
+<div class="grid grid-3">{req_cards}</div>
+
+<div class="section-title">7 Capability Pillars</div>
+<div class="grid grid-2">{pillar_cards}</div>
+
+<div class="section-title">Cold-infra build sequence ({done}/{len(_COLD_INFRA)} done)</div>
+<div class="card">{infra_chips}</div>
+
+<div class="section-title">Gates between here and a flawless ship</div>
+<div class="card"><table><tr><th>Status</th><th>Gate</th><th>Why it matters</th></tr>{gate_rows}</table></div>
+
+<div class="section-title">Live signals</div>
+<div class="grid grid-4">
+  {_stat_card("Spend today", f"${spend_today:.2f} / ${cap:.0f}", "cap enforced via cost bridge")}
+  {_stat_card("Corpus", f"{corpus_pct}", f"{corpus.get('canonical',0)} canonical · {corpus.get('pending',0)} pending")}
+  {_stat_card("Proof clients", "2", "MWK-001 · Paracale-001")}
+  {_stat_card("Cost target", "$6–15/day", ">85% inference margin")}
+</div>
+<p class="muted" style="margin-top:14px">Pillar status is curated from MASTER_PLAN §4A; live signals are real-time. See also <a href="/ops/spend">Spend</a> · <a href="/ops/health">Health</a>.</p>
+"""
+    return _layout("Trajectory", body, active="trajectory")
 
 
 def _safe_fetch(cur, conn, sql: str, params=(), default=None, one: bool = False):
