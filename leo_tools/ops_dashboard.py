@@ -71,6 +71,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("ingestion", "/ingestion", "Ingestion"),
         ("history", "/history", "History"),
         ("health", "/health", "Health"),
+        ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
     ]
@@ -234,6 +235,107 @@ def _timer_rows() -> list[dict]:
             "note": "timer",
         })
     return rows
+
+
+def _svc_state(unit: str):
+    """(active, enabled) for a systemd unit, best-effort."""
+    def _run(args):
+        try:
+            return (subprocess.run(args, capture_output=True, text=True, timeout=5).stdout or "").strip()
+        except Exception:
+            return "?"
+    return _run(["systemctl", "is-active", unit]), _run(["systemctl", "is-enabled", unit])
+
+
+# Loops that burn the shared Anthropic balance — should read inactive/disabled until
+# the spend bridge is on AND credits are topped (otherwise they re-drain, like the outage).
+_SPEND_LOOPS = [
+    ("leo-simulator", "Leo simulator (n8n burn)"),
+    ("landtek-truth-loop", "Truth QA loop"),
+    ("landtek-fullstack-loop", "Fullstack SRE loop"),
+]
+# Core services that must stay active for real Leo to work.
+_CORE_UNITS = [
+    ("landtek-tg-router", "Telegram router (real Leo)"),
+    ("landtek-tg-inbox", "Telegram inbox"),
+    ("landtek-corpus-backfill", "Corpus backfill"),
+]
+
+
+@bp.route("/spend")
+def spend_panel():
+    """System & Spend cockpit: real LLM burn by source vs the daily cap, which
+    loops are on/off, and a credit warning — the screen that makes a silent credit
+    drain (the kind that took Leo down) impossible to miss."""
+    import sys as _s
+    _s.path.insert(0, "/root/landtek/scripts")
+    try:
+        import cost_governor as cg
+        by_src = cg.today_spend_by_source()
+        cap = float(cg.DAILY_CAP)
+    except Exception:
+        by_src, cap = {}, 8.0
+    total = round(sum(by_src.values()), 4)
+
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    n8n_exec = _safe_fetch(cur, conn, """
+        SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE status = 'error') AS err
+          FROM execution_entity
+         WHERE "startedAt" > now() - interval '24 hours'
+    """, default={}, one=True) or {}
+    cur.close()
+    conn.close()
+
+    bridge_active, bridge_enabled = _svc_state("landtek-spend-bridge.timer")
+
+    alerts = []
+    if total >= cap:
+        alerts.append(f'<div class="alert alert-bad">LLM spend today ${total:.2f} has hit the ${cap:.0f} cap — synthetic loops are now blocked by can_afford()</div>')
+    elif total >= cap * 0.75:
+        alerts.append(f'<div class="alert alert-warn">LLM spend today ${total:.2f} is near the ${cap:.0f} cap</div>')
+    if bridge_active != "active" and bridge_enabled != "enabled":
+        alerts.append('<div class="alert alert-warn">Spend bridge is OFF — n8n / simulator spend is NOT being recorded, so cost is partially blind. The activation runbook enables it FIRST.</div>')
+
+    if by_src:
+        spend_cards = "".join(_stat_card(src, f"${amt:.2f}", "today") for src, amt in by_src.items())
+    else:
+        spend_cards = _stat_card("LLM spend today", "$0.00", "nothing recorded yet")
+    spend_cards += _stat_card("Total vs cap", f"${total:.2f} / ${cap:.0f}",
+                              "synthetic stops at cap · client work to 3×")
+
+    def _svc_card(unit, label, want_off=False):
+        a, e = _svc_state(unit)
+        ok = (a == "active")
+        good = (not ok) if want_off else ok
+        badge = "badge-ok" if good else ("badge-off" if want_off else "badge-bad")
+        return (f'<div class="card"><h2>{_esc(label)}</h2>'
+                f'<div><span class="badge {badge}">{_esc(a)}</span> '
+                f'<span class="badge badge-off">{_esc(e)}</span></div>'
+                f'<div class="stat-sub">{_esc(unit)}</div></div>')
+
+    loop_cards = "".join(_svc_card(u, l, want_off=True) for u, l in _SPEND_LOOPS)
+    core_cards = "".join(_svc_card(u, l) for u, l in _CORE_UNITS)
+    n8n_total = n8n_exec.get("total") or 0
+
+    body = f"""
+<h1>System &amp; Spend</h1>
+<p class="lead">Real LLM burn by source vs the daily cap, and what's turned on — the screen that makes a silent credit drain impossible.</p>
+{''.join(alerts) or '<div class="alert alert-ok">Spend within cap.</div>'}
+<div class="section-title">LLM spend today (real — from llm_spend, incl. n8n via the bridge)</div>
+<div class="grid grid-4">{spend_cards}</div>
+<div class="section-title">Synthetic loops — should read inactive/disabled until metering + credits</div>
+<div class="grid grid-3">{loop_cards}</div>
+<div class="section-title">Core services (must stay active for real Leo)</div>
+<div class="grid grid-3">{core_cards}</div>
+<div class="section-title">n8n + cost bridge</div>
+<div class="grid grid-4">
+  {_stat_card("n8n execs 24h", n8n_total, f"{n8n_exec.get('err', 0)} errored")}
+  {_stat_card("Spend bridge", bridge_active, f"enabled={bridge_enabled}")}
+</div>
+<p class="muted" style="margin-top:16px">Spend recorded by <code>scripts/anthropic_spend_bridge.py</code> (n8n) + the Leo handler (python); cap = <code>LANDTEK_DAILY_LLM_CAP</code>.</p>
+"""
+    return _layout("Spend", body, active="spend")
 
 
 def _safe_fetch(cur, conn, sql: str, params=(), default=None, one: bool = False):
