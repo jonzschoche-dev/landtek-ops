@@ -25,9 +25,13 @@ for _l in open("/root/landtek/.env"):
 
 PACE = 420          # 7 min between full sweeps
 DISK_WARN, DISK_CRIT = 85, 92
+# NOTE (2026-06-13): leo-simulator + landtek-truth-loop deliberately REMOVED from CRITICAL.
+# They are synthetic-QA loops that burn the shared Anthropic balance; the SRE loop used to
+# auto-resurrect the simulator within ~25s of any pause, re-draining credits and starving
+# real Leo. Operator-paused until their spend is metered/capped. Do NOT re-add without
+# re-instrumenting cost. Real Telegram path + tools + corpus stay protected.
 CRITICAL = ["landtek-tg-router", "landtek-tg-inbox", "landtek-tg-media",
-            "leo-tools", "landtek-corpus-backfill", "landtek-truth-loop",
-            "leo-simulator.service"]
+            "leo-tools", "landtek-corpus-backfill"]
 OPUS_EVERY = 8       # Opus review every ~1hr (8 * 7min)
 
 

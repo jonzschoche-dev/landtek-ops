@@ -657,9 +657,16 @@ def handle(row):
     context = _recent_context(chat_id)
     reply, err = _call_anthropic(system_prompt, text, context)
     if reply is None:
-        # API failed — fall back to a concise honest message rather than ghost
-        _reply(chat_id, "I'm having trouble thinking right now — give me a moment, "
-                       "or send the message as a vault command if it's a vault action.")
+        # API failed — fall back to a concise honest message rather than ghost.
+        # Make the credit-balance case explicit so "not working" reads as "out of
+        # credit, top up" instead of a vague glitch (deploy_426).
+        if err and "credit balance" in err.lower():
+            _reply(chat_id, "I'm temporarily out of Anthropic API credit, so I can't "
+                           "answer right now. Top up at console.anthropic.com (Plans & "
+                           "Billing) and I'll be back online immediately.")
+        else:
+            _reply(chat_id, "I'm having trouble thinking right now — give me a moment, "
+                           "or send the message as a vault command if it's a vault action.")
         return {"handler": "llm", "outcome": f"api_failed:{err[:80]}",
                 "reply_sent": True}
 
