@@ -47,6 +47,34 @@
 - **5 elite layers:** per-matter · per-portfolio · per-firm · per-channel · per-jurisdiction.
 - **Phases:** 0 safety substrate · 1 data integrity · 2 relational + financial · 3 autonomous agency · 4 channels · 5 multi-jurisdiction. **⚠️ All May-2026 phase timelines are obsolete — rebaseline against Aug 12.**
 
+## 4A. North-Star vision — the full product (7 pillars · from artifact v1.1, 2026-06-13)
+
+The complete arc Leo is built toward (vision doc: **claude.ai artifact `1893ca64`, v1.1**).
+MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — keep them linked.
+
+**5 readiness requirements:** Grounded · Durable · Complete-corpus · Proactive · Affordable.
+
+**7 capability pillars** (status grounded in the box, 2026-06-13):
+1. **Evidence & Knowledge** — grounded memory, citations, immutable assertions. **Built (strong).**
+2. **Legal Case Mgmt** — matters, chain of title, deadlines, evidence spine. **Active (the Aug-12 focus).**
+3. **Finance & Accounting** — ledger, bill extraction, P&L, per-matter ROI. **Planned v1.5** (QuickBooks integration available in-env).
+4. **Property Mgmt** — tenants, rent, leases, maintenance, permits. **Planned v2.0.**
+5. **Proactive Intelligence** — daily briefs, sentinels, autonomous discovery. **Partial** (`daily_digest` + sentinels exist).
+6. **Forensic & Compliance** — signature/authentication, audit chain, OpenTimestamps. **Early** (`fraud_indicators` + audit exist; signature-validation not built).
+7. **Platform & Access** — multi-client, 4-layer RBAC, billing, omnichannel. **Partial** (client isolation + auth-gate exist).
+
+**Net-new capability dimensions (were NOT in MASTER_PLAN):**
+- **Geospatial** — PostGIS parcels, survey-plan georeferencing, geotagged-photo-vs-titled-boundary, PRS92↔WGS84. Directly unlocks the **Inocalla/Keesey maps + boundary proof**; ~65 metes-and-bounds survey docs already in corpus to build from. **Infra note:** the live DB image (`pgvector/pg15`) has **no PostGIS** → geospatial needs a **separate spatial DB**, never an extension on the production DB.
+- **Multimodal vision** — Claude/Gemini vision, object detection, EXIF + perceptual hashing (feeds Forensic).
+- **Omnichannel** — Telegram (live) → Email → Messenger/WhatsApp/Viber via one channel-abstraction layer.
+- **Agentic calendar** — derive obligations from docs, work backward from hard deadlines, lead-time alerts.
+
+**Model-cost ladder (routing target ≈ 70% inference cut):** Opus $15/$75 (hard legal synthesis only) · Sonnet $3/$15 (default) · Haiku $0.80/$4 (classify/route) · GPT-4o-mini $0.15/$0.60 (bulk extract) · Gemini Flash $0.075/$0.30 (embeddings).
+
+**OCR (correction vs artifact):** running stack is **Gemini vision (free tier) + Tesseract**; "Google Document AI" is a *planned premium-tier upgrade*, not current.
+
+**Proof clients before GA:** MWK-001 (title recovery) + Paracale-001 (estate/mining/construction). Targets: $6–15/day burn · $15–80/mo per-client inference · PHP 15–50k/mo retainer · >85% margin.
+
 ## 5. Operating model (multi-agent — condensed; full git protocol in CLAUDE.md)
 
 - **Two agents:** VPS Claude (`/root/landtek`, runtime/ops) + Mac Claude (`~/landtek`, authoring/design). Both push to `landtek-ops`. Mac auto-sync launchd pulls every 2 min (fast-forward only).
@@ -62,6 +90,7 @@
 3. **Data integrity** — title-chain holes + live-filing exhibit-tier still open. **Corpus backlog (re-assessed 2026-06-13):** 938 docs at `pending_classification` = 703 OCR-able digital docs the backfill daemon isn't draining (idle despite eligible — needs a runtime look at its Qdrant-seed startup) + ~54 needing Drive/Gmail re-fetch + ~50 unsupported formats (.eml/.docx/zip/corrupt). **No automated `pending→classified` transition exists** (only one-shot `scannerpro_ingest.py` sets it); the missing classify step is LLM-dependent = credit-gated. This is an *operational* drain, not a creditless build.
 4. **Carried-over "blockers" — RE-VERIFIED 2026-06-13 (mostly de-haunted):** heartbeat dashboard ✅ exists (`/ops/health` + `/ops/spend`); auth-gate ✅ exists (`leo_tools/server.py`, `channel_adapters.py`; `/files/c/` is intentionally public); DSN "fragmentation" benign (3 env-var names → one DB); Bible pipeline built (`generate_case_bible.py` + `opus_validate_bible.py`) — only the Opus audit *verdict* is unverified (needs an Opus run = credit-gated); **auto-rollback sentinel genuinely not built** (mitigated by the truth_tests deploy gate + manual `git revert` — low priority). `leo_qa_runner` v2-stub kinds fixed (deploy_429).
 5. **Web workspace v1** — deferred (peacetime; the server-rendered Flask cockpit at `/ops` suffices for now; removes the Termius dependency only when the live matter is clear).
+6. **Pillar build sequence (started 2026-06-13, "build everything" — architecture-first, creditless where possible):** (a) **Geospatial engine** — separate PostGIS DB + metes-and-bounds→polygon parser over the ~65 in-corpus survey docs → parcel boundaries + computed-area cross-check vs stated hectares + a map endpoint; unlocks the Inocalla 23-ha-lot map + Keesey boundary proof. Then (b) model-routing ladder (Haiku/Gemini/GPT for cheap tasks ≈ 70% inference cut), (c) finance scaffold (Pillar 3 + QuickBooks), (d) forensic hashing/EXIF (Pillar 6), (e) email channel + channel-abstraction (Pillar 7). LLM-runtime behaviour of each activates on credit top-up; the scaffolding is built cold now.
 
 ## 6.5 Activation — flip the stack ON when credits land (architecture is in place)
 
