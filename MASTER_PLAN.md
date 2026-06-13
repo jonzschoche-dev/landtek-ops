@@ -32,7 +32,7 @@
 
 ## 3. Current verified state (2026-06-12)
 
-- **✅ Infra:** single DigitalOcean droplet (1 vCPU / 961 MB / 33 GB, 78% disk — **fragile, has frozen**). Postgres in docker `n8n-postgres-1` (`172.18.0.3:5432/n8n`). Repo `landtek-ops`, pushed from Mac (`~/landtek`) + VPS (`/root/landtek`). Tailscale SSH (check-mode reauth).
+- **✅ Infra:** single DigitalOcean droplet — **1 vCPU / 2 GB / 67 GB NVMe + 2 GB swap** (39% disk), Premium Intel, $16/mo (upgraded 2026-06-13 from 1 GB / 33 GB; load dropped 1.8→0.5 — **freeze risk resolved**, single vCPU adequate). Postgres in docker `n8n-postgres-1` (`172.18.0.3:5432/n8n`). Repo `landtek-ops`, pushed from Mac (`~/landtek`) + VPS (`/root/landtek`). Tailscale SSH (check-mode reauth).
 - **✅ Corpus:** ~**1,056 canonical** docs (1,126 total). All 26-360 court filings are blended in from Barandon's emails, incl. **both sides' judicial affidavits**. **~791 MWK-001 docs sit at `pending_classification`** (text captured, integration layer unfinished); 95 in `error`.
 - **✅ Daemons active:** `leo-simulator`, `landtek-truth-loop`, `landtek-fullstack-loop`, `landtek-corpus-backfill`, `landtek-tg-router/-inbox/-media`. **`truth-qa-loop` INACTIVE.**
 - **✅ Ingestion:** Gemini vision OCR (free tier — exhausted) + **local Tesseract via PyMuPDF** (the cost-driven pivot). Qdrant Cloud embeddings (gemini-embedding-001).
@@ -76,6 +76,7 @@
 
 - **2026-05-13** — pre-trial held; case advanced to motion practice (phase change, not a slip).
 - **2026-06-02** — mediation held; May-2026 docs had targeted a "v1.0 by June 2" cut — not cut; north star reset to **Aug 12** (trial testimony).
+- **2026-06-13** — droplet upgraded 1 GB→2 GB RAM / 33→67 GB / +2 GB swap ($16/mo); load 1.8→0.5, freezes resolved. VPS git resynced **381→423** (had drifted 42 commits behind, phantom-dirty — running code already matched origin, only HEAD was stale). `notifications/pending.txt` gitignored to stop the recurring dirty-tree-blocks-pull friction that caused the drift.
 - *(append entries as milestones move — cause + new date)*
 
 ## 9. Sources & related
