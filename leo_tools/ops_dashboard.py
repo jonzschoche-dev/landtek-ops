@@ -72,6 +72,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("history", "/history", "History"),
         ("health", "/health", "Health"),
         ("trajectory", "/trajectory", "Trajectory"),
+        ("parcels", "/parcels", "Parcels"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
@@ -481,6 +482,72 @@ def trajectory():
 <p class="muted" style="margin-top:14px">Pillar status is curated from MASTER_PLAN §4A; live signals are real-time. See also <a href="/ops/spend">Spend</a> · <a href="/ops/health">Health</a>.</p>
 """
     return _layout("Trajectory", body, active="trajectory")
+
+
+def _polygon_svg(pts, size=480, pad=24):
+    if len(pts) < 3:
+        return "<p class='empty'>No geometry.</p>"
+    xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+    minx, maxx, miny, maxy = min(xs), max(xs), min(ys), max(ys)
+    w = (maxx - minx) or 1.0; h = (maxy - miny) or 1.0
+    sc = (size - 2 * pad) / max(w, h)
+    tx = lambda x: pad + (x - minx) * sc
+    ty = lambda y: size - pad - (y - miny) * sc   # north up
+    poly = " ".join(f"{tx(x):.1f},{ty(y):.1f}" for x, y in pts)
+    return (f'<svg viewBox="0 0 {size} {size}" width="100%" '
+            f'style="max-width:520px;background:#fff;border:1px solid var(--line);border-radius:8px">'
+            f'<polygon points="{poly}" fill="#2563eb22" stroke="#2563eb" stroke-width="2"/></svg>')
+
+
+@bp.route("/parcels")
+def parcels_list():
+    import sys as _s; _s.path.insert(0, "/root/landtek/scripts")
+    try:
+        import parcels as P
+        rows = P.list_parcels()
+    except Exception:
+        rows = []
+    if rows:
+        trs = "".join(
+            f"<tr><td><a href='/ops/parcel/{r['id']}'>#{r['id']}</a></td>"
+            f"<td>{_esc(r.get('title_no') or '—')}</td><td>{_esc(r.get('matter_code') or '—')}</td>"
+            f"<td>{r.get('area_ha') or '—'}</td><td>{r.get('stated_ha') or '—'}</td>"
+            f"<td>{'✓' if r.get('area_matches') else ('✗' if r.get('stated_ha') else '—')}</td>"
+            f"<td>{r.get('closure_error_m') or '—'} m</td></tr>" for r in rows)
+        table = ("<table><tr><th>Parcel</th><th>Title</th><th>Matter</th><th>Computed ha</th>"
+                 f"<th>Stated ha</th><th>Match</th><th>Closure</th></tr>{trs}</table>")
+    else:
+        table = ("<p class='empty'>No parcels ingested yet — feed metes-and-bounds via "
+                 "<code>parcels.upsert_parcel</code> (survey_vision_extract → survey_geometry).</p>")
+    body = ("<h1>Parcels</h1><p class='lead'>Boundaries derived from survey metes-and-bounds "
+            "(creditless engine); computed area cross-checked vs the title's stated hectares.</p>"
+            f"<div class='card'>{table}</div>")
+    return _layout("Parcels", body, active="parcels")
+
+
+@bp.route("/parcel/<int:pid>")
+def parcel_detail(pid):
+    import sys as _s; _s.path.insert(0, "/root/landtek/scripts")
+    import parcels as P
+    rows = [r for r in P.list_parcels() if r["id"] == pid]
+    if not rows:
+        abort(404)
+    r = rows[0]
+    c = P._conn(); cur = c.cursor()
+    cur.execute("SELECT geom_wkt FROM parcels WHERE id=%s", (pid,))
+    wkt = (cur.fetchone() or [""])[0]; cur.close(); c.close()
+    svg = _polygon_svg(P.wkt_points(wkt))
+    match = "✓" if r.get("area_matches") else ("✗" if r.get("stated_ha") else "—")
+    body = (f"<h1>Parcel #{pid}</h1><p class='lead'>{_esc(r.get('title_no') or '')} · "
+            f"{_esc(r.get('matter_code') or '')}</p>"
+            f"<div class='grid grid-4'>"
+            f"{_stat_card('Computed area', str(r.get('area_ha'))+' ha')}"
+            f"{_stat_card('Stated area', (str(r.get('stated_ha'))+' ha') if r.get('stated_ha') else '—')}"
+            f"{_stat_card('Area match', match)}"
+            f"{_stat_card('Closure error', str(r.get('closure_error_m'))+' m')}</div>"
+            "<div class='section-title'>Boundary (local meters — shape; absolute georeferencing "
+            f"pending a tie point)</div><div class='card'>{svg}</div>")
+    return _layout(f"Parcel {pid}", body, active="parcels")
 
 
 def _safe_fetch(cur, conn, sql: str, params=(), default=None, one: bool = False):
