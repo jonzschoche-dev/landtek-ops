@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek Anthropic spend bridge (records n8n/simulator token usage into llm_spend so cost_governor sees total burn)
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/anthropic_spend_bridge.py
+StandardOutput=append:/var/log/landtek_spend_bridge.log
+StandardError=append:/var/log/landtek_spend_bridge.log

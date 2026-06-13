@@ -45,15 +45,23 @@ def price(model, usage):
     return (it * pi + cw * pi * 1.25 + cr * pcr + ot * po) / 1e6
 
 
-def record(model, usage, source="leo"):
+def record(model, usage, source="leo", ts=None):
+    """Log one LLM call's usage + cost. ts defaults to now(); pass an explicit
+    timestamp when backfilling (e.g. the spend-bridge dating n8n executions to
+    when they actually ran, so daily-spend accounting stays correct)."""
     try:
         c = _conn(); cur = c.cursor(); ensure(cur)
-        cur.execute("""INSERT INTO llm_spend
-            (source, model, input_tok, output_tok, cache_read_tok, cache_write_tok, cost_usd)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-            (source, model, usage.get("input_tokens", 0), usage.get("output_tokens", 0),
-             usage.get("cache_read_input_tokens", 0), usage.get("cache_creation_input_tokens", 0),
-             round(price(model, usage), 6)))
+        vals = [source, model, usage.get("input_tokens", 0), usage.get("output_tokens", 0),
+                usage.get("cache_read_input_tokens", 0), usage.get("cache_creation_input_tokens", 0),
+                round(price(model, usage), 6)]
+        if ts is not None:
+            cur.execute("""INSERT INTO llm_spend
+                (source, model, input_tok, output_tok, cache_read_tok, cache_write_tok, cost_usd, ts)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""", vals + [ts])
+        else:
+            cur.execute("""INSERT INTO llm_spend
+                (source, model, input_tok, output_tok, cache_read_tok, cache_write_tok, cost_usd)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)""", vals)
         cur.close(); c.close()
     except Exception:
         pass
@@ -66,6 +74,19 @@ def today_spend():
         v = float(cur.fetchone()[0]); cur.close(); c.close(); return v
     except Exception:
         return 0.0
+
+
+def today_spend_by_source():
+    """{source: $today} breakdown for the ops cockpit — makes the n8n/sim share
+    of the daily burn visible alongside the Python pipeline. Empty dict on error."""
+    try:
+        c = _conn(); cur = c.cursor()
+        cur.execute("""SELECT coalesce(source,'?'), round(coalesce(sum(cost_usd),0),4)
+                       FROM llm_spend WHERE ts::date = current_date GROUP BY 1 ORDER BY 2 DESC""")
+        out = {r[0]: float(r[1]) for r in cur.fetchall()}
+        cur.close(); c.close(); return out
+    except Exception:
+        return {}
 
 
 def can_afford(source="qa", cap=None):

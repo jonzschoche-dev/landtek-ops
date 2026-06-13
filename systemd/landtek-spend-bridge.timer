@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek Anthropic spend bridge — sweep n8n token usage into llm_spend every 15 min
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
