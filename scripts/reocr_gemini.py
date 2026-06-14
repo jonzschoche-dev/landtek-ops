@@ -35,6 +35,35 @@ def _conn():
     c = psycopg2.connect(DSN); c.autocommit = True; return c
 
 
+_DRIVE = None
+
+
+def _drive():
+    global _DRIVE
+    if _DRIVE is None:
+        from googleapiclient.discovery import build
+        from google.oauth2 import service_account
+        creds = service_account.Credentials.from_service_account_file(
+            "/root/landtek/google-creds.json", scopes=["https://www.googleapis.com/auth/drive.readonly"])
+        _DRIVE = build("drive", "v3", credentials=creds, cache_discovery=False)
+    return _DRIVE
+
+
+def _drive_fetch(fid):
+    """Download a Drive file to a temp path (for docs whose bytes aren't local)."""
+    import io
+    import tempfile
+    from googleapiclient.http import MediaIoBaseDownload
+    buf = io.BytesIO()
+    dl = MediaIoBaseDownload(buf, _drive().files().get_media(fileId=fid, supportsAllDrives=True))
+    done = False
+    while not done:
+        _, done = dl.next_chunk()
+    f = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    f.write(buf.getvalue()); f.close()
+    return f.name
+
+
 def _gemini_page(png_b64):
     body = {"contents": [{"parts": [{"inline_data": {"mime_type": "image/png", "data": png_b64}},
                                     {"text": PROMPT}]}],
@@ -52,14 +81,25 @@ def reocr(doc_id, go=False):
         return {"error": "no GEMINI_API_KEY"}
     import fitz
     c = _conn(); cur = c.cursor()
-    cur.execute("SELECT file_path, length(coalesce(extracted_text,'')) FROM documents WHERE id=%s", (doc_id,))
+    cur.execute("SELECT file_path, drive_file_id, length(coalesce(extracted_text,'')) FROM documents WHERE id=%s", (doc_id,))
     row = cur.fetchone()
-    if not row or not row[0]:
-        cur.close(); c.close(); return {"doc": doc_id, "error": "no file_path"}
-    path, before = row
+    if not row:
+        cur.close(); c.close(); return {"doc": doc_id, "error": "no such doc"}
+    path, drive_id, before = row
+    tmp = None
+    if not path or not os.path.exists(path or ""):
+        if not drive_id:
+            cur.close(); c.close(); return {"doc": doc_id, "error": "no local file and no drive_file_id"}
+        try:
+            path = tmp = _drive_fetch(drive_id)
+        except Exception as e:
+            cur.close(); c.close(); return {"doc": doc_id, "error": f"drive fetch: {str(e)[:100]}"}
     try:
         d = fitz.open(path)
     except Exception as e:
+        if tmp:
+            try: os.remove(tmp)
+            except Exception: pass
         cur.close(); c.close(); return {"doc": doc_id, "error": f"open: {e}"}
     pages = min(d.page_count, MAXPAGES)
     chunks = []
@@ -81,6 +121,9 @@ def reocr(doc_id, go=False):
         cur.execute("""UPDATE documents SET extracted_text=%s, text_length=%s, ocr_used=true,
                        extraction_method='gemini_reocr' WHERE id=%s""", (text[:300000], len(text), doc_id))
         res["written"] = True
+    if tmp:
+        try: os.remove(tmp)
+        except Exception: pass
     cur.close(); c.close()
     return res
 
