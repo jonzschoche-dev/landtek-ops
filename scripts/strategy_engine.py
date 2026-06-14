@@ -70,22 +70,22 @@ def _ensure(cur):
 def seed(go=False):
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     _ensure(cur)
-    # 1. north-star objective in client_goals (idempotent on goal_category='strategic')
+    # 1. north-star objective in client_goals (idempotent on goal_category='north_star')
     cur.execute("SELECT DISTINCT client_id FROM client_goals WHERE case_file='MWK-001' LIMIT 1")
     row = cur.fetchone()
     client_id = row["client_id"] if row else None
     ns_id = None
-    cur.execute("SELECT id FROM client_goals WHERE case_file='MWK-001' AND goal_category='strategic' LIMIT 1")
+    cur.execute("SELECT id FROM client_goals WHERE case_file='MWK-001' AND goal_category='north_star' LIMIT 1")
     ex = cur.fetchone()
     if ex:
         ns_id = ex["id"]
     elif go:
         cur.execute("""INSERT INTO client_goals (client_id, case_file, goal_text, goal_category, priority, status, progress_pct)
-                       VALUES (%s,'MWK-001',%s,'strategic','critical','active',0) RETURNING id""",
+                       VALUES (%s,'MWK-001',%s,'north_star','critical','active',0) RETURNING id""",
                     (client_id, NORTH_STAR["MWK-001"]))
         ns_id = cur.fetchone()["id"]
         # re-parent the existing tactical goals under the north-star
-        cur.execute("UPDATE client_goals SET parent_goal_id=%s WHERE case_file='MWK-001' AND goal_category<>'strategic' AND parent_goal_id IS NULL", (ns_id,))
+        cur.execute("UPDATE client_goals SET parent_goal_id=%s WHERE case_file='MWK-001' AND goal_category<>'north_star' AND parent_goal_id IS NULL", (ns_id,))
     print(f"[strategy] north-star goal_id={ns_id} client_id={client_id}")
     # 2. matter leverage mapping (all MWK matters)
     cur.execute("SELECT matter_code, matter_type, status FROM matters WHERE case_file='MWK-001'")
@@ -121,7 +121,7 @@ def seed(go=False):
 
 def board(case_file):
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT goal_text, progress_pct FROM client_goals WHERE case_file=%s AND goal_category='strategic' LIMIT 1", (case_file,))
+    cur.execute("SELECT goal_text, progress_pct FROM client_goals WHERE case_file=%s AND goal_category='north_star' LIMIT 1", (case_file,))
     ns = cur.fetchone()
     cur.execute("SELECT * FROM keystones WHERE case_file=%s AND status='open'", (case_file,))
     keys = cur.fetchall()
