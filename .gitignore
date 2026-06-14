@@ -81,3 +81,7 @@ notifications/blocked.txt
 
 # Generated derivative outputs — regenerable from producers
 drafts/
+
+# OCR-attack: Drive folder symlink (designer convenience, never committed)
+drive_local
+ocr_pending_write/
