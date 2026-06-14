@@ -92,10 +92,10 @@ def score_text(text):
             good_toks += 1
     word_quality = (good_toks / alpha_toks) if alpha_toks else 0.0
     dict_hit = (dict_toks / alpha_toks) if alpha_toks else 0.0
-    # dict-hit dominates (catches garbled-but-word-shaped OCR); word_quality is the secondary;
-    # both discounted by dirty/replacement chars. Tuned so readable legal prose lands ~0.5+,
-    # plausible-garbage scans land ~0.1-0.25.
-    score = (0.7 * dict_hit + 0.3 * word_quality) * clean_ratio * (1.0 - min(bad_ratio * 8, 0.6))
+    # dict-hit IS the score: garbled OCR is still "word-shaped" (word_quality ~0.93 for garbage AND
+    # clean), so word_quality has no discriminative power and only inflates garbage above threshold.
+    # Readable legal prose hits the dictionary ~0.45-0.60; plausible-garbage scans ~0.15-0.25.
+    score = dict_hit * clean_ratio * (1.0 - min(bad_ratio * 8, 0.6))
     return round(score, 4), {
         "chars": n, "alpha_tokens": alpha_toks, "dict_hit": round(dict_hit, 3),
         "word_quality": round(word_quality, 3), "clean_ratio": round(clean_ratio, 3),
