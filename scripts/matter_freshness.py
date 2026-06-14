@@ -38,11 +38,11 @@ def _inputs(cur, matter_code):
                    FROM matter_authorities m JOIN legal_authorities a ON a.id = m.authority_id
                    WHERE m.matter_code = %s ORDER BY a.id""", (matter_code,))
     auth = {str(r["id"]): r["asof"] for r in cur.fetchall()}
-    cur.execute("SELECT to_char(updated_at, 'YYYY-MM-DD\"T\"HH24:MI:SS') FROM matters WHERE matter_code=%s", (matter_code,))
+    cur.execute("SELECT to_char(updated_at, 'YYYY-MM-DD\"T\"HH24:MI:SS') AS rev FROM matters WHERE matter_code=%s", (matter_code,))
     row = cur.fetchone()
-    matter_rev = row[0] if row else None
-    cur.execute("SELECT count(*) FROM matter_facts WHERE matter_code=%s", (matter_code,))
-    n_facts = cur.fetchone()[0]
+    matter_rev = row["rev"] if row else None
+    cur.execute("SELECT count(*) AS n FROM matter_facts WHERE matter_code=%s", (matter_code,))
+    n_facts = cur.fetchone()["n"]
     return {"docs": docs, "authorities": auth, "matter_rev": matter_rev}, n_facts
 
 
