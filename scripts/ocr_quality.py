@@ -21,11 +21,38 @@ import psycopg2.extras
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 # below this score a doc is flagged for re-OCR
-THRESHOLD = float(os.environ.get("OCR_QUALITY_THRESHOLD", "0.62"))
+THRESHOLD = float(os.environ.get("OCR_QUALITY_THRESHOLD", "0.30"))
 VOWELS = set("aeiouAEIOU")
 _TOKEN = re.compile(r"\S+")
 _LETTERS = re.compile(r"[A-Za-z]")
 _4CONS = re.compile(r"[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{5,}")
+
+# Compact common-English + PH-legal/land dictionary. The dict-HIT RATE is the signal that
+# separates real text from "plausible garbage" OCR (Transter/Certiiicate/Titie/situater/foloos):
+# garbled words miss the dictionary even though they look word-shaped. Lowercased, stripped.
+_DICT = """the of and to in a is was for that it as on are with be by this an or at from not but had
+have has his her him she they we you i he them their there here which who whom whose what when where
+will would can could shall should may might must do does did been being were am if then than so such
+all any some no nor only own same too very more most other into over under above below up down out off
+about after before between during through against because while until upany each both few many much
+year years day days month months date dated time times new old first second third one two three four
+five six seven eight nine ten hundred thousand million number no page line
+certificate title registry deeds deed register registration land lands lot lots parcel parcels plan
+survey property properties real estate owner owners ownership transfer transfers transferred sale sold
+buyer seller heirs heir estate intestate special power attorney fact administrator administratrix
+province provincial municipality municipal city barangay street road avenue district situated situate
+bounded described description boundary boundaries area square meters hectares more less containing
+point corner thence degrees minutes north south east west along bearing distance metes bounds
+republic philippines philippine court regional trial municipal judge order petition complaint
+defendant plaintiff respondent civil case docket annex exhibit affidavit notary public notarized
+sworn subscribed before witness signature signed page volume entry document instrument copy original
+duplicate true tax declaration assessor assessed value payment receipt official paid amount peso pesos
+revenue internal bureau capital gains documentary stamp clearance issued issuing dated received from
+name names last middle initial address resident residence age legal married single filipino citizen
+heirs late deceased spouse husband wife children child son daughter mother father
+mary worrick keesey zschoche balane fuente llamanzares cesar gloria benjamin patricia jonathan
+camarines norte daet mercedes vicente san roque poblacion""".split()
+_DICT = set(_DICT)
 
 
 def _conn():
@@ -43,27 +70,34 @@ def score_text(text):
     clean_ratio = clean / n
     bad = text.count("�")  # unicode replacement char = decode/ocr failure
     bad_ratio = bad / n
-    # word-likeness over ALPHA tokens only (digits/codes like T-4497, Psu-143364 are neutral)
+    # token-level signals over ALPHA tokens only (digits/codes like T-4497, Psu-143364 are neutral)
     toks = _TOKEN.findall(text)
     alpha_toks = 0
-    good_toks = 0
+    good_toks = 0   # structurally word-shaped (vowel, no long consonant run, not repeated char)
+    dict_toks = 0   # actually a known English/legal word -> the anti-"plausible-garbage" signal
     for t in toks:
         letters = _LETTERS.findall(t)
-        if len(letters) < 2:
-            continue  # punctuation / single chars / pure numbers -> neutral
+        if len(letters) < 3:
+            continue  # punctuation / single chars / pure numbers / 2-letter codes -> neutral
         alpha_toks += 1
         core = "".join(letters)
+        lc = core.lower()
+        if lc in _DICT:
+            dict_toks += 1
         has_vowel = any(c in VOWELS for c in core)
         no_long_consonant_run = not _4CONS.search(core)
-        not_repeat = len(set(core.lower())) > 1
-        reasonable_len = 2 <= len(t) <= 30
+        not_repeat = len(set(lc)) > 1
+        reasonable_len = 3 <= len(t) <= 22
         if has_vowel and no_long_consonant_run and not_repeat and reasonable_len:
             good_toks += 1
     word_quality = (good_toks / alpha_toks) if alpha_toks else 0.0
-    # composite: word quality dominated, discounted by dirty chars
-    score = word_quality * clean_ratio * (1.0 - min(bad_ratio * 8, 0.6))
+    dict_hit = (dict_toks / alpha_toks) if alpha_toks else 0.0
+    # dict-hit dominates (catches garbled-but-word-shaped OCR); word_quality is the secondary;
+    # both discounted by dirty/replacement chars. Tuned so readable legal prose lands ~0.5+,
+    # plausible-garbage scans land ~0.1-0.25.
+    score = (0.7 * dict_hit + 0.3 * word_quality) * clean_ratio * (1.0 - min(bad_ratio * 8, 0.6))
     return round(score, 4), {
-        "chars": n, "alpha_tokens": alpha_toks, "good_tokens": good_toks,
+        "chars": n, "alpha_tokens": alpha_toks, "dict_hit": round(dict_hit, 3),
         "word_quality": round(word_quality, 3), "clean_ratio": round(clean_ratio, 3),
         "bad_ratio": round(bad_ratio, 4),
     }
@@ -116,7 +150,7 @@ def report():
     if not total:
         print("[ocr_quality] no scores yet — run --scan --go first"); cur.close(); c.close(); return
     print(f"[ocr_quality] {total} docs scored. Distribution:")
-    for lo, hi in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.62), (0.62, 0.8), (0.8, 1.01)]:
+    for lo, hi in [(0.0, 0.15), (0.15, 0.30), (0.30, 0.50), (0.50, 0.75), (0.75, 1.01)]:
         cur.execute("SELECT count(*) FROM ocr_quality WHERE score>=%s AND score<%s", (lo, hi))
         n = cur.fetchone()[0]
         bar = "#" * min(n // 5, 50)

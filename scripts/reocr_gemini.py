@@ -104,7 +104,8 @@ def _call_gemini(png_b64, model):
 
 
 def _gemini_page(png_b64):
-    """Transcribe one page, with the economy ladder: 2.5-flash, fall back to 2.0-flash on quota."""
+    """Transcribe one page, with the economy ladder: 2.5-flash, fall back to 2.0-flash on quota.
+    Retries once on socket timeout (slow first pages are common) before giving up the page."""
     _throttle(); _CALLS[0] += 1
     try:
         return _call_gemini(png_b64, MODEL)
@@ -113,6 +114,9 @@ def _gemini_page(png_b64):
             time.sleep(2); _throttle()
             return _call_gemini(png_b64, FALLBACK_MODEL)
         raise
+    except (TimeoutError, urllib.error.URLError, OSError):
+        time.sleep(2); _throttle(); _CALLS[0] += 1  # one retry on timeout/transport
+        return _call_gemini(png_b64, MODEL)
 
 
 def reocr(doc_id, go=False):
