@@ -83,6 +83,26 @@ MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — ke
 - **Safety substrate:** provenance ontology = master of truth; `_safe` views for any legal output; never break comms; auth-gate every access; clone-first authoring.
 - **Health invariants:** daemons active · heartbeat < 1 hr · Telegram bot responds · n8n active.
 
+## 5A. Active Cowork directive (2026-06-14 — two windows, one working tree)
+
+**Roles.** Two Cowork windows run on this same Mac tree:
+- **EXECUTOR** — the window with VPS SSH + local Drive files + Chrome + DB. Owns: running OCR/comprehension/embeddings, DB write-backs, deploys, and **all commits/pushes**.
+- **DESIGNER** — the sandboxed window (no VPS/DB/local files/browser). Owns: **drafting/refining files only**; announces each new file so the executor rescues + commits it. The designer does **not** commit, push, or run anything needing the VPS/DB.
+- **Git:** one committer (the executor); `pull --rebase` before every commit; specific paths only; never `git add .`.
+
+**Do NOT rebuild — these already exist (deploys 442–472):** freshness / evidence-matrix / play / strategy / revenue engines; `harvest_facts.py` (free regex facts); `comprehend.py` + `comprehend_browser_adapter.py` (text→facts); `ocr_browser_adapter.py` (image→text); `rag_embed.py` (pgvector RAG); `knowledge_coverage.py` (the awareness meter).
+
+**Standing rules (load-bearing — do not regress):**
+- Awareness is an **accretion** problem, not a budget problem. Spend only where it moves `knowledge_coverage` (live — read it, don't quote a fixed number). The **simulator stays dead** (it was the money pit).
+- **Thinking runs on the Claude Cowork subscription**, not the depleted metered API. Embeddings = Gemini-free / local. **OCR = Gemini Advanced browser** (operator's choice; strong at OCR, separate sub quota).
+- The corpus is **local on the Mac** (`…/My Drive/LANDTEK`, ~950 files) → Claude vision OCRs directly (T-4497 etc. that were Drive-only on the VPS are readable here).
+- **Transport-agnostic ingestion contract:** DB `--next` / `--write`, any LLM in between. *Extend* transports (ChatGPT/Grok browser); do **not** fork the contract or the prompts (`comprehend.PROMPT`, `reocr_gemini.PROMPT` are single-source).
+
+**Current lanes (parallel, no contention):**
+- **Executor:** Claude-direct comprehension of readable titles + RAG embeddings + applying the operator's OCR write-backs.
+- **Operator:** Gemini Advanced browser OCR of the garbage docs (worklist provided; `ocr_browser_adapter.py --write-ocr` flows it back).
+- **Designer:** refine the OCR/comprehend prompts; script the full OCR-worklist generator; add ChatGPT/Grok browser transports to the adapter; sharpen the element frameworks. **Design only — no execution.**
+
 ## 6. Roadmap (rebaselined to Aug 12 — legal deliverable first)
 
 1. **✅ in progress — Balane SJ/testimony pack** (spine → exhibit list → cross-exam outline). The only calendar-bound work; everything else yields to it.
