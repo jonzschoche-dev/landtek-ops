@@ -103,6 +103,14 @@ MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — ke
 - **Operator:** Gemini Advanced browser OCR of the garbage docs (worklist provided; `ocr_browser_adapter.py --write-ocr` flows it back).
 - **Designer:** refine the OCR/comprehend prompts; script the full OCR-worklist generator; add ChatGPT/Grok browser transports to the adapter; sharpen the element frameworks. **Design only — no execution.**
 
+### OCR attack (current operation — drain 341 flagged / no-text docs)
+
+- **Engine:** Gemini Advanced (browser), operator-driven; every result flows back through `scripts/ocr_browser_adapter.py` (re-scores quality, backs up old text, feeds RAG + comprehension). Goal: `--status` pending_ocr **341 → 0**; `knowledge_coverage` "documents readable" **66% → ~95%**.
+- **Priority (already encoded in `--next-ocr`):** text-bearing garbage first (titles / SPAs / deeds), worst score first; then no-text images/surveys; skip zip/docx/xlsx (handled elsewhere).
+- **Loop per doc:** `python3 scripts/ocr_browser_adapter.py --next-ocr 5` → locate the local file under `…/My Drive/LANDTEK ` (executor supplies the doc→path worklist) → upload to Gemini Advanced + paste the **canonical prompt** (`reocr_gemini.PROMPT` — faithful transcription, preserve names / dates / title nos / bearings exactly, **no paraphrase**) → copy the transcription → `echo "<text>" | python3 scripts/ocr_browser_adapter.py --write-ocr --doc <id>`. One doc per chat; transcribe **all pages** of multi-page PDFs. If write-back still scores flagged (<0.30), the OCR didn't take — retry.
+- **Waves.** W1 (keystone): SPA Cesar de la Fuente (246) · T-4497 family (25 / 382 / 348 / 97) · TCT-4503 (87) · Victa-fraud T-47657 set (28 / 31 / 34) · OCT/TCT-1616 (639). W2: remaining flagged titles/deeds. W3: no-text surveys/images.
+- **Roles for the attack:** operator drives the browser loop · executor supplies the worklist + runs write-backs + comprehends/embeds results + tracks the meter · designer scripts the full doc→local-path worklist generator, adds ChatGPT/Grok transports for parallel lanes, and refines the prompt. Round-robin subscriptions once the extra transports exist; executor can Claude-direct the few hardest docs from the local files if Gemini stalls.
+
 ## 6. Roadmap (rebaselined to Aug 12 — legal deliverable first)
 
 1. **✅ in progress — Balane SJ/testimony pack** (spine → exhibit list → cross-exam outline). The only calendar-bound work; everything else yields to it.
