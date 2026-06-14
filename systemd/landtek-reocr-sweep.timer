@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the LandTek re-OCR sweep hourly until the flagged-doc queue is drained (creditless Gemini free-tier).
+
+[Timer]
+# Hourly batches. Productive runs do ~80 page-calls; once daily Gemini quota is hit the sweep
+# 429-stops early and resumes next window. Self-terminating in practice: when the queue is empty
+# each run prints "queue=0" and exits immediately (negligible cost).
+OnBootSec=3min
+OnUnitActiveSec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

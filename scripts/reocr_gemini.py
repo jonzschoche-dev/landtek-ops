@@ -23,10 +23,21 @@ import psycopg2.extras
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
-# economy ladder: high-quality 2.5-flash first; on quota (429) fall back to higher-quota 2.0-flash
+GEMINI_KEY_FALLBACK = os.environ.get("GEMINI_API_KEY_FALLBACK", "")
+# economy ladder: high-quality 2.5-flash first; on quota (429) fall back to higher-quota 2.0-flash,
+# then roll over to the FALLBACK key (separate project = separate free-tier quota) on the same ladder.
 MODEL = os.environ.get("GEMINI_VISION_MODEL", "gemini-2.5-flash")
 FALLBACK_MODEL = os.environ.get("GEMINI_VISION_FALLBACK", "gemini-2.0-flash")
 MAXPAGES = int(os.environ.get("REOCR_MAXPAGES", "15"))
+
+
+class QuotaExhausted(Exception):
+    """All gemini key/model combos returned 429 — real free-tier exhaustion (resets later)."""
+
+
+def _ladder():
+    keys = [k for k in (GEMINI_KEY, GEMINI_KEY_FALLBACK) if k]
+    return [(k, m) for k in keys for m in (MODEL, FALLBACK_MODEL)]
 
 # rate-limit state (free-tier RPM). _RPM=0 means no throttle (single --doc runs).
 _RPM = 0
@@ -91,11 +102,11 @@ def _throttle():
     _LAST[0] = time.time()
 
 
-def _call_gemini(png_b64, model):
+def _call_gemini(png_b64, key, model):
     body = {"contents": [{"parts": [{"inline_data": {"mime_type": "image/png", "data": png_b64}},
                                     {"text": PROMPT}]}],
             "generationConfig": {"temperature": 0}}
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
     req = urllib.request.Request(url, data=json.dumps(body).encode(),
                                  headers={"content-type": "application/json"}, method="POST")
     with urllib.request.urlopen(req, timeout=120) as r:
@@ -104,19 +115,24 @@ def _call_gemini(png_b64, model):
 
 
 def _gemini_page(png_b64):
-    """Transcribe one page, with the economy ladder: 2.5-flash, fall back to 2.0-flash on quota.
-    Retries once on socket timeout (slow first pages are common) before giving up the page."""
+    """Transcribe one page, walking the key×model ladder: (primary,2.5)->(primary,2.0)->
+    (fallback,2.5)->(fallback,2.0). 429 advances to the next combo; one timeout retry per combo.
+    Raises QuotaExhausted only when every combo is 429 (true free-tier exhaustion)."""
     _throttle(); _CALLS[0] += 1
-    try:
-        return _call_gemini(png_b64, MODEL)
-    except urllib.error.HTTPError as e:
-        if e.code == 429:  # quota — drop to higher-quota fallback model after a short cooldown
-            time.sleep(2); _throttle()
-            return _call_gemini(png_b64, FALLBACK_MODEL)
-        raise
-    except (TimeoutError, urllib.error.URLError, OSError):
-        time.sleep(2); _throttle(); _CALLS[0] += 1  # one retry on timeout/transport
-        return _call_gemini(png_b64, MODEL)
+    for key, model in _ladder():
+        for attempt in (1, 2):  # one timeout retry per combo
+            try:
+                return _call_gemini(png_b64, key, model)
+            except urllib.error.HTTPError as e:
+                if e.code == 429:
+                    time.sleep(1); _throttle()
+                    break  # this combo is quota'd -> next combo
+                raise
+            except (TimeoutError, urllib.error.URLError, OSError):
+                if attempt == 2:
+                    break  # give up this combo after the retry
+                time.sleep(2); _throttle()
+    raise QuotaExhausted("all gemini key/model combos returned 429")
 
 
 def reocr(doc_id, go=False):
@@ -150,6 +166,13 @@ def reocr(doc_id, go=False):
         try:
             png = d[i].get_pixmap(matrix=fitz.Matrix(2.2, 2.2)).tobytes("png")
             chunks.append(_gemini_page(base64.b64encode(png).decode()))
+        except QuotaExhausted:
+            # leave the doc untouched (no partial write, no failure log) — retry after quota reset
+            if tmp:
+                try: os.remove(tmp)
+                except Exception: pass
+            cur.close(); c.close()
+            raise
         except urllib.error.HTTPError as e:
             cur.close(); c.close()
             return {"doc": doc_id, "error": f"gemini http_{e.code}: {e.read().decode('utf-8','replace')[:120]}", "page": i}
@@ -201,8 +224,12 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False):
             break
         try:
             r = reocr(did, go=True)
+        except QuotaExhausted:
+            print(f"[sweep] Gemini quota exhausted (all keys/models 429) after {done} docs — "
+                  f"stopping; resume after reset (doc {did} left for retry)", flush=True)
+            break
         except urllib.error.HTTPError as e:
-            print(f"  doc {did}: HTTP {e.code} — stopping (quota/transport); resume next run", flush=True)
+            print(f"  doc {did}: HTTP {e.code} — stopping; resume next run", flush=True)
             break
         except Exception as e:
             r = {"error": str(e)[:120]}

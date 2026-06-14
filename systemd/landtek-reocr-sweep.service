@@ -1,0 +1,13 @@
+[Unit]
+Description=LandTek OCR-quality re-OCR sweep (Gemini free-tier vision; rewrites garbage OCR on flagged docs). Creditless re: Anthropic.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+# One bounded, rate-limited, resumable batch per run. reocr_log makes it idempotent; the timer
+# spreads batches across the day so we stay inside Gemini free-tier quota (429 -> ladder -> stop).
+ExecStart=/usr/bin/python3 /root/landtek/scripts/reocr_gemini.py --sweep --rpm 8 --max-calls 80
+StandardOutput=append:/var/log/landtek_reocr_sweep.log
+StandardError=append:/var/log/landtek_reocr_sweep.log
