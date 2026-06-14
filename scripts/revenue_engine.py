@@ -99,6 +99,9 @@ def _ensure(cur):
         est_value numeric, est_income_monthly numeric, title_status text, possession text,
         has_authority boolean DEFAULT false, controlling_matter text, modes text[] DEFAULT '{}',
         tier text, note text, updated_at timestamptz DEFAULT now())""")
+    for col, ddl in [("area_sqm", "numeric"), ("title_ref", "text"), ("origin", "text DEFAULT 'seed'"),
+                     ("needs_valuation", "boolean DEFAULT false"), ("monetization_plan", "text")]:
+        cur.execute(f"ALTER TABLE property_assets ADD COLUMN IF NOT EXISTS {col} {ddl}")
 
 
 def seed(go=False):
@@ -154,40 +157,96 @@ def _opportunity(a, mode):
     return chain, gating
 
 
-def board():
+def plan_for(a):
+    """Pick the mode closest to cash; return (best_mode, gating, plan_text, ok_ratio)."""
+    best = None
+    for mode in (a.get("modes") or []):
+        chain, gating = _opportunity(a, mode)
+        ratio = sum(1 for _, _, st, _ in chain if st == "ok") / len(chain)
+        cand = (ratio, mode, gating)
+        if best is None or ratio > best[0]:
+            best = cand
+    if not best:
+        return (None, None, "no monetization mode set", 0.0)
+    ratio, mode, gating = best
+    if gating is None:
+        return (mode, None, f"READY to {mode}", ratio)
+    code, label, st, reason = gating
+    return (mode, gating, f"{mode}: blocked at {label} ({reason}) → {NEXT_MOVE.get(code, '')}", ratio)
+
+
+def enroll_titles(go=False):
+    """Standing rule: every title in the corpus becomes a monetizable asset with a plan."""
+    c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    _ensure(cur)
+    cur.execute("""SELECT tct_number, case_file, registrant_canonical, location, area_sqm, status, lifecycle_status, notes
+                   FROM titles WHERE coalesce(tct_number,'') <> ''""")
+    rows = cur.fetchall(); n = 0
+    for t in rows:
+        tct = t["tct_number"]; cf = t["case_file"] or ""
+        area = float(t["area_sqm"]) if t["area_sqm"] else None
+        ls = (t["lifecycle_status"] or t["status"] or "").lower()
+        if "cancel" in ls or "supersed" in ls or "disput" in ls:
+            tstatus = "clouded"
+        elif cf == "MWK-001":
+            tstatus = "clouded"      # in the contested estate under active recovery
+        elif cf == "Paracale-001":
+            tstatus = "clean"
+        else:
+            tstatus = "unverified"
+        possession = "contested" if cf == "MWK-001" else ("yes" if cf == "Paracale-001" else "unknown")
+        ctrl = "MWK-CV26360" if cf == "MWK-001" else None
+        modes = ["sale", "lease"] + (["develop"] if (area and area > 5000) else [])
+        tier = "recover_then" if tstatus == "clouded" else ("develop" if (area and area > 20000) else "earn_now")
+        adict = {"title_status": tstatus, "possession": possession, "controlling_matter": ctrl,
+                 "has_authority": True, "modes": modes}
+        _, _, plan, _ = plan_for(adict)
+        label = f"{tct} — {t['location'] or 'location TBD'}" + (f" ({area/10000:.2f} ha)" if area else "")
+        if go:
+            cur.execute("""INSERT INTO property_assets
+                (asset_code,label,case_file,asset_type,location,est_value,est_income_monthly,title_status,possession,
+                 has_authority,controlling_matter,modes,tier,note,area_sqm,title_ref,origin,needs_valuation,monetization_plan,updated_at)
+                VALUES (%s,%s,%s,'parcel',%s,NULL,0,%s,%s,true,%s,%s,%s,%s,%s,%s,'title',true,%s, now())
+                ON CONFLICT (asset_code) DO UPDATE SET label=EXCLUDED.label, location=EXCLUDED.location,
+                 title_status=EXCLUDED.title_status, possession=EXCLUDED.possession, controlling_matter=EXCLUDED.controlling_matter,
+                 modes=EXCLUDED.modes, tier=EXCLUDED.tier, area_sqm=EXCLUDED.area_sqm, monetization_plan=EXCLUDED.monetization_plan,
+                 origin='title', updated_at=now()""",
+                ("PA-" + tct, label, cf or None, t["location"], tstatus, possession, ctrl, modes, tier,
+                 (t["notes"] or "")[:200], area, tct, plan))
+        n += 1
+    print(f"[revenue] {'WROTE' if go else 'DRY'} titles_enrolled={n} (every title now has a monetization plan)")
+    cur.close(); c.close()
+
+
+def board(cap=10):
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("SELECT * FROM property_assets")
     assets = cur.fetchall()
     rows = []
     for a in assets:
-        for mode in (a["modes"] or []):
-            chain, gating = _opportunity(a, mode)
-            ok_links = sum(1 for _, _, st, _ in chain if st == "ok")
-            tier_rank = {"earn_now": 0, "develop": 1, "recover_then": 2}.get(a["tier"], 3)
-            rows.append({"asset": a, "mode": mode, "gating": gating, "ok": ok_links, "n": len(chain),
-                         "tier_rank": tier_rank})
-    # fastest money first: tier, then most links already satisfied, then income/value
-    rows.sort(key=lambda r: (r["tier_rank"], -(r["ok"] / r["n"]),
-                             -float(r["asset"]["est_income_monthly"] or 0), -float(r["asset"]["est_value"] or 0)))
-    print("\n" + "=" * 80)
-    print("PATH TO CASH — every opportunity, fastest money first, with the broken link")
-    print("=" * 80)
-    cur_tier = None
+        mode, gating, plan, ratio = plan_for(a)
+        rows.append({"a": a, "mode": mode, "gating": gating, "plan": plan, "ratio": ratio,
+                     "tier_rank": {"earn_now": 0, "develop": 1, "recover_then": 2}.get(a["tier"], 3)})
+    rows.sort(key=lambda r: (r["tier_rank"], -r["ratio"], -float(r["a"]["est_income_monthly"] or 0),
+                             -float(r["a"]["est_value"] or 0), -float(r["a"]["area_sqm"] or 0)))
+    print("\n" + "=" * 82)
+    print(f"PATH TO CASH — {len(rows)} assets, every one with a plan, fastest money first")
+    print("=" * 82)
+    cur_tier = None; shown = 0
     for r in rows:
-        a = r["asset"]
+        a = r["a"]
         if a["tier"] != cur_tier:
-            cur_tier = a["tier"]
-            print(f"\n── {cur_tier.upper().replace('_', '-')} ──")
-        val = f"₱{float(a['est_value'] or 0)/1e6:.0f}M"
-        inc = f" · ₱{float(a['est_income_monthly'])/1e3:.0f}k/mo" if a["est_income_monthly"] else ""
-        if r["gating"] is None:
-            status = "▶ READY TO TRANSACT"
-        else:
-            code, label, st, reason = r["gating"]
-            tag = {"blocked": "⛔", "todo": "○", "unknown": "?"}.get(st, "")
-            status = f"{tag} blocked at: {label} — {reason}  →  {NEXT_MOVE.get(code, '')}"
-        print(f" [{r['ok']}/{r['n']}] {a['asset_code']:<16} {r['mode']:<8} {val}{inc}")
-        print(f"        {status}")
+            cur_tier = a["tier"]; shown = 0
+            cnt = sum(1 for x in rows if x["a"]["tier"] == cur_tier)
+            print(f"\n── {(cur_tier or 'UNSET').upper().replace('_', '-')} ({cnt}) ──")
+        shown += 1
+        if shown > cap:
+            continue
+        size = (f"₱{float(a['est_value'])/1e6:.0f}M" if a["est_value"] else
+                (f"{float(a['area_sqm'])/10000:.1f}ha" if a["area_sqm"] else "—"))
+        inc = f"·₱{float(a['est_income_monthly'])/1e3:.0f}k/mo" if a["est_income_monthly"] else ""
+        ready = "▶" if r["gating"] is None else " "
+        print(f" {ready}{a['asset_code']:<16}{(r['mode'] or '-'):<8}{size:>7}{inc:<10} {r['plan']}")
     cur.close(); c.close()
 
 
@@ -211,6 +270,8 @@ if __name__ == "__main__":
     a = sys.argv
     if "--seed" in a:
         seed(go="--go" in a)
+    elif "--enroll-titles" in a:
+        enroll_titles(go="--go" in a)
     elif "--board" in a:
         board()
     elif "--asset" in a:
