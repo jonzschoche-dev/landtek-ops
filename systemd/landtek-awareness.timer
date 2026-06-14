@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the LandTek awareness loop hourly — autonomous knowledge accretion + score logging.
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -33,7 +33,7 @@ def _ratio(n, d):
     return (n / d) if d else 0.0
 
 
-def run():
+def run(log=False):
     c = _conn(); cur = c.cursor()
     M = []  # (layer, metric, n, d, weight)
 
@@ -90,8 +90,16 @@ def run():
         print(f"    • {g}")
     print("\n  → every comprehension pass must move this number. If spend doesn't move it,")
     print("    it's being wasted on ephemera (chat/QA/indexing) — exactly the past failure.")
+    if log:
+        cur.execute("""CREATE TABLE IF NOT EXISTS awareness_log
+            (ts timestamptz DEFAULT now(), score real, n_facts int, titles_comprehended int, assets_valued int)""")
+        cur.execute("""INSERT INTO awareness_log (score, n_facts, titles_comprehended, assets_valued)
+            VALUES (%s, (SELECT count(*) FROM matter_facts),
+                    (SELECT count(*) FROM property_assets WHERE coalesce(note,'') LIKE '%%comprehended%%'),
+                    (SELECT count(*) FROM property_assets WHERE est_value IS NOT NULL))""", (round(score, 1),))
+        print(f"\n  [logged awareness={score:.1f}% to awareness_log]")
     cur.close(); c.close()
 
 
 if __name__ == "__main__":
-    run()
+    run(log="--log" in sys.argv)

@@ -1,0 +1,16 @@
+[Unit]
+Description=LandTek awareness loop — accrete knowledge autonomously: harvest free structured facts, comprehend (Gemini, as quota allows), log the awareness score. The system gets smarter on its own; the score is the tripwire if it stops.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+# 1) FREE structured-fact harvest (no LLM) — always moves the meter
+ExecStart=-/usr/bin/python3 /root/landtek/scripts/harvest_facts.py --all --go
+# 2) LLM comprehension for judgment (title status etc.) — drains as Gemini quota resets, creditless
+ExecStart=-/usr/bin/python3 /root/landtek/scripts/comprehend.py --sweep --limit 40 --rpm 8 --go
+# 3) record the awareness score so the climb (or a stall = wasted spend) is visible
+ExecStart=/usr/bin/python3 /root/landtek/scripts/knowledge_coverage.py --log
+StandardOutput=append:/var/log/landtek_awareness.log
+StandardError=append:/var/log/landtek_awareness.log
