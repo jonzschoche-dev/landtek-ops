@@ -161,6 +161,10 @@ if __name__ == "__main__":
         lim = int(a[a.index("--limit") + 1]) if "--limit" in a else None
         sweep(limit=lim, rpm=int(a[a.index("--rpm") + 1]) if "--rpm" in a else 8, go="--go" in a)
     elif "--title" in a:
-        print(json.dumps(comprehend_title(a[a.index("--title") + 1], go="--go" in a), indent=2))
+        try:
+            print(json.dumps(comprehend_title(a[a.index("--title") + 1], go="--go" in a), indent=2))
+        except QuotaExhausted:
+            print(json.dumps({"error": "gemini quota exhausted — comprehension runs as quota resets "
+                              "(shares the re-OCR sweep's budget), or instantly with Anthropic credits"}, indent=2))
     else:
         print(__doc__)
