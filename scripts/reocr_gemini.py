@@ -124,15 +124,16 @@ def _gemini_page(png_b64):
             try:
                 return _call_gemini(png_b64, key, model)
             except urllib.error.HTTPError as e:
-                if e.code == 429:
+                if e.code in (429, 500, 502, 503, 504):  # quota OR transient overload -> next combo
                     time.sleep(1); _throttle()
-                    break  # this combo is quota'd -> next combo
+                    break
                 raise
             except (TimeoutError, urllib.error.URLError, OSError):
                 if attempt == 2:
                     break  # give up this combo after the retry
                 time.sleep(2); _throttle()
-    raise QuotaExhausted("all gemini key/model combos returned 429")
+    # every key/model combo is quota'd or overloaded — transient; leave the doc for retry
+    raise QuotaExhausted("all gemini key/model combos returned 429/5xx")
 
 
 def reocr(doc_id, go=False):
