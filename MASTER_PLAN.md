@@ -43,7 +43,7 @@
 ## 4. Strategic frame (carried forward — still sound)
 
 - **Vision:** the most truth-seeking, deadline-reliable property + legal-ops AI; database is exhaust, the workspace is the product.
-- **8 non-negotiable principles:** (1) no hallucination, (2) never miss a deadline, (3) comms chokepoint sacred (S14 Telegram rules), (4) `provenance_level` sacred, (5) information is gold, (6) self-research, (7) git discipline, (8) hard cost stop. **⚠️ Principle 8 is currently violated in practice — see §3.**
+- **9 non-negotiable principles:** (1) no hallucination, (2) never miss a deadline, (3) comms chokepoint sacred (S14 Telegram rules), (4) `provenance_level` sacred, (5) information is gold, (6) self-research, (7) git discipline, (8) hard cost stop, **(9) inference is marked** — whenever any layer (OCR, comprehend, RAG, bible, brief, Telegram) substitutes inferred content for source content (even high-confidence), the inferred token is flagged inline per §4B; silent substitution is the failure that compounds into hallucination; no layer exempt — provenance applies inside the prose, not only on the row. **⚠️ Principles 8 and 9 have known violations in practice — see §3 (cost telemetry) and `drafts/ocr_pending_write/*.flags.md` (silent OCR corrections, since rewritten).**
 - **5 elite layers:** per-matter · per-portfolio · per-firm · per-channel · per-jurisdiction.
 - **Phases:** 0 safety substrate · 1 data integrity · 2 relational + financial · 3 autonomous agency · 4 channels · 5 multi-jurisdiction. **⚠️ All May-2026 phase timelines are obsolete — rebaseline against Aug 12.**
 
@@ -74,6 +74,20 @@ MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — ke
 **OCR (correction vs artifact):** running stack is **Gemini vision (free tier) + Tesseract**; "Google Document AI" is a *planned premium-tier upgrade*, not current.
 
 **Proof clients before GA:** MWK-001 (title recovery) + Paracale-001 (estate/mining/construction). Targets: $6–15/day burn · $15–80/mo per-client inference · PHP 15–50k/mo retainer · >85% margin.
+
+## 4B. Conventions — inline inference marking (Principle 9)
+
+Any cross-layer output that substitutes inferred content for source content uses ONE compact, machine-parseable tag. Tag every NAMED ENTITY, DOLLAR AMOUNT, INSTRUMENT REF (doc/page/book/notary), DATE, and QUOTED PHRASE; common-word OCR fixes (`tho`→`the`) may be silent — this is about facts, not grammar.
+
+| Tag | When | Example |
+|---|---|---|
+| `[OCR: raw]` | OCR-noise correction | `CESAR M. DE LA FUENTE [OCR: CESAR N. DE LA VENTE]` |
+| `[?word]` | missing/inferred, no raw source | `[?Bounded] on the` |
+| `[v: source]` | verified cross-reference | `KEESEY [v: birth cert; RTC Order; 307 corpus]` |
+| `[STRUCTURE: desc]` | reconstructed table/list | `[STRUCTURE: footer table reconstructed]` |
+| `[HUMAN VERIFY]` | needs human confirmation | `Yanto/Yu — uncorroborated [HUMAN VERIFY]` |
+
+Parse: `\[(?:OCR|STRUCTURE|v|HUMAN VERIFY|\?)[^\]]*\]`. Layers must PRESERVE upstream tags (OCR→comprehend→bible→brief); stripping them is a violation. Raw OCR noise (bearings / lot codes the OCR mangled) stays in a verbatim `[RAW OCR DUMP] … [end]` block, never silently cleaned.
 
 ## 5. Operating model (multi-agent — condensed; full git protocol in CLAUDE.md)
 
