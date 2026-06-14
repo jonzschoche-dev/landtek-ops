@@ -183,9 +183,13 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False):
     if retry_failed:
         cur.execute("DELETE FROM reocr_log WHERE note IS NOT NULL AND note <> 'ok'")
     skip = "" if force else "AND q.doc_id NOT IN (SELECT doc_id FROM reocr_log)"
+    # only renderable bytes (PDF/image) — fitz can't open zip/docx/xlsx; extract_formats handles those.
+    # Order: text-bearing garbage first (real legal docs w/ bad OCR, e.g. T-4497), worst dict_hit first,
+    # then the no-text images. This spends quota on the high-value docs before passport pics / screenshots.
     cur.execute(f"""SELECT q.doc_id FROM ocr_quality q JOIN documents d ON d.id=q.doc_id
         WHERE q.flagged AND (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL)
-        {skip} ORDER BY q.score ASC""")
+          AND lower(coalesce(d.original_filename,'')) !~ '\\.(zip|docx|xlsx|doc|eml|csv|txt|pptx|json)$'
+        {skip} ORDER BY (q.chars >= 200) DESC, q.score ASC""")
     ids = [r[0] for r in cur.fetchall()]
     if limit:
         ids = ids[:limit]
