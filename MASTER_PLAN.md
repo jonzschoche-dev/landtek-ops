@@ -94,7 +94,7 @@ MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — ke
 
 **Standing rules (load-bearing — do not regress):**
 - Awareness is an **accretion** problem, not a budget problem. Spend only where it moves `knowledge_coverage` (live — read it, don't quote a fixed number). The **simulator stays dead** (it was the money pit).
-- **Thinking runs on the Claude Cowork subscription**, not the depleted metered API. Embeddings = Gemini-free / local. **OCR = Gemini Advanced browser** (operator's choice; strong at OCR, separate sub quota).
+- **Thinking runs on the Claude Cowork subscription**, not the depleted metered API. Embeddings = Gemini-free / local. **OCR engine (REVISED 2026-06-14): Claude vision direct on the local PDFs for legal-critical docs** — operator found Gemini browser OCR **not accurate enough for exhibit-grade text** (it missed the deed/SPA dates, mis-attributed the notary, and was ambiguous on the KELSEY/KEESEY name; Claude vision on the original corrected all three). Gemini browser OCR is now relegated to low-value searchable bulk only.
 - The corpus is **local on the Mac** (`…/My Drive/LANDTEK`, ~950 files) → Claude vision OCRs directly (T-4497 etc. that were Drive-only on the VPS are readable here).
 - **Transport-agnostic ingestion contract:** DB `--next` / `--write`, any LLM in between. *Extend* transports (ChatGPT/Grok browser); do **not** fork the contract or the prompts (`comprehend.PROMPT`, `reocr_gemini.PROMPT` are single-source).
 
@@ -105,7 +105,7 @@ MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — ke
 
 ### OCR attack (current operation — drain 341 flagged / no-text docs)
 
-- **Engine:** Gemini Advanced (browser), operator-driven; every result flows back through `scripts/ocr_browser_adapter.py` (re-scores quality, backs up old text, feeds RAG + comprehension). Goal: `--status` pending_ocr **341 → 0**; `knowledge_coverage` "documents readable" **66% → ~95%**.
+- **Engine (REVISED 2026-06-14 — Gemini not accurate enough for exhibits):** legal-critical docs (titles / SPAs / deeds — Waves 1–2) → **Claude vision direct on the local PDF** (executor session; reads + OCRs + comprehends in one pass; most accurate, $0 on the subscription). Low-value searchable bulk (Wave 3 images/surveys) → Gemini browser is acceptable. Every result flows back through `scripts/ocr_browser_adapter.py` (re-scores quality, backs up old text, feeds RAG + comprehension). Goal: `--status` pending_ocr **341 → 0**; `knowledge_coverage` "documents readable" **66% → ~95%**.
 - **Priority (already encoded in `--next-ocr`):** text-bearing garbage first (titles / SPAs / deeds), worst score first; then no-text images/surveys; skip zip/docx/xlsx (handled elsewhere).
 - **Loop per doc:** `python3 scripts/ocr_browser_adapter.py --next-ocr 5` → locate the local file under `…/My Drive/LANDTEK ` (executor supplies the doc→path worklist) → upload to Gemini Advanced + paste the **canonical prompt** (`reocr_gemini.PROMPT` — faithful transcription, preserve names / dates / title nos / bearings exactly, **no paraphrase**) → copy the transcription → `echo "<text>" | python3 scripts/ocr_browser_adapter.py --write-ocr --doc <id>`. One doc per chat; transcribe **all pages** of multi-page PDFs. If write-back still scores flagged (<0.30), the OCR didn't take — retry.
 - **Waves.** W1 (keystone): SPA Cesar de la Fuente (246) · T-4497 family (25 / 382 / 348 / 97) · TCT-4503 (87) · Victa-fraud T-47657 set (28 / 31 / 34) · OCT/TCT-1616 (639). W2: remaining flagged titles/deeds. W3: no-text surveys/images.
