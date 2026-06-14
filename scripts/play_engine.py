@@ -178,6 +178,15 @@ def generate(matter_code, go=False):
     m = cur.fetchone()
     if not m:
         cur.close(); c.close(); return {"matter": matter_code, "error": "no matter"}
+    # don't propose offensive moves on terminal/triage matters — an agent that says "file on a won
+    # case" loses trust. Clear any stale plays for them so the war room stays honest.
+    TERMINAL = {"closed", "merged", "archived", "out_of_scope", "resolved", "resolved_no_merit",
+                "pending_triage", "pending_context", "unknown"}
+    if (m["status"] or "") in TERMINAL:
+        if go:
+            cur.execute("DELETE FROM matter_plays WHERE matter_code=%s", (matter_code,))
+        cur.close(); c.close()
+        return {"matter": matter_code, "skipped": m["status"], "plays": []}
     cur.execute("SELECT framework_key, element_code, status FROM matter_elements WHERE matter_code=%s", (matter_code,))
     rows = cur.fetchall()
     if not rows:
