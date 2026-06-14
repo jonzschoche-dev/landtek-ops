@@ -77,7 +77,7 @@ def run():
     for lyr, metric, n, d, w in M:
         if lyr != layer:
             layer = lyr; print(f"\n{lyr}")
-        r = _ratio(n, d)
+        r = min(_ratio(n, d), 1.0)
         weighted_sum += r * w; wt += w
         bar = "█" * int(r * 20) + "·" * (20 - int(r * 20))
         print(f"  {bar} {r*100:5.1f}%  {metric}  ({n}/{d})")
