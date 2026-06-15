@@ -175,6 +175,37 @@ CLIENTS = {
         "next_forcing_function": None,
     },
 
+    # ─── NIBDC — Northern Island Builders and Development Corporation ─────
+    # Third client (onboarded 2026-06-15). Mining-tenement services. Matters
+    # NIBDC-EXPA-000250 + NIBDC-APSA-000322 already exist in `matters`. Note:
+    # NIBDC has an adverse-interest history with the Paracale/Inocalla small-
+    # scale miners over the APSA-000322 area — a business-awareness matter,
+    # kept as separate clients (see memory client-separation-invariants).
+    "NIBDC": {
+        "client_id": "NIBDC",
+        "label": "Northern Island Builders and Development Corporation",
+        "owner_principal": "NIBDC (corporate)",
+
+        "case_file": "NIBDC-001",
+        "matter_prefix": "NIBDC-",
+
+        "operative_root": None,
+        "ghost_titles": [],
+        "trunk_titles": [],
+
+        "arta_ctn_prefix_to_matter": None,
+        "civil_case_mappings": {},
+
+        "keystone_entities": {},           # TODO: as NIBDC entities are canonicalized
+        "case_theory_modules": [],
+        "consolidation_groups_count": 0,
+        "memory_rules": [],
+        "chronicle_script": None,
+        "chronicle_keystones_var": None,
+        "truth_test_modules": [],
+        "next_forcing_function": None,
+    },
+
     # ─── OWNER — Jonathan Zschoche's personal/owner-bucket files ─────────
     # Not a legal client in the representation sense; it's the case_file used
     # for Jonathan's own documents (passport, birth records, family research,
