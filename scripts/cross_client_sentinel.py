@@ -153,6 +153,13 @@ def merge_entities(cur, survivor, alias_id):
                           WHERE x.doc_id=de.doc_id AND x.entity_id=%s AND x.role IS NOT DISTINCT FROM de.role)
     """, (survivor, alias_id, survivor))
     cur.execute("DELETE FROM doc_entities WHERE entity_id=%s", (alias_id,))
+    # entities.canonical_id is a self-referential FK. Re-point everyone pointing at the alias
+    # to the survivor; if the survivor itself pointed at the alias, null it (the survivor IS
+    # the canonical now and can't point at a row we're about to delete).
+    cur.execute("UPDATE entities SET canonical_id=%s WHERE canonical_id=%s AND id<>%s",
+                (survivor, alias_id, survivor))
+    cur.execute("UPDATE entities SET canonical_id=NULL WHERE id=%s AND canonical_id=%s",
+                (survivor, alias_id))
     # scalar FKs
     for tbl, col in _SCALAR_FKS:
         if _table_exists(cur, tbl):
