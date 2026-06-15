@@ -1,0 +1,12 @@
+[Unit]
+Description=LandTek cross-client sentinel (role-aware conflation + mis-file + entity-canon drift; writes cross_client_flags). $0, no LLM.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/cross_client_sentinel.py --apply-canon
+ExecStart=/usr/bin/python3 /root/landtek/scripts/cross_client_sentinel.py --report --log
+StandardOutput=append:/var/log/landtek_cross_client.log
+StandardError=append:/var/log/landtek_cross_client.log

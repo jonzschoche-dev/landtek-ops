@@ -1,0 +1,9 @@
+[Unit]
+Description=Cross-client sentinel — daily 03:30 UTC (re-applies entity canon, refreshes conflation/mis-file flags)
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

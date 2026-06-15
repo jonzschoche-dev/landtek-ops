@@ -238,6 +238,31 @@ CLIENTS = {
 }
 
 
+# ─── Entity-consolidation canon (machine-readable; enforced, not just commented) ───
+# survivor_entity_id -> [alias entity_ids that MUST fold into it].
+# WHY this exists: extraction re-spawns name-variants ("Allan Inocalla", "Allan Inocalla
+# y Villafria", "Datu Shishir Inocalla") as fresh entity rows, so a one-time manual merge
+# silently DRIFTS back apart. The deploy_258 consolidation lived only in a code comment and
+# had fully drifted by 2026-06-15 (8320/8062/8776/8158 all live again). This dict is the
+# durable canon: `cross_client_sentinel.py --apply-canon` re-applies it idempotently and a
+# truth test (test_cross_client_integrity) fails if any alias id is live — so it can't rot.
+CANON_ALIAS_MERGES = {
+    7983: [8091, 8147, 8320],   # Allan Villafria Inocalla — PAR principal (deploy_258)
+    8708: [8062, 8776],         # Shishir Allan Inocalla — held SEPARATE from Allan (deploy_258)
+    8120: [8158],               # Jesus V. Inocalla — PAR co-petitioner (deploy_258)
+    1348: [9036],               # Cesar de la Fuente — MWK void-SPA executor (exact-name dup)
+    15:   [3716],               # Gloria Balane — MWK defendant, "Gloria H. Balane" dup
+}
+
+# Entities that LEGITIMATELY hold defining roles across >1 client (so the integrity test
+# must not flag them). The operator/agent is the canonical case: Jonathan acts as attorney-
+# in-fact in MWK and is the principal of his own Owner bucket. Add a (id, reason) only after
+# verifying the cross-appearance is real, not a mis-file.
+CROSS_CLIENT_PRINCIPAL_ALLOWLIST = {
+    1184: "Jonathan Paul Zschoche — operator / attorney-in-fact (MWK) + Owner principal",
+}
+
+
 def get(client_id):
     """Return client config dict. KeyError if not registered."""
     if client_id not in CLIENTS:
