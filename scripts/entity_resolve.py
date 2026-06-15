@@ -237,6 +237,130 @@ def accept(cur, survivor, alias):
         print(f"[accept] #{alias} already merged / not found")
 
 
+def _lev(a, b):
+    """Levenshtein edit distance (no external dep)."""
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        prev = cur
+    return prev[-1]
+
+
+def _gender_flip(da, db):
+    """True if a token only-in-A and a token only-in-B differ solely by a trailing a<->o
+    (maria/mario, roberta/roberto) — a likely different person, not OCR noise."""
+    for x in da:
+        for y in db:
+            if len(x) == len(y) and x[:-1] == y[:-1] and {x[-1], y[-1]} == {"a", "o"}:
+                return True
+    return False
+
+
+def review_decision(name_a, name_b):
+    """('accept'|'hold', reason) for a fuzzy pair. Conservative: only pure OCR typos and
+    fuller-name subsets accept; generational and gender/name flips hold for human eyes."""
+    ka, kb = set(norm_key(name_a)), set(norm_key(name_b))
+    sym = ka ^ kb
+    if sym & GEN:
+        return ("hold", "generational suffix differs (father/son/namesake)")
+    if ka < kb or kb < ka:
+        # subset is NOT auto-safe: a dropped short token can leave a bare first name that
+        # is a subset of a DIFFERENT person ("Carlos" ⊂ "Carlos Vargas"), or a reorder drops
+        # a surname ("Joseph Guy" ⊂ "Guy Joseph Hopp"). Always hold for human eyes.
+        return ("hold", "subset / token-drop — could be a different person")
+    da, db = ka - kb, kb - ka
+    if _gender_flip(da, db):
+        return ("hold", "possible gender/name flip (a/o)")
+    d = _lev(" ".join(sorted(ka)), " ".join(sorted(kb)))
+    if d <= 2:
+        return ("accept", f"OCR typo (edit {d})")
+    return ("hold", f"edit distance {d} — review")
+
+
+def _choose_survivor(cur, members):
+    ks = [m for m in members if m in KEYSTONE_IDS]
+    if len(ks) > 1:
+        return None                      # two keystones chained together -> refuse, review
+    if ks:
+        return ks[0]
+    cur.execute("SELECT id,(SELECT count(*) FROM doc_entities de WHERE de.entity_id=e.id) n "
+                "FROM entities e WHERE e.id=ANY(%s)", (list(members),))
+    rows = cur.fetchall()
+    return max(rows, key=lambda r: (r["n"], -r["id"]))["id"] if rows else None
+
+
+def review_accept(cur, apply=False):
+    """Decide each pending fuzzy proposal; accept the provably-same, hold the ambiguous.
+    Accept edges form chains (A~B, B~C), so union-find collapses each connected cluster to a
+    single survivor before merging — and a cluster spanning >1 keystone is refused (a fuzzy
+    chain must never silently fuse two distinct keystone people)."""
+    _ensure_tables(cur)
+    cur.execute("""SELECT survivor, alias, survivor_name, alias_name FROM entity_merge_proposals
+                   WHERE status='pending' AND tier='fuzzy' ORDER BY id""")
+    rows = cur.fetchall()
+    accepts, holds = [], []
+    for r in rows:
+        dec, why = review_decision(r["survivor_name"], r["alias_name"])
+        (accepts if dec == "accept" else holds).append((r, why))
+    print(f"FUZZY review: {len(accepts)} accept-edges · {len(holds)} hold · {len(rows)} total")
+
+    if not apply:
+        print("\n-- WOULD ACCEPT (sample) --")
+        for r, why in accepts[:20]:
+            print(f"   #{r['alias']} \"{r['alias_name']}\" → #{r['survivor']} \"{r['survivor_name']}\" ({why})")
+        print("\n-- WOULD HOLD (sample) --")
+        for r, why in holds[:20]:
+            print(f"   ? #{r['alias']} \"{r['alias_name']}\" vs #{r['survivor']} \"{r['survivor_name']}\" ({why})")
+        return
+
+    # union-find over accept edges -> connected clusters
+    parent = {}
+    def find(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+    def union(a, b):
+        parent[find(a)] = find(b)
+    for r, _ in accepts:
+        union(r["survivor"], r["alias"])
+    comps = {}
+    for r, _ in accepts:
+        comps.setdefault(find(r["survivor"]), set()).update((r["survivor"], r["alias"]))
+
+    merged = refused = 0
+    for members in comps.values():
+        surv = _choose_survivor(cur, members)
+        if surv is None:
+            print(f"  ⚠ refused cluster {sorted(members)} — >1 keystone; left for review")
+            refused += 1
+            continue
+        for m in members:
+            if m == surv:
+                continue
+            try:
+                if merge_entities(cur, surv, m):
+                    merged += 1
+            except Exception as e:
+                print(f"  ⚠ {m}->{surv} failed: {str(e)[:80]}")
+        cur.execute("UPDATE entity_merge_proposals SET status='accepted' "
+                    "WHERE (survivor=ANY(%s) AND alias=ANY(%s))", (list(members), list(members)))
+    for r, why in holds:
+        cur.execute("UPDATE entity_merge_proposals SET status='held', reason=%s "
+                    "WHERE survivor=%s AND alias=%s", (why, r["survivor"], r["alias"]))
+    print(f"[review-accept] merged {merged} variant(s) across {len(comps)} cluster(s); "
+          f"{refused} refused; {len(holds)} held")
+
+
 def scan(cur):
     res = cluster(cur)
     a, h, f = res["auto"], res["hold"], res["fuzzy"]
@@ -271,6 +395,9 @@ def main():
     ap.add_argument("--apply-auto", action="store_true")
     ap.add_argument("--propose", action="store_true")
     ap.add_argument("--accept", nargs=2, type=int, metavar=("SURVIVOR", "ALIAS"))
+    ap.add_argument("--review-accept", action="store_true",
+                    help="decide pending fuzzy proposals (dry); add --apply to act")
+    ap.add_argument("--apply", action="store_true")
     a = ap.parse_args()
     c = _conn()
     cur = _cur(c)
@@ -278,6 +405,8 @@ def main():
         apply_auto(cur)
     elif a.propose:
         propose(cur)
+    elif a.review_accept:
+        review_accept(cur, apply=a.apply)
     elif a.accept:
         accept(cur, a.accept[0], a.accept[1])
     else:
