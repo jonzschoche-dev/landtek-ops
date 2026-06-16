@@ -108,14 +108,53 @@ def gate(cur, text):
             "cited_docs": cited, "n_warns": len(warns)}
 
 
+def remediate(cur, text, res=None):
+    """Deterministically produce a GROUNDED-ONLY version of a reply that failed the gate — $0,
+    no LLM. The token-efficient fail-path: instead of regenerating (which doubles cost), keep
+    every non-factual sentence and every factual sentence with a RESOLVABLE citation, and drop
+    the ungrounded ones (fabricated cite / uncited cascade / uncited factual claim). Guarantees
+    nothing ungrounded ships, at zero extra tokens and millisecond speed.
+
+    (The n8n flow MAY instead try one bounded LLM regeneration first for quality, then fall back
+    to this — but this is the floor: accurate and free, never a loop.)"""
+    res = res or gate(cur, text)
+    if res["verdict"] == "pass" and not res["warns"]:
+        return text
+    real = set()
+    if res["cited_docs"]:
+        cur.execute("SELECT id FROM documents WHERE id = ANY(%s)", (res["cited_docs"],))
+        real = {r[0] for r in cur.fetchall()}
+    kept, dropped = [], 0
+    for s in _split_sentences(text):
+        cites = {int(m) for m in CITE_RE.findall(s)}
+        if any(c not in real for c in cites):          # cites a fabricated doc
+            dropped += 1; continue
+        factual = bool(FACT_SIGNAL_RE.search(s)) and not HEDGE_RE.search(s)
+        if CASCADE_RE.search(s) and not cites:          # ungrounded cascade
+            dropped += 1; continue
+        if factual and not cites:                       # uncited factual claim
+            dropped += 1; continue
+        kept.append(s)
+    out = " ".join(kept).strip()
+    if dropped:
+        out = (out + " I've left out claims I can't ground in the record.").strip() \
+            if out else "I don't have a verified record to answer that."
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--text")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--remediate", action="store_true",
+                    help="print a grounded-only rewrite of a failing reply ($0, no LLM)")
     a = ap.parse_args()
     text = a.text if a.text is not None else sys.stdin.read()
     c = _conn()
     cur = c.cursor()
+    if a.remediate:
+        print(remediate(cur, text))
+        return
     res = gate(cur, text)
     if a.json:
         print(json.dumps(res, indent=2))
