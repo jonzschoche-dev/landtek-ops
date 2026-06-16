@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""grounded_brief.py — auto-generate the SYSTEM GROUNDED BRIEF. $0, deterministic, no LLM.
+"""constitution_generator.py — auto-generate the SYSTEM CONSTITUTION. $0, deterministic, no LLM.
 
 WHY (operator, 2026-06-16): the system is fragmented — MASTER_PLAN (manual, stales), DB facts
 (grounded but not synthesized), memos (static), engines (running without a unified grounded
@@ -22,8 +22,8 @@ DESIGN (deliberate, per the design review):
     No semantic version bumps on a daily auto-regen.
 
 Reads (all `_safe`/grounded): matters, matter_facts (verified), keystones, matter_state.
-  python3 scripts/grounded_brief.py            # print to stdout
-  python3 scripts/grounded_brief.py --write     # write SYSTEM_BRIEF.md (repo root)
+  python3 scripts/constitution_generator.py            # print to stdout
+  python3 scripts/constitution_generator.py --write     # write SYSTEM_CONSTITUTION.md (repo root)
 
 Runs on the VPS (psycopg2 + PG_DSN). Rides landtek-cross-client.timer (regen after self-heal).
 Wiring into LLM entry points (Leo systemMessage / comprehend / play+memo generation) is step 2.
@@ -39,7 +39,7 @@ import psycopg2.extras
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "SYSTEM_BRIEF.md")
+OUT = os.path.join(REPO, "SYSTEM_CONSTITUTION.md")
 SKIP_MATTERS = ("AUTO-ARCHIVE",)   # orphan/archive buckets, not real matters
 
 PREAMBLE = """## OPERATING RULES (fixed — read before every decision)
@@ -73,6 +73,16 @@ def _q(cur, sql, args=None):
 
 def gather(cur):
     d = {}
+    # NORTH STARS — sourced from client_goals (data, not hardcoded). The north_star row per
+    # client + its active sub-goals. This is the harvested framing from the designer's draft,
+    # but grounded in the table instead of a hardcoded dict that would stale.
+    d["north_stars"] = _q(cur, """
+        SELECT case_file, goal_text, priority FROM client_goals
+        WHERE goal_category='north_star' ORDER BY case_file""")
+    d["subgoals"] = _q(cur, """
+        SELECT case_file, goal_text FROM client_goals
+        WHERE goal_category <> 'north_star' AND status='active' AND parent_goal_id IS NOT NULL
+        ORDER BY case_file, priority""")
     d["verified_facts"] = _q(cur, """
         SELECT matter_code, statement, source_kind, source_id, as_of
         FROM matter_facts WHERE provenance_level='verified'
@@ -119,12 +129,37 @@ def candidate_cascades(matters, keystone_controllers):
 
 def render(d, now_iso):
     L = []
-    L.append("# SYSTEM GROUNDED BRIEF")
+    L.append("# SYSTEM CONSTITUTION")
     L.append("")
-    L.append("> AUTO-GENERATED FACTS LAYER — do not hand-edit the body. Intent/north-star/decisions "
-             "live in `MASTER_PLAN.md` (manual, authoritative). North star: see MASTER_PLAN §1.")
+    L.append("> AUTO-GENERATED FACTS LAYER — do not hand-edit the body. The system reads this before "
+             "every decision. Intent/strategy decisions are authored MANUALLY in `MASTER_PLAN.md`; "
+             "this Constitution is the grounded-facts mirror (every line cited or marked).")
     L.append("")
     L.append(PREAMBLE)
+
+    # ── NORTH STARS (per client; objective from client_goals, keystone from keystones) ──
+    ks_by_cf = {}
+    for k in d["keystones"]:
+        ks_by_cf.setdefault(k["case_file"], []).append(k)
+    sub_by_cf = {}
+    for s in d["subgoals"]:
+        sub_by_cf.setdefault(s["case_file"], []).append(s["goal_text"])
+    L.append("## NORTH STARS (per client — objective + keystone)")
+    L.append("")
+    if not d["north_stars"]:
+        L.append("_(no north_star goals set in client_goals)_")
+    for ns in d["north_stars"]:
+        cf = ns["case_file"]
+        L.append(f"### {cf}")
+        L.append(f"- **objective:** {ns['goal_text'].strip()}")
+        for k in ks_by_cf.get(cf, []):
+            casc = k["cascade_matters"]
+            casc = ", ".join(casc) if isinstance(casc, (list, tuple)) else (casc or "")
+            L.append(f"- **keystone:** {k['label']} → `{k['controlling_matter']}` cascades to {casc}")
+        subs = sub_by_cf.get(cf, [])
+        for s in subs[:6]:
+            L.append(f"  - sub-goal: {s.strip()[:120]}")
+        L.append("")
 
     # ── VERIFIED CASCADES (keystones, re-checked for grounding) ──
     vf = d["verified_facts"]
@@ -225,7 +260,7 @@ def main():
     if a.write:
         with open(OUT, "w") as f:
             f.write(out)
-        print(f"[grounded_brief] wrote {OUT} ({len(out)} bytes)")
+        print(f"[constitution] wrote {OUT} ({len(out)} bytes)")
     else:
         sys.stdout.write(out)
 

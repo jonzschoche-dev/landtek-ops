@@ -1,5 +1,5 @@
 [Unit]
-Description=LandTek cross-client sentinel + grounded brief (collapse exact-dup re-spawns + role-aware conflation + mis-file + entity-canon drift, then regenerate SYSTEM_BRIEF.md). $0, no LLM.
+Description=LandTek cross-client sentinel + constitution (collapse exact-dup re-spawns + role-aware conflation + mis-file + entity-canon drift, then regenerate SYSTEM_CONSTITUTION.md). $0, no LLM.
 After=network-online.target docker.service
 
 [Service]
@@ -9,6 +9,6 @@ WorkingDirectory=/root/landtek
 ExecStart=/usr/bin/python3 /root/landtek/scripts/entity_resolve.py --apply-auto
 ExecStart=/usr/bin/python3 /root/landtek/scripts/cross_client_sentinel.py --apply-canon
 ExecStart=/usr/bin/python3 /root/landtek/scripts/cross_client_sentinel.py --report --log
-ExecStart=/usr/bin/python3 /root/landtek/scripts/grounded_brief.py --write
+ExecStart=/usr/bin/python3 /root/landtek/scripts/constitution_generator.py --write
 StandardOutput=append:/var/log/landtek_cross_client.log
 StandardError=append:/var/log/landtek_cross_client.log

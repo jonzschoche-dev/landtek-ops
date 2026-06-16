@@ -68,10 +68,11 @@ staging/.env
 system_state.json
 drafts/daily_digest_*.md
 
-# SYSTEM_BRIEF.md — auto-generated FACTS layer, regenerated daily on the VPS by
-# grounded_brief.py (rides landtek-cross-client.timer). Tracking it would dirty the VPS
-# tree nightly and break the multi-agent pull protocol (cf. notifications/pending.txt).
-# Read it on the VPS; regenerate with: python3 scripts/grounded_brief.py --write
+# SYSTEM_CONSTITUTION.md — auto-generated FACTS layer, regenerated daily on the VPS by
+# constitution_generator.py (rides landtek-cross-client.timer). Tracking it would dirty the
+# VPS tree nightly and break the multi-agent pull protocol (cf. notifications/pending.txt).
+# Read it on the VPS; regenerate with: python3 scripts/constitution_generator.py --write
+SYSTEM_CONSTITUTION.md
 SYSTEM_BRIEF.md
 
 # Sweep-loop heartbeat (daemon-written, changes every cycle)
