@@ -1,8 +1,15 @@
 [Unit]
-Description=LandTek verification ladder auto-promote
+Description=LandTek verifiable-corpus loop (scour + point + measure; strict, gate-aligned)
 After=network-online.target
+
+# NOTE: this unit formerly ran verification_ladder.py, which auto-promotes entities to
+# 'verified' by CORROBORATION (3+ mentions) — that contradicts the provenance write-gate
+# (deploy_504: verified = resolving source doc + quoted excerpt). The ladder is quarantined
+# (its timer stays disabled) until its target tier is relabeled 'corroborated' so that
+# 'verified' uniformly means document-proven. The daily verification job is now verify_loop.py.
+
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /root/landtek/verification_ladder.py
+ExecStart=/usr/bin/python3 /root/landtek/scripts/verify_loop.py
 StandardOutput=append:/var/log/landtek_verify.log
 StandardError=append:/var/log/landtek_verify.log

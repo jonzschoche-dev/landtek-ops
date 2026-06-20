@@ -131,6 +131,62 @@ FACTS = [
      "authorizing the latter to “negotiate for the sale of the [property] in favor of third persons in "
      "possession of CONTRACTS TO SELL executed by the previous administrator, MR. BEN LLAMANZARES "
      "and/or to those who have paid their down-payments or have made partial payments therefor"),
+
+    # ── doc 376 = Yuzon Law Office memo on CV-6839 (legible email attachment). Finally gives the real
+    #    CV-6839 identity/parties/theory — the system knew it only as 'the ₱20M case'. (The award FIGURE
+    #    is in doc 351's valuation tables, still tabular — the ₱20M stays operator until cleanly read.) ──
+    ("MWK-CV6839", 376,
+     "Civil Case 6839 is 'Heirs of Mary Worrick Keesey v. The Department of Agrarian Reform and "
+     "LandBank of the Philippines' — a just-compensation / agrarian-reform expropriation case (RTC "
+     "sitting as Special Agrarian Court), NOT a private dispute.",
+     "Civil Case No. 6839 titled 'Heirs of Mary Worrick Keesey v. The Department of Agrarian Reform "
+     "and LandBank of the Philippines'"),
+    ("MWK-CV6839", 376,
+     "Preliminary payments of just compensation were made to the heirs of Mary Worrick Keesey through "
+     "their attorney-in-fact Cesar M. de la Fuente — the SAME de la Fuente later central to the void "
+     "Balane sale in CV-26360; per the memo these payments do not absolve the government of delay liability.",
+     "there were preliminary payments to the heirs of Mary Worrick Keesey through their attorney-in-fact, "
+     "Cesar M. De La Fuente, does not in any way absolve, relieve, or exempt the government from liability "
+     "for the delay"),
+    ("MWK-CV6839", 376,
+     "The SPA dated 17 May 1999 (Geraldine Keesey Hoppe, Patricia Keesey Zschoche, Marcia Ellen Keesey "
+     "→ Ida M. Buenaventura) did NOT authorize Buenaventura to represent the heirs in CV-6839; DAR raised "
+     "this in a Motion for Reconsideration dated 29 Dec 1999. Her authority came only via the separate "
+     "SPA dated 15 August 2005 (the same revocation-SPA at the heart of CV-26360).",
+     "Nowhere did it state in the said Special Power of Attorney that Ida M. Buenaventura was authorized "
+     "to represent the principals in Civil Case No. 6839. Such authority was only granted to Ida M. "
+     "Buenaventura only through the execution of a separate Special Power of Attorney dated 15 August 2005"),
+    ("MWK-CV6839", 376,
+     "Under R.A. 6657 (CARL), just compensation to landowners is paid in cash AND bonds; the landowner "
+     "cannot insist on cash alone — relevant to how any CV-6839 award would be satisfied.",
+     "the Comprehensive Agrarian Reform Law provides that just compensation to landowners shall be paid "
+     "in cash and bonds. Accordingly, the landowner cannot insist to be paid in cash alone"),
+
+    # ── doc 967 = the ARTA RESOLUTION on CTN SL-2025-1021-0747 (legible). A real outcome for ARTA-0747. ──
+    ("MWK-ARTA-0747", 967,
+     "ARTA issued a Resolution on CTN SL-2025-1021-0747 REFERRING the complaint to the CART/Agency under "
+     "the R.A. 11032 referral procedure (not a merits ruling), signed by the Regional Chief, ARTA "
+     "Southern Luzon.",
+     "during the period that the Complaint is with the CART/Agency, the Complainant may, at any time, "
+     "submit a Request for Termination of Referral to ARTA"),
+    ("MWK-ARTA-0747", 967,
+     "Zschoche submitted the Initial Complaint in ARTA CTN SL-2025-1021-0747 on 20 October 2025, charging "
+     "Mayor Pajarillo with imposing additional requirements and failure to render service within the "
+     "prescribed processing time.",
+     "On 20 October 2025, Zschoche submitted an Initial Complaint charging Hon. Pajarillo for imposing "
+     "additional requirements and for his failure to render government service within the prescribed processing"),
+    ("MWK-ARTA-0747", 967,
+     "Grounds on which the complainant may request Termination of Referral include (a) the official "
+     "complained-of is the CART approving Chairperson / Head of Agency, and (c) lapse of 20 working days "
+     "from referral with no resolution — both live triggers for escalating ARTA-0747.",
+     "The government official complained of is the approving Chairperson of the CART or the Head of "
+     "Agency; ... Lapse of twenty working (20) days or any extension from the time of the referral and "
+     "no resolution is met"),
+    ("MWK-ARTA-0747", 967,
+     "Mayor Alexander Pajarillo — the respondent — is identified in the Resolution as the CART "
+     "Chairperson (copy-furnished as 'CART Chairperson / Mayor'); the respondent thus heads the very "
+     "body the complaint is referred to (squarely Termination-of-Referral ground (a)).",
+     "HON. ALEXANDER PAJARILLO CART Chairperson Mayor"),
 ]
 
 
