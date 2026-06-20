@@ -72,6 +72,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("history", "/history", "History"),
         ("health", "/health", "Health"),
         ("trajectory", "/trajectory", "Trajectory"),
+        ("awareness", "/awareness", "Awareness"),
         ("parcels", "/parcels", "Parcels"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
@@ -2315,3 +2316,80 @@ def search_page():
 </div>
 """
     return _layout("Search", body, active="home")
+
+
+@bp.route("/awareness")
+def awareness():
+    """Reliability cockpit: deadline coverage + awareness-score trend + verified-fact coverage."""
+    import re as _re
+
+    def _cn(label, val, cls=""):
+        return (f'<div class="card"><div class="muted">{_esc(label)}</div>'
+                f'<div style="font-size:26px;font-weight:700" class="{cls}">{_esc(val)}</div></div>')
+
+    conn = _db(); conn.autocommit = True
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cards = dl_rows = trend = cov = ""
+    try:
+        cur.execute("SELECT max(as_of) m FROM surfaced_deadlines")
+        row = cur.fetchone(); asof = row["m"] if row else None
+        if asof:
+            cur.execute("SELECT bucket, count(*) n FROM surfaced_deadlines WHERE as_of=%s GROUP BY bucket", (asof,))
+            bc = {r["bucket"]: r["n"] for r in cur.fetchall()}
+            cur.execute("""SELECT due_date, matter_code, label, bucket, days_out FROM surfaced_deadlines
+                            WHERE as_of=%s AND bucket IN ('OVERDUE','THIS WEEK','THIS MONTH','UPCOMING')
+                            ORDER BY due_date""", (asof,))
+            for r in cur.fetchall():
+                cls = "bad" if r["bucket"] == "OVERDUE" else "warn"
+                when = f"{-r['days_out']}d ago" if (r["days_out"] or 0) < 0 else f"in {r['days_out']}d"
+                dl_rows += (f"<tr><td>{_esc(r['due_date'])}</td><td>{_esc(r['matter_code'])}</td>"
+                            f"<td class='{cls}'>{_esc(when)}</td><td>{_esc((r['label'] or '')[:64])}</td></tr>")
+            cards += _cn("Overdue", bc.get("OVERDUE", 0), "bad")
+            cards += _cn("This month", bc.get("THIS WEEK", 0) + bc.get("THIS MONTH", 0), "warn")
+            cards += _cn("Upcoming", bc.get("UPCOMING", 0), "ok")
+    except Exception as e:
+        dl_rows = f"<tr><td colspan='4'>deadlines unavailable: {_esc(str(e)[:80])}</td></tr>"
+    try:
+        wr = _re.compile(r"observation_only|advisory|tracking|no_immediate_deadline|"
+                         r"asset_development|declared_unrelated|under_review", _re.I)
+        cur.execute("""SELECT matter_code, coalesce(current_stage,status) st FROM matters
+                        WHERE next_deadline IS NULL AND (status IS NULL OR status NOT IN ('closed','archived'))""")
+        needs = sum(1 for r in cur.fetchall()
+                    if not r["matter_code"].startswith("AUTO-") and not wr.search(r["st"] or ""))
+        cards += _cn("Need a date", needs, "warn")
+    except Exception:
+        pass
+    try:
+        cur.execute("SELECT ts, score, n_facts FROM awareness_log ORDER BY ts DESC LIMIT 14")
+        rows = cur.fetchall()[::-1]
+        if rows:
+            cards += _cn("Awareness", f"{rows[-1]['score']}%", "ok")
+            trend = "".join(f"<tr><td>{_esc(str(r['ts'])[:16])}</td><td>{_esc(r['score'])}%</td>"
+                            f"<td>{_esc(r['n_facts'])}</td></tr>" for r in rows)
+    except Exception as e:
+        trend = f"<tr><td colspan='3'>trend unavailable: {_esc(str(e)[:80])}</td></tr>"
+    try:
+        cur.execute("""SELECT matter_code, count(*) FILTER (WHERE provenance_level='verified') v,
+                              count(*) FILTER (WHERE provenance_level<>'verified') i
+                         FROM matter_facts GROUP BY matter_code ORDER BY v DESC, i DESC LIMIT 12""")
+        for r in cur.fetchall():
+            cov += (f"<tr><td>{_esc(r['matter_code'])}</td><td class='ok'>{r['v']}</td>"
+                    f"<td class='muted'>{r['i']}</td></tr>")
+    except Exception:
+        cov = "<tr><td colspan='3'>coverage unavailable</td></tr>"
+    conn.close()
+    body = f"""
+<h1>Awareness</h1>
+<div class="grid grid-2">{cards}</div>
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card"><h2>Due dates (latest surface)</h2>
+    <table><tr><th>Date</th><th>Matter</th><th>When</th><th>What</th></tr>
+    {dl_rows or "<tr><td colspan='4' class='muted'>none surfaced</td></tr>"}</table></div>
+  <div class="card"><h2>Awareness score trend</h2>
+    <table><tr><th>When</th><th>Score</th><th>Facts</th></tr>
+    {trend or "<tr><td colspan='3' class='muted'>no log yet</td></tr>"}</table></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Verified-fact coverage (top matters)</h2>
+  <table><tr><th>Matter</th><th>Verified</th><th>Inferred</th></tr>{cov}</table></div>
+"""
+    return _layout("Awareness", body, active="awareness")
