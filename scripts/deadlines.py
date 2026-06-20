@@ -99,9 +99,23 @@ def gather(cur):
     for g in cur.fetchall():
         obs.append({"date": g["target_date"], "matter": g["case_file"],
                     "label": (g["goal_text"] or "")[:70], "kind": "goal", "source": "client_goals"})
-    # matters with no date at all = the awareness gap
-    no_date = [m["matter_code"] for m in matters if m["matter_code"] not in dated_matters]
+    # matters with no date at all = the awareness gap (carry the stage so we can classify honestly)
+    no_date = [(m["matter_code"], m["stage"]) for m in matters if m["matter_code"] not in dated_matters]
     return obs, no_date, len(matters), timeline
+
+
+# Stages that legitimately have NO deadline — surfacing them as "missing" is false alarm.
+WATCH_RE = re.compile(
+    r"observation_only|advisory|tracking|no_immediate_deadline|asset_development|"
+    r"declared_unrelated|under_review", re.I)
+
+
+def classify_gap(code, stage):
+    if code.startswith("AUTO-"):
+        return "orphan"
+    if WATCH_RE.search(stage or ""):
+        return "watch"
+    return "needs_date"   # an action/litigation stage that SHOULD carry a date
 
 
 def bucket(delta):
@@ -146,9 +160,17 @@ def digest(cur, today, write=False):
             when = f"{-delta}d ago" if delta < 0 else (f"in {delta}d" if delta else "TODAY")
             L.append(f"   {o['date'].isoformat()} ({when})  {o['matter']} — {o['label']}")
         L.append("")
-    L.append(f"⚠ AWARENESS GAP: {len(no_date)}/{n_matters} active matters have NO tracked deadline.")
-    L.append("   " + ", ".join(no_date[:24]) + (" …" if len(no_date) > 24 else ""))
-    L.append(f"   ({timeline} historical/filing dates in prose were correctly NOT counted as deadlines.)")
+    gaps = {"needs_date": [], "watch": [], "orphan": []}
+    for code, stage in no_date:
+        gaps[classify_gap(code, stage)].append((code, stage))
+    L.append(f"📋 NEEDS A DATE ({len(gaps['needs_date'])}) — action-stage matters with no tracked deadline:")
+    for code, stage in sorted(gaps["needs_date"]):
+        L.append(f"   {code} — {stage}")
+    L.append("")
+    L.append(f"👁 watch-only, no deadline by design: {len(gaps['watch'])}"
+             + (" (" + ", ".join(c for c, _ in gaps["watch"]) + ")" if gaps["watch"] else ""))
+    L.append(f"🗑 orphan/auto-promoted (not real matters): {len(gaps['orphan'])}")
+    L.append(f"   ({timeline} historical/filing dates in prose correctly excluded — not deadlines.)")
     out = "\n".join(L)
     print(out)
 
@@ -164,6 +186,32 @@ def digest(cur, today, write=False):
                         (o["date"], o["matter"], o["label"], o["kind"], bucket(delta), delta, today))
         print(f"\n[write] persisted {len(uniq)} dated obligations to surfaced_deadlines (as_of {today}).")
     return out
+
+
+def summary_text(cur, today=None):
+    """Concise plain-text block for the daily digest (S14-safe: short, one topic). $0."""
+    today = today or date.today()
+    obs, no_date, n_matters, timeline = gather(cur)
+    seen, uniq = set(), []
+    for o in sorted(obs, key=lambda x: x["date"]):
+        k = (o["date"], o["matter"], o["kind"])
+        if k not in seen:
+            seen.add(k); uniq.append(o)
+    overdue = [(o, (o["date"] - today).days) for o in uniq if (o["date"] - today).days < 0]
+    soon = [(o, (o["date"] - today).days) for o in uniq if 0 <= (o["date"] - today).days <= 45]
+    needs = sum(1 for c, s in no_date if classify_gap(c, s) == "needs_date")
+    L = [f"DUE DATES (as of {today.isoformat()})",
+         f"North star: testimony in {(NORTH_STAR[0]-today).days}d (Aug 12)."]
+    if overdue:
+        L.append("OVERDUE — confirm status:")
+        for o, d in overdue[:6]:
+            L.append(f"  - {o['matter']}: {-d}d past ({o['label'][:48]})")
+    if soon:
+        L.append("UPCOMING (next 45d):")
+        for o, d in soon[:6]:
+            L.append(f"  - {o['matter']}: in {d}d ({o['label'][:48]})")
+    L.append(f"{needs} action-stage matters still need a deadline set.")
+    return "\n".join(L)
 
 
 def main():

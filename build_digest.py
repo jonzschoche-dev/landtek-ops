@@ -64,6 +64,15 @@ def build_digest_sections():
     now = datetime.now(timezone.utc)
     yesterday = now - timedelta(hours=24)
 
+    # 0. Due dates — the proactive never-miss-a-date surface (deadlines.py). Top of the digest.
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "scripts"))
+        import deadlines as _dl
+        sections["deadlines"] = "⏰ <b>Due dates</b>\n" + _dl.summary_text(cur)
+    except Exception as _e:
+        sections["deadlines"] = f"⏰ <b>Due dates</b>\n  (deadline engine unavailable: {str(_e)[:80]})"
+
     # 1. Overnight client activity
     cur.execute("""
         SELECT case_file, client_name, count(*) AS n_messages,
@@ -190,7 +199,7 @@ def render_digest_messages():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     header = f"📊 <b>LandTek Daily Digest — {today}</b>\n\n"
 
-    order = ["activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
+    order = ["deadlines", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
     msgs = []
     buf = header
     for k in order:

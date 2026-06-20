@@ -142,6 +142,44 @@ Parse: `\[(?:OCR|STRUCTURE|v|HUMAN VERIFY|\?)[^\]]*\]`. Layers must PRESERVE ups
    - **Email channel** — `email_channel_bridge.py` feeds Gmail into the existing `/api/channel/email` adapter (inbound + send drain).
    - LLM-runtime *behaviour* of the gated pieces (Leo replies, classify-at-scale, bill-extraction, reply content) lights up via `activate_stack.sh` on credit top-up. The scaffolding is built + inert.
 
+## 6A. Reliability-first plan (2026-06-20 — counter to the "build the apex agent" pitch)
+
+Operator surfaced the real failure: *"the stack is missing every important date — it's almost
+useless; a random LLM helps more."* True diagnosis: the stack is **~90% built but unreliable +
+not proactive**, not greenfield. So the plan is **reliability before autonomy**, $0-first, on the
+existing machinery — explicitly rejecting the rebuild / always-on-loops / **self-deploying-code**
+("Meta-Evolution") / Jetson framing (bottleneck is grounded data + credits, not compute).
+
+**5 pillars** (each builds on what exists; metric-gated):
+1. **Awareness & data quality** — close the deadline gap + raise *verified*-fact coverage on the
+   live matters first. `deadlines.py` (deploy_496/497) surfaces every dated obligation with a
+   forward-marker precision filter (no filing-date false alarms) and classifies the 27 dateless
+   matters honestly: **17 genuinely need a date** (incl. GUARDIANSHIP pending-filing + the ARTA
+   cases), 6 watch-only by design, 4 AUTO orphans. Metric: deadline coverage + awareness score.
+2. **Proactivity (push, not pull)** — `build_digest.py` now **leads the daily digest with "Due
+   dates"** (north-star countdown, overdue-confirm, upcoming, needs-a-date count). The stack tells
+   you what's due unprompted. $0.
+3. **Grounding discipline** — Constitution + `leo_answer_gate.py` (built/tested) + structured tools
+   keep outputs on exact data; dates/facts go via structured leo-tools endpoints, **not** the
+   vector stores (RAG/`rag_local`/Qdrant stay for *semantic doc* retrieval — embedding exact dates
+   loses precision and invites "close-enough" hallucination).
+3.5 **Integration into live Leo** — the deterministic engines write structured Postgres rows;
+   Leo reads them through leo-tools HTTP tools (`/api/deadlines`, `/api/get_verified_facts`) like
+   the existing `query_documents`/`get_entity` nodes. Build now ($0); wire at activation.
+4. **Earn autonomy slowly** — ladder: read-only digests → **auto-suggest via the existing
+   proposals queue** (`leo_improvement_proposals`/`promote_proposals.py`, human-approved) → execute
+   only the lowest-risk, each rung **metric-gated** (e.g. deadline coverage ≥90% + push clean ~2wk).
+   **Never auto-execute before the gate; never self-deploying code.**
+5. **Stay cheap** — $0 deterministic engines do standing work; LLM only where it moves a metric;
+   sim stays dead; trim the 90KB Leo systemMessage at activation (biggest per-call token waste).
+
+**Awareness dashboard:** extend the existing `/ops` cockpit with `/ops/awareness` (coverage trends
+from `awareness_log` + `surfaced_deadlines` + per-matter verified-fact coverage) — at-a-glance, $0.
+
+**Done this session (P1+P2, $0):** honest deadline coverage + proactive daily push. **Next ($0):**
+`/ops/awareness` page + the structured `/api/deadlines` feed; then the credit-gated comprehension
+pass to raise verified-fact coverage.
+
 ## 6.5 Activation — flip the stack ON when credits land (architecture is in place)
 
 Everything is built cold and **inert**: the spend-bridge timer is disabled, the synthetic loops
