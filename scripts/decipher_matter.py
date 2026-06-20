@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""decipher_matter.py — give the system the machinery to DECIPHER a case instead of flattening it.
+"""decipher_matter.py — give the system the machinery to DECIPHER a case, from the SOURCE pleading.
 
-WHY (operator, 2026-06-20): CV-26360 has 3 Balane defendants (Gloria=title-holder, Engr. Erwin=
-building official, Efren=spouse) and multiple causes — but the system collapsed it to one theory
-("void-title vs Balane") with 2 respondents, because a matter was a FLAT row: one legal_theory, an
-entity array, no roles, no causes. This adds the structure (matter_parties + matter_causes), pins
-the operative pleading, and populates CV-26360 from operator ground truth ("all Balanes are in
-26-360") + the already-deduped Balane entities. The standing version reads the operative pleading
-(doc 419) to auto-extract this — that's the credit-gated comprehension step; the schema +
-reconciliation here is $0 and is what makes the extraction representable at all.
+A matter was a flat row (one legal_theory, an entity array). This populates the structure
+(matter_parties + matter_causes) by READING the operative pleading and citing it — so the rows are
+VERIFIED (gate-passing: source_doc_id/operative_doc_id resolves + a quoted span), not hand-fed.
+
+CV-26360 deciphered from doc 781 — 'Latest Draft Complaint - Zschoche v. Balane, et al.' (the real
+operative complaint, found in the Barandon email thread; the earlier 419/384 were mislabeled decoys).
 
   python3 scripts/decipher_matter.py --apply
 """
@@ -17,28 +15,55 @@ import argparse
 import psycopg2
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
-
-# CV-26360 deciphered from operator ground truth + deduped entities. Roles/causes are
-# inferred_strong pending confirmation against the operative pleading (doc 419, Exhibit I Complaint).
 MATTER = "MWK-CV26360"
-OPERATIVE_DOC = 419
+OPERATIVE_DOC = 781   # Latest Draft Complaint - Zschoche v. Balane, et al. (legible, in email)
+
+# (entity_id, name, side, role, provenance, source_excerpt) — READ from doc 781, cited → verified.
 PARTIES = [
-    # (entity_id, name, side, role, provenance). Hand-fed from operator ground truth = 'operator' tier,
-    # NEVER 'verified' — a verified role must be EXTRACTED from the operative pleading with a citation.
-    (400, "Patricia Keesey Zschoche", "plaintiff", "registered heir/owner (rep. by Jonathan Zschoche)", "operator"),
-    (15, "Gloria Balane", "defendant", "holder of the void title TCT T-079-2021002126", "operator"),
-    (3057, "Efren Balane", "defendant", "spouse / co-party of Gloria Balane", "inferred_strong"),
+    (400, "Patricia Keesey Zschoche", "plaintiff",
+     "co-owner/plaintiff, represented by her son and Attorney-in-fact Jonathan Paul Zschoche", "verified",
+     "PLAINTIFF PATRICIA KEESEY ZSCHOCHE ... represented by her son and Attorney-in-fact, JONATHAN PAUL ZSCHOCHE"),
+    (15, "Gloria Balane", "defendant",
+     "buyer under the void 2016 Deed of Absolute Sale; holder of the assailed TCT 079-2021002126", "verified",
+     "herein defendant Gloria Balane fraudulently executed a Deed of Absolute Sale, conveying the subject property in favor of the latter"),
+    (3057, "Efren Balane", "defendant", "spouse of Gloria Balane, sued jointly", "verified",
+     "Defendant Efren Balane is being sued jointly with Gloria as her spouse"),
+    (3059, "Jomil Torralba", "defendant",
+     "present illegal possessor of the subject property (allowed to reside there by Gloria and Efren)", "verified",
+     "defendant Spouses Jomil and Princess Balane Torralba are being impleaded as the present illegal possessors of the subject property"),
+    (2391, "Princess Balane Torralba", "defendant",
+     "present illegal possessor of the subject property (spouse of Jomil Torralba)", "verified",
+     "defendant Spouses Jomil and Princess Balane Torralba are being impleaded as the present illegal possessors of the subject property"),
     (3060, "Engr. Erwin Balane", "defendant",
-     "involved in the title TRANSFER and SUBDIVISION (operator-corrected 2026-06-20; exact role/cause "
-     "to be read from the operative pleading doc:419 — NOT inferred)", "operator"),
+     "child of Gloria & Efren; used his official capacity as Municipal Engineer of Mercedes to perform "
+     "acts validating/giving effect to the illegal sale, in conspiracy with the co-defendants", "verified",
+     "Engr. Erwin Balane, one of the children of Gloria and Efren, is being impleaded for acting in "
+     "conspiracy with his co-defendants by using his official capacity, authority and influence as the "
+     "Municipal Engineer of Mercedes to perform acts intended to validate and give effect to the illegal sale"),
 ]
+# (cause, against, basis, provenance, source_excerpt) — from the complaint caption + body (doc 781).
 CAUSES = [
-    # (cause, against, basis, provenance). operator/strong-grounded only — the FULL, exact cause list
-    # must be extracted from the operative pleading (doc:419) with citations, not hand-fed here.
-    ("Accion reinvindicatoria / nullification of TCT T-079-2021002126",
-     "Gloria Balane, Efren Balane",
-     "Void 1992 SPA (negotiate ≠ sell, revoked 2005) → void 2016 deed → void title; recover the parcel.",
-     "operator"),
+    ("Accion reivindicatoria — recovery of ownership and possession of the 2,587 sqm subject property",
+     "all defendants",
+     "Real action for the co-ownership; the sale among defendants is null and void for being entered "
+     "into without the co-owners' knowledge and consent (Art. 487 Civil Code standing).", "verified",
+     "This is a real action praying from the recovery of the ownership and possession of the subject "
+     "property ... the sale executed by and among the defendants is null and void"),
+    ("Declaration of nullity of the 2016 Deed of Absolute Sale",
+     "Gloria Balane (and the late Cesar de la Fuente)",
+     "Cesar's 1992 SPA authorized only to 'negotiate', not to sell, and only to Llamanzares CTS "
+     "holders; it was revoked 15 Aug 2005 — so the 2016 sale is void.", "verified",
+     "his authority was limited ... explicitly only to “negotiate” for the sale of land, which does "
+     "not include the authority to sell"),
+    ("Cancellation of TCT 079-2021002126 and Declaration of Real Property ARP GR-2023-II-07-001-00256",
+     "Gloria Balane",
+     "Cancellation/nullification of all instruments emanating from the void sale, incl. the assailed "
+     "title, the tax declaration, and the annotations on plaintiff's Torrens title.", "verified",
+     "cancellation and nullification of all instruments and documents emanating from the void sale, "
+     "including the tax declaration issued in the name of defendants Balane and the annotations"),
+    ("Accounting and damages", "all defendants",
+     "Accounting of the proceeds Cesar refused to remit to the co-owners, plus the award of damages.",
+     "verified", "Accounting, and Damages"),
 ]
 
 
@@ -49,47 +74,50 @@ def main():
     c = psycopg2.connect(DSN); c.autocommit = True
     cur = c.cursor()
     if not a.apply:
-        print(f"[dry] would create matter_parties + matter_causes and decipher {MATTER}: "
-              f"{len(PARTIES)} parties, {len(CAUSES)} causes, operative pleading doc:{OPERATIVE_DOC}.")
+        print(f"[dry] {MATTER}: {len(PARTIES)} parties, {len(CAUSES)} causes, operative pleading doc:{OPERATIVE_DOC}.")
         return
     cur.execute("""CREATE TABLE IF NOT EXISTS matter_parties (
-        id serial PRIMARY KEY, matter_code text, entity_id int, party_name text,
-        side text, role text, provenance_level text DEFAULT 'inferred_strong',
+        id serial PRIMARY KEY, matter_code text, entity_id int, party_name text, side text, role text,
+        provenance_level text DEFAULT 'inferred_strong', source_doc_id int, source_excerpt text,
         created_at timestamptz DEFAULT now(), UNIQUE(matter_code, entity_id, side))""")
     cur.execute("""CREATE TABLE IF NOT EXISTS matter_causes (
-        id serial PRIMARY KEY, matter_code text, cause text, against_parties text,
-        basis text, provenance_level text DEFAULT 'inferred_strong',
-        operative_doc_id int, created_at timestamptz DEFAULT now(), UNIQUE(matter_code, cause))""")
-    for eid, name, side, role, prov in PARTIES:
-        cur.execute("""INSERT INTO matter_parties (matter_code,entity_id,party_name,side,role,provenance_level)
-            VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (matter_code,entity_id,side)
+        id serial PRIMARY KEY, matter_code text, cause text, against_parties text, basis text,
+        provenance_level text DEFAULT 'inferred_strong', operative_doc_id int, source_excerpt text,
+        created_at timestamptz DEFAULT now(), UNIQUE(matter_code, cause))""")
+    for eid, name, side, role, prov, exc in PARTIES:
+        cur.execute("""INSERT INTO matter_parties
+            (matter_code,entity_id,party_name,side,role,provenance_level,source_doc_id,source_excerpt)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (matter_code,entity_id,side)
             DO UPDATE SET role=EXCLUDED.role, party_name=EXCLUDED.party_name,
-                          provenance_level=EXCLUDED.provenance_level""",
-            (MATTER, eid, name, side, role, prov))
-    for cause, against, basis, prov in CAUSES:
-        cur.execute("""INSERT INTO matter_causes (matter_code,cause,against_parties,basis,provenance_level,operative_doc_id)
-            VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (matter_code,cause)
+              provenance_level=EXCLUDED.provenance_level, source_doc_id=EXCLUDED.source_doc_id,
+              source_excerpt=EXCLUDED.source_excerpt""",
+            (MATTER, eid, name, side, role, prov, OPERATIVE_DOC, exc))
+    for cause, against, basis, prov, exc in CAUSES:
+        cur.execute("""INSERT INTO matter_causes
+            (matter_code,cause,against_parties,basis,provenance_level,operative_doc_id,source_excerpt)
+            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (matter_code,cause)
             DO UPDATE SET against_parties=EXCLUDED.against_parties, basis=EXCLUDED.basis,
-                          provenance_level=EXCLUDED.provenance_level, operative_doc_id=EXCLUDED.operative_doc_id""",
-            (MATTER, cause, against, basis, prov, OPERATIVE_DOC))
-    # pin the operative pleading as a verified fact
-    stmt = (f"OPERATIVE PLEADING for {MATTER} = doc:{OPERATIVE_DOC} (Exhibit I — Complaint, Civil Case "
-            f"26-360). It defines the full defendant roster (Gloria, Efren, Engr. Erwin Balane) and the "
-            f"causes — the authoritative source for deciphering the case structure (operator-confirmed: "
-            f"all Balanes are in 26-360).")
+              provenance_level=EXCLUDED.provenance_level, operative_doc_id=EXCLUDED.operative_doc_id,
+              source_excerpt=EXCLUDED.source_excerpt""",
+            (MATTER, cause, against, basis, prov, OPERATIVE_DOC, exc))
+    stmt = (f"OPERATIVE PLEADING for {MATTER} = doc:{OPERATIVE_DOC} ('Latest Draft Complaint - Zschoche "
+            f"v. Balane, et al.', MTC Mercedes). Defendants: Sps. Efren & Gloria Balane, Sps. Jomil & "
+            f"Princess Balane Torralba (illegal possessors), and Engr. Erwin Balane (Municipal Engineer, "
+            f"impleaded for using his office to validate the illegal sale). Causes: accion reivindicatoria, "
+            f"nullity of the 2016 deed, cancellation of TCT 079-2021002126 + ARP, accounting & damages.")
+    exc = ("SPOUSES EFREN BALANE and GLORIA BALANE, SPOUSES JOMIL TORRALBA and PRINCESS BALANE TORRALBA, "
+           "and ENGR. ERWIN BALANE and all other person/s deriving rights from them ... Defendants.")
     cur.execute("SELECT 1 FROM matter_facts WHERE matter_code=%s AND statement=%s", (MATTER, stmt))
     if not cur.fetchone():
         cur.execute("""INSERT INTO matter_facts (matter_code,statement,fact_kind,source_kind,source_id,
-                       provenance_level,confidence,created_by,created_at)
-                       VALUES (%s,%s,'structure','doc',%s,'operator',1.0,'operator',now())""",
-                    (MATTER, stmt, str(OPERATIVE_DOC)))
+                       excerpt,provenance_level,confidence,created_by,created_at)
+                       VALUES (%s,%s,'structure','doc',%s,%s,'verified',1.0,'cowork_source_read',now())""",
+                    (MATTER, stmt, str(OPERATIVE_DOC), exc))
     cur.execute("SELECT side, count(*) FROM matter_parties WHERE matter_code=%s GROUP BY side", (MATTER,))
     sides = dict(cur.fetchall())
-    cur.execute("SELECT count(*) FROM matter_causes WHERE matter_code=%s", (MATTER,))
-    nc = cur.fetchone()[0]
-    print(f"[apply] {MATTER} deciphered: {sides.get('defendant',0)} defendants, "
-          f"{sides.get('plaintiff',0)} plaintiff(s), {nc} causes, operative pleading doc:{OPERATIVE_DOC}.")
-    print("[apply] STANDING NEXT: read doc:419 to confirm/complete causes (credit-gated comprehension).")
+    cur.execute("SELECT count(*) FROM matter_causes WHERE matter_code=%s AND provenance_level='verified'", (MATTER,))
+    print(f"[apply] {MATTER} deciphered from doc:{OPERATIVE_DOC} — {sides.get('defendant',0)} defendants, "
+          f"{sides.get('plaintiff',0)} plaintiff(s), {cur.fetchone()[0]} verified causes (all cited).")
 
 
 if __name__ == "__main__":

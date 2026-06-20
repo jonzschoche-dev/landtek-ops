@@ -112,6 +112,25 @@ FACTS = [
      "yet citable; it must be verified from the court's decision/order or a clean re-OCR.",
      "WHEREFORE, the undersigned hereby submits the foregoing valuation for consideration and "
      "appreciation of the Honorable Court. RODOLFO M. YAGO ... November 18, 2015"),
+
+    # ── doc 781 = the REAL CV-26360 complaint ('Latest Draft Complaint - Zschoche v. Balane, et al.',
+    #    from the Barandon email thread). Legible. Foundational facts beyond the party/cause structure. ──
+    ("MWK-CV26360", 781,
+     "The CV-26360 subject property is a 2,587 sqm portion of TCT T-52540 (28,891 sqm, Brgy. San Roque, "
+     "Mercedes), now embraced by the assailed TCT No. 079-2021002126 and Declaration of Real Property "
+     "ARP No. GR-2023-II-07-001-00256 in Gloria Balane's name; assessed value Php257,670 (within MTC "
+     "Mercedes jurisdiction).",
+     "a portion of the above-mentioned parcel of land measuring 2,587 square meters and which currently "
+     "embraced by Transfer Certificate of Title No. 079-2021002126 ... and Declaration of Real Property "
+     "No. GR-2023-II-07-001-00256 ... The assessed value of the subject property is Php257,670.00"),
+    ("MWK-CV26360", 781,
+     "The 16 March 1992 SPA authorized Cesar de la Fuente only to 'negotiate for the sale ... in favor "
+     "of third persons in possession of CONTRACTS TO SELL executed by the previous administrator, MR. "
+     "BEN LLAMANZARES and/or to those who have paid their down-payments or made partial payments' — a "
+     "power to negotiate, NOT a power to sell (the SJ kill-shot, now from the operative complaint).",
+     "authorizing the latter to “negotiate for the sale of the [property] in favor of third persons in "
+     "possession of CONTRACTS TO SELL executed by the previous administrator, MR. BEN LLAMANZARES "
+     "and/or to those who have paid their down-payments or have made partial payments therefor"),
 ]
 
 
