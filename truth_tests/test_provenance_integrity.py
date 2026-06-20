@@ -53,11 +53,32 @@ def gate_is_installed(cur):
         raise TruthFailure("provenance write-gate triggers missing — re-run migrations/apply_provenance_gate.py")
 
 
+def no_ungrounded_verified(cur):
+    """Every verified row's excerpt must be a VERBATIM substring of its cited document
+    (deploy_509 hardening). Guards the autonomous reader from smuggling fabricated quotes."""
+    cur.execute("SELECT count(*) AS n FROM pg_proc WHERE proname='excerpt_grounded'")
+    if not cur.fetchone()["n"]:
+        raise TruthFailure("excerpt_grounded() missing — re-run migrations/harden_excerpt_gate.py --apply")
+    checks = [("matter_facts", "excerpt", "source_id"),
+              ("matter_parties", "source_excerpt", "source_doc_id::text"),
+              ("matter_causes", "source_excerpt", "operative_doc_id::text")]
+    bad = []
+    for tbl, exc, doc in checks:
+        cur.execute(f"SELECT count(*) AS n FROM {tbl} WHERE provenance_level='verified' "
+                    f"AND NOT excerpt_grounded({exc}, {doc})")
+        n = cur.fetchone()["n"]
+        if n:
+            bad.append(f"{n} {tbl}")
+    if bad:
+        raise TruthFailure("ungrounded verified rows (excerpt not in cited doc): " + ", ".join(bad))
+
+
 TESTS = [
     ("provenance.gate_installed", gate_is_installed),
     ("provenance.no_uncited_verified_facts", no_uncited_verified_facts),
     ("provenance.no_uncited_verified_parties", no_uncited_verified_parties),
     ("provenance.no_uncited_verified_causes", no_uncited_verified_causes),
+    ("provenance.no_ungrounded_verified", no_ungrounded_verified),
 ]
 
 
