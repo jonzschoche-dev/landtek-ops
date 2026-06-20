@@ -89,10 +89,30 @@ def _gemini(text, matter):
 
 
 def _next_docs(cur, limit):
+    """Breadth-fair: build out EVERY acknowledged matter, not just the flagship. Round-robin one doc
+    per matter per round, matters ordered by current verified-fact count ASC (most-neglected first),
+    each matter's docs in priority order. So a 0-fact matter gets read before CV-26360's 80th fact."""
     work = doc_worklist(cur)
     cur.execute(f"SELECT DISTINCT doc_id FROM verify_worker_log WHERE attempted_at > now() - interval '{COOLDOWN_DAYS} days'")
     recent = {r["doc_id"] for r in cur.fetchall()}
-    return [w for w in work if w["id"] not in recent][:limit]
+    work = [w for w in work if w["id"] not in recent]
+    if not work:
+        return []
+    cur.execute("SELECT matter_code, count(*) c FROM matter_facts WHERE provenance_level='verified' GROUP BY matter_code")
+    vcount = {r["matter_code"]: r["c"] for r in cur.fetchall()}
+    bym = {}
+    for w in work:
+        bym.setdefault(w["matter_code"], []).append(w)
+    matters = sorted(bym, key=lambda m: vcount.get(m, 0))  # most-neglected matter first
+    picked = []
+    while len(picked) < limit:
+        progressed = False
+        for m in matters:
+            if bym[m] and len(picked) < limit:
+                picked.append(bym[m].pop(0)); progressed = True
+        if not progressed:
+            break
+    return picked
 
 
 def process_doc(cur, w, go):
