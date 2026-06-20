@@ -92,11 +92,14 @@ done
 # Remote 'landtek-b2' is configured in /root/.config/rclone/rclone.conf (chmod 600).
 # Bucket 'LeoLandtek' is scoped to a dedicated app key (no master credentials).
 #
-# Sync is idempotent: only changed files are re-uploaded. First run uploaded
-# ~818 MB; subsequent nightly runs upload only the new daily pg_dump, code
-# tarball, snapshot, plus any changed files under uploads/.
-log "starting B2 off-site sync..."
+# Sync is idempotent: only changed files are re-uploaded.
+# uploads/ is EXCLUDED from B2 — the document corpus is already backed up in Google
+# Drive, and mirroring it here was ~4.5 GB of redundant data that filled the bucket.
+# B2 holds the irreplaceable layer only: DB dumps, code tarballs, workflow snapshots.
+# (rclone sync will delete the existing uploads/ mirror from B2 on the next run.)
+log "starting B2 off-site sync (uploads/ excluded — corpus lives in Drive)..."
 if rclone sync "$DEST/" landtek-b2:LeoLandtek/landtek-vps/ \
+     --exclude 'uploads/**' \
      --transfers 4 --checkers 8 \
      --log-file "$LOG" --log-level NOTICE 2>>"$LOG"; then
   REMOTE_SIZE=$(rclone size landtek-b2:LeoLandtek/landtek-vps/ --json 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin)['bytes'])" 2>/dev/null || echo "?")
