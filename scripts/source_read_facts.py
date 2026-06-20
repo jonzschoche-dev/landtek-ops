@@ -187,6 +187,65 @@ FACTS = [
      "Chairperson (copy-furnished as 'CART Chairperson / Mayor'); the respondent thus heads the very "
      "body the complaint is referred to (squarely Termination-of-Referral ground (a)).",
      "HON. ALEXANDER PAJARILLO CART Chairperson Mayor"),
+
+    # ── Aug-12 north-star docs: the Judicial Affidavit (445), the SJ-pillars memo (452), and the
+    #    Defendants' Manifestation (1088) — the live Summary-Judgment fight, all legible from email. ──
+    ("MWK-CV26360", 445,
+     "Doc 445 is the JUDICIAL AFFIDAVIT (sworn direct testimony) of Jonathan Paul Zschoche in CV-26360, "
+     "examined by Atty. Bonifacio T. Barandon Jr. — the testimony Jonathan gives as Patricia's witness.",
+     "JUDICIAL AFFIDAVIT ... I, JONATHAN PAUL ZSCHOCHE ... I am being examined by Atty. Bonifacio T. "
+     "Barandon, Jr."),
+    ("MWK-CV26360", 445,
+     "⚠ DATE DISCREPANCY (plaintiff's own documents): the Judicial Affidavit (doc 445) states the "
+     "assailed Deed of Absolute Sale to Gloria Balane was executed on SEPTEMBER 26, 2019 — but the "
+     "complaint (doc 781 ¶9) and Patricia's adverse-claim affidavit (doc 419) both state SEPTEMBER 29, "
+     "2016. Two different sale dates in the plaintiff's filings; must be reconciled before trial.",
+     "Cesar De La Fuente maliciously sold the subject property to Defendant Gloria Balane, who was not a "
+     "qualified buyer under the terms of the aforesaid SPA, on September 26, 2019, executing the assailed "
+     "Deed of Absolute sale to that effect"),
+    ("MWK-CV26360", 452,
+     "Procedural posture (CV-26360): plaintiff's Motion to Render Summary Judgment was filed 24 April "
+     "2026; the Defendants' Comment/Opposition was filed 4 May 2026 by defense counsel Atty. Ronald A. "
+     "Ramos; the plaintiff's Reply deadline was Monday 11 May 2026.",
+     "our Motion to Render Summary Judgment filed April 24, 2026 ... the Defendants' Comment/Opposition "
+     "filed by Atty. Ronald A. Ramos on May 4, 2026 ... The deadline is therefore Monday, May 11, 2026"),
+    ("MWK-CV26360", 452,
+     "The CV-26360 summary-judgment motion rests on Rule 35's two pillars — (1) no genuine issue of "
+     "material fact and (2) movant entitled to judgment as a matter of law — supported by Laqui Sr. v. "
+     "Sagun (G.R. 271967, 2024), Calubaquib v. Republic (G.R. 170658), Philippine Business Bank v. Chua "
+     "(G.R. 178899), and Ley Construction v. Union Bank (G.R. 133801).",
+     "Rule 35 ... summary judgment is proper when two conditions concur: PILLAR ONE: NO GENUINE ISSUE OF "
+     "MATERIAL FACT ... PILLAR TWO: MOVING PARTY IS ENTITLED TO JUDGMENT AS A MATTER OF LAW"),
+    ("MWK-CV26360", 452,
+     "A Certified True Copy of the 1992 SPA was secured from the Registry of Deeds, Camarines Norte "
+     "(Ref. No. 2025003039, 21 May 2025) — the documentary proof of the SPA's limited terms for the SJ.",
+     "the Certified True Copy of the Special Power of Attorney (Registry of Deeds, Camarines Norte, Ref. "
+     "No. 2025003039, May 21, 2025)"),
+    ("MWK-CV26360", 1088,
+     "Doc 1088 is the DEFENDANTS' Manifestation with Tender of Excluded Evidence: Gloria H. Balane's "
+     "Judicial Affidavit was EXCLUDED at pre-trial because the copy presented was a scanned copy with a "
+     "consular notarization (Gloria being in Canada); the defense tenders it under Rule 132 Sec 40 and "
+     "alternatively moves to admit the original.",
+     "the exclusion and denial of admission of the Judicial Affidavit of defendant GLORIA H. BALANE "
+     "during pre-trial on the ground that the copy then presented was a scanned copy, including the "
+     "consular notarization made because defendant Gloria Balane is in Canada"),
+    ("MWK-CV26360", 1088,
+     "CV-26360 is governed by the Rules on SUMMARY PROCEDURE (constraining dilatory/prohibited "
+     "pleadings) — confirmed in the Defendants' Manifestation.",
+     "this case is governed by Summary Procedure, defendants are mindful of the policy against delay and "
+     "the prohibition against dilatory or prohibited pleadings"),
+    ("MWK-CV26360", 1088,
+     "THE DEFENSE THEORY (Gloria Balane's tendered Judicial Affidavit): the Balane family's long "
+     "possession, prior rental/payment arrangements, Gloria's GOOD-FAITH reliance on the 1992 SPA to "
+     "Cesar de la Fuente, ABSENCE OF PRIOR NOTICE OF THE REVOCATION, taxes paid, improvements, and no "
+     "fraud/bad faith — the buyer-in-good-faith defense the SJ must defeat.",
+     "Gloria Balane's good-faith reliance on the 1992 Special Power of Attorney in favor of Cesar M. de "
+     "la Fuente, the absence of prior notice of revocation"),
+    ("MWK-CV26360", 1088,
+     "Defendant Gloria H. Balane is the registered owner named in TCT 079-2021002126 (2,587 sqm) and is "
+     "currently in Canada — material to her availability as a defense witness.",
+     "Defendant Gloria H. Balane is the registered owner named in Transfer Certificate of Title No. "
+     "079-2021002126, covering the 2,587-square-meter property ... defendant Gloria Balane is in Canada"),
 ]
 
 
