@@ -23,21 +23,21 @@ DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 MATTER = "MWK-CV26360"
 OPERATIVE_DOC = 419
 PARTIES = [
-    # (entity_id, name, side, role, provenance)
-    (400, "Patricia Keesey Zschoche", "plaintiff", "registered heir/owner (rep. by Jonathan Zschoche)", "verified"),
-    (15, "Gloria Balane", "defendant", "holder of the void title TCT T-079-2021002126", "verified"),
+    # (entity_id, name, side, role, provenance). Hand-fed from operator ground truth = 'operator' tier,
+    # NEVER 'verified' — a verified role must be EXTRACTED from the operative pleading with a citation.
+    (400, "Patricia Keesey Zschoche", "plaintiff", "registered heir/owner (rep. by Jonathan Zschoche)", "operator"),
+    (15, "Gloria Balane", "defendant", "holder of the void title TCT T-079-2021002126", "operator"),
     (3057, "Efren Balane", "defendant", "spouse / co-party of Gloria Balane", "inferred_strong"),
-    (3060, "Engr. Erwin Balane", "defendant", "Municipal Building Official — failure to enforce the National Building Code / act on illegal structures", "operator"),
+    (3060, "Engr. Erwin Balane", "defendant",
+     "involved in the title TRANSFER and SUBDIVISION (operator-corrected 2026-06-20; exact role/cause "
+     "to be read from the operative pleading doc:419 — NOT inferred)", "operator"),
 ]
 CAUSES = [
-    # (cause, against, basis, provenance)
+    # (cause, against, basis, provenance). operator/strong-grounded only — the FULL, exact cause list
+    # must be extracted from the operative pleading (doc:419) with citations, not hand-fed here.
     ("Accion reinvindicatoria / nullification of TCT T-079-2021002126",
      "Gloria Balane, Efren Balane",
      "Void 1992 SPA (negotiate ≠ sell, revoked 2005) → void 2016 deed → void title; recover the parcel.",
-     "verified"),
-    ("Dereliction by the Building Official re illegal structures",
-     "Engr. Erwin Balane",
-     "Failure to enforce the National Building Code / refusal to act on permitless construction on the titled land (operator issue #6 — confirm exact pleading count vs doc:419).",
      "operator"),
 ]
 
@@ -81,7 +81,7 @@ def main():
     if not cur.fetchone():
         cur.execute("""INSERT INTO matter_facts (matter_code,statement,fact_kind,source_kind,source_id,
                        provenance_level,confidence,created_by,created_at)
-                       VALUES (%s,%s,'structure','doc',%s,'verified',1.0,'operator',now())""",
+                       VALUES (%s,%s,'structure','doc',%s,'operator',1.0,'operator',now())""",
                     (MATTER, stmt, str(OPERATIVE_DOC)))
     cur.execute("SELECT side, count(*) FROM matter_parties WHERE matter_code=%s GROUP BY side", (MATTER,))
     sides = dict(cur.fetchall())

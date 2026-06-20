@@ -119,7 +119,7 @@ def main():
         if not cur.fetchone():
             cur.execute("""INSERT INTO matter_facts
                 (matter_code,statement,fact_kind,source_kind,source_id,provenance_level,confidence,created_by,created_at)
-                VALUES (%s,%s,'issue','operator','operator-2026-06-20','verified',1.0,%s,now())""",
+                VALUES (%s,%s,'issue','operator','operator-2026-06-20','operator',1.0,%s,now())""",
                 (mc, stmt, by))
     # the guardianship gate keystone
     cf, label, ctrl, casc, basis, st = KEYSTONE
