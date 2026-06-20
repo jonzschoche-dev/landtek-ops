@@ -1,0 +1,10 @@
+[Unit]
+Description=Continuous verifiable-corpus reader - every 15 min (paced to Gemini free-tier)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

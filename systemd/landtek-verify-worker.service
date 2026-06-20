@@ -1,0 +1,13 @@
+[Unit]
+Description=LandTek autonomous verifiable-corpus reader (Gemini free-tier; hardened-gate guarded)
+After=network-online.target
+
+# Reads the top of verify_loop's worklist and writes grounded facts through the hardened provenance
+# gate (a fact is 'verified' only if its quote is a verbatim substring of the cited doc). $0 — Gemini
+# free-tier; no Anthropic credits. Paced + small per tick so it spreads across the free-tier quota.
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'set -a; . /root/landtek/.env; set +a; exec /usr/bin/python3 /root/landtek/scripts/verify_worker.py --limit 4 --go --rpm 3'
+StandardOutput=append:/var/log/landtek_verify_worker.log
+StandardError=append:/var/log/landtek_verify_worker.log
