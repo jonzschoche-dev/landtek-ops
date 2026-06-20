@@ -31,7 +31,10 @@ from verify_loop import doc_worklist
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 GEMINI_KEYS = [k for k in (os.environ.get("GEMINI_API_KEY", ""), os.environ.get("GEMINI_API_KEY_FALLBACK", "")) if k]
-MODELS = [os.environ.get("GEMINI_VISION_MODEL", "gemini-2.5-flash"), os.environ.get("GEMINI_VISION_FALLBACK", "gemini-2.0-flash")]
+# flash-lite first: it carries a SEPARATE free-tier quota from flash/2.0-flash (which are often the
+# first exhausted by the OCR/embed jobs sharing this key). Ladder falls through on 429.
+MODELS = [m.strip() for m in os.environ.get(
+    "VERIFY_WORKER_MODELS", "gemini-2.5-flash-lite,gemini-2.5-flash,gemini-2.0-flash").split(",") if m.strip()]
 MIN_CONF = float(os.environ.get("VERIFY_WORKER_MIN_CONF", "0.55"))
 COOLDOWN_DAYS = 14
 
