@@ -1,0 +1,257 @@
+# MWK-ESTATE — Estate Administration — Heirs of Mary Worrick Keesey
+
+**Status:** active / estate_administration_active_no_immediate_deadline
+
+## Verified facts — the document-proven corpus (3)
+
+- INVARIANT (operator 2026-06-15): Allan Inocalla (Paracale-001 / NIBDC-001) must NOT be conflated with the Keesey/MWK matter. He appears in MWK-001 ONLY as the disinterested-person AFFIANT (witness) in Patricia Ann Keesey Zschoche delayed-birth-registration packet (docs 1155, 1157) — NOT as a party or principal. Corrected: docs 513 and 525 (Inocalla family litigation) re-filed MWK-001 -> Paracale-001; doc 803 (NIBDC due-diligence authorization) -> NIBDC-001. Filename Patricia Inocalla affidavit (1155) is a misnomer for Patricia KEESEY affidavit with Allan INOCALLA as affiant.  `doc:1155`
+  > "AFFIDAVIT OF DISINTERESTED PERSON (In Support of the Delayed Report of Birth of Patricia Ann Keesey Zschoche) I, ALLAN VILLAFRIA INOCALLA"
+- TCT T-4503 (a Manguisoc parcel, ~8,209 sqm per filename) is CANCELLED/superseded (CANCELLED stamp across its MoE pages). Its registered Memorandum of Encumbrances records the 1988 Extra-Judicial Settlement dividing T-4503 with T-4501 and T-4502 among the three Keesey heirs (Hoppe, Zschoche, Keesey) one-third each. Register of Deeds: Francisco N. Cuevas II. Manguisoc is a separate matter from the T-4497 Mercedes-Poblacion chain.  `doc:87`
+  > "EXTRA-JUDICIAL SETTLEMENT OF THE ESTATE OF THE DECEASED MARY WORRICK KEESEY ... together with T-4501 and T-4502 ... one-third (1/3) each ... CANCELLED"
+- EJS DATE RECONCILED to DECEMBER 7, 1988: TCT T-4503 registered MoE dates the Extra-Judicial Settlement to Dec 7, 1988 (before Consul Willy G. Que, PH Consulate General LA; Page 167, Series of 1988) — corroborating Patricia Affidavit (doc 176). The 1992 SPA (doc 246) date of Dec 7, 1990 is the outlier; the registered 1988 date is authoritative. Bears on the heirs ownership chain relied on in CV26360.  `doc:87`
+  > "before Willy G. Que, Consul, Phil. Consulate General, Los Angeles ... Series of 1988 ... dated December 7, 1988"
+
+## Evidence on file (237 documents)
+
+- `doc:246` SPA CEsar De La Fuente — ✅ read (5 facts)
+- `doc:76` Notice of Revocation De La Fuente  — ✅ read (2 facts)
+- `doc:91` IDa emails — ✅ read (1 facts)
+- `doc:38` Von De La Fuente SPA  — ✅ read (1 facts)
+- `doc:235` Bicol Post — ⛔ OCR-blocked / too short
+- `doc:78` Bicol post — ⛔ OCR-blocked / too short
+- `doc:298` supporting docs.pdf — 📄 legible — unread
+- `doc:30` HRS of  Mary Worrick Tax Declarations — 📄 legible — unread
+- `doc:369` Balane Supporting Docs.partition.titles.pdf — 📄 legible — unread
+- `doc:956` connectED and connectEd Lite Terms and Conditions V4.0 Dec232024 — 📄 legible — unread
+- `doc:685` Scan Jan 4, 2025 at 5.28 PM.pdf — 📄 legible — unread
+- `doc:218` Scan Jan 4, 2025 at 5.35 PM 2.pdf — 📄 legible — unread
+- `doc:469` ? — 📄 legible — unread
+- `doc:328` Dominador Bayani Supporting Documents.pdf — 📄 legible — unread
+- `doc:562` ? — 📄 legible — unread
+- `doc:222` Worrick Garrido Separation of property — 📄 legible — unread
+- `doc:592` ? — 📄 legible — unread
+- `doc:567` ? — ⛔ OCR-blocked / too short
+- `doc:327` José Pacual Jr Supporting Doncuments 629sq meters.pdf — 📄 legible — unread
+- `doc:371` T -4503 Dar August 12 2025.pdf — ⛔ OCR-blocked / too short
+- `doc:840` Citizenship from Pansacola (1).pdf — ⛔ OCR-blocked / too short
+- `doc:282` TCT-772 Cabanbanan,San Vicente. CARP  — 📄 legible — unread
+- `doc:636` LABO Civil Case 4992.pdf — ⛔ OCR-blocked / too short
+- `doc:32` do overScan Jan 2, 2025 at 5.45 PM.pdf — ⛔ OCR-blocked / too short
+- `doc:10` TCT-30683 Heirs of Mary Worrick, Manguisoc.pdf — 📄 legible — unread
+- `doc:416` Exhibit 7 - Special Power of Attorney dated March 16, 1992.pdf — 📄 legible — unread
+- `doc:49` Statement of Account 2023 Mercedes  — 📄 legible — unread
+- `doc:13` TCT-30682 TCT-32478, Heirs of Mary Worrick  Mambungalon.pdf — 📄 legible — unread
+- `doc:347` TCT-30682 TCT-32478, Heirs of Mary Worrick  Mambungalon.pdf — 📄 legible — unread
+- `doc:957` Campaign Strategy Report.docx — ⛔ OCR-blocked / too short
+- `doc:92` Ida Buenaventura — 📄 legible — unread
+- `doc:55` Do over tax dec — 📄 legible — unread
+- `doc:285` SPS Jonathan Zschoche.pdf — 📄 legible — unread
+- `doc:468` ? — 📄 legible — unread
+- `doc:135` TCT -45616 Fraud — ⛔ OCR-blocked / too short
+- `doc:121` Mambubgalonn Statement of account — 📄 legible — unread
+- `doc:124` TCT-33365 2-x-1-b Lionson Cribe — ⛔ OCR-blocked / too short
+- `doc:143` TCT-46460 Heirs of Mary Worrick 4222 sq meters — 📄 legible — unread
+- `doc:280` A SPA Jonathan Zschoche 2025.pdf — 📄 legible — unread
+- `doc:597` ? — 📄 legible — unread
+- `doc:165` Receipt Yanto Partial payment — 📄 legible — unread
+- `doc:594` ? — 📄 legible — unread
+- `doc:98` Ida Buenaventura — 📄 legible — unread
+- `doc:17` TCT-32911 Heirs of Mary Worrick fraud LGU .pdf — 📄 legible — unread
+- `doc:65` 006 Tax dec — 📄 legible — unread
+- `doc:279` LGU DEED OF DONATION LGU  w: Translation.pdf — 📄 legible — unread
+- `doc:190` Tax Receipt 2024 — 📄 legible — unread
+- `doc:12` TCT-30681  Heirs of Mary Worrick Manguisoc.pdf — 📄 legible — unread
+- `doc:346` TCT-30681  Heirs of Mary Worrick Manguisoc.pdf — 📄 legible — unread
+- `doc:51` Scan Jan 3, 2025 at 3.21 PM.pdf — 📄 legible — unread
+- `doc:73` RTC Petition  — ⛔ OCR-blocked / too short
+- `doc:329` SPA Cesar de la Fuente.pdf — 📄 legible — unread
+- `doc:659` TCT LABO.pdf — 📄 legible — unread
+- `doc:118` 2-x-6-T Tax dec — 📄 legible — unread
+- `doc:93` TCT-11753 Teofilo Sison Lot 2-Y — 📄 legible — unread
+- `doc:277` Padilla.pdf — 📄 legible — unread
+- `doc:53` Tax dec - 008  (2790 sq meters Barangay 1 ) — 📄 legible — unread
+- `doc:74` Ida Buenaventura — 📄 legible — unread
+- `doc:123` 007 Brangay 3 1537 sq meters — 📄 legible — unread
+- `doc:578` ? — 📄 legible — unread
+- `doc:61` tax dec 052 — 📄 legible — unread
+- `doc:777` JPZ ADMIN STATEMENT OF EXPENSES updated.xlsx — ⛔ OCR-blocked / too short
+- `doc:60` tax dec 017 — 📄 legible — unread
+- `doc:140` 01-003 tax dec — 📄 legible — unread
+- `doc:273` TCT-45964.pdf — 📄 legible — unread
+- `doc:116` History of Transactions Barangay 1.pdf — ⛔ OCR-blocked / too short
+- `doc:43` TCT Daet Rico Llamanzares — ⛔ OCR-blocked / too short
+- `doc:71` TCT- 11750 Lot 2-t Roman Ferrer — 📄 legible — unread
+- `doc:139` 2023 RPT — 📄 legible — unread
+- `doc:779` JPZ ADMIN STATEMENT OF EXPENSES.xlsx — ⛔ OCR-blocked / too short
+- `doc:42` TCT 39630 Rosco Leano Fraud? — 📄 legible — unread
+- `doc:134` Tax Dec 01-016 , 231 sq meters  — 📄 legible — unread
+- `doc:99` 049 Tax Dec  — 📄 legible — unread
+- `doc:133` Tax Dec 006a — 📄 legible — unread
+- `doc:589` ? — ⛔ OCR-blocked / too short
+- `doc:122` 2-x-6-n Tax dec 469 sq meters fraud — 📄 legible — unread
+- `doc:56` Tax dec 044 — 📄 legible — unread
+- `doc:338` Gemma Abla may28 municipal Assesor.pdf — 📄 legible — unread
+- `doc:35` De La Fuente SPA — ⛔ OCR-blocked / too short
+- `doc:54` Tax dec  039 (269 sq meters, Barangay 1))  — 📄 legible — unread
+- `doc:90` Ida Buenaventura tax dec numbers  — 📄 legible — unread
+- `doc:57` Tax dec 043 — 📄 legible — unread
+- `doc:378` lgu responses.pdf — 📄 legible — unread
+- `doc:106` 010A. Tax dec 4651 sq meters Mercedes — 📄 legible — unread
+- `doc:59` tax dec 042 — 📄 legible — unread
+- `doc:84` Ida Buenaventura — 📄 legible — unread
+- `doc:317` TCT-33681 Dominador Bayani.pdf — 📄 legible — unread
+- `doc:335` Barandon Case Summary.pdf — 📄 legible — unread
+- `doc:132` Tax dec 2-x-6-t — 📄 legible — unread
+- `doc:318` Scan May 25, 2025 at 2.31 PM pages 1, 2.pdf — 📄 legible — unread
+- `doc:58` Tax dec 041 — 📄 legible — unread
+- `doc:24` TCT-51641 Heirs.pdf — 📄 legible — unread
+- `doc:86` TCT-4502 — ⛔ OCR-blocked / too short
+- `doc:80` Land Bank Bond — 📄 legible — unread
+- `doc:312` TCT-33350 Elena Vergara.pdf — 📄 legible — unread
+- `doc:281` IDA SPA.pdf — 📄 legible — unread
+- `doc:14` TCT-4503 Heirs of Mary Worrick Manguisoc (8209 sq meters).pdf — ⛔ OCR-blocked / too short
+- `doc:456` Executive Briefing_ Gov. Ascutia Meeting.pdf — 📄 legible — unread
+- `doc:295` Municipal Assesor List of properties.pdf — 📄 legible — unread
+- `doc:138` 01-051 Tx dec fraud  — 📄 legible — unread
+- `doc:129` Tax Dec 2-X-4-J — 📄 legible — unread
+- `doc:324` Tct-46038 Ruben Ocan.pdf — 📄 legible — unread
+- `doc:119` 009 TAX DEC Barangay 5 1138 sq meters — 📄 legible — unread
+- `doc:331` Tax Liability Inquiry Municpal Treasurer  .pdf — 📄 legible — unread
+- `doc:226` TAX Declared owner — ⛔ OCR-blocked / too short
+- `doc:311` TCT-51639 Maria Cereza.pdf — 📄 legible — unread
+- `doc:105` 018 Tax dec 1019 sq meters — 📄 legible — unread
+- `doc:561` ? — ⛔ OCR-blocked / too short
+- `doc:560` ? — ⛔ OCR-blocked / too short
+- `doc:72` Scan Jan 3, 2025 at 4.09 PM.pdf — 📄 legible — unread
+- `doc:467` ? — 📄 legible — unread
+- `doc:558` ? — ⛔ OCR-blocked / too short
+- `doc:476` ? — 📄 legible — unread
+- `doc:82` SPA Cesar de la Fuente — 📄 legible — unread
+- `doc:187` Affidavit of Loss — 📄 legible — unread
+- `doc:551` ? — ⛔ OCR-blocked / too short
+- `doc:814` Treasurer Responses 2025.pdf — 📄 legible — unread
+- `doc:136` tax dec 2-x-4-J — 📄 legible — unread
+- `doc:292` IDA SPA.pdf — 📄 legible — unread
+- `doc:692` Affidavit for Delayed Registration of Birth_dup1.docx — 📄 legible — unread
+- `doc:131` Tax dec 22 sq meters — 📄 legible — unread
+- `doc:128` Tax Dec  10 sq meters — 📄 legible — unread
+- `doc:380` NBI INQUIRY.pdf — 📄 legible — unread
+- `doc:625` file_36.pdf — 📄 legible — unread
+- `doc:538` ? — ⛔ OCR-blocked / too short
+- `doc:579` ? — 📄 legible — unread
+- `doc:36` do over Scan Jan 2, 2025 at 5.47 PM.pdf — ⛔ OCR-blocked / too short
+- `doc:85` IDA Buenaventura Draft — 📄 legible — unread
+- `doc:537` ? — 📄 legible — unread
+- `doc:555` ? — 📄 legible — unread
+- `doc:192` RPT 2023 — 📄 legible — unread
+- `doc:130` Tax Dec 2-x-4-E — 📄 legible — unread
+- `doc:191` RPT 2023 — 📄 legible — unread
+- `doc:556` ? — 📄 legible — unread
+- `doc:548` ? — ⛔ OCR-blocked / too short
+- `doc:189` RPT 2024 — 📄 legible — unread
+- `doc:550` ? — ⛔ OCR-blocked / too short
+- `doc:194` RPT 2025 — 📄 legible — unread
+- `doc:466` ? — 📄 legible — unread
+- `doc:100` Letter from Date San Vicente — 📄 legible — unread
+- `doc:83` IDA Buenaventura — 📄 legible — unread
+- `doc:183` Intestate Estate of Mary Worrick Keesey — 📄 legible — unread
+- `doc:361` Birth certificate.pdf — 📄 legible — unread
+- `doc:577` ? — ⛔ OCR-blocked / too short
+- `doc:294` Provincial Assesor 2023.pdf — 📄 legible — unread
+- `doc:108` Cedar de la fuente — ⛔ OCR-blocked / too short
+- `doc:196` Scan Jan 4, 2025 at 5.31 PM 2.pdf — 📄 legible — unread
+- `doc:289` Agcaoili Title Lot 2-W.pdf — ⛔ OCR-blocked / too short
+- `doc:239` Gloria Balane Fraud — 📄 legible — unread
+- `doc:127` Statement of account 01-021 — 📄 legible — unread
+- `doc:220` 01-021 SOA — 📄 legible — unread
+- `doc:214` Elmer worrick SOA — 📄 legible — unread
+- `doc:223` RPT 2023 — 📄 legible — unread
+- `doc:141` Elmer Worrick Statement of Account — 📄 legible — unread
+- `doc:62` 059 SOA Elmer Worrick — 📄 legible — unread
+- `doc:291` Deed of Donation.pdf — ⛔ OCR-blocked / too short
+- `doc:63` Scan Jan 3, 2025 at 3.37 PM.pdf — 📄 legible — unread
+- `doc:219` 01-018 SOA — 📄 legible — unread
+- `doc:221` 01-007 SOA — 📄 legible — unread
+- `doc:213` 01-009 SOA — 📄 legible — unread
+- `doc:66` 050 TAX dec — 📄 legible — unread
+- `doc:664` Scan Mar 21, 2026 at 5.12 PM.pdf — 📄 legible — unread
+- `doc:64` proof of payment LGU MERCEDES receipt of transfer BOA — 📄 legible — unread
+- `doc:211` Scan Jan 4, 2025 at 5.34 PM 1.pdf — 📄 legible — unread
+- `doc:70` 046 Tax Dec 469 sq meters — 📄 legible — unread
+- `doc:389` 1996-03-13_Resolution_26-96_AdHoc_Committee_Mercedes_LGU_re_MWK_ — ⛔ OCR-blocked / too short
+- `doc:534` ? — ⛔ OCR-blocked / too short
+- `doc:217` SOA — 📄 legible — unread
+- `doc:199` Scan Jan 4, 2025 at 5.32 PM 2.pdf — 📄 legible — unread
+- `doc:126` Statement of Account — 📄 legible — unread
+- `doc:125` 2-x-6-n 006 Barangay 1 (8565 sq meters) — 📄 legible — unread
+- `doc:228` Taxes Governor Padilla — 📄 legible — unread
+- `doc:200` Scan Jan 4, 2025 at 5.32 PM 3.pdf — 📄 legible — unread
+- `doc:205` Scan Jan 4, 2025 at 5.33 PM 2.pdf — 📄 legible — unread
+- `doc:195` Scan Jan 4, 2025 at 5.31 PM 1.pdf — 📄 legible — unread
+- `doc:209` Scan Jan 4, 2025 at 5.33 PM 6.pdf — 📄 legible — unread
+- `doc:210` Scan Jan 4, 2025 at 5.34 PM.pdf — 📄 legible — unread
+- `doc:203` Scan Jan 4, 2025 at 5.32 PM 5.pdf — 📄 legible — unread
+- `doc:202` Scan Jan 4, 2025 at 5.32 PM 4.pdf — 📄 legible — unread
+- `doc:206` Scan Jan 4, 2025 at 5.33 PM 3.pdf — 📄 legible — unread
+- `doc:198` Scan Jan 4, 2025 at 5.32 PM 1.pdf — 📄 legible — unread
+- `doc:193` Scan Jan 4, 2025 at 5.31 PM.pdf — 📄 legible — unread
+- `doc:207` Scan Jan 4, 2025 at 5.33 PM 4.pdf — 📄 legible — unread
+- `doc:595` ? — 📄 legible — unread
+- `doc:375` Road donation reply.pdf — 📄 legible — unread
+- `doc:299` Reply to JDavis CGrippo re CDelaFuente 15Aug2019.pdf — 📄 legible — unread
+- `doc:208` Scan Jan 4, 2025 at 5.33 PM 5.pdf — 📄 legible — unread
+- `doc:204` Scan Jan 4, 2025 at 5.33 PM.pdf — 📄 legible — unread
+- `doc:137` 01-057 Statement of account 152 sq meters — 📄 legible — unread
+- `doc:197` Scan Jan 4, 2025 at 5.32 PM.pdf — 📄 legible — unread
+- `doc:212` 01-041 SOA  — 📄 legible — unread
+- `doc:150` Scan Jan 4, 2025 at 5.15 PM 1.pdf — 📄 legible — unread
+- `doc:662` Scan Mar 21, 2026 at 7.02 PM.pdf — ⛔ OCR-blocked / too short
+- `doc:475` ? — 📄 legible — unread
+- `doc:151` Scan Jan 4, 2025 at 5.15 PM 2.pdf — 📄 legible — unread
+- `doc:37` Tax dec Elmer Worrick — 📄 legible — unread
+- `doc:245` Jose Pascual JR.pdf — 📄 legible — unread
+- `doc:81` Tax demand letters — 📄 legible — unread
+- `doc:304` Mayor Alex Return letter copy.pdf — 📄 legible — unread
+- `doc:385` SB Gmail - Road Donation Implementation and Inquiry Mercedes.pdf — 📄 legible — unread
+- `doc:109` Demand letter Bir — ⛔ OCR-blocked / too short
+- `doc:94` Demand Letter — 📄 legible — unread
+- `doc:169` Scan Jan 4, 2025 at 5.18 PM 1.pdf — 📄 legible — unread
+- `doc:175` Scan Jan 4, 2025 at 5.19 PM 1.pdf — 📄 legible — unread
+- `doc:603` ? — ⛔ OCR-blocked / too short
+- `doc:162` Scan Jan 4, 2025 at 5.17 PM 2.pdf — 📄 legible — unread
+- `doc:161` Scan Jan 4, 2025 at 5.17 PM 1.pdf — 📄 legible — unread
+- `doc:163` Scan Jan 4, 2025 at 5.17 PM 3.pdf — 📄 legible — unread
+- `doc:158` Scan Jan 4, 2025 at 5.16 PM 1.pdf — 📄 legible — unread
+- `doc:182` Scan Jan 4, 2025 at 5.20 PM.pdf — 📄 legible — unread
+- `doc:159` Scan Jan 4, 2025 at 5.17 PM.pdf — 📄 legible — unread
+- `doc:602` ? — ⛔ OCR-blocked / too short
+- `doc:167` Scan Jan 4, 2025 at 5.18 PM.pdf — 📄 legible — unread
+- `doc:181` Scan Jan 4, 2025 at 5.19 PM 5.pdf — 📄 legible — unread
+- `doc:164` Scan Jan 4, 2025 at 5.17 PM 4.pdf — 📄 legible — unread
+- `doc:184` Scan Jan 4, 2025 at 5.20 PM 1.pdf — 📄 legible — unread
+- `doc:155` Scan Jan 4, 2025 at 5.16 PM.pdf — 📄 legible — unread
+- `doc:186` Scan Jan 4, 2025 at 5.21 PM.pdf — 📄 legible — unread
+- `doc:180` Scan Jan 4, 2025 at 5.19 PM 4.pdf — 📄 legible — unread
+- `doc:170` Scan Jan 4, 2025 at 5.18 PM 2.pdf — 📄 legible — unread
+- `doc:178` Scan Jan 4, 2025 at 5.19 PM 3.pdf — 📄 legible — unread
+- `doc:177` Scan Jan 4, 2025 at 5.19 PM 2.pdf — 📄 legible — unread
+- `doc:174` Scan Jan 4, 2025 at 5.19 PM.pdf — 📄 legible — unread
+- `doc:166` Scan Jan 4, 2025 at 5.17 PM 5.pdf — 📄 legible — unread
+- `doc:173` Scan Jan 4, 2025 at 5.18 PM 4.pdf — 📄 legible — unread
+- `doc:172` Scan Jan 4, 2025 at 5.18 PM 3.pdf — 📄 legible — unread
+- `doc:185` Scan Jan 4, 2025 at 5.20 PM 2.pdf — 📄 legible — unread
+- `doc:599` ? — 📄 legible — unread
+- `doc:736` CART Consent to Closure of Complaint_Annex B.docx — 📄 legible — unread
+- `doc:587` ? — 📄 legible — unread
+- `doc:225` Scan Jan 4, 2025 at 5.52 PM.pdf — 📄 legible — unread
+- `doc:474` ? — ⛔ OCR-blocked / too short
+- `doc:147` Receipt — ⛔ OCR-blocked / too short
+- `doc:157` Receipt — ⛔ OCR-blocked / too short
+- `doc:145` receipt — ⛔ OCR-blocked / too short
+- `doc:290` Taxes Amnesty Sect 270 .pdf — ⛔ OCR-blocked / too short
+- `doc:215` Receipt — ⛔ OCR-blocked / too short
+
+## Coverage & gaps
+
+- Verified facts: **3**  ·  operator-asserted (pending source): **0**  ·  inferred (not surfaced as fact): 1607
+- Documents: 237 on file — 4 read, 39 OCR-blocked, 194 other

@@ -10,6 +10,6 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /root/landtek/scripts/verify_loop.py
+ExecStart=/bin/bash -c '/usr/bin/python3 /root/landtek/scripts/verify_loop.py && /usr/bin/python3 /root/landtek/scripts/case_dossier.py --all'
 StandardOutput=append:/var/log/landtek_verify.log
 StandardError=append:/var/log/landtek_verify.log
