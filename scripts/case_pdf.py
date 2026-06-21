@@ -20,6 +20,10 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTemplate, Spacer
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from chronology import timeline, parse_dates
+
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 CHAT = "6513067717"
 
@@ -102,10 +106,19 @@ def build(mc, path):
         return bool(src) and src.isdigit() and int(src) in off_docs
     clean = [(st, src) for st, src in facts if not _off(src)]
     flagged = [(st, src) for st, src in facts if _off(src)]
-    f.append(Paragraph(f"Verified facts — the document-proven record ({len(clean)})", h2))
-    for i, (st, src) in enumerate(clean, 1):
-        tag = f' <font color="#2563eb">[Annex doc:{_e(src)}]</font>' if src else ""
-        f.append(Paragraph(f"{i}. {_e(st)}{tag}", body))
+    # Lead with the date-ordered chronology (events from verified facts + submissions), off-profile excluded
+    tl = [e for e in timeline(cur, mc) if not (e[4] and str(e[4]).isdigit() and int(e[4]) in off_docs)]
+    f.append(Paragraph(f"Chronology — evidence &amp; submissions by date ({len(tl)})", h2))
+    for key, disp, kind, text, src in tl:
+        cite = f' <font color="#2563eb">[doc:{_e(src)}]</font>' if src else ""
+        lab = "" if kind == "event" else "<b>[submission]</b> "
+        f.append(Paragraph(f"<b>{disp}</b> &nbsp; {lab}{_e(text[:240])}{cite}", body))
+    undated = [(st, src) for st, src in clean if not parse_dates(st)]
+    if undated:
+        f.append(Paragraph(f"Additional verified facts (undated) ({len(undated)})", h2))
+        for st, src in undated:
+            tag = f' <font color="#2563eb">[doc:{_e(src)}]</font>' if src else ""
+            f.append(Paragraph(f"&bull; {_e(st)}{tag}", body))
 
     cur.execute("""SELECT DISTINCT cf.forum_code, am.name, cf.remedy FROM client_issues ci
                    JOIN case_forums cf ON cf.issue_no=ci.issue_no

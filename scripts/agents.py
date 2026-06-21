@@ -74,7 +74,9 @@ AGENTS = [
     ("case_pdf",             "organized case-brief PDF → Telegram (relevance-tiered + annexes)", "det",
      "on demand", "", "live", "case_pdf.py MATTER --send"),
     ("relevance",            "classify surrounding corpus by relevance to a focal matter", "det",
-     "on demand", "", "live", "CORE/RELATED/CONTEXTUAL/OFF-PROFILE + connection; labels, never conflates"),
+     "on demand", "", "live", "CORE/RELATED/CONTEXTUAL/OFF-PROFILE + connection; docket+title+party fingerprint"),
+    ("chronology",           "date-ordered evidence & submissions (the case timeline)", "det",
+     "on demand", "", "live", "events from verified facts + filings; leads the case_pdf brief"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
