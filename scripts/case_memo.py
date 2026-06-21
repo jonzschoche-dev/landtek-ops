@@ -116,7 +116,7 @@ def build(mc, path):
     # Discerning reasoning: the multi-step harness → a structured, counsel-ready marked block (14B)
     _la = _legal_analyze(mc)
     if os.environ.get("MEMO_PRINT"):
-        for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "related"):
+        for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "related_ctx"):
             print(f"[{k}]\n{_la.get(k,'(missing)')}\n")
     today = datetime.date.today().isoformat()
 
