@@ -67,6 +67,8 @@ AGENTS = [
      "on demand", "", "live", "feeds /ops/cases; curated from agency_mandates"),
     ("case_builder_ui",      "cockpit /ops/cases — live case cards (forums + corpus support)", "det",
      "live (web)", "", "live", "ops_dashboard.py; grows fluidly with the corpus"),
+    ("legal_authority",      "forum law library — verbatim statutes/circulars in a local-embed RAG", "local",
+     "on demand", "", "live", "RA 11032 seeded for ARTA; nomic-embed (Ollama $0); retrieve(forum,q)"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
