@@ -60,28 +60,34 @@ def scour(cur):
 def doc_worklist(cur):
     """Legible, matter-linked docs not yet source-read, ranked by value — the next reads."""
     cur.execute("""
-        WITH email AS (SELECT DISTINCT document_id FROM gmail_messages WHERE document_id IS NOT NULL),
+        WITH dm AS (   -- a doc belongs to a matter via its matter_code OR a document_matter_links row
+            SELECT id AS doc_id, matter_code FROM documents WHERE matter_code IS NOT NULL
+            UNION
+            SELECT doc_id, matter_code FROM document_matter_links
+        ),
+             email AS (SELECT DISTINCT document_id FROM gmail_messages WHERE document_id IS NOT NULL),
              valued AS (SELECT DISTINCT unnest(maps_to_matters) mc FROM client_issues WHERE value_amount IS NOT NULL)
         SELECT d.id,
-               d.matter_code,
+               dm.matter_code,
                (e.document_id IS NOT NULL) AS from_email,
                coalesce(q.score,0)::numeric(5,2) AS ocr,
                length(coalesce(d.extracted_text,'')) AS tlen,
                (m.next_deadline IS NOT NULL) AS has_deadline,
                (v.mc IS NOT NULL) AS has_value,
                left(coalesce(d.original_filename,d.smart_filename,'?'),52) AS fn
-        FROM documents d
+        FROM dm
+        JOIN documents d ON d.id = dm.doc_id
         LEFT JOIN ocr_quality q ON q.doc_id=d.id
         LEFT JOIN email e ON e.document_id=d.id
-        LEFT JOIN matters m ON m.matter_code=d.matter_code
-        LEFT JOIN valued v ON v.mc=d.matter_code
-        WHERE d.matter_code IS NOT NULL
-          AND (m.status IS NULL OR m.status NOT IN ('closed','archived'))
+        LEFT JOIN matters m ON m.matter_code=dm.matter_code
+        LEFT JOIN valued v ON v.mc=dm.matter_code
+        WHERE (m.status IS NULL OR m.status NOT IN ('closed','archived'))
           AND length(coalesce(d.extracted_text,'')) >= 1000
           AND coalesce(q.flagged,false)=false
           AND (e.document_id IS NOT NULL OR coalesce(q.score,0) >= 0.40)
-          AND NOT EXISTS (SELECT 1 FROM matter_facts f
-                          WHERE f.provenance_level='verified' AND f.source_kind='doc' AND f.source_id=d.id::text)
+          AND NOT EXISTS (SELECT 1 FROM matter_facts f   -- not yet read FOR THIS matter (per-matter)
+                          WHERE f.provenance_level='verified' AND f.source_kind='doc'
+                            AND f.source_id=d.id::text AND f.matter_code=dm.matter_code)
     """)
     rows = cur.fetchall()
     for r in rows:
