@@ -53,6 +53,15 @@ AGENTS = [
      "every 6h", "landtek-filing-monitor.timer", "live", "filing_alerts + tg_send (S14); 32 baselined"),
     ("execution_tracker",    "track filings/actions to completion (planned→filed→confirmed)", "det",
      "on demand", "", "live", "case_actions ledger + stale-watch; NEVER files with the court"),
+    # ── FORUM DESKS — one engine (agency_agent.py), four playbooks ──────────────
+    ("agency:ARTA",          "forum desk — RA 11032 clocks/procedure/escalation", "det",
+     "on demand", "", "live", "9 matters; grounded (docs 384/967); agency_agent.py --desk ARTA"),
+    ("agency:CIVIL",         "forum desk — Rules of Court / Summary Procedure", "det",
+     "on demand", "", "live", "RTC/MTC cluster; grounded (docs 452/1088)"),
+    ("agency:CSC",           "forum desk — CSC administrative-case rules", "det",
+     "on demand", "", "ready", "no matters yet; periods NEEDS-COUNSEL-VERIFICATION"),
+    ("agency:OMBUDSMAN",     "forum desk — R.A. 6770 / AO 07", "det",
+     "on demand", "", "ready", "no matters yet; periods NEEDS-COUNSEL-VERIFICATION"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
