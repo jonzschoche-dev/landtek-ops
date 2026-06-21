@@ -282,6 +282,28 @@ FACTS = [
      "the intervention sought relative to the issues and concerns stated therein may be best addressed by "
      "the Civil Service Commission, in relation to Republic Act No. 6713. Hence, in accordance with "
      "Section 17 (d) of Republic Act No. 11032 ... we are hereby referring the above complaint to your office"),
+
+    # ── doc 724 = the SUBSTANTIVE demand (the underlying grievance the referral wrappers only point to):
+    #    LGU Mercedes obstruction of FOI/records requests re the property occupation. Grounds the substance. ──
+    ("MWK-ARTA-1891", 724,
+     "SUBSTANCE of the grievance (doc 724, Jonathan's 6 Apr 2026 Formal Demand to DILG Provincial "
+     "Director Melody E. Relucio): direct administrative enforcement of FOI mandates (PCOO-DILG JMC "
+     "2018-01) and R.A. 11032 against LGU Mercedes.",
+     "SUBJECT: FORMAL DEMAND FOR DIRECT ADMINISTRATIVE ENFORCEMENT OF FOI MANDATES (PCOO-DILG JMC "
+     "2018-01) AND R.A. NO. 11032 REGARDING LGU MERCEDES"),
+    ("MWK-ARTA-1891", 724,
+     "The core violation alleged: LGU Mercedes has a SUSTAINED PATTERN of ignoring, delaying, or "
+     "obstructing valid requests for public records concerning the OCCUPATION OF THE PROPERTY — the "
+     "FOI/transparency obstruction that ties this matter to the CV-26360 / estate land claims.",
+     "The LGU of Mercedes has demonstrated a sustained pattern of ignoring, delaying, or obstructing "
+     "valid requests for public records concerning the occupation of"),
+    ("MWK-ARTA-1891", 724,
+     "Legal theory pressed: DILG retains a DIRECT, CONTINUING duty over the LGU's transparency / "
+     "administrative-process compliance; referral of the property issues to the Governor (LGC §29) or "
+     "merely 'cascading' memoranda to the Mayor does NOT exhaust DILG's own duty to act on the breaches.",
+     "Referral of the broader property issues to the Governor, or simply \"cascading\" memoranda to the "
+     "Mayor, does not exhaust the DILG's own duty to address ongoing administrative breaches already "
+     "brought to its attention"),
 ]
 
 
