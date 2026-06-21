@@ -43,12 +43,13 @@ AGENTS = [
     ("ocr_triage",           "re-OCR the OCR-garbage docs (local Tesseract)", "det",
      "daily", "", "planned", "unblocks OCR-blocked matters; no Gemini quota"),
     ("reconciler",           "adjudicate proposed_facts → verified/reject", "det+human",
-     "on demand", "", "planned", "human-in-the-loop review of borderline facts"),
-    # ── PLANNED — output / reasoning (now affordable on the local tier) ─────────
+     "on demand", "", "live", "human-in-the-loop; gate still checks on accept"),
+    # ── LIVE — output / reasoning (in-house Ollama tier) ───────────────────────
     ("analyst",              "case theory / strategy from the verified corpus", "local",
-     "on demand", "", "planned", "grounded in verified facts only"),
-    ("brief_drafter",        "draft pleadings grounded in verified facts + the gate", "local/api",
-     "on demand", "", "planned", "output passes leo_answer_gate"),
+     "on demand", "", "live", "derived reasoning, labeled; never a verified fact"),
+    ("brief_drafter",        "draft work-product grounded in verified facts", "local",
+     "on demand", "", "live", "[PENDING VERIFICATION] for gaps; draft for counsel"),
+    # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
      "realtime", "", "needs-wiring", "n8n AI-Agent; wire discernment protocol + answer gate"),
