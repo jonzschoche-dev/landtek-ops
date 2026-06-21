@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""case_memo.py — all-in-one legal ACTION MEMO for a matter → Telegram. Local-LLM + grounded. $0.
+"""case_memo.py — corpus-grade legal ACTION MEMO for a matter → Telegram. $0 (local LLM + grounded).
 
-The decision-grade output: an analyst-written memo (status · substantive allegations · pattern &
-strategy vs the broader estate · legal analysis w/ governing law · recommended next actions w/ draft
-language · gaps) reasoned over the matter's VERIFIED facts + GOVERNING LAW + RELATED matters, then
-grounded appendices (chronology, key facts, annexes WITH excerpts, coverage). The memo body is DERIVED
-REASONING (labeled, counsel-vetted); the appendices are the cited record. Runs on the in-house Ollama
-tier. Where the record lacks substance, the memo is instructed to write GAP rather than invent.
+Discipline (built for legal-office use, NOT filing-as-is):
+  • VERIFIED sections are deterministic + provenance-tagged [VERIFIED · doc:N]; the DERIVED block
+    (LLM reasoning) is fenced and labeled "operator/counsel review required".
+  • Hard SEPARATION of matters: an administrative (ARTA/DILG/CSC) matter is never said to decide a
+    judicial one (CV-26360); cross-links are framed only as pattern evidence.
+  • SOURCE AVAILABILITY is checked — every cited annex is confirmed to have a link/file, else flagged.
+  • A "Usable for Filing?" flag + Risk/Opportunity line sit in the header. The LLM never signs.
 
   python3 scripts/case_memo.py MWK-ARTA-1891 --send
 """
@@ -32,6 +33,8 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
 MODEL = os.environ.get("VERIFY_WORKER_OLLAMA_MODEL", "qwen2.5:7b-instruct")
 CHAT = "6513067717"
+JUDICIAL = {"MWK-CV26360": "the CV-26360 accion reivindicatoria (RTC; Aug-12-2026 testimony)",
+            "MWK-CV6839": "CV-6839 just-compensation (Special Agrarian Court)"}
 
 
 def _tok():
@@ -54,8 +57,18 @@ def _forums(ftext):
     return out
 
 
+def _avail(dl, drid, p):
+    if dl:
+        return dl, True
+    if drid:
+        return f"https://drive.google.com/file/d/{drid}/view", True
+    if p:
+        return p, os.path.exists(p)
+    return "(no source on file)", False
+
+
 def _ollama(prompt):
-    body = {"model": MODEL, "stream": False, "options": {"temperature": 0.4}, "prompt": prompt}
+    body = {"model": MODEL, "stream": False, "options": {"temperature": 0.3}, "prompt": prompt}
     req = urllib.request.Request(OLLAMA_URL + "/api/generate", data=json.dumps(body).encode(),
                                  headers={"content-type": "application/json"}, method="POST")
     with urllib.request.urlopen(req, timeout=300) as r:
@@ -64,102 +77,154 @@ def _ollama(prompt):
 
 def build(mc, path):
     c = psycopg2.connect(DSN); c.autocommit = True; cur = c.cursor()
-    cur.execute("SELECT title, coalesce(forum,court_or_agency,'') FROM matters WHERE matter_code=%s", (mc,))
-    title, forum = cur.fetchone() or ("", "")
+    cur.execute("SELECT title, coalesce(forum,court_or_agency,''), coalesce(docket_number,'') FROM matters WHERE matter_code=%s", (mc,))
+    title, forum, docket = cur.fetchone() or ("", "", "")
     cur.execute("SELECT doc_id, tier FROM matter_relevance WHERE focal_matter=%s", (mc,))
     rel = dict(cur.fetchall())
     off = {d for d, t in rel.items() if t == "OFF-PROFILE"}
-    cur.execute("""SELECT statement, source_id FROM matter_facts WHERE matter_code=%s AND provenance_level='verified'
-                   ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
-    facts = [(s, src) for s, src in cur.fetchall() if not (src and src.isdigit() and int(src) in off)]
-    factstr = "\n".join(f"- {s} [doc:{src}]" for s, src in facts)[:11000]
+    cur.execute("""SELECT statement, excerpt, source_id FROM matter_facts WHERE matter_code=%s
+                   AND provenance_level='verified' ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
+    facts = [(s, e, src) for s, e, src in cur.fetchall() if not (src and src.isdigit() and int(src) in off)]
+    factstr = "\n".join(f"- {s} [doc:{src}]" for s, e, src in facts)[:11000]
     laws = []
     for lf in _forums(forum):
         try:
             for cit, txt, vf, d in retrieve_chunks(lf, (title or "") + " " + factstr[:400], 2):
-                laws.append(f"[{lf} {cit}] {txt.strip()[:240]}")
+                laws.append(f"[{lf} {cit}] {txt.strip()[:220]}")
         except Exception:
             pass
     lawstr = "\n".join(laws)[:2500]
     cur.execute("""SELECT doc_matter, count(*) FROM matter_relevance WHERE focal_matter=%s AND tier='RELATED'
                    AND doc_matter IS NOT NULL AND doc_matter<>%s GROUP BY 1 ORDER BY 2 DESC LIMIT 6""", (mc, mc))
-    relstr = ", ".join(f"{m} ({n})" for m, n in cur.fetchall())
+    related = cur.fetchall()
+    relstr = ", ".join(f"{m} ({n})" for m, n in related)
 
-    prompt = f"""You are a Philippine litigation strategist preparing an ACTION MEMO for counsel on
-matter {mc} ({title}; forum: {forum}). Use ONLY the material below. Where the record lacks something
-needed, write 'GAP: ...' — do NOT invent. Be concrete and concise. Produce these sections:
-
-A. STATUS & POSTURE (2-3 sentences)
-B. SUBSTANTIVE ALLEGATIONS — what the underlying complaint actually alleges + the evidence; if the
-   specific allegations/evidence are NOT in the facts, write 'GAP: underlying complaint substance not in record — obtain it.'
-C. PATTERN & STRATEGY — how this connects to the broader estate / CV-26360 reivindicatory action (use RELATED MATTERS)
-D. LEGAL ANALYSIS — strengths, risks, and the governing provisions (cite the GOVERNING LAW excerpts)
-E. RECOMMENDED NEXT ACTIONS — prioritized, with short draft language where useful
-F. GAPS & VERIFICATION NEEDED
-
-VERIFIED FACTS:
-{factstr}
-
-GOVERNING LAW (excerpts):
-{lawstr or '(none loaded for these forums)'}
-
-RELATED MATTERS (share parties/property): {relstr or '(none)'}"""
-    memo = _ollama(prompt)
-    if os.environ.get("MEMO_PRINT"):
-        print(memo + "\n" + "=" * 60)
-
-    s = getSampleStyleSheet()
-    h1 = ParagraphStyle("h1", parent=s["Heading1"], fontSize=15, spaceAfter=2)
-    sub = ParagraphStyle("sub", parent=s["BodyText"], fontSize=9, textColor=colors.HexColor("#6b7280"))
-    h2 = ParagraphStyle("h2", parent=s["Heading2"], fontSize=12, spaceBefore=12, spaceAfter=4,
-                        textColor=colors.HexColor("#1e293b"))
-    bdy = ParagraphStyle("bdy", parent=s["BodyText"], fontSize=9.5, leading=13)
-    note = ParagraphStyle("note", parent=bdy, fontSize=8, textColor=colors.HexColor("#6b7280"))
-    f = [Paragraph(f"{_e(mc)} — Action Memo", h1),
-         Paragraph(f"{_e(title)} &nbsp;·&nbsp; {_e(forum)}", sub),
-         Paragraph("Sections A–F are DERIVED REASONING (counsel-vetted, not verified fact); the "
-                   "appendices are the cited record.", note), Spacer(1, 6)]
-    for line in memo.split("\n"):
-        ln = line.strip()
-        if not ln:
-            continue
-        st = h2 if (len(ln) > 1 and ln[0] in "ABCDEF" and ln[1] in ". ") else bdy
-        f.append(Paragraph(_e(ln), st))
-
-    # Appendix 1: chronology
-    tl = [e for e in timeline(cur, mc) if not (e[4] and str(e[4]).isdigit() and int(e[4]) in off)]
-    f.append(Paragraph(f"Appendix A — Chronology ({len(tl)})", h2))
-    for key, disp, kind, text, src in tl:
-        lab = "" if kind == "event" else "[submission] "
-        f.append(Paragraph(f"<b>{disp}</b> &nbsp; {lab}{_e(text[:160])}{(' [doc:'+_e(src)+']') if src else ''}", bdy))
-    # Appendix 2: annexes with excerpts
+    # annexes + source-availability
     cur.execute("""SELECT d.id, coalesce(d.original_filename,d.smart_filename,'?'), d.drive_link, d.drive_file_id,
                    d.file_path, left(coalesce(d.extracted_text,''),200),
                    (SELECT count(*) FROM matter_facts mf WHERE mf.provenance_level='verified' AND mf.source_kind='doc' AND mf.source_id=d.id::text) nf
                    FROM documents d WHERE d.matter_code=%s ORDER BY nf DESC, d.id""", (mc,))
-    docs = [r for r in cur.fetchall() if r[0] not in off]
-    f.append(Paragraph(f"Appendix B — Annexes with excerpts ({len(docs)})", h2))
-    for did, fn, dl, drid, p, exc, nf in docs:
-        link = dl or (f"https://drive.google.com/file/d/{drid}/view" if drid else p) or ""
-        f.append(Paragraph(f"<b>doc:{did}</b> {_e(fn[:54])} {('['+str(nf)+'f]') if nf else ''}<br/>"
-                           f"<font size='7' color='#6b7280'>{_e(' '.join(exc.split())[:150])}…</font><br/>"
-                           f"<font size='7' color='#2563eb'>{_e(link)}</font>", bdy))
+    annex = [(did, fn, *_avail(dl, drid, p), exc, nf) for did, fn, dl, drid, p, exc, nf in cur.fetchall() if did not in off]
+    missing = [a for a in annex if not a[3]]
+
+    is_admin = bool(_forums(forum)) and mc not in JUDICIAL
+    usable = ("Not yet — source documents missing/unavailable" if missing else
+              "With additional verification — operator/counsel review required")
+
+    prompt = f"""You are assisting LandTek (a land/mining-services operator, NOT a law firm). Output is a
+DRAFT for counsel review, never to be filed as-is. Matter {mc} ({title}; forum: {forum}).
+HARD RULES: (1) This is an {'ADMINISTRATIVE red-tape/records matter' if is_admin else 'matter'}; CV-26360 is a
+SEPARATE JUDICIAL case (Aug-12 testimony) — you must NEVER say this matter wins/loses/decides CV-26360;
+treat any link ONLY as 'pattern evidence of LGU obstruction usable in CV-26360 / the bigger reivindicatory
+action.' (2) Cite GOVERNING LAW by exact section. (3) Never invent — write GAP if missing. (4) Do NOT sign.
+Produce ONLY:
+EXECUTIVE SUMMARY: (3-4 sentences)
+STRENGTHS: (bullets)
+RISKS: (bullets)
+RECOMMENDED ACTIONS: (numbered; each [Owner] [Deadline ~7-10 days] then DRAFT: a ready-to-paste paragraph
+that names the exact referral {docket}, the ongoing non-response, the prejudice to the estate/heirs, and
+an escalation if no action by the deadline)
+RISK/OPPORTUNITY: (one line)
+
+VERIFIED FACTS:
+{factstr}
+
+GOVERNING LAW:
+{lawstr or '(none loaded)'}
+
+RELATED MATTERS: {relstr or '(none)'}"""
+    derived = _ollama(prompt)
+    if os.environ.get("MEMO_PRINT"):
+        print(derived + "\n" + "=" * 60)
+
+    s = getSampleStyleSheet()
+    h1 = ParagraphStyle("h1", parent=s["Heading1"], fontSize=15, spaceAfter=2)
+    sub = ParagraphStyle("sub", parent=s["BodyText"], fontSize=8.5, textColor=colors.HexColor("#6b7280"))
+    h2 = ParagraphStyle("h2", parent=s["Heading2"], fontSize=12, spaceBefore=11, spaceAfter=3, textColor=colors.HexColor("#1e293b"))
+    bdy = ParagraphStyle("bdy", parent=s["BodyText"], fontSize=9.5, leading=13)
+    note = ParagraphStyle("note", parent=bdy, fontSize=8, textColor=colors.HexColor("#6b7280"))
+    warn = ParagraphStyle("warn", parent=bdy, textColor=colors.HexColor("#b91c1c"))
+    fence = ParagraphStyle("fence", parent=bdy, backColor=colors.HexColor("#f3f4f6"), borderPadding=4)
+    f = []
+
+    f.append(Paragraph(f"{_e(mc)} — Action Memo", h1))
+    f.append(Paragraph(f"{_e(title)}<br/>Forum: {_e(forum)} &nbsp;·&nbsp; Docket: {_e(docket)} &nbsp;·&nbsp; "
+                       f"Generated by LandTek (assisted) — operator review required", sub))
+    f.append(Paragraph(f"<b>Usable for filing?</b> {_e(usable)} &nbsp;|&nbsp; "
+                       f"<b>Verification:</b> {len(facts)} verified facts; {len(missing)} source(s) unavailable", sub))
+    f.append(Spacer(1, 4))
+
+    # Relationship / strict separation
+    f.append(Paragraph("Relationship to other matters (separation)", h2))
+    if is_admin:
+        f.append(Paragraph(f"&bull; <b>This matter ({_e(mc)})</b> is an ADMINISTRATIVE red-tape / records-obstruction "
+                           f"track ({_e(forum)}). It is NOT a court case and cannot itself decide any judicial matter.", bdy))
+        f.append(Paragraph("&bull; <b>CV-26360</b> is a SEPARATE judicial proceeding (RTC; Aug-12-2026 testimony). "
+                           "Its outcome is independent of this matter.", bdy))
+        f.append(Paragraph("&bull; <b>Strategic value (note — counsel review):</b> this matter can generate "
+                           "<i>contemporaneous evidence of LGU Mercedes obstruction</i> usable as pattern evidence in "
+                           "CV-26360 manifestations and the larger Accion Reivindicatoria — nothing more.", note))
+    if related:
+        f.append(Paragraph("&bull; Corpus cross-refs (shared parties/property, distinct matters): "
+                           + _e(relstr), note))
+
+    # Substantive allegations + key verified facts (provenance-tagged, with excerpts)
+    f.append(Paragraph(f"Verified facts &amp; substantive allegations — provenance-tagged ({len(facts)})", h2))
+    for s_, e_, src in facts[:16]:
+        f.append(Paragraph(f"&bull; {_e(s_)} <font size='7' color='#059669'>[VERIFIED · doc:{_e(src)}]</font>", bdy))
+        if e_:
+            f.append(Paragraph(f"&nbsp;&nbsp;<font size='7' color='#6b7280'>“{_e(' '.join(e_.split())[:150])}”</font>", note))
+    if len(facts) > 16:
+        f.append(Paragraph(f"…+{len(facts)-16} more verified facts (full set in the matter dossier).", note))
+
+    # Derived block — fenced
+    f.append(Paragraph("Analysis &amp; recommendations — DERIVED REASONING (LandTek-assisted; counsel must verify)", h2))
+    for line in derived.split("\n"):
+        ln = line.strip()
+        if ln:
+            f.append(Paragraph(_e(ln), fence if ln[:1].isdigit() or ln.isupper() or ":" in ln[:22] else bdy))
+
+    # Gaps & verification
+    f.append(Paragraph("Gaps &amp; verification required", h2))
+    if missing:
+        f.append(Paragraph(f"&#9888; {len(missing)} cited source document(s) are NOT available "
+                           f"(no link/file): " + ", ".join(f"doc:{a[0]}" for a in missing) + " — retrieve before filing.", warn))
+    else:
+        f.append(Paragraph("&bull; All cited source documents are available (link/file confirmed).", bdy))
     cur.execute("SELECT provenance_level, count(*) FROM matter_facts WHERE matter_code=%s GROUP BY 1", (mc,))
     pv = dict(cur.fetchall())
-    f.append(Paragraph(f"Coverage: verified {pv.get('verified',0)} · operator {pv.get('operator',0)} · "
-                       f"inferred {pv.get('inferred_strong',0)+pv.get('inferred_weak',0)}.", note))
-    SimpleDocTemplate(path, pagesize=letter, topMargin=0.7*inch, bottomMargin=0.7*inch, title=f"{mc} action memo").build(f)
-    return len(facts), len(docs)
+    f.append(Paragraph(f"&bull; Provenance: verified {pv.get('verified',0)} · operator-asserted "
+                       f"{pv.get('operator',0)} (not in the record above) · inferred "
+                       f"{pv.get('inferred_strong',0)+pv.get('inferred_weak',0)} (excluded). See the DERIVED block for issue-specific gaps.", note))
+
+    # Appendices
+    tl = [e for e in timeline(cur, mc) if not (e[4] and str(e[4]).isdigit() and int(e[4]) in off)]
+    f.append(Paragraph(f"Appendix A — Chronology ({len(tl)})", h2))
+    for key, disp, kind, text, src in tl:
+        lab = "" if kind == "event" else "[submission] "
+        f.append(Paragraph(f"<b>{disp}</b> &nbsp; {lab}{_e(text[:150])}{(' [doc:'+_e(src)+']') if src else ''}", bdy))
+    f.append(Paragraph(f"Appendix B — Annexes (with excerpts &amp; availability) ({len(annex)})", h2))
+    for did, fn, link, ok, exc, nf in annex:
+        flag = "" if ok else " <font color='#b91c1c'>[SOURCE NOT AVAILABLE]</font>"
+        f.append(Paragraph(f"<b>doc:{did}</b> {_e(fn[:54])} {('['+str(nf)+'f]') if nf else ''}{flag}<br/>"
+                           f"<font size='7' color='#6b7280'>{_e(' '.join(exc.split())[:140])}…</font><br/>"
+                           f"<font size='7' color='#2563eb'>{_e(link)}</font>", bdy))
+    f.append(Spacer(1, 6))
+    f.append(Paragraph("LandTek Assisted — Operator/Counsel Review Required. Verified facts are corpus-grounded; "
+                       "the Analysis &amp; Recommendations block is derived reasoning, not legal advice.", note))
+
+    SimpleDocTemplate(path, pagesize=letter, topMargin=0.6*inch, bottomMargin=0.6*inch, title=f"{mc} action memo").build(f)
+    return len(facts), len(annex), len(missing)
 
 
 def main():
     mc = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "MWK-ARTA-1891"
     path = f"/tmp/memo_{mc}.pdf"
-    nf, nd = build(mc, path)
-    print(f"[case-memo] {mc}: {nf} verified facts, {nd} annexes → {path}")
+    nf, nd, nm = build(mc, path)
+    print(f"[case-memo] {mc}: {nf} verified facts, {nd} annexes, {nm} unavailable → {path}")
     if "--send" in sys.argv:
         tok = _tok()
-        r = subprocess.run(["curl", "-s", "-F", f"chat_id={CHAT}", "-F", f"caption={mc} — Action Memo",
+        r = subprocess.run(["curl", "-s", "-F", f"chat_id={CHAT}", "-F", f"caption={mc} — Action Memo (corpus-grade)",
                             "-F", f"document=@{path}", f"https://api.telegram.org/bot{tok}/sendDocument"],
                            capture_output=True, text=True)
         print("[send] sent ✓" if '"ok":true' in r.stdout else f"[send] FAIL {r.stdout[:150]}")
