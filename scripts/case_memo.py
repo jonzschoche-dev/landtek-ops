@@ -116,7 +116,7 @@ def build(mc, path):
     # Discerning reasoning: the multi-step harness → a structured, counsel-ready marked block (14B)
     _la = _legal_analyze(mc)
     if os.environ.get("MEMO_PRINT"):
-        for k in ("priority", "summary", "gaps", "evidence", "actions", "strategic"):
+        for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "linkage"):
             print(f"[{k}]\n{_la.get(k,'(missing)')}\n")
     today = datetime.date.today().isoformat()
 
@@ -153,15 +153,20 @@ def build(mc, path):
         f.append(Paragraph("1. Executive summary", h2))
         f.append(Paragraph(_e(_la["summary"]), summ))
 
-    # ── 2. Verified facts (deterministic, provenance-tagged, top 12) ──
-    f.append(Paragraph(f"2. Verified facts — provenance-tagged ({min(len(facts),12)} of {len(facts)})", h2))
+    # ── 2. Objective — what victory in THIS matter looks like (first principles) ──
+    if _la.get("objective"):
+        f.append(Paragraph("2. Objective — what victory in this matter looks like", h2))
+        _lines(_la["objective"], bdy)
+
+    # ── 3. Verified facts (deterministic, provenance-tagged, top 12) ──
+    f.append(Paragraph(f"3. Verified facts — provenance-tagged ({min(len(facts),12)} of {len(facts)})", h2))
     for s_, e_, src in facts[:12]:
         f.append(Paragraph(f"&bull; {_e(s_)} <font size='7' color='#059669'>[VERIFIED · doc:{_e(src)}]</font>", bdy))
     if len(facts) > 12:
         f.append(Paragraph(f"…+{len(facts)-12} more in the matter dossier; key source excerpts in Appendix B.", note))
 
-    # ── 3. Key gaps (derived gaps + deterministic source-availability) ──
-    f.append(Paragraph("3. Key gaps (what blocks stronger action)", h2))
+    # ── 4. Key gaps (derived gaps + deterministic source-availability) ──
+    f.append(Paragraph("4. Key gaps (what blocks stronger action)", h2))
     _lines(_la.get("gaps") or "(none identified by the agent)", bdy, bullet=True)
     if missing:
         f.append(Paragraph(f"&#9888; {len(missing)} cited source(s) NOT available: "
@@ -169,22 +174,23 @@ def build(mc, path):
     else:
         f.append(Paragraph("&bull; All cited source documents are available (link/file confirmed).", note))
 
-    # ── 4. Evidence-to-element map (derived, tight: 2-3 issues) ──
+    # ── 5. Evidence-to-element map (derived, tight: 2-3 issues) ──
     if _la.get("evidence"):
-        f.append(Paragraph("4. Evidence-to-element map", h2))
+        f.append(Paragraph("5. Evidence-to-element map", h2))
         _lines(_la["evidence"], bdy)
 
-    # ── 5. Immediate recommended actions (derived, fenced + clearly labeled) ──
-    f.append(Paragraph("5. Immediate recommended actions", h2))
+    # ── 6. Immediate recommended actions = the path to victory (derived, fenced + labeled) ──
+    f.append(Paragraph("6. Immediate recommended actions (path to victory)", h2))
     f.append(Paragraph("LandTek-generated analysis for counsel review only — not legal advice.", note))
     _lines(_la.get("actions"), fence)
 
-    # ── 6. Strategic note (derived) + deterministic separation guardrail ──
-    f.append(Paragraph("6. Strategic note", h2))
-    _lines(_la.get("strategic"), bdy)
+    # ── 7. Relevance to parallel cases — SECONDARY (demoted; party-overlap aware) ──
+    f.append(Paragraph("7. Relevance to parallel cases (secondary)", h2))
+    _lines(_la.get("linkage") or "Byproduct only; not a driver of this matter.", bdy)
     if is_admin:
-        f.append(Paragraph("&bull; <b>Separation:</b> " + _e(mc) + " is an administrative matter; CV-26360 is a "
-                           "separate judicial proceeding (Aug-12-2026 testimony) — this matter does NOT decide it.", note))
+        f.append(Paragraph("&bull; <b>Separation:</b> " + _e(mc) + " is an administrative matter against LGU "
+                           "Mercedes; CV-26360 is a separate judicial action with different defendants — this "
+                           "matter does NOT decide it, and its cross-case value is incidental.", note))
 
     # ── Appendix A — condensed chronology (key dated events, max 10) ──
     tl = [e for e in timeline(cur, mc) if not (e[4] and str(e[4]).isdigit() and int(e[4]) in off)]
