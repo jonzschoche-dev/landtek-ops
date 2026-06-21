@@ -62,6 +62,7 @@ def _esc(s):
 def _layout(title: str, body: str, active: str = "home") -> str:
     nav = [
         ("home", "/", "Home"),
+        ("cases", "/cases", "Cases"),
         ("clients", "/clients", "Clients"),
         ("participants", "/participants", "People"),
         ("mwk", "/mwk", "MWK"),
@@ -728,6 +729,68 @@ def _badge_timer(row: dict) -> str:
     if enabled == "enabled":
         return '<span class="badge badge-warn">enabled</span>'
     return f'<span class="badge badge-off">{_esc(enabled)}</span>'
+
+
+@bp.route("/cases")
+def cases():
+    """Fluid case builder: each grievance → candidate forums + live corpus support."""
+    conn = _db()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT issue_no, title, detail, value_amount, status, maps_to_matters FROM client_issues ORDER BY issue_no")
+        issues = cur.fetchall()
+    except Exception:
+        conn.rollback()
+        return _layout("Case builder", '<h1>Case builder</h1><p class="empty">issue spine not loaded yet — run load_issue_spine.py / forum_router.py</p>', "cases")
+    routes = {}
+    try:
+        cur.execute("""SELECT cf.issue_no, cf.forum_code, coalesce(am.name, cf.forum_code), cf.remedy, cf.status
+                       FROM case_forums cf LEFT JOIN agency_mandates am ON am.code=cf.forum_code
+                       ORDER BY cf.issue_no, cf.forum_code""")
+        for ino, fc, name, remedy, st in cur.fetchall():
+            routes.setdefault(ino, []).append((fc, name, remedy, st))
+    except Exception:
+        conn.rollback()
+    cards = []
+    for ino, title, detail, value, status, matters in issues:
+        matters = matters or []
+        vf = docs = filings = 0
+        if matters:
+            cur.execute("SELECT count(*) FROM matter_facts WHERE matter_code=ANY(%s) AND provenance_level='verified'", (matters,))
+            vf = cur.fetchone()[0]
+            cur.execute("SELECT count(*) FROM documents WHERE matter_code=ANY(%s)", (matters,))
+            docs = cur.fetchone()[0]
+            try:
+                cur.execute("SELECT count(*) FROM filing_alerts WHERE matter_code=ANY(%s)", (matters,))
+                filings = cur.fetchone()[0]
+            except Exception:
+                conn.rollback()
+        val = f"₱{int(value):,}" if value else ""
+        fhtml = ""
+        for fc, name, remedy, st in routes.get(ino, []):
+            b = "badge-ok" if st in ("chosen", "filed") else "badge-off"
+            fhtml += (f'<div style="margin:4px 0"><span class="badge {b}" title="{_esc(name)}">{_esc(fc)}</span> '
+                      f'<span class="muted">{_esc(remedy)}</span></div>')
+        if not fhtml:
+            fhtml = '<span class="empty">no forum routed</span>'
+        mlist = ", ".join(matters[:4]) + ("…" if len(matters) > 4 else "")
+        cards.append(f"""<div class="card">
+          <div style="display:flex;justify-content:space-between;gap:8px">
+            <strong>#{ino} {_esc(title)}</strong><span class="muted">{_esc(val)}</span></div>
+          <div class="muted" style="font-size:12px;margin:4px 0 8px">{_esc((detail or '')[:170])}</div>
+          <div style="font-size:12px;margin-bottom:8px">
+            <span class="badge badge-ok">{vf} verified</span>
+            <span class="badge badge-off">{docs} docs</span>
+            <span class="badge badge-off">{filings} filings</span>
+            <span class="muted" style="margin-left:6px">{_esc(mlist)}</span></div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">Candidate forums</div>
+          {fhtml}</div>""")
+    body = (f'<h1>Case builder</h1>'
+            f'<p class="lead">Each grievance → its candidate forums (from the oversight-mandate DB) with live corpus support. '
+            f'Grows fluidly as the worker verifies facts, filing_monitor catches filings, and docs link in.</p>'
+            f'<div class="grid grid-2">{"".join(cards)}</div>')
+    conn.close()
+    return _layout("Case builder", body, "cases")
 
 
 @bp.route("/")

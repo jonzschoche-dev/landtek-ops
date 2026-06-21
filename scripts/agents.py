@@ -62,6 +62,11 @@ AGENTS = [
      "on demand", "", "ready", "no matters yet; periods NEEDS-COUNSEL-VERIFICATION"),
     ("agency:OMBUDSMAN",     "forum desk — R.A. 6770 / AO 07", "det",
      "on demand", "", "ready", "no matters yet; periods NEEDS-COUNSEL-VERIFICATION"),
+    # ── LIVE — case builder (the operator interface) ───────────────────────────
+    ("forum_router",         "wire each grievance → candidate oversight forums (case_forums)", "det",
+     "on demand", "", "live", "feeds /ops/cases; curated from agency_mandates"),
+    ("case_builder_ui",      "cockpit /ops/cases — live case cards (forums + corpus support)", "det",
+     "live (web)", "", "live", "ops_dashboard.py; grows fluidly with the corpus"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
