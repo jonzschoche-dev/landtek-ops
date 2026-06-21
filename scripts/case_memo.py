@@ -36,6 +36,9 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
 MODEL = os.environ.get("VERIFY_WORKER_OLLAMA_MODEL", "qwen2.5:7b-instruct")
 CHAT = "6513067717"
+# Dashboard base for usable, clickable document links. /files/c/<id> streams the PDF from disk OR Drive
+# and is Tailscale-reachable from the operator's phone.
+DOCBASE = os.environ.get("LANDTEK_DOC_BASE", "http://100.85.203.58:8765")
 JUDICIAL = {"MWK-CV26360": "the CV-26360 accion reivindicatoria (RTC; Aug-12-2026 testimony)",
             "MWK-CV6839": "CV-6839 just-compensation (Special Agrarian Court)"}
 
@@ -60,14 +63,15 @@ def _forums(ftext):
     return out
 
 
-def _avail(dl, drid, p):
+def _doc_link(did, dl, drid, p):
+    """A usable, clickable URL to OPEN the document + whether it's actually retrievable.
+    Primary = the dashboard serve endpoint, which streams from local disk OR Drive and is reachable
+    from the operator's phone over Tailscale (so it works even when the doc has only a Drive copy)."""
+    if (p and os.path.exists(p)) or drid:
+        return f"{DOCBASE}/files/c/{did}", True
     if dl:
         return dl, True
-    if drid:
-        return f"https://drive.google.com/file/d/{drid}/view", True
-    if p:
-        return p, os.path.exists(p)
-    return "(no source on file)", False
+    return "", False
 
 
 def _ollama(prompt):
@@ -109,8 +113,9 @@ def build(mc, path):
                    FROM documents d WHERE d.matter_code=%s
                      OR d.id IN (SELECT doc_id FROM document_matter_links WHERE matter_code=%s)
                    ORDER BY nf DESC, d.id""", (mc, mc))
-    annex = [(did, fn, *_avail(dl, drid, p), exc, nf) for did, fn, dl, drid, p, exc, nf in cur.fetchall() if did not in off]
+    annex = [(did, fn, *_doc_link(did, dl, drid, p), exc, nf) for did, fn, dl, drid, p, exc, nf in cur.fetchall() if did not in off]
     missing = [a for a in annex if not a[3]]
+    avail_ids = {a[0] for a in annex if a[3]}        # docs with a usable link (for inline doc:N hyperlinks)
 
     is_admin = bool(_forums(forum)) and mc not in JUDICIAL
     usable = ("Not yet — source documents missing/unavailable" if missing else
@@ -147,6 +152,20 @@ def build(mc, path):
             return [v for v in val if v]
         return [x.strip() for x in str(val or "").split("\n") if x.strip()]
 
+    def _vtag(src):
+        """Provenance tag for a verified fact — clickable when the source doc is retrievable."""
+        s = _e(src)
+        if src and str(src).isdigit() and int(src) in avail_ids:
+            return (f"<a href='{DOCBASE}/files/c/{int(src)}'><font size='7' color='#059669'>"
+                    f"[VERIFIED · doc:{s} ↗]</font></a>")
+        return f"<font size='7' color='#059669'>[VERIFIED · doc:{s}]</font>"
+
+    def _dref(src):
+        """Inline doc reference — clickable when retrievable."""
+        if src and str(src).isdigit() and int(src) in avail_ids:
+            return f" <a href='{DOCBASE}/files/c/{int(src)}'>[doc:{_e(src)} ↗]</a>"
+        return f" [doc:{_e(src)}]" if src else ""
+
     # ── Header ──
     f.append(Paragraph(f"{_e(mc)} — Action Memo", h1))
     f.append(Paragraph(f"{_e(title)}<br/>Forum/Docket: {_e(forum)} → {_e(docket)} &nbsp;·&nbsp; "
@@ -180,7 +199,7 @@ def build(mc, path):
     # ── 3. Verified facts (deterministic, provenance-tagged, top 12) ──
     f.append(Paragraph(f"3. Verified facts — provenance-tagged ({min(len(facts),12)} of {len(facts)})", h2))
     for s_, e_, src in facts[:12]:
-        f.append(Paragraph(f"&bull; {_e(s_)} <font size='7' color='#059669'>[VERIFIED · doc:{_e(src)}]</font>", bdy))
+        f.append(Paragraph(f"&bull; {_e(s_)} {_vtag(src)}", bdy))
     if len(facts) > 12:
         f.append(Paragraph(f"…+{len(facts)-12} more in the matter dossier; key source excerpts in Appendix B.", note))
 
@@ -231,18 +250,24 @@ def build(mc, path):
     f.append(Paragraph(f"Appendix A — Condensed chronology ({min(len(tl),10)} of {len(tl)})", h2))
     for key, disp, kind, text, src in tl[:10]:
         lab = "" if kind == "event" else "[submission] "
-        f.append(Paragraph(f"<b>{disp}</b> &nbsp; {lab}{_e(text[:120])}{(' [doc:'+_e(src)+']') if src else ''}", bdy))
+        f.append(Paragraph(f"<b>{disp}</b> &nbsp; {lab}{_e(text[:120])}{_dref(src)}", bdy))
 
     # ── Appendix B — key source excerpts with links/paths ──
-    f.append(Paragraph(f"Appendix B — Key source excerpts &amp; links ({min(len(annex),12)} of {len(annex)})", h2))
-    for did, fn, link, ok, exc, nf in annex[:12]:
-        flag = "" if ok else " <font color='#b91c1c'>[SOURCE NOT AVAILABLE]</font>"
-        f.append(Paragraph(f"<b>doc:{did}</b> {_e(fn[:54])} {('['+str(nf)+'f]') if nf else ''}{flag}<br/>"
-                           f"<font size='7' color='#6b7280'>“{_e(' '.join(exc.split())[:130])}…”</font><br/>"
-                           f"<font size='7' color='#2563eb'>{_e(link)}</font>", bdy))
+    f.append(Paragraph(f"Appendix B — Key source excerpts &amp; links ({min(len(annex),14)} of {len(annex)})", h2))
+    for did, fn, link, ok, exc, nf in annex[:14]:
+        if ok and link:
+            head = (f"<a href='{link}'><b>doc:{did}</b> {_e(fn[:52])} ↗</a>"
+                    f" {('['+str(nf)+'f]') if nf else ''}")
+            linkline = f"<br/><a href='{link}'><font size='7' color='#2563eb'>{_e(link)}</font></a>"
+        else:
+            head = f"<b>doc:{did}</b> {_e(fn[:52])} <font color='#b91c1c'>[SOURCE NOT AVAILABLE]</font>"
+            linkline = ""
+        f.append(Paragraph(head + f"<br/><font size='7' color='#6b7280'>“{_e(' '.join(exc.split())[:130])}…”</font>"
+                           + linkline, bdy))
     f.append(Spacer(1, 6))
-    f.append(Paragraph("Verified facts are corpus-grounded (cited source + verbatim excerpt). Sections 1 and 3–6 "
-                       "are LandTek-generated analysis for counsel review — not legal advice.", note))
+    f.append(Paragraph("Document links open the source in the LandTek viewer (over Tailscale). Verified facts are "
+                       "corpus-grounded (cited source + verbatim excerpt); sections 1 and 3–6 are LandTek-generated "
+                       "analysis for counsel review — not legal advice.", note))
 
     SimpleDocTemplate(path, pagesize=letter, topMargin=0.6*inch, bottomMargin=0.6*inch, title=f"{mc} action memo").build(f)
     return len(facts), len(annex), len(missing)
