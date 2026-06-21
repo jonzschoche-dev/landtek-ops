@@ -354,6 +354,31 @@ FACTS = [
      "restrictions beyond the specific ARTA-referred complaints (pp. 3-13) — exceeding the proper scope "
      "of CART action under ARTA MC Nos. 2021-08 & 2021-11.",
      "Issuance of broad prospec-\ntive\nrestrictions\nbeyond\nthe specific ARTA-referred\ncomplaints"),
+
+    # ── doc 702 = the OP-level "Petition for Supervisory Review and Corrective Action" (05 May 2026, to
+    #    Exec. Sec. Recto) appealing ARTA's 07-Apr-2026 Resolution on ARTA cases 0690 + 0792. The
+    #    operative pleading for OP-PETITION and the in-corpus substance for 0690 / 0792 (both were 0-fact). ──
+] + [
+    (m, 702, stmt, exc)
+    for m in ("MWK-OP-PETITION", "MWK-ARTA-0690", "MWK-ARTA-0792")
+    for (stmt, exc) in [
+        ("Operative pleading (doc 702): a Petition for Supervisory Review and Corrective Action — with an "
+         "alternative Notice of Appeal — filed 05 May 2026 with the Office of the President (Executive "
+         "Secretary Ralph G. Recto) by Jonathan Paul Zschoche (Attorney-in-Fact for Patricia Keesey "
+         "Zschoche, heir in the Estate of Mary Worrick Keesey), over ARTA's Resolution dated 07 April 2026.",
+         "Petition for Supervisory Review and Corrective Action over the Anti-Red Tape Authority's "
+         "Resolution dated 07 April 2026"),
+        ("The petition warns that the ARTA Resolution, if allowed to stand, would signal to government "
+         "offices nationwide that threshold refusals, undelivered responses, unpublished requirements, and "
+         "citizenship-based dismissals are permissible under R.A. No. 11032 — i.e. it seeks to overturn an "
+         "ARTA dismissal that legitimised those red-tape practices.",
+         "threshold refusals, undelivered responses, unpublished requirements, and citizenship-based "
+         "dismissals are permissible under R.A. No. 11032"),
+        ("A Notice of Appeal was filed simultaneously, in the alternative and without prejudice to the "
+         "supervisory nature of the petition; the primary filing is a supervisory petition not subject to "
+         "Administrative Order No. 22 (fee tendered only if the OP deems A.O. 22 applicable).",
+         "A Notice of Appeal is filed simultaneously, in the alternative"),
+    ]
 ]
 
 
