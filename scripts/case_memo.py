@@ -139,6 +139,11 @@ def build(mc, path):
                     ln = "&bull; " + ln
                 f.append(Paragraph(_e(ln).replace("&amp;bull;", "&bull;"), style))
 
+    def _aslist(val):
+        if isinstance(val, list):
+            return [v for v in val if v]
+        return [x.strip() for x in str(val or "").split("\n") if x.strip()]
+
     # ── Header ──
     f.append(Paragraph(f"{_e(mc)} — Action Memo", h1))
     f.append(Paragraph(f"{_e(title)}<br/>Forum/Docket: {_e(forum)} → {_e(docket)} &nbsp;·&nbsp; "
@@ -167,7 +172,9 @@ def build(mc, path):
 
     # ── 4. Key gaps (derived gaps + deterministic source-availability) ──
     f.append(Paragraph("4. Key gaps (what blocks stronger action)", h2))
-    _lines(_la.get("gaps") or "(none identified by the agent)", bdy, bullet=True)
+    for g in (_aslist(_la.get("gaps")) or ["(none identified by the agent)"]):
+        g = str(g)
+        f.append(Paragraph(_e(g) if g.startswith(("-", "•", "&bull;")) else "&bull; " + _e(g), bdy))
     if missing:
         f.append(Paragraph(f"&#9888; {len(missing)} cited source(s) NOT available: "
                            + ", ".join(f"doc:{a[0]}" for a in missing) + " — retrieve before filing.", warn))
@@ -175,14 +182,25 @@ def build(mc, path):
         f.append(Paragraph("&bull; All cited source documents are available (link/file confirmed).", note))
 
     # ── 5. Evidence-to-element map (derived, tight: 2-3 issues) ──
-    if _la.get("evidence"):
+    ev = _aslist(_la.get("evidence"))
+    if ev:
         f.append(Paragraph("5. Evidence-to-element map", h2))
-        _lines(_la["evidence"], bdy)
+        for e_ in ev:
+            f.append(Paragraph("&bull; " + _e(str(e_)), bdy))
 
     # ── 6. Immediate recommended actions = the path to victory (derived, fenced + labeled) ──
     f.append(Paragraph("6. Immediate recommended actions (path to victory)", h2))
     f.append(Paragraph("LandTek-generated analysis for counsel review only — not legal advice.", note))
-    _lines(_la.get("actions"), fence)
+    acts = _la.get("actions")
+    if isinstance(acts, list) and acts and isinstance(acts[0], dict):
+        for i, a in enumerate(acts, 1):
+            f.append(Paragraph(f"<b>{i}. Owner:</b> {_e(a.get('owner','—'))} &nbsp;·&nbsp; "
+                               f"<b>Deadline:</b> {_e(a.get('deadline','—'))}", bdy))
+            if a.get("draft"):
+                f.append(Paragraph("<b>DRAFT:</b> " + _e(a["draft"]), fence))
+    else:
+        for ln in _aslist(acts):
+            f.append(Paragraph(_e(str(ln)), fence))
 
     # ── 7. Related matters — clear + evidence-grounded, typed by coupling ──
     f.append(Paragraph("7. Related matters (evidence-grounded)", h2))
