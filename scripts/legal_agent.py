@@ -29,6 +29,7 @@ import psycopg2
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from legal_authority import retrieve_chunks
+from matter_readiness import assess as _rd_assess, verdict as _rd_verdict
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
@@ -46,8 +47,9 @@ _SCHEMA = {
         "evidence": {"type": "array", "items": {"type": "string"}},
         "actions": {"type": "array", "items": {
             "type": "object",
-            "properties": {"owner": {"type": "string"}, "deadline": {"type": "string"}, "draft": {"type": "string"}},
-            "required": ["owner", "deadline", "draft"],
+            "properties": {"owner": {"type": "string"}, "deadline": {"type": "string"}, "draft": {"type": "string"},
+                           "condition": {"type": "string"}},
+            "required": ["owner", "deadline", "draft", "condition"],
         }},
     },
     "required": ["priority", "summary", "objective", "gaps", "evidence", "actions"],
@@ -110,7 +112,15 @@ def _gather(mc):
     o = cur.fetchone()
     objective_note = (f"operator-set role: {o[0]} (leverage {o[1]}/3) — {o[2]}" if o else "")
     related_ctx = _related_context(cur, mc)
-    return title, forum, docket, factstr, lawstr, objective_note, related_ctx
+    # data-layer gaps from the readiness pre-flight → lets the memo name the exact missing sources
+    try:
+        _ra = _rd_assess(cur, mc)
+        _ready, _fixes, _adv = _rd_verdict(_ra) if _ra else (True, [], [])
+        readiness_gaps = ("; ".join(_fixes + _adv)[:600] if (_fixes or _adv)
+                          else "(pre-flight: data layer READY — no missing sources flagged)")
+    except Exception:
+        readiness_gaps = ""
+    return title, forum, docket, factstr, lawstr, objective_note, related_ctx, readiness_gaps
 
 
 def _split_markers(text):
@@ -164,7 +174,7 @@ def _related_context(cur, mc):
 
 
 def analyze(mc):
-    title, forum, docket, factstr, lawstr, objective_note, related_ctx = _gather(mc)
+    title, forum, docket, factstr, lawstr, objective_note, related_ctx, readiness_gaps = _gather(mc)
     today = datetime.date.today()
     deadline = (today + datetime.timedelta(days=10)).isoformat()
     aug12 = datetime.date(2026, 8, 12)
@@ -195,20 +205,25 @@ def analyze(mc):
     fields = (f"priority: 'High|Medium|Low — one-line reason'. summary: ONE sentence (current posture + the "
               f"single most important next action). objective: what VICTORY in THIS matter looks like (the "
               f"concrete outcome this forum can deliver) + the single most direct lever; 2-3 sentences. gaps: "
-              f"2-3 SPECIFIC missing items (e.g. 'the exact records requested and dates denied are not yet "
-              f"extracted from the complaint'). evidence: 2-3 strings, each a CONCRETE issue→element→support "
-              f"with a real fact id — e.g. 'FOI obstruction: failure to act on valid records requests — "
-              f"SUPPORTED [F5405]'; 'DILG continuing duty: referral does not exhaust it — SUPPORTED [F5869]' "
-              f"(do NOT output the literal words 'Issue' or 'key element'). actions: 2-3 objects, each the "
-              f"prioritized PATH TO VICTORY (force the agency to act + escalation ladder; build a non-response "
-              f"record; close gaps — NOT 'generate pattern evidence'), with owner, deadline (YYYY-MM-DD in "
-              f"2026), and draft = 2-4 sentences copy-paste-ready naming docket {docket}, the specific "
-              f"violation, the prejudice to the estate/heirs, and the escalation if ignored.")
-    p2 = (f"You are a senior litigation associate. {fp}\n{sep}\n{datectx}\nOperator's stated objective: "
-          f"{objective_note or '(not set)'}\nMatter {mc} ({title}; forum {forum}; docket {docket}). Crisp and "
-          f"professional; cite law by exact section/sub-provision; never invent facts, names, or official "
-          f"titles (there is NO 'DILG Commissioner'; DILG has a Secretary, here Provincial Director Relucio).\n"
-          f"Fill each field: {fields}\n\n"
+              f"2-3 strings — each states WHAT is missing, WHY it matters for action, and the FASTEST way to "
+              f"close it (name the specific doc/source to retrieve when known, e.g. 'retrieve doc:699'). "
+              f"evidence: 2-3 strings, each a CONCRETE issue→element→support with a real fact id — e.g. "
+              f"'FOI obstruction: failure to act on valid records requests — SUPPORTED [F5405]' (do NOT output "
+              f"the literal words 'Issue' or 'key element'). actions: 2-3 objects, the prioritized PATH TO "
+              f"VICTORY (force the agency to act + escalation ladder; build a non-response record; close gaps "
+              f"— NOT 'generate pattern evidence'). Each object = {{owner, deadline (YYYY-MM-DD in 2026), draft "
+              f"(2-4 sentences copy-paste-ready naming docket {docket}, the specific violation, the prejudice "
+              f"to the estate/heirs, and the escalation if ignored), condition}}. condition='' for an action "
+              f"that can proceed now; when a BLOCKING gap exists, ALSO give an INTERIM action with "
+              f"condition='Interim — while awaiting <X>' (a holding/follow-up letter that proceeds now, with "
+              f"its draft) AND a CONDITIONAL action with condition='If <specific doc/info> is obtained'.")
+    p2 = (f"You are a senior litigation associate. {fp}\n{sep}\n{datectx}\n"
+          f"DATA-LAYER GAPS (from the pre-flight — use these to write the gaps section and any conditional/"
+          f"interim actions; name the specific docs): {readiness_gaps}\n"
+          f"Operator's stated objective: {objective_note or '(not set)'}\nMatter {mc} ({title}; forum {forum}; "
+          f"docket {docket}). Crisp and professional; cite law by exact section/sub-provision; never invent "
+          f"facts, names, or official titles (there is NO 'DILG Commissioner'; DILG has a Secretary, here "
+          f"Provincial Director Relucio).\nFill each field: {fields}\n\n"
           f"ELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}\n\nVERIFIED FACTS:\n{factstr}")
     draft = _llm(p2, 0.3, fmt=_SCHEMA)
 
@@ -220,7 +235,10 @@ def analyze(mc):
           f"'[addressee — verify]'. (3) Each action is a step toward VICTORY IN THIS MATTER with owner + a "
           f"deadline IN 2026 (use {deadline} if unsure) + 2-4 sentences of copy-paste-ready draft; no "
           f"'generate pattern evidence' action. (4) summary is ONE sentence. (5) evidence items are concrete "
-          f"(no placeholder words like 'Issue' or 'key element'). Keep the same fields.\nFields spec: {fields}\n\n"
+          f"(no placeholder words like 'Issue' or 'key element'). (6) each gap states what's missing + why it "
+          f"matters + the fastest way to close it. (7) if a BLOCKING gap exists, there is an INTERIM action "
+          f"(condition='Interim — while awaiting …', proceeds now, with draft) AND a CONDITIONAL one "
+          f"(condition='If … obtained'); otherwise condition=''. Keep the same fields.\nFields spec: {fields}\n\n"
           f"JSON TO REVISE:\n{draft}\n\nVERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
     final = _llm(p3, 0.2, fmt=_SCHEMA)
     parts = _coerce(final) or _coerce(draft) or {"summary": "(agent output could not be parsed)"}

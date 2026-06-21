@@ -208,8 +208,10 @@ def build(mc, path):
     acts = _la.get("actions")
     if isinstance(acts, list) and acts and isinstance(acts[0], dict):
         for i, a in enumerate(acts, 1):
+            cond = (a.get("condition") or "").strip()
+            cond_s = f" &nbsp; <i><font color='#b45309'>[{_e(cond)}]</font></i>" if cond else ""
             f.append(Paragraph(f"<b>{i}. Owner:</b> {_e(a.get('owner','—'))} &nbsp;·&nbsp; "
-                               f"<b>Deadline:</b> {_e(a.get('deadline','—'))}", bdy))
+                               f"<b>Deadline:</b> {_e(a.get('deadline','—'))}{cond_s}", bdy))
             if a.get("draft"):
                 f.append(Paragraph("<b>DRAFT:</b> " + _e(a["draft"]), fence))
     else:
