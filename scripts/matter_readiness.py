@@ -103,10 +103,10 @@ def assess(cur, mc):
                 (mc, tok0))
     msgs = cur.fetchall()
     mids = [m[0] for m in msgs]
-    blended = set()
+    blended = {d["fn"].lower() for d in docs}        # already-ingested linked docs (any path)
     if mids:
         cur.execute("SELECT lower(filename) FROM email_documents WHERE message_id = ANY(%s)", (mids,))
-        blended = {r[0] for r in cur.fetchall()}
+        blended |= {r[0] for r in cur.fetchall()}    # plus the blend ledger (catches renamed docs)
     for mid, subj, refs in msgs:
         for ref in (refs if isinstance(refs, list) else (_json.loads(refs) if refs else [])):
             fn = (ref.get("filename") or "")

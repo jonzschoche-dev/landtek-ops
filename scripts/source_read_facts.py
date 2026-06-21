@@ -378,7 +378,20 @@ FACTS = [
          "supervisory nature of the petition; the primary filing is a supervisory petition not subject to "
          "Administrative Order No. 22 (fee tendered only if the OP deems A.O. 22 applicable).",
          "A Notice of Appeal is filed simultaneously, in the alternative"),
+        ("Petitioner requests expedited treatment, stressing that the heirs' property rights have been "
+         "without regulatory protection since October 2025.",
+         "The heirs' property rights have\nbeen without\nregulatory protection since October 2025"),
+        ("The petition is addressed to Executive Secretary Ralph G. Recto (Office of the President), copy "
+         "furnished the Director General of the Anti-Red Tape Authority.",
+         "Copy furnished: Director General, Anti-Red Tape Authority"),
     ]
+] + [
+    # ── doc 691 = DILG Records Section furnishing email for the ARTA referral (the DILG-track marker) ──
+    ("MWK-ARTA-DILG", 691,
+     "On 11 May 2026 the DILG Records Section (fldomingo@dilg.gov.ph) furnished ARTA and the complainant a "
+     "copy of the ARTA Referral of Complaint CTN SL-2026-0423-1891 and requested acknowledgment of receipt "
+     "— the act that opened the DILG-referral track of the 1891 complaint.",
+     "Respectfully furnishing you a copy of the ARTA Referral of Complaint (CTN SL-2026-0423-1891)"),
 ] + [
     # ── doc 782 = the 0747 Complaint-Affidavit vs Mayor Pajarillo (RA 11032 §21(b)/(d)/(e)) ──
     ("MWK-ARTA-0747", 782,
