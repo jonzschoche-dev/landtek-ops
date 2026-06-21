@@ -39,9 +39,8 @@ AGENTS = [
      "daily (in verify svc)", "", "live", "conservative; proposes + auto-links strong docket signals"),
     ("contradiction",        "cross-check verified facts for conflicts per matter", "det",
      "daily (in verify svc)", "", "live", "caught the Sept-2016-vs-2019 sale-date conflict"),
-    # ── PLANNED — gap-fillers ──────────────────────────────────────────────────
     ("ocr_triage",           "re-OCR the OCR-garbage docs (local Tesseract)", "det",
-     "daily", "", "planned", "unblocks OCR-blocked matters; no Gemini quota"),
+     "daily (in verify svc)", "", "live", "side-table, no overwrite; Drive-fetch for 66 remaining = next increment"),
     ("reconciler",           "adjudicate proposed_facts → verified/reject", "det+human",
      "on demand", "", "live", "human-in-the-loop; gate still checks on accept"),
     # ── LIVE — output / reasoning (in-house Ollama tier) ───────────────────────
