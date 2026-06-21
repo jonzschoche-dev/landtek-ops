@@ -116,7 +116,7 @@ def build(mc, path):
     # Discerning reasoning: the multi-step harness → a structured, counsel-ready marked block (14B)
     _la = _legal_analyze(mc)
     if os.environ.get("MEMO_PRINT"):
-        for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "linkage"):
+        for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "related"):
             print(f"[{k}]\n{_la.get(k,'(missing)')}\n")
     today = datetime.date.today().isoformat()
 
@@ -184,13 +184,13 @@ def build(mc, path):
     f.append(Paragraph("LandTek-generated analysis for counsel review only — not legal advice.", note))
     _lines(_la.get("actions"), fence)
 
-    # ── 7. Relevance to parallel cases — SECONDARY (demoted; party-overlap aware) ──
-    f.append(Paragraph("7. Relevance to parallel cases (secondary)", h2))
-    _lines(_la.get("linkage") or "Byproduct only; not a driver of this matter.", bdy)
+    # ── 7. Related matters — clear + evidence-grounded, typed by coupling ──
+    f.append(Paragraph("7. Related matters (evidence-grounded)", h2))
+    _lines(_la.get("related") or "(none recorded yet — see complaint + email attachments)", bdy)
     if is_admin:
-        f.append(Paragraph("&bull; <b>Separation:</b> " + _e(mc) + " is an administrative matter against LGU "
-                           "Mercedes; CV-26360 is a separate judicial action with different defendants — this "
-                           "matter does NOT decide it, and its cross-case value is incidental.", note))
+        f.append(Paragraph("&bull; <b>Separation guardrail:</b> the same-campaign ARTA/RA 11032 matters are "
+                           "genuinely related; the property/ownership track (e.g. CV-26360, different defendants) "
+                           "is CONTEXT only — this administrative matter does not decide it.", note))
 
     # ── Appendix A — condensed chronology (key dated events, max 10) ──
     tl = [e for e in timeline(cur, mc) if not (e[4] and str(e[4]).isdigit() and int(e[4]) in off)]

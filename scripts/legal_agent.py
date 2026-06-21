@@ -75,28 +75,14 @@ def _gather(mc):
     cur.execute("SELECT contribution, leverage, note FROM matter_objectives WHERE matter_code=%s ORDER BY updated_at DESC LIMIT 1", (mc,))
     o = cur.fetchone()
     objective_note = (f"operator-set role: {o[0]} (leverage {o[1]}/3) — {o[2]}" if o else "")
-    # deterministic party-overlap with related matters → how tightly coupled this really is
-    focal = _party_ids(cur, mc)
-    cur.execute("""SELECT doc_matter, count(*) FROM matter_relevance WHERE focal_matter=%s AND tier='RELATED'
-                   AND doc_matter IS NOT NULL AND doc_matter<>%s GROUP BY 1 ORDER BY 2 DESC LIMIT 5""", (mc, mc))
-    shared = []
-    for rm, _n in cur.fetchall():
-        inter = focal & _party_ids(cur, rm)
-        if inter:
-            shared.append(f"{rm} (shares party entity ids {sorted(inter)})")
-    if not focal:
-        party_link = "This matter has NO recorded parties of its own; any parallel-case linkage is LOOSE/SECONDARY, not a driver."
-    elif shared:
-        party_link = "Shared parties exist: " + "; ".join(shared) + " — linkage may be stronger for those, but stay proportional."
-    else:
-        party_link = "NO shared parties with any related matter — parallel-case linkage is LOOSE/SECONDARY, not a driver."
-    return title, forum, docket, factstr, lawstr, objective_note, party_link
+    related_ctx = _related_context(cur, mc)
+    return title, forum, docket, factstr, lawstr, objective_note, related_ctx
 
 
 def _split_markers(text):
     out, cur = {}, None
     for line in text.splitlines():
-        m = re.match(r"\s*\[?(PRIORITY|SUMMARY|OBJECTIVE|GAPS|EVIDENCE|ACTIONS|LINKAGE|STRATEGIC)\]?\s*[:\-]?\s*(.*)", line)
+        m = re.match(r"\s*\[?(PRIORITY|SUMMARY|OBJECTIVE|GAPS|EVIDENCE|ACTIONS|RELATED|LINKAGE|STRATEGIC)\]?\s*[:\-]?\s*(.*)", line)
         if m and (line.lstrip().startswith("[") or m.group(2) == "" or len(line) < 40):
             cur = m.group(1).lower()
             out[cur] = m.group(2).strip() + "\n"
@@ -117,8 +103,34 @@ def _party_ids(cur, mc):
     return ids
 
 
+def _related_context(cur, mc):
+    """Evidence-grounded related matters, bucketed by coupling TYPE (shared docs in the corpus)."""
+    cur.execute("""SELECT mr.doc_matter, count(*) c, upper(coalesce(m.forum,m.court_or_agency,'')||' '||coalesce(m.title,''))
+                   FROM matter_relevance mr LEFT JOIN matters m ON m.matter_code=mr.doc_matter
+                   WHERE mr.focal_matter=%s AND mr.doc_matter IS NOT NULL AND mr.doc_matter<>%s
+                   GROUP BY 1,3 ORDER BY c DESC""", (mc, mc))
+    admin, prop = [], []
+    for dm, c, ctx in cur.fetchall():
+        tag = f"{dm} ({c} shared docs)"
+        if any(k in (dm + " " + ctx) for k in ("ARTA", "DILG", "OP-PETITION", "RED TAPE", "11032", "EXECUTIVE SEC")):
+            admin.append(tag)
+        else:
+            prop.append(tag)
+    parts = []
+    if admin:
+        parts.append("SAME ADMINISTRATIVE CAMPAIGN (RA 11032 / red-tape vs LGU Mercedes officials — genuinely "
+                     "related, same fight): " + ", ".join(admin[:10]))
+    if prop:
+        parts.append("SAME ESTATE but a SEPARATE property/ownership track (context only; different defendants, "
+                     "e.g. CV-26360): " + ", ".join(prop[:8]))
+    body = "\n- ".join(parts) if parts else "none recorded in the corpus yet"
+    return ("RELATED MATTERS (evidence-grounded via shared documents/entities in the corpus):\n- " + body +
+            "\nThe complaint itself and its email attachments assert the fuller web of related matters; where "
+            "those are not yet ingested, the related-matters map is INCOMPLETE — flag to obtain.")
+
+
 def analyze(mc):
-    title, forum, docket, factstr, lawstr, objective_note, party_link = _gather(mc)
+    title, forum, docket, factstr, lawstr, objective_note, related_ctx = _gather(mc)
     today = datetime.date.today()
     deadline = (today + datetime.timedelta(days=10)).isoformat()
     aug12 = datetime.date(2026, 8, 12)
@@ -128,9 +140,11 @@ def analyze(mc):
           "forum to ACT. 'Victory' = the agency/court delivering the concrete relief this forum can give "
           "(for an administrative matter: the agency compels the LGU to comply / issues a directive or "
           "adverse finding / meaningful escalation succeeds). Evidence for parallel or related cases is a "
-          "BYPRODUCT, NEVER a driver — do not overstate it, do not let it shape the recommended actions.")
-    sep = ("SEPARATION & COUPLING: This matter is " + kind + ". " + party_link + " CV-26360 is a SEPARATE "
-           "judicial proceeding; never say this matter decides it. Any cross-case value is incidental.")
+          "BYPRODUCT, NEVER a driver — do not let it shape the recommended actions.")
+    sep = ("RELATEDNESS RULE: This matter is " + kind + ".\n" + related_ctx + "\nBe CLEAR and explicit about "
+           "the genuinely related matters (especially the sibling RA 11032/ARTA complaints — the same campaign), "
+           "but NEVER say this matter decides a separate judicial case (e.g. CV-26360, different defendants); "
+           "for that property/ownership track the connection is context only.")
 
     # PASS 1 — element map (rigor: issues → elements → supported/gap)
     p1 = (f"You are a Philippine litigation analyst. Matter {mc} ({title}; forum: {forum}). Using ONLY "
@@ -164,8 +178,11 @@ def analyze(mc):
           f"(c) close the substance gaps. Each: Owner; Deadline; then 'DRAFT:' 2-4 sentences of copy-paste-ready "
           f"text naming docket {docket}, the specific violation, the prejudice to the estate/heirs, and the "
           f"escalation. Do NOT list 'generate pattern evidence' as an action.\n"
-          f"[LINKAGE] Relevance to parallel/related cases — SECONDARY, a byproduct only, 1-2 lines MAX. "
-          f"Be honest and proportional given: {party_link}\n\n"
+          f"[RELATED] Be CLEAR about the genuinely related matters using the RELATED MATTERS context above: "
+          f"name the same-campaign RA 11032/ARTA sibling complaints + escalation tracks (these ARE part of the "
+          f"same fight) and, SEPARATELY, the property/ownership track as context only (different defendants). "
+          f"Note if the complaint/email attachments asserting the fuller web are not yet ingested (map incomplete). "
+          f"3-5 lines.\n\n"
           f"ELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}\n\nVERIFIED FACTS:\n{factstr}")
     draft = _llm(p2, 0.3)
 
@@ -177,10 +194,11 @@ def analyze(mc):
           f"with '[addressee — verify]'. (3) Each [ACTIONS] item is a step toward VICTORY IN THIS MATTER "
           f"(forcing the agency to act), with Owner + concrete Deadline + 2-4 sentences of genuinely "
           f"copy-paste-ready DRAFT text; no 'generate pattern evidence' action. (4) [OBJECTIVE] states what "
-          f"victory in THIS matter is + the lever. (5) [LINKAGE] is SECONDARY and PROPORTIONAL — given "
-          f"'{party_link}', it must NOT frame any parallel case as a major asset; if no shared parties, say "
-          f"the connection is loose and not a driver, ≤2 lines. (6) [SUMMARY] one sentence. (7) Keep the EXACT "
-          f"marked structure ([PRIORITY]/[SUMMARY]/[OBJECTIVE]/[GAPS]/[EVIDENCE]/[ACTIONS]/[LINKAGE]); concise, "
+          f"victory in THIS matter is + the lever. (5) [RELATED] is CLEAR and evidence-grounded: list the "
+          f"genuinely related same-campaign RA 11032/ARTA siblings as related; the property/ownership track "
+          f"(e.g. CV-26360, different defendants) only as CONTEXT — never as deciding this matter. (6) [SUMMARY] "
+          f"one sentence. (7) Keep the EXACT marked structure "
+          f"([PRIORITY]/[SUMMARY]/[OBJECTIVE]/[GAPS]/[EVIDENCE]/[ACTIONS]/[RELATED]); concise, "
           f"professional. Output ONLY the corrected marked block — no commentary.\n\nBLOCK:\n{draft}\n\n"
           f"VERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
     final = _llm(p3, 0.2)
@@ -196,7 +214,7 @@ def main():
     mc = sys.argv[1] if len(sys.argv) > 1 else "MWK-ARTA-1891"
     print(f"[legal_agent] reasoning over {mc} via {MODEL} (3 passes)…", flush=True)
     r = analyze(mc)
-    for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "linkage"):
+    for k in ("priority", "summary", "objective", "gaps", "evidence", "actions", "related"):
         print(f"\n===== {k.upper()} =====\n" + r.get(k, "(missing)"))
 
 
