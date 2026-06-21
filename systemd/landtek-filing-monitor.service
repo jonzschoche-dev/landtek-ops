@@ -1,0 +1,9 @@
+[Unit]
+Description=LandTek filing monitor (Discovery) — watch email for incoming filings, alert operator
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'set -a; . /root/landtek/.env; set +a; exec /usr/bin/python3 /root/landtek/scripts/filing_monitor.py'
+StandardOutput=append:/var/log/landtek_filing_monitor.log
+StandardError=append:/var/log/landtek_filing_monitor.log

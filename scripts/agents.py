@@ -48,6 +48,11 @@ AGENTS = [
      "on demand", "", "live", "derived reasoning, labeled; never a verified fact"),
     ("brief_drafter",        "draft work-product grounded in verified facts", "local",
      "on demand", "", "live", "[PENDING VERIFICATION] for gaps; draft for counsel"),
+    # ── LIVE — monitoring & execution (the filing cycle; system never files itself) ─────
+    ("filing_monitor",       "Discovery — watch email for incoming filings → alert operator", "det",
+     "every 6h", "landtek-filing-monitor.timer", "live", "filing_alerts + tg_send (S14); 32 baselined"),
+    ("execution_tracker",    "track filings/actions to completion (planned→filed→confirmed)", "det",
+     "on demand", "", "live", "case_actions ledger + stale-watch; NEVER files with the court"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
