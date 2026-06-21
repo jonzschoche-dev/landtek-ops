@@ -202,9 +202,9 @@ def build(mc, path):
         for ln in _aslist(acts):
             f.append(Paragraph(_e(str(ln)), fence))
 
-    # ── 7. Related matters — clear + evidence-grounded, typed by coupling ──
+    # ── 7. Related matters — DETERMINISTIC from the corpus (typed by coupling), not model prose ──
     f.append(Paragraph("7. Related matters (evidence-grounded)", h2))
-    _lines(_la.get("related") or "(none recorded yet — see complaint + email attachments)", bdy)
+    _lines(_la.get("related_ctx") or _la.get("related") or "(none recorded yet — see complaint + email attachments)", bdy)
     if is_admin:
         f.append(Paragraph("&bull; <b>Separation guardrail:</b> the same-campaign ARTA/RA 11032 matters are "
                            "genuinely related; the property/ownership track (e.g. CV-26360, different defendants) "

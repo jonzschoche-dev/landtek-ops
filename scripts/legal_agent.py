@@ -35,6 +35,24 @@ OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
 MODEL = os.environ.get("LEGAL_AGENT_MODEL", "qwen2.5:14b-instruct")
 JUDICIAL = {"MWK-CV26360", "MWK-CV6839", "MWK-PARALLEL-CV6922", "MWK-PARALLEL-CRIM9221", "PAR-CV13-131220"}
 
+# Exact output contract — Ollama structured outputs constrain the 14B to these keys (no key drift).
+_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "priority": {"type": "string"},
+        "summary": {"type": "string"},
+        "objective": {"type": "string"},
+        "gaps": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "actions": {"type": "array", "items": {
+            "type": "object",
+            "properties": {"owner": {"type": "string"}, "deadline": {"type": "string"}, "draft": {"type": "string"}},
+            "required": ["owner", "deadline", "draft"],
+        }},
+    },
+    "required": ["priority", "summary", "objective", "gaps", "evidence", "actions"],
+}
+
 
 def _llm(prompt, temp=0.2, fmt=None):
     body = {"model": MODEL, "stream": False, "options": {"temperature": temp}, "prompt": prompt}
@@ -170,51 +188,47 @@ def analyze(mc):
           f"| UNSUPPORTED (gap)\n\nVERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
     element_map = _llm(p1)
 
-    # PASS 2 — counsel-ready analysis as STRICT JSON (forced via Ollama format:json)
+    # PASS 2 — counsel-ready analysis, forced to an exact SCHEMA (Ollama structured outputs)
     datectx = (f"Today is {today.isoformat()}. Use {deadline} (~10 days) as the realistic default action "
                f"deadline unless a statute/forum sets a sooner one. CV-26360 testimony is 2026-08-12 "
-               f"({dtest} days away). Every date MUST be ISO (YYYY-MM-DD) and in 2026 or 2027 — NEVER any "
-               f"earlier year.")
-    schema = ('{"priority":"High|Medium|Low — one-line reason",'
-              '"summary":"ONE sentence: current posture + the single most important next action",'
-              '"objective":"what VICTORY in THIS matter looks like (the concrete outcome this forum can '
-              'deliver) + the single most direct lever to force it; 2-3 sentences",'
-              '"gaps":["short gap","short gap"],'
-              '"evidence":["Issue — key element — SUPPORTED [F#] or GAP","..."],'
-              '"actions":[{"owner":"who","deadline":"YYYY-MM-DD","draft":"2-4 sentences, copy-paste-ready, '
-              'naming docket ' + docket + ', the specific violation, prejudice to the estate/heirs, and the '
-              'escalation if ignored"}],'
-              '"related":"clear, evidence-grounded: name the same-campaign RA 11032/ARTA sibling complaints '
-              '(genuinely related) and, separately, the property/ownership track as context only (different '
-              'defendants); note if the complaint/attachments asserting the fuller web are not yet ingested"}')
+               f"({dtest} days away). Every date MUST be ISO (YYYY-MM-DD) and in 2026 or 2027 — NEVER earlier.")
+    fields = (f"priority: 'High|Medium|Low — one-line reason'. summary: ONE sentence (current posture + the "
+              f"single most important next action). objective: what VICTORY in THIS matter looks like (the "
+              f"concrete outcome this forum can deliver) + the single most direct lever; 2-3 sentences. gaps: "
+              f"2-3 SPECIFIC missing items (e.g. 'the exact records requested and dates denied are not yet "
+              f"extracted from the complaint'). evidence: 2-3 strings, each a CONCRETE issue→element→support "
+              f"with a real fact id — e.g. 'FOI obstruction: failure to act on valid records requests — "
+              f"SUPPORTED [F5405]'; 'DILG continuing duty: referral does not exhaust it — SUPPORTED [F5869]' "
+              f"(do NOT output the literal words 'Issue' or 'key element'). actions: 2-3 objects, each the "
+              f"prioritized PATH TO VICTORY (force the agency to act + escalation ladder; build a non-response "
+              f"record; close gaps — NOT 'generate pattern evidence'), with owner, deadline (YYYY-MM-DD in "
+              f"2026), and draft = 2-4 sentences copy-paste-ready naming docket {docket}, the specific "
+              f"violation, the prejudice to the estate/heirs, and the escalation if ignored.")
     p2 = (f"You are a senior litigation associate. {fp}\n{sep}\n{datectx}\nOperator's stated objective: "
           f"{objective_note or '(not set)'}\nMatter {mc} ({title}; forum {forum}; docket {docket}). Crisp and "
           f"professional; cite law by exact section/sub-provision; never invent facts, names, or official "
-          f"titles (there is NO 'DILG Commissioner'; DILG has a Secretary, here Provincial Director Relucio). "
-          f"ACTIONS must be the prioritized PATH TO VICTORY (force the agency to act + a concrete escalation "
-          f"ladder; build a clean non-response record; close the substance gaps) — NOT 'generate pattern "
-          f"evidence'. Give 2-3 gaps, 2-3 evidence items, 2-3 actions.\n"
-          f"Output ONE JSON object with EXACTLY these keys and no other text:\n{schema}\n\n"
+          f"titles (there is NO 'DILG Commissioner'; DILG has a Secretary, here Provincial Director Relucio).\n"
+          f"Fill each field: {fields}\n\n"
           f"ELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}\n\nVERIFIED FACTS:\n{factstr}")
-    draft = _llm(p2, 0.3, fmt="json")
+    draft = _llm(p2, 0.3, fmt=_SCHEMA)
 
-    # PASS 3 — adversarial self-critique + revise, SAME JSON schema
+    # PASS 3 — adversarial self-critique + revise, SAME schema
     p3 = (f"Adversarially CHECK then REVISE this memo JSON for {mc}. {fp}\n{sep}\nChecklist: (1) every statute "
           f"citation matches the GOVERNING LAW — correct section AND sub-provision (a complaint vs a MUNICIPAL "
           f"elective official is RA 7160 §61(b), not §61(a)); fix or remove. (2) No fact, name, office, or "
           f"official TITLE not supported by the VERIFIED FACTS — replace any invented addressee with "
           f"'[addressee — verify]'. (3) Each action is a step toward VICTORY IN THIS MATTER with owner + a "
           f"deadline IN 2026 (use {deadline} if unsure) + 2-4 sentences of copy-paste-ready draft; no "
-          f"'generate pattern evidence' action. (4) summary is ONE sentence. (5) related is clear + "
-          f"proportional (ARTA siblings genuinely related; property track context only, different defendants). "
-          f"Output ONLY the corrected JSON object, SAME keys, no other text.\n\nJSON:\n{draft}\n\n"
-          f"VERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
-    final = _llm(p3, 0.2, fmt="json")
+          f"'generate pattern evidence' action. (4) summary is ONE sentence. (5) evidence items are concrete "
+          f"(no placeholder words like 'Issue' or 'key element'). Keep the same fields.\nFields spec: {fields}\n\n"
+          f"JSON TO REVISE:\n{draft}\n\nVERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
+    final = _llm(p3, 0.2, fmt=_SCHEMA)
     parts = _coerce(final) or _coerce(draft) or {"summary": "(agent output could not be parsed)"}
-    # deterministic date safety-net — never let a hallucinated year through
+    # deterministic safety-nets: dates never earlier than 2026; related is corpus-fact, not model prose
     for a in (parts.get("actions") or []):
         if isinstance(a, dict) and not re.match(r"^202[6-9]-\d\d-\d\d", str(a.get("deadline", ""))):
             a["deadline"] = deadline
+    parts["related_ctx"] = related_ctx
     parts["element_map"] = element_map
     parts["_deadline"] = deadline
     return parts
