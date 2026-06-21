@@ -15,6 +15,7 @@ import datetime
 import html
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.request
@@ -30,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from chronology import timeline
 from legal_authority import retrieve_chunks
 from legal_agent import analyze as _legal_analyze
-from matter_readiness import assess as _readiness_assess, verdict as _readiness_verdict
+from matter_readiness import assess as _readiness_assess, verdict as _readiness_verdict, _tokens as _rd_tokens
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
@@ -106,14 +107,26 @@ def build(mc, path):
     related = cur.fetchall()
     relstr = ", ".join(f"{m} ({n})" for m, n in related)
 
-    # annexes + source-availability
+    # annexes — an annex must EARN its place: verified facts FOR THIS MATTER, or it carries the matter's
+    # docket/number (text or filename). Merely being linked is NOT enough (that swept in images + stray letters).
+    toks = list(_rd_tokens(docket, title))
+    _m = re.search(r"-(\d{3,5})$", mc)               # ARTA-style matter number suffix (e.g. 1319, 0747)
+    if _m:
+        toks.append(_m.group(1))
+    toks = toks or ["~nomatch~"]
     cur.execute("""SELECT d.id, coalesce(d.original_filename,d.smart_filename,'?'), d.drive_link, d.drive_file_id,
                    d.file_path, left(coalesce(d.extracted_text,''),200),
-                   (SELECT count(*) FROM matter_facts mf WHERE mf.provenance_level='verified' AND mf.source_kind='doc' AND mf.source_id=d.id::text) nf
+                   (SELECT count(*) FROM matter_facts mf WHERE mf.provenance_level='verified' AND mf.source_kind='doc'
+                      AND mf.source_id=d.id::text AND mf.matter_code=%s) nf,
+                   (SELECT bool_or((coalesce(d.extracted_text,'')||' '||coalesce(d.original_filename,'')||' '||
+                      coalesce(d.smart_filename,'')) ILIKE '%%'||t||'%%') FROM unnest(%s::text[]) t) hits
                    FROM documents d WHERE d.matter_code=%s
                      OR d.id IN (SELECT doc_id FROM document_matter_links WHERE matter_code=%s)
-                   ORDER BY nf DESC, d.id""", (mc, mc))
-    annex = [(did, fn, *_doc_link(did, dl, drid, p), exc, nf) for did, fn, dl, drid, p, exc, nf in cur.fetchall() if did not in off]
+                   ORDER BY nf DESC, d.id""", (mc, toks, mc, mc))
+    cand = [r for r in cur.fetchall() if r[0] not in off]
+    keep = [r for r in cand if (r[6] or 0) > 0 or r[7]]
+    n_omitted = len(cand) - len(keep)
+    annex = [(did, fn, *_doc_link(did, dl, drid, p), exc, nf) for did, fn, dl, drid, p, exc, nf, hits in keep]
     missing = [a for a in annex if not a[3]]
     avail_ids = {a[0] for a in annex if a[3]}        # docs with a usable link (for inline doc:N hyperlinks)
 
@@ -253,7 +266,9 @@ def build(mc, path):
         f.append(Paragraph(f"<b>{disp}</b> &nbsp; {lab}{_e(text[:120])}{_dref(src)}", bdy))
 
     # ── Appendix B — key source excerpts with links/paths ──
-    f.append(Paragraph(f"Appendix B — Key source excerpts &amp; links ({min(len(annex),14)} of {len(annex)})", h2))
+    f.append(Paragraph(f"Appendix B — Key source excerpts &amp; links ({min(len(annex),14)} of {len(annex)} relevant"
+                       + (f"; {n_omitted} loosely-linked doc(s) omitted as not clearly relevant" if n_omitted else "")
+                       + ")", h2))
     for did, fn, link, ok, exc, nf in annex[:14]:
         if ok and link:
             head = (f"<a href='{link}'><b>doc:{did}</b> {_e(fn[:52])} ↗</a>"
