@@ -18,8 +18,10 @@ returns {"element_map":…, "analysis":…} for case_memo; CLI prints both.
 
   python3 scripts/legal_agent.py MWK-ARTA-1891
 """
+import datetime
 import json
 import os
+import re
 import sys
 import urllib.request
 
@@ -72,14 +74,31 @@ def _gather(mc):
     return title, forum, docket, factstr, lawstr
 
 
+def _split_markers(text):
+    out, cur = {}, None
+    for line in text.splitlines():
+        m = re.match(r"\s*\[?(PRIORITY|SUMMARY|GAPS|EVIDENCE|ACTIONS|STRATEGIC)\]?\s*[:\-]?\s*(.*)", line)
+        if m and (line.lstrip().startswith("[") or m.group(2) == "" or len(line) < 40):
+            cur = m.group(1).lower()
+            out[cur] = m.group(2).strip() + "\n"
+        elif cur is not None:
+            out[cur] += line + "\n"
+    return {k: v.strip() for k, v in out.items()}
+
+
 def analyze(mc):
     title, forum, docket, factstr, lawstr = _gather(mc)
+    today = datetime.date.today()
+    deadline = (today + datetime.timedelta(days=10)).isoformat()
+    aug12 = datetime.date(2026, 8, 12)
+    dtest = (aug12 - today).days
     kind = "JUDICIAL (a court case)" if mc in JUDICIAL else "ADMINISTRATIVE (agency/red-tape; NOT a court case)"
     sep = ("SEPARATION RULE: This matter is " + kind + ". CV-26360 is a SEPARATE judicial proceeding "
-           "(RTC; Aug-12 testimony). An administrative matter must NEVER be said to win/lose/decide "
+           "(RTC; Aug-12-2026 testimony). An administrative matter must NEVER be said to win/lose/decide "
            "CV-26360 — link only as 'pattern evidence of obstruction usable in CV-26360 / the larger "
            "Accion Reivindicatoria.'")
 
+    # PASS 1 — element map (rigor: issues → elements → supported/gap)
     p1 = (f"You are a Philippine litigation analyst. Matter {mc} ({title}; forum: {forum}). Using ONLY "
           f"the VERIFIED FACTS and GOVERNING LAW below, identify each legal ISSUE/claim and its ELEMENTS. "
           f"For each element, list the supporting fact ids [F#], then mark it SUPPORTED or UNSUPPORTED "
@@ -87,34 +106,52 @@ def analyze(mc):
           f"| UNSUPPORTED (gap)\n\nVERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
     element_map = _llm(p1)
 
-    p2 = (f"You are drafting an Action Memo block for counsel on matter {mc}. {sep}\nUse the ELEMENT MAP "
-          f"below: treat SUPPORTED elements as established; list UNSUPPORTED ones as gaps to close. Cite "
-          f"GOVERNING LAW by EXACT section (and correct sub-provision). Output sections:\nEXECUTIVE SUMMARY "
-          f"(3-4 sentences)\nSTRENGTHS\nRISKS\nRECOMMENDED ACTIONS (numbered; each [Owner] [Deadline ~7-10 "
-          f"days] then DRAFT: a ready-to-paste paragraph naming docket {docket}, the specific violation, "
-          f"the prejudice to the estate/heirs, and escalation if no action by the deadline)\nGAPS\n"
-          f"Do not sign.\n\nELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
+    # PASS 2 — counsel-ready marked block
+    datectx = (f"Today is {today.isoformat()}. Use {deadline} (~10 days) as the realistic default action "
+               f"deadline unless a statute/forum sets a sooner one. CV-26360 testimony is 2026-08-12 "
+               f"({dtest} days away) — flag any date-sensitive item relative to it. All dates ISO (YYYY-MM-DD).")
+    p2 = (f"You are a senior litigation associate writing a COUNSEL-READY action-memo block for {mc} "
+          f"({title}; forum {forum}; docket {docket}). {sep}\n{datectx}\nPrinciples: counsel reads fast — "
+          f"every line must give a verified fact, name a gap, or enable an action; crisp and professional; "
+          f"no filler, no long hybrid sentences. Cite law by exact section/sub-provision. Never invent facts, "
+          f"names, or official titles (there is NO 'DILG Commissioner'; DILG has a Secretary, and here "
+          f"Provincial Director Relucio). Output EXACTLY these marked sections and nothing else:\n"
+          f"[PRIORITY] High|Medium|Low — one-line reason\n"
+          f"[SUMMARY] ONE sentence: current posture + the single most important next action.\n"
+          f"[GAPS] 2-4 short bullets: what is missing that blocks stronger action.\n"
+          f"[EVIDENCE] the 2-3 MOST important issues only — each one line: Issue — key element — SUPPORTED [F#] or GAP.\n"
+          f"[ACTIONS] 2-3 numbered. Each: Owner; Deadline; then 'DRAFT:' 2-4 sentences of copy-paste-ready text "
+          f"naming docket {docket}, the specific violation, the prejudice to the estate/heirs, and escalation if no response.\n"
+          f"[STRATEGIC] 3-4 lines MAX: precisely how this helps CV-26360 / the reivindicatory action, AND its limits.\n\n"
+          f"ELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}\n\nVERIFIED FACTS:\n{factstr}")
     draft = _llm(p2, 0.3)
 
-    p3 = (f"Adversarially CHECK then REVISE this legal draft for matter {mc}. {sep}\nChecklist: (1) every "
-          f"statute citation must match the GOVERNING LAW provided — correct section AND sub-provision "
-          f"(e.g. a complaint vs a MUNICIPAL elective official is RA 7160 §61(b), not §61(a)); fix any "
-          f"mismatch or remove the citation. (2) Separation respected. (3) No fact, name, office, or "
-          f"OFFICIAL TITLE that is not in the VERIFIED FACTS — do NOT invent titles (e.g. there is no "
-          f"'DILG Commissioner'; DILG has a Secretary and, here, Provincial Director Relucio). Replace any "
-          f"unverified addressee with a role you can support, or '[addressee — verify]'. (4) Keep 2-3 "
-          f"DISTINCT, specific recommendations (not one, not repetitive). Output ONLY the corrected final "
-          f"memo text — no commentary, no sign-off.\n\nDRAFT:\n{draft}\n\nVERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
+    # PASS 3 — adversarial self-critique + revise (keep the marked structure)
+    p3 = (f"Adversarially CHECK then REVISE this counsel memo block for {mc}. {sep}\nChecklist: (1) every "
+          f"statute citation matches the GOVERNING LAW — correct section AND sub-provision (a complaint vs a "
+          f"MUNICIPAL elective official is RA 7160 §61(b), not §61(a)); fix or remove. (2) Separation respected. "
+          f"(3) No fact, name, office, or official TITLE not supported by the VERIFIED FACTS — replace any "
+          f"invented addressee with '[addressee — verify]'. (4) Each [ACTIONS] item has Owner + a concrete "
+          f"Deadline + 2-4 sentences of genuinely copy-paste-ready DRAFT text (not instructions). (5) [SUMMARY] "
+          f"is ONE sentence; [STRATEGIC] ≤4 lines. (6) Keep the EXACT marked structure "
+          f"([PRIORITY]/[SUMMARY]/[GAPS]/[EVIDENCE]/[ACTIONS]/[STRATEGIC]); be concise, professional. "
+          f"Output ONLY the corrected marked block — no commentary.\n\nBLOCK:\n{draft}\n\n"
+          f"VERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
     final = _llm(p3, 0.2)
-    return {"element_map": element_map, "analysis": final}
+    parts = _split_markers(final)
+    if "summary" not in parts:           # parsing fell through — keep the raw text usable
+        parts = {"summary": final[:600]}
+    parts["element_map"] = element_map
+    parts["_deadline"] = deadline
+    return parts
 
 
 def main():
     mc = sys.argv[1] if len(sys.argv) > 1 else "MWK-ARTA-1891"
     print(f"[legal_agent] reasoning over {mc} via {MODEL} (3 passes)…", flush=True)
     r = analyze(mc)
-    print("\n===== ELEMENT MAP =====\n" + r["element_map"])
-    print("\n===== ANALYSIS (post self-critique) =====\n" + r["analysis"])
+    for k in ("priority", "summary", "gaps", "evidence", "actions", "strategic"):
+        print(f"\n===== {k.upper()} =====\n" + r.get(k, "(missing)"))
 
 
 if __name__ == "__main__":
