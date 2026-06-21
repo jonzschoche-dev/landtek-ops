@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.landtek.ollama-host</string>
+  <!-- At login: bind Ollama to all interfaces so the LandTek VPS reaches it over Tailscale
+       (in-house Tier-1 inference). Sets the launchd env, then bounces Ollama.app to pick it up. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>launchctl setenv OLLAMA_HOST 0.0.0.0:11434; sleep 10; osascript -e 'tell application "Ollama" to quit' 2>/dev/null; sleep 3; open -a Ollama</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>

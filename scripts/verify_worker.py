@@ -38,6 +38,11 @@ MODELS = [m.strip() for m in os.environ.get(
 MIN_CONF = float(os.environ.get("VERIFY_WORKER_MIN_CONF", "0.55"))
 COOLDOWN_DAYS = 14
 
+# Tier 1: in-house Ollama on the Mac Studio (sovereign, unlimited, $0). Local-first; Gemini = fallback.
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
+OLLAMA_MODEL = os.environ.get("VERIFY_WORKER_OLLAMA_MODEL", "qwen2.5:7b-instruct")
+FORCE_TIER = os.environ.get("LANDTEK_INFERENCE_TIER")  # '2' = emergency Gemini-only
+
 PROMPT = """You are reading the OCR text of a legal document in matter {matter} (a Philippine
 property/land case). Extract up to 6 ATOMIC factual claims this document PROVES — parties and their
 roles, dates, amounts, case identity/caption, rulings/dispositions, obligations, admissions.
@@ -88,6 +93,51 @@ def _gemini(text, matter):
     return None  # all combos 429 → quota exhausted
 
 
+def _ollama(text, matter):
+    """Tier 1 — in-house Ollama. Returns (facts_list, tokens) or (None, 0) on failure."""
+    body = {"model": OLLAMA_MODEL, "stream": False, "format": "json",
+            "options": {"temperature": 0.1},
+            "prompt": PROMPT.replace("{matter}", matter) + "\n\nTEXT:\n" + text[:16000]}
+    req = urllib.request.Request(OLLAMA_URL + "/api/generate", data=json.dumps(body).encode(),
+                                 headers={"content-type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=180) as r:
+            out = json.loads(r.read())
+        facts = json.loads(out.get("response", "{}")).get("facts", [])
+        toks = int(out.get("prompt_eval_count", 0)) + int(out.get("eval_count", 0))
+        return facts, toks
+    except (urllib.error.URLError, json.JSONDecodeError, KeyError, ValueError, TypeError):
+        return None, 0
+
+
+def _log_inference(cur, tier, model, doc_id, matter, toks, ms, ok, fallback=None, err=None):
+    try:
+        cur.execute("""INSERT INTO inference_audit (request_id,model_tier,model_name,task_type,doc_id,
+            matter_id,tokens_completion,latency_ms,fallback_reason,success,error_message,created_by)
+            VALUES (gen_random_uuid(),%s,%s,'verify',%s,%s,%s,%s,%s,%s,%s,'verify_worker')""",
+            (tier, model, str(doc_id), matter, toks, ms, fallback, ok, err))
+    except psycopg2.Error:
+        pass  # audit logging must never block verification
+
+
+def _extract_facts(cur, text, w):
+    """Local-first (Ollama, sovereign $0), Gemini fallback. Logs every call. Returns (facts, tier)."""
+    doc_id, matter = w["id"], w["matter_code"]
+    if FORCE_TIER != "2":
+        t0 = time.time(); facts, toks = _ollama(text, matter); ms = int((time.time() - t0) * 1000)
+        if facts is not None:
+            _log_inference(cur, "tier1", OLLAMA_MODEL, doc_id, matter, toks, ms, True)
+            return facts, "tier1"
+        _log_inference(cur, "tier1", OLLAMA_MODEL, doc_id, matter, 0, ms, False,
+                       fallback="ollama unreachable/parse-fail")
+    t0 = time.time(); facts = _gemini(text, matter); ms = int((time.time() - t0) * 1000)
+    if facts is None:
+        _log_inference(cur, "tier2", "gemini", doc_id, matter, 0, ms, False, err="gemini quota exhausted")
+        return None, "tier2"
+    _log_inference(cur, "tier2", "gemini", doc_id, matter, 0, ms, True, fallback="tier1 down")
+    return facts, "tier2"
+
+
 def _next_docs(cur, limit):
     """Breadth-fair: build out EVERY acknowledged matter, not just the flagship. Round-robin one doc
     per matter per round, matters ordered by current verified-fact count ASC (most-neglected first),
@@ -120,9 +170,9 @@ def process_doc(cur, w, go):
     text = (cur.fetchone() or {}).get("extracted_text") or ""
     if len(text) < 200:
         return {"doc": w["id"], "skip": "too short"}
-    facts = _gemini(text, w["matter_code"])
+    facts, tier = _extract_facts(cur, text, w)
     if facts is None:
-        raise RuntimeError("gemini quota exhausted")
+        raise RuntimeError("all inference tiers unavailable (ollama down + gemini quota)")
     nv = npr = 0; shown = []
     for f in (facts or []):
         stmt = (f.get("statement") or "").strip()
@@ -154,7 +204,7 @@ def process_doc(cur, w, go):
     if go:
         cur.execute("INSERT INTO verify_worker_log (doc_id,n_verified,n_proposed,status) VALUES (%s,%s,%s,%s)",
                     (w["id"], nv, npr, "ok"))
-    return {"doc": w["id"], "matter": w["matter_code"], "verified": nv, "proposed": npr, "shown": shown}
+    return {"doc": w["id"], "matter": w["matter_code"], "verified": nv, "proposed": npr, "tier": tier, "shown": shown}
 
 
 def run(limit, go, loop, rpm):
@@ -172,7 +222,7 @@ def run(limit, go, loop, rpm):
                 print("[worker] Gemini quota exhausted — resume on reset"); loop = False; break
             total_v += r.get("verified", 0); total_p += r.get("proposed", 0)
             tag = f"+{r.get('verified',0)}v/{r.get('proposed',0)}p" if go else "(dry)"
-            print(f"  doc:{r['doc']} [{r.get('matter','?')}] {tag}", flush=True)
+            print(f"  doc:{r['doc']} [{r.get('matter','?')}] {r.get('tier','?')} {tag}", flush=True)
             for verdict, g, conf, s in r.get("shown", []):
                 print(f"      [{verdict:8} {g} c={conf}] {s}", flush=True)
             if rpm > 0:
