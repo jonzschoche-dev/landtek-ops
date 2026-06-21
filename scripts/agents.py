@@ -68,7 +68,11 @@ AGENTS = [
     ("case_builder_ui",      "cockpit /ops/cases — live case cards (forums + corpus support)", "det",
      "live (web)", "", "live", "ops_dashboard.py; grows fluidly with the corpus"),
     ("legal_authority",      "forum law library — verbatim statutes/circulars in a local-embed RAG", "local",
-     "on demand", "", "live", "RA 11032 seeded for ARTA; nomic-embed (Ollama $0); retrieve(forum,q)"),
+     "on demand", "", "live", "5 forums seeded; nomic-embed (Ollama $0); retrieve(forum,q)"),
+    ("case_files",           "find all docs of a case + links to the originals", "det",
+     "on demand", "", "live", "case_files.py MATTER [--read-only]"),
+    ("case_pdf",             "organized case-brief PDF → Telegram (top-to-bottom + annexes)", "det",
+     "on demand", "", "live", "case_pdf.py MATTER --send"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
