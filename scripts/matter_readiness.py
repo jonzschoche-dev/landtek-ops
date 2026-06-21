@@ -93,24 +93,25 @@ def assess(cur, mc):
     offp = {r[0] for r in cur.fetchall()}
     conflations = [d for d in docs if d["id"] in offp and not re.search(r"annex|exhibit", d["fn"], re.I)]
 
-    # un-ingested gmail attachments referencing the matter
-    uningested = []
-    cur.execute("""SELECT message_id, coalesce(subject,''), attachment_refs FROM gmail_messages
-                   WHERE has_attachments AND (matter_codes @> ARRAY[%s]::text[]
-                      OR subject ILIKE %s OR body_plain ILIKE %s)""",
-                (mc, f"%{toks[0]}%" if toks else "%~none~%", f"%{toks[0]}%" if toks else "%~none~%"))
-    cur.execute("SELECT lower(coalesce(original_filename,smart_filename,'')) FROM documents WHERE id = ANY(%s)",
-                (list(linked) or [-1],)) if linked else None
-    linked_names = {r[0] for r in cur.fetchall()} if linked else set()
-    cur.execute("""SELECT message_id, coalesce(subject,''), attachment_refs FROM gmail_messages
-                   WHERE has_attachments AND (matter_codes @> ARRAY[%s]::text[]
-                      OR subject ILIKE %s)""", (mc, f"%{toks[0]}%" if toks else "%~none~%"))
+    # un-ingested gmail attachments referencing the matter. "Ingested" = it has a row in the blend
+    # ledger (email_documents) — robust against doc renaming (filename matching gave false positives).
     import json as _json
-    for mid, subj, refs in cur.fetchall():
+    uningested = []
+    tok0 = f"%{toks[0]}%" if toks else "%~none~%"
+    cur.execute("""SELECT message_id, coalesce(subject,''), attachment_refs FROM gmail_messages
+                   WHERE has_attachments AND (matter_codes @> ARRAY[%s]::text[] OR subject ILIKE %s)""",
+                (mc, tok0))
+    msgs = cur.fetchall()
+    mids = [m[0] for m in msgs]
+    blended = set()
+    if mids:
+        cur.execute("SELECT lower(filename) FROM email_documents WHERE message_id = ANY(%s)", (mids,))
+        blended = {r[0] for r in cur.fetchall()}
+    for mid, subj, refs in msgs:
         for ref in (refs if isinstance(refs, list) else (_json.loads(refs) if refs else [])):
             fn = (ref.get("filename") or "")
             mime = (ref.get("mime") or "")
-            if "pdf" in mime.lower() and fn.lower() not in linked_names and re.search(OPERATIVE + r"|annex", fn, re.I):
+            if "pdf" in mime.lower() and fn.lower() not in blended and re.search(OPERATIVE + r"|annex", fn, re.I):
                 uningested.append({"fn": fn, "subj": subj[:50], "size": ref.get("size", 0)})
 
     return {"mc": mc, "title": title, "docket": docket, "forum": forum, "tokens": toks,

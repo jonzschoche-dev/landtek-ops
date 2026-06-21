@@ -379,6 +379,47 @@ FACTS = [
          "Administrative Order No. 22 (fee tendered only if the OP deems A.O. 22 applicable).",
          "A Notice of Appeal is filed simultaneously, in the alternative"),
     ]
+] + [
+    # ── doc 782 = the 0747 Complaint-Affidavit vs Mayor Pajarillo (RA 11032 §21(b)/(d)/(e)) ──
+    ("MWK-ARTA-0747", 782,
+     "MWK-ARTA-0747 operative complaint (doc 782): a Complaint-Affidavit before ARTA Southern Luzon "
+     "(CTN SL-2025-1021-0747) by Jonathan Zschoche (AIF for Patricia Keesey Zschoche, co-owner of the "
+     "subject private property) against Hon. Alexander L. Pajarillo, incumbent Municipal Mayor of Mercedes.",
+     "Respondent is the incumbent Municipal Mayor of Mercedes, Camarines Norte"),
+    ("MWK-ARTA-0747", 782,
+     "Charges: RA 11032 §21(b) imposition of additional requirements beyond the Citizen's Charter; §21(d) "
+     "failure to issue a written notice of disapproval; §21(e) failure to render the service within the "
+     "prescribed processing time without due cause (respondent tried to reclassify the request as complex).",
+     "Section 21(b): Imposition of additional requirements other than those listed in"),
+    ("MWK-ARTA-0747", 782,
+     "The underlying request (1 Oct 2025 Letter of Inquiry to the Office of the Mayor) sought release of "
+     "Building Permits and Tax Declarations regarding Antonio Teope (the Mayor's Personal Assistant/Chief "
+     "of Staff) and Miguel Baliza (Draftsman, Municipal Assessor's Office), or a written statement of their "
+     "non-existence.",
+     "Building Permits and\nTaxDeclarationsregarding Antonio Teope"),
+
+    # ── doc 530 = the 1319 sworn complaint vs Fortuno + Engr. Remoto (DENR-PENRO) ──
+    ("MWK-ARTA-1319", 530,
+     "MWK-ARTA-1319 operative pleading (doc 530): Verification & Sworn Affirmation of Complaint (ARTA CTN "
+     "SL-2026-0209-1319) by Jonathan Zschoche (AIF for Patricia Keesey Zschoche) against Nestor Franz A. "
+     "Fortuno and Engr. Leonora R. Remoto of DENR-PENRO Camarines Norte for RA 11032 violations.",
+     "against\nRespondents\nNestor\nFranz\nA.\nFortuno\nand\nEngr.\nLeonora R. Remoto of DENR-PENRO Camarines Norte"),
+    ("MWK-ARTA-1319", 530,
+     "Filed electronically on 8 February 2026 (Digital Ref JZ-DENR-2026-001), then supplemented by a Formal "
+     "Demand to Cease and Desist (9 Feb 2026) and a Regional Escalation and Rejoinder (23 Feb 2026).",
+     "On\nFebruary\n8,\n2026,\nI\nelectronically\nfiled\na\nFormal\nAdministrative\nComplaint\n(Digital\nRef:\nJZ-DENR-2026-001)"),
+
+    # ── doc 1188 = the 1321 Reply-Affidavit vs Gemma Abla (Municipal Assessor; §21(a)/(f)) ──
+    ("MWK-ARTA-1321", 1188,
+     "MWK-ARTA-1321 operative pleading (doc 1188): a Reply-Affidavit (ARTA CTN SL-2026-0209-1321) by "
+     "Jonathan Paul Zschoche (AIF for Patricia Keesey Zschoche) responding to the Counter-Affidavit of "
+     "respondent Gemma P. Abla, REA, Municipal Assessor of Mercedes.",
+     "I submit this Reply to the Counter-Affidavit of\nrespondent GEMMA P. ABLA, REA"),
+    ("MWK-ARTA-1321", 1188,
+     "Charged violations: RA 11032 §21(a) and §21(f). The grievance: certified true copies and a "
+     "certification the complainant asked for, paid for, and was promised have still not been given.",
+     "the certified true copies and\ncertification I asked for, paid for, and was promised have still not "
+     "been given to me"),
 ]
 
 
