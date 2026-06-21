@@ -71,8 +71,10 @@ AGENTS = [
      "on demand", "", "live", "5 forums seeded; nomic-embed (Ollama $0); retrieve(forum,q)"),
     ("case_files",           "find all docs of a case + links to the originals", "det",
      "on demand", "", "live", "case_files.py MATTER [--read-only]"),
-    ("case_pdf",             "organized case-brief PDF → Telegram (top-to-bottom + annexes)", "det",
+    ("case_pdf",             "organized case-brief PDF → Telegram (relevance-tiered + annexes)", "det",
      "on demand", "", "live", "case_pdf.py MATTER --send"),
+    ("relevance",            "classify surrounding corpus by relevance to a focal matter", "det",
+     "on demand", "", "live", "CORE/RELATED/CONTEXTUAL/OFF-PROFILE + connection; labels, never conflates"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",

@@ -89,11 +89,21 @@ def build(mc, path):
         f.append(ListFlowable([ListItem(Paragraph(f"<b>{_e(ca)}</b> — vs {_e(ag)}. {_e(bs)}", body))
                                for ca, ag, bs in causes], bulletType="bullet", leftIndent=10))
 
+    # relevance map — label, never conflate
+    cur.execute("SELECT doc_id, tier, connection, doc_matter FROM matter_relevance WHERE focal_matter=%s", (mc,))
+    rel = {r[0]: (r[1], r[2], r[3]) for r in cur.fetchall()}
+    off_docs = {d for d, v in rel.items() if v[0] == "OFF-PROFILE"}
+    warn = ParagraphStyle("warn", parent=body, textColor=colors.HexColor("#b91c1c"))
+
     cur.execute("""SELECT statement, source_id FROM matter_facts WHERE matter_code=%s
                    AND provenance_level='verified' ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
     facts = cur.fetchall()
-    f.append(Paragraph(f"Verified facts — the document-proven record ({len(facts)})", h2))
-    for i, (st, src) in enumerate(facts, 1):
+    def _off(src):
+        return bool(src) and src.isdigit() and int(src) in off_docs
+    clean = [(st, src) for st, src in facts if not _off(src)]
+    flagged = [(st, src) for st, src in facts if _off(src)]
+    f.append(Paragraph(f"Verified facts — the document-proven record ({len(clean)})", h2))
+    for i, (st, src) in enumerate(clean, 1):
         tag = f' <font color="#2563eb">[Annex doc:{_e(src)}]</font>' if src else ""
         f.append(Paragraph(f"{i}. {_e(st)}{tag}", body))
 
@@ -107,27 +117,52 @@ def build(mc, path):
         f.append(ListFlowable([ListItem(Paragraph(f"<b>{_e(fc)}</b> ({_e(nm)}): {_e(rem)}", body))
                                for fc, nm, rem in forums], bulletType="bullet", leftIndent=10))
 
+    # Annexes, tiered by relevance — CORE = this matter's own files
     cur.execute("""SELECT d.id, coalesce(d.original_filename,d.smart_filename,d.file_name,'?'),
                    d.drive_link, d.drive_file_id, d.file_path,
                    (SELECT count(*) FROM matter_facts mf WHERE mf.provenance_level='verified'
                       AND mf.source_kind='doc' AND mf.source_id=d.id::text) nf
                    FROM documents d WHERE d.matter_code=%s ORDER BY nf DESC, d.id""", (mc,))
-    docs = cur.fetchall()
-    f.append(Paragraph(f"Annexes — all documents on file ({len(docs)})", h2))
-    for did, fn, dl, drid, p, nf in docs:
+    core = [r for r in cur.fetchall() if r[0] not in off_docs]
+    f.append(Paragraph(f"Annexes — CORE: this matter's own files ({len(core)})", h2))
+    for did, fn, dl, drid, p, nf in core:
         mark = f"[{nf} facts] " if nf else ""
         f.append(Paragraph(f"<b>doc:{did}</b> {mark}{_e(fn)}<br/>"
                            f'<font color="#2563eb" size="7">{_e(_link(dl, drid, p))}</font>', body))
 
+    related = [(d, rel[d][2], rel[d][1]) for d in rel if rel[d][0] == "RELATED"]
+    if related:
+        bym = {}
+        for d, dm, conn in related:
+            bym.setdefault(dm or "(unlinked)", []).append((d, conn))
+        f.append(Paragraph(f"Related — distinct matters sharing parties/property ({len(related)} docs) "
+                           "— context only, NOT this case's record", h2))
+        for dm, items in sorted(bym.items(), key=lambda x: -len(x[1])):
+            ex = ", ".join("doc:" + str(d) for d, _ in items[:5])
+            f.append(Paragraph(f"<b>{_e(dm)}</b> — {len(items)} docs; shares {_e(items[0][1][:70])} (e.g. {ex})", body))
+
+    ctx = [d for d in rel if rel[d][0] == "CONTEXTUAL"]
+    if ctx:
+        f.append(Paragraph(f"Loosely connected — {len(ctx)} docs share only a name (e.g. 'Keesey'/'Balane'); "
+                           "background, not evidence in this matter.", note))
+
+    if off_docs or flagged:
+        f.append(Paragraph(f"&#9888; Flagged — possible mis-file ({len(off_docs)} docs, {len(flagged)} facts): "
+                           "reads like a DIFFERENT proceeding — NOT this matter's record; verify.", h2))
+        for d in sorted(off_docs):
+            f.append(Paragraph(f"doc:{d} — {_e(rel[d][1])}", warn))
+        for st, src in flagged:
+            f.append(Paragraph(f"&#9888; {_e(st)} [doc:{_e(src)}]", warn))
+
     cur.execute("SELECT provenance_level, count(*) FROM matter_facts WHERE matter_code=%s GROUP BY 1", (mc,))
     pv = dict(cur.fetchall())
-    f.append(Paragraph(f"Coverage: verified {pv.get('verified',0)} · operator-asserted {pv.get('operator',0)} "
-                       f"· inferred {pv.get('inferred_strong',0)+pv.get('inferred_weak',0)}. "
-                       "Operator/inferred items are NOT in the verified record above; confirm before relying.", note))
+    f.append(Paragraph(f"Coverage: verified {pv.get('verified',0)} (record above excludes {len(flagged)} flagged) "
+                       f"· operator {pv.get('operator',0)} · inferred {pv.get('inferred_strong',0)+pv.get('inferred_weak',0)}. "
+                       "Operator/inferred items NOT in the record; confirm before relying.", note))
 
     SimpleDocTemplate(path, pagesize=letter, topMargin=0.7 * inch, bottomMargin=0.7 * inch,
                       title=f"{mc} case brief").build(f)
-    return len(facts), len(docs)
+    return len(clean), len(core)
 
 
 def send(mc, path):
