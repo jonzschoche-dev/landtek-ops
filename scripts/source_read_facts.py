@@ -246,6 +246,34 @@ FACTS = [
      "currently in Canada — material to her availability as a defense witness.",
      "Defendant Gloria H. Balane is the registered owner named in Transfer Certificate of Title No. "
      "079-2021002126, covering the 2,587-square-meter property ... defendant Gloria Balane is in Canada"),
+
+    # ── doc 701 = the operative ARTA-1891 referral wrapper (its substance was never source-read; the
+    #    matter's verified facts had been peripheral DILG-orientation boilerplate). Grounds 1891 in itself. ──
+    ("MWK-ARTA-1891", 701,
+     "ARTA Case CTN SL-2026-0423-1891 is a complaint by Jonathan Paul Zschoche (AIF for Patricia Keesey "
+     "Zschoche) against the LGU of Mercedes, over alleged procedural/institutional issues in the "
+     "proceedings of the Mercedes Committee on Anti-Red Tape (CART) on 6 April 2026 and the resulting "
+     "CART Resolutions Nos. 1–6, Series of 2026.",
+     "the complaint filed by Mr. Jonathan Paul Zschoche, on behalf of Ms. Patricia Keesey Zschoche, "
+     "against the Local Government Unit (LGU) of Mercedes. The complaint pertains to the alleged "
+     "procedural and intuitional issues relative to the proceedings conducted by the Committee on "
+     "Anti-Red Tape (CART) of the Municipality of Mercedes, Camarines Norte on 06 April 2026, and the "
+     "resulting CART Resolutions No. 1 through 6, Series of 2026"),
+    ("MWK-ARTA-1891", 701,
+     "ARTA received the complaint by email on 23 April 2026 and, finding the relief best addressed by the "
+     "DILG, referred it under R.A. 11032 §17(d) (ARTA's power to refer complaints to the appropriate "
+     "agency) — Referral CTN SL-2026-0423-1891 dated 4 May 2026.",
+     "the attached complaint from Jonathan Paul Zschoche, which was received by the Authority through "
+     "email on 23 April 2026 ... in accordance with Section 17 (d) of Republic Act No. 11032 ... which "
+     "provides that the Authority has the power to refer complaints to the appropriate agency, we are "
+     "hereby referring the above complaint to your office"),
+    ("MWK-ARTA-1891", 701,
+     "On 6 May 2026 the DILG-CART endorsed the ARTA referral to the Regional Director, DILG Region V "
+     "(Atty. Arnaldo E. Escober, Jr.), requesting appropriate action and a report to DILG-CART on or "
+     "before 14 May 2026.",
+     "MEMORANDUM TO: ATTY. ARNALDO E. ESCOBER, JR., CESO Ill Regional Director, DILG Region V SUBJECT: "
+     "ARTA REFERRAL OF COMPLAINT (CTN SL-2026-0423-1891) DATE: 06 May 2026 ... submit a report on the "
+     "actions taken to the DILG-CART ... on or before 14 May 2026"),
 ]
 
 

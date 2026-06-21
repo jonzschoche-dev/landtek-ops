@@ -23,6 +23,7 @@ from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTempl
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from chronology import timeline, parse_dates
+from legal_authority import retrieve_chunks as _law_chunks
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 CHAT = "6513067717"
@@ -48,6 +49,16 @@ def _link(dl, did, path):
     if did:
         return f"https://drive.google.com/file/d/{did}/view"
     return path or "(stored in corpus)"
+
+
+def _legal_forum(forum_text):
+    fl = (forum_text or "").lower()
+    if "arta" in fl: return "ARTA"
+    if "ombudsman" in fl: return "OMBUDSMAN"
+    if "dilg" in fl: return "DILG"
+    if "agrarian" in fl or "darab" in fl: return "DAR-DARAB"
+    if "deeds" in fl or "lra" in fl: return "RD-LRA"
+    return None
 
 
 def build(mc, path):
@@ -119,6 +130,19 @@ def build(mc, path):
         for st, src in undated:
             tag = f' <font color="#2563eb">[doc:{_e(src)}]</font>' if src else ""
             f.append(Paragraph(f"&bull; {_e(st)}{tag}", body))
+
+    # Governing law — pull the forum's verbatim statute sections from the law library (grounded)
+    lf = _legal_forum(forum)
+    if lf:
+        q = (title or "") + " " + " ".join(st for st, _ in clean[:4])
+        try:
+            law = _law_chunks(lf, q, 3)
+        except Exception:
+            law = []
+        if law:
+            f.append(Paragraph(f"Governing law — {lf} statute ({law[0][2]})", h2))
+            for cit, txt, vf, dist in law:
+                f.append(Paragraph(f"<b>{_e(cit)}</b><br/>{_e(txt.strip())}…", body))
 
     cur.execute("""SELECT DISTINCT cf.forum_code, am.name, cf.remedy FROM client_issues ci
                    JOIN case_forums cf ON cf.issue_no=ci.issue_no

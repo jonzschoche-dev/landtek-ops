@@ -82,14 +82,19 @@ def ingest(forum, citation, title, source, text, verify):
     print(f"[legal] ingested {n} chunks for {forum.upper()} — {citation} ({vflag})")
 
 
-def retrieve(forum, q, k=5):
+def retrieve_chunks(forum, q, k=5):
+    """Return [(citation, text, verify_flag, distance)] — for other tools (e.g. case_pdf)."""
     c = _conn(); cur = c.cursor()
     emb = _embed(q)
     cur.execute("""SELECT citation, left(text, 320), verify_flag, (embedding <=> %s) dist
                    FROM legal_chunks WHERE forum=%s ORDER BY embedding <=> %s LIMIT %s""",
                 (emb, forum.upper(), emb, k))
+    return cur.fetchall()
+
+
+def retrieve(forum, q, k=5):
     print(f"=== {forum.upper()} law — top {k} for: {q!r} ===")
-    for cit, txt, vf, dist in cur.fetchall():
+    for cit, txt, vf, dist in retrieve_chunks(forum, q, k):
         print(f"\n[{cit}] (sim {1-dist:.2f}, {vf})\n  {txt.strip()}…")
 
 
