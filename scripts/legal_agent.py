@@ -99,9 +99,12 @@ def analyze(mc):
     p3 = (f"Adversarially CHECK then REVISE this legal draft for matter {mc}. {sep}\nChecklist: (1) every "
           f"statute citation must match the GOVERNING LAW provided — correct section AND sub-provision "
           f"(e.g. a complaint vs a MUNICIPAL elective official is RA 7160 §61(b), not §61(a)); fix any "
-          f"mismatch or remove the citation. (2) Separation respected. (3) No fact not in the draft's "
-          f"basis. (4) Recommendations specific, non-repetitive. Output ONLY the corrected final memo "
-          f"text — no commentary, no sign-off.\n\nDRAFT:\n{draft}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
+          f"mismatch or remove the citation. (2) Separation respected. (3) No fact, name, office, or "
+          f"OFFICIAL TITLE that is not in the VERIFIED FACTS — do NOT invent titles (e.g. there is no "
+          f"'DILG Commissioner'; DILG has a Secretary and, here, Provincial Director Relucio). Replace any "
+          f"unverified addressee with a role you can support, or '[addressee — verify]'. (4) Keep 2-3 "
+          f"DISTINCT, specific recommendations (not one, not repetitive). Output ONLY the corrected final "
+          f"memo text — no commentary, no sign-off.\n\nDRAFT:\n{draft}\n\nVERIFIED FACTS:\n{factstr}\n\nGOVERNING LAW:\n{lawstr or '(none)'}")
     final = _llm(p3, 0.2)
     return {"element_map": element_map, "analysis": final}
 
