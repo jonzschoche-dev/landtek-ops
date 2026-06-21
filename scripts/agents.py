@@ -77,6 +77,8 @@ AGENTS = [
      "on demand", "", "live", "deterministic scaffolding + fenced derived block; case_memo.py MATTER --send"),
     ("legal_agent",          "discerning final-output reasoner — multi-step harness on 14B", "local",
      "on demand", "", "live", "element-map → draft → self-critique; powers case_memo's derived block"),
+    ("matter_readiness",     "TRUTH DATA-LAYER pre-flight — is a matter ready for a true memo?", "det",
+     "on demand", "", "live", "operative-pleading/orphan/conflation/grounding check + fix-list; run BEFORE case_memo"),
     ("relevance",            "classify surrounding corpus by relevance to a focal matter", "det",
      "on demand", "", "live", "CORE/RELATED/CONTEXTUAL/OFF-PROFILE + connection; docket+title+party fingerprint"),
     ("chronology",           "date-ordered evidence & submissions (the case timeline)", "det",

@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from chronology import timeline
 from legal_authority import retrieve_chunks
 from legal_agent import analyze as _legal_analyze
+from matter_readiness import assess as _readiness_assess, verdict as _readiness_verdict
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
@@ -154,6 +155,17 @@ def build(mc, path):
     if _la.get("priority"):
         f.append(Paragraph(f"<b>Strategic priority:</b> {_e(_la['priority'])}", sub))
     f.append(Spacer(1, 5))
+
+    # ── Data-layer readiness banner — never silently ship a memo on an unready truth layer ──
+    try:
+        _ra = _readiness_assess(cur, mc)
+        _ready, _rfixes, _radv = _readiness_verdict(_ra) if _ra else (True, [], [])
+    except Exception:
+        _ready, _rfixes = True, []
+    if not _ready:
+        f.append(Paragraph("&#9888; <b>DATA-LAYER NOT FULLY READY</b> — verify before relying on this memo: "
+                           + _e("; ".join(_rfixes)[:320]), warn))
+        f.append(Spacer(1, 4))
 
     # ── 1. Executive summary (one sentence) ──
     if _la.get("summary"):
