@@ -28,6 +28,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from chronology import timeline
 from legal_authority import retrieve_chunks
+from legal_agent import analyze as _legal_analyze
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
@@ -111,31 +112,11 @@ def build(mc, path):
     usable = ("Not yet — source documents missing/unavailable" if missing else
               "With additional verification — operator/counsel review required")
 
-    prompt = f"""You are assisting LandTek (a land/mining-services operator, NOT a law firm). Output is a
-DRAFT for counsel review, never to be filed as-is. Matter {mc} ({title}; forum: {forum}).
-HARD RULES: (1) This is an {'ADMINISTRATIVE red-tape/records matter' if is_admin else 'matter'}; CV-26360 is a
-SEPARATE JUDICIAL case (Aug-12 testimony) — you must NEVER say this matter wins/loses/decides CV-26360;
-treat any link ONLY as 'pattern evidence of LGU obstruction usable in CV-26360 / the bigger reivindicatory
-action.' (2) Cite GOVERNING LAW by exact section. (3) Never invent — write GAP if missing. (4) Do NOT sign.
-Produce ONLY:
-EXECUTIVE SUMMARY: (3-4 sentences)
-STRENGTHS: (bullets)
-RISKS: (bullets)
-RECOMMENDED ACTIONS: (numbered; each [Owner] [Deadline ~7-10 days] then DRAFT: a ready-to-paste paragraph
-that names the exact referral {docket}, the ongoing non-response, the prejudice to the estate/heirs, and
-an escalation if no action by the deadline)
-RISK/OPPORTUNITY: (one line)
-
-VERIFIED FACTS:
-{factstr}
-
-GOVERNING LAW:
-{lawstr or '(none loaded)'}
-
-RELATED MATTERS: {relstr or '(none)'}"""
-    derived = _ollama(prompt)
+    # Discerning reasoning: the multi-step legal harness (element-map → draft → self-critique) on the 14B
+    _la = _legal_analyze(mc)
+    emap, derived = _la["element_map"], _la["analysis"]
     if os.environ.get("MEMO_PRINT"):
-        print(derived + "\n" + "=" * 60)
+        print("ELEMENT MAP:\n" + emap + "\n---\nANALYSIS:\n" + derived + "\n" + "=" * 60)
 
     s = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=s["Heading1"], fontSize=15, spaceAfter=2)
@@ -176,6 +157,13 @@ RELATED MATTERS: {relstr or '(none)'}"""
             f.append(Paragraph(f"&nbsp;&nbsp;<font size='7' color='#6b7280'>“{_e(' '.join(e_.split())[:150])}”</font>", note))
     if len(facts) > 16:
         f.append(Paragraph(f"…+{len(facts)-16} more verified facts (full set in the matter dossier).", note))
+
+    # Evidence-to-element map (which verified facts prove which legal elements; gaps flagged)
+    f.append(Paragraph("Evidence-to-element map — DERIVED (facts → elements; unsupported elements = gaps)", h2))
+    for ln in emap.split("\n"):
+        ln = ln.strip()
+        if ln:
+            f.append(Paragraph(_e(ln), bdy))
 
     # Derived block — fenced
     f.append(Paragraph("Analysis &amp; recommendations — DERIVED REASONING (LandTek-assisted; counsel must verify)", h2))
