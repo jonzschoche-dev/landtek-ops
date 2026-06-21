@@ -105,7 +105,9 @@ def build(mc, path):
     cur.execute("""SELECT d.id, coalesce(d.original_filename,d.smart_filename,'?'), d.drive_link, d.drive_file_id,
                    d.file_path, left(coalesce(d.extracted_text,''),200),
                    (SELECT count(*) FROM matter_facts mf WHERE mf.provenance_level='verified' AND mf.source_kind='doc' AND mf.source_id=d.id::text) nf
-                   FROM documents d WHERE d.matter_code=%s ORDER BY nf DESC, d.id""", (mc,))
+                   FROM documents d WHERE d.matter_code=%s
+                     OR d.id IN (SELECT doc_id FROM document_matter_links WHERE matter_code=%s)
+                   ORDER BY nf DESC, d.id""", (mc, mc))
     annex = [(did, fn, *_avail(dl, drid, p), exc, nf) for did, fn, dl, drid, p, exc, nf in cur.fetchall() if did not in off]
     missing = [a for a in annex if not a[3]]
 

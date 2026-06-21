@@ -304,6 +304,56 @@ FACTS = [
      "Referral of the broader property issues to the Governor, or simply \"cascading\" memoranda to the "
      "Mayor, does not exhaust the DILG's own duty to address ongoing administrative breaches already "
      "brought to its attention"),
+
+    # ── doc 708 = THE ACTUAL MWK-ARTA-1891 COMPLAINT ("Complaint with Manifestation (1).pdf",
+    #    the 23/24-Apr-2026 filing to ARTA). This is the matter's TRUE substance — a supervisory-review
+    #    challenge to the Mercedes CART's PROCEDURE, not an FOI/records-obstruction complaint. ──
+    ("MWK-ARTA-1891", 708,
+     "TRUE NATURE of MWK-ARTA-1891: a standalone Complaint with Manifestation and Request for Supervisory "
+     "Review of the Mercedes Committee on Anti-Red Tape (CART) — specifically its 6 April 2026 proceedings "
+     "and the resulting Resolutions No. 1 through 6, Series of 2026 — limited to PROCEDURAL/institutional "
+     "concerns, expressly NOT the substantive merits of the underlying ARTA complaints.",
+     "This is a standalone Complaint with Manifestation concerning the conduct of the Committee on "
+     "Anti-Red Tape (CART) of the Municipal-ity of Mercedes, Camarines Norte, specifically its "
+     "proceedings on 6 April 2026 and the resulting Resolutions No. 1 through 6, Series of 2026"),
+    ("MWK-ARTA-1891", 708,
+     "Procedural fact: on 6 April 2026 the CART processed SEVEN complaints in a single sitting presided "
+     "over by the Municipal Mayor as Chairperson.",
+     "On 6 April 2026, the CART processed seven complaints in a single sitting presided over by the "
+     "Municipal Mayor as Chairperson"),
+    ("MWK-ARTA-1891", 708,
+     "Inadequate notice: the email invitation was received only on 5 April 2026 — one day before the "
+     "proceedings — with no notice or coordination made with the complainant's designated counsel "
+     "(Atty. Adan Botor), despite the CART's awareness of that designation.",
+     "The email invitation was received only on 5 April 2026 — one"),
+    ("MWK-ARTA-1891", 708,
+     "Active withholding: on 8 April 2026 the CART Chairperson met personally with Atty. Botor but "
+     "withheld that the CART had already resolved the complaints two days earlier; the complainant only "
+     "learned of the resolutions on 22 April 2026.",
+     "the CART Chairperson met personally with Atty.\nBotor but withheld the fact that the CART had "
+     "already resolved\nthe complaints two days earlier"),
+    ("MWK-ARTA-1891", 708,
+     "GROUND 1 — Structural Conflict of Interest: named respondents (including the Mayor as CART "
+     "Chairperson, and the Treasurer and Assessor) participated in evaluating complaints against their "
+     "own acts and offices — relevant to CART composition/impartiality standards under ARTA MC No. 2020-07.",
+     "participated\nin the evaluation of complaints against their own acts and offices"),
+    ("MWK-ARTA-1891", 708,
+     "GROUND 2 — Inadequate Notice & Denial of Participation: the belated one-day notice plus the bypass "
+     "of designated counsel rendered the proceedings effectively one-sided — a concern under ARTA MC "
+     "Nos. 2021-08 and 2021-11 (notice, participation, and fair complaint processing).",
+     "The proceedings were effectively one-sided, a concern\nunder ARTA MC Nos. 2021-08 and 2021-11"),
+    ("MWK-ARTA-1891", 708,
+     "RELIEF SOUGHT (what victory looks like): ARTA conducts a SUPERVISORY REVIEW of the 6 April 2026 "
+     "CART proceedings and Resolutions 1-6, requires Mercedes to submit the official order constituting "
+     "its CART and clarify each participant's role, and issues corrective procedural guidance — referring "
+     "to the Ombudsman and/or CSC if warranted.",
+     "Conduct a supervisory review of the CART proceedings of 6\nApril 2026 and Resolutions No. 1 to 6, "
+     "Series of 2026"),
+    ("MWK-ARTA-1891", 708,
+     "ANNEX A (CART Committee Record pp. 1-38) flags, inter alia, the issuance of broad PROSPECTIVE "
+     "restrictions beyond the specific ARTA-referred complaints (pp. 3-13) — exceeding the proper scope "
+     "of CART action under ARTA MC Nos. 2021-08 & 2021-11.",
+     "Issuance of broad prospec-\ntive\nrestrictions\nbeyond\nthe specific ARTA-referred\ncomplaints"),
 ]
 
 
