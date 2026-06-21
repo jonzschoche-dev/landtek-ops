@@ -51,14 +51,18 @@ def _link(dl, did, path):
     return path or "(stored in corpus)"
 
 
-def _legal_forum(forum_text):
+def _legal_forums(forum_text):
+    """A matter can run in several forums (e.g. ARTA referred to CSC + DILG) — return ALL."""
     fl = (forum_text or "").lower()
-    if "arta" in fl: return "ARTA"
-    if "ombudsman" in fl: return "OMBUDSMAN"
-    if "dilg" in fl: return "DILG"
-    if "agrarian" in fl or "darab" in fl: return "DAR-DARAB"
-    if "deeds" in fl or "lra" in fl: return "RD-LRA"
-    return None
+    out = []
+    if "arta" in fl: out.append("ARTA")
+    if "csc" in fl or "civil service" in fl: out.append("CSC")
+    if "ombudsman" in fl: out.append("OMBUDSMAN")
+    if "dilg" in fl: out.append("DILG")
+    if "agrarian" in fl or "darab" in fl: out.append("DAR-DARAB")
+    if "deeds" in fl or "lra" in fl: out.append("RD-LRA")
+    if any(k in fl for k in ("rtc", "mtc", " court")) and "CIVIL" not in out: out.append("CIVIL")
+    return out
 
 
 def build(mc, path):
@@ -131,18 +135,22 @@ def build(mc, path):
             tag = f' <font color="#2563eb">[doc:{_e(src)}]</font>' if src else ""
             f.append(Paragraph(f"&bull; {_e(st)}{tag}", body))
 
-    # Governing law — pull the forum's verbatim statute sections from the law library (grounded)
-    lf = _legal_forum(forum)
-    if lf:
+    # Governing law — pull each forum's verbatim statute from the law library (multi-forum aware)
+    lfs = _legal_forums(forum)
+    if lfs:
         q = (title or "") + " " + " ".join(st for st, _ in clean[:4])
-        try:
-            law = _law_chunks(lf, q, 3)
-        except Exception:
-            law = []
-        if law:
-            f.append(Paragraph(f"Governing law — {lf} statute ({law[0][2]})", h2))
-            for cit, txt, vf, dist in law:
-                f.append(Paragraph(f"<b>{_e(cit)}</b><br/>{_e(txt.strip())}…", body))
+        f.append(Paragraph(f"Governing law — forum(s): {', '.join(lfs)}", h2))
+        for lf in lfs:
+            try:
+                law = _law_chunks(lf, q, 2)
+            except Exception:
+                law = []
+            if law:
+                f.append(Paragraph(f"<b>{lf}</b> &nbsp;<font size='7' color='#6b7280'>({law[0][2]})</font>", body))
+                for cit, txt, vfl, dist in law:
+                    f.append(Paragraph(f"&nbsp;&nbsp;<b>{_e(cit)}</b> — {_e(txt.strip()[:240])}…", body))
+            else:
+                f.append(Paragraph(f"<b>{lf}</b> — statute not yet in the law library (pending official copy).", note))
 
     cur.execute("""SELECT DISTINCT cf.forum_code, am.name, cf.remedy FROM client_issues ci
                    JOIN case_forums cf ON cf.issue_no=ci.issue_no

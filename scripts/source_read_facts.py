@@ -274,6 +274,14 @@ FACTS = [
      "MEMORANDUM TO: ATTY. ARNALDO E. ESCOBER, JR., CESO Ill Regional Director, DILG Region V SUBJECT: "
      "ARTA REFERRAL OF COMPLAINT (CTN SL-2026-0423-1891) DATE: 06 May 2026 ... submit a report on the "
      "actions taken to the DILG-CART ... on or before 14 May 2026"),
+    ("MWK-ARTA-1891", 688,
+     "MULTI-FORUM: the SAME ARTA complaint (CTN SL-2026-0423-1891) was ALSO referred by ARTA Southern "
+     "Luzon to the CIVIL SERVICE COMMISSION (Asst. Commissioner for Legal, Atty. Ariel G. Ronquillo) on "
+     "4 May 2026 'in relation to Republic Act No. 6713' (Code of Conduct & Ethical Standards for Public "
+     "Officials), under RA 11032 §17(d). So 1891 runs in THREE forums: ARTA (origin) → CSC (RA 6713) + DILG.",
+     "the intervention sought relative to the issues and concerns stated therein may be best addressed by "
+     "the Civil Service Commission, in relation to Republic Act No. 6713. Hence, in accordance with "
+     "Section 17 (d) of Republic Act No. 11032 ... we are hereby referring the above complaint to your office"),
 ]
 
 
