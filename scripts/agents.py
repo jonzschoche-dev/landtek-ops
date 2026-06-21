@@ -34,13 +34,14 @@ AGENTS = [
      "daily 01:00", "landtek-digest.timer", "live", "Telegram-friendly"),
     ("supervisor",           "health — verify the fleet is alive (this script)", "det",
      "daily", "", "live", "agents.py --health"),
-    # ── PLANNED — gap-fillers (complete the corpus) ────────────────────────────
-    ("doc_discovery",        "find/link doc-less matters' papers from email/Drive", "det",
-     "daily", "", "planned", "converts 0-doc matters into the worklist"),
+    # ── LIVE — gap-fillers (complete the corpus) ───────────────────────────────
+    ("doc_discovery",        "find/link doc-less matters' papers from the unlinked pool", "det",
+     "daily (in verify svc)", "", "live", "conservative; proposes + auto-links strong docket signals"),
+    ("contradiction",        "cross-check verified facts for conflicts per matter", "det",
+     "daily (in verify svc)", "", "live", "caught the Sept-2016-vs-2019 sale-date conflict"),
+    # ── PLANNED — gap-fillers ──────────────────────────────────────────────────
     ("ocr_triage",           "re-OCR the OCR-garbage docs (local Tesseract)", "det",
      "daily", "", "planned", "unblocks OCR-blocked matters; no Gemini quota"),
-    ("contradiction",        "cross-check verified facts for conflicts per matter", "det",
-     "daily", "", "planned", "e.g. the Sept-2016-vs-2019 date catch"),
     ("reconciler",           "adjudicate proposed_facts → verified/reject", "det+human",
      "on demand", "", "planned", "human-in-the-loop review of borderline facts"),
     # ── PLANNED — output / reasoning (now affordable on the local tier) ─────────
