@@ -25,7 +25,8 @@ import re
 import psycopg2
 import psycopg2.extras
 
-_OPERATIVE_RE = re.compile(r"complaint|petition|affidavit|manifestation|motion|answer|comment|position paper", re.I)
+_OPERATIVE_RE = re.compile(r"complaint|petition|affidavit|manifestation|motion|answer|comment|position paper"
+                           r"|ejectment|detainer|forcible entry|accion|recovery of possession", re.I)
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 

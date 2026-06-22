@@ -433,6 +433,34 @@ FACTS = [
      "certification the complainant asked for, paid for, and was promised have still not been given.",
      "the certified true copies and\ncertification I asked for, paid for, and was promised have still not "
      "been given to me"),
+] + [
+    # ── PAR-VITO-CRUZ (Allan V. Inocalla; SEPARATE from MWK and from the Paracale/Labo properties) ──
+    #    doc 645 = the barangay EJECTMENT (the recovery action); doc 646 = the dereliction complaint
+    #    vs the Barangay Captain for failing to act on the illegal occupants. ──
+    ("PAR-VITO-CRUZ", 645,
+     "PAR-VITO-CRUZ is a barangay EJECTMENT action (Brgy. Case No. 001, Lupong Tagapamayapa, Barangay 759, "
+     "Zone 82, District V, City of Manila / Santa Ana) over the Vito Cruz property.",
+     "OFFICE OF THE LUPONNG TAGAPAMAYAPA\nBarangay Case No. 001"),
+    ("PAR-VITO-CRUZ", 645,
+     "Respondents / illegal occupants: VICENTE DE LEON INOCALLA III and ELENA DE LEON INOCALLA — substituted "
+     "as heirs of the late Vicente De Leon Inocalla, Jr.",
+     "served this summons upon respondent VICENTE DE LEON INOCALLA, III and ELENA\nDE LEON INOCALLA"),
+    ("PAR-VITO-CRUZ", 645,
+     "Complainants (the owners) are Jesus V. Inocalla — on his own behalf and for his brother Herbert V. and "
+     "sisters Marilou V. Inocalla and Cipriana Cambronero; Allan V. Inocalla acts as their attorney-in-fact.",
+     "JESUSV. INOCALLA in his\nOwn behalf and in behalf of his\nbrother"),
+    ("PAR-VITO-CRUZ", 645,
+     "Procedural posture: summons issued 16 January 2026, conciliation/mediation hearing set for "
+     "23 January 2026.",
+     "on the 23rd day of JANUARY, 2026 at 9:00"),
+    ("PAR-VITO-CRUZ", 646,
+     "The unlawful occupation was active and contested by August 2025: barangay blotter entry dated "
+     "22 August 2025, and Allan's request to convene the Lupon was made 28 August 2025.",
+     "Blotter Book of the Barangay dated\nAugust 22, 2025"),
+    ("PAR-VITO-CRUZ", 646,
+     "The illegal occupants are RELATIVES of Allan V. Inocalla occupying the said property — the family "
+     "dimension of the dispute.",
+     "the alleged relatives of Allan V.\nInocalla occupying the said\nproperty"),
 ]
 
 

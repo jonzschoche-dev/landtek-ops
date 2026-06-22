@@ -24,7 +24,8 @@ from matter_readiness import _tokens
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 IMG = re.compile(r"\.(png|jpe?g|gif|bmp|tiff?|webp)$", re.I)
-OPERATIVE = r"complaint|petition|manifestation|affidavit|motion|comment|position paper|answer"
+OPERATIVE = (r"complaint|petition|manifestation|affidavit|motion|comment|position paper|answer"
+             r"|ejectment|detainer|forcible entry|accion|recovery of possession")
 
 
 def _toks(docket, title, mc):
