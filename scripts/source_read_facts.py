@@ -461,6 +461,39 @@ FACTS = [
      "The illegal occupants are RELATIVES of Allan V. Inocalla occupying the said property — the family "
      "dimension of the dispute.",
      "the alleged relatives of Allan V.\nInocalla occupying the said\nproperty"),
+] + [
+    # ── PAR-CV13-131220 = the WON case (the title-recovery + the basis for damages). RTC Br.15 Manila.
+    #    Same Vito Cruz/Malate property + same defendant Vicente III. doc 650 = decision; 514/515 = writ/motion. ──
+    ("PAR-CV13-131220", 650,
+     "The won case: Civil Case No. 13-131220, RTC Branch 15, Manila — 'For: Cancellation of Title and "
+     "Damages' — Inocalla owners (Jesus, Herbert, Marilou, Cipriana Cambronero) vs Vicente V. Inocalla, Jr. "
+     "(substituted by heirs Vicente De Leon Inocalla III and Elena De Leon Inocalla).",
+     "This is an action for cancellation of title and damages filed by"),
+    ("PAR-CV13-131220", 650,
+     "Subject property: Transfer Certificate of Title No. 44055, located at 2521 G. Pilar Street, Malate, "
+     "Manila — the property at the center of the controversy.",
+     "Transfer Certificate of Title No, 44055 located at 2521 G. Pilar Street,\nMalate, Manila which is the "
+     "subject of the present controversy"),
+    ("PAR-CV13-131220", 650,
+     "BAD FAITH established: Vicente V. Inocalla, Jr. bought the contested property from PDAASPI on 11 "
+     "February 2011 and registered it on 23 May 2011 despite knowledge of his siblings' rights (from the "
+     "2006 RTC Br.16 decision in Civil Case 98-88750 and the lis pendens) — a buyer/occupant in bad faith.",
+     "he bought the contested property from PDAASPI on\nFebruary 11, 2011 and the said property was "
+     "registered under his name\non May 23, 2011"),
+    ("PAR-CV13-131220", 515,
+     "DISPOSITION: the decision declared Vicente Jr.'s Transfer Certificate of Title No. 002-2011002723 NULL "
+     "and VOID and ordered its cancellation.",
+     "Declares Transfer Certificate of Title No. 002\n2011002723 in the nameof Vicente Inocalla, Jr."),
+    ("PAR-CV13-131220", 515,
+     "The ONLY monetary award was Php 100,000.00 as attorney's fees plus costs of suit — the judgment did "
+     "NOT award any compensation for the use/occupation of the property, nor moral or exemplary damages.",
+     "to pay plaintiffs the\namount of Php.100,000.00 as attorney's fees"),
+    ("PAR-CV13-131220", 515,
+     "The decision is FINAL and EXECUTORY; the attorney's-fee award was satisfied, but the cancellation / "
+     "re-titling remains UNSATISFIED (the Register of Deeds declined for want of a named registrant), and "
+     "an Alias Writ of Execution is being pursued (2025) — i.e., the defendant has not surrendered the "
+     "property post-judgment.",
+     "able to satisfy\nthe judgment with respect to the award of the Attorney's\nFee"),
 ]
 
 
