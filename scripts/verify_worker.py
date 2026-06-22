@@ -138,11 +138,14 @@ def _extract_facts(cur, text, w):
     return facts, "tier2"
 
 
-def _next_docs(cur, limit):
+def _next_docs(cur, limit, matter=None):
     """Breadth-fair: build out EVERY acknowledged matter, not just the flagship. Round-robin one doc
     per matter per round, matters ordered by current verified-fact count ASC (most-neglected first),
-    each matter's docs in priority order. So a 0-fact matter gets read before CV-26360's 80th fact."""
+    each matter's docs in priority order. So a 0-fact matter gets read before CV-26360's 80th fact.
+    matter=<code> narrows the worklist to a single matter (used by matter_fix's targeted source-read)."""
     work = doc_worklist(cur)
+    if matter:
+        work = [w for w in work if w["matter_code"] == matter]
     cur.execute(f"SELECT DISTINCT doc_id FROM verify_worker_log WHERE attempted_at > now() - interval '{COOLDOWN_DAYS} days'")
     recent = {r["doc_id"] for r in cur.fetchall()}
     work = [w for w in work if w["id"] not in recent]
@@ -207,12 +210,12 @@ def process_doc(cur, w, go):
     return {"doc": w["id"], "matter": w["matter_code"], "verified": nv, "proposed": npr, "tier": tier, "shown": shown}
 
 
-def run(limit, go, loop, rpm):
+def run(limit, go, loop, rpm, matter=None):
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     _ensure(cur)
     total_v = total_p = 0
     while True:
-        docs = _next_docs(cur, limit)
+        docs = _next_docs(cur, limit, matter)
         if not docs:
             print("[worker] worklist empty (all legible docs read or in cooldown)"); break
         for w in docs:
@@ -236,4 +239,5 @@ if __name__ == "__main__":
     a = sys.argv
     run(limit=int(a[a.index("--limit") + 1]) if "--limit" in a else 5,
         go="--go" in a, loop="--loop" in a,
-        rpm=int(a[a.index("--rpm") + 1]) if "--rpm" in a else 6)
+        rpm=int(a[a.index("--rpm") + 1]) if "--rpm" in a else 6,
+        matter=a[a.index("--matter") + 1] if "--matter" in a else None)

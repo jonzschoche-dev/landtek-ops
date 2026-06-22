@@ -285,15 +285,20 @@ def build(mc, path):
                        "analysis for counsel review — not legal advice.", note))
 
     SimpleDocTemplate(path, pagesize=letter, topMargin=0.6*inch, bottomMargin=0.6*inch, title=f"{mc} action memo").build(f)
-    return len(facts), len(annex), len(missing)
+    return len(facts), len(annex), len(missing), _ready
 
 
 def main():
     mc = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "MWK-ARTA-1891"
     path = f"/tmp/memo_{mc}.pdf"
-    nf, nd, nm = build(mc, path)
-    print(f"[case-memo] {mc}: {nf} verified facts, {nd} annexes, {nm} unavailable → {path}")
+    nf, nd, nm, ready = build(mc, path)
+    print(f"[case-memo] {mc}: {nf} verified facts, {nd} annexes, {nm} unavailable, "
+          f"data-layer {'READY' if ready else 'NOT READY'} → {path}")
     if "--send" in sys.argv:
+        if not ready and "--force" not in sys.argv:
+            print(f"[send] BLOCKED — {mc} data layer NOT READY. Run matter_readiness.py {mc} / matter_fix.py "
+                  f"{mc} first, or pass --force to override.")
+            return
         tok = _tok()
         r = subprocess.run(["curl", "-s", "-F", f"chat_id={CHAT}", "-F", f"caption={mc} — Action Memo (corpus-grade)",
                             "-F", f"document=@{path}", f"https://api.telegram.org/bot{tok}/sendDocument"],

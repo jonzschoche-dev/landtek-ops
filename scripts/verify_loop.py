@@ -20,9 +20,12 @@ It never writes a 'verified' row itself (that needs a real read + the gate). It 
   python3 verify_loop.py --report    # measure + point only (no queue writes)
 """
 import argparse
+import re
 
 import psycopg2
 import psycopg2.extras
+
+_OPERATIVE_RE = re.compile(r"complaint|petition|affidavit|manifestation|motion|answer|comment|position paper", re.I)
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
@@ -92,7 +95,8 @@ def doc_worklist(cur):
     rows = cur.fetchall()
     for r in rows:
         r["p"] = (3 if r["from_email"] else 0) + (3 if r["has_value"] else 0) \
-            + (2 if r["has_deadline"] else 0) + float(r["ocr"]) + min(float(r["tlen"]) / 40000.0, 2)
+            + (2 if r["has_deadline"] else 0) + float(r["ocr"]) + min(float(r["tlen"]) / 40000.0, 2) \
+            + (4 if _OPERATIVE_RE.search(r["fn"] or "") else 0)   # read the operative pleading FIRST
     rows.sort(key=lambda r: -r["p"])
     return rows
 
