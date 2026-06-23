@@ -200,6 +200,84 @@ def _whatsapp_send(to_wa_id, text):
 
 
 # ════════════════════════════════════════════════════════════════
+# Viber Public Account / Bot — inbound webhook + outbound send
+# (mirrors WhatsApp; auth via X-Viber-Auth-Token. Needs a public HTTPS
+#  webhook URL registered once via scripts/viber_set_webhook.py.)
+# ════════════════════════════════════════════════════════════════
+
+VIBER_SEND_URL = "https://chatapi.viber.com/pa/send_message"
+
+
+@bp.route("/api/channel/viber", methods=["POST"])
+def viber_webhook():
+    """Viber Bot callback. Events: webhook(verify), conversation_started, message, delivered/seen/failed.
+    Viber requires a 200 to every callback; for conversation_started the response body becomes the greeting."""
+    payload = request.get_json(silent=True) or {}
+    event = payload.get("event")
+    if event == "webhook":
+        return jsonify({"status": 0}), 200                       # set_webhook verification ping
+    if event == "conversation_started":
+        return jsonify({"sender": {"name": _env("VIBER_SENDER_NAME", "Leo · LandTek")},
+                        "type": "text",
+                        "text": "Hello — this is Leo, assistant to Atty. Jonathan Zschoche. How can I help?"}), 200
+    if event != "message":
+        return jsonify({"status": 0}), 200                       # delivered/seen/subscribed/unsubscribed/failed — ack
+    try:
+        sender = payload.get("sender", {}) or {}
+        uid = str(sender.get("id") or "")
+        name = sender.get("name") or uid
+        msg = payload.get("message", {}) or {}
+        text = (msg.get("text") or "").strip() if msg.get("type") == "text" else ""
+        if not uid or not text:
+            return jsonify({"status": 0}), 200                   # non-text (image/file/location) — ack, no route
+        _log_inbound("viber", uid, text, raw_payload=payload)
+        reply, state, passthrough = _route_to_onboard_or_agent("viber", uid, name, None, text)
+        if reply:
+            _viber_send(uid, reply)
+        elif passthrough:
+            if not _forward_to_agent("viber", uid, name, None, text):
+                _viber_send(uid, "Thank you — Atty. Jonathan has been notified.")
+        return jsonify({"status": 0}), 200
+    except Exception as e:
+        return jsonify({"status": 3, "status_message": str(e)}), 200
+
+
+def _viber_send(receiver_id, text):
+    """Send a Viber message via the Public Account API; queue as pending_viber_send if no token yet."""
+    import requests
+    token = _env("VIBER_AUTH_TOKEN")
+    name = _env("VIBER_SENDER_NAME", "Leo · LandTek")
+    if not token:
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name='viber'), %s, 'outbound', %s, now(),
+                    'pending_viber_send', '{"reason":"VIBER_AUTH_TOKEN not configured"}'::jsonb)
+        """, (receiver_id, text))
+        cur.close(); conn.close()
+        return False
+    try:
+        r = requests.post(VIBER_SEND_URL,
+                          headers={"X-Viber-Auth-Token": token, "Content-Type": "application/json"},
+                          json={"receiver": receiver_id, "type": "text", "text": text,
+                                "sender": {"name": name}}, timeout=15)
+        j = r.json() if r.content else {}
+        ok = r.status_code == 200 and j.get("status") == 0
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, external_msg_id)
+            VALUES ((SELECT id FROM channels WHERE name='viber'), %s, 'outbound', %s, now(), %s, %s)
+        """, (receiver_id, text, "sent" if ok else "failed",
+              str(j.get("message_token")) if ok else None))
+        cur.close(); conn.close()
+        return ok
+    except Exception:
+        return False
+
+
+# ════════════════════════════════════════════════════════════════
 # Web chat widget — inbound + outbound (HTTP polling or SSE)
 # ════════════════════════════════════════════════════════════════
 
@@ -397,6 +475,8 @@ def channel_send():
         ok = r.status_code == 200
     elif channel == "whatsapp":
         ok = _whatsapp_send(recipient, text)
+    elif channel == "viber":
+        ok = _viber_send(recipient, text)
     else:
         # Web/Email/SMS handled by polling consumers
         ok = True

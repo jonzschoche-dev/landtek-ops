@@ -107,6 +107,8 @@ AGENTS = [
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
      "realtime", "", "needs-wiring", "n8n AI-Agent; wire discernment protocol + answer gate"),
+    ("channel:viber",        "Viber Bot channel for Leo (inbound webhook + outbound send)", "api",
+     "realtime", "", "needs-creds", "/api/channel/viber mirrors WhatsApp; needs VIBER_AUTH_TOKEN + public HTTPS URL (viber_set_webhook.py)"),
 ]
 
 
