@@ -77,6 +77,8 @@ AGENTS = [
      "on demand", "", "live", "deterministic scaffolding + fenced derived block; case_memo.py MATTER --send"),
     ("render_memo",          "render a hand-authored markdown memo → PDF → Telegram", "det",
      "on demand", "", "live", "for frontier-authored memos on new/thin matters; render_memo.py memo.md 'cap' --send"),
+    ("case_dossier_pdf",     "scannable corpus dossier → Telegram (timeline + docs-by-category + facts, all linked)", "det",
+     "on demand", "", "live", "the case-bundle front matter for quick counsel scan; case_dossier_pdf.py MATTER --send"),
     ("legal_agent",          "discerning final-output reasoner — multi-step harness on 14B", "local",
      "on demand", "", "live", "element-map → draft → self-critique; powers case_memo's derived block"),
     ("matter_readiness",     "TRUTH DATA-LAYER pre-flight — is a matter ready for a true memo?", "det",
