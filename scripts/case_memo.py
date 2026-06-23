@@ -32,6 +32,7 @@ from chronology import timeline
 from legal_authority import retrieve_chunks
 from legal_agent import analyze as _legal_analyze
 from matter_readiness import assess as _readiness_assess, verdict as _readiness_verdict, _tokens as _rd_tokens
+from humanize import doc_titles as _doc_titles, matter_names as _matter_names, humanize as _humanize
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
@@ -141,6 +142,22 @@ def build(mc, path):
             print(f"[{k}]\n{_la.get(k,'(missing)')}\n")
     today = datetime.date.today().isoformat()
 
+    # HUMANIZE — strip internal tokens (doc:N, [VERIFIED·doc:N], [F#], MWK-codes) from everything a lawyer reads
+    _DT = _doc_titles(cur, mc); _MN = _matter_names(cur)
+    def _h(t):
+        return _humanize(t, _DT, _MN)
+    for _k in ("priority", "summary", "objective", "related_ctx"):
+        if isinstance(_la.get(_k), str):
+            _la[_k] = _h(_la[_k])
+    if isinstance(_la.get("gaps"), list):
+        _la["gaps"] = [_h(str(g)) for g in _la["gaps"]]
+    if isinstance(_la.get("evidence"), list):
+        _la["evidence"] = [_h(str(e)) for e in _la["evidence"]]
+    for _a in (_la.get("actions") or []):
+        if isinstance(_a, dict):
+            for _fld in ("draft", "owner", "condition"):
+                _a[_fld] = _h(_a.get(_fld, ""))
+
     s = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=s["Heading1"], fontSize=15, spaceAfter=2)
     sub = ParagraphStyle("sub", parent=s["BodyText"], fontSize=8.5, textColor=colors.HexColor("#6b7280"))
@@ -166,21 +183,26 @@ def build(mc, path):
         return [x.strip() for x in str(val or "").split("\n") if x.strip()]
 
     def _vtag(src):
-        """Provenance tag for a verified fact — clickable when the source doc is retrievable."""
-        s = _e(src)
-        if src and str(src).isdigit() and int(src) in avail_ids:
-            return (f"<a href='{DOCBASE}/files/c/{int(src)}'><font size='7' color='#059669'>"
-                    f"[VERIFIED · doc:{s} ↗]</font></a>")
-        return f"<font size='7' color='#059669'>[VERIFIED · doc:{s}]</font>"
+        """Clean human source citation for a verified fact — the document's title, clickable when retrievable."""
+        if src and str(src).isdigit():
+            nm = _DT.get(int(src), "source document")
+            if int(src) in avail_ids:
+                return (f"<a href='{DOCBASE}/files/c/{int(src)}'><font size='7' color='#059669'>"
+                        f"(source: {_e(nm)} ↗)</font></a>")
+            return f"<font size='7' color='#6b7280'>(source: {_e(nm)})</font>"
+        return ""
 
     def _dref(src):
-        """Inline doc reference — clickable when retrievable."""
-        if src and str(src).isdigit() and int(src) in avail_ids:
-            return f" <a href='{DOCBASE}/files/c/{int(src)}'>[doc:{_e(src)} ↗]</a>"
-        return f" [doc:{_e(src)}]" if src else ""
+        """Inline source reference — the document title, clickable when retrievable."""
+        if src and str(src).isdigit():
+            nm = _DT.get(int(src), "document")
+            if int(src) in avail_ids:
+                return f" <font size='7'><a href='{DOCBASE}/files/c/{int(src)}'>({_e(nm)} ↗)</a></font>"
+            return f" <font size='7' color='#6b7280'>({_e(nm)})</font>"
+        return ""
 
     # ── Header ──
-    f.append(Paragraph(f"{_e(mc)} — Action Memo", h1))
+    f.append(Paragraph(f"Action Memo — {_e(docket or title)}", h1))
     f.append(Paragraph(f"{_e(title)}<br/>Forum/Docket: {_e(forum)} → {_e(docket)} &nbsp;·&nbsp; "
                        f"Generated {today} — LandTek Assisted (Operator/Counsel Review Required)", sub))
     f.append(Paragraph(f"<b>Usable for filing?</b> {_e(usable)}", sub))
@@ -223,7 +245,7 @@ def build(mc, path):
         f.append(Paragraph(_e(g) if g.startswith(("-", "•", "&bull;")) else "&bull; " + _e(g), bdy))
     if missing:
         f.append(Paragraph(f"&#9888; {len(missing)} cited source(s) NOT available: "
-                           + ", ".join(f"doc:{a[0]}" for a in missing) + " — retrieve before filing.", warn))
+                           + ", ".join(_e(a[1][:40]) for a in missing) + " — retrieve before filing.", warn))
     else:
         f.append(Paragraph("&bull; All cited source documents are available (link/file confirmed).", note))
 
@@ -270,12 +292,13 @@ def build(mc, path):
                        + (f"; {n_omitted} loosely-linked doc(s) omitted as not clearly relevant" if n_omitted else "")
                        + ")", h2))
     for did, fn, link, ok, exc, nf in annex[:14]:
+        nm = _DT.get(did, fn)
         if ok and link:
-            head = (f"<a href='{link}'><b>doc:{did}</b> {_e(fn[:52])} ↗</a>"
-                    f" {('['+str(nf)+'f]') if nf else ''}")
-            linkline = f"<br/><a href='{link}'><font size='7' color='#2563eb'>{_e(link)}</font></a>"
+            head = (f"<a href='{link}'><b>{_e(nm[:58])}</b> ↗</a>"
+                    f" {('· '+str(nf)+' cited fact'+('s' if nf!=1 else '')) if nf else ''}")
+            linkline = f"<br/><a href='{link}'><font size='7' color='#2563eb'>open document ↗</font></a>"
         else:
-            head = f"<b>doc:{did}</b> {_e(fn[:52])} <font color='#b91c1c'>[SOURCE NOT AVAILABLE]</font>"
+            head = f"<b>{_e(nm[:58])}</b> <font color='#b91c1c'>(source not on file)</font>"
             linkline = ""
         f.append(Paragraph(head + f"<br/><font size='7' color='#6b7280'>“{_e(' '.join(exc.split())[:130])}…”</font>"
                            + linkline, bdy))

@@ -26,6 +26,9 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from humanize import doc_titles as _doc_titles, matter_names as _matter_names, humanize as _humanize
+
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 DOCBASE = os.environ.get("LANDTEK_DOC_BASE", "http://100.85.203.58:8765")
 CHAT = "6513067717"
@@ -92,6 +95,7 @@ def build(mc, path):
     cur.execute("""SELECT source_id, statement FROM matter_facts WHERE matter_code=%s AND provenance_level='verified'
                    ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
     facts = [(s, st) for s, st in cur.fetchall() if not (s and s.isdigit() and int(s) in off)]
+    DT = _doc_titles(cur, mc); MN = _matter_names(cur)   # human titles / names (no internal ids on the page)
 
     s = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=s["Heading1"], fontSize=15, spaceAfter=2)
@@ -125,8 +129,10 @@ def build(mc, path):
     for cat in sorted(bycat):
         f.append(Paragraph(_e(cat), h3))
         for did, fn, dd, exc, ok, nf, tl in bycat[cat]:
-            meta = (f" · {dd}" if dd else "") + (f" · <font color='#059669'>{nf} facts</font>" if nf else (" · <font color='#b45309'>not source-read</font>" if tl > 800 else ""))
-            f.append(Paragraph(f"&bull; {_link(did, ok)} <b>{_e(fn[:60])}</b>{meta}", bdy))
+            nm = DT.get(did, fn)
+            meta = (f" · {dd}" if dd else "") + (f" · <font color='#059669'>{nf} cited fact{'s' if nf!=1 else ''}</font>" if nf else (" · <font color='#b45309'>not yet read</font>" if tl > 800 else ""))
+            link = f"<a href='{DOCBASE}/files/c/{did}'><b>{_e(nm[:60])}</b> ↗</a>" if ok else f"<b>{_e(nm[:60])}</b>"
+            f.append(Paragraph(f"&bull; {link}{meta}", bdy))
             if exc.strip():
                 f.append(Paragraph(f"&nbsp;&nbsp;<font size='7' color='#6b7280'>“{_e(' '.join(exc.split())[:150])}…”</font>", note))
 
@@ -136,9 +142,13 @@ def build(mc, path):
     for src, st in facts:
         if src != cursrc:
             cursrc = src
-            tag = _link(int(src), True) if src and src.isdigit() else _e(src or "—")
-            f.append(Paragraph(f"<b>Source {tag}</b>", h3))
-        f.append(Paragraph(f"&bull; {_e(st[:230])}", bdy))
+            if src and src.isdigit():
+                nm = DT.get(int(src), "source document")
+                tag = f"<a href='{DOCBASE}/files/c/{int(src)}'>{_e(nm)} ↗</a>"
+            else:
+                tag = _e(src or "record")
+            f.append(Paragraph(f"<b>Source: {tag}</b>", h3))
+        f.append(Paragraph(f"&bull; {_e(_humanize(st[:240], DT, MN))}", bdy))
     f.append(Spacer(1, 6))
     f.append(Paragraph("Corpus dossier — verified facts are corpus-grounded (cited source + excerpt). For analysis "
                        "& recommended actions see the Action Memo. LandTek Assisted — operator/counsel review.", note))

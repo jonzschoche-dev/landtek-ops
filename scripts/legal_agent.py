@@ -226,6 +226,8 @@ def analyze(mc):
           f"(this is a MULTI-AGENCY matter — do NOT infer law): cite ONLY statutes/sections that appear in the "
           f"GOVERNING LAW block below; never add a law, section, or circular from general knowledge. If a "
           f"needed authority is not in the block, write '[authority not embedded — obtain]'.\n"
+          f"WRITE FOR A LAWYER: refer to a document by a short descriptive name, never an internal id; "
+          f"output NO fact-ids, NO database/matter codes — only words a human needs to read.\n"
           f"Fill each field: {fields}\n\n"
           f"ELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}\n\nVERIFIED FACTS:\n{factstr}")
     draft = _llm(p2, 0.3, fmt=_SCHEMA)
