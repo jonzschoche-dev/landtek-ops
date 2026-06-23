@@ -221,16 +221,21 @@ def analyze(mc):
           f"DATA-LAYER GAPS (from the pre-flight — use these to write the gaps section and any conditional/"
           f"interim actions; name the specific docs): {readiness_gaps}\n"
           f"Operator's stated objective: {objective_note or '(not set)'}\nMatter {mc} ({title}; forum {forum}; "
-          f"docket {docket}). Crisp and professional; cite law by exact section/sub-provision; never invent "
-          f"facts, names, or official titles (there is NO 'DILG Commissioner'; DILG has a Secretary, here "
-          f"Provincial Director Relucio).\nFill each field: {fields}\n\n"
+          f"docket {docket}). Crisp and professional; never invent facts, names, or official titles (there is "
+          f"NO 'DILG Commissioner'; DILG has a Secretary, here Provincial Director Relucio). LAW DISCIPLINE "
+          f"(this is a MULTI-AGENCY matter — do NOT infer law): cite ONLY statutes/sections that appear in the "
+          f"GOVERNING LAW block below; never add a law, section, or circular from general knowledge. If a "
+          f"needed authority is not in the block, write '[authority not embedded — obtain]'.\n"
+          f"Fill each field: {fields}\n\n"
           f"ELEMENT MAP:\n{element_map}\n\nGOVERNING LAW:\n{lawstr or '(none)'}\n\nVERIFIED FACTS:\n{factstr}")
     draft = _llm(p2, 0.3, fmt=_SCHEMA)
 
     # PASS 3 — adversarial self-critique + revise, SAME schema
     p3 = (f"Adversarially CHECK then REVISE this memo JSON for {mc}. {fp}\n{sep}\nChecklist: (1) every statute "
-          f"citation matches the GOVERNING LAW — correct section AND sub-provision (a complaint vs a MUNICIPAL "
-          f"elective official is RA 7160 §61(b), not §61(a)); fix or remove. (2) No fact, name, office, or "
+          f"citation MUST appear verbatim in the GOVERNING LAW block below — DELETE any citation not present "
+          f"there (no law from memory/inference; this is multi-agency, mis-citation confuses forums); match the "
+          f"correct section AND sub-provision (a complaint vs a MUNICIPAL elective official is RA 7160 §61(b), "
+          f"not §61(a)). (2) No fact, name, office, or "
           f"official TITLE not supported by the VERIFIED FACTS — replace any invented addressee with "
           f"'[addressee — verify]'. (3) Each action is a step toward VICTORY IN THIS MATTER with owner + a "
           f"deadline IN 2026 (use {deadline} if unsure) + 2-4 sentences of copy-paste-ready draft; no "
