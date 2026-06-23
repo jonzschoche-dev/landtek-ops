@@ -156,6 +156,12 @@ def main():
     extract(path, pages, out_path)
     kb = os.path.getsize(out_path) // 1024
     print(f"[pdf_pages] extracted {len(pages)} page(s) [{spec}] of {n} → {out_path} ({kb} KB)")
+    if "--compress" in args:
+        from pdf_compress import compress
+        small, ras = compress(out_path)
+        akb = os.path.getsize(small) // 1024
+        print(f"[pdf_pages] compressed → {small} ({akb} KB, {100-akb*100//max(kb,1)}% smaller, {ras} page(s) re-imaged)")
+        out_path = small
     if "--send" in args:
         send(out_path, f"{short} — page{'s' if len(pages) > 1 else ''} {spec}")
 
