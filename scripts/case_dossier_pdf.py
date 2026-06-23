@@ -73,7 +73,7 @@ def build(mc, path):
 
     # documents of the matter (matter_code OR linked), with excerpt + availability + facts count
     cur.execute("""SELECT d.id, coalesce(d.original_filename,d.smart_filename,'?'), d.doc_date,
-                   left(coalesce(d.extracted_text,''),200),
+                   left(regexp_replace(coalesce(d.extracted_text,''),'\\s+',' ','g'),1400),
                    (d.file_path IS NOT NULL OR coalesce(d.drive_file_id,'')<>'') ok,
                    (SELECT count(*) FROM matter_facts f WHERE f.matter_code=%s AND f.provenance_level='verified'
                       AND f.source_kind='doc' AND f.source_id=d.id::text) nf,
@@ -86,15 +86,21 @@ def build(mc, path):
     # correspondence ledger (gmail)
     tok0 = docket.split()[-1] if docket else mc
     cur.execute("""SELECT coalesce(sent_at::date::text,received_at::date::text,'?') dt,
-                   left(coalesce(from_name,from_addr,'?'),24), left(coalesce(subject,''),60)
+                   left(coalesce(from_name,from_addr,'?'),28), left(coalesce(subject,''),70),
+                   left(regexp_replace(coalesce(body_plain,''),'\\s+',' ','g'),260)
                    FROM gmail_messages WHERE subject ILIKE %s OR body_plain ILIKE %s
                    ORDER BY coalesce(sent_at,received_at)""", (f"%{tok0}%", f"%{tok0}%"))
     corr = cur.fetchall()
 
-    # verified facts grouped by source doc
-    cur.execute("""SELECT source_id, statement FROM matter_facts WHERE matter_code=%s AND provenance_level='verified'
+    # verified facts (statement + the verbatim excerpt) grouped by source doc, to EMBED inline
+    cur.execute("""SELECT source_id, statement, coalesce(excerpt,'') FROM matter_facts
+                   WHERE matter_code=%s AND provenance_level='verified'
                    ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
-    facts = [(s, st) for s, st in cur.fetchall() if not (s and s.isdigit() and int(s) in off)]
+    facts = [(s, st, ex) for s, st, ex in cur.fetchall() if not (s and s.isdigit() and int(s) in off)]
+    fbydoc = {}
+    for s, st, ex in facts:
+        if s and s.isdigit():
+            fbydoc.setdefault(int(s), []).append((st, ex))
     DT = _doc_titles(cur, mc); MN = _matter_names(cur)   # human titles / names (no internal ids on the page)
 
     s = getSampleStyleSheet()
@@ -102,6 +108,7 @@ def build(mc, path):
     sub = ParagraphStyle("sub", parent=s["BodyText"], fontSize=8.5, textColor=colors.HexColor("#6b7280"))
     h2 = ParagraphStyle("h2", parent=s["Heading2"], fontSize=12, spaceBefore=11, spaceAfter=3, textColor=colors.HexColor("#1e293b"))
     h3 = ParagraphStyle("h3", parent=s["Heading3"], fontSize=10, spaceBefore=6, spaceAfter=1, textColor=colors.HexColor("#374151"))
+    h4 = ParagraphStyle("h4", parent=s["BodyText"], fontSize=9.5, spaceBefore=6, spaceAfter=1, textColor=colors.HexColor("#111827"))
     bdy = ParagraphStyle("bdy", parent=s["BodyText"], fontSize=9, leading=12)
     note = ParagraphStyle("note", parent=bdy, fontSize=7.5, textColor=colors.HexColor("#6b7280"))
     f = []
@@ -114,44 +121,44 @@ def build(mc, path):
                        f"{len(facts)} verified facts. Document links open the source (LandTek viewer, over Tailscale).", sub))
     f.append(Spacer(1, 5))
 
-    # 2. correspondence timeline
+    # 2. correspondence timeline — with the gist of each message embedded
     f.append(Paragraph(f"1. Correspondence &amp; referral timeline ({len(corr)})", h2))
-    for dt, frm, subj in corr:
+    for dt, frm, subj, body in corr:
         f.append(Paragraph(f"<b>{_e(dt)}</b> &nbsp; {_e(frm)} &nbsp;→&nbsp; {_e(subj)}", bdy))
+        if body.strip():
+            f.append(Paragraph(f"&nbsp;&nbsp;<font size='7.5' color='#475569'>“{_e(body.strip())}…”</font>", note))
     if not corr:
         f.append(Paragraph("(no logged email correspondence)", note))
 
-    # 3. documents by category
-    f.append(Paragraph(f"2. Documents by category ({len(docs)})", h2))
+    # 3. documents by category — each with its grounded content EMBEDDED (the researcher reads it here, no digging)
+    f.append(Paragraph(f"2. Documents — organized, with content embedded ({len(docs)})", h2))
     bycat = {}
-    for did, fn, dd, exc, ok, nf, tl in docs:
-        bycat.setdefault(_cat(fn), []).append((did, fn, dd, exc, ok, nf, tl))
+    for row in docs:
+        bycat.setdefault(_cat(row[1]), []).append(row)
     for cat in sorted(bycat):
         f.append(Paragraph(_e(cat), h3))
         for did, fn, dd, exc, ok, nf, tl in bycat[cat]:
             nm = DT.get(did, fn)
-            meta = (f" · {dd}" if dd else "") + (f" · <font color='#059669'>{nf} cited fact{'s' if nf!=1 else ''}</font>" if nf else (" · <font color='#b45309'>not yet read</font>" if tl > 800 else ""))
-            link = f"<a href='{DOCBASE}/files/c/{did}'><b>{_e(nm[:60])}</b> ↗</a>" if ok else f"<b>{_e(nm[:60])}</b>"
-            f.append(Paragraph(f"&bull; {link}{meta}", bdy))
-            if exc.strip():
-                f.append(Paragraph(f"&nbsp;&nbsp;<font size='7' color='#6b7280'>“{_e(' '.join(exc.split())[:150])}…”</font>", note))
-
-    # 4. verified facts by source
-    f.append(Paragraph(f"3. Verified facts by source ({len(facts)})", h2))
-    cursrc = None
-    for src, st in facts:
-        if src != cursrc:
-            cursrc = src
-            if src and src.isdigit():
-                nm = DT.get(int(src), "source document")
-                tag = f"<a href='{DOCBASE}/files/c/{int(src)}'>{_e(nm)} ↗</a>"
+            datestr = f" &nbsp;·&nbsp; <font size='8' color='#6b7280'>{dd}</font>" if dd else ""
+            f.append(Paragraph(f"<b>{_e(nm[:72])}</b>{datestr}", h4))
+            dfacts = fbydoc.get(did)
+            if dfacts:                                  # grounded substance: the verified facts + their verbatim excerpts
+                for st, ex in dfacts:
+                    f.append(Paragraph(f"&bull; {_e(_humanize(st, DT, MN))}", bdy))
+                    if ex.strip():
+                        f.append(Paragraph(f"&nbsp;&nbsp;<font size='7.5' color='#475569'>“…{_e(' '.join(ex.split())[:240])}…”</font>", note))
+            elif exc.strip():                           # not yet source-read: embed a generous excerpt so it's still readable here
+                f.append(Paragraph(f"<font size='8' color='#475569'>“{_e(exc[:900])}…”</font>", note))
             else:
-                tag = _e(src or "record")
-            f.append(Paragraph(f"<b>Source: {tag}</b>", h3))
-        f.append(Paragraph(f"&bull; {_e(_humanize(st[:240], DT, MN))}", bdy))
+                f.append(Paragraph("<font size='7.5' color='#b45309'>(image/scan — no extracted text; open to view)</font>", note))
+            if ok:
+                f.append(Paragraph(f"<font size='7'><a href='{DOCBASE}/files/c/{did}'>open full document ↗</a></font>", note))
+            f.append(Spacer(1, 2))
+
     f.append(Spacer(1, 6))
-    f.append(Paragraph("Corpus dossier — verified facts are corpus-grounded (cited source + excerpt). For analysis "
-                       "& recommended actions see the Action Memo. LandTek Assisted — operator/counsel review.", note))
+    f.append(Paragraph("Corpus dossier — content embedded for direct reading; verified facts are corpus-grounded "
+                       "(cited source + verbatim excerpt). For analysis &amp; recommended actions see the Action Memo. "
+                       "LandTek Assisted — operator/counsel review.", note))
 
     SimpleDocTemplate(path, pagesize=letter, topMargin=0.6*inch, bottomMargin=0.6*inch, title=f"{mc} dossier").build(f)
     return len(docs), len(corr), len(facts)
