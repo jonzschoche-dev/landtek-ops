@@ -74,8 +74,9 @@ def _norm(s):
     return re.sub(r"\s+", " ", (s or "").lower())
 
 
-def page_text(src, i, ocr=True):
-    """Page text from the PDF layer; for scanned pages (no text layer) render + Tesseract on the fly ($0, local)."""
+def page_text(src, i, ocr=False):
+    """Page text from the PDF's own text layer. OCR (render+Tesseract) is an explicit last resort, not default —
+    the corpus already holds confirmed digital text; we should not re-OCR at query time."""
     t = src[i].get_text() or ""
     if t.strip() or not ocr:
         return t
@@ -87,13 +88,32 @@ def page_text(src, i, ocr=True):
         return t
 
 
-def find_pages(src, query, ocr=True):
+def find_pages(src, query, ocr=False):
     q = _norm(query)
-    hits = []
-    for i in range(src.page_count):
-        if q in _norm(page_text(src, i, ocr)):
-            hits.append(i + 1)
-    return hits
+    return [i + 1 for i in range(src.page_count) if q in _norm(page_text(src, i, ocr))]
+
+
+def _chunks_pages(did, query):
+    """Pages from the already-digital, page-indexed corpus (document_chunks). [] if this doc isn't page-indexed yet."""
+    c = psycopg2.connect(DSN); cur = c.cursor()
+    cur.execute("""SELECT DISTINCT page_number FROM document_chunks
+                   WHERE document_id=%s AND page_number IS NOT NULL AND content ILIKE %s
+                   ORDER BY page_number""", (did, f"%{query}%"))
+    pages = [r[0] for r in cur.fetchall()]
+    c.close()
+    return pages
+
+
+def _in_corpus_text(did, query):
+    """Is the phrase in the document's confirmed digital text (extracted_text)? Doc-level — no page mapping."""
+    c = psycopg2.connect(DSN); cur = c.cursor()
+    cur.execute("SELECT coalesce(extracted_text,'') ILIKE %s FROM documents WHERE id=%s", (f"%{query}%", did))
+    r = cur.fetchone(); c.close()
+    return bool(r and r[0])
+
+
+def _has_text_layer(src, sample=4):
+    return any((src[i].get_text() or "").strip() for i in range(min(src.page_count, sample)))
 
 
 def extract(src_path, pages, out_path):
@@ -128,22 +148,36 @@ def main():
         print(f"[pdf_pages] {short}: {n} pages, {os.path.getsize(path)//1024} KB")
         return
     if "--toc" in args:
-        scanned = not (src[0].get_text() or "").strip()
-        print(f"[pdf_pages] {short} — {n} pages" + (" (scanned — OCR'ing each page, ~1s/page)…" if scanned else "") + ":")
+        ocr = "--ocr" in args
+        if not _has_text_layer(src) and not ocr:
+            print(f"[pdf_pages] {short} — {n} pages: scanned (no text layer). Per-page text isn't indexed yet — "
+                  f"build the page index, or pass --ocr to read each page now (slow).")
+            return
+        print(f"[pdf_pages] {short} — {n} pages:")
         for i in range(n):
-            line = " ".join(page_text(src, i).split())[:84]
-            print(f"  p{i+1:>3}: {line}")
+            print(f"  p{i+1:>3}: {' '.join(page_text(src, i, ocr).split())[:84]}")
         return
     if "--find" in args:
         q = args[args.index("--find") + 1]
-        if not (src[0].get_text() or "").strip():
-            print(f"[pdf_pages] {short} is scanned — OCR'ing {n} pages to locate '{q}' (~{n}s)…", file=sys.stderr)
-        pages = find_pages(src, q)
+        # 1) the already-digital page index (document_chunks) — instant, no OCR
+        pages = _chunks_pages(did, q)
+        via = "page index"
+        # 2) the PDF's own text layer (born-digital) — instant, no OCR
+        if not pages and _has_text_layer(src):
+            pages = find_pages(src, q, ocr=False); via = "PDF text layer"
+        # 3) explicit last resort only
+        if not pages and "--ocr" in args:
+            print(f"[pdf_pages] --ocr: OCR'ing {n} pages to locate '{q}' (slow)…", file=sys.stderr)
+            pages = find_pages(src, q, ocr=True); via = "OCR (last resort)"
         src.close()
         if not pages:
-            print(f"[pdf_pages] '{q}' not found in {short} ({n} pages)")
+            if _in_corpus_text(did, q):
+                print(f"[pdf_pages] '{q}' IS in this document's confirmed digital text, but the doc isn't page-indexed "
+                      f"(scanned bundle, no page map). Build the page index for instant page lookup, or pass --ocr to locate it now.")
+            else:
+                print(f"[pdf_pages] '{q}' not in {short}'s digital text ({n} pages).")
             return
-        print(f"[pdf_pages] '{q}' found on page(s): {', '.join(map(str, pages))} of {n}")
+        print(f"[pdf_pages] '{q}' on page(s) {', '.join(map(str, pages))} of {n} (via {via})")
         spec = ",".join(map(str, pages))
     else:
         spec = args[0]
