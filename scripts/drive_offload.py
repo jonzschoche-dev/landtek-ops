@@ -43,9 +43,12 @@ def main():
     keep = "--keep-local" in sys.argv
     limit = int(sys.argv[sys.argv.index("--limit") + 1]) if "--limit" in sys.argv else 0
     c = psycopg2.connect(DSN); c.autocommit = True; cur = c.cursor()
+    # OFFLINE SAFETY: only offload a doc whose TEXT is already extracted locally — so dropping the binary
+    # to Drive never makes the doc unreadable offline (the stack reasons over extracted_text in Postgres).
     cur.execute("""SELECT id, file_path, coalesce(original_filename,smart_filename,'document.pdf'),
                    coalesce(mime_type,'application/pdf')
                    FROM documents WHERE file_path IS NOT NULL AND coalesce(drive_file_id,'')=''
+                     AND coalesce(extracted_text,'')<>''
                    ORDER BY id""")
     rows = [r for r in cur.fetchall() if r[1] and os.path.exists(r[1])]
     mb = sum(os.path.getsize(r[1]) for r in rows) / 1e6
