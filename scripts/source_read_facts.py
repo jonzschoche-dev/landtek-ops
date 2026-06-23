@@ -494,6 +494,27 @@ FACTS = [
      "an Alias Writ of Execution is being pursued (2025) — i.e., the defendant has not surrendered the "
      "property post-judgment.",
      "able to satisfy\nthe judgment with respect to the award of the Attorney's\nFee"),
+] + [
+    # ── MWK-ARTA-1891 — notable facts that were in the corpus but un-captured (doc 709 = the CART minutes;
+    #    doc 700 = the CART Resolutions 1-6 + the DILG/Relucio response). Primary-source proof. ──
+    ("MWK-ARTA-1891", 709,
+     "PRIMARY SOURCE: doc 709 (Annex A) is the official Minutes of the 6 April 2026 CART meeting of LGU "
+     "Mercedes, held at the Mayor's Office Conference Room — the proceedings 1891 challenges.",
+     "MINUTES OF THE MEETING CONDUCTED BY COMMITTEE ON ANTI RED-TAPE (CART) OF THE"),
+    ("MWK-ARTA-1891", 709,
+     "CONFLICT-OF-INTEREST proof: the CART present at the 6 April 2026 sitting (chaired by Mayor Alexander "
+     "Pajarillo) included officials who are themselves subjects of the complaints — Gemma P. Abla (Municipal "
+     "Assessor) and Antonio B. Teope — sitting as members.",
+     "Emer-Rose G. Asug\nGemma P, Abla\nAntonio B, Teope\nJayson M. Lo"),
+    ("MWK-ARTA-1891", 700,
+     "The Mercedes CART issued Resolutions Nos. 1 through 6, Series of 2026 (compiled in doc 700) — the "
+     "resolutions whose supervisory review 1891 seeks.",
+     "CART Resolution No. 1, s. 2026"),
+    ("MWK-ARTA-1891", 700,
+     "DILG response (Dir. Melody E. Relucio, CESO V) addressed the matter under PCOO-DILG JMC 2018-01 and "
+     "RA 11032 — the response from the very DILG official to whom the ARTA complaint was referred (the "
+     "referral-circularity point).",
+     "of PCOO-DILG JMC 2018-01 and RA 11032. With this, I respectfully provide the"),
 ]
 
 
