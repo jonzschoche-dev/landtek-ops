@@ -515,6 +515,22 @@ FACTS = [
      "RA 11032 — the response from the very DILG official to whom the ARTA complaint was referred (the "
      "referral-circularity point).",
      "of PCOO-DILG JMC 2018-01 and RA 11032. With this, I respectfully provide the"),
+] + [
+    # ── MWK-ARTA-1891 — the 24 Jun 2026 CSC→Ombudsman referral (doc 1195, scraped live from the email) ──
+    ("MWK-ARTA-1891", 1195,
+     "POSTURE (24 Jun 2026): the Civil Service Commission referred ARTA Case CTN SL-2026-0423-1891 to the "
+     "Office of the Ombudsman, transmitting OAC-L Letter No. 270, s. 2026 (dated 23 June 2026) — the matter "
+     "is now before the Ombudsman.",
+     "transmit OAC-L Letter No. 270, s. 2026, dated 23 June 2026 relative to the Referral Letter of ARTA Case"),
+    ("MWK-ARTA-1891", 1195,
+     "The CSC track traces to ARTA's referral of the complaint to the CSC (Atty. Ariel G. Ronquillo, "
+     "Assistant Commissioner for Legal) under R.A. 11032 §17(d) — ARTA's power to refer complaints to the "
+     "appropriate agency.",
+     "in accordance with Section 17 (d) of Republic Act No. 11032"),
+    ("MWK-ARTA-1891", 1195,
+     "ARTA assessed the complaint as best addressed by the CSC in relation to R.A. 6713 (the Code of Conduct "
+     "and Ethical Standards for Public Officials) — the ethical-standards hook now before the Ombudsman.",
+     "best addressed by the Civil Service Commission, in relation to Republic Act No. 6713"),
 ]
 
 
