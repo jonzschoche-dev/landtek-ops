@@ -81,6 +81,8 @@ AGENTS = [
      "on demand", "", "live", "markdown-leak/placeholder/machine-token/empty-section/date checks + optional --llm editorial; proof.py doc.md --pdf doc.pdf"),
     ("finalize_docx",        "FINALIZER — grounded markdown → professional editable Word doc (separates content from presentation)", "det",
      "on demand", "", "live", "title page + TOC + Word heading styles + styled tables + footer (CONFIDENTIAL+Page X/Y); python-docx; finalize_docx.py in.md out.docx"),
+    ("case_synthesizer",     "RAG-fed element-driven legal synthesis — LOCAL-FIRST (offline); frontier optional sharpener", "local",
+     "on demand", "", "live", "playbook→coverage-gate→per-element rag_local+law retrieval→Ollama 14B synth→finalize; case_synthesizer.py --playbook P --out O [--frontier]"),
     ("case_dossier_pdf",     "scannable corpus dossier → Telegram (timeline + docs-by-category + embedded content)", "det",
      "on demand", "", "live", "case-bundle front matter; embeds each doc's grounded content inline; case_dossier_pdf.py MATTER --send"),
     ("pdf_pages",            "carve specific pages out of a bundle PDF (a focused exhibit, not the whole thing)", "det",

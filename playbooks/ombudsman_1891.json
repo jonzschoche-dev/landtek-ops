@@ -1,0 +1,29 @@
+{
+  "title": "Element Analysis — Zschoche v. Mercedes Elective Officials",
+  "subtitle": "Office of the Ombudsman · RAG-fed, grounded in the embedded law library",
+  "elements": [
+    {
+      "heading": "Conflict of interest — officials judging their own cause (R.A. 3019 §3(e); R.A. 6713 §4(a))",
+      "statutes": [
+        {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "manifest partiality"},
+        {"cite": "R.A. 6713, Section 4(a)", "citation_ilike": "6713 (full)", "kw_ilike": "public interest over"}
+      ],
+      "rag_query": "Mayor chaired the CART and Sangguniang Bayan members voted to close complaints filed against themselves did not inhibit relinquished the chair temporarily conflict of interest"
+    },
+    {
+      "heading": "Manifest partiality through a sustained, cross-department refusal (R.A. 3019 §3(e), §3(f))",
+      "statutes": [
+        {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "manifest partiality"},
+        {"cite": "R.A. 3019, Section 3(f)", "citation_ilike": "3019", "kw_ilike": "reasonable time"}
+      ],
+      "rag_query": "LGU in the process of securing the records then refused to release for a year sustained pattern Mayor Assessor Treasurer Municipal Engineer Sangguniang Bayan obstruction public records"
+    },
+    {
+      "heading": "An operative directive with no basis in law (R.A. 11032 §21)",
+      "statutes": [
+        {"cite": "R.A. 11032, Section 21", "citation_ilike": "11032", "kw_ilike": "requirements"}
+      ],
+      "rag_query": "CART resolution directs the LGU shall not release the requested documents unless proof of legal personality requirement not found in the Citizen's Charter additional requirement"
+    }
+  ]
+}
