@@ -85,6 +85,8 @@ AGENTS = [
      "on demand", "", "live", "Ghostscript-free PyMuPDF; 16.6MB→9.1MB; pdf_compress.py in.pdf [out] [--dpi 150] [--quality 55]"),
     ("case_bundle",          "filing-grade CASE BUNDLE: clean front matter + the actual supporting docs bound in as exhibits", "det",
      "on demand", "", "live", "cover + numbered statement-of-facts (exhibit cross-refs) + index + merged exhibit pages (compressed); case_bundle.py MATTER [--send]"),
+    ("case_package",         "counsel-ready PACKAGE for external delivery: brief + CORE docs bound + the rest as OPEN public links", "det",
+     "on demand", "", "live", "leo.hayuma.org/files/c links (public, no login); case_package.py MATTER --brief b.md --core 708,709,... [--send]"),
     ("legal_agent",          "discerning final-output reasoner — multi-step harness on 14B", "local",
      "on demand", "", "live", "element-map → draft → self-critique; powers case_memo's derived block"),
     ("matter_readiness",     "TRUTH DATA-LAYER pre-flight — is a matter ready for a true memo?", "det",
