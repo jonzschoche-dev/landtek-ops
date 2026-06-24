@@ -32,11 +32,26 @@ def _field(paragraph, instr, placeholder=""):
     e = OxmlElement("w:fldChar"); e.set(qn("w:fldCharType"), "end"); r._r.append(e)
 
 
+def _hyperlink(paragraph, url, text):
+    """Real clickable hyperlink showing only the link text — the URL/number stays hidden."""
+    r_id = paragraph.part.relate_to(
+        url, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", is_external=True)
+    h = OxmlElement("w:hyperlink"); h.set(qn("r:id"), r_id)
+    run = OxmlElement("w:r"); rPr = OxmlElement("w:rPr")
+    c = OxmlElement("w:color"); c.set(qn("w:val"), "2563EB"); rPr.append(c)
+    u = OxmlElement("w:u"); u.set(qn("w:val"), "single"); rPr.append(u)
+    run.append(rPr)
+    t = OxmlElement("w:t"); t.text = text; run.append(t)
+    h.append(run); paragraph._p.append(h)
+
+
 def _inline(paragraph, text, base_size=None, color=None):
-    text = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1 (\2)", text)   # links → text (url)
-    for part in re.split(r"(\*\*.+?\*\*|`.+?`)", text):
+    for part in re.split(r"(\*\*.+?\*\*|`.+?`|\[[^\]]+\]\(https?://[^)\s]+\))", text):
         if not part:
             continue
+        m = re.match(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", part)
+        if m:
+            _hyperlink(paragraph, m.group(2), m.group(1)); continue
         if part.startswith("**") and part.endswith("**"):
             run = paragraph.add_run(part[2:-2]); run.bold = True
         elif part.startswith("`") and part.endswith("`"):
