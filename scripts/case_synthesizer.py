@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 """case_synthesizer.py — RAG-fed, element-driven legal synthesis. LOCAL-FIRST / offline-sovereign.
 
-The upgrade pipeline: a matter playbook decomposes the theory into legal ELEMENTS → coverage-gate (are the
-cited statutes embedded in the law library?) → per element, semantic-retrieve the best record passages
-(rag_local) + the governing rule text (legal_chunks) → SYNTHESIZE each element → assemble (Applicable Law +
-element analyses) → markdown (→ finalize_docx).
+The pipeline: a matter playbook decomposes the theory into a dispositive FRAME + legal ELEMENTS →
+coverage-gate (are the cited statutes embedded?) → PINPOINT the exact cited provision (scrubbed of
+HTML/copyright boilerplate, not a blind 600-char dump) → per section, semantic-retrieve the best
+record passages (rag_local) → SYNTHESIZE each section against an explicit THESIS (anti-drift,
+anti-hallucination prompt) → assemble the full dossier (Applicable Law · dispositive frame · element
+analyses · gaps · auto-built Document Index of named, hyperlinked sources) → markdown (→ finalize_docx).
 
-The reasoner is LOCAL by default (Ollama qwen2.5 on the Mac) so the stack produces work UNPLUGGED. A frontier
-brain is used ONLY as an optional online sharpener (--frontier) and degrades to local if unavailable —
-never a hard dependency. Runs on the Mac: local embed (fastembed) + local reason (Ollama); the DB is reached
-over the tailnet (works on LAN without the broader internet).
+The reasoner is frontier-by-default when an API key is present (the sharpener that makes it a good
+product) and degrades to LOCAL Ollama (qwen2.5) so the stack still produces work UNPLUGGED — never a
+hard dependency. Pass --local to force the offline reasoner.
 
-  python3 scripts/case_synthesizer.py --playbook playbooks/ombudsman_1891.json --out 1891_output/synth.md [--finalize] [--frontier]
+  python3 scripts/case_synthesizer.py --playbook playbooks/ombudsman_1891.json --out 1891_output/synth.md [--finalize] [--local]
 """
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.request
@@ -26,7 +28,12 @@ import rag_embed_local as rag
 
 OLLAMA = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 LOCAL_MODEL = os.environ.get("LANDTEK_SYNTH_MODEL", "qwen2.5:14b-instruct")
+BASE_URL = os.environ.get("LEO_PUBLIC_BASE_URL", "https://leo.hayuma.org/files/c")
 SSH = ["ssh", "-o", "ConnectTimeout=40", "root@100.85.203.58"]
+# chunks that are front-matter / site boilerplate, never the operative provision
+BOILER = ("COPYRIGHT", "Creative Commons", "Web Design and Programming", "LawPhil Project",
+          "Arellano Law Foundation", "This work is licensed", "Begun and held", "REPUBLIC ACT No.")
+MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 
 
 def _vps_psql(sql):
@@ -37,7 +44,7 @@ def _vps_psql(sql):
 
 def _ollama(prompt):
     body = {"model": LOCAL_MODEL, "prompt": prompt, "stream": False,
-            "options": {"temperature": 0.3, "num_ctx": 8192}}
+            "options": {"temperature": 0.2, "num_ctx": 8192}}
     req = urllib.request.Request(f"{OLLAMA}/api/generate", data=json.dumps(body).encode(),
                                  headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=400) as r:
@@ -45,7 +52,7 @@ def _ollama(prompt):
 
 
 def _frontier(prompt):
-    """Optional online sharpener. Uses the Anthropic API if a key is configured; else falls back to local."""
+    """Online sharpener — uses the Anthropic API if a key is configured; else None (falls back to local)."""
     key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not key:
         return None
@@ -61,70 +68,164 @@ def _frontier(prompt):
         return None
 
 
-def _rule_text(citation_ilike, kw_ilike, limit=2):
-    sql = (f"SELECT string_agg(text, E'\\n\\n') FROM (SELECT text FROM legal_chunks "
-           f"WHERE citation ILIKE '%{citation_ilike}%' AND text ILIKE '%{kw_ilike}%' "
-           f"ORDER BY chunk_no LIMIT {limit}) s;")
-    return _vps_psql(sql)
-
-
 def _covered(citation_ilike):
     return (_vps_psql(f"SELECT count(*) FROM legal_chunks WHERE citation ILIKE '%{citation_ilike}%';") or "0") != "0"
 
 
-def synth_element(el, use_frontier):
-    passages = rag.retrieve(el["rag_query"], k=el.get("k", 6))
-    rule = el.get("_rule", "")
-    pblock = "\n".join(f"- {p['text']} [{p['file']}]" for p in passages) or "(no passages retrieved)"
+def _pinpoint_law(citation_ilike, kw_ilike, cap=720):
+    """Return the ONE cleanest chunk that holds the operative clause (kw), scrubbed of HTML/boilerplate.
+    Fixes the old blind 600-char dump that surfaced copyright notices and the wrong section."""
+    kw = kw_ilike.replace("'", "''")
+    sql = (f"SELECT chunk_no || E'\\t' || replace(replace(text, E'\\n', ' '), E'\\t', ' ') "
+           f"FROM legal_chunks WHERE citation ILIKE '%{citation_ilike}%' AND text ILIKE '%{kw}%' "
+           f"ORDER BY chunk_no LIMIT 20;")
+    cands = []
+    for line in _vps_psql(sql).splitlines():
+        if "\t" not in line:
+            continue
+        txt = re.sub(r"<!--.*?-->", " ", line.split("\t", 1)[1], flags=re.S)
+        txt = re.sub(r"\s+", " ", txt).strip()
+        if not txt or any(b in txt for b in BOILER):
+            continue
+        pos = txt.lower().find(kw_ilike.lower())
+        cands.append((pos if pos >= 0 else 9999, txt))
+    if not cands:
+        return ""
+    cands.sort(key=lambda c: c[0])          # provision that LEADS with the operative clause wins
+    pos, txt = cands[0]
+    # if the operative clause sits deep in a chunk shared by several subsections, trim to its own marker
+    if 120 < pos < 9999:
+        marks = list(re.finditer(r"\(?[a-z0-9]{1,2}[\)\.]\s", txt[:pos + 3]))
+        if marks:
+            txt = txt[marks[-1].start():]
+    if len(txt) > cap:
+        cut = txt.rfind(". ", 0, cap)
+        txt = (txt[:cut + 1] if cut > cap * 0.5 else txt[:cap].rstrip() + "…")
+    return txt
+
+
+def _doc_title(fn):
+    t = re.sub(r"\.(pdf|docx|doc|png|jpe?g|txt)$", "", fn or "", flags=re.I)
+    t = re.sub(r"[_]+", " ", t)
+    t = re.sub(r"\s*\(\d+\)\s*$", "", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    return t or "source document"
+
+
+def _clean_analysis(text, rule):
+    """Deterministic scrub of local-model artifacts: a re-dumped verbatim rule, echoed [source labels],
+    and docket/annex parentheticals that belong in the index, not the prose."""
+    rule_heads = [r.strip()[:30].lower() for r in re.split(r"\n\n+", rule) if r.strip()]
+    keep = []
+    for p in re.split(r"\n+", text):
+        p = p.strip()
+        if not p:
+            continue
+        low = p[:30].lower()
+        if any(low.startswith(rh) for rh in rule_heads if rh):
+            continue                                                            # standalone rule re-dump
+        if re.match(r"^\(?[a-z]\)?[\.\)]?\s+(Causing|Neglecting|Imposition|Commitment|Professionalism)", p):
+            continue
+        keep.append(p)
+    t = "\n\n".join(keep)
+    # docket/annex citations belong in the back index, never woven into the prose
+    t = re.sub(r"\s*\((?:Annex|CTN|ARTA|Case No\.?|SL-|G\.R\.)[^)]*\)", "", t)
+    t = re.sub(r",?\s*(?:as\s+\w+\s+)?in\s+Annex\s+[A-Z0-9][A-Z0-9-]*(?:\s+of\s+ARTA\s+Case\s+No\.?\s*CTN\s*SL-[\d-]+)?", "", t, flags=re.I)
+    t = re.sub(r"\s*\(?\bARTA\s+Case\s+No\.?\s*CTN\s*SL-[\d-]+\)?", "", t, flags=re.I)
+    t = re.sub(r"\s*\bCTN\s*SL-[\d-]+", "", t)
+    t = re.sub(r"\bas (?:detailed|stated|noted|shown) in \[[^\]]+\]", "the record shows", t, flags=re.I)
+    t = re.sub(r"\[[^\]]{2,80}\]", "the record", t)                             # any other [label] echo
+    t = re.sub(r"Ka[sz]+ey|Keesee\b", "Keesey", t)                             # the recurring name garble
+    # one date format throughout: "Month D, YYYY" → "D Month YYYY"
+    t = re.sub(rf"\b({MONTHS})\s+(\d{{1,2}}),?\s+(\d{{4}})\b",
+               lambda m: f"{int(m.group(2))} {m.group(1)} {m.group(3)}", t)
+    t = re.sub(r"\s+([,.;])", r"\1", t)
+    t = re.sub(r"[ \t]{2,}", " ", t)
+    return t.strip()
+
+
+def synth_section(theory, rule, passages, use_frontier):
+    pblock = "\n".join(f"- {p['text']} [{_doc_title(p['file'])}]" for p in passages) or "(no passages retrieved)"
     prompt = (
-        "You are senior Philippine counsel writing one section of an evidence-grounded analysis.\n\n"
-        f"SECTION: {el['heading']}\n\n"
-        f"GOVERNING RULE (verbatim statutory text — apply ONLY this; cite no other statute):\n{rule[:2500]}\n\n"
-        "SUPPORTING PASSAGES FROM THE RECORD (each is from a real document; the bracket is the document's "
-        "name — refer to documents by a short description, NEVER by a number or filename):\n"
+        "You are senior Philippine counsel writing one section of an evidence-grounded dossier for the "
+        "Office of the Ombudsman.\n\n"
+        f"THE THESIS OF THIS SECTION — argue exactly this; do NOT drift to any other issue:\n{theory}\n\n"
+        "GOVERNING RULE — apply ONLY this verbatim text; cite no statute not given here:\n"
+        f"{rule[:2500] or '(no separate rule text; argue the thesis without citing any statute not named in it)'}\n\n"
+        "RECORD PASSAGES — each is from a real document; the bracket names it. Refer to documents by a short "
+        "description, NEVER by number or filename:\n"
         f"{pblock}\n\n"
-        "Write 2–4 tight paragraphs: state the rule briefly, then apply it to the SPECIFIC facts in the "
-        "passages, quoting the telling details. Do not invent facts beyond the passages. Professional, "
-        "judicious prose — no headings, no bullet lists, no document IDs."
+        "Write 2–4 tight paragraphs that PROVE THE THESIS: state the rule in one line, then apply it to the "
+        "SPECIFIC facts in the passages, quoting the telling details verbatim. HARD RULES: (1) do not invent "
+        "facts beyond the passages; (2) do NOT expand or guess what any acronym stands for — write it exactly as "
+        "it appears (e.g. 'the CART'), never invent its meaning; (3) do not hedge — no 'may suggest', 'raises "
+        "concerns', 'possibly', 'appears to' — state what the record shows; (4) no headings, no bullet lists, no "
+        "document numbers, no markdown."
     )
     out = (_frontier(prompt) if use_frontier else None) or _ollama(prompt)
-    return out, passages
+    return _clean_analysis(out, rule)
 
 
-def build(playbook, out_path, use_frontier=False):
+def build(playbook, out_path, use_frontier=True):
     pb = json.load(open(playbook))
-    md = [f"# {pb['title']}", f"## {pb.get('subtitle','')}", "", "---", ""]
-    # coverage-gate: fetch each statute's rule text once; attach to every element that cites it
-    law_section, gate = {}, []
-    for el in pb["elements"]:
-        el["_rule_pool"] = []
-        for st in el.get("statutes", []):
-            cite, ilike, kw = st["cite"], st["citation_ilike"], st["kw_ilike"]
-            if cite not in law_section:
-                law_section[cite] = _rule_text(ilike, kw) if _covered(ilike) else None
-            if law_section[cite]:
-                el["_rule_pool"].append((cite, law_section[cite]))
+    md = [f"# {pb['title']}", "", f"## {pb.get('subtitle', '')}", "", "---", ""]
+    if pb.get("purpose_note"):
+        md += [f"*{pb['purpose_note']}*", ""]
+
+    frame = pb.get("dispositive_frame")
+    order = ([frame] if frame else []) + pb["elements"]
+
+    # ── coverage-gate + pinpoint each cited provision once (stable order: frame, then elements) ──
+    law_cache, gate = {}, []
+    for sec in order:
+        rules = []
+        for st in sec.get("statutes", []):
+            cite = st["cite"]
+            if cite not in law_cache:
+                law_cache[cite] = _pinpoint_law(st["citation_ilike"], st["kw_ilike"]) if _covered(st["citation_ilike"]) else None
+            if law_cache[cite]:
+                rules.append((cite, law_cache[cite]))
             elif cite not in gate:
                 gate.append(cite)
-    md.append("## Applicable law")
-    for cite, txt in law_section.items():
-        md.append(f"**{cite}.** {txt[:600]}" if txt else f"**{cite}** — *[not embedded in the law library — obtain before filing]*")
-    md.append("")
+        sec["_rule"] = "\n\n".join(t for _, t in rules)
     if gate:
-        print(f"[synth] COVERAGE GAP — statutes not embedded: {', '.join(gate)}", file=sys.stderr)
-    # elements
-    brain = "frontier (online sharpener)" if (use_frontier and os.environ.get("ANTHROPIC_API_KEY")) else f"local {LOCAL_MODEL}"
-    print(f"[synth] reasoning on: {brain}", file=sys.stderr)
-    for el in pb["elements"]:
-        el["_rule"] = "\n\n".join(t for _, t in el.get("_rule_pool", []))
-        print(f"[synth] · {el['heading'][:50]} …", file=sys.stderr)
-        analysis, _ = synth_element(el, use_frontier)
-        md.append(f"## {el['heading']}")
-        md.append(analysis)
+        print(f"[synth] COVERAGE GAP — not embedded: {', '.join(gate)}", file=sys.stderr)
+
+    md += ["## Applicable law", ""]
+    for cite, txt in law_cache.items():
+        md.append(f"**{cite}.** {txt}" if txt else f"**{cite}** — *[not embedded in the law library — obtain official text before filing]*")
         md.append("")
-    md.append("---")
-    md.append(f"*Synthesized {('with a frontier sharpener' if use_frontier else 'locally (offline-capable)')} "
-              f"from the corpus RAG and the embedded law library. LandTek — for counsel review.*")
+
+    on_frontier = use_frontier and bool(os.environ.get("ANTHROPIC_API_KEY"))
+    print(f"[synth] reasoning on: {'frontier (online sharpener)' if on_frontier else f'local {LOCAL_MODEL}'}", file=sys.stderr)
+
+    all_passages = []
+    for sec in order:
+        ps = rag.retrieve(sec["rag_query"], k=sec.get("k", 6))
+        all_passages += ps
+        print(f"[synth] · {sec['heading'][:52]} …", file=sys.stderr)
+        md += [f"## {sec['heading']}", synth_section(sec["theory"], sec["_rule"], ps, use_frontier), ""]
+
+    if pb.get("gaps"):
+        md += ["## Gaps — what counsel must obtain or confirm", ""]
+        md += [f"{i}. {g}" for i, g in enumerate(pb["gaps"], 1)]
+        md.append("")
+
+    # ── auto Document Index: named, hyperlinked sources (dedup, first-appearance order) ──
+    md += ["## Document index", ""]
+    seen = set()
+    for p in all_passages:
+        did = p.get("doc_id")
+        if not did or did in seen:
+            continue
+        seen.add(did)
+        md.append(f"- **{_doc_title(p['file'])}** — [open]({BASE_URL}/{did})")
+    md.append("")
+
+    md += ["---",
+           f"*Synthesized {'with a frontier sharpener' if on_frontier else 'locally (offline-capable)'} from the "
+           f"corpus RAG and the embedded law library. LandTek — for counsel review; verify each cited document "
+           f"before filing.*"]
     open(out_path, "w").write("\n".join(md))
     print(f"[synth] wrote {out_path}")
 
@@ -134,9 +235,10 @@ def main():
     ap.add_argument("--playbook", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--finalize", action="store_true")
-    ap.add_argument("--frontier", action="store_true")
+    ap.add_argument("--local", action="store_true", help="force the offline reasoner (skip frontier)")
+    ap.add_argument("--frontier", action="store_true", help="(default behavior; kept for back-compat)")
     a = ap.parse_args()
-    build(a.playbook, a.out, a.frontier)
+    build(a.playbook, a.out, use_frontier=not a.local)
     if a.finalize:
         import finalize_docx
         docx = a.out.replace(".md", ".docx")

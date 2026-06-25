@@ -1,29 +1,39 @@
 {
-  "title": "Element Analysis — Zschoche v. Mercedes Elective Officials",
-  "subtitle": "Office of the Ombudsman · RAG-fed, grounded in the embedded law library",
+  "title": "Evidence Support Dossier — Office of the Ombudsman",
+  "subtitle": "The records-refusal & CART complaint — Zschoche v. the elective officials of Mercedes",
+  "purpose_note": "Prepared by LandTek for counsel. Not a pleading — the grounded evidentiary support for the working Complaint-Affidavit: the law stated from the embedded library, each charge tied to the record, and the gaps marked. This is the records-refusal / CART track against the elective officials (the Mayor and the Sangguniang Bayan members); the appointive/career officials fall before the Civil Service Commission on the parallel track.",
+  "dispositive_frame": {
+    "heading": "The dispositive fact — the officials sat in judgment of the complaint against their own offices",
+    "theory": "The Municipality's own minutes of the 6 April 2026 CART list the Mayor and Sangguniang Bayan members as present and participating while the committee disposed of the seven complaints directed at their own offices, and they did not inhibit. An official who sits on the body that adjudicates the complaint against his own office, and there concurs in the very refusal complained of, acts with manifest partiality and an irreconcilable conflict of interest — grave misconduct, not mere neglect. This single fact, recorded in the LGU's own minutes, is the spine of the case.",
+    "rag_query": "CART minutes 6 April 2026 present participating disposed of the seven complaints against their own offices Mayor Sangguniang Bayan did not inhibit conflict of interest directive shall not release records",
+    "statutes": [
+      {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "undue injury"},
+      {"cite": "R.A. 6713, Section 4(a)", "citation_ilike": "6713", "kw_ilike": "uphold the public interest"}
+    ]
+  },
   "elements": [
     {
-      "heading": "Conflict of interest — officials judging their own cause (R.A. 3019 §3(e); R.A. 6713 §4(a))",
+      "heading": "Manifest partiality through a sustained, cross-department refusal",
+      "theory": "Across the Assessor, the Treasurer, the Municipal Engineer, and the Mayor's office, the LGU sustained a coordinated, year-long refusal to release public records the heirs are entitled to. This is not isolated delay but a pattern across departments, evidencing manifest partiality and a refusal to act after due demand without sufficient justification.",
       "statutes": [
-        {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "manifest partiality"},
-        {"cite": "R.A. 6713, Section 4(a)", "citation_ilike": "6713 (full)", "kw_ilike": "public interest over"}
+        {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "undue injury"},
+        {"cite": "R.A. 3019, Section 3(f)", "citation_ilike": "3019", "kw_ilike": "Neglecting or refusing"}
       ],
-      "rag_query": "Mayor chaired the CART and Sangguniang Bayan members voted to close complaints filed against themselves did not inhibit relinquished the chair temporarily conflict of interest"
+      "rag_query": "sustained pattern year-long refusal release public records Mayor Assessor Treasurer Municipal Engineer Sangguniang Bayan obstruction follow-ups ignored no written disposition"
     },
     {
-      "heading": "Manifest partiality through a sustained, cross-department refusal (R.A. 3019 §3(e), §3(f))",
+      "heading": "An operative directive with no basis in law",
+      "theory": "The LGU conditioned release of the records on a Special Power of Attorney from all heirs and on proof of legal personality found nowhere in its Citizen's Charter. That is an additional requirement squarely prohibited by R.A. 11032 Section 21(b), and citizenship is no bar to relief under the Act.",
       "statutes": [
-        {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "manifest partiality"},
-        {"cite": "R.A. 3019, Section 3(f)", "citation_ilike": "3019", "kw_ilike": "reasonable time"}
+        {"cite": "R.A. 11032, Section 21", "citation_ilike": "11032", "kw_ilike": "Imposition of additional requirements"}
       ],
-      "rag_query": "LGU in the process of securing the records then refused to release for a year sustained pattern Mayor Assessor Treasurer Municipal Engineer Sangguniang Bayan obstruction public records"
-    },
-    {
-      "heading": "An operative directive with no basis in law (R.A. 11032 §21)",
-      "statutes": [
-        {"cite": "R.A. 11032, Section 21", "citation_ilike": "11032", "kw_ilike": "requirements"}
-      ],
-      "rag_query": "CART resolution directs the LGU shall not release the requested documents unless proof of legal personality requirement not found in the Citizen's Charter additional requirement"
+      "rag_query": "directive shall not release the requested documents unless proof of legal personality Special Power of Attorney from all heirs requirement not in the Citizen's Charter additional requirement section 21(b)"
     }
+  ],
+  "gaps": [
+    "Confirm each elective respondent's identity and term of office of record (Mayor Pajarillo and the named Sangguniang Bayan members who sat on the CART).",
+    "Produce the 6 April 2026 CART Minutes and Resolutions as the named annex — the dispositive exhibit.",
+    "Pin the per-office request letters as annexes (the Assessor request of 27 May 2025; the Treasurer request of 28 May 2025) in their received, stamped form.",
+    "Confirm which respondents are elective (Ombudsman) versus appointive (the parallel CSC track), so each is charged in the correct forum."
   ]
 }
