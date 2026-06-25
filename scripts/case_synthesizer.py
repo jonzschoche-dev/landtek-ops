@@ -190,6 +190,8 @@ def _index_label(m, use_model=True):
                 raw = g
         except Exception:
             pass
+    raw = re.sub(rf"\b({MONTHS})\s+(\d{{1,2}}),?\s+(\d{{4}})\b",
+                 lambda m: f"{int(m.group(2))} {m.group(1)} {m.group(3)}", raw)   # one date format in labels too
     return _titlecaps(raw) or "Case document"
 
 
