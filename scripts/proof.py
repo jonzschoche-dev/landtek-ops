@@ -69,6 +69,8 @@ def lint(src, pdf):
         styles.add("'YYYY-MM-DD'")
     if len(styles) > 1:
         issues.append(("DATE", "mixed date formats: " + ", ".join(sorted(styles)) + " — pick one"))
+    if re.search(r"&(amp|lt|gt|quot|#\d+);", src):
+        issues.append(("FORM", "literal HTML entity in source (e.g. &amp;) — will render verbatim"))
     if src.count("**") % 2:
         issues.append(("FORM", "odd number of '**' (unbalanced bold)"))
     if not re.search(r"(?m)^#\s", src):
