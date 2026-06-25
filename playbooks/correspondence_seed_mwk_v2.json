@@ -1,0 +1,48 @@
+[
+  {
+    "matter_code": "MWK-ARTA-1321",
+    "author": "Office of the Municipal Assessor (Gemma P. Abla)",
+    "addressee": "Jonathan Paul Zschoche",
+    "subject": "No written disposition issued on the records request (no extension, no denial)",
+    "claimed_date": null,
+    "channel": null,
+    "sent_to": null,
+    "delivery_status": "failed",
+    "received_date": null,
+    "gap_flag": "NO WRITTEN DISPOSITION — the Assessor neither issued a written extension fixing a release date nor a written denial; R.A. 11032 §21(d) requires a written notice of disapproval. Silence is not service.",
+    "proofs": [
+      {"doc_id": 1188, "quote": "I never received a written extension fixing a new release date, and I never received a written denial"}
+    ]
+  },
+  {
+    "matter_code": "MWK-ARTA-1321",
+    "author": "Office of the Municipal Assessor (Gemma P. Abla)",
+    "addressee": "Jonathan Paul Zschoche",
+    "subject": "Belated SPA/authorization objection raised six months after the request",
+    "claimed_date": null,
+    "channel": null,
+    "sent_to": null,
+    "delivery_status": "late",
+    "received_date": null,
+    "gap_flag": "BAD-FAITH DELAY — the authorization (SPA) objection was raised six months after the request, after fees were paid and the request partially processed; a delay tactic to frustrate release.",
+    "proofs": [
+      {"doc_id": 730, "quote": "Raising an alleged lack of authorization six months later is a bad-faith delay tactic designed to frustrate the release of public records"}
+    ]
+  },
+  {
+    "matter_code": "MWK-ARTA-1210",
+    "author": "Office of the Municipal Treasurer (Loida E. Macale)",
+    "addressee": "Jonathan Paul Zschoche",
+    "subject": "Tax records remain unrendered ten+ months after payment",
+    "claimed_date": null,
+    "channel": null,
+    "sent_to": null,
+    "delivery_status": "phantom",
+    "received_date": null,
+    "gap_flag": "NON-RENDERING — the certified copies remain undelivered/unissued; the Treasurer's response (28 May 2026) is more than ten months and 200+ working days after payment — the service was never rendered.",
+    "proofs": [
+      {"doc_id": 1158, "quote": "remain undelivered or unissued as of the date of this Reply-A ffidavit"},
+      {"doc_id": 1158, "quote": "Counter-A ffidavit is dated May 28, 2026: more than ten months later, and over two hundred (200) working days after I paid"}
+    ]
+  }
+]
