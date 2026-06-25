@@ -112,6 +112,87 @@ def _doc_title(fn):
     return t or "source document"
 
 
+_ACR = {"DILG", "ARTA", "NAPOLCOM", "RFO", "CART", "LGU", "SB", "RA", "PD", "RPC", "TCT", "OSCA",
+        "FOI", "COA", "BAC", "DENR", "LRA", "SPA", "MTC", "RTC", "CSC", "RPT", "SALN", "DAR", "NBI",
+        "OMB", "IRR", "MTO", "RD", "CTN", "SL"}
+_SMALL = {"of", "to", "the", "a", "an", "and", "in", "on", "for", "vs", "v.", "v", "with", "by", "or"}
+
+
+def _cap(w):
+    for j, ch in enumerate(w):
+        if ch.isalpha():
+            return w[:j] + ch.upper() + w[j + 1:]
+    return w
+
+
+def _titlecaps(t):
+    """Uniform Title Case: keep known acronyms upper, lower small connecting words, capitalize the rest."""
+    out = []
+    for i, w in enumerate(t.split()):
+        bare = re.sub(r"[^A-Za-z]", "", w)
+        if not bare:
+            out.append(w)
+        elif bare.upper() in _ACR:
+            out.append(w.replace(bare, bare.upper()))
+        elif i > 0 and w.lower() in _SMALL:
+            out.append(w.lower())
+        elif bare.isupper() and len(bare) > 1:
+            out.append(w.replace(bare, bare.title()))
+        else:
+            out.append(_cap(w))
+    return " ".join(out)
+
+
+def _fmt_date(s):
+    months = ["", "January", "February", "March", "April", "May", "June", "July", "August",
+              "September", "October", "November", "December"]
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", (s or "").strip())
+    if not m:
+        return "", ""
+    y, mo, d = m.groups()
+    return f"{int(d)} {months[int(mo)]} {y}", f"{y}-{mo}-{d}"
+
+
+def _index_meta(doc_ids):
+    """Per-doc metadata for a clean back index: a usable name, the date, and a text snippet (for the
+    docket-only / unnamed documents whose filename tells a human nothing)."""
+    if not doc_ids:
+        return {}
+    sql = ("SELECT id || E'\\t' || coalesce(nullif(document_title,''), nullif(smart_filename,''), original_filename, '') "
+           "|| E'\\t' || coalesce(doc_date::text,'') "
+           "|| E'\\t' || replace(left(regexp_replace(coalesce(extracted_text,''), '[[:space:]]+', ' ', 'g'), 380), E'\\t', ' ') "
+           f"FROM documents WHERE id IN ({','.join(doc_ids)});")
+    meta = {}
+    for line in _vps_psql(sql).splitlines():
+        p = line.split("\t")
+        if len(p) >= 4:
+            disp, iso = _fmt_date(p[2])
+            meta[p[0]] = {"name": p[1].strip(), "date": disp, "iso": iso, "snippet": p[3].strip()}
+    return meta
+
+
+def _index_label(m, use_model=True):
+    """A clean, descriptive label: keep a usable filename, but for docket-only / ALL-CAPS / unnamed
+    documents derive a short title from the content. Never a bare docket or 'source document'."""
+    raw = _doc_title(m.get("name", ""))
+    raw = re.sub(r"^\d{4}[-_]\d{2}[-_]\d{2}[ _]*", "", raw).strip()
+    up = raw.upper()
+    docketish = (not raw or raw.lower() == "source document" or "CTN" in up or "SL-" in up
+                 or not re.search(r"[a-z]", raw)                                   # no lowercase = shouty/cryptic
+                 or bool(re.fullmatch(r"(signed osca[ -]*)?(ctn[ -]*)?[a-z]{0,4}[ -]?sl[- 0-9a-z]+", raw, re.I)))
+    if docketish and use_model and m.get("snippet"):
+        try:
+            g = _ollama("Name this Philippine legal document in 4 to 8 words: its document type and its subject "
+                        "or the parties (e.g. 'Mayor's reply declining the records request'). Title Case, no docket "
+                        "numbers, no quotation marks, no file name, no trailing period.\n\nDOCUMENT TEXT:\n" + m["snippet"][:380])
+            g = g.strip().splitlines()[0].strip().strip('"').rstrip(".")
+            if 4 <= len(g) <= 72 and not re.search(r"\bSL-?\d", g):
+                raw = g
+        except Exception:
+            pass
+    return _titlecaps(raw) or "Case document"
+
+
 def _clean_analysis(text, rule):
     """Deterministic scrub of local-model artifacts: a re-dumped verbatim rule, echoed [source labels],
     and docket/annex parentheticals that belong in the index, not the prose."""
@@ -211,15 +292,21 @@ def build(playbook, out_path, use_frontier=True):
         md += [f"{i}. {g}" for i, g in enumerate(pb["gaps"], 1)]
         md.append("")
 
-    # ── auto Document Index: named, hyperlinked sources (dedup, first-appearance order) ──
+    # ── auto Document Index: clean descriptive labels, dated, chronological, deduped ──
     md += ["## Document index", ""]
-    seen = set()
+    ids = []
     for p in all_passages:
-        did = p.get("doc_id")
-        if not did or did in seen:
-            continue
-        seen.add(did)
-        md.append(f"- **{_doc_title(p['file'])}** — [open]({BASE_URL}/{did})")
+        if p.get("doc_id") and p["doc_id"] not in ids:
+            ids.append(p["doc_id"])
+    meta = _index_meta(ids)
+    entries = []
+    for did in ids:
+        m = meta.get(did, {"name": next((p["file"] for p in all_passages if p["doc_id"] == did), ""), "date": "", "iso": ""})
+        label = _index_label(m)
+        dated = f"{label} — {m['date']}" if m.get("date") else label
+        entries.append((m.get("iso") or "9999", f"- **{dated}** — [open]({BASE_URL}/{did})"))
+    for _, line in sorted(entries, key=lambda e: e[0]):
+        md.append(line)
     md.append("")
 
     md += ["---",
