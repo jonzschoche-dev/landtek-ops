@@ -7,6 +7,10 @@
     "heading": "The dispositive fact — the officials sat in judgment of the complaint against their own offices",
     "theory": "The Municipality's own minutes of the 6 April 2026 CART list the Mayor and Sangguniang Bayan members as present and participating while the committee disposed of the seven complaints directed at their own offices, and they did not inhibit. An official who sits on the body that adjudicates the complaint against his own office, and there concurs in the very refusal complained of, acts with manifest partiality and an irreconcilable conflict of interest — grave misconduct, not mere neglect. This single fact, recorded in the LGU's own minutes, is the spine of the case.",
     "rag_query": "CART minutes 6 April 2026 present participating disposed of the seven complaints against their own offices Mayor Sangguniang Bayan did not inhibit conflict of interest directive shall not release records",
+    "exhibits": [
+      {"id": "709", "note": "the 6 April 2026 CART hearing record — the dispositive exhibit"},
+      {"id": "711", "note": "the 6 April 2026 CART minutes of meeting"}
+    ],
     "statutes": [
       {"cite": "R.A. 3019, Section 3(e)", "citation_ilike": "3019", "kw_ilike": "undue injury"},
       {"cite": "R.A. 6713, Section 4(a)", "citation_ilike": "6713", "kw_ilike": "uphold the public interest"}

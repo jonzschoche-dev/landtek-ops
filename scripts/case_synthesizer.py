@@ -280,10 +280,10 @@ def build(playbook, out_path, use_frontier=True):
     on_frontier = use_frontier and bool(os.environ.get("ANTHROPIC_API_KEY"))
     print(f"[synth] reasoning on: {'frontier (online sharpener)' if on_frontier else f'local {LOCAL_MODEL}'}", file=sys.stderr)
 
-    all_passages = []
+    section_sources = []
     for sec in order:
         ps = rag.retrieve(sec["rag_query"], k=sec.get("k", 6))
-        all_passages += ps
+        section_sources.append((sec, ps))
         print(f"[synth] · {sec['heading'][:52]} …", file=sys.stderr)
         md += [f"## {sec['heading']}", synth_section(sec["theory"], sec["_rule"], ps, use_frontier), ""]
 
@@ -292,22 +292,39 @@ def build(playbook, out_path, use_frontier=True):
         md += [f"{i}. {g}" for i, g in enumerate(pb["gaps"], 1)]
         md.append("")
 
-    # ── auto Document Index: clean descriptive labels, dated, chronological, deduped ──
-    md += ["## Document index", ""]
-    ids = []
-    for p in all_passages:
-        if p.get("doc_id") and p["doc_id"] not in ids:
-            ids.append(p["doc_id"])
-    meta = _index_meta(ids)
-    entries = []
-    for did in ids:
-        m = meta.get(did, {"name": next((p["file"] for p in all_passages if p["doc_id"] == did), ""), "date": "", "iso": ""})
-        label = _index_label(m)
-        dated = f"{label} — {m['date']}" if m.get("date") else label
-        entries.append((m.get("iso") or "9999", f"- **{dated}** — [open]({BASE_URL}/{did})"))
-    for _, line in sorted(entries, key=lambda e: e[0]):
-        md.append(line)
-    md.append("")
+    # ── curated Document Index: the strongest exhibits, GROUPED by the finding each supports ──
+    # (not the old "everything the retriever touched" dump — capped per finding, deduped, purpose-mapped)
+    # Curated, not a retrieval dump: a finding's exhibits are the playbook-PINNED ones where the author
+    # named them (the dispositive documents a paralegal knows); only UNPINNED findings fall back to the
+    # retrieval top-N. Capped, deduped, grouped under the finding each supports.
+    INDEX_CAP = 3
+    md += ["## Document index — the evidence behind each finding", ""]
+    allids = []
+    for sec, ps in section_sources:
+        for did in [str(e["id"]) for e in sec.get("exhibits", [])] + [p["doc_id"] for p in ps]:
+            if did not in allids:
+                allids.append(did)
+    meta = _index_meta(allids)
+    seen = set()
+    for sec, ps in section_sources:
+        pinned = [str(e["id"]) for e in sec.get("exhibits", [])]
+        if pinned:
+            chosen = [d for d in pinned if d not in seen][:INDEX_CAP]
+        else:
+            chosen = [p["doc_id"] for p in sorted(ps, key=lambda p: p.get("dist", 9.0))
+                      if p["doc_id"] not in seen][:INDEX_CAP]
+        if not chosen:
+            continue
+        md.append(f"### Supporting — {sec['heading']}")
+        rows = []
+        for did in chosen:
+            seen.add(did)
+            m = meta.get(did, {"name": next((p["file"] for p in ps if p["doc_id"] == did), ""), "date": "", "iso": ""})
+            label = _index_label(m)
+            dated = f"{label} — {m['date']}" if m.get("date") else label
+            rows.append((m.get("iso") or "9999", f"- **{dated}** — [open]({BASE_URL}/{did})"))
+        md += [line for _, line in sorted(rows, key=lambda e: e[0])]
+        md.append("")
 
     md += ["---",
            f"*Synthesized {'with a frontier sharpener' if on_frontier else 'locally (offline-capable)'} from the "

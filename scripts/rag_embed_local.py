@@ -118,15 +118,15 @@ def status():
 def retrieve(query, k=6, width=650):
     """Return the top-k corpus passages for a query as dicts {doc_id, text, file} — for the synthesizer."""
     qv = _vec_literal(list(_model().embed([query]))[0])
-    sql = (f"SELECT r.doc_id || E'\\t' || "
+    sql = (f"SELECT r.doc_id || E'\\t' || round((r.embedding <=> '{qv}')::numeric,4) || E'\\t' || "
            f"regexp_replace(left(convert_from(decode(r.content_b64,'base64'),'UTF8'),{width}),'\\s+',' ','g') || E'\\t' || "
            "coalesce(d.original_filename,'') "
            f"FROM rag_local r JOIN documents d ON d.id=r.doc_id ORDER BY r.embedding <=> '{qv}' LIMIT {k}")
     rows = []
     for line in _psql(sql).splitlines():
         p = line.split("\t")
-        if len(p) >= 3:
-            rows.append({"doc_id": p[0].strip(), "text": p[1].strip(), "file": p[2].strip()})
+        if len(p) >= 4:
+            rows.append({"doc_id": p[0].strip(), "dist": float(p[1]), "text": p[2].strip(), "file": p[3].strip()})
     return rows
 
 
