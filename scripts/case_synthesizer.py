@@ -225,20 +225,34 @@ def _clean_analysis(text, rule):
     return t.strip()
 
 
-def _timeline(matter_likes, since="2000-01-01"):
-    """The pertinent record as a chronological register: every dated case document across the named
-    matters (correspondence, requests, replies, orders, pleadings, minutes) — links and dates included.
-    Excludes pure image scans / historical title-evidence so it reads as the case paper trail."""
-    if not matter_likes:
-        return []
-    clause = " OR ".join(f"matter_code ILIKE '{m}'" for m in matter_likes)
+def _docket_tail(docket):
+    return "-".join(docket.split("-")[-2:])           # 'CTN SL-2025-1104-0792' -> '1104-0792' (unique per case)
+
+
+def _docket_doc_ids(docket):
+    tail = _docket_tail(docket)
+    sql = (f"SELECT DISTINCT id FROM documents WHERE (coalesce(original_filename,'')||' '||"
+           f"coalesce(extracted_text,'')) ILIKE '%{tail}%';")
+    return [r.strip() for r in _vps_psql(sql).splitlines() if r.strip()]
+
+
+def _timeline(matter_likes=None, since="2000-01-01", docket=None):
+    """The pertinent record as a chronological register: every dated case document (correspondence,
+    requests, replies, orders, pleadings, minutes) — links and dates included. Scope by matter-code
+    family OR, more precisely, by a single case docket. Excludes pure image scans / historical title docs."""
     excl = ("AND coalesce(d.original_filename,'') !~* "
             "'screenshot|\\.png|\\.jpe?g|title.?plan|birth.?cert|death.?cert|deed.?of.?dona|deed.?of.?sale|_TCT|_tct'")
+    if docket:
+        scope = (f"(coalesce(d.original_filename,'')||' '||coalesce(d.extracted_text,'')) ILIKE '%{_docket_tail(docket)}%'")
+    elif matter_likes:
+        clause = " OR ".join(f"matter_code ILIKE '{m}'" for m in matter_likes)
+        scope = f"d.id IN (SELECT doc_id FROM document_matter_links WHERE {clause})"
+    else:
+        return []
     sql = ("SELECT d.id || E'\\t' || coalesce(d.doc_date::text,'') || E'\\t' || "
            "coalesce(nullif(d.document_title,''),nullif(d.smart_filename,''),d.original_filename,'') || E'\\t' || "
            "replace(left(regexp_replace(coalesce(d.extracted_text,''),'[[:space:]]+',' ','g'),300),E'\\t',' ') "
-           f"FROM documents d WHERE d.id IN (SELECT doc_id FROM document_matter_links WHERE {clause}) "
-           f"AND d.doc_date >= '{since}' {excl} ORDER BY d.doc_date, d.id;")
+           f"FROM documents d WHERE {scope} AND d.doc_date >= '{since}' {excl} ORDER BY d.doc_date, d.id;")
     out, seen = [], set()
     for line in _vps_psql(sql).splitlines():
         p = line.split("\t")
@@ -377,31 +391,118 @@ def build(playbook, out_path, use_frontier=True):
     print(f"[synth] wrote {out_path}")
 
 
+_LAW_KW = [  # (match-in-cite, citation_ilike, operative kw) — first match wins
+    ("3019, Section 3(e)", "3019", "undue injury"),
+    ("3019, Section 3(f)", "3019", "Neglecting or refusing"),
+    ("3019", "3019", "undue injury"),
+    ("6713", "6713", "uphold the public interest"),
+    ("11032", "11032", "Imposition of additional requirements"),
+]
+
+
+def _law_for(cite):
+    for key, ci, kw in _LAW_KW:
+        if key in cite:
+            return ci, kw
+    dig = re.search(r"\d{3,5}", cite)
+    return (dig.group(0) if dig else cite), ""
+
+
+def build_case(case, out_path, use_frontier=True):
+    """A focused, per-case ARTA dossier — scoped to ONE docket: profile, the §21 finding from that case's
+    own record, and a clean chronological case file. No cross-case bleed (the matter-code links are
+    catch-alls; scoping is by the docket the documents themselves reference)."""
+    docket = case["docket"]
+    ids = _docket_doc_ids(docket)
+    md = [f"# ARTA Case Dossier — {docket}", "",
+          f"## Zschoche v. {case['respondent']} — {case['office']}", "", "---", "",
+          f"*Prepared by LandTek for counsel — not a pleading. The R.A. 11032 finding and the pertinent "
+          f"record for ARTA case {docket}, scoped to this case alone ({len(ids)} documents reference this "
+          f"docket). Issue: {case['issue']}*", ""]
+
+    md += ["## Applicable law", ""]
+    law_cache, printed = {}, set()
+    for cite in case.get("statutes", []):
+        ci, kw = _law_for(cite)
+        if ci not in law_cache:
+            law_cache[ci] = (_pinpoint_law(ci, kw) if _covered(ci) else None)
+        if ci in printed:
+            continue
+        printed.add(ci)
+        label = ("R.A. " + ci) if ci.isdigit() else ci
+        md.append(f"**{label}.** {law_cache[ci]}" if law_cache[ci] else f"**{cite}** — *[not embedded — obtain official text]*")
+        md.append("")
+
+    rule = "\n\n".join(t for t in law_cache.values() if t)
+    q = (f"{case['issue']} refusal to release public records additional requirement Citizen's Charter SPA "
+         f"processing time inaction {case['office']} {docket}")
+    ps = rag.retrieve(q, k=6, ids=ids or None)
+    thesis = (f"In ARTA case {docket}, {case['respondent']} of the {case['office']} violated R.A. 11032 §21. "
+              f"{case['issue']} Prove this thesis from the specific facts in the case record.")
+    print(f"[case {case['code']}] {len(ids)} docs · synthesizing finding …", file=sys.stderr)
+    md += [f"## The finding — {docket}", synth_section(thesis, rule, ps, use_frontier), ""]
+
+    tl = _timeline(docket=docket)
+    if tl:
+        md += ["## Case record — the documents that reference this docket, in sequence", "",
+               f"*{len(tl)} dated documents, each linked.*", ""]
+        year = None
+        for iso, disp, did, label in tl:
+            y = iso[:4] if iso != "9999" else "Undated"
+            if y != year:
+                md += ["", f"### {y}"]
+                year = y
+            md.append(f"- **{disp or '—'}** — {label} — [open]({BASE_URL}/{did})")
+        md.append("")
+    md += ["---", f"*Scoped to ARTA {docket}. LandTek — for counsel review; verify each cited document before filing.*"]
+    open(out_path, "w").write("\n".join(md))
+    print(f"[case {case['code']}] wrote {out_path}", file=sys.stderr)
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--playbook", required=True)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--playbook")
+    ap.add_argument("--out")
+    ap.add_argument("--cases", help="ARTA case registry JSON (per-case dossier mode)")
+    ap.add_argument("--case", help="a single case code from the registry (e.g. 0792)")
+    ap.add_argument("--all", action="store_true", help="all cases in the registry")
+    ap.add_argument("--outdir", default="1891_output")
     ap.add_argument("--finalize", action="store_true")
     ap.add_argument("--local", action="store_true", help="force the offline reasoner (skip frontier)")
     ap.add_argument("--frontier", action="store_true", help="(default behavior; kept for back-compat)")
     ap.add_argument("--selfheal", action="store_true", help="run the diligence gate + auto-fix loop after synthesis")
     ap.add_argument("--matter", default=None, help="matter-family prefix for the client-separation check (else playbook's 'matter')")
     a = ap.parse_args()
+
+    def _post(out_path, matter):
+        if a.selfheal:
+            import dossier_fix
+            healed, log, final = dossier_fix.heal(open(out_path).read(), matter)
+            open(out_path, "w").write(healed)
+            for line in log:
+                print(f"[heal] {line}", file=sys.stderr)
+            if final:
+                print(f"[heal] {len(final)} issue(s) need human judgment — see dossier_verify", file=sys.stderr)
+        if a.finalize:
+            import finalize_docx
+            docx = out_path.replace(".md", ".docx")
+            finalize_docx.build(out_path, docx)
+            print(f"[synth] finalized → {docx}", file=sys.stderr)
+
+    if a.cases:
+        reg = json.load(open(a.cases))
+        sel = [c for c in reg["cases"] if a.all or c["code"] == a.case]
+        if not sel:
+            sys.exit("no case selected — use --all or --case CODE")
+        for c in sel:
+            out = os.path.join(a.outdir, f"arta_{c['code']}_dossier.md")
+            build_case(c, out, use_frontier=not a.local)
+            _post(out, "MWK")
+        return
+    if not (a.playbook and a.out):
+        sys.exit("need --playbook and --out (or --cases REGISTRY --all)")
     build(a.playbook, a.out, use_frontier=not a.local)
-    if a.selfheal:
-        import dossier_fix
-        matter = a.matter or json.load(open(a.playbook)).get("matter")
-        healed, log, final = dossier_fix.heal(open(a.out).read(), matter)
-        open(a.out, "w").write(healed)
-        for line in log:
-            print(f"[heal] {line}", file=sys.stderr)
-        if final:
-            print(f"[heal] {len(final)} issue(s) need human judgment — see dossier_verify", file=sys.stderr)
-    if a.finalize:
-        import finalize_docx
-        docx = a.out.replace(".md", ".docx")
-        finalize_docx.build(a.out, docx)
-        print(f"[synth] finalized → {docx}")
+    _post(a.out, a.matter or json.load(open(a.playbook)).get("matter"))
 
 
 if __name__ == "__main__":

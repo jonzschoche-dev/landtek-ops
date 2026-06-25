@@ -115,13 +115,15 @@ def status():
     print(f"[rag_local] {out.replace('|', ' chunks / ')} docs embedded · corpus target = {tot} docs")
 
 
-def retrieve(query, k=6, width=650):
-    """Return the top-k corpus passages for a query as dicts {doc_id, text, file} — for the synthesizer."""
+def retrieve(query, k=6, width=650, ids=None):
+    """Return the top-k corpus passages for a query as dicts {doc_id, dist, text, file}. Pass `ids` to
+    scope retrieval to a specific document set (e.g. one ARTA case's docket-referenced documents)."""
     qv = _vec_literal(list(_model().embed([query]))[0])
+    filt = f"WHERE r.doc_id IN ({','.join(str(i) for i in ids)}) " if ids else ""
     sql = (f"SELECT r.doc_id || E'\\t' || round((r.embedding <=> '{qv}')::numeric,4) || E'\\t' || "
            f"regexp_replace(left(convert_from(decode(r.content_b64,'base64'),'UTF8'),{width}),'\\s+',' ','g') || E'\\t' || "
            "coalesce(d.original_filename,'') "
-           f"FROM rag_local r JOIN documents d ON d.id=r.doc_id ORDER BY r.embedding <=> '{qv}' LIMIT {k}")
+           f"FROM rag_local r JOIN documents d ON d.id=r.doc_id {filt}ORDER BY r.embedding <=> '{qv}' LIMIT {k}")
     rows = []
     for line in _psql(sql).splitlines():
         p = line.split("\t")

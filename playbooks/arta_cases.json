@@ -1,0 +1,60 @@
+{
+  "_note": "ARTA case registry for the Mercedes records-refusal saga — the stack's per-case knowledge. Each case is scoped by its CTN SL docket (the reliable key; document_matter_links are catch-alls and must NOT be trusted for per-case membership). Verified against the OSCA / complaint-affidavit definers in the corpus, 2026-06.",
+  "complainant": "Patricia Keesey Zschoche, represented by Jonathan Paul Zschoche",
+  "cases": [
+    {
+      "code": "0690", "docket": "CTN SL-2025-1008-0690",
+      "respondent": "Engr. Erwin H. Balane", "office": "Municipal Engineer, Mercedes",
+      "issue": "Refusal to act on building-records / certification inquiries and imposition of an unlawful requirement — the FIRST count.",
+      "statutes": ["R.A. 11032, Section 21(a)", "R.A. 11032, Section 21(b)", "R.A. 11032, Section 21(d)", "R.A. 11032, Section 21(e)"]
+    },
+    {
+      "code": "0747", "docket": "CTN SL-2025-1021-0747",
+      "respondent": "Hon. Alexander L. Pajarillo", "office": "Office of the Municipal Mayor, Mercedes",
+      "issue": "Refusal of the records request and the SPA-from-all-heirs barrier; non-action on the Road Lot 6 donation.",
+      "statutes": ["R.A. 11032, Section 21(b)", "R.A. 11032, Section 21(e)"]
+    },
+    {
+      "code": "0792", "docket": "CTN SL-2025-1104-0792",
+      "respondent": "Engr. Erwin H. Balane", "office": "Municipal Engineer's Office, Mercedes",
+      "issue": "Failure to perform the ministerial index check for over 35 days and the 'SPA from all heirs' barrier 'prohibited under §21(b)' — the SECOND count.",
+      "statutes": ["R.A. 11032, Section 21(b)", "R.A. 11032, Section 21(e)"]
+    },
+    {
+      "code": "1210", "docket": "CTN SL-2026-0128-1210",
+      "respondent": "Loida E. Macale (with Mayor Pajarillo)", "office": "Municipal Treasurer, Mercedes",
+      "issue": "Administrative inaction / inordinate delay on the tax-record request despite issuing statements over the Treasurer's name.",
+      "statutes": ["R.A. 11032, Section 21(e)"]
+    },
+    {
+      "code": "1212", "docket": "CTN SL-2026-0128-1212",
+      "respondent": "TO CONFIRM — LGU / Municipal Engineer's Office (consolidated RTC-level matter)", "office": "to confirm",
+      "issue": "Consolidated LGU records-refusal arising from the Estate-of-Mary-Worrick information requests. Respondent scope to be confirmed before filing.",
+      "statutes": ["R.A. 11032, Section 21"]
+    },
+    {
+      "code": "1319", "docket": "CTN SL-2026-0209-1319",
+      "respondent": "Nestor Franz A. Fortuno (PENR Officer)", "office": "PENRO — Provincial Environment & Natural Resources Office (DENR), Camarines Norte",
+      "issue": "Refusal / inaction on survey and boundary-history records; regional escalation against the provincial environment office.",
+      "statutes": ["R.A. 11032, Section 21"]
+    },
+    {
+      "code": "1321", "docket": "CTN SL-2026-0209-1321",
+      "respondent": "Gemma P. Abla", "office": "Municipal Assessor, Mercedes",
+      "issue": "Refusal to release tax declarations / assessment records and imposition of the all-heirs-SPA requirement not in the Citizen's Charter.",
+      "statutes": ["R.A. 11032, Section 21(b)", "R.A. 11032, Section 21(e)"]
+    },
+    {
+      "code": "1378", "docket": "CTN SL-2026-0218-1378",
+      "respondent": "Engr. Erwin H. Balane", "office": "Municipal Engineer, Mercedes",
+      "issue": "Continued refusal on building records — the THIRD count, expressly distinct from 0690 and 0792.",
+      "statutes": ["R.A. 11032, Section 21"]
+    },
+    {
+      "code": "1891", "docket": "CTN SL-2026-0423-1891",
+      "respondent": "Mayor Pajarillo and the Sangguniang Bayan members (the elective officials)", "office": "consolidated — before the Ombudsman / the 6 April 2026 CART",
+      "issue": "The officials sat on the CART that disposed of the seven complaints against their own offices — conflict of interest / grave misconduct, and the directive barring release of the records.",
+      "statutes": ["R.A. 3019, Section 3(e)", "R.A. 3019, Section 3(f)", "R.A. 6713, Section 4(a)", "R.A. 11032, Section 21"]
+    }
+  ]
+}
