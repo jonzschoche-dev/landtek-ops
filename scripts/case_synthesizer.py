@@ -225,6 +225,32 @@ def _clean_analysis(text, rule):
     return t.strip()
 
 
+def _timeline(matter_likes, since="2000-01-01"):
+    """The pertinent record as a chronological register: every dated case document across the named
+    matters (correspondence, requests, replies, orders, pleadings, minutes) — links and dates included.
+    Excludes pure image scans / historical title-evidence so it reads as the case paper trail."""
+    if not matter_likes:
+        return []
+    clause = " OR ".join(f"matter_code ILIKE '{m}'" for m in matter_likes)
+    excl = ("AND coalesce(d.original_filename,'') !~* "
+            "'screenshot|\\.png|\\.jpe?g|title.?plan|birth.?cert|death.?cert|deed.?of.?dona|deed.?of.?sale|_TCT|_tct'")
+    sql = ("SELECT d.id || E'\\t' || coalesce(d.doc_date::text,'') || E'\\t' || "
+           "coalesce(nullif(d.document_title,''),nullif(d.smart_filename,''),d.original_filename,'') || E'\\t' || "
+           "replace(left(regexp_replace(coalesce(d.extracted_text,''),'[[:space:]]+',' ','g'),300),E'\\t',' ') "
+           f"FROM documents d WHERE d.id IN (SELECT doc_id FROM document_matter_links WHERE {clause}) "
+           f"AND d.doc_date >= '{since}' {excl} ORDER BY d.doc_date, d.id;")
+    out, seen = [], set()
+    for line in _vps_psql(sql).splitlines():
+        p = line.split("\t")
+        if len(p) < 3 or p[0] in seen:
+            continue
+        seen.add(p[0])
+        disp, iso = _fmt_date(p[1])
+        m = {"name": p[2].strip(), "date": disp, "iso": iso, "snippet": p[3].strip() if len(p) > 3 else ""}
+        out.append((iso or "9999", disp, p[0], _index_label(m, use_model=(not m["name"]))))
+    return out
+
+
 def synth_section(theory, rule, passages, use_frontier):
     pblock = "\n".join(f"- {p['text']} [{_doc_title(p['file'])}]" for p in passages) or "(no passages retrieved)"
     prompt = (
@@ -325,6 +351,23 @@ def build(playbook, out_path, use_frontier=True):
             rows.append((m.get("iso") or "9999", f"- **{dated}** — [open]({BASE_URL}/{did})"))
         md += [line for _, line in sorted(rows, key=lambda e: e[0])]
         md.append("")
+
+    # ── the full pertinent record, as a navigable chronological timeline with links ──
+    rec = pb.get("record")
+    if rec:
+        tl = _timeline(rec.get("matters", []), rec.get("since", "2000-01-01"))
+        if tl:
+            md += ["## Correspondence & document timeline — the pertinent record", "",
+                   f"*The {len(tl)} dated documents across these cases, in sequence — each one linked. This is the "
+                   f"navigable paper trail the findings above are drawn from.*", ""]
+            year = None
+            for iso, disp, did, label in tl:
+                y = iso[:4] if iso != "9999" else "Undated"
+                if y != year:
+                    md += ["", f"### {y}"]
+                    year = y
+                md.append(f"- **{disp or '—'}** — {label} — [open]({BASE_URL}/{did})")
+            md.append("")
 
     md += ["---",
            f"*Synthesized {'with a frontier sharpener' if on_frontier else 'locally (offline-capable)'} from the "

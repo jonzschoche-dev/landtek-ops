@@ -35,6 +35,10 @@
       "rag_query": "directive shall not release the requested documents unless proof of legal personality Special Power of Attorney from all heirs requirement not in the Citizen's Charter additional requirement section 21(b)"
     }
   ],
+  "record": {
+    "matters": ["MWK-ARTA%", "MWK-OP-PETITION"],
+    "since": "2025-01-01"
+  },
   "gaps": [
     "Confirm each elective respondent's identity and term of office of record (Mayor Pajarillo and the named Sangguniang Bayan members who sat on the CART).",
     "Produce the 6 April 2026 CART Minutes and Resolutions as the named annex — the dispositive exhibit.",
