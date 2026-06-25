@@ -60,12 +60,14 @@ def lint(src, pdf):
         # a ## / ### section with no body before the next heading (a lone # title + ## subtitle is fine)
         if re.match(r"#{2,3}\s", lines[i]) and re.match(r"#{1,3}\s", lines[i + 1]):
             issues.append(("EMPTY", f"section '{lines[i][:44]}' has no content before the next heading"))
+    # verbatim quotes (blockquote lines) preserve their source's date format — exempt them
+    src_nq = "\n".join(l for l in src.splitlines() if not l.lstrip().startswith(">"))
     styles = set()
-    if re.search(rf"\b\d{{1,2}}\s({MONTHS})\s\d{{4}}", src):
+    if re.search(rf"\b\d{{1,2}}\s({MONTHS})\s\d{{4}}", src_nq):
         styles.add("'D Month YYYY'")
-    if re.search(rf"\b({MONTHS})\s\d{{1,2}},\s\d{{4}}", src):
+    if re.search(rf"\b({MONTHS})\s\d{{1,2}},\s\d{{4}}", src_nq):
         styles.add("'Month D, YYYY'")
-    if re.search(r"\b\d{4}-\d{2}-\d{2}\b", src):
+    if re.search(r"\b\d{4}-\d{2}-\d{2}\b", src_nq):
         styles.add("'YYYY-MM-DD'")
     if len(styles) > 1:
         issues.append(("DATE", "mixed date formats: " + ", ".join(sorted(styles)) + " — pick one"))

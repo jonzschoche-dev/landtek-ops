@@ -236,6 +236,25 @@ def _docket_doc_ids(docket):
     return [r.strip() for r in _vps_psql(sql).splitlines() if r.strip()]
 
 
+def _delivery_findings(case_code):
+    """Verified delivery-gap events for this case from the correspondence ledger — composed, not generated:
+    each is a curated gap statement + verbatim quotes already confirmed as substrings of their sources."""
+    sql = ("SELECT delivery_status || E'\\x1f' || coalesce(claimed_date::text,'') || E'\\x1f' || "
+           "coalesce(author,'') || E'\\x1f' || coalesce(gap_flag,'') || E'\\x1f' || coalesce(proofs::text,'[]') "
+           f"FROM correspondence_events WHERE matter_code ILIKE '%{case_code}%' AND all_verified "
+           "ORDER BY claimed_date NULLS LAST;")
+    out = []
+    for line in _vps_psql(sql).splitlines():
+        p = line.split("\x1f")
+        if len(p) >= 5:
+            try:
+                proofs = json.loads(p[4])
+            except Exception:
+                proofs = []
+            out.append({"status": p[0], "date": p[1], "author": p[2], "gap": p[3], "proofs": proofs})
+    return out
+
+
 def _timeline(matter_likes=None, since="2000-01-01", docket=None):
     """The pertinent record as a chronological register: every dated case document (correspondence,
     requests, replies, orders, pleadings, minutes) — links and dates included. Scope by matter-code
@@ -441,6 +460,23 @@ def build_case(case, out_path, use_frontier=True):
               f"{case['issue']} Prove this thesis from the specific facts in the case record.")
     print(f"[case {case['code']}] {len(ids)} docs · synthesizing finding …", file=sys.stderr)
     md += [f"## The finding — {docket}", synth_section(thesis, rule, ps, use_frontier), ""]
+
+    # ── verified delivery findings: composed from the quote-verified ledger, NOT generated ──
+    df = _delivery_findings(case["code"])
+    if df:
+        md += ["## Delivery findings — verified from the record", "",
+               "*Composed only from the correspondence ledger: every quoted line below has been verified as a "
+               "verbatim excerpt of its cited source. Delivery is a separate fact from a document's date — an "
+               "undelivered or late notice does not satisfy the R.A. 11032 processing duty.*", ""]
+        head = {"phantom": "Phantom / undelivered", "failed": "No delivery / no disposition",
+                "late": "Late delivery", "delivered": "Delivered", "unknown": "Delivery unverified"}
+        for e in df:
+            when = f" — {_fmt_date(e['date'])[0]}" if e["date"] else ""
+            md.append(f"**{head.get(e['status'], e['status'])}{when} ({e['author']}).** {e['gap']}")
+            for pr in e["proofs"]:
+                if pr.get("verified", True):
+                    md.append(f"> \"{pr['quote']}\" — [open]({BASE_URL}/{pr['doc_id']})")
+            md.append("")
 
     tl = _timeline(docket=docket)
     if tl:
