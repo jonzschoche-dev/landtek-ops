@@ -51,22 +51,24 @@ def _index_ids(text):
     return re.findall(r"/files/c/(\d+)", seg[-1]) if len(seg) > 1 else []
 
 
-def verify(md, matter=None):
-    src = open(md).read()
+def verify_text(src, matter=None):
+    """Return a list of structured issue dicts (cat + human msg + fields the self-heal loop acts on)."""
     issues = []
 
     # 1 — citation fidelity
     emb = _embedded_acts()
     for n, ctx in _cited(src).items():
         if n not in emb:
-            issues.append(("CITATION", f"cites '{n}' but it is NOT in the embedded law library — ground it or remove (…{ctx}…)"))
+            issues.append({"cat": "CITATION", "act": n,
+                           "msg": f"cites '{n}' but it is NOT in the embedded law library — ground it or remove (…{ctx}…)"})
 
     # 2 — acronym invention (only true domain acronyms; a CAPS surname like "ABLA (Municipal Assessor)" is not one)
     KNOWN = {"CART", "ARTA", "SPA", "LGU", "FOI", "DILG", "COA", "BAC", "OSCA", "RACCS",
              "TCT", "RPT", "RPC", "MTC", "RTC", "DENR", "LRA", "DAR", "SALN"}
     for m in re.finditer(r"\b([A-Z]{2,5})\b\s*\(([^)]{8,70})\)", src):
         if m.group(1) in KNOWN and not re.search(r"https?://", m.group(2)):
-            issues.append(("ACRONYM", f"'{m.group(1)}' expanded as '{m.group(2)}' — confirm this expansion is in the record, not invented"))
+            issues.append({"cat": "ACRONYM", "acr": m.group(1), "exp": m.group(2),
+                           "msg": f"'{m.group(1)}' expanded as '{m.group(2)}' — confirm this expansion is in the record, not invented"})
 
     # 3 — source integrity (exists · has text · not a draft with a received twin) + client-separation (matter family)
     ids = sorted(set(_index_ids(src)), key=int)
@@ -87,26 +89,35 @@ def verify(md, matter=None):
                 seen[p[0]]["codes"] |= set(c for c in p[1].split(",") if c)
         for i in ids:
             if i not in seen:
-                issues.append(("SOURCE", f"indexed document {i} does not exist in the corpus")); continue
+                issues.append({"cat": "SOURCE", "doc_id": i, "kind": "missing",
+                               "msg": f"indexed document {i} does not exist in the corpus"}); continue
             if seen[i]["len"] < 40:
-                issues.append(("SOURCE", f"indexed document {i} has no extracted text — cannot be evidence"))
+                issues.append({"cat": "SOURCE", "doc_id": i, "kind": "notext",
+                               "msg": f"indexed document {i} has no extracted text — cannot be evidence"})
             if seen[i]["vchain"] and seen[i]["vchain"] != i and not seen[i]["stamped"]:
-                issues.append(("SOURCE", f"indexed document {i} looks like a DRAFT (chained to received copy {seen[i]['vchain']}) — cite the received copy"))
+                issues.append({"cat": "SOURCE", "doc_id": i, "kind": "draft", "twin": seen[i]["vchain"],
+                               "msg": f"indexed document {i} looks like a DRAFT (chained to received copy {seen[i]['vchain']}) — cite the received copy"})
             if matter and seen[i]["codes"] and not any(c.upper().startswith(matter.upper()) for c in seen[i]["codes"]):
-                issues.append(("MATTER", f"indexed document {i} belongs to {sorted(seen[i]['codes'])}, outside the {matter} family — client-separation check"))
+                issues.append({"cat": "MATTER", "doc_id": i, "codes": sorted(seen[i]["codes"]),
+                               "msg": f"indexed document {i} belongs to {sorted(seen[i]['codes'])}, outside the {matter} family — client-separation check"})
 
     # 4 — name / entity consistency
     for variants, canon in [((r"Keesee\b", r"Kassey\b", r"Keesy\b"), "Keesey"), ((r"\bMMK\b",), "MWK")]:
         for v in variants:
-            if re.search(v, src):
-                issues.append(("NAME", f"found '{re.search(v, src).group(0)}' — the verified form is '{canon}'; reconcile"))
-
+            mm = re.search(v, src)
+            if mm:
+                issues.append({"cat": "NAME", "found": mm.group(0), "canon": canon,
+                               "msg": f"found '{mm.group(0)}' — the verified form is '{canon}'; reconcile"})
     return issues
+
+
+def verify(md, matter=None):
+    return verify_text(open(md).read(), matter)
 
 
 def main():
     if len(sys.argv) < 2:
-        sys.exit("usage: dossier_verify.py dossier.md [--matter CODE]")
+        sys.exit("usage: dossier_verify.py dossier.md [--matter PREFIX]")
     md = sys.argv[1]
     matter = sys.argv[sys.argv.index("--matter") + 1] if "--matter" in sys.argv else None
     issues = verify(md, matter)
@@ -115,8 +126,8 @@ def main():
         print("✓ CLEAN — citation fidelity, sources, and names all check out.")
     else:
         by = {}
-        for cat, msg in issues:
-            by.setdefault(cat, []).append(msg)
+        for it in issues:
+            by.setdefault(it["cat"], []).append(it["msg"])
         for cat in by:
             print(f"\n[{cat}] {len(by[cat])}")
             for m in by[cat]:

@@ -237,8 +237,19 @@ def main():
     ap.add_argument("--finalize", action="store_true")
     ap.add_argument("--local", action="store_true", help="force the offline reasoner (skip frontier)")
     ap.add_argument("--frontier", action="store_true", help="(default behavior; kept for back-compat)")
+    ap.add_argument("--selfheal", action="store_true", help="run the diligence gate + auto-fix loop after synthesis")
+    ap.add_argument("--matter", default=None, help="matter-family prefix for the client-separation check (else playbook's 'matter')")
     a = ap.parse_args()
     build(a.playbook, a.out, use_frontier=not a.local)
+    if a.selfheal:
+        import dossier_fix
+        matter = a.matter or json.load(open(a.playbook)).get("matter")
+        healed, log, final = dossier_fix.heal(open(a.out).read(), matter)
+        open(a.out, "w").write(healed)
+        for line in log:
+            print(f"[heal] {line}", file=sys.stderr)
+        if final:
+            print(f"[heal] {len(final)} issue(s) need human judgment — see dossier_verify", file=sys.stderr)
     if a.finalize:
         import finalize_docx
         docx = a.out.replace(".md", ".docx")
