@@ -276,6 +276,12 @@ def _resolutions(ids, docket):
     return out
 
 
+def _gap_phrase(df):
+    m = {"phantom": "never actually delivered (a phantom response sent to a dead address)",
+         "late": "furnished only after the period had run", "failed": "never issued at all"}
+    return "; ".join(sorted(set(m.get(e["status"], e["status"]) for e in df)))
+
+
 def _delivery_findings(case_code):
     """Verified delivery-gap events for this case from the correspondence ledger — composed, not generated:
     each is a curated gap statement + verbatim quotes already confirmed as substrings of their sources."""
@@ -529,6 +535,21 @@ def build_case(case, out_path, use_frontier=True):
                 if pr.get("verified", True):
                     md.append(f"> \"{pr['quote']}\" — [open]({BASE_URL}/{pr['doc_id']})")
             md.append("")
+
+    # ── the truth-test: a resolution is not the end. Where the disposition conflicts with the verified
+    # record, name the conflict and the correction path (law-anchored, composed from verified facts only) ──
+    if res and df:
+        md += ["## Where the resolution fails against the verified record", "",
+               "The disposition above found this complaint **\"sufficiently addressed\"** and recommended its "
+               f"closure. The verified delivery findings contradict that conclusion: the response was {_gap_phrase(df)}. "
+               "Under R.A. 11032 the service obligation is met only by the **actual, timely delivery of a substantive "
+               "disposition** — an undelivered, late, or never-issued response is no compliance at all. The "
+               "\"sufficiently addressed\" finding therefore rests on a record the verified facts disprove.", "",
+               "**Path to correction — this is the opening, not the close.** The verified record is the ground for a "
+               "Petition for Supervisory Review and Corrective Action and/or referral to the Office of the Ombudsman: "
+               "a closure cannot stand where the underlying \"response\" was never delivered, was furnished late, or "
+               "was never issued. The same verified facts also feed the related records-withholding and bad-faith "
+               "counts in the consolidated matters.", ""]
 
     tl = _timeline(docket=docket)
     if tl:
