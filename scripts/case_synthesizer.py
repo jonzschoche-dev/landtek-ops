@@ -245,6 +245,37 @@ def _docket_doc_ids(docket):
     return [r.strip() for r in _vps_psql(sql).splitlines() if r.strip()]
 
 
+def _resolutions(ids, docket):
+    """The tribunal's disposition FOR THIS CASE — quoted verbatim. Searched within the case's docket docs
+    (by id, fast), and the extracted ruling must name THIS docket (so the multi-docket CART minutes that
+    recite some other complaint's disposition are excluded). Deduped by ruling text."""
+    if not ids:
+        return []
+    tail = _docket_tail(docket)
+    idsql = (f"SELECT id || '|' || coalesce(left(doc_date::text,10),'') FROM documents WHERE id IN ({','.join(ids)}) "
+             "AND (original_filename ~* 'resolution|notice of compliance' OR extracted_text ~* 'is hereby resolved|CART Resolution No') "
+             "ORDER BY doc_date NULLS LAST;")
+    out, seen_doc, seen_q = [], set(), set()
+    for line in _vps_psql(idsql).splitlines():
+        if "|" not in line:
+            continue
+        did, date = line.split("|", 1)
+        did = did.strip()
+        if did in seen_doc:
+            continue
+        seen_doc.add(did)
+        # the clean ruling from 'is hereby resolved' forward; keep only if it NAMES this docket
+        q = _vps_psql(
+            "SELECT substr(t, strpos(lower(t),'is hereby resolved'), 380) FROM "
+            f"(SELECT regexp_replace(extracted_text,'[[:space:]]+',' ','g') t FROM documents WHERE id={did}) x "
+            "WHERE strpos(lower(t),'is hereby resolved')>0;").strip()
+        key = re.sub(r"\s+", " ", q)[:90].lower()
+        if len(q) > 25 and tail in q and key not in seen_q:
+            seen_q.add(key)
+            out.append({"doc_id": did, "date": date.strip(), "quote": q})
+    return out
+
+
 def _delivery_findings(case_code):
     """Verified delivery-gap events for this case from the correspondence ledger — composed, not generated:
     each is a curated gap statement + verbatim quotes already confirmed as substrings of their sources."""
@@ -467,6 +498,18 @@ def build_case(case, out_path, use_frontier=True):
     ps = rag.retrieve(q, k=6, ids=ids or None)
     thesis = (f"In ARTA case {docket}, {case['respondent']} of the {case['office']} violated R.A. 11032 §21. "
               f"{case['issue']} Prove this thesis from the specific facts in the case record.")
+    # ── the tribunal's disposition(s), quoted verbatim — the outcome this dossier examines ──
+    res = _resolutions(ids, docket)
+    if res:
+        md += ["## Resolution / disposition — what the tribunal ruled", "",
+               "*Quoted verbatim from the resolution(s) of record. These dispositions are the outcome being "
+               "examined; the delivery findings below bear directly on whether a 'sufficiently addressed' "
+               "finding can stand when the response was undelivered, late, or never issued.*", ""]
+        for r in res:
+            when = f"{_fmt_date(r['date'])[0]} — " if r["date"] else ""
+            md += [f"**{when}disposition of record.**",
+                   f"> \"{r['quote']}\" — [open]({BASE_URL}/{r['doc_id']})", ""]
+
     print(f"[case {case['code']}] {len(ids)} docs · synthesizing finding …", file=sys.stderr)
     md += [f"## The finding — {docket}", synth_section(thesis, rule, ps, use_frontier), ""]
 
