@@ -48,7 +48,7 @@ NEEDED = [
     ("RA 7160 §389 (Punong Barangay)", "LGC — Punong Barangay duties; barangay clearances/certifications for residents & property owners", ["punong barangay"], "7160"),
     ("RA 7160 §§399-412 (Katarungang Pambarangay)", "LGC — barangay justice: Lupong Tagapamayapa conciliation (prerequisite to many property suits)", ["lupon"], "7160"),
     # ── the APPEAL / correction-path forum: the Office of the President ──
-    ("AO 18 s.1987 (OP appeals)", "Office of the President — appeal rules: 30-day period, stay of execution, finality (the correction-path forum)", ["appeal to the office of the president"], ""),
+    ("AO 22 s.2011 (OP appeals)", "Office of the President — CURRENT appeal rules (repealed AO 18): 15-day period, P1,500 fee, stay, finality", ["appeal to the office of the president"], ""),
     ("OP review authority", "President's power of control (Const Art VII §17) — basis for supervisory review/corrective action over ARTA", ["control of all the executive"], ""),
 ]
 
