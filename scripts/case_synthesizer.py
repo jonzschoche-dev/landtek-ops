@@ -197,7 +197,8 @@ def _index_label(m, use_model=True):
         except Exception:
             pass
     raw = re.sub(rf"\b({MONTHS})\s+(\d{{1,2}}),?\s+(\d{{4}})\b",
-                 lambda m: f"{int(m.group(2))} {m.group(1)} {m.group(3)}", raw, flags=re.I)  # one date format in labels too
+                 lambda m: f"{int(m.group(2))} {m.group(1)} {m.group(3)}", raw, flags=re.I)  # Month D, YYYY → D Month YYYY
+    raw = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", lambda m: _fmt_date(m.group(0))[0] or m.group(0), raw)  # YYYY-MM-DD → D Month YYYY
     return _titlecaps(raw) or "Case document"
 
 
