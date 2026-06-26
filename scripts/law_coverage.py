@@ -28,6 +28,18 @@ NEEDED = [
     ("RPC Arts 217/220", "Malversation / technical malversation", ["other than that for which"], ""),
     ("RA 9485", "Anti-Red Tape Act 2007 (RA 11032 predecessor)", ["Anti-Red Tape Act"], ""),
     ("Const. Art III §9", "Just compensation (inverse condemnation)", ["just compensation"], "Civil"),
+    # ── officer duties: the BUILDING OFFICIAL (Engr. Balane) ──
+    ("PD 1096 §203/§301", "National Building Code — BUILDING OFFICIAL duties; building permits & records (the Engineer cases' measure)", ["building official"], "1096"),
+    # ── the Sangguniang Bayan's own rules ──
+    ("RA 7160 §§446-447", "LGC — SANGGUNIANG BAYAN: composition & powers", ["sangguniang bayan"], "446"),
+    ("RA 7160 §49", "LGC — presiding officer of the sanggunian (Vice-Mayor)", ["presiding officer"], "7160"),
+    ("RA 7160 §50", "LGC — Sanggunian INTERNAL RULES OF PROCEDURE (how the SB must operate)", ["internal rules of procedure"], "7160"),
+    # ── prevailing OVERSIGHT BODIES & their mandates over the office heads ──
+    ("DILG oversight", "Oversight: DILG general supervision & discipline over LGUs/officials (RA 7160 §§25,29,60-67)", ["general supervision"], "7160"),
+    ("DPWH / Building Official oversight", "Oversight: DPWH Secretary as Building Official + supervision of local building officials (PD 1096)", ["secretary of public works"], "1096"),
+    ("Ombudsman oversight", "Oversight: the Ombudsman over all public officers (RA 6770)", ["preventively suspend"], ""),
+    ("CSC oversight", "Oversight: Civil Service Commission over appointive/career officials (RACCS)", ["grave misconduct"], "RACCS"),
+    ("COA oversight", "Oversight: Commission on Audit over public funds (PD 1445 personal liability)", ["personal liability"], "1445"),
 ]
 
 
