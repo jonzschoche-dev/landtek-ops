@@ -36,10 +36,16 @@ BOILER = ("COPYRIGHT", "Creative Commons", "Web Design and Programming", "LawPhi
 MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 
 
-def _vps_psql(sql):
-    r = subprocess.run(SSH + ["docker exec -i n8n-postgres-1 psql -U n8n -d n8n -t -A"],
-                       input=sql, capture_output=True, text=True, timeout=90)
-    return r.stdout.strip()
+def _vps_psql(sql, _tries=3):
+    for i in range(_tries):
+        try:
+            r = subprocess.run(SSH + ["docker exec -i n8n-postgres-1 psql -U n8n -d n8n -t -A"],
+                               input=sql, capture_output=True, text=True, timeout=150)
+            return r.stdout.strip()
+        except subprocess.TimeoutExpired:
+            if i == _tries - 1:
+                raise
+    return ""
 
 
 def _ollama(prompt):
