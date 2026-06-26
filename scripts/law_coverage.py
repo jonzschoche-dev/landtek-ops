@@ -40,6 +40,13 @@ NEEDED = [
     ("Ombudsman oversight", "Oversight: the Ombudsman over all public officers (RA 6770)", ["preventively suspend"], ""),
     ("CSC oversight", "Oversight: Civil Service Commission over appointive/career officials (RACCS)", ["grave misconduct"], "RACCS"),
     ("COA oversight", "Oversight: Commission on Audit over public funds (PD 1445 personal liability)", ["personal liability"], "1445"),
+    # ── the ACCOUNTANT + the BUDGET / DISBURSEMENT pipeline (the ₱2.6M spend) ──
+    ("RA 7160 §474", "LGC — Municipal ACCOUNTANT: certify availability of funds, keep accounts, the disbursement record", ["accountant"], "7160"),
+    ("RA 7160 fiscal §§305-354", "LGC — local fiscal administration: appropriations ordinance, budget, DISBURSEMENT pipeline", ["no money shall be disbursed"], "7160"),
+    ("RA 9184 (procurement/BAC)", "Government Procurement Reform Act — the BAC & procurement pipeline (the ₱2.6M; Balane as BAC Chair)", ["bids and awards committee"], "9184"),
+    # ── BARANGAY services & officials for property owners ──
+    ("RA 7160 §389 (Punong Barangay)", "LGC — Punong Barangay duties; barangay clearances/certifications for residents & property owners", ["punong barangay"], "7160"),
+    ("RA 7160 §§399-412 (Katarungang Pambarangay)", "LGC — barangay justice: Lupong Tagapamayapa conciliation (prerequisite to many property suits)", ["lupon"], "7160"),
 ]
 
 
