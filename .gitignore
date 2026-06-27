@@ -92,3 +92,8 @@ drafts/
 # OCR-attack: Drive folder symlink (designer convenience, never committed)
 drive_local
 ocr_pending_write/
+
+# local data store (gmail cache + packet outputs) — large, regenerable, never commit
+corpus_store/
+# editor/backup artifacts
+*.bak_matrix
