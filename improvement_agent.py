@@ -270,10 +270,20 @@ def main():
     scan = static_code_scan(scripts)
     with db() as cur:
         kpis = fetch_kpis(cur)
-    recs = ({"moves": [], "trajectory_score": None,
-             "trajectory_commentary": "(--no-llm — synthesis skipped)"}
-            if args.no_llm
-            else synthesize_recommendations(scan, kpis))
+    if args.no_llm:
+        recs = {"moves": [], "trajectory_score": None,
+                "trajectory_commentary": "(--no-llm — synthesis skipped)"}
+    else:
+        try:
+            recs = synthesize_recommendations(scan, kpis)
+        except Exception as e:
+            # Degrade gracefully: a depleted balance / unreachable model must NOT crash the
+            # self-improvement loop. Still emit the deterministic audit; LLM synthesis resumes
+            # automatically once the model is reachable again (offline-sovereignty principle).
+            print(f"  LLM synthesis unavailable ({type(e).__name__}: {str(e)[:90]}) — "
+                  f"emitting deterministic audit only")
+            recs = {"moves": [], "trajectory_score": None,
+                    "trajectory_commentary": f"(LLM unavailable — deterministic audit only: {type(e).__name__})"}
 
     md = render_md(scan, kpis, recs)
     out_path = Path(args.out or

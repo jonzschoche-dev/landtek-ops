@@ -65,16 +65,29 @@ def main():
     """, (WORKFLOW_ID,))
     last_succ = cur.fetchone()["last_success_ever"]
 
+    # Is the workflow even supposed to be running? If it's INACTIVE (e.g. Leo not yet wired/activated),
+    # idleness is EXPECTED — escalating "no executions" to CRITICAL just cries wolf and fails the
+    # nightly self-check forever. Only treat idle as critical when the workflow is active.
+    cur.execute('SELECT active FROM workflow_entity WHERE id = %s', (WORKFLOW_ID,))
+    _wf = cur.fetchone()
+    wf_active = bool(_wf["active"]) if _wf else False
+
     cur.close()
     conn.close()
 
     # Compute alert conditions
     alerts = []
+    info = []
     now = datetime.now(timezone.utc)
 
     if win["total"] == 0:
         # No executions in window
-        if last_succ is None:
+        if not wf_active:
+            info.append(
+                f"INFO: workflow is INACTIVE — 0 executions is expected, not an alert "
+                f"(last success {last_succ}). When Leo is wired/active, idleness re-escalates to CRITICAL."
+            )
+        elif last_succ is None:
             alerts.append("CRITICAL: Workflow has NEVER had a successful execution")
         else:
             age_h = (now - last_succ.replace(tzinfo=timezone.utc)).total_seconds() / 3600
@@ -106,7 +119,9 @@ def main():
         "running": win["running"],
         "last_success_in_window": win["last_success_in_window"].isoformat() if win["last_success_in_window"] else None,
         "last_success_ever": last_succ.isoformat() if last_succ else None,
+        "workflow_active": wf_active,
         "alerts": alerts,
+        "info": info,
     }
 
     if args.json:
@@ -120,6 +135,9 @@ def main():
         print(f"  running:  {win['running']}")
         print(f"  last_success_in_window: {win['last_success_in_window']}")
         print(f"  last_success_ever:      {last_succ}")
+        print(f"  workflow_active:        {wf_active}")
+        for i in info:
+            print(f"  {i}")
         if alerts:
             print()
             print("  ALERTS:")
