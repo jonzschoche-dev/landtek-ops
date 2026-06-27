@@ -95,11 +95,13 @@ FULL_CORPUS = [
 # Known supersession/repeal pairs relevant to the matters. PRESENCE ≠ CURRENCY: a law being in the
 # library does not mean it is the law in force. This is the discipline the AO 18-vs-22 catch taught —
 # AO 18 s.1987 was embedded and cited until we found A.O. 22 s.2011 had repealed it. Each entry:
-# (superseded_like, superseded_label, current_like, current_label, note).
+# (superseded_like, current_like, current_excl, superseded_label, current_label, note).
+# current_excl excludes the CURRENT act's own chunks from the superseded count — the AO 22 chunks carry
+# "repealed AO 18" in their citation label, which would otherwise false-match the AO 18 probe.
 SUPERSEDED = [
-    ("AO 18", "AO 18 s.1987 (old OP appeal rules)", "AO 22 s.2011", "AO 22 s.2011 (current OP appeals)",
+    ("AO 18", "AO 22 s.2011", "AO 22", "AO 18 s.1987 (old OP appeal rules)", "AO 22 s.2011 (current OP appeals)",
      "AO 22 expressly repealed AO 18; the operative regime is 15-day appeal from notice, ₱1,500 fee, stay, finality"),
-    ("9485", "RA 9485 (Anti-Red Tape Act of 2007)", "11032", "RA 11032 (ARTA, 2018)",
+    ("9485", "11032", "11032", "RA 9485 (Anti-Red Tape Act of 2007)", "RA 11032 (ARTA, 2018)",
      "RA 11032 amended & expanded RA 9485; outputs must cite RA 11032 as the operative act (esp. §21)"),
 ]
 
@@ -107,8 +109,9 @@ SUPERSEDED = [
 def currency_check():
     print("=== LAW CURRENCY CHECK — presence ≠ currency ===\n")
     issues = 0
-    for old_like, old_lbl, new_like, new_lbl, note in SUPERSEDED:
-        old_n = int(_psql(f"SELECT count(*) FROM legal_chunks WHERE citation ILIKE '%{old_like}%';") or "0")
+    for old_like, new_like, new_excl, old_lbl, new_lbl, note in SUPERSEDED:
+        # count the superseded act's OWN chunks — exclude the current act's chunks that merely reference it
+        old_n = int(_psql(f"SELECT count(*) FROM legal_chunks WHERE citation ILIKE '%{old_like}%' AND citation NOT ILIKE '%{new_excl}%';") or "0")
         new_n = int(_psql(f"SELECT count(*) FROM legal_chunks WHERE citation ILIKE '%{new_like}%';") or "0")
         if old_n and not new_n:
             print(f"  ✗ SUPERSEDED EMBEDDED, CURRENT MISSING\n      {old_lbl} is in the library ({old_n} chunks) but {new_lbl} is NOT.\n      → embed {new_lbl} and purge/repoint {old_lbl}. {note}"); issues += 1
