@@ -73,6 +73,25 @@ def build_digest_sections():
     except Exception as _e:
         sections["deadlines"] = f"⏰ <b>Due dates</b>\n  (deadline engine unavailable: {str(_e)[:80]})"
 
+    # 0b. Corpus stats (folded in from daily_digest — the morning status snapshot)
+    try:
+        cur.execute("""
+            SELECT (SELECT count(*) FROM documents WHERE case_file='MWK-001') AS docs,
+                   (SELECT count(*) FROM extraction_chunks WHERE field_status='extracted') AS chunks,
+                   (SELECT count(*) FROM instruments_on_title) AS instruments,
+                   (SELECT count(*) FROM fraud_indicators) AS fraud,
+                   (SELECT count(*) FROM gmail_messages) AS gmail,
+                   (SELECT count(*) FROM titles WHERE provenance_level='verified') AS verified_titles
+        """)
+        s = cur.fetchone()
+        sections["corpus_stats"] = (
+            "📊 <b>Corpus</b>\n"
+            f"  docs {s['docs']} · chunks {s['chunks']} · instruments {s['instruments']}\n"
+            f"  fraud flags {s['fraud']} · emails {s['gmail']} · verified titles {s['verified_titles']}"
+        )
+    except Exception as _e:
+        sections["corpus_stats"] = f"📊 <b>Corpus</b>\n  (stats unavailable: {str(_e)[:70]})"
+
     # 1. Overnight client activity
     cur.execute("""
         SELECT case_file, client_name, count(*) AS n_messages,
@@ -199,7 +218,7 @@ def render_digest_messages():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     header = f"📊 <b>LandTek Daily Digest — {today}</b>\n\n"
 
-    order = ["deadlines", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
+    order = ["deadlines", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
     msgs = []
     buf = header
     for k in order:
