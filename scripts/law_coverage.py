@@ -9,6 +9,7 @@ import glob
 import os
 import re
 import subprocess
+import sys
 
 SSH = ["ssh", "-o", "ConnectTimeout=45", "root@100.85.203.58"]
 
@@ -74,7 +75,34 @@ def cited_in_playbooks():
     return cited
 
 
+# Major governing acts that should be present as FULL text (for in-house self-sufficiency).
+FULL_CORPUS = [
+    ("RA 386 — Civil Code", "386"), ("RA 7160 — Local Government Code", "7160 (Local"),
+    ("1987 Constitution", "Constitution (full"), ("PD 1529 — Property Registration", "1529 (full"),
+    ("CA 141 — Public Land Act", "CA 141"), ("PD 1445 — Auditing Code", "1445 (Gov"),
+    ("RA 11032 — ARTA Act", "11032 — consolidated"), ("RA 3019 — Anti-Graft", "3019 (full"),
+    ("RA 6770 — Ombudsman Act", "6770"), ("RA 6713 — Code of Conduct", "6713 (full"),
+    ("2017 RACCS", "RACCS"), ("RA 9184 — Procurement", "9184 (Gov"),
+    ("EO 292 — Administrative Code", "292 (Admin"), ("RPC — Revised Penal Code", "Penal Code, full"),
+    ("PD 1096 — Building Code", "1096 (Nat"), ("RA 6657 — CARL", "6657 (full"),
+    ("Rules of Court (full)", "Rules of Court (full"), ("RA 8424 — Tax Code (NIRC)", "8424"),
+]
+
+
+def corpus_inventory():
+    print("=== FULL-TEXT CORPUS COMPLETENESS (in-house self-sufficiency) ===\n")
+    full = partial = missing = 0
+    for label, like in FULL_CORPUS:
+        n = int(_psql(f"SELECT count(*) FROM legal_chunks WHERE citation ILIKE '%{like}%';") or "0")
+        flag = "FULL    " if n >= 80 else ("partial " if n else "MISSING ")
+        full += n >= 80; partial += 0 < n < 80; missing += n == 0
+        print(f"  {flag} {n:>4} chunks  {label}")
+    print(f"\n  {full} full · {partial} partial · {missing} missing  (of {len(FULL_CORPUS)} major acts)\n")
+
+
 def main():
+    if "--corpus" in sys.argv:
+        corpus_inventory(); return
     print("=== LAW-LIBRARY COVERAGE MONITOR ===\n")
     embedded_acts = set()
     for c in _psql("SELECT DISTINCT citation FROM legal_chunks;").splitlines():

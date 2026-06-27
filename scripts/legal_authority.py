@@ -55,6 +55,17 @@ def _embed(text):
 
 def _chunks(text, target=900):
     paras = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
+    # hard-split oversized paragraphs (few-break sources like big HTML statutes) so no chunk exceeds the
+    # embedder's context — otherwise a single 40k-char paragraph becomes one chunk and is truncated on embed
+    split = []
+    for p in paras:
+        while len(p) > target * 2:
+            cut = p.rfind(" ", target, target * 2)
+            cut = cut if cut > target else target * 2
+            split.append(p[:cut].strip()); p = p[cut:].strip()
+        if p:
+            split.append(p)
+    paras = split
     out, buf = [], ""
     for p in paras:
         if len(buf) + len(p) > target and buf:
