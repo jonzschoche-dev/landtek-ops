@@ -23,7 +23,19 @@ import psycopg2
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 JONATHAN_CHAT_ID = "6513067717"
-ALERTS_LIVE = os.environ.get("LANDTEK_AGENT_ALERTS_LIVE", "") == "1"
+ENV_PATH = "/root/landtek/.env"
+
+
+def _alerts_live():
+    """Is immediate HIGH delivery enabled? Checked at send-time from the environment OR the .env file,
+    so it works the same whether the agent is launched by cron (loads .env) or systemd (may not). $0."""
+    if os.environ.get("LANDTEK_AGENT_ALERTS_LIVE", "") == "1":
+        return True
+    try:
+        with open(ENV_PATH) as f:
+            return any(line.strip() == "LANDTEK_AGENT_ALERTS_LIVE=1" for line in f)
+    except Exception:
+        return False
 
 
 def emit(agent_name, event_type, summary, *, matter=None, severity="medium",
@@ -45,7 +57,7 @@ def emit(agent_name, event_type, summary, *, matter=None, severity="medium",
         if row is None:
             return None  # already logged (idempotent)
         audit_id = row[0]
-        if severity == "high" and ALERTS_LIVE:
+        if severity == "high" and _alerts_live():
             if _send(summary, matter):
                 cur.execute("UPDATE agent_audit SET delivered_at = now() WHERE id = %s", (audit_id,))
         return audit_id
