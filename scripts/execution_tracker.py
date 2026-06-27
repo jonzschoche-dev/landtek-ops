@@ -18,6 +18,8 @@ import sys
 
 import psycopg2
 
+from agent_alert import emit  # unified decision log (scripts/ is on sys.path when run as a script)
+
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 TG_SEND = "/root/landtek/scripts/tg_send.py"
 STAGES = ["planned", "drafted", "approved", "filed", "confirmed"]
@@ -42,13 +44,19 @@ def check(cur, notify):
     alerts = []
     for cid, mc, desc, st, due, past_due, stale in cur.fetchall():
         if st == "approved" and due and past_due is not None and past_due > 0:
-            alerts.append(f"[{mc}] APPROVED but not filed, {past_due}d past due: {desc}")
+            msg = f"[{mc}] APPROVED but not filed, {past_due}d past due: {desc}"
+            alerts.append(msg)
+            emit("execution_tracker", "execution", msg[:160], matter=mc, severity="high",
+                 dedup_key=f"exec:{cid}:approved_past_due")
         elif st == "filed" and stale:
             # has a court filing landed for this matter since? (possible confirmation)
             cur.execute("""SELECT 1 FROM filing_alerts WHERE matter_code=%s AND received > now()-interval '30 days'
                            AND subject ~* 'order|resolution|decision' LIMIT 1""", (mc,))
             hint = " (a recent order/resolution exists — verify if it confirms)" if cur.fetchone() else ""
-            alerts.append(f"[{mc}] FILED >14d, awaiting confirmation: {desc}{hint}")
+            msg = f"[{mc}] FILED >14d, awaiting confirmation: {desc}{hint}"
+            alerts.append(msg)
+            emit("execution_tracker", "execution", msg[:160], matter=mc, severity="medium",
+                 dedup_key=f"exec:{cid}:filed_unconfirmed")
     if notify and alerts:
         msg = "Execution tracker: " + alerts[0] + (f" (+{len(alerts)-1} more)" if len(alerts) > 1 else "")
         try:

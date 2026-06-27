@@ -92,6 +92,21 @@ def build_digest_sections():
     except Exception as _e:
         sections["corpus_stats"] = f"📊 <b>Corpus</b>\n  (stats unavailable: {str(_e)[:70]})"
 
+    # 0c. Agent activity — the unified agent decision log (deadline escalations + filing/execution alerts)
+    try:
+        import sys as _s2, os as _o2
+        _s2.path.insert(0, _o2.path.join(_o2.path.dirname(_o2.path.abspath(__file__)), "scripts"))
+        import deadlines as _dl2
+        import agent_alert as _aa
+        _dl2.escalate(cur)                      # refresh deadline escalations into agent_audit first
+        rows = _aa.recent(conn, hours=24, severities=("high", "medium"))
+        if rows:
+            tag = {"high": "🔴", "medium": "🟡", "low": "⚪"}
+            lines = [f"  {tag.get(sev, '·')} {(summary or '')[:90]}" for _ag, _mc, sev, summary, _g in rows[:10]]
+            sections["agent_activity"] = f"🤖 <b>Agent activity (24h, {len(rows)})</b>\n" + "\n".join(lines)
+    except Exception:
+        pass
+
     # 1. Overnight client activity
     cur.execute("""
         SELECT case_file, client_name, count(*) AS n_messages,
@@ -218,7 +233,7 @@ def render_digest_messages():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     header = f"📊 <b>LandTek Daily Digest — {today}</b>\n\n"
 
-    order = ["deadlines", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
+    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
     msgs = []
     buf = header
     for k in order:

@@ -17,6 +17,8 @@ import subprocess
 
 import psycopg2
 
+from agent_alert import emit  # unified decision log (scripts/ is on sys.path when run as a script)
+
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 TG_SEND = "/root/landtek/scripts/tg_send.py"
 KW = r"order|motion|resolution|notice of|hearing|summons|opposition|comment|manifestation|decision|writ|referral|subpoena"
@@ -47,6 +49,9 @@ def scan(cur, notify):
         cur.execute("""INSERT INTO filing_alerts (message_id,matter_code,subject,sender,received)
                        VALUES (%s,%s,%s,%s,%s) ON CONFLICT (message_id) DO NOTHING""",
                     (mid, mc, (subj or "")[:200], (sender or "")[:120], d))
+        emit("filing_monitor", "new_filing",
+             f"New filing in {mc}: {(subj or '').strip()[:120]} (from {sender})",
+             matter=((mc or "").split(",")[0] or None), severity="high", dedup_key=f"filing:{mid}")
     notified = 0
     if notify:
         for mid, mc, subj, sender, d in new:

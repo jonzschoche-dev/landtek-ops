@@ -214,15 +214,57 @@ def summary_text(cur, today=None):
     return "\n".join(L)
 
 
+def _severity_for(delta):
+    """Proximity → alert severity. The escalation ladder: closer = louder."""
+    if delta < 0 or delta <= 7:
+        return "high"      # overdue, or due within a week
+    if delta <= 14:
+        return "medium"
+    return None            # >14d: lives in the digest, not an alert
+
+
+def escalate(cur, today=None):
+    """Emit overdue + imminent (≤14d) deadlines into agent_audit with proximity-severity, so the
+    deadline clock surfaces in the digest and (when alerts are live) fires HIGH for the urgent ones.
+    Idempotent per (matter, date, severity-tier) — re-emits only when a deadline crosses into a louder
+    tier. $0. Returns the number of new escalations logged."""
+    import os as _os, sys as _sys
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    from agent_alert import emit
+    today = today or date.today()
+    obs, _no_date, _n, _tl = gather(cur)
+    seen, n = set(), 0
+    for o in sorted(obs, key=lambda x: x["date"]):
+        k = (o["date"], o["matter"], o["kind"])
+        if k in seen:
+            continue
+        seen.add(k)
+        delta = (o["date"] - today).days
+        sev = _severity_for(delta)
+        if sev is None:
+            continue
+        when = f"{-delta}d overdue" if delta < 0 else (f"due in {delta}d" if delta else "due TODAY")
+        summary = f"{o['matter']}: {o['label'][:60]} — {when} ({o['date'].isoformat()})"
+        if emit("deadlines", "deadline", summary, matter=o["matter"], severity=sev,
+                grounding=o.get("kind"),
+                dedup_key=f"deadline:{o['matter']}:{o['date'].isoformat()}:{sev}"):
+            n += 1
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--today")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--escalate", action="store_true", help="emit overdue/imminent deadlines to agent_audit")
     a = ap.parse_args()
     today = datetime.strptime(a.today, "%Y-%m-%d").date() if a.today else date.today()
     c = _conn()
     cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    digest(cur, today, write=a.write)
+    if a.escalate:
+        print(f"[escalate] {escalate(cur, today)} overdue/imminent deadlines → agent_audit")
+    else:
+        digest(cur, today, write=a.write)
 
 
 if __name__ == "__main__":
