@@ -34,7 +34,14 @@ Verify after: the four sim rules (S1–S4) and S14 text are still present in the
 
 ---
 
-## STEP 2 — leo-tools gate endpoint (so n8n can call the $0 gate over HTTP)
+## STEP 2 — leo-tools gate endpoint ✅ BUILT + VERIFIED (deploy_617)
+
+**Done.** `/api/answer_gate` is live in `leo_tools/server.py` (uses the local `db()` helper). Verified on
+the box: `{"text":"Balane paid 5M [doc:99999]."}` → `verdict:fail` + `final_text:"I don't have a verified
+record to answer that."`; a clean line passes through unchanged. Steps 1 & 3 (the live n8n edits) remain
+operator-applied. Original build note below:
+
+### (original — so n8n can call the $0 gate over HTTP)
 
 n8n Code nodes are JS; the gate is Python — so expose it as an endpoint and call it. Add to
 `leo_tools/server.py` (follows the existing `/api/*` pattern):

@@ -1446,5 +1446,28 @@ def pending_entity_types():
         for r in rows]})
 
 
+# ── Leo answer-gate over HTTP (deploy_617) ──────────────────────────────────────────────────
+# Exposes the $0 deterministic discernment gate (scripts/leo_answer_gate.py) so the n8n workflow can
+# strip a fabricated cite / ungrounded cascade from EVERY Leo reply before it ships — no LLM
+# regeneration, no extra tokens. POST {"text": "..."} → {verdict, fails, warns, final_text}.
+import sys as _gsys
+_gsys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
+import leo_answer_gate as _answer_gate
+
+
+@app.route('/api/answer_gate', methods=['POST'])
+def answer_gate():
+    data = request.get_json(force=True) or {}
+    text = data.get('text', '')
+    c = db(); cur = c.cursor()
+    try:
+        res = _answer_gate.gate(cur, text)
+        # deterministic $0 fail-path: ship the grounded-only rewrite, never an LLM regen
+        res['final_text'] = text if res['verdict'] == 'pass' else _answer_gate.remediate(cur, text, res)
+        return jsonify(res)
+    finally:
+        cur.close(); c.close()
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8765)
