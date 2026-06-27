@@ -164,6 +164,8 @@ def list_roster():
     planned = sum(1 for a in AGENTS if a[5] == "planned")
     print(f"\n{live} live · {planned} planned · {len(AGENTS)} total. "
           f"Ship-readiness = build the planned gap-fillers + output agents, then wire Leo.")
+    print("  (this is the on-demand TOOL catalog — for the systemd/cron automation layer run "
+          "`agents.py --wired`)")
 
 
 def health():
@@ -186,13 +188,50 @@ def health():
     print("\n" + ("✓ fleet healthy" if ok else "✗ one or more agents need attention"))
 
 
+def wired_automation():
+    """The OTHER roster. The AGENTS list above is the on-demand TOOL catalog; it does NOT list the
+    scripts wired into systemd timers + cron — a separate ~50-script automation layer. This reads the
+    LIVE host state so 'what actually runs, how often' is visible in one place and dormancy stays
+    catchable (the bloat audit found these two rosters had drifted apart). Run on the VPS host."""
+    import re
+    print("=" * 78)
+    print("WIRED AUTOMATION  (systemd timers + cron — the running layer, read live)")
+    print("=" * 78)
+    enabled = _sh("systemctl list-unit-files --state=enabled --no-legend 2>/dev/null")
+    en_set = {l.split()[0] for l in enabled.splitlines()
+              if (".timer" in l or ".service" in l) and re.search(r"landtek|leo|cowork", l)}
+    raw = _sh("systemctl list-timers --all --no-legend 2>/dev/null")
+    timers = sorted({next((p for p in l.split() if p.endswith(".timer")), "")
+                     for l in raw.splitlines() if re.search(r"landtek|leo", l)} - {""})
+    print(f"\n[systemd timers]  ({len(timers)})")
+    for unit in timers:
+        print(f"  {unit:36} {'enabled' if unit in en_set else 'DISABLED'}")
+    svcs = sorted(u for u in en_set if u.endswith(".service"))
+    print(f"\n[systemd services enabled]  ({len(svcs)})")
+    for s in svcs:
+        print(f"  {s}")
+    cron = _sh("crontab -l 2>/dev/null")
+    jobs = [l for l in cron.splitlines() if l.strip() and not l.lstrip().startswith("#")]
+    print(f"\n[cron]  ({len(jobs)})")
+    for l in jobs:
+        flds = l.split()
+        sched = " ".join(flds[:5]) if len(flds) >= 5 else "?"
+        m = re.search(r"([\w./-]+\.py)(\s+[\w-]+)?", l)
+        print(f"  {sched:16} {(m.group(0).strip() if m else l[-44:])}")
+    if not timers and not jobs:
+        print("\n  (no systemd/cron visible — run this on the VPS host)")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--health", action="store_true")
+    ap.add_argument("--wired", action="store_true")
     a = ap.parse_args()
     if a.health:
         health()
+    elif a.wired:
+        wired_automation()
     else:
         list_roster()
 
