@@ -85,10 +85,9 @@ FULL_CORPUS = [
     ("RA 11032 — ARTA Act", "11032 — consolidated"), ("RA 3019 — Anti-Graft", "3019 (full"),
     ("RA 6770 — Ombudsman Act", "6770 (Ombudsman"), ("RA 6713 — Code of Conduct", "6713 (full"),
     ("2017 RACCS", "RACCS"), ("RA 9184 — Procurement", "9184 (Gov"),
-    ("EO 292 — Administrative Code", "292 (Admin"), ("RPC — Revised Penal Code", "Penal"),
-    ("PD 1096 — Building Code", "1096"), ("RA 6657 — CARL", "6657 (full"),
-    ("RA 6657 (CARL) — full", "6657 (CARL"),
-    ("Rules of Court (specific rules only)", "Rules of Court"), ("RA 8424 — Tax Code (NIRC)", "8424"),
+    ("EO 292 — Administrative Code", "292 (Admin"), ("Act 3815 — Revised Penal Code", "Penal"),
+    ("PD 1096 — National Building Code", "1096"), ("RA 6657 — CARL", "6657 (CARL"),
+    ("Rules of Court (Civil/Crim/Evidence/Spec)", "Rules of Court"), ("RA 8424 — Tax Code (NIRC)", "8424"),
 ]
 
 
