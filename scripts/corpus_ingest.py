@@ -22,6 +22,12 @@ CORPUS = [
     ("https://lawphil.net/statutes/repacts/ra2003/ra_9184_2003.html", "RA 9184 (Govt Procurement Reform Act, full)", "Government Procurement Reform Act — full text", "OMBUDSMAN"),
     ("https://lawphil.net/statutes/presdecs/pd1977/pd_1096_1977.html", "PD 1096 (National Building Code, full)", "National Building Code — full text", "ARTA"),
     ("https://lawphil.net/executive/execord/eo1987/eo_292_1987.html", "EO 292 (Administrative Code of 1987, full)", "Administrative Code of 1987 — full text", "DILG"),
+    ("https://lawphil.net/statutes/repacts/ra1997/ra_8424_1997.html", "RA 8424 (NIRC / Tax Code, full)", "National Internal Revenue Code (Tax Code) — full text", "CIVIL"),
+    ("https://lawphil.net/courts/rules/rc_1-71_civil.html", "Rules of Court (Rules 1-71, Civil Procedure, full)", "Rules of Court — Rules 1-71 (civil procedure incl. Rule 70 ejectment) — full text", "CIVIL"),
+    ("https://lawphil.net/courts/rules/rc_110-127_2000.html", "Rules of Court (Rules 110-127, Criminal Procedure 2000, full)", "Rules of Court — Rules 110-127 (2000 Revised Rules of Criminal Procedure) — full text", "CIVIL"),
+    ("https://lawphil.net/courts/rules/rc_128-134_evidence.html", "Rules of Court (Rules 128-134, Evidence, full)", "Rules of Court — Rules 128-134 (Evidence) — full text", "CIVIL"),
+    ("https://lawphil.net/courts/rules/rc_72-109_proceedings.html", "Rules of Court (Rules 72-109, Special Proceedings, full)", "Rules of Court — Rules 72-109 (special proceedings incl. settlement of estate) — full text", "CIVIL"),
+    ("https://lawphil.net/statutes/acts/act1930/act_3815_1930.html", "Act 3815 (Revised Penal Code, full)", "Revised Penal Code (Act No. 3815) — full text", "OMBUDSMAN"),
 ]
 SSH_PSQL = "docker exec -i n8n-postgres-1 psql -U n8n -d n8n -t -A"
 
@@ -51,7 +57,8 @@ def already(citation_like):
 def main():
     force = "--force" in sys.argv
     for url, cite, title, forum in CORPUS:
-        key = re.search(r"(RA|PD|EO|Act)\s*\d+|Constitution", cite).group(0)
+        m = re.search(r"(RA|PD|EO|Act|CA)\s*\d+|Constitution|Rules of Court|NIRC", cite)
+        key = m.group(0) if m else cite.split("(")[0].strip()
         if not force and already(key) >= 30:
             print(f"  skip (already substantial): {cite}  [{already(key)} chunks]"); continue
         try:

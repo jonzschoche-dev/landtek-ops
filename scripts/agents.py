@@ -113,6 +113,23 @@ AGENTS = [
      "on demand", "", "live", "CORE/RELATED/CONTEXTUAL/OFF-PROFILE + connection; docket+title+party fingerprint"),
     ("chronology",           "date-ordered evidence & submissions (the case timeline)", "det",
      "on demand", "", "live", "events from verified facts + filings; leads the case_pdf brief"),
+    # ── LIVE — no-hallucination pipeline + law-corpus (2026-06) ─────────────────
+    ("dossier_verify",       "DILIGENCE gate — citation fidelity / source integrity / client-separation / name (paralegal-grade)", "det",
+     "on demand", "", "live", "structured issues; verify_text() reusable; dossier_verify.py doc.md --matter PREFIX"),
+    ("dossier_fix",          "SELF-HEAL loop — flag→fix→re-verify until clean; escalates the un-fixable", "det",
+     "on demand", "", "live", "acronym/name/citation/draft-source/cross-matter fixes; dossier_fix.py doc.md --matter"),
+    ("execution_classify",   "execution-status GATE — draft vs executed/received (no draft posing as evidence)", "det",
+     "on demand", "", "live", "regex_classifier_v2: received-stamp + tribunal-order + complainant-letter guard; --matter scope"),
+    ("correspondence_ledger","delivery-aware, quote-verified correspondence ledger — delivery is its own fact, gaps are findings", "det",
+     "on demand", "", "live", "correspondence_events table; --gaps/--render; every claim a verbatim ✓ source quote"),
+    ("correspondence_extract","delivery-gap candidate feed — mine non/late-delivery language (verbatim), curate into the ledger", "det",
+     "on demand", "", "live", "high-recall + META filter + per-doc cap; correspondence_extract.py --matter"),
+    ("cross_matter",         "cross-matter evidence map — a verified fact → the other matters it strengthens (quote-verified)", "det",
+     "on demand", "", "live", "cross_matter_links table; --matter X surfaces out-of-matter ammunition"),
+    ("law_coverage",         "law-library coverage + completeness monitor — needed provisions + full/partial/missing inventory", "det",
+     "on demand", "", "live", "law_coverage.py [--corpus]; 15 major acts full; flags gaps to embed"),
+    ("corpus_ingest",        "bulk full-text law ingester — fetch lawphil → strip → embed (offline self-sufficiency)", "det",
+     "on demand", "", "live", "skips stubs; ingested full LGC/Constitution/Admin Code; one-line per act"),
     # ── PLANNED ────────────────────────────────────────────────────────────────
     # ── THE FACE ───────────────────────────────────────────────────────────────
     ("leo",                  "Telegram interface — answers grounded in the corpus", "api",
