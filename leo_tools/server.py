@@ -1469,5 +1469,49 @@ def answer_gate():
         cur.close(); c.close()
 
 
+# ── Leo retrieve-before grounding (deploy_618) ──────────────────────────────────────────────
+# The "RETRIEVE, then reason" data path the discernment protocol references: Leo pulls a matter's
+# VERIFIED (document-proven) facts here BEFORE answering, so dates/facts come from structured rows
+# (exact) not the vector store (close-enough). Verified-only by design — the only tier surfaced as
+# fact — and matter-scoped (client-separation: no cross-client leakage). Each fact carries its cite.
+#   GET  /api/get_verified_facts?matter=MWK-CV26360[&q=balane][&limit=60]
+#   POST /api/get_verified_facts  {"matter": "...", "q": "...", "limit": 60}
+@app.route('/api/get_verified_facts', methods=['GET', 'POST'])
+def get_verified_facts():
+    data = (request.get_json(force=True, silent=True) or {}) if request.method == 'POST' else {}
+    matter = (data.get('matter') or request.args.get('matter') or '').strip()
+    q = (data.get('q') or request.args.get('q') or '').strip()
+    try:
+        limit = min(int(data.get('limit') or request.args.get('limit') or 60), 500)
+    except (TypeError, ValueError):
+        limit = 60
+    if not matter:
+        return jsonify({"error": "matter required (verified facts are matter-scoped)", "facts": []}), 400
+    sql = ("SELECT statement, excerpt, source_kind, source_id, fact_kind, as_of, confidence "
+           "FROM matter_facts WHERE matter_code = %s AND provenance_level = 'verified'")
+    params = [matter]
+    if q:
+        sql += " AND (statement ILIKE %s OR excerpt ILIKE %s)"
+        params += [f"%{q}%", f"%{q}%"]
+    sql += " ORDER BY id LIMIT %s"
+    params.append(limit)
+    c = db(); cur = c.cursor()
+    try:
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+    finally:
+        cur.close(); c.close()
+    facts = [{
+        "statement": st,
+        "cite": (f"doc:{sid}" if sk == 'doc' and sid else (f"{sk}:{sid}" if sid else None)),
+        "excerpt": exc,
+        "fact_kind": fk,
+        "as_of": str(asof) if asof else None,
+        "confidence": conf,
+    } for st, exc, sk, sid, fk, asof, conf in rows]
+    return jsonify({"matter": matter, "count": len(facts), "facts": facts,
+                    "note": "verified-only (document-proven); cite each fact as shown"})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8765)
