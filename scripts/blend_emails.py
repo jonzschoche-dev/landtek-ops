@@ -47,6 +47,19 @@ def ensure_schema(cur):
         )""")
 
 
+sys.path.insert(0, "/root/landtek/scripts")
+try:
+    from execution_classify import classify_text
+except Exception:
+    classify_text = None
+
+_MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
+_BORNE_RE = re.compile(
+    rf"(\d{{1,2}})(?:st|nd|rd|th)?\s+(?:day\s+of\s+)?({_MONTHS})[,\s]+(\d{{4}})"
+    rf"|({_MONTHS})\s+(\d{{1,2}}),?\s+(\d{{4}})", re.IGNORECASE)
+_MONTHNUM = {m.lower(): i for i, m in enumerate(_MONTHS.split("|"), 1)}
+
+
 def pdf_text(data):
     try:
         d = fitz.open(stream=data, filetype="pdf")
@@ -55,6 +68,50 @@ def pdf_text(data):
         return t.strip()
     except Exception:
         return ""
+
+
+def extract_text(data, mime, path):
+    """Text by TYPE — PDF (fitz), .docx (python-docx), .xlsx (openpyxl if present). The ACTUAL content
+    of the attachment, not just PDFs — the judicial affidavits + complaints arrive as .docx and were
+    previously ingested textless."""
+    m = (mime or "").lower(); p = (path or "").lower()
+    if "pdf" in m or p.endswith(".pdf"):
+        return pdf_text(data)
+    if "word" in m or "officedocument.wordprocessing" in m or p.endswith(".docx"):
+        try:
+            from docx import Document
+            return "\n".join(par.text for par in Document(path).paragraphs).strip()
+        except Exception:
+            return ""
+    if "sheet" in m or "excel" in m or p.endswith((".xlsx", ".xls")):
+        try:
+            import openpyxl
+            rows = ["\t".join(str(c) for c in r if c is not None)
+                    for ws in openpyxl.load_workbook(path, read_only=True, data_only=True).worksheets
+                    for r in ws.iter_rows(values_only=True)]
+            return "\n".join(rows).strip()
+        except Exception:
+            return ""
+    return ""
+
+
+def borne_date(text):
+    """The date the DOCUMENT bears, read from its OPENING text — a CLAIM, flagged weak. NEVER the email
+    date: conflating 'the date on the letter' with 'when we received it' is the forensic error this whole
+    pass exists to prevent. Returns 'YYYY-MM-DD' or None."""
+    if not text:
+        return None
+    m = _BORNE_RE.search(text[:1500])
+    if not m:
+        return None
+    try:
+        if m.group(2):                                    # "8 May 2026" / "8th day of May, 2026"
+            d, mon, y = int(m.group(1)), _MONTHNUM[m.group(2).lower()], int(m.group(3))
+        else:                                             # "May 8, 2026"
+            mon, d, y = _MONTHNUM[m.group(4).lower()], int(m.group(5)), int(m.group(6))
+        return f"{y:04d}-{mon:02d}-{d:02d}"
+    except Exception:
+        return None
 
 
 def fresh_attachment_id(svc, msg_id, filename):
@@ -202,31 +259,44 @@ def is_noise(ref):
     return False
 
 
+CLIENT_OF = {"MWK": "MWK-001", "PAR": "Paracale-001", "NIBDC": "NIBDC-001"}
+
+
 def blend_email(cur, svc, g):
     msg_id = g["message_id"]
     refs = g["attachment_refs"] or []
-    case_file = g["case_file"] or "MWK-001"
     matters = list(g["matter_codes"] or [])
     matter1 = matters[0] if matters else None
-    ddate = g["sent_at"] or g["received_at"]
+    # SEPARATION GUARD: the client comes from the VALIDATED matter tags, NEVER from a weak email
+    # case_file. A 'DELAYED REGISTRATION OF BIRTH' email was tagged Paracale (because Allan Inocalla
+    # appears only as the WITNESS) and blindly inheriting that misfiled Patricia's MWK birth docs across
+    # the sacred client line. No matter_codes → leave the doc UNCLASSIFIED (NULL) for proper downstream
+    # classification, rather than guess a client and risk a cross-client misfile.
+    case_file = None
+    if matter1:
+        case_file = next((c for p, c in CLIENT_OF.items() if matter1.startswith(p)), g["case_file"])
     made, linked, skipped = [], [], []
     for ref in refs:
         fn = ref.get("filename") or "attachment"
         att_id = ref.get("attachmentId")
         mime = ref.get("mime") or "application/octet-stream"
-        if not att_id:
-            skipped.append((fn, "no attachmentId"))
-            continue
         if is_noise(ref):
             skipped.append((fn, "inline/noise image"))
             continue
-        # fetch bytes
-        try:
-            a = svc.users().messages().attachments().get(
-                userId="me", messageId=msg_id, id=att_id).execute()
-            data = base64.urlsafe_b64decode(a["data"])
-        except Exception as e:
-            skipped.append((fn, f"fetch fail {type(e).__name__}"))
+        # fetch bytes — try the stored attachmentId, then a FRESHLY-resolved one (stored IDs go stale,
+        # which is why much of the backlog silently failed to extract)
+        data = None
+        for aid in (att_id, fresh_attachment_id(svc, msg_id, fn)):
+            if not aid:
+                continue
+            try:
+                a = svc.users().messages().attachments().get(
+                    userId="me", messageId=msg_id, id=aid).execute()
+                data = base64.urlsafe_b64decode(a["data"]); break
+            except Exception:
+                continue
+        if data is None:
+            skipped.append((fn, "fetch fail (stale id + refresh failed)"))
             continue
         chash = hashlib.sha256(data).hexdigest()
         existing, how = find_existing(cur, chash)
@@ -240,23 +310,36 @@ def blend_email(cur, svc, g):
             path = os.path.join(STORE, f"{msg_id}__{safe_name(fn)}")
             with open(path, "wb") as fh:
                 fh.write(data)
-            txt = pdf_text(data) if "pdf" in mime else ""
-            need_ocr = len(txt) < 50
+            txt = extract_text(data, mime, path)
+            need_ocr = (not txt) and (mime.startswith("image/") or "pdf" in mime)
+            # FORENSIC: doc_date = the BORNE date read from CONTENT (a claim, flagged weak), NEVER the
+            # email date. execution_status = draft/executed/received from the text. The email envelope
+            # (claimed-send + the TRUE Gmail receipt) is recorded distinctly in execution_metadata so
+            # receipt ≠ borne is preserved end-to-end.
+            bdate = borne_date(txt)
+            est, emeta, _conf = (classify_text(txt, mime_type=mime, smart_filename=fn)
+                                 if (classify_text and txt) else (None, {}, 0.0))
+            emeta = dict(emeta or {})
+            emeta.update({"source": "gmail_attachment", "email_message_id": msg_id,
+                          "email_from": g.get("from_name"),
+                          "email_sent_at": str(g["sent_at"]) if g["sent_at"] else None,
+                          "email_received_at": str(g["received_at"]) if g["received_at"] else None})
             cur.execute("""
                 INSERT INTO documents
                   (master_form, ingest_source, original_filename, smart_filename, mime_type,
-                   file_path, content_hash, doc_date, case_file, matter_code,
-                   classification, extracted_text)
-                VALUES ('digital','gmail_attachment',%s,%s,%s,%s,%s,%s,%s,%s,
-                        %s,%s)
+                   file_path, content_hash, doc_date, doc_date_quality, case_file, matter_code,
+                   classification, extracted_text, execution_status, execution_metadata)
+                VALUES ('digital','gmail_attachment',%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                        %s,%s,%s,%s)
                 RETURNING id""",
-                (fn, fn, mime, path, chash, ddate, case_file, matter1,
-                 None, (txt or None)))
+                (fn, fn, mime, path, chash, bdate, ("content_weak" if bdate else None),
+                 case_file, matter1, None, (txt or None), est, psycopg2.extras.Json(emeta)))
             doc_id = cur.fetchone()["id"]
+            role = "draft" if est in ("draft_unsigned", "template") else "attachment"
             cur.execute("""INSERT INTO email_documents (message_id, doc_id, role, filename)
-                           VALUES (%s,%s,'attachment',%s) ON CONFLICT DO NOTHING""",
-                        (msg_id, doc_id, fn))
-            made.append((fn, doc_id, "ocr_pending" if need_ocr else f"{len(txt)}c text"))
+                           VALUES (%s,%s,%s,%s) ON CONFLICT DO NOTHING""",
+                        (msg_id, doc_id, role, fn))
+            made.append((fn, doc_id, f"{est or 'unclassified'}·{len(txt)}c" if txt else "ocr_pending"))
         # matter links
         for mc in matters:
             cur.execute("""INSERT INTO document_matter_links (doc_id, matter_code)
