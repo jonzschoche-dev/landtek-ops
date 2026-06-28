@@ -35,9 +35,11 @@ PLAYBOOKS = {
         "law": "11032", "law_kw": "Imposition of additional requirements",
         "elements": [
             ("§21(e) / §9 — failure to render the service within the prescribed processing time",
-             "a dated request to the office + the Citizen's Charter processing clock + no compliant response within it"),
+             "a dated request to the office + the Citizen's Charter processing clock + no compliant response within it",
+             ("Citizens Charter", "working day")),
             ("§21(b)/(c) — imposition of a requirement or cost not in the Citizen's Charter",
-             "an extra-legal requirement (e.g. hire a private professional, sue) imposed on the requester"),
+             "an extra-legal requirement (e.g. hire a private professional, sue) imposed on the requester",
+             ("11032", "Imposition of additional requirements")),
         ],
     },
 }
@@ -96,10 +98,11 @@ def stage_position(matter, docket, pb):
                 f"FROM {j} AND (original_filename ~* 'counter-affidavit|joint response|reply to' OR extracted_text ~* 'Joint Response|Counter-Affidavit|respectfully den') ORDER BY doc_date LIMIT 3", n=3)
     law = cs._pinpoint_law(pb["law"], pb["law_kw"]) or "(law text not embedded)"
     elements = []
-    for label, proofdesc in pb["elements"]:
+    for label, proofdesc, probe in pb["elements"]:
         ps = cs.rag.retrieve(f"{label} {proofdesc} {docket}", k=3, ids=ids or None)
         cites = " || ".join(f"[doc:{p.get('doc_id')}] {(p.get('text') or '')[:240]}" for p in ps)
-        elements.append((label, proofdesc, cites or "(no passage retrieved → likely GAP)"))
+        authority = (cs._pinpoint_law(*probe) if probe else "") or ""   # the governing rule from legal_chunks
+        elements.append((label, proofdesc, cites or "(no passage retrieved → likely GAP)", authority))
     facts = _rows("SELECT '- '||regexp_replace(statement,'[[:space:]]+',' ','g')||'  [doc:'||coalesce(source_id,'?')||']' "
                   "FROM matter_facts WHERE matter_code=%r AND provenance_level='verified' ORDER BY id LIMIT 30" % matter, n=30)
     print(f"   posture: {posture or '(none found)'}")
@@ -110,7 +113,8 @@ def stage_position(matter, docket, pb):
 # ── 3 SYNTHESIS (decision-first, grounded) ──────────────────────────────────────
 def stage_synthesis(matter, docket, pb, pos, integ, use_frontier):
     print("\n── 3 · SYNTHESIS (decision-first) ──")
-    el = "\n".join(f"- ELEMENT: {lab}\n  proof needed: {pd}\n  retrieved: {ct}" for lab, pd, ct in pos["elements"])
+    el = "\n".join(f"- ELEMENT: {lab}\n  GOVERNING AUTHORITY (quote the rule/clock): {(auth or '(not embedded)')[:480]}\n"
+                   f"  proof needed: {pd}\n  retrieved proof: {ct}" for lab, pd, ct, auth in pos["elements"])
     facts = "\n".join(pos["facts"]) or "(no verified facts on file)"
     opp = "\n".join("- " + o.strip() for o in pos["opp"]) or "(no respondent filing in record)"
     integ_note = ("Cross-matter docs present (do NOT cite as this matter's proof): "
@@ -131,8 +135,10 @@ From POSTURE. State what is pending and any deadline.
 Assess claim↔forum↔remedy fit. If our pleaded claims include matters the forum CANNOT grant, say so plainly
 and state they must be reserved. Give an explicit verdict: are we positioned to WIN, CONTESTED, or LOSE — and why.
 ## The theory — element by element
-For each ELEMENT: the rule, the fact, and the proving exhibit [doc:ID]; or **GAP** if unproven.
-PREFER the VERIFIED FACT LEDGER below for proof citations (each fact is already tied to its source doc);
+For each ELEMENT, the RULE must be a VERBATIM quote from that element's GOVERNING AUTHORITY text shown below —
+copy its key standard/figure exactly (for §21(e), quote the Citizen's Charter clock, i.e. the working-day
+number). NEVER restate the element label as the rule. Then the fact, then the proving exhibit [doc:ID]; or
+**GAP** if unproven. PREFER the VERIFIED FACT LEDGER below for proof citations (each fact is tied to its source doc);
 use the retrieved passages only to corroborate.
 ## The opponent's position
 Their filed defense (from OPPONENT) and our rebuttal grounded in the record. If OPPONENT is non-empty, you
