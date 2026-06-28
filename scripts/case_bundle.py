@@ -60,7 +60,7 @@ CORE_RE = __import__("re").compile(
     r"order|resolution|\bnsr\b|\bosca\b|affidavit|indorsement|referral|notice", __import__("re").I)
 
 
-def _gather(mc, exclude=frozenset()):
+def _gather(mc, exclude=frozenset(), core=False):
     c = psycopg2.connect(DSN); cur = c.cursor()
     cur.execute("SELECT coalesce(title,''), coalesce(docket_number,''), coalesce(forum,court_or_agency,'') FROM matters WHERE matter_code=%s", (mc,))
     title, docket, forum = cur.fetchone() or ("", "", "")
@@ -100,25 +100,32 @@ def _gather(mc, exclude=frozenset()):
         if nearkey:
             seen_near.add(nearkey)
         docs.append([did, DT.get(did, fn), dd, fp, nf, pc])
-    docs.sort(key=lambda r: (_rank(r[1]), -r[4], r[0]))
-    docs = docs[:20]                         # pick the most-relevant, then…
-    # …bind them in CHRONOLOGICAL order so the exhibits follow the dossier's timeline outline —
-    # complaint first, then each response/order in sequence — for prompt examination in order.
-    docs.sort(key=lambda r: (str(r[2]) if r[2] else "9999-99-99", r[0]))
-    exmap = {docs[i][0]: chr(65 + i) for i in range(len(docs))}
+    _chrono = lambda r: (str(r[2]) if r[2] else "9999-99-99", r[0])
+    if core:                                  # SLIM working copy: the spine, the rest go to a linked index
+        chrono = sorted(docs, key=_chrono)
+        early = chrono[:6]                     # the initial letters → the complaint (precipitating narrative)
+        rest = sorted([d for d in docs if d not in early], key=lambda r: (_rank(r[1]), -r[4], r[0]))
+        bound = early + rest[:6]               # + the key dispositions / operative documents
+        supporting = [d for d in docs if d not in bound]
+    else:                                      # FULL archive: bind the whole record (capped)
+        docs.sort(key=lambda r: (_rank(r[1]), -r[4], r[0]))
+        bound, supporting = docs[:20], []
+    bound.sort(key=_chrono)                    # bind chronologically (initial letters → complaint → orders)
+    supporting.sort(key=_chrono)
+    exmap = {bound[i][0]: chr(65 + i) for i in range(len(bound))}
     cur.execute("""SELECT statement, source_id FROM matter_facts WHERE matter_code=%s AND provenance_level='verified'
                    ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
     facts = [(st, sid) for st, sid in cur.fetchall() if not (sid and sid.isdigit() and int(sid) in off)]
     tmap = {}
-    if docs:
+    if bound:
         cur.execute("SELECT id, left(coalesce(extracted_text,''),60000) FROM documents WHERE id = ANY(%s)",
-                    ([d[0] for d in docs],))
+                    ([d[0] for d in bound],))
         tmap = {r[0]: r[1] for r in cur.fetchall()}
     c.close()
-    return title, docket, forum, docs, exmap, facts, DT, MN, tmap
+    return title, docket, forum, bound, supporting, exmap, facts, DT, MN, tmap
 
 
-def _front_matter(path, mc, title, docket, forum, docs, exmap, facts, DT, MN, brief=False):
+def _front_matter(path, mc, title, docket, forum, docs, exmap, facts, DT, MN, supporting=None, brief=False, startmap=None):
     s = getSampleStyleSheet()
     cover_t = ParagraphStyle("ct", parent=s["Title"], fontSize=22, leading=26, alignment=1, spaceAfter=6)
     cover_s = ParagraphStyle("cs", parent=s["Normal"], fontSize=12, leading=16, alignment=1, textColor=colors.HexColor("#374151"))
@@ -162,10 +169,23 @@ def _front_matter(path, mc, title, docket, forum, docs, exmap, facts, DT, MN, br
         f.append(Spacer(1, 4))
     for did, nm, dd, fp, nf, pc in docs:
         L = exmap[did]
+        loc = f" &nbsp; <b>p.&nbsp;{startmap[did]}</b>" if (startmap and did in startmap) else ""
         meta = (f"{dd} · " if dd else "") + f"{pc} page{'s' if pc != 1 else ''}"
-        f.append(Paragraph(f"<b>Exhibit {L}</b> &nbsp; {_e(nm)} &nbsp; <font size='8' color='#6b7280'>({meta})</font>", idx))
+        f.append(Paragraph(f"<b>Exhibit {L}</b> &nbsp; {_e(nm)}{loc} &nbsp; <font size='8' color='#6b7280'>({meta})</font>", idx))
     f.append(Paragraph("&nbsp;", body))
-    f.append(Paragraph("Scanned exhibits are reproduced as imaged; selectable-text pages are preserved as text.", note))
+    f.append(Paragraph("Navigate via the PDF bookmarks (outline). Scanned exhibits are reproduced as imaged; "
+                       "text-layer pages are preserved as selectable text.", note))
+    # ── Index of Supporting Documents (core/working copy: the rest of the record, one open link each) ──
+    if supporting:
+        f.append(PageBreak())
+        f.append(Paragraph("Index of Supporting Documents", h))
+        f.append(Paragraph("Not bound in this working copy — each opens the full document on the case server:", note))
+        f.append(Spacer(1, 4))
+        for did, nm, dd, fp, nf, pc in supporting:
+            url = f"https://leo.hayuma.org/files/c/{did}"
+            when = f"{dd} · " if dd else ""
+            f.append(Paragraph(f"&bull;&nbsp; {when}{_e(nm)} &nbsp; "
+                               f"<link href='{url}'><font size='8' color='#1d4ed8'>{url}</font></link>", idx))
 
     SimpleDocTemplate(path, pagesize=letter, topMargin=0.8 * inch, bottomMargin=0.7 * inch,
                       title=f"{mc} Case Bundle").build(f)
@@ -228,28 +248,58 @@ def _append_doc(out, fp, dpi, quality, text="", label=""):
     _render_text_pages(out, text, label)                        # .docx etc. — render the content so it's in-bundle
 
 
-def build(mc, dpi=110, quality=45, brief_md=None, exclude=frozenset()):
-    title, docket, forum, docs, exmap, facts, DT, MN, tmap = _gather(mc, exclude)
+def _stamp_pagenums(out):
+    for i in range(out.page_count):
+        try:
+            r = out[i].rect
+            out[i].insert_text((r.width - 62, r.height - 22), f"p. {i + 1}", fontsize=8,
+                               fontname="helv", color=(0.5, 0.5, 0.5))
+        except Exception:
+            pass
+
+
+def build(mc, dpi=110, quality=45, brief_md=None, exclude=frozenset(), core=False):
+    title, docket, forum, docs, supporting, exmap, facts, DT, MN, tmap = _gather(mc, exclude, core)
     if not docs:
         sys.exit(f"[bundle] no local supporting documents found for {mc}")
-    out = fitz.open()
-    if brief_md and os.path.exists(brief_md):           # lead with the analytical dossier (render md → PDF)
+    # 1) the analytical brief (render md → PDF)
+    brief_pdf = None
+    if brief_md and os.path.exists(brief_md):
         import render_memo
-        bpdf = f"/tmp/_brief_{mc}.pdf"
+        brief_pdf = f"/tmp/_brief_{mc}.pdf"
         try:
-            render_memo.render(brief_md, bpdf)
-            out.insert_pdf(fitz.open(bpdf))
+            render_memo.render(brief_md, brief_pdf)
         except Exception as e:
-            print(f"[bundle] brief render failed, continuing without it: {e}", file=sys.stderr)
-    front = f"/tmp/_front_{mc}.pdf"
-    _front_matter(front, mc, title, docket, forum, docs, exmap, facts, DT, MN, brief=bool(brief_md))
-    out.insert_pdf(fitz.open(front))
+            print(f"[bundle] brief render failed, continuing without it: {e}", file=sys.stderr); brief_pdf = None
+    B = fitz.open(brief_pdf).page_count if (brief_pdf and os.path.exists(brief_pdf)) else 0
+    # 2) merge exhibits once into a side doc, recording each exhibit's start page (relative)
+    ex = fitz.open(); rel = {}
     for did, nm, dd, fp, nf, pc in docs:
-        _divider(out, f"EXHIBIT {exmap[did]}", f"{nm}" + (f"  ·  {dd}" if dd else ""))
-        _append_doc(out, fp, dpi, quality, text=tmap.get(did, ""), label=nm)
-    path = f"/tmp/bundle_{mc}.pdf"
-    out.save(path, garbage=4, deflate=True)
-    out.close()
+        rel[did] = ex.page_count
+        _divider(ex, f"EXHIBIT {exmap[did]}", f"{nm}" + (f"  ·  {dd}" if dd else ""))
+        _append_doc(ex, fp, dpi, quality, text=tmap.get(did, ""), label=nm)
+    # 3) front matter — render to measure length F, then re-render with ABSOLUTE exhibit start pages
+    front = f"/tmp/_front_{mc}.pdf"
+    _front_matter(front, mc, title, docket, forum, docs, exmap, facts, DT, MN, supporting, bool(brief_md), None)
+    F = fitz.open(front).page_count
+    startmap = {did: B + F + rel[did] + 1 for did in rel}              # 1-based absolute page of each divider
+    _front_matter(front, mc, title, docket, forum, docs, exmap, facts, DT, MN, supporting, bool(brief_md), startmap)
+    # 4) assemble brief → front matter → exhibits, and build the navigable bookmark outline
+    out = fitz.open(); toc = []
+    if brief_pdf and os.path.exists(brief_pdf):
+        out.insert_pdf(fitz.open(brief_pdf)); toc.append([1, "Analytical brief", 1])
+    toc.append([1, "Index of exhibits", out.page_count + 1])
+    out.insert_pdf(fitz.open(front))
+    out.insert_pdf(ex)
+    for did, nm, dd, fp, nf, pc in docs:
+        toc.append([1, f"Exhibit {exmap[did]} — {nm[:46]}" + (f" ({dd})" if dd else ""), startmap[did]])
+    _stamp_pagenums(out)
+    try:
+        out.set_toc(toc)
+    except Exception as e:
+        print(f"[bundle] bookmark set failed: {e}", file=sys.stderr)
+    path = f"/tmp/bundle_{'core_' if core else ''}{mc}.pdf"
+    out.save(path, garbage=4, deflate=True); out.close()
     return path, len(docs)
 
 
@@ -260,12 +310,14 @@ def main():
     brief = sys.argv[sys.argv.index("--brief") + 1] if "--brief" in sys.argv else None
     exclude = frozenset(int(x) for x in sys.argv[sys.argv.index("--exclude") + 1].split(",")) \
         if "--exclude" in sys.argv else frozenset()
-    path, nex = build(mc, dpi, q, brief_md=brief, exclude=exclude)
+    core = "--core" in sys.argv
+    path, nex = build(mc, dpi, q, brief_md=brief, exclude=exclude, core=core)
     kb = os.path.getsize(path) // 1024
-    print(f"[bundle] {mc}: {nex} exhibits → {path} ({kb} KB)")
+    kind = "Core packet" if core else "Full bundle"
+    print(f"[bundle] {mc}: {kind} — {nex} exhibits bound → {path} ({kb} KB)")
     if "--send" in sys.argv:
         tok = _tok()
-        r = subprocess.run(["curl", "-s", "-F", f"chat_id={CHAT}", "-F", f"caption={mc} — Case Bundle ({nex} exhibits)",
+        r = subprocess.run(["curl", "-s", "-F", f"chat_id={CHAT}", "-F", f"caption={mc} — {kind} ({nex} exhibits)",
                             "-F", f"document=@{path}", f"https://api.telegram.org/bot{tok}/sendDocument"],
                            capture_output=True, text=True)
         print("[send] sent ✓" if '"ok":true' in r.stdout else f"[send] FAIL {r.stdout[:160]}")

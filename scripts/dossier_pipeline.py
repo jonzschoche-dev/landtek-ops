@@ -221,16 +221,18 @@ def stage_gate(md_path, matter):
 
 
 def stage_deliver(matter, md_path, send, exclude_ids=()):
-    print("\n── 5 · DELIVER (bound PDF) ──")
+    print("\n── 5 · DELIVER (slim core working copy + full archive) ──")
     remote_md = f"/tmp/dossier_{matter}.md"
     subprocess.run(["scp", "-q", md_path, f"{VPS}:{remote_md}"], timeout=120)
     exc = (" --exclude " + ",".join(str(i) for i in exclude_ids)) if exclude_ids else ""
-    cmd = ("cd /root/landtek && set -a; . .env 2>/dev/null; set +a; "
-           f"python3 scripts/case_bundle.py {matter} --brief {remote_md}{exc}" + (" --send" if send else ""))
-    r = subprocess.run(["ssh", "-o", "ConnectTimeout=60", VPS, cmd], capture_output=True, text=True, timeout=900)
-    for l in r.stdout.splitlines():
-        if "[bundle]" in l or "[send]" in l:
-            print("   " + l.strip())
+    # core working copy (the one sent on --send) + the full navigated archive (always generated)
+    for label, flags in [("core", " --core" + (" --send" if send else "")), ("full archive", "")]:
+        cmd = ("cd /root/landtek && set -a; . .env 2>/dev/null; set +a; "
+               f"python3 scripts/case_bundle.py {matter} --brief {remote_md}{exc}{flags}")
+        r = subprocess.run(["ssh", "-o", "ConnectTimeout=60", VPS, cmd], capture_output=True, text=True, timeout=900)
+        for l in r.stdout.splitlines():
+            if "[bundle]" in l or "[send]" in l:
+                print(f"   [{label}] " + l.strip())
 
 
 def main():
