@@ -276,6 +276,77 @@ def _resolutions(ids, docket):
     return out
 
 
+_OP_MARKERS = ("wherefore", "premises considered", "it is hereby", "is hereby ordered",
+               "is hereby resolved", "this office hereby", "ordered:", "resolved:", "directed to",
+               "after careful", "in view of the foregoing")
+
+
+def _dispositions(ids, docket):
+    """The agency's POSITION over the life of the matter — every government-issued disposition AND
+    respondent filing (resolution / order / OSCA / NSR / notice / reply / response / explanation /
+    rejoinder / counter-affidavit), in date order, each with its operative line + a link. A reference for
+    counsel to track the respondents' historic stance (how their position evolved, and where it contradicts
+    itself across filings). Scoped to the case's docket docs; the gist is verbatim from the source."""
+    if not ids:
+        return []
+    sql = (f"SELECT id||'|'||coalesce(left(doc_date::text,10),'')||'|'||coalesce(original_filename,'(untitled)') "
+           f"FROM documents WHERE id IN ({','.join(ids)}) "
+           "AND (original_filename ~* 'resolution|order|osca|nsr|notice|disposition|reply|response|explanation|rejoinder|counter|letter' "
+           "OR execution_status='government_issued') ORDER BY doc_date NULLS LAST, id;")
+    out, seen = [], set()
+    for line in _vps_psql(sql).splitlines():
+        if line.count("|") < 2:
+            continue
+        did, date, fn = line.split("|", 2)
+        did = did.strip()
+        if did in seen:
+            continue
+        seen.add(did)
+        txt = _vps_psql(f"SELECT regexp_replace(left(extracted_text,4000),'[[:space:]]+',' ','g') FROM documents WHERE id={did};")
+        low = txt.lower()
+        hits = [low.find(m) for m in _OP_MARKERS if low.find(m) >= 0]
+        pos = min(hits) if hits else 0
+        gist = re.sub(r"\s+", " ", txt[pos:pos + 260]).strip()
+        out.append({"doc_id": did, "date": date.strip(), "title": fn.strip()[:74], "gist": gist})
+    return out
+
+
+def _complaint_block(case, matter_likes):
+    """The FOUNDATIONAL pleading + the precipitating record. Docket-scoping drops the initiating complaint
+    (it predates the docket number), so this surfaces the matter's complaint + cease-and-desist by filename
+    within the matter (NOT docket-scoped) and the earliest verified facts (the request history + the admitted
+    error). Deterministic — survives every regeneration; no hand-editing."""
+    mc = matter_likes[0] if matter_likes else None
+    if not mc:
+        return []
+    docs = _vps_psql(
+        f"SELECT id||'|'||coalesce(left(doc_date::text,10),'')||'|'||coalesce(original_filename,'(untitled)') "
+        f"FROM documents WHERE id IN (SELECT doc_id FROM document_matter_links WHERE matter_code='{mc}') "
+        "AND original_filename ~* 'complaint|cease' AND coalesce(original_filename,'') !~* 'sample|template' "
+        "ORDER BY doc_date NULLS LAST, id;").splitlines()
+    facts = [f for f in _vps_psql(
+        f"SELECT '- '||regexp_replace(statement,'[[:space:]]+',' ','g')||'  [doc:'||source_id||']' "
+        f"FROM matter_facts WHERE matter_code='{mc}' AND provenance_level='verified' "
+        "AND statement ~* 'psd|cadastr|229480|t-32911|t-4497|november 7|7 november|26 nov|december 5|5 december"
+        "|technical request|inadvertent|filed (a|the)? ?formal|administrative complaint on' "
+        "ORDER BY id LIMIT 8;").splitlines() if f.strip()]
+    if not docs and not facts:
+        return []
+    md = ["## The complaint & the precipitating record", "",
+          "*The foundational pleading and the request history the agency failed to act on. The initiating "
+          "complaint predates the ARTA docket number, so it is surfaced here by filing date — the docket-scoped "
+          "record further below begins only once the case was numbered. Verify each before relying.*", ""]
+    for line in docs:
+        if line.count("|") < 2:
+            continue
+        did, date, fn = line.split("|", 2)
+        md.append(f"- **{date.strip() or '(undated)'}** — {fn.strip()[:78]} — [open]({BASE_URL}/{did.strip()})")
+    if facts:
+        md += ["", "**The precipitating record (verified facts):**", ""] + facts
+    md += ["", "---", ""]
+    return md
+
+
 def _gap_phrase(df):
     m = {"phantom": "never actually delivered (a phantom response sent to a dead address)",
          "late": "furnished only after the period had run", "failed": "never issued at all"}
@@ -498,6 +569,10 @@ def build_case(case, out_path, use_frontier=True):
         md.append(f"**{label}.** {law_cache[ci]}" if law_cache[ci] else f"**{cite}** — *[not embedded — obtain official text]*")
         md.append("")
 
+    # ── the foundational complaint + precipitating record (matter-scoped, NOT docket: the initiating
+    #    complaint predates the docket number, so docket-scoping silently drops it) ──
+    md += _complaint_block(case, [f"MWK-ARTA-{case['code']}"])
+
     rule = "\n\n".join(t for t in law_cache.values() if t)
     q = (f"{case['issue']} refusal to release public records additional requirement Citizen's Charter SPA "
          f"processing time inaction {case['office']} {docket}")
@@ -515,6 +590,21 @@ def build_case(case, out_path, use_frontier=True):
             when = f"{_fmt_date(r['date'])[0]} — " if r["date"] else ""
             md += [f"**{when}disposition of record.**",
                    f"> \"{r['quote']}\" — [open]({BASE_URL}/{r['doc_id']})", ""]
+
+    # ── the agency's POSITION over time: every disposition + respondent filing, chronologically ──
+    # (a reference for counsel — the historic stance, where it evolved, where it contradicts itself)
+    disp = _dispositions(ids, docket)
+    if disp:
+        md += ["## The agency's position over time — orders, resolutions & respondent filings", "",
+               "*Reference for counsel: each government-issued disposition and respondent filing in this "
+               "matter, in date order, with its operative line and a link — to review the respondents' "
+               "historic position (how it shifted, and where one filing contradicts another). Verify each "
+               "against the source before relying.*", ""]
+        for d in disp:
+            md.append(f"- **{d['date'] or '(undated)'}** — {d['title']} — [open]({BASE_URL}/{d['doc_id']})")
+            if d["gist"]:
+                md.append(f"    > {d['gist']}")
+        md += ["", "---", ""]
 
     print(f"[case {case['code']}] {len(ids)} docs · synthesizing finding …", file=sys.stderr)
     md += [f"## The finding — {docket}", synth_section(thesis, rule, ps, use_frontier), ""]
