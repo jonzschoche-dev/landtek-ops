@@ -177,6 +177,40 @@ INTEGRITY: {integ_note}
     return out
 
 
+# ── 3b RED TEAM (adversarial critique — a separate, deliberately hostile pass) ──
+def stage_redteam(md_path, matter, docket, pos, use_frontier):
+    print("\n── 3b · RED TEAM (opposing critique) ──")
+    body = open(md_path).read()
+    opp = "\n".join("- " + o.strip() for o in pos["opp"]) or "(no respondent filing in record)"
+    prompt = f"""You are OPPOSING COUNSEL and a skeptical handling lawyer reviewing the dossier below for matter
+{matter} ({docket}). ATTACK the complainant's case and expose every weakness — be ruthless and concrete. This
+is a PRE-MORTEM so our side fixes it before the tribunal does. Ground the critique in the dossier and the
+respondents' filing; do NOT invent facts. Output GitHub-markdown, exactly this section:
+
+## Weaknesses & the opposing case (red team)
+- **Strongest arguments against us** — the 2–4 points the respondents / tribunal will press (jurisdiction,
+  "we already acted", proper-referral, FOI exemption, non-receipt of the request, record already closed, etc.).
+- **Where our proof is thin** — the weakest element; any citation that is procedural rather than probative;
+  what we ASSERT but have not PROVEN.
+- **Most likely path to dismissal** — the single cleanest way ARTA rules against us.
+- **Shore-ups** — the concrete fix for each weakness (a document to obtain, a count to drop, an argument to add).
+
+THE DOSSIER (our case):
+{body[:4200]}
+
+RESPONDENTS' ACTUAL FILING (their defense):
+{opp[:1500]}
+"""
+    crit = (cs._frontier(prompt) if use_frontier else cs._ollama(prompt)) or ""
+    if not crit.strip():
+        print("   (red-team pass produced nothing)"); return
+    marker = "\n\n---\n*Primary documents"
+    body = (body.replace(marker, "\n\n" + crit.strip() + marker, 1) if marker in body
+            else body + "\n\n" + crit.strip() + "\n")
+    open(md_path, "w").write(body)
+    print("   appended red-team critique")
+
+
 # ── 4 GATE · 5 DELIVER ──────────────────────────────────────────────────────────
 def stage_gate(md_path, matter):
     print("\n── 4 · DILIGENCE GATE ──")
@@ -186,12 +220,13 @@ def stage_gate(md_path, matter):
         print("   " + ((r.stdout.strip().splitlines() or ["(no output)"])[-1]))
 
 
-def stage_deliver(matter, md_path, send):
+def stage_deliver(matter, md_path, send, exclude_ids=()):
     print("\n── 5 · DELIVER (bound PDF) ──")
     remote_md = f"/tmp/dossier_{matter}.md"
     subprocess.run(["scp", "-q", md_path, f"{VPS}:{remote_md}"], timeout=120)
+    exc = (" --exclude " + ",".join(str(i) for i in exclude_ids)) if exclude_ids else ""
     cmd = ("cd /root/landtek && set -a; . .env 2>/dev/null; set +a; "
-           f"python3 scripts/case_bundle.py {matter} --brief {remote_md}" + (" --send" if send else ""))
+           f"python3 scripts/case_bundle.py {matter} --brief {remote_md}{exc}" + (" --send" if send else ""))
     r = subprocess.run(["ssh", "-o", "ConnectTimeout=60", VPS, cmd], capture_output=True, text=True, timeout=900)
     for l in r.stdout.splitlines():
         if "[bundle]" in l or "[send]" in l:
@@ -215,8 +250,10 @@ def main():
     integ = stage_integrity(a.matter, docket)
     pos = stage_position(a.matter, docket, pb)
     md = stage_synthesis(a.matter, docket, pb, pos, integ, a.frontier)
+    stage_redteam(md, a.matter, docket, pos, a.frontier)
     stage_gate(md, a.matter)
-    stage_deliver(a.matter, md, a.send)
+    contam_ids = [r.split()[0] for r in integ["contam"] if r.split() and r.split()[0].isdigit()]
+    stage_deliver(a.matter, md, a.send, exclude_ids=contam_ids)
     print("\n✓ done")
 
 

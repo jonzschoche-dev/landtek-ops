@@ -54,7 +54,13 @@ def _rank(fn):
     return 4
 
 
-def _gather(mc):
+# foundational narrative doc-types that belong in the packet even when no matter_fact cites them by id
+CORE_RE = __import__("re").compile(
+    r"inquiry|request|letter|cease|demand|reply|respons|complaint|escalation|rejoinder|manifest|"
+    r"order|resolution|\bnsr\b|\bosca\b|affidavit|indorsement|referral|notice", __import__("re").I)
+
+
+def _gather(mc, exclude=frozenset()):
     c = psycopg2.connect(DSN); cur = c.cursor()
     cur.execute("SELECT coalesce(title,''), coalesce(docket_number,''), coalesce(forum,court_or_agency,'') FROM matters WHERE matter_code=%s", (mc,))
     title, docket, forum = cur.fetchone() or ("", "", "")
@@ -63,25 +69,39 @@ def _gather(mc):
     off = {r[0] for r in cur.fetchall()}
     cur.execute("""SELECT d.id, coalesce(d.original_filename,d.smart_filename,'?'), d.doc_date, d.file_path,
                    (SELECT count(*) FROM matter_facts f WHERE f.matter_code=%s AND f.source_id=d.id::text
-                      AND f.provenance_level='verified') nf
+                      AND f.provenance_level='verified') nf,
+                   coalesce(d.content_hash,''),
+                   lower(regexp_replace(left(coalesce(d.extracted_text,''),1200),'[^a-z0-9]','','g'))
                    FROM documents d
                    WHERE (d.matter_code=%s OR d.id IN (SELECT doc_id FROM document_matter_links WHERE matter_code=%s))
                      AND d.file_path IS NOT NULL
                      AND coalesce(d.original_filename, d.smart_filename, '') !~* 'sample|template'
+                     AND coalesce(d.original_filename, d.smart_filename, '') !~* '[.]zip$'
                    ORDER BY d.id""", (mc, mc, mc))
-    docs = []
-    for did, fn, dd, fp, nf in cur.fetchall():
-        if did in off or not (fp and os.path.exists(fp)):
+    docs, seen_hash, seen_near = [], set(), set()
+    for did, fn, dd, fp, nf, chash, tkey in cur.fetchall():
+        if did in off or did in exclude or not (fp and os.path.exists(fp)):
             continue
-        if nf == 0 and _rank(fn) > 1:        # skip fact-less peripheral letters; keep operative + core evidence
+        # keep the NARRATIVE: a doc earns a place if it is fact-cited, OR a core doc-type, OR simply dated
+        # (the initial letters / correspondence up to the complaint). Drop only undated fact-less non-core noise.
+        if nf == 0 and _rank(fn) > 1 and not dd and not CORE_RE.search(fn or ""):
+            continue
+        # DEDUP — bind each document once: drop exact-byte dups AND same-day same-content re-scans
+        # (e.g. the complaint ingested under two filenames) by (date, first-300 alnum of text).
+        nearkey = (str(dd), tkey[:300]) if len(tkey) >= 300 else None
+        if (chash and chash in seen_hash) or (nearkey and nearkey in seen_near):
             continue
         try:
             pc = fitz.open(fp).page_count
         except Exception:
             continue
+        if chash:
+            seen_hash.add(chash)
+        if nearkey:
+            seen_near.add(nearkey)
         docs.append([did, DT.get(did, fn), dd, fp, nf, pc])
     docs.sort(key=lambda r: (_rank(r[1]), -r[4], r[0]))
-    docs = docs[:14]                         # pick the most-relevant, then…
+    docs = docs[:20]                         # pick the most-relevant, then…
     # …bind them in CHRONOLOGICAL order so the exhibits follow the dossier's timeline outline —
     # complaint first, then each response/order in sequence — for prompt examination in order.
     docs.sort(key=lambda r: (str(r[2]) if r[2] else "9999-99-99", r[0]))
@@ -208,8 +228,8 @@ def _append_doc(out, fp, dpi, quality, text="", label=""):
     _render_text_pages(out, text, label)                        # .docx etc. — render the content so it's in-bundle
 
 
-def build(mc, dpi=110, quality=45, brief_md=None):
-    title, docket, forum, docs, exmap, facts, DT, MN, tmap = _gather(mc)
+def build(mc, dpi=110, quality=45, brief_md=None, exclude=frozenset()):
+    title, docket, forum, docs, exmap, facts, DT, MN, tmap = _gather(mc, exclude)
     if not docs:
         sys.exit(f"[bundle] no local supporting documents found for {mc}")
     out = fitz.open()
@@ -238,7 +258,9 @@ def main():
     dpi = int(sys.argv[sys.argv.index("--dpi") + 1]) if "--dpi" in sys.argv else 120
     q = int(sys.argv[sys.argv.index("--quality") + 1]) if "--quality" in sys.argv else 50
     brief = sys.argv[sys.argv.index("--brief") + 1] if "--brief" in sys.argv else None
-    path, nex = build(mc, dpi, q, brief_md=brief)
+    exclude = frozenset(int(x) for x in sys.argv[sys.argv.index("--exclude") + 1].split(",")) \
+        if "--exclude" in sys.argv else frozenset()
+    path, nex = build(mc, dpi, q, brief_md=brief, exclude=exclude)
     kb = os.path.getsize(path) // 1024
     print(f"[bundle] {mc}: {nex} exhibits → {path} ({kb} KB)")
     if "--send" in sys.argv:
