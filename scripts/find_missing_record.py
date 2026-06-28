@@ -158,6 +158,7 @@ def _collect(svc, queries, limit):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backfill", action="store_true")
+    ap.add_argument("--matter")
     ap.add_argument("--query")
     ap.add_argument("--ocr", action="store_true")
     ap.add_argument("--apply", action="store_true")
@@ -179,7 +180,18 @@ def main():
         print(f"[find] OCR-filled {ocr_fill(cur, a.apply)}")
         return
 
-    queries = [a.query] if a.query else AGENCY_QUERIES
+    if a.matter:                                    # recover one matter's records (Stage 0 of case_dossier)
+        rev = {v: k for k, v in DOCKET_MAP.items()}
+        queries = []
+        if rev.get(a.matter):
+            queries.append(f'"{rev[a.matter]}" OR "CTN {rev[a.matter]}"')
+        if a.matter.startswith("MWK"):
+            queries.append('Psd-229480 OR Psd-221861 OR "Lot 2-A" OR "boundary history" OR "LETTER DATED NOVEMBER 26"')
+        queries = queries or AGENCY_QUERIES
+    elif a.query:
+        queries = [a.query]
+    else:
+        queries = AGENCY_QUERIES
     ids = _collect(svc, queries, a.limit)
     print(f"[find] {len(ids)} unique live-mailbox messages match ({mode})")
     if not ids and a.query and a.apply:
