@@ -14,6 +14,7 @@ import subprocess
 import sys
 
 SSH = ["ssh", "-o", "ConnectTimeout=45", "root@100.85.203.58"]
+ON_VPS = os.path.realpath(__file__).startswith("/root/")  # query docker directly on the VPS; SSH only from the Mac
 
 # What the active matters need. Each: (label, why, probe-keywords [ALL present in one chunk], citation-scope).
 NEEDED = [
@@ -57,8 +58,11 @@ NEEDED = [
 
 
 def _psql(sql):
-    r = subprocess.run(SSH + ["docker exec -i n8n-postgres-1 psql -U n8n -d n8n -t -A"],
-                       input=sql, capture_output=True, text=True, timeout=120)
+    cmd = "docker exec -i n8n-postgres-1 psql -U n8n -d n8n -t -A"
+    if ON_VPS:    # local docker — SSH-to-self returned empty, which made every probe false-MISSING
+        r = subprocess.run(cmd, shell=True, input=sql, capture_output=True, text=True, timeout=120)
+    else:         # Mac side reaches the VPS over SSH
+        r = subprocess.run(SSH + [cmd], input=sql, capture_output=True, text=True, timeout=120)
     return r.stdout.strip()
 
 
