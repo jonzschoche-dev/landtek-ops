@@ -207,6 +207,20 @@ Auto-tagged by landtek_git_routine.sh on ${SIDE}."
       git push origin main 2>&1 | tail -3
     fi
     ok "deploy_${nn} live"
+
+    # Post-deploy: sync the VPS clone's CODE dirs to origin so manual scp is unnecessary and the
+    # running code never drifts from what was just deployed. Surgical (only code paths), so the
+    # tracked-but-regenerated dirs (case_dossiers/) and data dirs are left untouched; safe on a
+    # dirty tree because `checkout <ref> -- <paths>` overwrites only the named code files.
+    if [ "$SIDE" != "VPS" ]; then
+      hdr "Sync VPS code"
+      if ssh -o ConnectTimeout=20 root@100.85.203.58 \
+           "cd /root/landtek && git fetch origin main -q && git checkout origin/main -- scripts migrations leo_tools truth_tests landtek_telegram 2>/dev/null"; then
+        ok "VPS code synced to deploy_${nn} (no scp needed)"
+      else
+        warn "VPS code sync skipped (ssh/git issue) — verify manually"
+      fi
+    fi
     ;;
 
   *)
