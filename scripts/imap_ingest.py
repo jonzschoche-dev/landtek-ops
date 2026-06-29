@@ -28,7 +28,7 @@ sys.path.insert(0, "/root/landtek"); sys.path.insert(0, "/root/landtek/scripts")
 import blend_emails as B
 
 ACCOUNTS = {
-    "hotmail": {"host": "imap-mail.outlook.com", "port": 993, "email": "jonpeezee@hotmail.com",
+    "hotmail": {"host": "outlook.office365.com", "port": 993, "email": "jonpeezee@hotmail.com",
                 "user_env": "HOTMAIL_IMAP_USER", "pass_env": "HOTMAIL_IMAP_PASS",
                 "folders": ["INBOX", "Sent"]},
     "hayuma":  {"host": "imap.gmail.com", "port": 993, "email": "jonathan@hayuma.org",
