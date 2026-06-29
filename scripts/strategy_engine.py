@@ -24,16 +24,21 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 
 NORTH_STAR = {
     "MWK-001": ("Recover + consolidate the Mary Worrick Keesey estate — restore the full T-4497 "
-                "derivative chain to the heirs, free of the fraudulent transfers, then settle/secure "
-                "the estate."),
+                "derivative chain to the heirs free of the fraudulent transfers; AND compel the "
+                "occupiers (LGU Mercedes and the named transferees) to PAY OR BUY — full-value "
+                "compensation, lease, or negotiated purchase for land they cannot title (the "
+                "Mariano v. Naga outcome) — using COA / Ombudsman / ARTA Sec.21 legal pressure as the lever."),
 }
 
 # matter_code -> (leverage 1-5, contribution, why) toward the north-star
 MWK_LEVERAGE = {
     "MWK-CV26360":    (5, "spearhead", "litigates the de la Fuente keystone — voids Balane + cascades to the chain"),
+    "MWK-LGU-RECOVERY": (5, "spearhead", "litigates the LGU keystone — void donation + ₱2.88M spend → pay-or-buy (Naga); monetizes the occupation"),
     "MWK-TCT4497":    (4, "advances",  "forces the RD chain record correction; sits in the keystone cascade"),
     "MWK-ESTATE":     (4, "advances",  "consolidation + settlement umbrella for the recovered estate"),
     "MWK-CV6839":     (3, "funds",     "just-compensation recovery converts a taking into estate value"),
+    "MWK-ARTA-1210":  (3, "pressure",  "COA fraud-audit pressure on the LGU spend — feeds the LGU keystone"),
+    "MWK-ARTA-1378":  (3, "pressure",  "the ₱2.88M audit / BAC-chairman exposure — feeds the LGU keystone"),
     "MWK-GUARDIANSHIP": (3, "protects", "protects Marcia + secures authority to act for the estate"),
     "MWK-OP-PETITION": (2, "pressure", "supervisory escalation pressure on the bureaucracy"),
 }
@@ -48,6 +53,16 @@ KEYSTONES = [
               "under it falls — the 2016 deed, Balane's T-079-2021002127, and the derivative chain from "
               "T-52540 — and the same defect reaches the 20 transferees who derive through that authority.",
      "downstream_note": "+ opens the 20 named-transferee recoveries (evidence_action_list)"},
+    {"case_file": "MWK-001",
+     "label": "LGU's 1953 donation declared void + the ₱2.88M spend exposed (no signed instrument; council admits no donation)",
+     "controlling_matter": "MWK-LGU-RECOVERY",
+     "cascade_matters": ["MWK-ARTA-1210", "MWK-ARTA-1378", "MWK-ARTA-1212", "MWK-ESTATE"],
+     "basis": "A donation of immovable is void without a signed public instrument (Civil Code 749); the LGU "
+              "holds no original deed, and its own councilors admit (SB group chat, Dec 2024 — source Ibasco) "
+              "the donation cannot be found while debating a loan to BUY the land. The ₱2,881,071.57 Brentmin "
+              "rehabilitation (PhilGEPS NOA 25-Sep-2024, Sanggunian-funded) was spent on titled TCT T-32911 with "
+              "knowledge of the defect — Mariano v. City of Naga compels recovery or full compensation/lease.",
+     "downstream_note": "+ opens the COA fraud audit (1210), the Ombudsman §3(e), and the pay-or-buy settlement leverage"},
 ]
 
 

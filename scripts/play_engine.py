@@ -141,6 +141,23 @@ PLAYBOOK = {
             if has(el, "ward_status") and not missing(el, "estate_to_protect")
             else _blocked("petition not ready", "document ward incapacity + estate to protect")),
     ],
+    "lgu_recovery": [
+        ("naga_pay_or_buy", "Demand recovery OR full compensation/lease — pay-or-buy (the Naga outcome)", "demand", 5,
+         "Civil Code 749 (void donation) + Mariano v. City of Naga — an occupant of titled land it cannot title must vacate or justly compensate/buy",
+         "Serve the Naga demand on the LGU: vacate + restore, or buy/lease at full value; the council's own buy-debate is the opening.",
+         lambda m, el: _ready("void donation + heirs' title + public spend proven — demand pay-or-buy")
+            if has(el, "void_donation") and has(el, "ownership") else _blocked("void/ownership not pinned", "pin the void donation + the heirs' title")),
+        ("ombudsman_3e", "File Ombudsman §3(e) complaint vs the officials", "filing", 5,
+         "R.A. 3019 §3(e) — manifest partiality / evident bad faith / undue injury: spending public funds on titled land knowing the donation is void",
+         "File the complaint-affidavit naming the Mayor + BAC chairman + councilors; the SB chat admissions corroborate knowledge.",
+         lambda m, el: _ready("knowledge admission + spend + injury proven — file the §3(e)")
+            if has(el, "knowledge_admission") and has(el, "public_spend") else _blocked("knowledge/spend not pinned", "pin the admissions + the ₱2.88M spend")),
+        ("coa_fraud_audit", "File COA special/fraud audit request (Municipality of Mercedes)", "filing", 4,
+         "1987 Constitution Art IX-D §2; PD 1445 §68 — audit of public funds/property used upon privately-titled land",
+         "File the COA Region V audit request (built: /files/c/1247) with the NOA + the admissions; await addressee + date.",
+         lambda m, el: _ready("public spend on titled land documented — file the audit")
+            if has(el, "public_spend") else _blocked("spend not documented", "pin the contract/expenditure")),
+    ],
     "generic": [
         ("assemble_demand", "Assemble + send a demand letter", "demand", 2,
          "demand preserves rights + creates a record",
