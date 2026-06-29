@@ -31,4 +31,13 @@ EOSQL
 
 # 3) refresh the per-matter case-file snapshots (the view is live; these are the readable copies)
 python3 scripts/case_file.py --all || true
+
+# 4) KNOWLEDGE + STRATEGY refresh — close the ingest->knowledge->strategy lockstep gap.
+#    Newly-ingested docs land in the DIGITAL corpus (documents); without this they stay invisible to
+#    the KNOWLEDGE layer (matter_facts) and the strategy engine reasons on stale inputs. This promotes
+#    structured facts from the new docs, then re-aims the campaign board — so the war room reflects the
+#    latest evidence every cycle. $0 (regex harvest + pure-rules engines; no LLM).
+python3 scripts/harvest_facts.py --all --go 2>&1 | tail -2 || true            # docs -> matter_facts (grounded)
+python3 scripts/strategy_engine.py --seed --go 2>&1 | tail -2 || true         # north-star + leverage + keystones
+python3 scripts/play_engine.py --generate-all --go 2>&1 | tail -2 || true     # offensive war-room queue
 echo "[sweep] done $(date -u +%FT%TZ)"
