@@ -18,7 +18,7 @@
 
 - **✅ Court: MTC Mercedes, Camarines Norte; governed by Summary Procedure.** NOT the RTC. NOT an "Aug 1 pre-trial." Pre-trial was **May 13, 2026 (passed)** — the case advanced into motion practice.
 - **✅ Live now:** our **Motion for Summary Judgment** pending a ruling; defendants moving to admit **Gloria Balane's Judicial Affidavit** (excluded at pre-trial); **mediation** held ~June 2.
-- **✅ Parallel: MWK-GUARDIANSHIP** (special proceeding, RTC Daet) — **✅ Atty. Adan Botor is counsel of record** (ENGAGED); **✅ petition FILED** (status: pending RTC grant). Guardianship-first sequencing (Jonathan as guardian) gates CV-26360 authority.
+- **✅ Parallel: MWK-GUARDIANSHIP** (special proceeding, RTC Daet) — **✅ Atty. Adan Botor is counsel of record** (ENGAGED); **✅ petition FILED as Spec. Proc. No. 2680, RTC Br. 41 Daet — hearing SET 2026-07-27 8:30am** (in-court; per RTC Order doc#1199 / gmail#91604 from Botor, recv 2026-06-22; supersedes the older "pending filing" language). Guardianship-first sequencing (Jonathan as guardian) gates CV-26360 authority.
 - **Posture: wartime, not peacetime.** Everything the stack does serves the Aug 12 deadline / the SJ motion / the guardianship grant, or it is deferred. No from-scratch rebuilds during the live window.
 
 **✅ Verified case corrections (override older docs / CLAUDE.md):**
