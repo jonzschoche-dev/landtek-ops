@@ -54,6 +54,24 @@ NEEDED = [
     # ── the APPEAL / correction-path forum: the Office of the President ──
     ("AO 22 s.2011 (OP appeals)", "Office of the President — CURRENT appeal rules (repealed AO 18): 15-day period, P1,500 fee, stay, finality", ["appeal to the office of the president"], ""),
     ("OP review authority", "President's power of control (Const Art VII §17) — basis for supervisory review/corrective action over ARTA", ["control of all the executive"], ""),
+    # ── PRIVATE-LAW / CONVEYANCE SCRUTINY: the rules to test the de la Fuente (and all MWK) title transfers ──
+    # The transactions to scrutinize are agent-executed land sales under the 1992 Munda SPA. These provisions
+    # are the measure for VALIDITY (scope + term + revocation), the VOID consequence, and the REMEDY (recovery,
+    # accounting, trust, prescription). Needed so the stack can adjudicate a conveyance offline, not just ARTA.
+    ("CC Art. 1874", "Agency — sale of LAND through an agent w/o WRITTEN authority to sell is VOID (the core test of the de la Fuente deeds)", ["sale of a piece of land", "in writing"], "386"),
+    ("CC Art. 1878", "Agency — acts requiring a SPECIAL power (incl. to sell/convey immovable); 'negotiate' ≠ 'sell'", ["Special powers of attorney are necessary"], "386"),
+    ("CC Art. 1879", "Agency — a special power to sell is STRICTLY construed (authority not expanded by implication)", ["special power to sell excludes"], "386"),
+    ("CC Art. 1891", "Agency — agent's DUTY to render account & deliver to principal all received (the 'never a peso' breach)", ["bound to render an account"], "386"),
+    ("CC Art. 1919", "Agency — EXTINGUISHED by revocation / death of agent (Cesar's death terminates; the termination-date crux)", ["Agency is extinguished"], "386"),
+    ("CC Art. 1920", "Agency — principal may REVOKE at will (the 15-Aug-2005 revocation)", ["may revoke the agency at will"], "386"),
+    ("CC Art. 1921", "Agency — revocation re specified persons binds them once NOTICED/registered (constructive notice; kills good-faith reliance post-2005)", ["contracting with specified persons"], "386"),
+    ("CC Art. 1317", "Contracts — acts in another's name w/o authority are UNENFORCEABLE absent ratification (no ratification: ₱0 received)", ["in the name of another"], "386"),
+    ("CC Art. 1409", "Contracts — VOID/inexistent contracts produce no effect (the void-deed spine)", ["inexistent and void from the beginning"], "386"),
+    ("CC Art. 1410", "Contracts — action to declare a void contract inexistent is IMPRESCRIPTIBLE", ["inexistence of a contract"], "386"),
+    ("CC Art. 1456", "Trusts — property acquired by fraud => CONSTRUCTIVE TRUST for the true owner (reconveyance hook)", ["trustee of an implied trust"], "386"),
+    ("CC Art. 1505", "Sales — NEMO DAT: sale by one who is not the owner / not authorized passes no title", ["is not the owner"], "386"),
+    ("PD 1529 §53", "Torrens — registration by fraud; INNOCENT-PURCHASER-FOR-VALUE test (is Balane one? void deed + registered revocation say no)", ["innocent purchaser for value"], "1529"),
+    ("PD 1529 §107", "Torrens — SURRENDER/cancellation of an outstanding owner's duplicate; vehicle to cancel the void derivative titles", ["Surrender of withhold"], "1529"),
 ]
 
 
