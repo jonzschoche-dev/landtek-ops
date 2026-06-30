@@ -72,6 +72,11 @@ NEEDED = [
     ("CC Art. 1505", "Sales — NEMO DAT: sale by one who is not the owner / not authorized passes no title", ["is not the owner"], "386"),
     ("PD 1529 §53", "Torrens — registration by fraud; INNOCENT-PURCHASER-FOR-VALUE test (is Balane one? void deed + registered revocation say no)", ["innocent purchaser for value"], "1529"),
     ("PD 1529 §107", "Torrens — SURRENDER/cancellation of an outstanding owner's duplicate; vehicle to cancel the void derivative titles", ["Surrender of withhold"], "1529"),
+    # ── CONTROLLING JURISPRUDENCE (verified vs lawphil; embedded in legal_chunks forum CIVIL) ──
+    ("Cosmic Lumber v. CA (G.R. 114311)", "Agent authority strictly construed; sale beyond SPA scope is void ipso jure ('negotiate' ≠ 'sell')", ["ipso jure is consequently void"], "114311"),
+    ("Sps. Alcantara v. Nido (G.R. 165133)", "Art. 1874 — land sale by agent w/o WRITTEN authority is void; cannot be ratified", ["shall be in writing"], "165133"),
+    ("Heirs of Tulauan v. Mateo (G.R. 248974)", "Reconveyance on a void/inexistent deed is IMPRESCRIPTIBLE (Art. 1410)", ["does not prescribe"], "248974"),
+    ("Domingo v. Domingo (G.R. L-30573)", "Art. 1891 — agent must account/remit all received; unfaithful agent forfeits compensation", ["render an account"], "30573"),
 ]
 
 
