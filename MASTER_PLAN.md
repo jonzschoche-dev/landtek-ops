@@ -231,10 +231,22 @@ confirm `/ops/spend` shows recorded n8n spend + the cap enforcing, and that Leo 
 - Paracale-001: active, or maintenance mode?
 - Don Qi role (client vs co-principal).
 - Recovery vs. settlement posture per transferee (the 20-transferee campaign).
-- Product versioning kickoff; capital strategy.
+- ~~Product versioning kickoff~~ — **DECIDED 2026-06-30: develop the product relentlessly.** A
+  dedicated commercialization subagent fleet now exists at `.claude/agents/` (product-hardener ·
+  ship-packager · revenue-engineer · truth-qa-gate) driving toward a retainer-ready workspace for the
+  proof clients (MWK-001 + Paracale-001), §4A money model. Still open: capital strategy.
 
 ## 8. Slip / change log
 
+- **2026-06-30** — **commercialization fleet established (`.claude/agents/`).** Operator directive:
+  "develop the product relentlessly" → ship a retainer-ready workspace + bring in money (§4A: PHP
+  15–50k/mo, >85% margin, proof clients MWK-001 + Paracale-001). Authored 4 Claude Code subagents,
+  $0 to exist, each baking in the non-negotiables (no hallucination · `_safe` views · provenance ·
+  client separation · S14 · stay-cheap/sim-stays-dead · git discipline · no financial execution):
+  **product-hardener** (reliability of what exists), **ship-packager** (client-visible surface),
+  **revenue-engineer** (pricing + >85% margin proof + cost governance), **truth-qa-gate** (adversarial
+  pre-ship gate). Orchestration + map in `.claude/agents/README.md`. Resolves the §7 product-versioning
+  decision. Net-new role definitions — NOT a rebuild of the resident agent fleet or case automation.
 - **2026-05-13** — pre-trial held; case advanced to motion practice (phase change, not a slip).
 - **2026-06-02** — mediation held; May-2026 docs had targeted a "v1.0 by June 2" cut — not cut; north star reset to **Aug 12** (trial testimony).
 - **2026-06-13** — droplet upgraded 1 GB→2 GB RAM / 33→67 GB / +2 GB swap ($16/mo); load 1.8→0.5, freezes resolved. VPS git resynced **381→423** (had drifted 42 commits behind, phantom-dirty — running code already matched origin, only HEAD was stale). `notifications/pending.txt` gitignored to stop the recurring dirty-tree-blocks-pull friction that caused the drift.
