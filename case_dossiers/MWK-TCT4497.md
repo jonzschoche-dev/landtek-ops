@@ -2,6 +2,13 @@
 
 **Forum:** Registry of Deeds  ·  **Docket:** T-4497  ·  **Status:** active / demand_letter_pending_send  ·  **Next deadline:** 2026-05-18
 
+> 📒 **Complete transaction ledger:** `drafts/t4497_transaction_ledger_2026-06-30.md` reads the
+> full 13-page title face (`doc:39`) and lists **all ~35 on-title transactions** (Eras A–E) with
+> supporting docs + gap report. Loaded into `instruments_on_title` (T-4497: 6 verified → 49 rows;
+> the added 43 are `inferred_strong`, source doc:39, OCR-soft figures flagged `[verify-img]`).
+> ⚠️ The "Evidence on file" list below mislabels the title-face copies `doc:39`/`doc:348`/`doc:382`
+> as "OCR-blocked" — they are in fact fully legible (doc:39 = 39,027 chars, all 13 pages).
+
 ## Verified facts — the document-proven corpus (1)
 
 - T-4497 FINAL MoE entry (No. 2010000600, June 16 2010): the title was SUBDIVIDED INTO 24 LOTS per LRC PSD-221861 (by letter-request of ROGELIO YASIS; notary Atty. Francisco R. Obusan III, Daet) and PARTIALLY CANCELLED, issuing the 079-2010xxxx derivative titles (e.g. 079-2010000663). Registrar of Deeds: Atty. Emmanuel Enriquez Tuy. This 2010 subdivision is the mechanism that created the modern 079- series the transferees hold (Gaulit 079-2010000694, Iligan 079-2018001329, Balane 079-2021002127). Note: the late MoE pages are modern computerized (clean, typed) — no tiling needed; only the pre-2000 handwritten pages required tile-crop.  `doc:25`
@@ -21,10 +28,10 @@
 - `doc:381` SB Inquiry Road Donation cc DILG MERCEDES.pdf — ⛔ OCR-blocked / too short
 - `doc:654` Vicente Jr. Murder.pdf — 📄 legible — unread
 - `doc:297` ROD Fraudylent  supporting docs REQUEST.pdf — 📄 legible — unread
-- `doc:39` Do over Scan Jan 2, 2025 at 5.16 PM.pdf 4497 — ⛔ OCR-blocked / too short
+- `doc:39` CTC TCT T-4497, 13pp (Ref 2023000031) — ✅ MASTER LEDGER, 39,027 chars / all 13 pages (full Memorandum of Encumbrances; see t4497_transaction_ledger)
 - `doc:303` BB ROD RECEIVED REQUEST April 29 2025.pdf — 📄 legible — unread
-- `doc:348` TCT-4497.pdf — ⛔ OCR-blocked / too short
-- `doc:382` TCT-4497.pdf — ⛔ OCR-blocked / too short
+- `doc:348` CTC TCT T-4497 (04-Aug-2023) — ✅ legible, 32,946 chars (duplicate of master doc:39)
+- `doc:382` 1964 MWK TCT (T-4497 partition era) — ✅ legible
 - `doc:344` Mayor iquiry about roads.pdf — 📄 legible — unread
 - `doc:249` TCT 38838, TCT 48336 — 📄 legible — unread
 - `doc:568` ? — 📄 legible — unread
@@ -33,7 +40,7 @@
 - `doc:694` Citizenship from Pansacola (1) (1)_dup1.pdf — ⛔ OCR-blocked / too short
 - `doc:473` ? — ⛔ OCR-blocked / too short
 - `doc:96` TCT-52540 Balane Fraud — 📄 legible — unread
-- `doc:224` Scan Jan 4, 2025 at 5.51 PM.pdf — ⛔ OCR-blocked / too short
+- `doc:224` CTC TCT T-4497 (04-Jan-2025) — ✅ legible, 16,435 chars (recent copy)
 - `doc:590` ? — 📄 legible — unread
 - `doc:272` TCT-52540.pdf — 📄 legible — unread
 - `doc:265` TCT-32916.pdf — ⛔ OCR-blocked / too short

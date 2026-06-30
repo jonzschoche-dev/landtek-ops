@@ -1,4 +1,8 @@
 # TCT T-4497 — Every Transaction Ever
+> ⚠️ **SUPERSEDED 2026-06-30** by `drafts/t4497_transaction_ledger_2026-06-30.md`, which reads the
+> full 13-page title face (doc:39) directly instead of inferring from `title_chain`/`title_transfers`.
+> Kept for the descent-tree cut only.
+
 **Generated:** 2026-05-16 21:35 UTC
 **Scope:** T-4497 and every descendant in `title_chain`.
 
