@@ -50,6 +50,28 @@ PAST_RE = re.compile(
     r"ordered|order ingested|likely the|not yet|bundled)", re.I)
 
 
+# §4B inline provenance tags must never be rendered half-open. A naive label[:70] truncation
+# severed "[HUMAN VERIFY]" into "[HUMAN VERIF" (deploy_642 bug) which a client-facing view then
+# renders verbatim. Cap the label, but if the cap lands inside an open bracket-tag, back up to
+# before the tag opened (or, if that would lose everything, drop the broken tail entirely).
+LABEL_CAP = 70
+TAG_OPEN_RE = re.compile(r"\[[^\]]*$")  # an unclosed '[...' running to end of the (capped) string
+
+
+def _tag_safe_label(text):
+    """Truncate to LABEL_CAP chars without leaving a severed §4B tag like '[HUMAN VERIF'."""
+    if not text:
+        return text
+    if len(text) <= LABEL_CAP:
+        return text
+    cut = text[:LABEL_CAP]
+    m = TAG_OPEN_RE.search(cut)
+    if m:
+        # the cap fell inside an open '[' tag — back up to just before the bracket
+        cut = cut[:m.start()].rstrip()
+    return cut
+
+
 def extract_dated_spans(text):
     """[(date, snippet)] for each date in free text, snippet = ±45 chars of context."""
     out = []
@@ -86,11 +108,21 @@ def gather(cur):
             obs.append({"date": m["next_deadline"], "matter": m["matter_code"],
                         "label": m["stage"], "kind": "deadline", "source": "next_deadline"})
             dated_matters.add(m["matter_code"])
+        # ROOT-CAUSE GATE (deploy_644): only harvest prose dates for a matter that ALREADY carries a
+        # structured next_deadline. A NULL next_deadline is the operator's explicit "this matter is
+        # NEEDS-A-DATE" signal — a historical date sitting in next_event/stage_notes prose (a mediation
+        # that was held, a filing, a death) must NEVER be promoted into a phantom forward deadline that
+        # overrides that. This is the exact trap that bit CV-26360 in deploy_642: we set next_deadline
+        # NULL (correct — Aug-1 discredited) but the prose's historical "2026-06-06" mediation date got
+        # parsed back into a surfaced OVERDUE row. Prose harvest is a SECONDARY enrichment of an already-
+        # dated matter, never a primary source that can date an intentionally dateless one.
+        if not m["next_deadline"]:
+            continue
         for fld in ("next_event", "stage_notes"):
             for dt, snip in extract_dated_spans(m[fld]):
                 if is_deadline_context(snip):
                     obs.append({"date": dt, "matter": m["matter_code"],
-                                "label": snip.strip()[:70], "kind": "obligation", "source": fld})
+                                "label": _tag_safe_label(snip.strip()), "kind": "obligation", "source": fld})
                     dated_matters.add(m["matter_code"])
                 else:
                     timeline += 1
@@ -98,7 +130,7 @@ def gather(cur):
                    WHERE target_date IS NOT NULL AND status='active'""")
     for g in cur.fetchall():
         obs.append({"date": g["target_date"], "matter": g["case_file"],
-                    "label": (g["goal_text"] or "")[:70], "kind": "goal", "source": "client_goals"})
+                    "label": _tag_safe_label(g["goal_text"] or ""), "kind": "goal", "source": "client_goals"})
     # matters with no date at all = the awareness gap (carry the stage so we can classify honestly)
     no_date = [(m["matter_code"], m["stage"]) for m in matters if m["matter_code"] not in dated_matters]
     return obs, no_date, len(matters), timeline
