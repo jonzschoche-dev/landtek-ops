@@ -13,6 +13,8 @@ ladder) = creditless re: Anthropic. Quality scales with OCR (the re-OCR sweep fe
   python3 comprehend.py --title T-32917            # dry: show what it derives
   python3 comprehend.py --title T-32917 --go       # derive + write (updates property_assets)
   python3 comprehend.py --sweep --limit 20 --go    # comprehend the title backlog, rate-limited
+  python3 comprehend.py --reconcile-chain          # dry: face-reads that the verified chain contradicts
+  python3 comprehend.py --reconcile-chain --go     # self-heal: verified chain overrides the face-read
 """
 import json
 import os
@@ -195,6 +197,62 @@ def sweep(limit=None, rpm=8, go=False):
     print(f"[comprehend] processed={done} wrote={wrote} flagged_for_human={flagged}", flush=True)
 
 
+def reconcile_chain(go=False):
+    """Self-heal against the VERIFIED title_chain (which OUTRANKS the LLM face-read).
+
+    comprehend reads the FACE of a title doc, so a title later cancelled by a derivative (its
+    cancellation living on a different doc) can read 'clean/active'. This pass corrects that:
+    a title that a verified 'cancelled_and_replaced' edge shows cancelled — but that is NOT marked
+    cancelled — is set to cancelled (verified, sourced to the chain quote). Subdivision parents
+    ('derivative' edges) that read active/clouded are AMBIGUOUS (mother-title status is
+    case-dependent) and only FLAGGED as an operator-review matter_fact, never auto-changed.
+    Hard-locked titles are skipped. Idempotent."""
+    c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("""SELECT DISTINCT ON (tc.parent_title) tc.parent_title AS tct,
+                          tc.provenance_quote AS q, t.status, coalesce(t.verification_lock,'') AS lock
+                   FROM title_chain tc JOIN titles t ON t.tct_number=tc.parent_title
+                   WHERE tc.relationship='cancelled_and_replaced' AND tc.provenance_level='verified'
+                     AND coalesce(tc.provenance_quote,'')<>'' AND t.status<>'cancelled'
+                   ORDER BY tc.parent_title, tc.verified_at DESC""")
+    corrected = []
+    for r in cur.fetchall():
+        if r["lock"] == "hard":
+            print(f"  SKIP {r['tct']}: hard-locked — surfacing for manual review", flush=True); continue
+        if go:
+            cur.execute("""UPDATE titles SET status='cancelled', provenance_level='verified',
+                           provenance_notes=left(%s,400), updated_at=now()
+                           WHERE tct_number=%s AND coalesce(verification_lock,'')<>'hard'""",
+                        ("chain-verified cancelled (supersedes face-read): " + (r["q"] or ""), r["tct"]))
+            cur.execute("""UPDATE property_assets SET title_status='cancelled',
+                           note=left(coalesce(note,'')||' | CHAIN-CORRECTED->cancelled (verified title_chain edge)',400),
+                           updated_at=now() WHERE title_ref=%s""", (r["tct"],))
+        corrected.append(r["tct"])
+        print(f"  {'CORRECT' if go else 'WOULD-CORRECT'} {r['tct']}: {r['status']} -> cancelled (verified)", flush=True)
+    cur.execute("""SELECT DISTINCT tc.parent_title AS tct, t.status FROM title_chain tc
+                   JOIN titles t ON t.tct_number=tc.parent_title
+                   WHERE tc.relationship='derivative' AND tc.provenance_level='verified'
+                     AND t.status IN ('active','clouded')
+                     AND tc.parent_title NOT IN (SELECT parent_title FROM title_chain
+                        WHERE relationship='cancelled_and_replaced' AND provenance_level='verified')
+                   ORDER BY tc.parent_title""")
+    flags = cur.fetchall()
+    for f in flags:
+        print(f"  FLAG {f['tct']}: {f['status']} (subdivision parent — mother-title status case-dependent)", flush=True)
+    if go and flags:
+        stmt = ("Title chain-reconcile: subdivision-parent titles read active/clouded but spawned verified "
+                "derivatives (" + ", ".join(f["tct"] for f in flags) + "). Mother-title status on subdivision "
+                "is case-dependent (retained vs cancelled) — operator confirmation needed before treated as fact.")
+        cur.execute("""INSERT INTO matter_facts (matter_code, statement, fact_kind, source_kind,
+                       provenance_level, confidence, created_by)
+                       SELECT 'MWK-001', %s, 'issue', 'operator', 'inferred_strong', 0.8, 'comprehend-reconcile-chain'
+                       WHERE NOT EXISTS (SELECT 1 FROM matter_facts
+                          WHERE created_by='comprehend-reconcile-chain' AND statement=%s)""",
+                    (stmt, stmt))
+    print(f"[reconcile] corrections={len(corrected)} subdivision_flags={len(flags)} go={go}", flush=True)
+    cur.close(); c.close()
+    return {"corrected": corrected, "flagged": [f["tct"] for f in flags], "go": go}
+
+
 if __name__ == "__main__":
     a = sys.argv
     if "--sweep" in a:
@@ -206,5 +264,7 @@ if __name__ == "__main__":
         except QuotaExhausted:
             print(json.dumps({"error": "gemini quota exhausted — comprehension runs as quota resets "
                               "(shares the re-OCR sweep's budget), or instantly with Anthropic credits"}, indent=2))
+    elif "--reconcile-chain" in a:
+        reconcile_chain(go="--go" in a)
     else:
         print(__doc__)
