@@ -58,7 +58,7 @@ Recovery **strength rises the later the deed** (the more clearly past the author
 ### ⚠️ VERIFY-HOLDER — the biggest gap (cannot rank until identified)
 | Titles | Area | Problem |
 |---|---|---|
-| **T-47655 / T-47656 / T-47657 / T-48336 / T-69404** | **~50,000 sqm combined** | Registrant OCR captured only the blank Torrens form ("conjugal partnership of spouses ___") — **actual holder not extracted.** This is the LARGEST uncovered chunk of Lot 2-X-6. Identify first. |
+| **T-47655 / T-47656 / T-47657 / T-48336 / T-69404** | **holder + area both unresolved** (active: T-47655 7,186 + T-48336 14,817 + T-69404 unknown ≈ 22,000+ sqm; T-47656/47657 superseded and areas don't reconcile) | Registrant OCR captured only the blank Torrens form ("conjugal partnership of spouses ___") — **actual holder not extracted.** Largest uncovered chunk of Lot 2-X-6. Identify first. |
 | T-147652, T-52354 | ~1,832 sqm + ? | Holder unknown — verify |
 
 ---
@@ -69,10 +69,10 @@ Recovery **strength rises the later the deed** (the more clearly past the author
 - **Medium:** Tier 4 = ~4 lots (scope theory).
 - **Separate track:** the Mercedes donation.
 - **Retain:** 2 family lots.
-- **Blocking gap:** ~50,000 sqm held by an **unidentified** conjugal partnership.
+- **Blocking gap:** the conjugal-partnership cluster (T-47655/56/57/48336/69404) — **unidentified holder**, and even the current area is unresolved (superseded parents + non-reconciling figures; ≈22,000+ sqm active, likely more).
 
 ## Next actions
-1. **Identify the T-47655/47656/47657/48336/69404 holder** — pull clean CTCs (RD request) or re-OCR the title images; ~50,000 sqm turns from dark to targetable.
+1. **Identify the T-47655/47656/47657/48336/69404 holder** — pull clean CTCs (RD request) or re-OCR the title images; the cluster turns from dark to targetable.
    - ✅ *Checked 2026-07-01:* the corpus text for all five is **form-boilerplate only** — none of the docs (52/18/144/309) contain "Heirs of Mary Worrick" **or** "de la Fuente" in the registrant clause. The holder is **not recoverable from the current OCR** → a clean certified true copy (RD) or re-OCR of the title image is required. Not guessable.
 2. **Pull the primary deeds** for Tier 2 (Dean 1997, Capistrano 2003) — the clearest post-lapse conveyances — as void-deed exhibits.
    - ✅ *Checked 2026-07-01:* the Dean (PE-214781) and Capistrano (PE-261974) names appear **only** as annotations on the T-32917 title (doc:21) and in summary ledgers — **no standalone primary deed is in the corpus.** Same pattern as doc:353: the underlying de la Fuente deeds are not held → **RD request** (and likely another "no record on file" candidate).
@@ -80,7 +80,7 @@ Recovery **strength rises the later the deed** (the more clearly past the author
 4. **Sequence the campaign:** Balane (26-360) as the test case → Tier 2/3 as the next filings on the same theory + the same RD non-availability cert.
 
 ## Confirmed corpus gaps (this pass) — all point to one RD request
-The Tier-2 primary deeds and the ~50,000 sqm cluster's registrant are **both absent from the corpus**.
+The Tier-2 primary deeds and the cluster's registrant are **both absent from the corpus**.
 Bundle them into ONE Register of Deeds request: (a) certified true copies of T-47655/47656/47657/
 48336/69404 (holder identity), and (b) certified copies OR a non-availability certification for the
 Dean (PE-214781) and Capistrano (PE-261974) deeds. This extends the doc:353 evidence set across the branch.

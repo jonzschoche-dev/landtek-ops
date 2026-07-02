@@ -143,3 +143,14 @@ INSERT INTO correspondence_events (matter_code, author, addressee, subject, clai
 ('MWK-DLF-VOID','Counsel / Jonathan','Register of Deeds, Camarines Norte','Chaser: T-52540 certified annotations / non-availability (re 25-Feb-2025 unanswered)',NULL,'letter','RD Daet','planned',NULL,'OUTSTANDING — priority 2','[]',false),
 ('MWK-DLF-VOID','Jonathan Zschoche','RTC Daet — Office of the Clerk of Court (Genesis Ibasco)','Confirm retrieval of transaction documentation (re 27-May-2025 request)',NULL,'letter','RTC-OCC Daet','planned',NULL,'OUTSTANDING — priority 3','["doc:1019"]',false);
 SELECT delivery_status, count(*) FROM correspondence_events WHERE matter_code='MWK-DLF-VOID' GROUP BY 1 ORDER BY 2 DESC;
+
+-- ========== 5. TAX DECLARATIONS (added 2026-07-01; excludes contaminants doc:443 court-filing-fee, doc:75 Mambungalon separate property) ==========
+INSERT INTO document_matter_links (doc_id, matter_code, case_file, relation_kind, provenance_level, linked_by, note)
+SELECT d.id, 'MWK-DLF-VOID', 'MWK-001', 'evidence', 'verified', 'claude-investigation-build',
+  '[tax_dec] '||coalesce(d.doc_date_norm::text,'?')||' '||left(coalesce(d.smart_filename,d.document_title,d.original_filename),44)
+FROM documents d
+WHERE (d.smart_filename ~* 'tax_dec|tax_declaration|property_tax|assessment|tax_statement|property_declaration|real_property'
+       OR d.document_type ~* 'tax_declaration|real_property_assessment')
+  AND coalesce(d.case_file,'') NOT ILIKE '%ARTA%'
+  AND d.id NOT IN (443, 75)  -- 443 = court filing-fee assessment; 75 = Mambungalon (separate property, not T-4497)
+  AND NOT EXISTS (SELECT 1 FROM document_matter_links l WHERE l.doc_id=d.id AND l.matter_code='MWK-DLF-VOID');

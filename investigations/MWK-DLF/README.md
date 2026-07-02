@@ -21,7 +21,7 @@ derivative titles are cancellable; reconveyance is imprescriptible; the agent mu
 ```sql
 -- the matter
 SELECT * FROM matters WHERE matter_code='MWK-DLF-VOID';
--- the corpus (42 docs, role-tagged in note as [title_face]/[spa]/[revocation]/[rd_certification]/[admission]/[contested]/[target_t3]/...)
+-- the corpus (86 docs, role-tagged in note as [title_face]/[spa]/[revocation]/[rd_certification]/[admission]/[contested]/[target_t3]/[tax_dec]/[pleading]/...)
 SELECT relation_kind, note FROM document_matter_links WHERE matter_code='MWK-DLF-VOID' ORDER BY note;
 -- the mapping
 SELECT * FROM matter_parties      WHERE matter_code='MWK-DLF-VOID';   -- 13 parties
@@ -54,13 +54,13 @@ T-4497  (MWK mother title — full transaction ledger on the title face, doc:39)
        ├─ (portion) Cristina Capistrano ◀ Tier 2 (2003 deed — post-lapse, PE-261974)
        ├─ (portion) Municipality of Mercedes ◀ 1995 donation → MWK-LGU-RECOVERY
        ├─ T-38838  Heirs of MWK       ◀ RETAIN (32,448 sqm, still estate)
-       └─ T-47655 / T-47656 / T-47657 / T-48336 / T-69404  ◀ ⚠️ ~50,000 sqm, HOLDER UNRESOLVED
+       └─ T-47655 / T-47656 / T-47657 / T-48336 / T-69404  ◀ ⚠️ HOLDER UNRESOLVED (active: T-47655 7,186 + T-48336 14,817 + T-69404 ?; T-47656/47657 superseded — areas don't reconcile, need CTCs)
 ```
 
 Recovery strength rises the later the deed sits past the SPA's end (1995 lapse → 2005 registered revocation).
 
 ## Open gaps (also tracked as `planned` correspondence)
-1. **~50,000 sqm conjugal-partnership cluster** (T-47655/56/57/48336/69404) — holder not extractable from OCR; needs clean RD CTCs.
+1. **conjugal-partnership cluster** (T-47655/56/57/48336/69404) — both HOLDER and true area unresolved (OCR caught only the blank form; active parcels ≈ 22,000 sqm + T-69404, but the supersession/areas don't reconcile). Needs clean RD CTCs.
 2. **Tier-2 primary deeds** (Dean 1997, Capistrano 2003) — not in corpus; RD request / non-availability cert.
 3. **Von's 1995 tax-payment PDF** — corroborates the 1995 lapse; awaiting the file from Jonathan.
 4. **Cesar's exact death date** — pins the agent-death termination ceiling (2021 acts = Salvador).
