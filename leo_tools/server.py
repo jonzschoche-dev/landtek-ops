@@ -69,6 +69,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: ops dashboard not registered: {_e}", file=_sys.stderr)
 
+try:
+    from client_portal import bp as _portal_bp
+    app.register_blueprint(_portal_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: client portal not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 
