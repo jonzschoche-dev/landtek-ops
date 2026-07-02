@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek Viber channel bridge — drain queued replies once the token lands. Token-gated: idle (clean exit) until VIBER_AUTH_TOKEN is set, then auto-drains the backlog. For Viber the token IS the external switch.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/viber_channel_bridge.py --send
+StandardOutput=append:/var/log/landtek_viber_bridge.log
+StandardError=append:/var/log/landtek_viber_bridge.log

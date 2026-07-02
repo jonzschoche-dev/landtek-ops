@@ -16,23 +16,37 @@ import psycopg2
 import psycopg2.extras
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
-TOKEN = os.environ.get("VIBER_AUTH_TOKEN", "")
 NAME = os.environ.get("VIBER_SENDER_NAME", "Leo · LandTek")
 URL = "https://chatapi.viber.com/pa/send_message"
 
 
-def _send(receiver, text):
+def _env(key, default=None):
+    """Read a key from /root/landtek/.env (file-first, like the adapter), then os.environ."""
+    try:
+        with open("/root/landtek/.env") as f:
+            for line in f:
+                if line.startswith(f"{key}="):
+                    return line.strip().split("=", 1)[1]
+    except Exception:
+        pass
+    return os.environ.get(key, default)
+
+
+def _send(token, receiver, text):
     req = urllib.request.Request(URL, data=json.dumps(
         {"receiver": receiver, "type": "text", "text": text, "sender": {"name": NAME}}).encode(),
-        headers={"X-Viber-Auth-Token": TOKEN, "Content-Type": "application/json"})
+        headers={"X-Viber-Auth-Token": token, "Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=20) as r:
         j = json.loads(r.read().decode())
     return j.get("status") == 0, j.get("message_token")
 
 
 def send():
-    if not TOKEN:
-        sys.exit("[viber_bridge] VIBER_AUTH_TOKEN not set — nothing to drain to")
+    token = _env("VIBER_AUTH_TOKEN")
+    if not token:
+        # Expected-idle: Viber not provisioned yet. Exit 0 so a timer never shows failed.
+        print("[viber_bridge] idle — VIBER_AUTH_TOKEN not set; nothing to drain yet")
+        return
     c = psycopg2.connect(DSN); c.autocommit = True
     cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("""SELECT id, channel_user_id, text_content FROM channel_messages
@@ -41,7 +55,7 @@ def send():
     rows = cur.fetchall(); sent = 0
     for r in rows:
         try:
-            ok, tok = _send(r["channel_user_id"], r["text_content"])
+            ok, tok = _send(token, r["channel_user_id"], r["text_content"])
         except Exception:
             ok, tok = False, None
         cur.execute("UPDATE channel_messages SET status=%s, external_msg_id=%s WHERE id=%s",
