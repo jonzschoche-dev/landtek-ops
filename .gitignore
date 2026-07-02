@@ -88,6 +88,12 @@ notifications/blocked.txt
 
 # Generated derivative outputs — regenerable from producers
 drafts/
+1891_output/
+
+# Case evidence artifacts — canonical in Google Drive (Drive-canonical storage
+# policy), not hoarded as binaries in git. Kept local on the machine that dropped
+# them; back up to Drive rather than committing.
+evidence/
 
 # OCR-attack: Drive folder symlink (designer convenience, never committed)
 drive_local
