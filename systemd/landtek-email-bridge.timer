@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek email channel bridge — sweep new client emails into the bus every 10 min (inbound only)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

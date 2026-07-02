@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek email channel bridge — INBOUND ONLY (feeds new client emails into the channel bus; routes + queues drafts). Outbound send is HELD (external switch): run email_channel_bridge.py --send manually until the operator opens it.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/email_channel_bridge.py --inbound
+StandardOutput=append:/var/log/landtek_email_bridge.log
+StandardError=append:/var/log/landtek_email_bridge.log
