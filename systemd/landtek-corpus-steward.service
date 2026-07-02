@@ -1,0 +1,16 @@
+[Unit]
+Description=LandTek Corpus Steward — keep every matter's case file complete, current, and reachable
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# case_corpus_sweep.sh sources /root/landtek/.env itself; the wrapper env-load is belt-and-suspenders.
+ExecStart=/bin/bash -c 'set -a; . /root/landtek/.env 2>/dev/null || true; set +a; exec /bin/bash /root/landtek/scripts/case_corpus_sweep.sh'
+# Recovery + strategy passes can be slow (live Gmail fetch + OCR + local Ollama); cap the run.
+TimeoutStartSec=25min
+StandardOutput=append:/var/log/landtek_corpus_steward.log
+StandardError=append:/var/log/landtek_corpus_steward.log
+
+[Install]
+WantedBy=multi-user.target

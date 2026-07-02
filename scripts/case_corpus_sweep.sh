@@ -40,4 +40,14 @@ python3 scripts/case_file.py --all || true
 python3 scripts/harvest_facts.py --all --go 2>&1 | tail -2 || true            # docs -> matter_facts (grounded)
 python3 scripts/strategy_engine.py --seed --go 2>&1 | tail -2 || true         # north-star + leverage + keystones
 python3 scripts/play_engine.py --generate-all --go 2>&1 | tail -2 || true     # offensive war-room queue
+
+# 5) ACCESSIBILITY — is the freshened corpus actually REACHABLE across every issue?
+#    "up to date" is only half the ask; the other half is that no matter goes dark. This scores
+#    system-wide awareness (what we SHOULD know vs. what we actually know as grounded facts),
+#    NAMES the biggest cluelessness gaps, and logs the number to awareness_log so every sweep must
+#    visibly move it — a matter whose corpus is unreachable shows up here as a gap, not a silent hole.
+#    Pure SQL, creditless. The per-matter readable snapshots (step 3) are the reachable surface itself.
+echo "[sweep] accessibility scorecard (cross-matter):"
+python3 scripts/knowledge_coverage.py --log 2>&1 | grep -E 'OVERALL AWARENESS|•' || true
+
 echo "[sweep] done $(date -u +%FT%TZ)"

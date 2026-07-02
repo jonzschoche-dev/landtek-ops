@@ -1,0 +1,11 @@
+[Unit]
+Description=Corpus Steward — every 6h (recover live-source records, refresh snapshots/facts/strategy, score cross-matter reach)
+
+[Timer]
+# Offset from the filing monitor (also 6h) so the two 6h loops don't both fire at boot+10min.
+OnBootSec=25min
+OnUnitActiveSec=6h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

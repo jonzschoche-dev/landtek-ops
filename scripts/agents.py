@@ -35,6 +35,8 @@ AGENTS = [
     ("supervisor",           "health — verify the fleet is alive (this script)", "det",
      "daily", "", "live", "agents.py --health"),
     # ── LIVE — gap-fillers (complete the corpus) ───────────────────────────────
+    ("corpus_steward",       "steward — keep every matter's case file complete, current & reachable", "det",
+     "every 6h", "landtek-corpus-steward.timer", "live", "case_corpus_sweep.sh: live-source recovery+OCR -> dedup/separation guard -> per-matter snapshots -> facts/strategy -> cross-matter awareness scorecard"),
     ("doc_discovery",        "find/link doc-less matters' papers from the unlinked pool", "det",
      "daily (in verify svc)", "", "live", "conservative; proposes + auto-links strong docket signals"),
     ("contradiction",        "cross-check verified facts for conflicts per matter", "det",
