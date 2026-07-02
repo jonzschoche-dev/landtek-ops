@@ -89,6 +89,8 @@ notifications/blocked.txt
 # Generated derivative outputs — regenerable from producers
 drafts/
 1891_output/
+ombudsman_output/
+playbooks/ombudsman_hunter_*.json
 
 # Case evidence artifacts — canonical in Google Drive (Drive-canonical storage
 # policy), not hoarded as binaries in git. Kept local on the machine that dropped
