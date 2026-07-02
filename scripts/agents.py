@@ -64,6 +64,8 @@ AGENTS = [
      "on demand", "", "ready", "no matters yet; periods NEEDS-COUNSEL-VERIFICATION"),
     ("agency:OMBUDSMAN",     "forum desk — R.A. 6770 / AO 07", "det",
      "on demand", "", "ready", "no matters yet; periods NEEDS-COUNSEL-VERIFICATION"),
+    ("ombudsman_hunter",     "OFFENSIVE graft/misconduct lead engine — ranks public officers by exposure (RA 3019/6713/RPC), ripeness-gates, drafts; NEVER files", "det",
+     "on demand", "", "live", "ombudsman_hunter.py --scan/--board/--candidate/--playbook; leads only (inference-grade), filing human-gated; feeds case_synthesizer + strategy_engine Ombudsman lever"),
     # ── LIVE — case builder (the operator interface) ───────────────────────────
     ("forum_router",         "wire each grievance → candidate oversight forums (case_forums)", "det",
      "on demand", "", "live", "feeds /ops/cases; curated from agency_mandates"),
