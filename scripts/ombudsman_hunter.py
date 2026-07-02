@@ -157,7 +157,13 @@ SIGNAL_PATTERNS = {
     "public_spend":        r"\b(public funds?|₱[\d,]+|appropriat\w+|disbursed|spent .*(?:funds|budget)|"
                            r"P[\d,]{4,}|expenditure|contract)\b",
     "knowledge_admission": r"\b(admit\w+|acknowledg\w+|aware|knew|admission|minutes .*present)\b",
-    "undue_injury":        r"\b(injur\w+|damage|deprived|prevented|prejudic\w+|loss to the heirs?)\b",
+    # In a records-refusal graft case the "undue injury" is the deprivation of records the heirs are
+    # entitled to + the quantified delay (undue delay / obstruction over N months). NB: under Llorente
+    # v. Sandiganbayan, Sec. 3(e) undue injury wants ACTUAL, quantified damage — these facts are the
+    # FLOOR; counsel must quantify. §3(f) (refusal, no damage-quantum) + grave misconduct are sturdier.
+    "undue_injury":        r"\b(injur\w+|damage|deprived|deprivation|prevented|prejudic\w+|loss to the heirs?|"
+                           r"undue delay|obstruct\w+|failure to render service|"
+                           r"over (?:eight|nine|ten|eleven|twelve|\d+) months?)\b",
     "unwarranted_benefit": r"\b(unwarranted (?:benefit|advantage)|favor\w+|preference|benefit to)\b",
     "due_demand":          r"\b(demand\w*|request\w*|follow-?up|letter of|written request)\b",
     "official_document":   r"\b(letter|memorandum|resolution|order|certification|joint response|"
