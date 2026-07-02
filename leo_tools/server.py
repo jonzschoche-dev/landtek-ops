@@ -76,6 +76,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: client portal not registered: {_e}", file=_sys.stderr)
 
+try:
+    from client_access import bp as _client_access_bp
+    app.register_blueprint(_client_access_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: client access (/client/) blueprint not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 

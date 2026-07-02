@@ -32,7 +32,7 @@ import psycopg2.extras
 from flask import Blueprint, abort
 
 # Reuse the cockpit chrome + DB plumbing so this is ONE app, one style.
-from ops_dashboard import PG_DSN, _esc, _layout, _safe_fetch, _stat_card
+from ops_dashboard import CSS, PG_DSN, _esc, _layout, _safe_fetch, _stat_card
 
 bp = Blueprint("client_portal", __name__, url_prefix="/ops")
 
@@ -120,6 +120,45 @@ def _has_tag(*texts: str | None) -> bool:
     return False
 
 
+# Fingerprints of INTERNAL shorthand that must never reach a client label. A
+# surfaced_deadlines label carrying any of these is operator/pipeline scratch — not a
+# client-safe next-action string. We fall back to next_event / current_stage instead.
+# (Defence-in-depth: product-hardener owns the upstream fix in deadlines.py /
+# surfaced_deadlines; we never touch that data, we only refuse to render it raw.)
+_INTERNAL_LABEL_MARKERS = ("||", "perjury point", "docs from other matters")
+
+
+def _is_internal_fragment(text: str | None) -> bool:
+    """True if a surfaced label looks like internal shorthand rather than a client-facing
+    next-action. Trips on: a `||` field separator, known internal phrases, or a string that
+    begins lowercase mid-word (a truncated fragment, e.g. '...docs from other matters')."""
+    if not text:
+        return False
+    low = text.strip().lower()
+    if any(m in low for m in _INTERNAL_LABEL_MARKERS):
+        return True
+    # Starts lowercase AND not a normal sentence lead-in — a severed fragment. We allow a
+    # leading '[' (a §4B tag like [HUMAN VERIFY]) and normal capitalised/®digit starts.
+    first = text.strip()[:1]
+    if first and first.islower():
+        return True
+    return False
+
+
+def _safe_label(surfaced_label: str | None, next_event: str | None,
+                current_stage: str | None) -> str:
+    """Choose a client-safe next-action label. Prefer the surfaced label, but if it reads
+    as an internal fragment (BLOCKER 1 guard) fall back to next_event, then current_stage,
+    then a neutral placeholder — a client label must never pass raw internal shorthand."""
+    if surfaced_label and not _is_internal_fragment(surfaced_label):
+        return surfaced_label
+    if next_event and not _is_internal_fragment(next_event):
+        return next_event
+    if current_stage and not _is_internal_fragment(current_stage):
+        return current_stage
+    return "—"
+
+
 def _truncate_keep_tags(text: str, cap: int = 200) -> str:
     """Cap label length WITHOUT severing a §4B caveat tag. If a tag sits past the cut,
     append it after an ellipsis so the caveat always survives length-capping (BLOCKER 3)."""
@@ -138,9 +177,76 @@ def _truncate_keep_tags(text: str, cap: int = 200) -> str:
     return head + suffix
 
 
+def _client_layout(title: str, body: str) -> str:
+    """Client-facing chrome — deliberately NO ops nav.
+
+    A retainer client must never see (or be tempted to click) the internal
+    cockpit links (/ops/cases, /ops/clients, /ops/spend, …). The ops _layout()
+    renders that whole nav bar; this one renders ONLY the LandTek brand + the
+    client's own page. Same CSS (one style), zero pivot surface.
+    """
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    return f"""<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{_esc(title)} — LandTek</title>{CSS}
+<style>
+  /* Client chrome: brand only, no nav, comfortable on a phone. */
+  .topbar {{ justify-content:space-between; }}
+  .wrap {{ max-width:820px; }}
+  @media (max-width:640px) {{
+    .grid-4 {{ grid-template-columns:repeat(2,1fr); }}
+    table {{ font-size:12px; }}
+    th,td {{ padding:6px 7px; }}
+    h1 {{ font-size:19px; }}
+  }}
+</style></head><body>
+<header class="topbar">
+  <div class="brand">LandTek <span class="muted">client portal</span></div>
+  <div class="ts">{now}</div>
+</header>
+<main class="wrap">{body}</main>
+</body></html>"""
+
+
 @bp.route("/portal/<client_code>")
 def client_portal(client_code: str):
-    """The client-facing world for ONE client, led by the deadline countdown."""
+    """INTERNAL cockpit view for ONE client — stays behind the /ops basic-auth
+    gate (Jonathan's own use). The external, token-gated client entry is
+    /client/<token> in client_access.py, which calls render_client_portal()
+    with the client-only chrome."""
+    title, body = render_client_portal(client_code)
+    return _layout(title, body, active="clients")
+
+
+def _default_doc_url(doc_id: int) -> str:
+    """Ops-chrome doc link — the ops-gated public proxy. ONLY used for the internal
+    /ops/portal view (behind nginx basic-auth). The client chrome NEVER uses this."""
+    return f"/files/c/{int(doc_id)}"
+
+
+def _default_matter_url(matter_code: str) -> str:
+    """Ops-chrome per-matter doc-list link. Ops-gated; not used in client chrome."""
+    return f"/files/c/m/{matter_code}"
+
+
+def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]:
+    """Build (page_title, body_html) for ONE client's portal, led by the
+    deadline countdown. Pure content — the caller wraps it in the appropriate
+    chrome (_layout for internal /ops, _client_layout for the client link).
+
+    link_builder: optional (doc_url_fn, matter_url_fn) pair. When the portal is
+    rendered in CLIENT chrome (reached via /client/<token>), the caller passes a
+    builder that emits TOKEN-SCOPED, ownership-checked URLs
+    (/client/<token>/doc/<id>, /client/<token>/m/<code>). When None (the internal
+    /ops/portal view, which is ops-gated), we fall back to the /files/c proxy.
+    CRITICAL-1: no bare /files/c/ string may reach the client HTML — that is
+    enforced by always routing client links through the injected builder.
+
+    Separation is enforced HERE: every row filters on matters.client_code (the
+    validated FK), never case_file. A 404 is raised for an unknown client_code
+    so both callers behave identically."""
+    doc_url, matter_url = (link_builder if link_builder
+                           else (_default_doc_url, _default_matter_url))
     today = date.today()
     conn = _db()
     conn.autocommit = True
@@ -183,6 +289,36 @@ def client_portal(client_code: str):
     """, (client_code,), default=[])
     surf_by_matter = {r["matter_code"]: r for r in surfaced}
 
+    # --- Servable counsel deliverables (bound-PDF dossiers) for THIS client. ---
+    # Scope on the client's validated case_file AND (defence-in-depth) require the
+    # doc's matter_code — when set — to belong to this client, so a mis-tagged doc
+    # can never surface under the wrong client. Only servable rows (a real file on
+    # disk or in Drive) are linked; we NEVER invent a link to a doc that isn't there.
+    # MEDIUM-1: scope on this client's VALIDATED case_file only, and guard against an
+    # empty/blank case_file matching blank-case_file rows (the `Owner`/unassigned escape
+    # hatch). We do NOT fall back to client_code and we require the case_file to be
+    # non-empty (%s <> '') — a client whose case_file is blank pulls ZERO deliverables
+    # rather than every blank-tagged doc. Defence-in-depth: a doc that DOES carry a
+    # matter_code must additionally belong to this client's matters; matter_code-NULL rows
+    # (the 8 real MWK-001 deliverables) still pass because they're scoped by case_file.
+    case_file = (client.get("case_file") or "").strip()
+    deliverables = _safe_fetch(cur, conn, """
+        SELECT d.id,
+               COALESCE(NULLIF(d.smart_filename,''), d.original_filename, 'Deliverable') AS name,
+               d.doc_date, d.classification, d.matter_code
+          FROM documents d
+         WHERE %s <> ''
+           AND d.case_file = %s
+           AND d.classification ILIKE '%%Counsel Deliverable%%'
+           AND (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL)
+           AND (d.matter_code IS NULL OR d.matter_code IN (
+                  SELECT matter_code FROM matters WHERE client_code = %s))
+           -- evidence-grade = RECEIVED, not draft: never surface a draft to a client.
+           AND COALESCE(d.classification,'')                       NOT ILIKE '%%draft%%'
+           AND COALESCE(NULLIF(d.smart_filename,''), d.original_filename, '') NOT ILIKE '%%draft%%'
+         ORDER BY d.doc_date DESC NULLS LAST, d.id DESC
+    """, (case_file, case_file, client_code), default=[])
+
     cur.close()
     conn.close()
 
@@ -197,17 +333,19 @@ def client_portal(client_code: str):
             # days_out from the snapshot may be stale (computed at as_of); recompute vs today.
             days_out = (due - today).days
             bucket = _bucket_for(days_out)
-            label = s.get("label") or next_event or m.get("current_stage") or "—"
+            # BLOCKER 1 guard: reject an internal-shorthand surfaced label (falls back to
+            # next_event / current_stage) so a client never sees pipeline scratch as a label.
+            label = _safe_label(s.get("label"), next_event, m.get("current_stage"))
         elif m.get("next_deadline") is not None:
             due = m["next_deadline"]
             days_out = (due - today).days
             bucket = _bucket_for(days_out)
-            label = next_event or m.get("current_stage") or "—"
+            label = _safe_label(None, next_event, m.get("current_stage"))
         else:
             due = None
             days_out = None
             bucket = "NEEDS-A-DATE"
-            label = next_event or m.get("current_stage") or "—"
+            label = _safe_label(None, next_event, m.get("current_stage"))
 
         # BLOCKER 2: surfaced_deadlines.label is often a bare stage string that strips the
         # [HUMAN VERIFY]/est caveat the matter's next_event carries on the date. The date is
@@ -313,14 +451,52 @@ def client_portal(client_code: str):
         _stat_card("Awaiting a date", counts["NEEDS-A-DATE"], "shown honestly"),
     ])
 
+    # --- Deliverables card (bound-PDF dossiers), served via the public /files/c
+    # doc proxy so the client can actually GET the artifact. Only rendered when a
+    # real, servable deliverable exists — no invented links. ---
+    deliverable_block = ""
+    if deliverables:
+        drows = []
+        for d in deliverables:
+            dt = _esc(str(d["doc_date"])) if d.get("doc_date") else ""
+            nm = _esc((d.get("name") or "Deliverable")[:110])
+            durl = _esc(doc_url(int(d["id"])))
+            drows.append(
+                f"<tr><td><a href='{durl}'>{nm}</a>"
+                f"<div class='muted' style='font-size:12px'>"
+                f"{('as of ' + dt) if dt else 'counsel deliverable'} · doc#{int(d['id'])}</div></td>"
+                f"<td><a class='badge badge-ok' href='{durl}'>view / download</a></td></tr>"
+            )
+        deliverable_block = (
+            '<div class="section-title">Your deliverables '
+            f'<span class="muted">({len(deliverables)})</span></div>'
+            '<div class="card"><table>'
+            '<tr><th>Document</th><th>Get it</th></tr>'
+            f'{"".join(drows)}</table></div>'
+        )
+
+    # Per-matter document lists route through the injected builder: token-scoped
+    # (/client/<token>/m/<code>) in client chrome, /files/c/m/ only for the ops view.
+    doc_links = " · ".join(
+        f"<a href='{_esc(matter_url(r['matter_code']))}'>{_esc(r['matter_code'])}</a>"
+        for r in rows
+    )
+    docs_block = (
+        '<div class="section-title">Documents by matter</div>'
+        f'<div class="card"><p class="muted" style="font-size:13px">Open the source '
+        f'documents on file for any matter:</p><p>{doc_links}</p></div>'
+        if doc_links else ""
+    )
+
     body = f"""
 <h1>{_esc(client.get('name') or client_code)}</h1>
 <p class="lead">Your matters and deadlines · <code>{_esc(client_code)}</code>
-  · as of {now}
-  · <a href="/files/?case={_esc(client.get('case_file') or client_code)}">Your documents</a></p>
+  · as of {now}</p>
 {ns_banner}
 <div class="grid grid-4" style="margin-bottom:8px">{stat_cards}</div>
 {''.join(bucket_blocks)}
+{deliverable_block}
+{docs_block}
 <p class="muted" style="margin-top:16px;font-size:12px">
   Dates are read from the grounded deadline record (latest surface {_esc(str(today))}).
   Items marked <code>[HUMAN VERIFY]</code> or <code>[verify-img]</code> are still being
@@ -328,4 +504,5 @@ def client_portal(client_code: str):
   presented as settled fact. Matters awaiting a confirmed date are listed openly rather
   than hidden.</p>
 """
-    return _layout(f"{client.get('name') or client_code} — portal", body, active="clients")
+    title = f"{client.get('name') or client_code} — portal"
+    return title, body
