@@ -185,11 +185,12 @@ def _client_owns_doc(client_code: str, doc_id: int) -> bool:
 
 
 def _token_link_builder(token: str):
-    """Return (doc_url_fn, matter_url_fn) that emit TOKEN-SCOPED, ownership-checked
-    URLs for the client chrome. render_client_portal routes every doc/matter link
-    through these so NO bare /files/c/ string ever reaches client HTML (CRITICAL-1).
-    The token is already URL-safe (validated by _TOKEN_RE) so no escaping is needed;
-    matter_code is url-quoted defensively for the path segment."""
+    """Return (doc_url_fn, matter_url_fn, matter_detail_url_fn) that emit TOKEN-SCOPED,
+    ownership-checked URLs for the client chrome. render_client_portal /
+    render_matter_detail route every doc/matter link through these so NO bare
+    /files/c/ string ever reaches client HTML (CRITICAL-1). The token is already
+    URL-safe (validated by _TOKEN_RE) so no escaping is needed; matter_code is
+    url-quoted defensively for the path segment."""
     from urllib.parse import quote
 
     def doc_url(doc_id: int) -> str:
@@ -198,7 +199,10 @@ def _token_link_builder(token: str):
     def matter_url(matter_code: str) -> str:
         return f"/client/{token}/m/{quote(str(matter_code), safe='')}"
 
-    return doc_url, matter_url
+    def matter_detail_url(matter_code: str) -> str:
+        return f"/client/{token}/matter/{quote(str(matter_code), safe='')}"
+
+    return doc_url, matter_url, matter_detail_url
 
 
 @bp.route("/<token>")
@@ -212,9 +216,9 @@ def client_entry(token: str):
     if not client_code:
         abort(404)
     # Import lazily to avoid a hard import cycle at module load.
-    from client_portal import _client_layout, render_client_portal
+    from client_portal import _client_layout, _client_name, render_client_portal
     title, body = render_client_portal(client_code, link_builder=_token_link_builder(token))
-    return _client_layout(title, body)
+    return _client_layout(title, body, client_name=_client_name(client_code))
 
 
 @bp.route("/<token>/doc/<int:doc_id>")
@@ -252,7 +256,7 @@ def client_matter(token: str, matter_code: str):
     # /files/c/ reaches the client. Only the numeric-id doc links appear here.
     try:
         html_body = resp.get_data(as_text=True)
-        doc_url, _ = _token_link_builder(token)
+        doc_url, _, _ = _token_link_builder(token)
         html_body = re.sub(
             r'/files/c/(\d+)',
             lambda mo: doc_url(int(mo.group(1))),
@@ -264,6 +268,33 @@ def client_matter(token: str, matter_code: str):
         # emit a body that might contain a bare /files/c link.
         abort(404)
     return resp
+
+
+@bp.route("/<token>/matter/<matter_code>")
+def client_matter_detail(token: str, matter_code: str):
+    """Render ONE matter's full drill-down for the token holder — title, forum/docket,
+    stage, deadline + human next-action, a grounded timeline, and the matter's docs as
+    token-scoped download links.
+
+    SAME trust boundary as the other routes: unknown/revoked/malformed token → 404;
+    a matter that does not belong to this token's client → 404 (indistinguishable,
+    no leak of what exists). The ownership check runs BEFORE render_matter_detail
+    reads anything, and render_matter_detail re-checks the (matter_code, client_code)
+    pair as defence-in-depth. All doc links inside are token-scoped via
+    _token_link_builder — no bare /files/c/ reaches the client (CRITICAL-1)."""
+    client_code = _resolve_token(token)
+    if not client_code:
+        abort(404)
+    if not _client_owns_matter(client_code, matter_code):
+        abort(404)
+    from client_portal import _client_layout, _client_name, render_matter_detail
+    title, body = render_matter_detail(
+        client_code, matter_code, link_builder=_token_link_builder(token))
+    return _client_layout(
+        title, body,
+        client_name=_client_name(client_code),
+        back_url=f"/client/{token}",
+    )
 
 
 # ─────────────────────────── mint / revoke CLI ───────────────────────────────

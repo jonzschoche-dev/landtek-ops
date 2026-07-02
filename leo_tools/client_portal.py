@@ -76,6 +76,24 @@ def _db():
     return psycopg2.connect(PG_DSN)
 
 
+def _client_name(client_code: str) -> str | None:
+    """Look up a client's display name for the chrome header. Read-only, single-row,
+    scoped to the passed (already token-resolved) client_code. Returns None on miss."""
+    conn = _db()
+    conn.autocommit = True
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT name FROM clients WHERE client_code = %s", (client_code,))
+        row = cur.fetchone()
+        return row[0] if row else None
+    except Exception:
+        conn.rollback()
+        return None
+    finally:
+        cur.close()
+        conn.close()
+
+
 def _bucket_for(days_out: int | None) -> str:
     """Same boundaries the deadline engine uses (deadlines.py)."""
     if days_out is None:
@@ -165,8 +183,14 @@ def _truncate_keep_tags(text: str, cap: int = 200) -> str:
     text = text or ""
     if len(text) <= cap:
         return text
-    head = text[:cap]
-    kept = [m.group(0) for m in _TAG_RE.finditer(text) if m.start() >= cap]
+    # If a §4B tag STRADDLES the cap (opens before it, closes after), extend the
+    # head to the tag's end so an opened caveat is never cut mid-content.
+    head_end = cap
+    for m in _TAG_RE.finditer(text):
+        if m.start() < cap and m.end() > head_end:
+            head_end = m.end()
+    head = text[:head_end]
+    kept = [m.group(0) for m in _TAG_RE.finditer(text) if m.start() >= head_end]
     # de-dup while preserving order
     seen, extra = set(), []
     for t in kept:
@@ -177,34 +201,67 @@ def _truncate_keep_tags(text: str, cap: int = 200) -> str:
     return head + suffix
 
 
-def _client_layout(title: str, body: str) -> str:
+def _client_layout(title: str, body: str, client_name: str | None = None,
+                   back_url: str | None = None) -> str:
     """Client-facing chrome — deliberately NO ops nav.
 
     A retainer client must never see (or be tempted to click) the internal
     cockpit links (/ops/cases, /ops/clients, /ops/spend, …). The ops _layout()
     renders that whole nav bar; this one renders ONLY the LandTek brand + the
     client's own page. Same CSS (one style), zero pivot surface.
+
+    Mobile-first: a client opens this on a phone. Header carries the client's
+    own name so it reads as *their* workspace; a footer carries the standing
+    service-scope disclaimer (LandTek does property & legal-ops work, not legal
+    advice). `back_url` renders a single in-portal breadcrumb link (used by the
+    matter-detail page to return to the portal home) — it is always a
+    token-scoped URL supplied by the caller, never a pivot to another surface.
     """
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    who = _esc(client_name) if client_name else ""
+    sub = (f'<div class="client-name">{who}</div>' if who else "")
+    back = (f'<a class="back" href="{_esc(back_url)}">&larr; Back to your workspace</a>'
+            if back_url else "")
     return f"""<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{_esc(title)} — LandTek</title>{CSS}
 <style>
-  /* Client chrome: brand only, no nav, comfortable on a phone. */
-  .topbar {{ justify-content:space-between; }}
-  .wrap {{ max-width:820px; }}
+  /* Client chrome: brand only, no nav, product-grade, comfortable on a phone. */
+  .topbar {{ justify-content:flex-start; gap:12px; padding:14px 20px;
+             background:#0f172a; border-bottom:3px solid #38bdf8; }}
+  .topbar .brand {{ font-size:18px; letter-spacing:.02em; }}
+  .topbar .brand .muted {{ opacity:.65; font-weight:400; }}
+  .topbar .client-name {{ margin-left:auto; font-size:13px; color:#cbd5e1;
+                          font-weight:600; text-align:right; }}
+  .subtitle {{ background:#0f172a; color:#94a3b8; font-size:12.5px;
+               padding:0 20px 12px; }}
+  .subtitle .ts {{ opacity:.6; }}
+  .wrap {{ max-width:820px; padding-top:20px; padding-bottom:8px; }}
+  .back {{ display:inline-block; font-size:13px; margin:0 0 12px;
+           color:var(--link); }}
+  .client-footer {{ max-width:820px; margin:0 auto; padding:20px;
+                    color:var(--muted); font-size:12px; line-height:1.6;
+                    border-top:1px solid var(--line); }}
+  .client-footer .disclaimer {{ font-weight:600; }}
   @media (max-width:640px) {{
     .grid-4 {{ grid-template-columns:repeat(2,1fr); }}
     table {{ font-size:12px; }}
     th,td {{ padding:6px 7px; }}
     h1 {{ font-size:19px; }}
+    .topbar {{ flex-wrap:wrap; }}
+    .topbar .client-name {{ margin-left:auto; }}
   }}
 </style></head><body>
 <header class="topbar">
-  <div class="brand">LandTek <span class="muted">client portal</span></div>
-  <div class="ts">{now}</div>
+  <div class="brand">LandTek <span class="muted">workspace</span></div>
+  {sub}
 </header>
-<main class="wrap">{body}</main>
+<div class="subtitle">Your property &amp; legal-operations workspace <span class="ts">· {now}</span></div>
+<main class="wrap">{back}{body}</main>
+<footer class="client-footer">
+  <div class="disclaimer">LandTek performs property &amp; legal-operations services only; not legal advice.</div>
+  <div>Questions on any item here go through your LandTek point of contact.</div>
+</footer>
 </body></html>"""
 
 
@@ -229,24 +286,33 @@ def _default_matter_url(matter_code: str) -> str:
     return f"/files/c/m/{matter_code}"
 
 
+def _default_matter_detail_url(matter_code: str) -> str:
+    """Ops-chrome matter-detail link — the internal /ops/portal view routes the
+    matter row to the ops per-client portal (behind nginx basic-auth). The client
+    chrome NEVER uses this; the token builder supplies /client/<token>/matter/<code>."""
+    return f"/ops/portal/matter/{matter_code}"
+
+
 def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]:
     """Build (page_title, body_html) for ONE client's portal, led by the
     deadline countdown. Pure content — the caller wraps it in the appropriate
     chrome (_layout for internal /ops, _client_layout for the client link).
 
-    link_builder: optional (doc_url_fn, matter_url_fn) pair. When the portal is
-    rendered in CLIENT chrome (reached via /client/<token>), the caller passes a
-    builder that emits TOKEN-SCOPED, ownership-checked URLs
-    (/client/<token>/doc/<id>, /client/<token>/m/<code>). When None (the internal
-    /ops/portal view, which is ops-gated), we fall back to the /files/c proxy.
+    link_builder: optional (doc_url_fn, matter_url_fn, matter_detail_url_fn) triple.
+    When the portal is rendered in CLIENT chrome (reached via /client/<token>), the
+    caller passes a builder that emits TOKEN-SCOPED, ownership-checked URLs
+    (/client/<token>/doc/<id>, /client/<token>/m/<code>,
+    /client/<token>/matter/<code>). When None (the internal /ops/portal view, which
+    is ops-gated), we fall back to the /files/c proxy + the ops matter-detail path.
     CRITICAL-1: no bare /files/c/ string may reach the client HTML — that is
     enforced by always routing client links through the injected builder.
 
     Separation is enforced HERE: every row filters on matters.client_code (the
     validated FK), never case_file. A 404 is raised for an unknown client_code
     so both callers behave identically."""
-    doc_url, matter_url = (link_builder if link_builder
-                           else (_default_doc_url, _default_matter_url))
+    doc_url, matter_url, matter_detail_url = (
+        link_builder if link_builder
+        else (_default_doc_url, _default_matter_url, _default_matter_detail_url))
     today = date.today()
     conn = _db()
     conn.autocommit = True
@@ -423,10 +489,11 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
                 note = ' <span class="badge badge-off">advisory — no deadline expected</span>'
             elif b == "NEEDS-A-DATE":
                 note = ' <span class="badge badge-warn">awaiting a confirmed date</span>'
+            mdurl = _esc(matter_detail_url(r["matter_code"]))
             trs.append(
                 f"<tr><td>{when_badge}</td>"
                 f"<td>{due_txt}</td>"
-                f"<td><strong>{_esc(r['title'] or r['matter_code'])}</strong>"
+                f"<td><a href='{mdurl}'><strong>{_esc(r['title'] or r['matter_code'])}</strong></a>"
                 f"<div class='muted' style='font-size:12px'><code>{_esc(r['matter_code'])}</code>"
                 f"{(' · ' + _esc(r['forum'])) if r['forum'] else ''}"
                 f"{(' · ' + _esc(r['docket'])) if r['docket'] else ''}</div></td>"
@@ -442,6 +509,21 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
 
     if not bucket_blocks:
         bucket_blocks.append('<div class="card"><p class="empty">No active matters for this client.</p></div>')
+
+    # Honest empty/quiet-state framing: a client whose matters are ALL awaiting a
+    # confirmed date (Paracale-001 today) must NOT read as broken or empty. Lead
+    # with a positive, TRUE statement — we're tracking N matters; dates appear as
+    # they're confirmed. Never fabricates a date to fill the space.
+    dated = counts["OVERDUE"] + counts["THIS WEEK"] + counts["THIS MONTH"] + counts["UPCOMING"]
+    quiet_banner = ""
+    if rows and dated == 0:
+        n = len(rows)
+        quiet_banner = (
+            f'<div class="alert alert-ok">We are tracking {n} '
+            f'matter{"s" if n != 1 else ""} for you. Confirmed deadlines will '
+            f'appear here as soon as a court or agency sets them — nothing is '
+            f'overdue right now.</div>'
+        )
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     stat_cards = "".join([
@@ -474,6 +556,14 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
             '<tr><th>Document</th><th>Get it</th></tr>'
             f'{"".join(drows)}</table></div>'
         )
+    else:
+        # Honest empty state — never invent a document to fill the space.
+        deliverable_block = (
+            '<div class="section-title">Your deliverables</div>'
+            '<div class="card"><p class="empty">No bound dossiers yet — we prepare '
+            'these on request and as your matters progress. When one is ready it '
+            'appears here as a single download.</p></div>'
+        )
 
     # Per-matter document lists route through the injected builder: token-scoped
     # (/client/<token>/m/<code>) in client chrome, /files/c/m/ only for the ops view.
@@ -493,6 +583,7 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
 <p class="lead">Your matters and deadlines · <code>{_esc(client_code)}</code>
   · as of {now}</p>
 {ns_banner}
+{quiet_banner}
 <div class="grid grid-4" style="margin-bottom:8px">{stat_cards}</div>
 {''.join(bucket_blocks)}
 {deliverable_block}
@@ -505,4 +596,255 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
   than hidden.</p>
 """
     title = f"{client.get('name') or client_code} — portal"
+    return title, body
+
+
+def render_matter_detail(client_code: str, matter_code: str,
+                         link_builder=None) -> tuple[str, str]:
+    """Build (page_title, body_html) for ONE matter's full picture — the token-scoped
+    drill-down reached from a matter row on the portal home.
+
+    Shows: the matter's title, forum/court + docket, current stage, the deadline +
+    human next-action (via _safe_label), a chronological timeline built ONLY from
+    grounded case_stage_transitions rows for THIS matter, and its documents as
+    token-scoped download links.
+
+    SEPARATION (defence-in-depth): the caller (client_access.client_matter_detail)
+    already ownership-checks matter ∈ client and 404s otherwise. This function
+    ADDITIONALLY re-verifies the (matter_code, client_code) pair against matters
+    before reading anything, and aborts 404 on mismatch — so the trust boundary
+    holds even if this were ever called from a new path. Every query filters on the
+    validated client_code / matter_code; no client-supplied value widens scope.
+
+    NO hallucination: dates come from matters.next_deadline / the latest
+    surfaced_deadlines snapshot only; [HUMAN VERIFY]/[OPERATOR-ATTESTED] caveats are
+    preserved via _safe_label + the estimated flag; an absent timeline/deadline/doc
+    is shown honestly, never filled.
+
+    link_builder: same (doc_url, matter_url, matter_detail_url) triple contract as
+    render_client_portal. In client chrome the doc links are token-scoped
+    (/client/<token>/doc/<id>) — NO bare /files/c/ reaches the HTML (CRITICAL-1).
+    """
+    doc_url, matter_url, _matter_detail_url = (
+        link_builder if link_builder
+        else (_default_doc_url, _default_matter_url, _default_matter_detail_url))
+    today = date.today()
+    conn = _db()
+    conn.autocommit = True
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    # --- Re-verify matter ∈ client on the VALIDATED FK before reading anything. ---
+    m = _safe_fetch(cur, conn, """
+        SELECT matter_code, title, status, current_stage, next_deadline, next_event,
+               matter_type, docket_number, court_or_agency, forum, date_opened
+          FROM matters
+         WHERE matter_code = %s AND client_code = %s
+           -- drill-down surface == listed surface: never expose a triage stub or a
+           -- closed/archived matter the portal home deliberately hides (security F1).
+           AND matter_code NOT LIKE 'AUTO-%%'
+           AND COALESCE(status,'') NOT IN ('closed', 'archived')
+    """, (matter_code, client_code), default=None, one=True)
+    if not m:
+        cur.close()
+        conn.close()
+        abort(404)
+
+    # Client name for the chrome header.
+    cli = _safe_fetch(cur, conn,
+                      "SELECT name FROM clients WHERE client_code = %s",
+                      (client_code,), default=None, one=True)
+    client_name = (cli or {}).get("name") if cli else None
+
+    # --- Latest grounded surfaced-deadline snapshot for THIS matter only. ---
+    s = _safe_fetch(cur, conn, """
+        SELECT DISTINCT ON (matter_code)
+               matter_code, due_date, bucket, days_out, label, kind, as_of
+          FROM surfaced_deadlines
+         WHERE matter_code = %s
+         ORDER BY matter_code, as_of DESC, (bucket = 'OVERDUE') DESC, due_date ASC
+    """, (matter_code,), default=None, one=True)
+
+    # --- Grounded timeline: stage transitions for THIS matter (never re-derived). ---
+    timeline = _safe_fetch(cur, conn, """
+        SELECT to_stage, from_stage, transitioned_at, notes, transition_doc_id,
+               detected_by
+          FROM case_stage_transitions
+         WHERE matter_code = %s
+         ORDER BY transitioned_at ASC
+    """, (matter_code,), default=[])
+
+    # --- Documents linked to THIS matter (token-scoped links, ownership-checked at
+    # the route level; the /client/<token>/doc/<id> route re-checks per doc). ---
+    docs = _safe_fetch(cur, conn, """
+        SELECT d.id,
+               COALESCE(NULLIF(d.smart_filename,''), d.original_filename, 'Document') AS name,
+               d.doc_date, d.classification,
+               (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) AS servable
+          FROM documents d
+          JOIN document_matter_links l ON l.doc_id = d.id
+         WHERE l.matter_code = %s
+           -- evidence-grade = RECEIVED, not draft: never hand a client a draft as a
+           -- document "on file" (matches the deliverables-card discipline).
+           AND COALESCE(d.classification,'')                                NOT ILIKE '%%draft%%'
+           AND COALESCE(NULLIF(d.smart_filename,''), d.original_filename,'') NOT ILIKE '%%draft%%'
+         ORDER BY d.doc_date ASC NULLS LAST, d.id ASC
+    """, (matter_code,), default=[])
+
+    cur.close()
+    conn.close()
+
+    next_event = m.get("next_event")
+    # --- Deadline + next action (same grounded logic as the portal row). ---
+    if s and s.get("due_date") is not None:
+        due = s["due_date"]
+        days_out = (due - today).days
+        bucket = _bucket_for(days_out)
+        label = _safe_label(s.get("label"), next_event, m.get("current_stage"))
+    elif m.get("next_deadline") is not None:
+        due = m["next_deadline"]
+        days_out = (due - today).days
+        bucket = _bucket_for(days_out)
+        label = _safe_label(None, next_event, m.get("current_stage"))
+    else:
+        due = None
+        days_out = None
+        bucket = "NEEDS-A-DATE"
+        label = _safe_label(None, next_event, m.get("current_stage"))
+    estimated = due is not None and _has_tag(next_event, s.get("label") if s else None)
+    label = _truncate_keep_tags(label or "")
+
+    badge = _BUCKET_BADGE.get(bucket, "badge-off")
+    when = _countdown(days_out)
+    when_badge = f"<span class='badge {badge}'>{_esc(when)}</span>"
+    if due is not None:
+        due_txt = _esc(str(due)) + (" (estimated · awaiting confirmation)" if estimated else "")
+    else:
+        due_txt = "awaiting a confirmed date"
+
+    forum = m.get("court_or_agency") or m.get("forum") or m.get("matter_type") or ""
+    docket = m.get("docket_number") or ""
+    stage = m.get("current_stage") or m.get("status") or "—"
+
+    # --- Facts card (title / forum / docket / stage). ---
+    fact_rows = []
+    fact_rows.append(f"<tr><th>Matter</th><td><code>{_esc(matter_code)}</code></td></tr>")
+    if forum:
+        fact_rows.append(f"<tr><th>Forum</th><td>{_esc(forum)}</td></tr>")
+    if docket:
+        fact_rows.append(f"<tr><th>Docket / ref</th><td>{_esc(docket)}</td></tr>")
+    fact_rows.append(f"<tr><th>Current stage</th><td>{_esc(stage)}</td></tr>")
+    if m.get("date_opened"):
+        fact_rows.append(f"<tr><th>Opened</th><td>{_esc(str(m['date_opened']))}</td></tr>")
+    facts_block = (
+        '<div class="card"><table>' + "".join(fact_rows) + "</table></div>"
+    )
+
+    # --- Deadline / next-action card. ---
+    est_note = (' <span class="badge badge-warn">estimated · awaiting confirmation</span>'
+                if estimated else "")
+    deadline_block = (
+        '<div class="section-title">Deadline &amp; next action</div>'
+        '<div class="card"><table>'
+        f'<tr><th>Countdown</th><td>{when_badge}</td></tr>'
+        f'<tr><th>Due</th><td>{due_txt}</td></tr>'
+        f'<tr><th>Next action</th><td>{_esc(label)}{est_note}</td></tr>'
+        '</table></div>'
+    )
+
+    # --- Timeline (grounded only). Each entry that carries a source doc links via
+    # the token-scoped doc route — the doc route re-checks ownership per id. ---
+    if timeline:
+        tl_rows = []
+        for ev in timeline:
+            when_ts = ev.get("transitioned_at")
+            when_disp = _esc(str(when_ts)[:10]) if when_ts else "—"
+            to_stage = _esc(ev.get("to_stage") or "")
+            frm = ev.get("from_stage")
+            move = (f"{_esc(frm)} &rarr; {to_stage}" if frm else to_stage)
+            note = ev.get("notes")
+            # notes is the stage classifier's INTERNAL reasoning string — gate it through
+            # the same internal-fragment guard as labels; raw internal shorthand or a
+            # cross-matter reference must never reach a client (security Vuln 1a).
+            if note and _is_internal_fragment(note):
+                note = None
+            # surviving notes may carry §4B caveat tags — preserve them, cap without severing.
+            note_disp = _esc(_truncate_keep_tags(note)) if note else ""
+            note_html = (f"<div class='muted' style='font-size:12px'>{note_disp}</div>"
+                         if note_disp else "")
+            doc_link = ""
+            did = ev.get("transition_doc_id")
+            if did:
+                # Route through the ownership-checked doc route (token-scoped in
+                # client chrome). NO bare /files/c/.
+                du = _esc(doc_url(int(did)))
+                doc_link = f" <a href='{du}'>source doc</a>"
+            tl_rows.append(
+                f"<tr><td style='white-space:nowrap'>{when_disp}</td>"
+                f"<td><strong>{move}</strong>{note_html}{doc_link}</td></tr>"
+            )
+        timeline_block = (
+            '<div class="section-title">Timeline '
+            f'<span class="muted">({len(timeline)})</span></div>'
+            '<div class="card"><table>'
+            '<tr><th>Date</th><th>What happened</th></tr>'
+            f'{"".join(tl_rows)}</table></div>'
+        )
+    else:
+        timeline_block = (
+            '<div class="section-title">Timeline</div>'
+            '<div class="card"><p class="empty">No dated milestones recorded yet for '
+            'this matter. As steps are confirmed against source documents they will '
+            'appear here in order.</p></div>'
+        )
+
+    # --- Documents on file (token-scoped links). ---
+    if docs:
+        drows = []
+        avail = 0
+        for d in docs:
+            nm = _esc((d.get("name") or "Document")[:90])
+            dt = _esc(str(d["doc_date"])) if d.get("doc_date") else ""
+            cls = _esc((d.get("classification") or "")[:28])
+            if d.get("servable"):
+                du = _esc(doc_url(int(d["id"])))
+                link = f"<a href='{du}'>view / download</a>"
+                avail += 1
+            else:
+                link = '<span class="muted">no scan on file yet</span>'
+            drows.append(
+                f"<tr><td style='white-space:nowrap'>{dt}</td>"
+                f"<td>{nm}<div class='muted' style='font-size:12px'>"
+                f"{cls}{(' · ' if cls else '')}doc#{int(d['id'])}</div></td>"
+                f"<td>{link}</td></tr>"
+            )
+        docs_block = (
+            '<div class="section-title">Documents on file '
+            f'<span class="muted">({len(docs)} · {avail} downloadable)</span></div>'
+            '<div class="card"><table>'
+            '<tr><th>Date</th><th>Document</th><th>File</th></tr>'
+            f'{"".join(drows)}</table></div>'
+        )
+    else:
+        docs_block = (
+            '<div class="section-title">Documents on file</div>'
+            '<div class="card"><p class="empty">No documents are linked to this '
+            'matter yet.</p></div>'
+        )
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    body = f"""
+<h1>{_esc(m.get('title') or matter_code)}</h1>
+<p class="lead">One matter in your workspace · as of {now}</p>
+{facts_block}
+{deadline_block}
+{timeline_block}
+{docs_block}
+<p class="muted" style="margin-top:16px;font-size:12px">
+  Dates and stages are read from the grounded record. Items marked
+  <code>[HUMAN VERIFY]</code>, <code>[OPERATOR-ATTESTED]</code> or
+  <code>[verify-img]</code> are still being confirmed against the source document
+  and are shown with that caveat — they are not presented as settled fact. A matter
+  awaiting a confirmed date is shown openly rather than hidden.</p>
+"""
+    title = f"{m.get('title') or matter_code} — {client_name or client_code}"
     return title, body
