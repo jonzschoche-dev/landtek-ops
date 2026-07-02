@@ -75,13 +75,27 @@ def _candidate_urls(gr: str, date: str) -> list[str]:
     known = _MONTHS.get(mon_m.group(1).lower(), mon_m.group(1)[:3].lower()) if mon_m else None
     months = ([known] + [m for m in _ALLMON if m != known]) if known else list(_ALLMON)
     stems = [f"gr_{digits}", f"gr_l-{digits}"] if "l-" in gr.lower() else [f"gr_{digits}"]
-    return [f"https://lawphil.net/judjuris/juri{yr}/{m}{yr}/{s}_{yr}.html"
-            for m in months for s in stems]
+    # lawphil hosts many decisions as HTML, others as PDF-only (…/<mon><yr>/pdf/gr_N_YYYY.pdf) — try both.
+    urls = []
+    for m in months:
+        for s in stems:
+            urls.append(f"https://lawphil.net/judjuris/juri{yr}/{m}{yr}/{s}_{yr}.html")
+            urls.append(f"https://lawphil.net/judjuris/juri{yr}/{m}{yr}/pdf/{s}_{yr}.pdf")
+    return urls
 
 
 def _fetch_text(url: str) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": _UA})
-    raw = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "ignore")
+    data = urllib.request.urlopen(req, timeout=25).read()
+    # PDF-hosted decision (many lawphil pages are PDF-only): extract text via PyMuPDF.
+    if url.lower().endswith(".pdf") or data[:5] == b"%PDF-":
+        import fitz  # PyMuPDF (already on the VPS)
+        d = fitz.open(stream=data, filetype="pdf")
+        t = "\n".join(p.get_text() for p in d); d.close()
+        t = re.sub(r"[ \t]+", " ", t)
+        t = re.sub(r"\n\s*\n+", "\n\n", t)
+        return t.strip()
+    raw = data.decode("utf-8", "ignore")
     t = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", raw, flags=re.S | re.I)
     t = re.sub(r"<[^>]+>", " ", t)
     t = _html.unescape(t)
