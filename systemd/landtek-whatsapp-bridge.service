@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek WhatsApp channel bridge — drain queued replies once the token lands. Token-gated: idle (clean exit) until WHATSAPP_API_TOKEN + WHATSAPP_PHONE_NUMBER_ID are set, then auto-drains the backlog. For WhatsApp the token IS the external switch.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/whatsapp_channel_bridge.py --send
+StandardOutput=append:/var/log/landtek_whatsapp_bridge.log
+StandardError=append:/var/log/landtek_whatsapp_bridge.log
