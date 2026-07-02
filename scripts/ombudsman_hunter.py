@@ -174,21 +174,34 @@ SIGNAL_PATTERNS = {
 # against matter_facts on --scan; a seed the corpus does not corroborate is flagged
 # NEEDS-VERIFICATION rather than asserted. New names surfaced by the scan are added as SEED.
 # ─────────────────────────────────────────────────────────────────────────────
+# Geography / role-generic tokens that are too common to identify a specific officer — a fact that
+# merely mentions "Mercedes" the town must NOT match "Mayor of Mercedes". Matching keys on the
+# DISTINCTIVE tokens (role title + surname) below, never on these.
+MATCH_STOPWORDS = {"mercedes", "municipal", "office", "camarines", "norte", "bayan",
+                   "denr", "provincial", "the", "and", "of"}
+
 ROSTER = [
-    # official, office, capacity, note (provenance of the seed)
-    ("Mayor of Mercedes",            "Office of the Mayor, Mercedes",             "elective",
-     "playbook ombudsman_1891 dispositive frame — sat on the 6-Apr-2026 CART over complaints vs own office"),
+    # official, office, capacity, distinctive match tokens, note (provenance of the seed)
+    ("Mayor Alexander Pajarillo",    "Office of the Mayor, Mercedes",             "elective",
+     ["Mayor", "Pajarillo"],
+     "playbook ombudsman_1891 + fact 5243 — CART Chairperson over complaints vs his own office; fact 5229 — imposed the All-Heirs-SPA requirement"),
     ("Sangguniang Bayan (Mercedes)", "Sangguniang Bayan, Mercedes",               "elective",
+     ["Sangguniang", "Kagawad", "Councilor"],
      "playbook ombudsman_1891 — members present/participating at the CART, did not inhibit"),
     ("Municipal Assessor",           "Office of the Municipal Assessor, Mercedes", "appointive",
+     ["Assessor"],
      "records-refusal track (27-May-2025 request) — CSC parallel track"),
     ("Municipal Treasurer",          "Office of the Municipal Treasurer, Mercedes","appointive",
+     ["Treasurer"],
      "records-refusal track (28-May-2025 request) — CSC parallel track"),
     ("Municipal Engineer",           "Office of the Municipal Engineer, Mercedes", "appointive",
+     ["Municipal Engineer", "Engr"],   # NB: fact 6469 names 'Engr. Balane' as Mun. Engineer — do NOT conflate with Gloria Balane (CV-26360)
      "cross-department refusal — CSC parallel track"),
     ("PENRO Fortuno",                "PENRO, Camarines Norte (DENR)",              "career",
+     ["Fortuno", "PENRO"],
      "ARTA-1319 respondent; Joint Response 18-Feb-2026 — false-denial angle"),
     ("PENRO Remoto",                 "PENRO, Camarines Norte (DENR)",              "career",
+     ["Remoto"],
      "ARTA-1319 co-respondent"),
 ]
 
@@ -222,11 +235,20 @@ def _ensure_table(cur):
 
 
 # ── Stages ───────────────────────────────────────────────────────────────────
-def _match_official(fact_stmt, official):
-    """Loose surname/office match so 'Mayor Pajarillo' matches the 'Mayor of Mercedes' seed."""
-    toks = [t for t in re.split(r"[^a-zA-Z]+", official) if len(t) > 3]
+def _match_official(fact_stmt, match_tokens):
+    """Match on DISTINCTIVE role/surname tokens only — never on geography (a fact mentioning the
+    town 'Mercedes' must not attach to 'Mayor …Mercedes'). Multi-word tokens match as a phrase."""
     low = fact_stmt.lower()
-    return any(t.lower() in low for t in toks)
+    for tok in match_tokens:
+        t = tok.lower()
+        if t in MATCH_STOPWORDS:
+            continue
+        if " " in t:  # phrase token, e.g. "municipal engineer"
+            if t in low:
+                return True
+        elif re.search(r"\b" + re.escape(t) + r"\b", low):
+            return True
+    return False
 
 
 def _scan_signals(text):
@@ -240,14 +262,16 @@ def _scan_signals(text):
 def cull_and_profile(facts):
     """official -> {matters:set, incidents:[(fact_id, doc_handle, signals, matter)]}"""
     profiles = {}
-    for official, office, capacity, note in ROSTER:
+    tokens_by_official = {}
+    for official, office, capacity, match_tokens, note in ROSTER:
         profiles[official] = {"office": office, "capacity": capacity, "seed_note": note,
                               "matters": set(), "incidents": []}
+        tokens_by_official[official] = match_tokens
     for fid, matter, stmt, src, prov in facts:
         if prov and prov not in ("verified", "inferred_strong"):
             continue  # scan only grounded facts, never weak/draft
         for official in list(profiles):
-            if _match_official(stmt, official):
+            if _match_official(stmt, tokens_by_official[official]):
                 sigs = _scan_signals(stmt)
                 if not sigs:
                     continue
@@ -503,8 +527,8 @@ def cmd_doctrine():
         print(f"      elements: {', '.join(v['elements'].keys())}")
         print(f"      prescription: {v['prescription']}")
     print("\nSEED ROSTER (corroborated against matter_facts on --scan):")
-    for o, off, cap, note in ROSTER:
-        print(f"  {o:<28} [{cap}] {off}\n      seed: {note}")
+    for o, off, cap, toks, note in ROSTER:
+        print(f"  {o:<28} [{cap}] {off}\n      match: {toks}\n      seed: {note}")
 
 
 def main():
