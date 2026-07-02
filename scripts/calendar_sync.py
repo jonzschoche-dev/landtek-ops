@@ -191,11 +191,16 @@ class Item:
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
+_OWNER_PLACEHOLDERS = {"owner", "tbd", "n/a", "na", "none", "-", ""}
+
+
 def _counsel_to_owner(lead_counsel):
-    """Map a matters.lead_counsel free-text value to an associate label."""
+    """Map a matters owner/counsel free-text value to a clean associate label."""
     if not lead_counsel:
         return None
-    lc = lead_counsel.lower()
+    lc = lead_counsel.strip().lower()
+    if lc in _OWNER_PLACEHOLDERS:
+        return None
     if "barandon" in lc:
         return "Barandon"
     if "botor" in lc:
@@ -203,138 +208,157 @@ def _counsel_to_owner(lead_counsel):
     return lead_counsel.strip()[:40]
 
 
-def gather_from_matters(cur, client_filter):
-    """Source A: matters.next_deadline / next_event — fully tagged natively."""
+class MatterInfo:
+    __slots__ = ("id", "matter_code", "client", "owner", "label",
+                 "next_deadline", "next_event", "current_stage")
+
+    def __init__(self, **kw):
+        for s in self.__slots__:
+            setattr(self, s, kw.get(s))
+
+
+def load_matters_index(cur):
+    """Load matters once into an index keyed by every join handle (matter_code,
+    docket_number, case_file) → MatterInfo. Owner = next_event_owner or lead_counsel.
+    This is the single source of client/owner truth; all sources resolve through it,
+    so client_code is never guessed (client-separation invariant)."""
+    index, by_code = {}, {}
     if not table_exists(cur, "matters"):
-        return []
+        return index, by_code
     cols = columns_of(cur, "matters")
-    # Prefer a human matter label; fall back through likely columns.
-    label_col = next((c for c in ("matter_code", "docket_number", "case_file")
-                      if c in cols), None)
-    have = {c for c in ("id", "client_code", "lead_counsel", "next_deadline",
-                        "next_event", "current_stage") if c in cols}
-    if "id" not in have or "next_deadline" not in have:
-        return []
-    select_cols = sorted(have | ({label_col} if label_col else set()))
-    sql = f"SELECT {', '.join(select_cols)} FROM matters WHERE next_deadline IS NOT NULL"
-    params = []
-    if client_filter and "client_code" in cols:
-        sql += " AND client_code ILIKE %s"
-        params.append(f"{client_filter}%")
-    cur.execute(sql, params)
-    rows = cur.fetchall()
-    idx = {c: i for i, c in enumerate(select_cols)}
-    items = []
-    for r in rows:
+    if "matter_code" not in cols or "client_code" not in cols:
+        return index, by_code
+    optional = [c for c in ("docket_number", "case_file", "lead_counsel",
+                            "next_event_owner", "next_deadline", "next_event",
+                            "current_stage") if c in cols]
+    sel = ["id", "matter_code", "client_code"] + optional
+    cur.execute(f"SELECT {', '.join(sel)} FROM matters")
+    pos = {c: i for i, c in enumerate(sel)}
+    for r in cur.fetchall():
         def g(c):
-            return r[idx[c]] if c in idx else None
-        deadline = g("next_deadline")
-        if deadline is None:
+            return r[pos[c]] if c in pos else None
+        owner = _counsel_to_owner(g("next_event_owner") or g("lead_counsel"))
+        mi = MatterInfo(
+            id=g("id"), matter_code=g("matter_code"), client=g("client_code"),
+            owner=owner, label=g("matter_code"), next_deadline=g("next_deadline"),
+            next_event=g("next_event"), current_stage=g("current_stage"))
+        by_code[str(mi.matter_code).strip().lower()] = mi
+        for handle in (g("matter_code"), g("docket_number"), g("case_file")):
+            if handle:
+                index[str(handle).strip().lower()] = mi
+    return index, by_code
+
+
+def _client_match(client, client_filter):
+    """True if this item passes a client-scoped run. Unresolved items pass (they
+    carry no client to contaminate); resolved items must match the filter."""
+    if not client_filter:
+        return True
+    if not client:
+        return True
+    return client_filter.upper() in str(client).upper()
+
+
+def gather_from_matters(cur, client_filter, index, by_code):
+    """Source A: matters.next_deadline — fully tagged natively (client + owner + matter)."""
+    items = []
+    for mi in by_code.values():
+        if mi.next_deadline is None:
             continue
-        title = (g("next_event") or g("current_stage") or "Matter deadline")
-        matter_label = g(label_col) if label_col else None
+        if not _client_match(mi.client, client_filter):
+            continue
+        title = mi.next_event or mi.current_stage or "Matter deadline"
         items.append(Item(
-            uid=f"matter:{g('id')}:deadline",
-            source="matters",
-            source_id=str(g("id")),
-            title=str(title)[:200],
-            start=deadline,
-            end=None,
-            all_day=True,
-            client=g("client_code"),
-            matter=matter_label,
-            owner=_counsel_to_owner(g("lead_counsel")),
-            kind="deadline",
+            uid=f"matter:{mi.id}:deadline", source="matters", source_id=str(mi.id),
+            title=str(title)[:200], start=mi.next_deadline, end=None, all_day=True,
+            client=mi.client, matter=mi.label, owner=mi.owner, kind="deadline",
             status="scheduled",
-            desc=f"Matter deadline surfaced from matters.next_deadline. "
-                 f"Stage: {g('current_stage') or 'n/a'}.",
-        ))
+            desc=f"Matter deadline (matters.next_deadline). Stage: {mi.current_stage or 'n/a'}."))
     return items
 
 
-def gather_from_events(cur, client_filter):
-    """Source B: calendar_events — client/owner resolved via matters, else UNRESOLVED."""
+def gather_from_events(cur, client_filter, index, clients_by_id):
+    """Source B: calendar_events. Client via client_id→clients (authoritative);
+    matter/owner via related_case→matters. Client left UNRESOLVED if no real join."""
     if not table_exists(cur, "calendar_events"):
         return []
     cols = columns_of(cur, "calendar_events")
-    needed = {"id", "title", "start_at"}
-    if not needed <= cols:
+    if not {"id", "title", "start_at"} <= cols:
         return []
     opt = [c for c in ("description", "end_at", "location", "related_case",
-                       "related_tct", "status") if c in cols]
+                       "client_id", "status") if c in cols]
     sel = ["id", "title", "start_at"] + opt
     sql = f"SELECT {', '.join(sel)} FROM calendar_events"
-    # only future-ish and non-cancelled if the column exists
-    where = []
     if "status" in cols:
-        where.append("(status IS NULL OR status <> 'cancelled')")
-    if where:
-        sql += " WHERE " + " AND ".join(where)
+        sql += " WHERE (status IS NULL OR status <> 'cancelled')"
     cur.execute(sql)
     rows = cur.fetchall()
-    idx = {c: i for i, c in enumerate(sel)}
-    # Build a resolver: related_case → (client_code, lead_counsel)
-    resolver = _matter_resolver(cur)
+    pos = {c: i for i, c in enumerate(sel)}
     items = []
     for r in rows:
         def g(c):
-            return r[idx[c]] if c in idx else None
-        related_case = g("related_case")
-        client, owner, matter = resolver(related_case)
-        if client_filter and (client or "").upper().find(client_filter.upper()) < 0:
-            # if we couldn't resolve a client, don't filter it out silently on a
-            # client-scoped run — but do skip clearly-other-client rows.
-            if client:
-                continue
-        start = g("start_at")
+            return r[pos[c]] if c in pos else None
+        mi = index.get(str(g("related_case")).strip().lower()) if g("related_case") else None
+        client = clients_by_id.get(g("client_id")) or (mi.client if mi else None)
+        owner = mi.owner if mi else None
+        matter = mi.label if mi else g("related_case")
+        if not _client_match(client, client_filter):
+            continue
         items.append(Item(
-            uid=f"event:{g('id')}",
-            source="calendar_events",
-            source_id=str(g("id")),
-            title=str(g("title"))[:200],
-            start=start,
-            end=g("end_at"),
-            all_day=False,
-            client=client,
-            matter=matter or related_case,
-            owner=owner,
-            kind="event",
+            uid=f"event:{g('id')}", source="calendar_events", source_id=str(g("id")),
+            title=str(g("title"))[:200], start=g("start_at"), end=g("end_at"),
+            all_day=False, client=client, matter=matter, owner=owner, kind="event",
             status=g("status") or "scheduled",
             desc=(g("description") or "") +
-                 ("" if client else "\n[client UNRESOLVED — not tagged to avoid contamination]"),
-        ))
+                 ("" if client else "\n[client UNRESOLVED — untagged to avoid contamination]")))
     return items
 
 
-def _matter_resolver(cur):
-    """Return f(related_case)->(client_code, owner, matter_label) via real joins only."""
-    if not table_exists(cur, "matters"):
-        return lambda _rc: (None, None, None)
-    cols = columns_of(cur, "matters")
-    keys = [c for c in ("docket_number", "case_file", "matter_code") if c in cols]
-    if not keys or "client_code" not in cols:
-        return lambda _rc: (None, None, None)
-    lc = "lead_counsel" if "lead_counsel" in cols else "NULL"
-    label = keys[0]
-    # Load a small in-memory index (matters is ~dozens of rows).
-    idxmap = {}
+def gather_from_case_actions(cur, client_filter, index):
+    """Source C: case_actions — LandTek's planned actions with a due_date."""
+    if not table_exists(cur, "case_actions"):
+        return []
     cur.execute(
-        f"SELECT client_code, {lc} AS lead_counsel, {label} AS label, "
-        f"{', '.join(keys)} FROM matters"
-    )
-    for row in cur.fetchall():
-        client_code, lead_counsel, label_val = row[0], row[1], row[2]
-        for keyval in row[3:]:
-            if keyval:
-                idxmap[str(keyval).strip().lower()] = (
-                    client_code, _counsel_to_owner(lead_counsel), label_val)
+        "SELECT id, matter_code, description, status, due_date FROM case_actions "
+        "WHERE due_date IS NOT NULL AND status <> 'confirmed'")
+    items = []
+    for cid, matter_code, desc, status, due in cur.fetchall():
+        mi = index.get(str(matter_code).strip().lower()) if matter_code else None
+        client = mi.client if mi else None
+        if not _client_match(client, client_filter):
+            continue
+        items.append(Item(
+            uid=f"action:{cid}", source="case_actions", source_id=str(cid),
+            title=f"[{status}] {desc}"[:200], start=due, end=None, all_day=True,
+            client=client, matter=(mi.label if mi else matter_code),
+            owner=(mi.owner if mi else None), kind="action", status=status or "planned",
+            desc=f"Case action ({status}). Source: execution_tracker case_actions."))
+    return items
 
-    def resolve(related_case):
-        if not related_case:
-            return (None, None, None)
-        return idxmap.get(str(related_case).strip().lower(), (None, None, None))
 
-    return resolve
+def gather_from_plays(cur, client_filter, index, by_code):
+    """Source D: matter_plays — READY offensive moves, anchored to the matter's next
+    deadline (a play has no date of its own). Only 'ready' plays with a real deadline."""
+    if not table_exists(cur, "matter_plays"):
+        return []
+    cur.execute(
+        "SELECT id, matter_code, play_code, title, readiness, suggested_action "
+        "FROM matter_plays WHERE readiness = 'ready'")
+    items = []
+    for pid, matter_code, play_code, title, readiness, action in cur.fetchall():
+        mi = by_code.get(str(matter_code).strip().lower())
+        if mi is None or mi.next_deadline is None:
+            continue  # no anchor date → not calendarable
+        if not _client_match(mi.client, client_filter):
+            continue
+        items.append(Item(
+            uid=f"play:{matter_code}:{play_code}", source="matter_plays",
+            source_id=str(pid), title=f"READY: {title or play_code}"[:200],
+            start=mi.next_deadline, end=None, all_day=True, client=mi.client,
+            matter=mi.label, owner=mi.owner, kind="play", status="ready",
+            desc=f"Ready offensive move (matter_plays). Anchored to matter deadline. "
+                 f"Suggested: {(action or '')[:300]}"))
+    return items
 
 
 # ── Google Calendar upsert ──────────────────────────────────────────────
@@ -499,6 +523,12 @@ def main():
     ap.add_argument("--pull", action="store_true", help="reconcile manual gcal edits back")
     ap.add_argument("--calendar-id", default=None, help="target calendar (default: env or 'primary')")
     ap.add_argument("--client", default=None, help="limit to one client code prefix, e.g. MWK")
+    ap.add_argument("--lookback-days", type=int, default=30,
+                    help="include items due within this many days in the past (default 30)")
+    ap.add_argument("--all-dates", action="store_true", help="sync every item, incl. old past ones")
+    ap.add_argument("--daemon", action="store_true",
+                    help="run mode: missing calendar creds exit 0 (quiet) so a timer "
+                         "never marks the unit failed before the token is provisioned")
     ap.add_argument("--limit", type=int, default=None, help="cap items (debug)")
     args = ap.parse_args()
 
@@ -510,8 +540,38 @@ def main():
     ensure_schema(cur)
     conn.commit()
 
-    items = gather_from_matters(cur, args.client) + gather_from_events(cur, args.client)
+    index, by_code = load_matters_index(cur)
+    clients_by_id = {}
+    if table_exists(cur, "clients") and "client_code" in columns_of(cur, "clients"):
+        cur.execute("SELECT id, client_code FROM clients WHERE client_code IS NOT NULL")
+        clients_by_id = {cid: code for cid, code in cur.fetchall()}
+
+    items = (gather_from_matters(cur, args.client, index, by_code)
+             + gather_from_events(cur, args.client, index, clients_by_id)
+             + gather_from_case_actions(cur, args.client, index)
+             + gather_from_plays(cur, args.client, index, by_code))
     items = [i for i in items if i.start is not None]
+
+    # Forward-looking by default: drop items whose date is older than the lookback
+    # window so the calendar isn't cluttered with long-past events (still idempotent —
+    # dropped items simply aren't (re)created). --all-dates keeps everything.
+    if not args.all_dates:
+        from datetime import timedelta
+        try:
+            from zoneinfo import ZoneInfo
+            today = datetime.now(ZoneInfo(TZ)).date()
+        except Exception:
+            today = datetime.now(timezone.utc).date()
+        cutoff = today - timedelta(days=args.lookback_days)
+
+        def _d(it):
+            return it.start.date() if isinstance(it.start, datetime) else it.start
+        before = len(items)
+        items = [i for i in items if _d(i) >= cutoff]
+        dropped = before - len(items)
+        if dropped:
+            print(f"[calendar_sync] skipped {dropped} item(s) older than {cutoff} "
+                  f"(use --all-dates to include)")
     items.sort(key=lambda i: (i.start if isinstance(i.start, datetime)
                               else datetime(i.start.year, i.start.month, i.start.day, tzinfo=timezone.utc)))
     if args.limit:
@@ -528,9 +588,13 @@ def main():
 
     service = calendar_client(env)
     if args.apply and service is None:
-        print("[calendar_sync] --apply requested but no CALENDAR_REFRESH_TOKEN / calendar "
-              "auth. Mint a calendar-scoped token first (see handoff). Aborting write.",
-              file=sys.stderr)
+        msg = ("[calendar_sync] --apply requested but no CALENDAR_REFRESH_TOKEN / calendar "
+               "auth. Mint a calendar-scoped token first (scripts/mint_calendar_token.py).")
+        if args.daemon:  # degrade quietly so the timer unit never goes 'failed'
+            print(msg + " Daemon mode: no-op this cycle.")
+            conn.close()
+            sys.exit(0)
+        print(msg + " Aborting write.", file=sys.stderr)
         sys.exit(2)
 
     if args.pull:

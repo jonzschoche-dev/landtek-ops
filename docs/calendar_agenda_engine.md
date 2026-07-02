@@ -11,42 +11,41 @@ it has **not** been run against the live DB yet — do the dry-run first (Step 2
 
 ## What it syncs
 
-| Source | Tagging | Notes |
-|---|---|---|
-| `matters.next_deadline` / `next_event` | client_code + lead_counsel **native** | primary; fully tagged with client + owner + matter |
-| `calendar_events` | resolved via `related_case → matters` | client/owner left **UNRESOLVED** (not guessed) when no join — protects the client-separation invariant |
+Four sources, all resolved through one `matters` index so client/owner are never guessed:
 
-Each Google event summary is prefixed `[CLIENT · MATTER · OWNER] title`. A stable
+| Source | Kind | Client / owner | Notes |
+|---|---|---|---|
+| `matters.next_deadline` | deadline | native (`client_code`, `next_event_owner`/`lead_counsel`) | fully tagged |
+| `calendar_events` | event | client via `client_id → clients`; matter/owner via `related_case → matters` | left **UNRESOLVED** (untagged) when no real join — protects client-separation |
+| `case_actions` (with `due_date`, not confirmed) | action | via `matter_code → matters` | LandTek's planned actions |
+| `matter_plays` (`readiness='ready'`) | play | via `matter_code → matters` | anchored to the matter's `next_deadline`; skipped if no anchor date |
+
+Each Google event summary is prefixed `[CLIENT · MATTER · OWNER] title`, with
+`client_code`/`owner`/`kind` in extendedProperties for filtering. A stable
 `landtek_uid` + `calendar_sync_map` content-hash make re-runs idempotent (patch what
 changed, never double-create). `associates` is seeded with **Barandon** and **Botor**.
+
+**Forward-looking by default:** items older than 30 days are skipped (`--lookback-days N`
+/ `--all-dates` to override). Validated against the live DB 2026-07-02: 29 forward
+items across MWK-001 + Paracale-001, 8 conflict-days flagged, client separation intact.
 
 ## Step 0 — one-time: mint a calendar-scoped OAuth token (the real blocker)
 
 The existing `GMAIL_REFRESH_TOKEN` is scoped `gmail.readonly` only and will **not**
-authorize calendar writes. Mint a token with `.../auth/calendar.events` once, reusing
-the existing OAuth client (`/root/landtek/gmail_oauth_client.json`):
+authorize calendar writes. Mint a `calendar.events` token with the turnkey helper
+(reuses the existing OAuth client `gmail_oauth_client.json`):
 
 ```bash
 cd /root/landtek
-python3 - <<'PY'
-import json
-from google_auth_oauthlib.flow import InstalledAppFlow
-conf = json.load(open("gmail_oauth_client.json"))
-flow = InstalledAppFlow.from_client_config(
-    conf, scopes=["https://www.googleapis.com/auth/calendar.events"])
-creds = flow.run_console()   # prints a URL → consent in browser → paste code back
-print("\nCALENDAR_REFRESH_TOKEN=" + creds.refresh_token)
-PY
+python3 scripts/mint_calendar_token.py --console   # headless VPS: prints URL, paste code
+# or, from a machine with a browser:
+python3 scripts/mint_calendar_token.py             # opens the consent page
 ```
 
-> If `run_console()` is unavailable in the installed lib version, use
-> `flow.run_local_server(port=0)` from a machine with a browser, or generate the
-> token on the Mac and copy just the refresh-token string over.
-
-Add the result to `/root/landtek/.env` (chmod 600 — never commit it):
+Add its output to `/root/landtek/.env` (chmod 600 — never commit it):
 
 ```
-CALENDAR_REFRESH_TOKEN=1//0g...        # from the step above
+CALENDAR_REFRESH_TOKEN=1//0g...        # from the helper
 LANDTEK_CALENDAR_ID=primary            # or a dedicated LandTek calendar id
 ```
 
@@ -80,12 +79,18 @@ python3 scripts/calendar_sync.py --pull --apply   # reconcile manual gcal delete
 
 `--apply` aborts cleanly if `CALENDAR_REFRESH_TOKEN` is missing.
 
-## Step 4 — make it seamless (systemd timer) — after Step 3 looks right
+## Step 4 — make it seamless (systemd timer)
 
-Mirror the existing calendar/deadline timers (see `apply_deploy_276_agentic_calendar.py`):
-a `calendar-sync.service` (oneshot: `calendar_sync.py --apply`) + `calendar-sync.timer`
-every ~15 min, plus a nightly `--pull --apply`. Hold this until the manual `--apply`
-run is verified so the daemon never amplifies a mistake.
+```bash
+python3 migrations/apply_deploy_649_calendar_sync_timer.py
+```
+
+Installs a push timer (every 15 min, `--apply --daemon`) + a nightly pull-reconcile.
+**Self-guarding:** it only *enables* the timers when `CALENDAR_REFRESH_TOKEN` is set —
+before that it installs the units but leaves them disabled, so nothing ever shows as a
+`failed` unit (honors the `systemctl --failed == 0` invariant). Re-run it after the
+token is in place to flip the timers on. `--daemon` mode makes a missing token a clean
+no-op (exit 0), not a failure.
 
 ## Guardrails baked in
 
