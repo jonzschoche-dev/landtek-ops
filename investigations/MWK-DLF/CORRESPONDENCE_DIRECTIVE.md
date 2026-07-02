@@ -34,14 +34,24 @@ Mirror of the `planned` rows in `correspondence_events`:
    doc:353 already lists as "no record on file." Ask for the LRA-standard, signed & sealed form so it
    is a usable court exhibit. *(Upgrades a plain letter into evidence.)*
 2. **[P1] RD — consolidated request** (the gap-closer): (a) certified true copies of
-   **T-47655 / T-47656 / T-47657 / T-48336 / T-69404** to identify the ~50,000 sqm holder; and
+   **T-47655 / T-47656 / T-47657 / T-48336 / T-69404** to identify the dark-cluster holder + area; and
    (b) certified copies **or** a non-availability certification for the **Dean (PE-214781)** and
    **Capistrano (PE-261974)** deeds. Either outcome advances the case.
-3. **[P2] RD — T-52540 chaser.** The 25-Feb-2025 request for T-52540's certified annotations was never
+   *(drafted: `correspondence/DRAFT_2026-07_RD_consolidated_CTC_and_deeds.md`)*
+3. **[P1] RD — certified CHAIN / history of title** (the linchpin): trace and certify the derivation
+   **T-4497 → T-32917 → [2-X-6-I, 2-X-6-I-4] → T-52540 → 079-2021002126 / 079-2021002127**, stating
+   for each title its parent ("issued in lieu of"), the creating subdivision-plan + entry/PE + date,
+   the registered owner, and the cancelling entry. Fills the `inferred_strong` T-32917→T-52540 gap
+   with the RD's own record. *(drafted: `correspondence/DRAFT_2026-07_RD_certified_chain_of_title.md`)*
+4. **[P2] RD — T-52540 chaser.** The 25-Feb-2025 request for T-52540's certified annotations was never
    answered; re-ask under RA 11032, or request a non-availability cert for it too.
-4. **[P3] RTC Daet Clerk of Court** — confirm whether the 27-May-2025 request (doc:1019) was retrieved.
-5. **[drafted, unsent] Mercedes Assessor** — finalize and send the tax-declaration request (doc:332);
+5. **[P3] RTC Daet Clerk of Court** — confirm whether the 27-May-2025 request (doc:1019) was retrieved.
+6. **[drafted, unsent] Mercedes Assessor** — finalize and send the tax-declaration request (doc:332);
    it supports the complaint's prayer to cancel ARP GR-2023-II-07-001-00256.
+
+The three P1 letters (1–3) are the batch to file together — they share a recipient and reinforce
+each other: the chain (3) shows the lineage runs through the void instruments; the non-availability
+cert (1) proves those instruments don't exist; the CTCs (2) fill in the holders/areas.
 
 ## Cadence & escalation ladder
 - **T+0** send (log `sent` + `claimed_date`).
