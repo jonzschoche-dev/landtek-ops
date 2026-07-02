@@ -1,0 +1,34 @@
+LRA CITIZEN'S CHARTER — Register of Deeds service standards (extracted verbatim from the official
+Land Registration Authority Citizen's Charter, 2019 1st Edition, published 06 July 2022,
+lra.gov.ph/wp-content/uploads/2022/07/LRA-CITIZEN-CHARTER-07062022_.pdf). These are the RA 11032
+service standards that bind the Registry of Deeds and are the enforceable basis for records requests.
+
+SERVICE — ISSUANCE OF CERTIFIED TRUE COPY (CTC) OF TITLE (Charter item 27).
+- Classification: SIMPLE (PHILARIS / eTitles) / COMPLEX (Converted / manual titles).
+- Type: G2C / G2G.  Who may avail: transacting public.
+- Requirements: External Request Form (OAICTD.FRM.2016.007, 1 original) stating title number,
+  owner's name, property location (province/city/municipality); one valid government photo ID.
+- Fees: first 2 pages = PHP 196.97 (LOCAL RD) or PHP 644.97 (outside the local RD), plus
+  PHP 38.19 for every succeeding page.
+- Processing time: 1 day (PHILARIS/eTitle); 3 days (Converted titles). Per LRA eSerbisyo FAQ, an
+  additional 5-7 working days may be required for manually-issued/converted titles for validation of
+  the physical Government copy at the concerned Registry of Deeds.
+- KEY COUNTER MECHANISM: if the requested title is UNAVAILABLE, the agency action is to "remark
+  'No Record' in the [External Request Form] and return it to the client." — i.e., the RD's own
+  procedure produces a written no-record notation at the counter.
+
+SERVICE — ISSUANCE OF CERTIFICATION (Charter item 16; also items 17 Certification/Indorsement).
+- Classification: SIMPLE.  Type: G2C / G2G.  Who may avail: all.
+- Requirements: request form; government ID; documentary stamp; official receipt.
+- Fee: Certification fee = PHP 30.00 (plus documentary stamp).
+- The Registry issues certifications as to its records (e.g., status, receipt, and — by the same
+  authority that produced the 23 June 2025 letter in this matter — non-availability of a record).
+
+GENERAL RA 11032 SERVICE-TIME RULE (RA 11032 §9, as classified per service in the Charter):
+- Simple transactions: 3 working days.  Complex: 7 working days.  Highly technical: 20 working days.
+- An agency that fails to act within its posted Charter time, or imposes requirements beyond the
+  Charter, is subject to RA 11032 §21 (the punishable acts) — the enforcement hook for follow-ups.
+
+RD LEGAL FRAMEWORK (already embedded, cross-reference): PD 1529 (Property Registration Decree),
+esp. §10 (general functions/duties of the Register of Deeds) and §117 (Land Registration Authority);
+RA 11032 (Ease of Doing Business Act); EO 292 (Administrative Code — LRA under the DOJ).

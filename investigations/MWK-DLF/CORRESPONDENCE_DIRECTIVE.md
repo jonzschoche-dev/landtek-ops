@@ -19,6 +19,12 @@ governs **who we write, what we request, on what legal footing, the cadence, and
 6. **No double-tap to a busy office.** One request, one follow-up (RA 11032 §-cited), then escalate —
    don't send serial chasers that muddy the record.
 
+## The enforceable service standards (the teeth)
+The RD's own **LRA Citizen's Charter 2019** (ingested; `legal_chunks` forum ARTA + `legal_authorities`) fixes what we can demand and by when:
+- **CTC of Title** — Simple (eTitle) / Complex (converted); fees first 2 pp **₱196.97 local RD** (₱644.97 non-local) + ₱38.19/succeeding page; **1 day** eTitle / **3 days** converted (+5–7 days manual validation). If the title is unavailable the RD's own action is to **remark "No Record" on the request form** — build that into every CTC ask.
+- **Issuance of Certification** — Simple; **₱30** + documentary stamp.
+- **RA 11032 §9 clock:** simple **3** / complex **7** / highly technical **20** working days; breach or extra requirements → **§21 punishable acts**. Cite the applicable Charter time in every follow-up.
+
 ## Recipients & their mandates
 | Recipient | What they hold / owe | Footing |
 |---|---|---|

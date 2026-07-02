@@ -77,6 +77,8 @@ NEEDED = [
     ("Sps. Alcantara v. Nido (G.R. 165133)", "Art. 1874 — land sale by agent w/o WRITTEN authority is void; cannot be ratified", ["shall be in writing"], "165133"),
     ("Heirs of Tulauan v. Mateo (G.R. 248974)", "Reconveyance on a void/inexistent deed is IMPRESCRIPTIBLE (Art. 1410)", ["does not prescribe"], "248974"),
     ("Domingo v. Domingo (G.R. L-30573)", "Art. 1891 — agent must account/remit all received; unfaithful agent forfeits compensation", ["render an account"], "30573"),
+    # ── AGENCY SERVICE STANDARDS (RA 11032 enforcement basis for the RD correspondence campaign) ──
+    ("LRA Citizen's Charter (RD services)", "Register of Deeds service standards — CTC + Certification processing times/fees; the 'No Record' counter mechanism (the enforceable basis for the MWK-DLF-VOID records requests)", ["196.97"], "Citizen"),
 ]
 
 
