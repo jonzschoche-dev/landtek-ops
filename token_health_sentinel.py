@@ -22,6 +22,11 @@ Monitored OAuth credentials (VPS /root/landtek/.env):
                                                fault, until it is provisioned)
   google-creds.json        Drive service acct (required)
 
+Also monitored — API keys (validated via FREE metadata endpoints, never a billed
+call, so it's cheap to run hourly):
+  GEMINI_API_KEY           genai.list_models()      (required — OCR pipeline)
+  ANTHROPIC_API_KEY        client.models.list()     (required — Opus proposer)
+
 Each refresh token is validated with a LIVE refresh against Google's OAuth
 endpoint, using the shared OAuth client (gmail_oauth_client.json):
   ok               refresh succeeded — token healthy
@@ -65,6 +70,12 @@ OAUTH_TOKENS = [
 # Scope used only to mint a probe access token for the service account.
 SA_SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
+# (env_key, label, kind) — API keys validated via free metadata endpoints.
+API_KEYS = [
+    ("GEMINI_API_KEY",    "Gemini API key",    "gemini"),
+    ("ANTHROPIC_API_KEY", "Anthropic API key", "anthropic"),
+]
+
 
 def log(msg: str) -> None:
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
@@ -85,7 +96,7 @@ def load_env(path: str = ENV_PATH) -> dict:
     except FileNotFoundError:
         log(f"env file absent ({path}); relying on process env only")
     # process env overrides the file (matches calendar_sync.py convention)
-    for k in [t[0] for t in OAUTH_TOKENS]:
+    for k in [t[0] for t in OAUTH_TOKENS] + [a[0] for a in API_KEYS]:
         if os.environ.get(k):
             env[k] = os.environ[k]
     return env
@@ -184,6 +195,46 @@ def check_service_account() -> dict:
                 "detail": f"transient/unknown (not alerted): {msg[:180]}", "actionable": False}
 
 
+def check_api_key(env, key, label, kind) -> dict:
+    """Validate an API key with a FREE metadata call (list models). A rejected
+    key is actionable; a missing library / network / quota error degrades to a
+    non-alerted 'error' (the key itself may be fine)."""
+    base = {"key": key, "label": label, "required": True}
+    val = env.get(key)
+    if not val:
+        return {**base, "status": "not_provisioned",
+                "detail": "key absent from .env", "actionable": True}
+    try:
+        if kind == "gemini":
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")  # silence the genai deprecation notice
+                import google.generativeai as genai
+                genai.configure(api_key=val)
+                next(iter(genai.list_models()), None)  # forces the HTTP call
+        elif kind == "anthropic":
+            import anthropic
+            anthropic.Anthropic(api_key=val).models.list()
+        else:
+            return {**base, "status": "error",
+                    "detail": f"unknown api kind {kind}", "actionable": False}
+        return {**base, "status": "ok",
+                "detail": "key valid (free metadata probe ok)", "actionable": False}
+    except Exception as e:  # noqa: BLE001
+        msg = str(e)
+        low = msg.lower()
+        rejected = any(s in low for s in (
+            "api key not valid", "api_key_invalid", "invalid api key", "invalid x-api-key",
+            "401", "unauthorized", "authentication_error", "permission_denied", "invalid_api_key",
+        ))
+        if rejected:
+            return {**base, "status": "revoked",
+                    "detail": f"key rejected — rotate required: {msg[:160]}", "actionable": True}
+        # library missing / network / quota (429) → degrade, don't cry wolf
+        return {**base, "status": "error",
+                "detail": f"probe unavailable (not alerted): {msg[:160]}", "actionable": False}
+
+
 # ── persistence + self-suppression ─────────────────────────────────────────
 def persist_and_pick_alerts(results, do_alert) -> list:
     """Upsert every result into token_health; return the actionable findings that
@@ -268,9 +319,9 @@ def send_alert(alerts) -> None:
         log(f"tg_send unavailable; logging alert only: {e}")
         tg_send = None
 
-    parts = [f"{a['label']} token {a['status']}" for a in alerts]
+    parts = [f"{a['label']} {a['status']}" for a in alerts]
     text = ("Token health: " + "; ".join(parts)
-            + ". Re-mint needed (see scripts/mint_calendar_token.py for the calendar one).")
+            + ". OAuth tokens: re-mint (scripts/mint_calendar_token.py). API keys: rotate in .env.")
     log("ALERT → " + text)
     if tg_send is None:
         return
@@ -294,6 +345,7 @@ def main() -> None:
         results = [check_oauth_token(env, k, lbl, sc, req, cid, csec)
                    for (k, lbl, sc, req) in OAUTH_TOKENS]
         results.append(check_service_account())
+        results += [check_api_key(env, k, lbl, kind) for (k, lbl, kind) in API_KEYS]
 
         for r in results:
             log(f"{r['label']:<22} {r['status']:<16} {r['detail']}")
