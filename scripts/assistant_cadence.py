@@ -125,9 +125,21 @@ def compose_evening(items, today):
     return "Tomorrow: " + "; ".join(bits) + more + "."
 
 
+def compose_upcoming(items, today, n=5):
+    """On-demand 'what's coming' — the next N items from today forward, no 7-day cap.
+    Used for --now (ask any time; also the live test)."""
+    ahead = sorted([i for i in items if item_date(i) >= today], key=item_date)
+    if not ahead:
+        return "Nothing on the calendar ahead right now."
+    bits = [f"{_fmt_day(item_date(i))} {_short(i, 34)}"
+            + (f" ({_tag(i)})" if _tag(i) else "") for i in ahead[:n]]
+    return "Coming up: " + "; ".join(bits) + "."
+
+
 MODES = {
     "morning": ("morning_brief", compose_morning),
     "evening": ("day_before", compose_evening),
+    "now": ("on_demand", compose_upcoming),  # on-demand, no dedup
 }
 
 
@@ -140,14 +152,16 @@ def run_mode(cur, mode_key, items, today, chat_id, dry):
     if dry:
         print(f"[{mode_key}] WOULD SEND → {chat_id}:\n  {text}")
         return
-    if already_sent(cur, kind, today):
+    on_demand = mode_key == "now"  # on-demand: no once-a-day dedup
+    if not on_demand and already_sent(cur, kind, today):
         print(f"[{mode_key}] already sent for {today} — skip (dedup).")
         return
     from tg_send import send
     ok, info = send(chat_id=chat_id, text=text, source="assistant_cadence",
                     recipient_name="Jonathan")
     if ok:
-        mark_sent(cur, kind, today, text)
+        if not on_demand:
+            mark_sent(cur, kind, today, text)
         print(f"[{mode_key}] sent.")
     else:
         # S14 gate (e.g. awaiting-reply / rate limit) — expected, not a failure.
@@ -158,6 +172,7 @@ def main():
     ap = argparse.ArgumentParser(description="Scheduling assistant — reminder cadence")
     ap.add_argument("--morning", action="store_true", help="send week-ahead brief")
     ap.add_argument("--evening", action="store_true", help="send day-before nudge")
+    ap.add_argument("--now", action="store_true", help="on-demand 'what's coming' (no dedup)")
     ap.add_argument("--dry", action="store_true", help="preview only, send nothing")
     ap.add_argument("--to", default=JONATHAN_CHAT_ID, help="recipient chat_id")
     args = ap.parse_args()
@@ -171,9 +186,9 @@ def main():
     items = get_agenda(cur)
     print(f"[assistant_cadence] {len(items)} agenda item(s); today={today} (Manila)")
 
-    modes = [m for m in ("morning", "evening") if getattr(args, m)]
+    modes = [m for m in ("morning", "evening", "now") if getattr(args, m)]
     dry = args.dry or not modes
-    if not modes:  # no explicit mode → preview both
+    if not modes:  # no explicit mode → preview morning + evening
         modes = ["morning", "evening"]
 
     for m in modes:
