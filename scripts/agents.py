@@ -73,6 +73,8 @@ AGENTS = [
      "live (web)", "", "live", "ops_dashboard.py; grows fluidly with the corpus"),
     ("legal_authority",      "forum law library — verbatim statutes/circulars in a local-embed RAG", "local",
      "on demand", "", "live", "5 forums seeded; nomic-embed (Ollama $0); retrieve(forum,q)"),
+    ("jurisprudence_steward","law-librarian — keep the SHARED case-law library self-auditing + current for ALL clients", "det",
+     "weekly", "landtek-jurisprudence-steward.timer", "live", "jurisprudence_steward.py --gap-scan (wishlist) / --harvest (relevant new lawphil SC decisions) / --board; ingest_jurisprudence.py is the verbatim+verified embed path; AnyCase finder stays assisted"),
     ("case_files",           "find all docs of a case + links to the originals", "det",
      "on demand", "", "live", "case_files.py MATTER [--read-only]"),
     ("case_pdf",             "organized case-brief PDF → Telegram (relevance-tiered + annexes)", "det",

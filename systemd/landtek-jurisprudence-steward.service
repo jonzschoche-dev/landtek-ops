@@ -1,0 +1,16 @@
+[Unit]
+Description=LandTek Jurisprudence Steward — keep the shared law library self-auditing + current for ALL clients/matters
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# gap-scan (audit every matter's coverage) -> harvest this month's relevant new SC decisions -> board.
+ExecStart=/bin/bash -c 'set -a; . /root/landtek/.env 2>/dev/null || true; set +a; cd /root/landtek; exec /usr/bin/python3 scripts/jurisprudence_steward.py --gap-scan --harvest --apply --max 40 --board'
+# Harvest fetches + embeds decisions (network + local Ollama); give it room.
+TimeoutStartSec=40min
+StandardOutput=append:/var/log/landtek_jurisprudence_steward.log
+StandardError=append:/var/log/landtek_jurisprudence_steward.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Jurisprudence Steward — weekly (audit firm-wide coverage + harvest new SC decisions into the shared library)
+
+[Timer]
+OnBootSec=40min
+OnUnitActiveSec=1w
+Persistent=true
+
+[Install]
+WantedBy=timers.target
