@@ -28,6 +28,10 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 GEMINI_KEYS = [k for k in (os.environ.get("GEMINI_API_KEY", ""), os.environ.get("GEMINI_API_KEY_FALLBACK", "")) if k]
 MODELS = [os.environ.get("GEMINI_VISION_MODEL", "gemini-2.5-flash"), os.environ.get("GEMINI_VISION_FALLBACK", "gemini-2.0-flash")]
 CONF_WRITE = float(os.environ.get("COMPREHEND_MIN_CONF", "0.6"))   # write threshold
+# Local backend (offline-sovereignty): reason from extracted text with no cloud dependency.
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b-instruct")
+LLM_BACKEND = os.environ.get("LLM_BACKEND", "auto")   # auto | gemini | ollama
 _RPM = 0
 _LAST = [0.0]
 
@@ -86,6 +90,32 @@ def _gemini(text):
     raise QuotaExhausted("all gemini key/model combos 429")
 
 
+def _ollama(text):
+    """Local Ollama backend — reads the title text with no cloud dependency. Returns dict or None."""
+    body = {"model": OLLAMA_MODEL, "prompt": PROMPT + "\n\nTEXT:\n" + text[:12000],
+            "format": "json", "stream": False, "options": {"temperature": 0}}
+    req = urllib.request.Request(OLLAMA_URL + "/api/generate", data=json.dumps(body).encode(),
+                                 headers={"content-type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=240) as r:
+            out = json.loads(r.read())
+        return json.loads(out.get("response", "") or "{}")
+    except (json.JSONDecodeError, KeyError, urllib.error.URLError, TimeoutError):
+        return None
+
+
+def _derive(text):
+    """Backend selector. 'auto' tries Gemini, then DEGRADES to local Ollama (offline-sovereignty)."""
+    if LLM_BACKEND == "ollama":
+        return _ollama(text)
+    if LLM_BACKEND == "gemini":
+        return _gemini(text)
+    try:
+        return _gemini(text)
+    except QuotaExhausted:
+        return _ollama(text)
+
+
 def _doc_text(cur, tct):
     cur.execute("""SELECT d.extracted_text FROM titles t JOIN documents d ON d.id = t.source_doc_id
                    WHERE t.tct_number=%s AND length(coalesce(d.extracted_text,'')) > 50""", (tct,))
@@ -98,7 +128,7 @@ def comprehend_title(tct, go=False):
     text = _doc_text(cur, tct)
     if not text:
         cur.close(); c.close(); return {"tct": tct, "error": "no readable source doc"}
-    derived = _gemini(text)
+    derived = _derive(text)
     if not derived:
         cur.close(); c.close(); return {"tct": tct, "error": "no parse"}
     res = {"tct": tct, "derived": derived}
@@ -114,6 +144,16 @@ def comprehend_title(tct, go=False):
                     (derived["title_status"], derived["title_status"], note,
                      derived.get("assessed_or_market_value_php"), tct))
         res["written"] = cur.rowcount > 0
+        # promote titles.status out of 'unknown' (inferred_strong; guard keeps keystone-'active' titles untouched)
+        try:
+            st_map = {"clean": "active", "clouded": "clouded", "cancelled": "cancelled"}
+            cur.execute("""UPDATE titles SET status=%s, provenance_level='inferred_strong',
+                           provenance_notes=left(%s, 400), updated_at=now()
+                           WHERE tct_number=%s AND coalesce(status,'unknown')='unknown'""",
+                        (st_map[derived["title_status"]], "comprehend: " + note, tct))
+            res["title_promoted"] = cur.rowcount > 0
+        except Exception as e:
+            res["title_promote_err"] = str(e)[:120]
     elif conf < CONF_WRITE:
         res["flagged_for_human"] = f"low confidence ({conf:.2f}) — needs operator confirmation"
     cur.close(); c.close()
