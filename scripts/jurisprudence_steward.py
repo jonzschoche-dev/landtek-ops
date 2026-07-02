@@ -119,7 +119,7 @@ def gap_scan():
             (code, _client(code), mtype, theory[:2000], cases, cov, sugg, prio))
         dark += cov == "dark"; thin += cov == "thin"; covered += cov == "covered"
     print(f"[gap-scan] {len(rows)} active matters — dark:{dark} thin:{thin} covered:{covered} "
-          f"(wishlist refreshed {datetime.datetime.utcnow():%Y-%m-%dT%H:%MZ})")
+          f"(wishlist refreshed {datetime.datetime.now(datetime.timezone.utc):%Y-%m-%dT%H:%MZ})")
 
 
 def _index_url(y, m):
@@ -127,11 +127,16 @@ def _index_url(y, m):
     return f"https://lawphil.net/judjuris/juri{y}/{mon}{y}/{mon}{y}.html"
 
 
+def _kw_present(low: str, k: str) -> bool:
+    # whole-token match: 'mining' must NOT match inside 'examining'/'determining'; 'ward' not in 'toward'/'award'.
+    return re.search(r"(?<![a-z])" + re.escape(k) + r"(?![a-z])", low) is not None
+
+
 def _relevance(text: str):
     low = text.lower()
-    hits = {tag: sum(low.count(k) for k in kws) for tag, (_, kws) in DOMAINS.items()}
+    hits = {tag: sum(1 for k in kws if _kw_present(low, k)) for tag, (_, kws) in DOMAINS.items()}
     tags = [t for t, n in hits.items() if n > 0]
-    score = len(tags)
+    score = len(tags)  # number of distinct practice-domains the decision genuinely touches
     forum = DOMAINS[max(hits, key=hits.get)][0] if score else "CIVIL"
     return score, tags, forum
 
@@ -221,7 +226,7 @@ def main():
     if a.gap_scan:
         gap_scan()
     if a.harvest:
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc)
         harvest(a.year or now.year, a.month or now.month, a.apply, a.max)
     if a.board:
         board()
