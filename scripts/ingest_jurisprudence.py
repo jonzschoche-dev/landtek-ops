@@ -59,23 +59,29 @@ def _citation(gr: str, date: str) -> str:
     return f"{gr.strip()} ({date.strip()})"
 
 
+_ALLMON = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+
+
 def _candidate_urls(gr: str, date: str) -> list[str]:
+    """Build lawphil URLs from a G.R. number + date. AnyCase often gives only the YEAR, and lawphil
+    keys the path on the promulgation MONTH — so when the month is unknown we sweep all 12 (the
+    G.R.-in-text guard in _resolve_and_verify confirms the correct one; wrong months 404 and are skipped)."""
     digits = _gr_digits(gr)
-    ym = re.search(r"([A-Za-z]+).*?(\d{4})", date)
-    if not (digits and ym):
+    yr_m = re.search(r"(\d{4})", date)
+    if not (digits and yr_m):
         return []
-    mon = _MONTHS.get(ym.group(1).lower(), ym.group(1)[:3].lower())
-    yr = ym.group(2)
-    is_l = "l-" in gr.lower()
-    stems = [f"gr_{digits}_{yr}"]
-    if is_l:  # lawphil stores some old L- cases both ways
-        stems = [f"gr_{digits}_{yr}", f"gr_l-{digits}_{yr}"]
-    return [f"https://lawphil.net/judjuris/juri{yr}/{mon}{yr}/{s}.html" for s in stems]
+    yr = yr_m.group(1)
+    mon_m = re.search(r"([A-Za-z]{3,})", date)
+    known = _MONTHS.get(mon_m.group(1).lower(), mon_m.group(1)[:3].lower()) if mon_m else None
+    months = ([known] + [m for m in _ALLMON if m != known]) if known else list(_ALLMON)
+    stems = [f"gr_{digits}", f"gr_l-{digits}"] if "l-" in gr.lower() else [f"gr_{digits}"]
+    return [f"https://lawphil.net/judjuris/juri{yr}/{m}{yr}/{s}_{yr}.html"
+            for m in months for s in stems]
 
 
 def _fetch_text(url: str) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": _UA})
-    raw = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "ignore")
+    raw = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "ignore")
     t = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", raw, flags=re.S | re.I)
     t = re.sub(r"<[^>]+>", " ", t)
     t = _html.unescape(t)
