@@ -33,9 +33,17 @@ def _tok():
     return None
 
 
+# Glyphs the base PDF font (Helvetica) can't draw → readable Latin-1/ASCII fallbacks, so nothing
+# renders as a tofu box. Peso is the important one for PH legal work.
+_GLYPH_FALLBACK = {"₱": "PHP ", "→": " -> ", "✅ ": "", "✅": "", "⚠️": "", "⚠": "", "️": ""}
+
+
 def _inline(s):
+    for _k, _v in _GLYPH_FALLBACK.items():
+        s = s.replace(_k, _v)
     s = html.escape(s)
     s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"(?<![\w*])\*([^*\n]+?)\*(?![\w*])", r"<i>\1</i>", s)  # inline italic (after bold; may wrap <b> tags)
     s = re.sub(r"`(.+?)`", r"<font face='Courier'>\1</font>", s)
     s = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"<a href='\2' color='#2563eb'>\1</a>", s)
     return s
@@ -93,34 +101,54 @@ def render(md_path, out_path, footer_left=DEFAULT_FOOTER):
         ]))
         flow.append(tbl); flow.append(Spacer(1, 7)); rows.clear()
 
+    # Buffer a text block (body paragraph OR a list item) and fold continuation lines into it, so
+    # inline markup spanning wrapped source lines (bold/italic/links) resolves — real markdown behavior.
+    block, kind = [], ["body"]   # kind: body | bullet | number | note
+
+    def flush_block():
+        if not block:
+            return
+        text = " ".join(block); block.clear(); k = kind[0]; kind[0] = "body"
+        if k == "bullet":
+            flow.append(Paragraph("&bull;&nbsp; " + _inline(text), bdy))
+        elif k == "note":
+            flow.append(Paragraph(_inline(text.strip("*")), note))
+        else:  # body or number (numbered text keeps its "N. " prefix)
+            flow.append(Paragraph(_inline(text), bdy))
+
     for raw in open(md_path):
         t = raw.rstrip("\n").strip()
         if t.startswith("|"):
+            flush_block()
             cells = [c.strip() for c in t.strip("|").split("|")]
             if set("".join(cells)) <= set("-: "):
                 continue
             rows.append(cells); continue
-        flush_table()
+        if rows:
+            flush_block(); flush_table()
         if not t or t.startswith("# #") or t.startswith("#!"):   # blank or a comment-ish line
+            flush_block()
             if not t:
                 flow.append(Spacer(1, 4))
             continue
         if t.startswith("# "):
+            flush_block()
             flow.append(Paragraph(_inline(t[2:]), title if not seen_title[0] else h2)); seen_title[0] = True
         elif t.startswith("## "):
-            flow.append(Paragraph(_inline(t[3:]), h2))
+            flush_block(); flow.append(Paragraph(_inline(t[3:]), h2))
         elif t.startswith("### "):
-            flow.append(Paragraph(_inline(t[4:]), h3))
+            flush_block(); flow.append(Paragraph(_inline(t[4:]), h3))
         elif t.startswith("---"):
-            flow.append(Spacer(1, 6))
+            flush_block(); flow.append(Spacer(1, 6))
         elif t.startswith(("- ", "* ")):
-            flow.append(Paragraph("&bull;&nbsp; " + _inline(t[2:]), bdy))
+            flush_block(); kind[0] = "bullet"; block.append(t[2:])
         elif re.match(r"\d+\. ", t):
-            flow.append(Paragraph(_inline(t), bdy))
+            flush_block(); kind[0] = "number"; block.append(t)
         elif t.startswith("*") and t.endswith("*") and len(t) > 2:
-            flow.append(Paragraph(_inline(t.strip("*")), note))
+            flush_block(); kind[0] = "note"; block.append(t)
         else:
-            flow.append(Paragraph(_inline(t), bdy))
+            block.append(t)   # continuation of the active block (body or list item)
+    flush_block()
     flush_table()
     SimpleDocTemplate(out_path, pagesize=letter, topMargin=0.7 * inch, bottomMargin=0.75 * inch,
                       leftMargin=MARGIN, rightMargin=MARGIN).build(flow, canvasmaker=_numbered_canvas(footer_left))
