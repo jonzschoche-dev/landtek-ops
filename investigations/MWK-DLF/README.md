@@ -17,6 +17,35 @@ named in the SPA.** The principal **never received a peso.** The Register of Dee
 (doc:353) the underlying de la Fuente-era deeds are **not on file.** → the conveyances are void; the
 derivative titles are cancellable; reconveyance is imprescriptible; the agent must account.
 
+## Objective — Balane is the wedge, not the goal
+The **goal is estate-wide recovery** of the T-32917 (Lot 2-X-6) branch conveyed under the void
+de la Fuente authority. **Civil Case 26-360 (Balane) is the test case / wedge / evidence-builder** —
+its lot is one C-1 sub-lot five subdivision levels below the mother title. It is central only as the
+*strongest, already-filed vehicle* to establish the void-authority theory; it must not be mistaken
+for the objective. When 26-360 has done its job, priority shifts to the dark cluster (~50,000 sqm)
+and the Tier-2/3 lots — that is where the acreage and value actually sit.
+
+## 26-360 scope & reach — what it can and cannot carry
+Confirmed against the filed prayer (doc:446 / doc:424):
+- ✅ **Right theory pleaded** — the Balane deed is attacked as void "for being entered into without
+  the consent, authority and knowledge of the Plaintiff and the other co-owners" — i.e., the
+  **estate-wide authority defect**, not a Balane-specific quirk.
+- ✅ **Broader than the sliver** — the prayer asks to **reinstate TCT T-52540** (parent of both C-1
+  Balane and C-2 Hoppe) to the heirs → recovers the whole 2-X-6-I-4-C parcel, plus ejectment + accounting.
+- ❌ **But its reach is capped three ways:**
+  1. **Parties** — only the Balane defendants (+ "Cesar de la Fuente" as deed signatory) are named. The
+     other transferees (Santiago, Leaño, Dean, Capistrano, the cluster) are **not parties → no res
+     judicata against them.** A win doesn't bind them.
+  2. **Forum** — MTC Mercedes, **Summary Procedure**. A favorable ruling is a persuasive record, **not
+     binding precedent** for the branch.
+  3. **Relief** — voids only the Balane deed + T-52540 chain; it does not touch the other lots.
+
+**Implication (analysis, for counsel):** estate-wide recovery needs a **separate, broader RTC action**
+(declaration of nullity + reconveyance + accounting) that **names the de la Fuente side** (Cesar's
+estate + Salvador "Von") **and all transferees**, and prays to void **all** de la Fuente conveyances
+and cancel **all** derivative titles. 26-360's role is to prove the theory, build the record, recover
+the C parent — and set up that broader action. This whole investigation is the preparation for it.
+
 ## Where everything lives (query the live DB — this is the source of truth)
 ```sql
 -- the matter
