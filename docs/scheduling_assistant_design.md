@@ -132,17 +132,27 @@ Supported v1 intents: **query** ("what's on / am I free before the hearing?") an
 
 ---
 
-## 7. First increment (v1 — ship + test on ourselves)
+## 7. First increment (v1 — "a reminder and a sponge", ship + test on ourselves)
 
-The smallest thing that actually *feels* human:
-1. **Inbound handler** live (standalone getUpdates → channel_messages).
-2. **Cadence v1**: morning brief + day-before nudge from the spine, S14-clean, to you only.
-3. **Two-way, two intents**: (a) "what's on / am I free…"; (b) "reschedule/confirm X" with
-   propose→confirm→write-to-spine (calendar updates within the cycle).
-4. **Commitment status** on `case_actions` (confirmed/slipped) → a daily "needs your reply."
+Operator framing (2026-07-03): v1 is **a reminder and a sponge** — deterministic-first.
+
+**A. Reminder (outbound cadence) — `scripts/assistant_cadence.py` [BUILT]:**
+- Morning week-ahead brief + evening day-before nudge, composed from the spine
+  (`matters`/`case_actions`/`calendar_events`; **matter_plays excluded** — plays are
+  strategy, not commitments), one plain S14 message per run, dedup via
+  `assistant_nudge_log`. **Stays silent when there's nothing** (human cadence).
+- Timers (`apply_deploy_656…`) install **disabled** — self-guard: they only message you
+  once `ASSISTANT_CADENCE_LIVE=1` is set in `.env`, so nothing hits your phone unbidden.
+
+**B. Sponge (inbound capture) — `scripts/assistant_inbound.py` [NEXT]:**
+- getUpdates loop scoped to your chat → **store every inbound verbatim** to
+  `channel_messages` + `chat_notes` (never drop information — a sponge).
+- Deterministic date/keyword extraction (reuse `deadline_extractor` regex) → when a date
+  or commitment is spotted, **propose** adding it to the spine (confirm→write). If it can't
+  parse, it still *kept* the note.
 
 **Explicitly NOT in v1:** external channels, autonomous writes, WhatsApp/Leo, full NL
-coverage, reschedule *cascades* (dependencies) — those are v2.
+coverage, reschedule *cascades*, LLM-first parsing — those are later.
 
 ---
 
