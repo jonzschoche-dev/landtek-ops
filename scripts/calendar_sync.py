@@ -144,14 +144,49 @@ def ensure_schema(cur):
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS calendar_sync_map (
-            landtek_uid       TEXT PRIMARY KEY,
+            landtek_uid       TEXT NOT NULL,
             source            TEXT NOT NULL,
             source_id         TEXT,
             gcal_event_id     TEXT,
-            gcal_calendar_id  TEXT,
+            gcal_calendar_id  TEXT NOT NULL DEFAULT 'primary',
             content_hash      TEXT,
             status            TEXT DEFAULT 'active',
             last_synced_at    TIMESTAMPTZ,
+            created_at        TIMESTAMPTZ DEFAULT now(),
+            PRIMARY KEY (landtek_uid, gcal_calendar_id)
+        )
+        """
+    )
+    # Self-heal an older single-column PK (one event per item) → composite
+    # (landtek_uid, gcal_calendar_id) so the same item can live on the master
+    # ops calendar AND its client calendar. Idempotent.
+    cur.execute(
+        """
+        DO $$ BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_constraint c JOIN pg_class t ON c.conrelid = t.oid
+            WHERE t.relname = 'calendar_sync_map' AND c.contype = 'p'
+              AND array_length(c.conkey, 1) = 2
+          ) THEN
+            ALTER TABLE calendar_sync_map DROP CONSTRAINT IF EXISTS calendar_sync_map_pkey;
+            ALTER TABLE calendar_sync_map
+              ADD CONSTRAINT calendar_sync_map_pkey PRIMARY KEY (landtek_uid, gcal_calendar_id);
+          END IF;
+        END $$;
+        """
+    )
+    # calendar_targets: routing table. NULL client_filter = the master ops
+    # calendar (everything). A non-NULL filter + strict=TRUE = a client calendar
+    # that receives ONLY items positively resolved to that client (unresolved
+    # items are excluded — client separation is enforced by construction).
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS calendar_targets (
+            name              TEXT PRIMARY KEY,
+            gcal_calendar_id  TEXT NOT NULL,
+            client_filter     TEXT,
+            strict            BOOLEAN DEFAULT TRUE,
+            active            BOOLEAN DEFAULT TRUE,
             created_at        TIMESTAMPTZ DEFAULT now()
         )
         """
@@ -250,13 +285,47 @@ def load_matters_index(cur):
 
 
 def _client_match(client, client_filter):
-    """True if this item passes a client-scoped run. Unresolved items pass (they
+    """True if this item passes a client-scoped gather. Unresolved items pass (they
     carry no client to contaminate); resolved items must match the filter."""
     if not client_filter:
         return True
     if not client:
         return True
     return client_filter.upper() in str(client).upper()
+
+
+def load_targets(cur, env, cli_calendar_id=None, cli_client=None):
+    """Return the list of calendar targets to sync to. A --calendar-id override
+    forces a single ad-hoc target; otherwise read calendar_targets; if that is
+    empty, fall back to one master calendar (LANDTEK_CALENDAR_ID or 'primary')."""
+    if cli_calendar_id:
+        return [{"name": "cli", "calendar_id": cli_calendar_id,
+                 "client_filter": cli_client, "strict": False}]
+    targets = []
+    if table_exists(cur, "calendar_targets"):
+        cur.execute("SELECT name, gcal_calendar_id, client_filter, strict "
+                    "FROM calendar_targets WHERE active ORDER BY name")
+        for name, cal, cf, strict in cur.fetchall():
+            targets.append({"name": name, "calendar_id": cal,
+                            "client_filter": cf, "strict": strict})
+    if not targets:
+        targets = [{"name": "default",
+                    "calendar_id": env.get("LANDTEK_CALENDAR_ID", "primary"),
+                    "client_filter": cli_client, "strict": False}]
+    return targets
+
+
+def match_target(item, target):
+    """Does this agenda item belong on this calendar target?
+    - master ops calendar (no client_filter): everything, incl. UNRESOLVED.
+    - client calendar (client_filter + strict): ONLY items positively resolved to
+      that client. An unresolved or other-client item can NEVER land here."""
+    cf = target.get("client_filter")
+    if not cf:
+        return True
+    if not item.client:
+        return not target.get("strict", True)
+    return cf.upper() in str(item.client).upper()
 
 
 def gather_from_matters(cur, client_filter, index, by_code):
@@ -401,8 +470,9 @@ def sync_push(conn, service, items, calendar_id, apply):
     created = patched = skipped = 0
     for it in items:
         cur.execute(
-            "SELECT gcal_event_id, content_hash FROM calendar_sync_map WHERE landtek_uid=%s",
-            (it.uid,),
+            "SELECT gcal_event_id, content_hash FROM calendar_sync_map "
+            "WHERE landtek_uid=%s AND gcal_calendar_id=%s",
+            (it.uid, calendar_id),
         )
         row = cur.fetchone()
         h = it.hash()
@@ -453,9 +523,8 @@ def _upsert_map(cur, it, gcal_id, calendar_id, h):
             (landtek_uid, source, source_id, gcal_event_id, gcal_calendar_id,
              content_hash, status, last_synced_at)
         VALUES (%s,%s,%s,%s,%s,%s,'active', now())
-        ON CONFLICT (landtek_uid) DO UPDATE SET
+        ON CONFLICT (landtek_uid, gcal_calendar_id) DO UPDATE SET
             gcal_event_id = EXCLUDED.gcal_event_id,
-            gcal_calendar_id = EXCLUDED.gcal_calendar_id,
             content_hash = EXCLUDED.content_hash,
             status = 'active',
             last_synced_at = now()
@@ -495,7 +564,7 @@ def sync_pull(conn, service, calendar_id, apply):
             if apply:
                 cur.execute(
                     "UPDATE calendar_sync_map SET status='deleted', last_synced_at=now() "
-                    "WHERE landtek_uid=%s", (uid,))
+                    "WHERE landtek_uid=%s AND gcal_calendar_id=%s", (uid, calendar_id))
                 conn.commit()
     return drift
 
@@ -533,8 +602,6 @@ def main():
     args = ap.parse_args()
 
     env = load_env()
-    calendar_id = args.calendar_id or env.get("LANDTEK_CALENDAR_ID", "primary")
-
     conn = db()
     cur = conn.cursor()
     ensure_schema(cur)
@@ -578,7 +645,7 @@ def main():
         items = items[: args.limit]
 
     print(f"[calendar_sync] {len(items)} agenda item(s) gathered "
-          f"(client={args.client or 'ALL'}, calendar={calendar_id})")
+          f"(client={args.client or 'ALL'})")
 
     conflicts = detect_conflicts(items)
     if conflicts:
@@ -597,15 +664,31 @@ def main():
         print(msg + " Aborting write.", file=sys.stderr)
         sys.exit(2)
 
-    if args.pull:
-        drift = sync_pull(conn, service, calendar_id, args.apply)
-        print(f"[calendar_sync] pull: {drift} drift event(s)"
-              + ("" if args.apply else " (dry-run, no DB writes)"))
+    targets = load_targets(cur, env, args.calendar_id, args.client)
+    print(f"[calendar_sync] {len(targets)} calendar target(s): "
+          + ", ".join(f"{t['name']}→{t['calendar_id'][:24]}"
+                      f"({t['client_filter'] or 'ALL'})" for t in targets))
 
-    created, patched, skipped = sync_push(conn, service, items, calendar_id, args.apply)
     verb = "synced" if args.apply else "would sync"
-    print(f"[calendar_sync] {verb}: {created} create, {patched} update, {skipped} unchanged"
-          + ("" if args.apply else "  (DRY-RUN — pass --apply to write)"))
+    for t in targets:
+        tgt_items = [i for i in items if match_target(i, t)]
+        # Separation assertion: a client-scoped target must never carry a
+        # positively-resolved OTHER-client item.
+        if t.get("client_filter"):
+            leak = [i for i in tgt_items if i.client
+                    and t["client_filter"].upper() not in str(i.client).upper()]
+            if leak:
+                print(f"  [SEPARATION-ABORT] {t['name']}: {len(leak)} foreign-client "
+                      f"item(s) matched — skipping target.", file=sys.stderr)
+                continue
+        if args.pull:
+            drift = sync_pull(conn, service, t["calendar_id"], args.apply)
+            print(f"  [{t['name']}] pull: {drift} drift event(s)"
+                  + ("" if args.apply else " (dry-run)"))
+        created, patched, skipped = sync_push(conn, service, tgt_items, t["calendar_id"], args.apply)
+        print(f"  [{t['name']}] {verb}: {len(tgt_items)} scoped → "
+              f"{created} create, {patched} update, {skipped} unchanged"
+              + ("" if args.apply else "  (DRY-RUN)"))
 
     conn.close()
 

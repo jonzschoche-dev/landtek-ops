@@ -100,12 +100,31 @@ no-op (exit 0), not a failure.
   the item is left untagged (`UNRESOLVED`), never prefix-guessed.
 - **Idempotent** — `calendar_sync_map` + content-hash; re-runs patch only real changes.
 
+## Multi-calendar routing (`calendar_targets`)
+
+The engine pushes one agenda to **N calendars**, each row in `calendar_targets`:
+
+| column | meaning |
+|---|---|
+| `gcal_calendar_id` | the Google calendar to push to |
+| `client_filter` | `NULL` = master ops calendar (everything, incl. UNRESOLVED); a value = client calendar |
+| `strict` | client calendars set `TRUE` → **only items positively resolved to that client**; UNRESOLVED and other-client items are excluded |
+
+Intended topology (internal-first):
+- **LandTek Ops** — `client_filter=NULL` — the internal cockpit, shared with the team (Kristyle).
+- **Paracale — Inocalla** — `client_filter='Paracale'`, `strict=TRUE` — shared with Allan; carries **only** Paracale-001 items.
+
+**Separation is enforced by construction**, not by trusting the tag: a client target is
+fed by its filter and additionally guarded by a `[SEPARATION-ABORT]` assertion that skips
+the whole target if any foreign-client item ever matches. `calendar_sync_map` is keyed by
+`(landtek_uid, gcal_calendar_id)`, so the same item can live on both the ops and client
+calendars independently and idempotently. Proven 2026-07-02: a strict Paracale target
+received 1 item (the resolved Paracale one); the MWK `Civil Case 26-360` / `Owner` /
+`CV-6839` unresolved items were excluded.
+
 ## Known phase-2 items
 
 - Two-way pull currently records **drift** (managed events cancelled by hand); it does
   not yet ingest brand-new manual Google events into `calendar_events`.
-- Per-client / per-associate **separate calendars** (so a client sees only their own):
-  today it's one calendar with `[CLIENT · MATTER · OWNER]` prefixes + extendedProperties
-  (`client_code`, `owner`) for filtering. Splitting to per-owner calendars is a config
-  add once the single-calendar flow is trusted.
-- Wiring `case_actions` / `matter_plays` (client-facing operations) as a third source.
+- Auto-provisioning of the calendars + ACL sharing needs the broader `calendar` scope
+  (create/share); the every-cycle engine only needs `calendar.events`.
