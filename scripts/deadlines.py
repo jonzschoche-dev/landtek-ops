@@ -41,12 +41,18 @@ def _conn():
 # Otherwise it's a TIMELINE/context date (a filing, a death, an ingest) — NOT something due,
 # and counting it as overdue is false urgency. Precision over recall here on purpose.
 FORWARD_RE = re.compile(
-    r"(deadline|due\b|deadline|appeal|window|respond|reply by|file by|filing deadline|"
+    r"(deadline|due\b|appeal|window|\brespond\b|reply by|file by|filing deadline|"
     r"within \d+ days|pending send|pending_send|to send|send (?:the )?demand|demand_letter|"
     r"hearing|manifestation|comply|expire|lapse|follow ?up|escalate|submit by|next event)", re.I)
+# NB (deploy_655): `respond` was unbounded, so the NOUN "Respondent" (opposing party) matched as a
+# forward "respond" obligation — that false-positive is what promoted MWK-ARTA-1378's historical
+# "PERJURY POINT (2026-06-07)" narrative date into a phantom OVERDUE. `\brespond\b` fixes it, and
+# the narrative/editorial markers below (perjury/swore/correction/defaulted/contaminated…) mark such
+# case-history prose as TIMELINE, not a forward obligation — same discipline as the CV-26360 phantom.
 PAST_RE = re.compile(
     r"(filed|\bdated\b|died|death|created|ingested|retroactively|merged|resolved|"
-    r"posture-verified|verified|corrected|received|issued|executed|recorded|registered|"
+    r"correction|corrected|admission|\bswore\b|\bsworn\b|non-receipt|perjury|defaulted|contaminated|"
+    r"posture-verified|verified|received|issued|executed|recorded|registered|"
     r"ordered|order ingested|likely the|not yet|bundled)", re.I)
 
 
@@ -70,6 +76,31 @@ def _tag_safe_label(text):
         # the cap fell inside an open '[' tag — back up to just before the bracket
         cut = cut[:m.start()].rstrip()
     return cut
+
+
+# A surfaced label is CLIENT-FACING. The prose harvester grabs a ±45-char window around a date, which
+# can begin mid-word/mid-sentence and can straddle the internal "||" segment separator we use in
+# stage_notes to fence off distinct case-history blocks. Rendering that verbatim leaked
+# "s docs from other matters. || PERJURY POINT (2026-06-07): Respondent s" to the client (deploy_655).
+# Rule: never emit a label that carries the "||" internal separator or starts lowercase mid-word.
+# Repair, in order: (1) drop everything from the first "||" on; (2) if the remainder still starts
+# lowercase (i.e. we're mid-sentence), advance to the next sentence boundary; (3) if nothing clean
+# survives, fall back to the matter's stage token (always a presentable snake_case status).
+SENT_START_RE = re.compile(r"(?<=[.;:])\s+(?=[A-Z0-9\[])")
+
+
+def _clean_label(snippet, fallback=""):
+    """Return a presentable label from a harvested prose window, or the stage fallback."""
+    s = (snippet or "").strip()
+    if "||" in s:
+        s = s.split("||", 1)[0].strip()
+    # If it starts lowercase (a severed mid-word/mid-sentence fragment), align to a sentence boundary.
+    if s and s[0].islower():
+        m = SENT_START_RE.search(s)
+        s = s[m.end():].strip() if m else ""
+    if not s or s[0].islower():
+        return _tag_safe_label((fallback or "").strip())
+    return _tag_safe_label(s)
 
 
 def extract_dated_spans(text):
@@ -122,7 +153,7 @@ def gather(cur):
             for dt, snip in extract_dated_spans(m[fld]):
                 if is_deadline_context(snip):
                     obs.append({"date": dt, "matter": m["matter_code"],
-                                "label": _tag_safe_label(snip.strip()), "kind": "obligation", "source": fld})
+                                "label": _clean_label(snip, fallback=m["stage"]), "kind": "obligation", "source": fld})
                     dated_matters.add(m["matter_code"])
                 else:
                     timeline += 1
