@@ -96,8 +96,8 @@ VIOLATIONS = {
             "due_demand":      {"needs": ["due_demand", "records_refusal"], "any": True, "label": "a matter pending after due demand"},
             "unjustified_refusal": {"needs": ["records_refusal", "false_denial"], "weak": ["delay_past_charter", "injury_delay"], "any": True,
                                 "label": "refused/neglected to act without sufficient justification"},
-            "purpose":         {"needs": ["discrimination", "unwarranted_benefit"], "any": True,
-                                "label": "for the purpose of favoring/discriminating (or obtaining benefit)"},
+            "purpose":         {"needs": ["discrimination", "political_favor", "unwarranted_benefit"], "any": True,
+                                "label": "for the purpose of favoring an insider/occupant OR discriminating against the (absentee) heirs"},
         },
         "prescription": "20 years (same clock as Sec. 3) — NEEDS-COUNSEL-VERIFICATION",
     },
@@ -165,11 +165,25 @@ SIGNAL_PATTERNS = {
     "injury_delay":        r"\b(injur\w+|damage|deprived|deprivation|prevented|prejudic\w+|loss to the heirs?|"
                            r"undue delay|obstruct\w+|failure to render service|"
                            r"over (?:eight|nine|ten|eleven|twelve|\d+) months?)\b",
-    "unwarranted_benefit": r"\b(unwarranted (?:benefit|advantage)|favor\w+|preference|benefit to)\b",
+    # The "unwarranted preference" prong (operator theory 2026-07-03): officials give illegal
+    # occupants/insiders an unwarranted advantage — tolerating unpermitted construction/encroachment
+    # on the heirs' titled land, or favoring a political insider (the Mayor's Chief of Staff Teope;
+    # Baliza in the Assessor's office) — while refusing the heirs. Grounded in facts 6650/6469/6530/5672.
+    "unwarranted_benefit": r"\b(unwarranted (?:benefit|advantage|preference)|preference|benefit to|"
+                           r"unpermitted|encroach\w+|erected .{0,20}structure|cement cottage|"
+                           r"without owner('?s)? (?:agreement|consent)|failed to (?:remove|demolish|act on)|"
+                           r"tolerat\w+|allowed .{0,25}(?:build|occupy|remain|construct))\b",
+    # political-favor / insider motive (partly inferential — the voter-support angle is argument,
+    # the named-insider favoring is grounded). Feeds the §3(f) discriminatory-purpose element.
+    "political_favor":     r"\b(chief of staff|personal assistant|the mayor'?s (?:man|ally|staff|aide)|"
+                           r"voter|constituent|re-?election|political (?:support|ally)|insider|crony|Teope|Baliza)\b",
     "due_demand":          r"\b(demand\w*|request\w*|follow-?up|letter of|written request)\b",
     "official_document":   r"\b(letter|memorandum|resolution|order|certification|joint response|"
                            r"official (?:communication|document)|minutes)\b",
-    "discrimination":      r"\b(discriminat\w+|singled out|treated differently)\b",
+    # discrimination against the heirs: absentee/abroad owners disfavored vs local insiders/occupants
+    "discrimination":      r"\b(discriminat\w+|singled out|treated differently|residing abroad|"
+                           r"non-?resident|absentee|foreigner|U\.?S\.?-based|out of the country|"
+                           r"while .{0,30}(?:refus|toler|allow))\b",
     "bad_faith":           r"\b(bad faith|deliberate\w*|willful\w*|intentional\w*)\b",
     "manifest_partiality": r"\b(partial\w+|biased|one-sided|favored|CART|sat .*own office)\b",
     "gross_negligence":    r"\b(gross\w* neglig\w+|inexcusable|reckless\w*|patent\w* disregard)\b",
