@@ -180,10 +180,13 @@ SIGNAL_PATTERNS = {
     "due_demand":          r"\b(demand\w*|request\w*|follow-?up|letter of|written request)\b",
     "official_document":   r"\b(letter|memorandum|resolution|order|certification|joint response|"
                            r"official (?:communication|document)|minutes)\b",
-    # discrimination against the heirs: absentee/abroad owners disfavored vs local insiders/occupants
+    # discrimination against the heirs: absentee/abroad owners disfavored vs local insiders/occupants;
+    # + the DIRECT citizenship-based dismissal (officials applied the EO-2 citizenship limitation to
+    # refuse the American heirs — fact 5576/5984/5987 — while favoring local insiders).
     "discrimination":      r"\b(discriminat\w+|singled out|treated differently|residing abroad|"
                            r"non-?resident|absentee|foreigner|U\.?S\.?-based|out of the country|"
-                           r"while .{0,30}(?:refus|toler|allow))\b",
+                           r"citizenship (?:limitation|dismissal)|citizenship-based|applied the citizenship|"
+                           r"Executive Order No\.? ?2|while .{0,30}(?:refus|toler|allow))\b",
     "bad_faith":           r"\b(bad faith|deliberate\w*|willful\w*|intentional\w*)\b",
     "manifest_partiality": r"\b(partial\w+|biased|one-sided|favored|CART|sat .*own office)\b",
     "gross_negligence":    r"\b(gross\w* neglig\w+|inexcusable|reckless\w*|patent\w* disregard)\b",
@@ -755,10 +758,13 @@ def _gather_element_evidence(cur, tokens, signals, limit=6):
 INTENT_ELEMENTS = {"purpose", "modality", "flagrant_breach", "bad_faith", "unjustified_refusal"}
 THEORY_HINTS = {
     ("ra3019_3f", "purpose"):
-        "Wrongful/discriminatory purpose is inferred from the PATTERN: the officials refused the "
-        "ABSENTEE heirs (residing abroad) their own records/permits while TOLERATING or FAVORING "
-        "insiders — the Mayor's Chief of Staff (Antonio Teope) building a cement cottage on the "
-        "heirs' titled land 'without owner agreement'; the LGU failing to remove the encroachment.",
+        "Wrongful/discriminatory purpose, shown by the PATTERN: (a) officials applied a CITIZENSHIP "
+        "LIMITATION (EO 2) to dismiss the AMERICAN heirs' records requests (fact 5576) — near-direct "
+        "discrimination pleaded to the Office of the President as 'citizenship-based dismissals'; "
+        "while (b) FAVORING two LGU insiders on the SAME land — Antonio Teope (Mayor's Chief of "
+        "Staff) erecting an unpermitted cottage 'without owner agreement', and Miguel Baliza "
+        "(draftsman IN the Assessor's office) claiming a hectare via the VOID de la Fuente sale, with "
+        "the Treasurer declining to collect Baliza's tax (shielding the paper trail).",
     ("ra3019_3e", "injury_or_benefit"):
         "The unwarranted BENEFIT/PREFERENCE = giving an insider an advantage they are not entitled "
         "to (tolerating the Chief of Staff's unpermitted construction on the heirs' land) while "
