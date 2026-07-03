@@ -606,40 +606,51 @@ def _hunt_one(cur, label, tokens, capacity):
                    FROM documents WHERE extracted_text ~* %s""", (rx,))
     docs = cur.fetchall()
 
-    sig_evidence = {}   # signal -> list of (handle, snippet)
+    # signal -> {distinct source handle -> best snippet}  (dedup by SOURCE so counts are honest,
+    # not passage-inflated; a source counts once per signal no matter how many times it recurs)
+    sig_evidence = {}
+
+    def _add(sig, key, snippet):
+        d = sig_evidence.setdefault(sig, {})
+        if key not in d or len(snippet) > len(d[key]):
+            d[key] = snippet
     for fid, matter, stmt, src in facts:
         for s in _scan_signals(stmt):
-            sig_evidence.setdefault(s, []).append((f"fact:{fid}", stmt[:150]))
-    doc_hits = 0
+            _add(s, f"fact:{fid}", stmt[:150])
+    doc_src_hits = set()
     for did, fname, text in docs:
         for w in _windows(text, tokens):
-            sigs = _scan_signals(w)
-            if sigs:
-                doc_hits += 1
-            for s in sigs:
-                sig_evidence.setdefault(s, []).append((f"doc:{did} ({fname[:36]})", w[:170]))
+            for s in _scan_signals(w):
+                _add(s, f"doc:{did}", f"[{fname[:32]}] {w[:150]}")
+                doc_src_hits.add(did)
 
-    # element map over the applicable templates
-    present = {s: sig_evidence[s][0][0] for s in sig_evidence}
+    def _n(sig):   # distinct sources carrying this signal
+        return len(sig_evidence.get(sig, {}))
+
+    present = {s: next(iter(d)) for s, d in sig_evidence.items() if d}
     print(f"\n══ {label}  [{capacity}] ══")
-    print(f"   corpus reach: {len(facts)} grounded fact(s) + {len(docs)} document(s) mined "
-          f"({doc_hits} doc passages carried a signal the fact-ledger may not have).")
+    print(f"   corpus reach: {len(facts)} grounded fact(s) + {len(docs)} document(s) mined; "
+          f"{len(doc_src_hits)} document(s) held a signal NOT necessarily in the fact-ledger.")
+    print("   element evidence AVAILABLE (co-occurrence in the record; attribution is --verify's job):")
     forums = ["ra3019_3e", "ra3019_3f", "grave_misconduct", "rpc_171"] if capacity != "unknown" else ["ra3019_3f"]
     for vcode in forums:
         vt = VIOLATIONS[vcode]
-        report, strength = _element_gate(vt, present)
-        print(f"   • {vt['statute']} — {int(strength*100)}% elements supported:")
+        report, _ = _element_gate(vt, present)
+        print(f"   • {vt['statute']}:")
         for ekey, ev in report.items():
-            sigs_for = [s for s in (vt['elements'][ekey]['needs'] + vt['elements'][ekey].get('weak', [])) if s in sig_evidence]
-            n = sum(len(sig_evidence[s]) for s in sigs_for)
-            mark = {"have": "✓", "thin": "~", "missing": "·"}[ev["state"]]
-            print(f"       {mark} {ekey:<20} [{ev['state']:<7}] {n:>3} evidence item(s)")
-    # the richest signals + a sample handle each (shows the DEPTH now gathered)
+            needs = vt['elements'][ekey]['needs']
+            weak = vt['elements'][ekey].get('weak', [])
+            n_strong = sum(_n(s) for s in needs)
+            n_weak = sum(_n(s) for s in weak)
+            mark = "●" if n_strong else ("◐" if n_weak else "○")
+            extra = f" (+{n_weak} weak/floor-only)" if (n_weak and not n_strong) else ""
+            print(f"       {mark} {ekey:<20} {n_strong:>3} distinct source(s){extra}")
     top = sorted(sig_evidence.items(), key=lambda kv: len(kv[1]), reverse=True)[:6]
     if top:
-        print("   strongest signals (count · sample):")
-        for s, items in top:
-            print(f"       {s:<22} ×{len(items):<3} e.g. {items[0][0]} — \"{items[0][1][:80]}…\"")
+        print("   strongest signals (distinct sources · sample):")
+        for s, d in top:
+            k = next(iter(d))
+            print(f"       {s:<22} ×{len(d):<3} e.g. {k} — \"{d[k][:80]}…\"")
 
 
 def cmd_hunt(query):
