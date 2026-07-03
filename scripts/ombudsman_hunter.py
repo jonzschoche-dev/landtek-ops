@@ -176,10 +176,11 @@ SIGNAL_PATTERNS = {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ROSTER — the operator-known public officers, grounded in the record + the working playbook
-# (playbooks/ombudsman_1891.json) and the ARTA cluster. Names here are SEEDS to be corroborated
-# against matter_facts on --scan; a seed the corpus does not corroborate is flagged
-# NEEDS-VERIFICATION rather than asserted. New names surfaced by the scan are added as SEED.
+# SEED_ROSTER — the operator-CURATED overlay: high-value known identities (esp. the flagship Mayor,
+# whose entity carries no title in its name) that corpus discovery can't reliably name/classify.
+# The LIVE roster is SEED_ROSTER ∪ discover_officers(corpus) — see build_roster(). So the engine
+# LEARNS its targets from the whole entities graph and grows as the corpus grows, instead of only
+# hunting a hardcoded list. Generic office seeds are dropped once a NAMED officer is discovered.
 # ─────────────────────────────────────────────────────────────────────────────
 # Geography / role-generic tokens that are too common to identify a specific officer — a fact that
 # merely mentions "Mercedes" the town must NOT match "Mayor of Mercedes". Matching keys on the
@@ -187,7 +188,7 @@ SIGNAL_PATTERNS = {
 MATCH_STOPWORDS = {"mercedes", "municipal", "office", "camarines", "norte", "bayan",
                    "denr", "provincial", "the", "and", "of"}
 
-ROSTER = [
+SEED_ROSTER = [
     # official, office, capacity, distinctive match tokens, note (provenance of the seed)
     ("Mayor Alexander Pajarillo",    "Office of the Mayor, Mercedes",             "elective",
      ["Mayor", "Pajarillo"],
@@ -211,6 +212,93 @@ ROSTER = [
      ["Remoto"],
      "ARTA-1319 co-respondent"),
 ]
+
+# ── Corpus-driven officer discovery (the "learn across the corpus" layer) ─────
+# Title words stripped to isolate the distinctive surname; office phrase kept if nothing survives.
+_TITLE_WORDS = {"hon", "atty", "engineer", "engr", "mayor", "vice", "vicemayor", "vice-mayor",
+                "assistant", "asst", "senior", "commissioner", "director", "undersecretary",
+                "provincial", "municipal", "city", "prosecutor", "councilor", "kagawad", "sheriff",
+                "clerk", "registrar", "register", "deeds", "administrator", "governor", "penro",
+                "cenro", "ms", "mr", "mrs", "jr", "sr", "of", "the", "office"}
+_ELECTIVE_KW = ("mayor", "vice-mayor", "vice mayor", "vicemayor", "governor", "councilor",
+                "kagawad", "sanggunian", "congressman", "senator", "barangay captain", "punong")
+_CAREER_KW = ("assessor", "treasurer", "engineer", "register of deeds", "registrar", "penro",
+              "cenro", "prosecutor", "commissioner", "director", "administrator", "sheriff",
+              "clerk", "undersecretary", "provincial assessor", "adjudicator")
+# our own side / non-targets — never generate an Ombudsman lead against these
+_OURSIDE_RE = (r"heirs of mary|MWK-001|attorney-in-fact|\bheir\b|plaintiff|decedent|estate principal|"
+               r"barandon|botor|zschoche|keesey|don qi|private")
+
+
+def _classify_capacity(blob):
+    b = blob.lower()
+    if any(k in b for k in _ELECTIVE_KW):
+        return "elective"
+    if any(k in b for k in _CAREER_KW):
+        return "appointive"
+    return "unknown"
+
+
+def _match_tokens_from(canonical_name, aliases):
+    toks = []
+    for t in re.split(r"[^A-Za-z]+", canonical_name):
+        if len(t) >= 3 and t.lower() not in _TITLE_WORDS and t.lower() not in MATCH_STOPWORDS:
+            toks.append(t)
+    for a in aliases or []:
+        for t in re.split(r"[^A-Za-z]+", a or ""):
+            if len(t) >= 3 and t.lower() not in _TITLE_WORDS and t.lower() not in MATCH_STOPWORDS and t not in toks:
+                toks.append(t)
+    if not toks:  # office-only entity (e.g. "Provincial Assessor") — match the phrase itself
+        toks = [canonical_name.strip()]
+    return toks[:6]
+
+
+def discover_officers(cur):
+    """LEARN the target set from the entities graph: person-entities whose name/role/affiliation
+    signal a PUBLIC OFFICE, excluding our own side + private parties. Grows as the corpus grows."""
+    if not _table_exists(cur, "entities"):
+        return []
+    cur.execute("""
+        SELECT id, canonical_name, COALESCE(aliases,'{}'), COALESCE(role,''),
+               COALESCE(affiliation,''), COALESCE(mentions_count,0)
+        FROM entities
+        WHERE type ILIKE '%%person%%' AND canonical_name IS NOT NULL
+          AND ( canonical_name ~* '(^| )(mayor|vice.?mayor|assessor|treasurer|engineer|penro|cenro|register of deeds|registrar|commissioner|director|administrator|sheriff|prosecutor|governor|councilor|kagawad|undersecretary|hon\\.)'
+             OR role ~* '(mayor|assessor|treasurer|register|registrar|penro|cenro|engineer|commissioner|director|administrator|sheriff|clerk|prosecutor|officer|official|undersecretary|adjudicator|governor|councilor|kagawad|sanggunian)'
+             OR affiliation ~* '(municipal|provincial|LGU|DENR|register of deeds|civil service|anti-red tape|ARTA|RTC|MTC|office of|government|city of)' )
+          AND (COALESCE(role,'') || ' ' || COALESCE(affiliation,'') || ' ' || canonical_name) !~* %s
+        ORDER BY mentions_count DESC NULLS LAST
+    """, (_OURSIDE_RE,))
+    out = []
+    for eid, name, aliases, role, aff, mc in cur.fetchall():
+        blob = f"{name} {role} {aff}"
+        cap = _classify_capacity(blob)
+        office = (aff or role or "public office").strip()
+        toks = _match_tokens_from(name, aliases)
+        note = f"corpus-discovered [entity {eid}, {mc} mentions]" + (f"; role: {role}" if role else "")
+        out.append((name, office[:70], cap, toks, note, "discovered"))
+    return out
+
+
+def build_roster(cur):
+    """LIVE roster = corpus-discovered officers ∪ curated seed overlay (deduped). Generic office
+    seeds are dropped once a NAMED officer covers that office."""
+    discovered = discover_officers(cur)
+    disc_tokens = {t.lower() for _n, _o, _c, toks, _no, _s in discovered for t in toks}
+    disc_offices = " ".join((n + " " + o).lower() for n, o, _c, _t, _no, _s in discovered)
+    roster = [(n, o, c, t, no, "discovered") for (n, o, c, t, no, _s) in discovered]
+    for name, office, cap, toks, note in SEED_ROSTER:
+        # drop a generic office seed if a named officer already covers that office
+        if name in ("Municipal Assessor", "Municipal Treasurer", "Municipal Engineer"):
+            offword = name.split()[-1].lower()
+            if offword in disc_offices:
+                continue
+        # skip an exact seed already present by token (avoid duplicates); else keep the seed overlay
+        if any(t.lower() in disc_tokens for t in toks) and name not in (
+                "Mayor Alexander Pajarillo",):  # always keep the flagship's curated provenance
+            continue
+        roster.append((name, office, cap, toks, note, "seed"))
+    return roster
 
 
 # ── DB helpers ───────────────────────────────────────────────────────────────
@@ -307,15 +395,16 @@ def _scan_signals(text):
     return hits
 
 
-def cull_and_profile(facts, docmap=None):
+def cull_and_profile(facts, roster, docmap=None):
     """official -> {matters:set, incidents:[(fact_id, doc_handle, signals, matter)]}. Handles carry
-    the document's IDENTITY (filename) so downstream never mislabels a pleading as a receipt."""
+    the document's IDENTITY (filename) so downstream never mislabels a pleading as a receipt.
+    `roster` is the LIVE (corpus-discovered ∪ seed) officer list from build_roster()."""
     docmap = docmap or {}
     profiles = {}
     tokens_by_official = {}
-    for official, office, capacity, match_tokens, note in ROSTER:
+    for official, office, capacity, match_tokens, note, source in roster:
         profiles[official] = {"office": office, "capacity": capacity, "seed_note": note,
-                              "matters": set(), "incidents": []}
+                              "source": source, "matters": set(), "incidents": []}
         tokens_by_official[official] = match_tokens
     for fid, matter, stmt, src, prov in facts:
         if prov and prov not in ("verified", "inferred_strong"):
@@ -451,15 +540,34 @@ def cmd_scan():
         if not facts:
             print("[hunter] no matter_facts found — nothing to scan (is PG_DSN pointed at the live DB?)")
             return
+        roster = build_roster(cur)
+        n_disc = sum(1 for r in roster if r[5] == "discovered")
         docmap = _fetch_docmap(cur)
-        profiles = cull_and_profile(facts, docmap)
+        profiles = cull_and_profile(facts, roster, docmap)
         cands = build_candidates(profiles)
         upsert(cur, cands)
         ripe = sum(1 for c in cands if c["status"] == "ripe")
-        print(f"[hunter] scanned {len(facts)} facts -> {len(cands)} candidate lead(s) "
-              f"across {sum(1 for p in profiles.values() if p['incidents'])} official(s); "
-              f"{ripe} at 'ripe' (keyword-scan, UNVERIFIED). None are filing-ready until --verify "
-              f"reads the evidence; filing stays human-gated.")
+        print(f"[hunter] learned {len(roster)} officers ({n_disc} corpus-discovered + "
+              f"{len(roster)-n_disc} seed) from the entities graph; scanned {len(facts)} facts -> "
+              f"{len(cands)} candidate lead(s) across "
+              f"{sum(1 for p in profiles.values() if p['incidents'])} officer(s) with signal-bearing facts; "
+              f"{ripe} at 'ripe' (keyword-scan, UNVERIFIED). Run --verify; filing stays human-gated.")
+
+
+def cmd_officers():
+    """Show the LIVE roster the engine learned from the corpus (discovered vs curated seed)."""
+    with _conn() as conn, conn.cursor() as cur:
+        roster = build_roster(cur)
+        disc = [r for r in roster if r[5] == "discovered"]
+        seed = [r for r in roster if r[5] == "seed"]
+        print(f"OMBUDSMAN HUNTER — learned officer roster: {len(roster)} "
+              f"({len(disc)} corpus-discovered + {len(seed)} curated seed)\n")
+        print("CORPUS-DISCOVERED (from the entities graph — grows with the corpus):")
+        for name, office, cap, toks, note, _s in disc:
+            print(f"  {name[:34]:<34} [{cap:<10}] {office[:38]}\n      match {toks} — {note}")
+        print("\nCURATED SEED (overlay for identities discovery can't name/classify):")
+        for name, office, cap, toks, note, _s in seed:
+            print(f"  {name[:34]:<34} [{cap:<10}] {office[:38]}  match {toks}")
 
 
 def cmd_verify(target):
@@ -671,8 +779,9 @@ def cmd_doctrine():
         print(f"      {v['gist']}")
         print(f"      elements: {', '.join(v['elements'].keys())}")
         print(f"      prescription: {v['prescription']}")
-    print("\nSEED ROSTER (corroborated against matter_facts on --scan):")
-    for o, off, cap, toks, note in ROSTER:
+    print("\nSEED ROSTER OVERLAY (the LIVE roster also LEARNS officers from the entities graph "
+          "— run --officers):")
+    for o, off, cap, toks, note in SEED_ROSTER:
         print(f"  {o:<28} [{cap}] {off}\n      match: {toks}\n      seed: {note}")
 
 
@@ -684,12 +793,15 @@ def main():
     ap.add_argument("--playbook", type=int, metavar="ID", help="emit a case_synthesizer playbook for a ripe lead")
     ap.add_argument("--verify", metavar="ID|ripe", help="DISCERNMENT PASS: read each cited fact + judge grounding "
                     "(local LLM $0); promotes only what survives to held_for_filing. 'ripe' verifies all ripe leads")
+    ap.add_argument("--officers", action="store_true", help="show the LIVE roster the engine learned from the corpus (discovered + seed)")
     ap.add_argument("--law-check", action="store_true", help="is the RA 3019/6713/6770 law library embedded?")
-    ap.add_argument("--doctrine", action="store_true", help="print templates + roster (dry, no DB)")
+    ap.add_argument("--doctrine", action="store_true", help="print templates + seed overlay (dry, no DB)")
     a = ap.parse_args()
 
     if a.doctrine:
         cmd_doctrine()
+    elif a.officers:
+        cmd_officers()
     elif a.scan:
         cmd_scan()
     elif a.board:
