@@ -563,6 +563,106 @@ def cmd_scan():
               f"{ripe} at 'ripe' (keyword-scan, UNVERIFIED). Run --verify; filing stays human-gated.")
 
 
+# ── DEEP per-individual corpus hunt (mines FULL document text, not just the fact ledger) ─────
+CORE_SEVEN = [
+    ("Mayor Alexander Pajarillo",        ["Pajarillo"],                         "elective"),
+    ("Loida E. Macale — Mun. Treasurer", ["Macale"],                            "appointive"),
+    ("Gemma P. Abla — Mun. Assessor",    ["Abla"],                              "appointive"),
+    ("Erwin H. Balane — Mun. Engineer",  ["Erwin Balane", "Engr. Balane", "Engr Balane", "Municipal Engineer"], "appointive"),
+    ("PENRO Fortuno",                    ["Fortuno"],                           "career"),
+    ("PENRO Remoto",                     ["Remoto"],                            "career"),
+    ("Sangguniang Bayan (Mercedes)",     ["Sangguniang", "Sanggunian"],         "elective"),
+]
+
+
+def _rx(tokens):
+    return "(" + "|".join(re.escape(t) for t in tokens) + ")"
+
+
+def _windows(text, tokens, half=140, cap=8):
+    """Evidence windows around each token occurrence in a document's full text."""
+    wins, low = [], text.lower()
+    for tok in tokens:
+        t, start = tok.lower(), 0
+        while len(wins) < cap:
+            i = low.find(t, start)
+            if i < 0:
+                break
+            a, b = max(0, i - half), min(len(text), i + len(t) + half)
+            wins.append(re.sub(r"\s+", " ", text[a:b]).strip())
+            start = i + len(t)
+    return wins
+
+
+def _hunt_one(cur, label, tokens, capacity):
+    rx = _rx(tokens)
+    # 1) the distilled fact ledger
+    cur.execute("""SELECT id, matter_code, COALESCE(statement,''), COALESCE(source_id::text,'')
+                   FROM matter_facts
+                   WHERE statement ~* %s AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx,))
+    facts = cur.fetchall()
+    # 2) the FULL document corpus (what the old hunt ignored)
+    cur.execute("""SELECT id, COALESCE(original_filename,''), COALESCE(extracted_text,'')
+                   FROM documents WHERE extracted_text ~* %s""", (rx,))
+    docs = cur.fetchall()
+
+    sig_evidence = {}   # signal -> list of (handle, snippet)
+    for fid, matter, stmt, src in facts:
+        for s in _scan_signals(stmt):
+            sig_evidence.setdefault(s, []).append((f"fact:{fid}", stmt[:150]))
+    doc_hits = 0
+    for did, fname, text in docs:
+        for w in _windows(text, tokens):
+            sigs = _scan_signals(w)
+            if sigs:
+                doc_hits += 1
+            for s in sigs:
+                sig_evidence.setdefault(s, []).append((f"doc:{did} ({fname[:36]})", w[:170]))
+
+    # element map over the applicable templates
+    present = {s: sig_evidence[s][0][0] for s in sig_evidence}
+    print(f"\n══ {label}  [{capacity}] ══")
+    print(f"   corpus reach: {len(facts)} grounded fact(s) + {len(docs)} document(s) mined "
+          f"({doc_hits} doc passages carried a signal the fact-ledger may not have).")
+    forums = ["ra3019_3e", "ra3019_3f", "grave_misconduct", "rpc_171"] if capacity != "unknown" else ["ra3019_3f"]
+    for vcode in forums:
+        vt = VIOLATIONS[vcode]
+        report, strength = _element_gate(vt, present)
+        print(f"   • {vt['statute']} — {int(strength*100)}% elements supported:")
+        for ekey, ev in report.items():
+            sigs_for = [s for s in (vt['elements'][ekey]['needs'] + vt['elements'][ekey].get('weak', [])) if s in sig_evidence]
+            n = sum(len(sig_evidence[s]) for s in sigs_for)
+            mark = {"have": "✓", "thin": "~", "missing": "·"}[ev["state"]]
+            print(f"       {mark} {ekey:<20} [{ev['state']:<7}] {n:>3} evidence item(s)")
+    # the richest signals + a sample handle each (shows the DEPTH now gathered)
+    top = sorted(sig_evidence.items(), key=lambda kv: len(kv[1]), reverse=True)[:6]
+    if top:
+        print("   strongest signals (count · sample):")
+        for s, items in top:
+            print(f"       {s:<22} ×{len(items):<3} e.g. {items[0][0]} — \"{items[0][1][:80]}…\"")
+
+
+def cmd_hunt(query):
+    """Deep per-individual corpus hunt: mine matter_facts AND documents.extracted_text exhaustively,
+    build a per-respondent element-proof map. `--hunt seven` runs the 7 core individuals."""
+    with _conn() as conn, conn.cursor() as cur:
+        if query.lower() in ("seven", "7", "the-seven"):
+            print("OMBUDSMAN HUNTER — DEEP corpus hunt of the 7 core individuals (facts + full document text)")
+            for label, toks, cap in CORE_SEVEN:
+                _hunt_one(cur, label, toks, cap)
+        else:
+            toks = [query]
+            cap = "unknown"
+            for name, office, capacity, mtoks, note, src in build_roster(cur):
+                if any(query.lower() == t.lower() for t in mtoks) or query.lower() in name.lower():
+                    toks, cap, query = mtoks, capacity, name
+                    break
+            print(f"OMBUDSMAN HUNTER — DEEP corpus hunt: {query}")
+            _hunt_one(cur, query, toks, cap)
+        print("\nNote: this is the EVIDENCE MAP (read-only). Counts = corpus depth now mined; "
+              "run --verify to element-test the promoted candidates. Filing stays human-gated.")
+
+
 def cmd_officers():
     """Show the LIVE roster the engine learned from the corpus (discovered vs curated seed)."""
     with _conn() as conn, conn.cursor() as cur:
@@ -802,6 +902,7 @@ def main():
     ap.add_argument("--playbook", type=int, metavar="ID", help="emit a case_synthesizer playbook for a ripe lead")
     ap.add_argument("--verify", metavar="ID|ripe", help="DISCERNMENT PASS: read each cited fact + judge grounding "
                     "(local LLM $0); promotes only what survives to held_for_filing. 'ripe' verifies all ripe leads")
+    ap.add_argument("--hunt", metavar="NAME|seven", help="DEEP per-individual corpus hunt — mines matter_facts AND full document text, builds an element-proof map. 'seven' = the 7 core individuals")
     ap.add_argument("--officers", action="store_true", help="show the LIVE roster the engine learned from the corpus (discovered + seed)")
     ap.add_argument("--law-check", action="store_true", help="is the RA 3019/6713/6770 law library embedded?")
     ap.add_argument("--doctrine", action="store_true", help="print templates + seed overlay (dry, no DB)")
@@ -809,6 +910,8 @@ def main():
 
     if a.doctrine:
         cmd_doctrine()
+    elif a.hunt is not None:
+        cmd_hunt(a.hunt)
     elif a.officers:
         cmd_officers()
     elif a.scan:
