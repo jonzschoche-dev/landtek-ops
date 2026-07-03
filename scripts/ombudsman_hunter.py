@@ -749,10 +749,35 @@ def _gather_element_evidence(cur, tokens, signals, limit=6):
     return out[:limit]
 
 
+# Intent/state-of-mind elements are NEVER proven by direct admission — PH courts establish them
+# CIRCUMSTANTIALLY, by reasonable inference from the totality of conduct. Judging them by a
+# direct-proof standard is legally wrong, so verify uses an inference standard + a connective theory.
+INTENT_ELEMENTS = {"purpose", "modality", "flagrant_breach", "bad_faith", "unjustified_refusal"}
+THEORY_HINTS = {
+    ("ra3019_3f", "purpose"):
+        "Wrongful/discriminatory purpose is inferred from the PATTERN: the officials refused the "
+        "ABSENTEE heirs (residing abroad) their own records/permits while TOLERATING or FAVORING "
+        "insiders — the Mayor's Chief of Staff (Antonio Teope) building a cement cottage on the "
+        "heirs' titled land 'without owner agreement'; the LGU failing to remove the encroachment.",
+    ("ra3019_3e", "injury_or_benefit"):
+        "The unwarranted BENEFIT/PREFERENCE = giving an insider an advantage they are not entitled "
+        "to (tolerating the Chief of Staff's unpermitted construction on the heirs' land) while "
+        "denying the titled heirs; OR undue injury = the heirs' concrete deprivation of records.",
+    ("ra3019_3e", "modality"):
+        "Manifest partiality / bad faith is inferred where an official invents an unlawful hurdle "
+        "(All-Heirs-SPA) AND sits in judgment of the complaint against his own office (CART chair), "
+        "or favors an insider over the titled owner.",
+    ("grave_misconduct", "flagrant_breach"):
+        "A flagrant breach: sitting in judgment of the complaint against one's own office; imposing "
+        "an unlawful requirement; or favoring an insider's illegal construction over titled heirs.",
+}
+
+
 def cmd_verify(target):
     """DISCERNMENT PASS — gather DEEP, client-scoped evidence per element (facts + full document
-    text) and judge whether it ESTABLISHES the element as to the named respondent. Downgrades
-    keyword-coincidence; only an evidence-read confirmation promotes to 'held_for_filing'.
+    text) and judge whether it ESTABLISHES the element as to the named respondent. Factual elements
+    use a direct-proof standard; INTENT elements use the correct circumstantial-inference standard
+    (with a connective theory). Only an evidence-read confirmation promotes to 'held_for_filing'.
     Local Ollama, $0.  target: id | 'ripe' | 'all' (all non-seed candidates)."""
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
         if not _table_exists(cur, "ombudsman_candidates"):
@@ -783,17 +808,34 @@ def cmd_verify(target):
                 evidence = _gather_element_evidence(cur, tokens, sigs) if sigs else []
                 ev["handle"] = [h for h, _sn in evidence]   # store the DEEP evidence handles
                 excerpts = "\n".join(f"- ({h}) {sn}" for h, sn in evidence) or "(no in-scope evidence found)"
-                prompt = (
-                    "You are a strict Philippine anti-graft evidence auditor. Judge ONLY whether the "
-                    "evidence below ESTABLISHES the specific element as to the named respondent. Be "
-                    "skeptical: a fact that merely mentions the office/town, or is about someone else, "
-                    "does NOT establish it.\n\n"
-                    f"STATUTE: {r['statute']}\n"
-                    f"ELEMENT TO PROVE: {ev['label']}\n"
-                    f"RESPONDENT: {r['official']} ({r['office']})\n"
-                    f"EVIDENCE:\n{excerpts}\n\n"
-                    'Reply STRICT JSON: {"verdict":"have|thin|no","why":"<=15 words"}. '
-                    '"have"=evidence directly establishes it; "thin"=related but incomplete; "no"=does not.')
+                if ekey in INTENT_ELEMENTS:
+                    hint = THEORY_HINTS.get((r["violation_code"], ekey), "")
+                    prompt = (
+                        "You are a Philippine anti-graft preliminary-investigation analyst. This is an "
+                        "INTENT/state-of-mind element. Intent is NEVER proven by direct admission — it is "
+                        "established CIRCUMSTANTIALLY, by a reasonable inference from the TOTALITY of the "
+                        "conduct. Do not demand a single fact that says it outright.\n\n"
+                        f"STATUTE: {r['statute']}\n"
+                        f"ELEMENT (intent): {ev['label']}\n"
+                        f"RESPONDENT: {r['official']} ({r['office']})\n"
+                        + (f"THEORY (how the pattern proves it): {hint}\n" if hint else "")
+                        + f"EVIDENCE:\n{excerpts}\n\n"
+                        "Do these facts, TAKEN TOGETHER, support a REASONABLE INFERENCE of the element? "
+                        'Reply STRICT JSON: {"verdict":"have|thin|no","why":"<=15 words"}. '
+                        '"have"=the inference is reasonably supported by the pattern; "thin"=partial '
+                        'support, pattern incomplete; "no"=facts do not support the inference. Stay honest.')
+                else:
+                    prompt = (
+                        "You are a strict Philippine anti-graft evidence auditor. Judge ONLY whether the "
+                        "evidence below ESTABLISHES the specific FACTUAL element as to the named respondent. "
+                        "Be skeptical: a fact that merely mentions the office/town, or is about someone "
+                        "else, does NOT establish it.\n\n"
+                        f"STATUTE: {r['statute']}\n"
+                        f"ELEMENT TO PROVE: {ev['label']}\n"
+                        f"RESPONDENT: {r['official']} ({r['office']})\n"
+                        f"EVIDENCE:\n{excerpts}\n\n"
+                        'Reply STRICT JSON: {"verdict":"have|thin|no","why":"<=15 words"}. '
+                        '"have"=evidence directly establishes it; "thin"=related but incomplete; "no"=does not.')
                 try:
                     v = json.loads(_ollama(prompt))
                     verdict = v.get("verdict", "thin").lower()
