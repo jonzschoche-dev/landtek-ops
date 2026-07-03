@@ -231,22 +231,31 @@ _OURSIDE_RE = (r"heirs of mary|MWK-001|attorney-in-fact|\bheir\b|plaintiff|deced
 
 
 def _classify_capacity(blob):
+    """Capacity from the officer's OWN title = the EARLIEST-occurring office keyword. A co-mentioned
+    official ('...Treasurer, with Mayor Pajarillo') must not flip the classification."""
     b = blob.lower()
-    if any(k in b for k in _ELECTIVE_KW):
-        return "elective"
-    if any(k in b for k in _CAREER_KW):
-        return "appointive"
-    return "unknown"
+    best_pos, best_cap = len(b) + 1, "unknown"
+    for kw in _ELECTIVE_KW:
+        i = b.find(kw)
+        if 0 <= i < best_pos:
+            best_pos, best_cap = i, "elective"
+    for kw in _CAREER_KW:
+        i = b.find(kw)
+        if 0 <= i < best_pos:
+            best_pos, best_cap = i, "appointive"
+    return best_cap
 
 
 def _match_tokens_from(canonical_name, aliases):
+    """Distinctive tokens: surnames from the canonical name (>=3), plus alias tokens (>=4, so noisy
+    OCR fragments like 'Mac'/'Ale' don't over-match). Office-only entities match on the phrase."""
     toks = []
     for t in re.split(r"[^A-Za-z]+", canonical_name):
         if len(t) >= 3 and t.lower() not in _TITLE_WORDS and t.lower() not in MATCH_STOPWORDS:
             toks.append(t)
     for a in aliases or []:
         for t in re.split(r"[^A-Za-z]+", a or ""):
-            if len(t) >= 3 and t.lower() not in _TITLE_WORDS and t.lower() not in MATCH_STOPWORDS and t not in toks:
+            if len(t) >= 4 and t.lower() not in _TITLE_WORDS and t.lower() not in MATCH_STOPWORDS and t not in toks:
                 toks.append(t)
     if not toks:  # office-only entity (e.g. "Provincial Assessor") — match the phrase itself
         toks = [canonical_name.strip()]
