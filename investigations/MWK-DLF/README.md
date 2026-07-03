@@ -45,6 +45,8 @@ Confirmed against the filed prayer (doc:446 / doc:424):
 estate + Salvador "Von") **and all transferees**, and prays to void **all** de la Fuente conveyances
 and cancel **all** derivative titles. 26-360's role is to prove the theory, build the record, recover
 the C parent — and set up that broader action. This whole investigation is the preparation for it.
+→ **Outline of that end-vehicle:** `RTC_COMPLAINT_OUTLINE.md` (parties, causes, global prayer, and the
+procedural decisions counsel must resolve — incl. why it is blocked on identifying the Doe cluster).
 
 ## Where everything lives (query the live DB — this is the source of truth)
 ```sql
