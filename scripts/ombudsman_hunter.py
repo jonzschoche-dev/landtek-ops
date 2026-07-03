@@ -316,8 +316,13 @@ def _table_exists(cur, name):
     return cur.fetchone()[0] is not None
 
 
-def _fetch_facts(cur):
-    """Every matter_fact we can scan, with its source handle. Defensive about column presence."""
+# CLIENT SEPARATION (hard invariant): the hunt is scoped to ONE client's matters. Cross-client facts
+# (e.g. the Paracale mining matter PAR-CASE-88750) must never contaminate a MWK Ombudsman lead.
+MATTER_SCOPE = os.environ.get("LANDTEK_OMBUDS_SCOPE", "MWK%")
+
+
+def _fetch_facts(cur, scope=MATTER_SCOPE):
+    """Every in-scope matter_fact we can scan. Scoped to the client's matters (client separation)."""
     if not _table_exists(cur, "matter_facts"):
         return []
     cur.execute("""
@@ -325,8 +330,8 @@ def _fetch_facts(cur):
                COALESCE(statement, '') AS statement,
                COALESCE(source_id::text, '') AS source_id,
                COALESCE(provenance_level, '') AS prov
-        FROM matter_facts
-    """)
+        FROM matter_facts WHERE matter_code LIKE %s
+    """, (scope,))
     return cur.fetchall()
 
 
@@ -594,17 +599,28 @@ def _windows(text, tokens, half=140, cap=8):
     return wins
 
 
-def _hunt_one(cur, label, tokens, capacity):
-    rx = _rx(tokens)
-    # 1) the distilled fact ledger
-    cur.execute("""SELECT id, matter_code, COALESCE(statement,''), COALESCE(source_id::text,'')
-                   FROM matter_facts
-                   WHERE statement ~* %s AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx,))
-    facts = cur.fetchall()
-    # 2) the FULL document corpus (what the old hunt ignored)
+def _scoped_docs(cur, rx, scope=MATTER_SCOPE):
+    """Documents whose text matches AND are linked to the client's matters (client separation)."""
+    if _table_exists(cur, "document_matter_links"):
+        cur.execute("""SELECT DISTINCT d.id, COALESCE(d.original_filename,''), COALESCE(d.extracted_text,'')
+                       FROM documents d JOIN document_matter_links l ON l.doc_id=d.id
+                       WHERE d.extracted_text ~* %s AND l.matter_code LIKE %s""", (rx, scope))
+        return cur.fetchall()
     cur.execute("""SELECT id, COALESCE(original_filename,''), COALESCE(extracted_text,'')
                    FROM documents WHERE extracted_text ~* %s""", (rx,))
-    docs = cur.fetchall()
+    return cur.fetchall()
+
+
+def _hunt_one(cur, label, tokens, capacity):
+    rx = _rx(tokens)
+    # 1) the distilled fact ledger — SCOPED to the client's matters (no cross-client contamination)
+    cur.execute("""SELECT id, matter_code, COALESCE(statement,''), COALESCE(source_id::text,'')
+                   FROM matter_facts
+                   WHERE statement ~* %s AND matter_code LIKE %s
+                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, MATTER_SCOPE))
+    facts = cur.fetchall()
+    # 2) the FULL document corpus (what the old hunt ignored) — SCOPED to client-linked docs
+    docs = _scoped_docs(cur, rx)
 
     # signal -> {distinct source handle -> best snippet}  (dedup by SOURCE so counts are honest,
     # not passage-inflated; a source counts once per signal no matter how many times it recurs)
@@ -690,16 +706,52 @@ def cmd_officers():
             print(f"  {name[:34]:<34} [{cap:<10}] {office[:38]}  match {toks}")
 
 
+def _official_tokens(cur, official_name):
+    """Resolve a candidate's official name -> distinctive match tokens (for deep evidence gather)."""
+    for label, toks, _cap in CORE_SEVEN:
+        if label.split(" —")[0].split("(")[0].strip().lower() in official_name.lower() \
+           or any(t.lower() in official_name.lower() for t in toks):
+            return toks
+    for name, _o, _c, mtoks, _n, _s in build_roster(cur):
+        if name == official_name:
+            return mtoks
+    # fallback: surname-ish tokens from the name
+    return [t for t in re.split(r"[^A-Za-z]+", official_name) if len(t) >= 4 and t.lower() not in _TITLE_WORDS][:4] or [official_name]
+
+
+def _gather_element_evidence(cur, tokens, signals, limit=6):
+    """DEEP, client-scoped evidence for ONE element: facts + document passages that mention the
+    official AND carry one of the element's signals. This feeds --verify the full corpus, not just
+    the scan's first-handle-per-signal."""
+    rx = _rx(tokens)
+    sset = set(signals)
+    out, seen = [], set()
+    cur.execute("""SELECT id, COALESCE(statement,'') FROM matter_facts
+                   WHERE statement ~* %s AND matter_code LIKE %s
+                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, MATTER_SCOPE))
+    for fid, stmt in cur.fetchall():
+        if sset & set(_scan_signals(stmt)) and f"fact:{fid}" not in seen:
+            seen.add(f"fact:{fid}"); out.append((f"fact:{fid}", stmt[:300]))
+    for did, fname, text in _scoped_docs(cur, rx):
+        for w in _windows(text, tokens):
+            if sset & set(_scan_signals(w)) and f"doc:{did}" not in seen:
+                seen.add(f"doc:{did}"); out.append((f"doc:{did}", f"[{fname[:30]}] {w[:240]}")); break
+    return out[:limit]
+
+
 def cmd_verify(target):
-    """DISCERNMENT PASS — actually READ each cited fact and judge whether it establishes the element
-    (not just contains a keyword). Downgrades keyword-coincidence matches; only an evidence-read
-    confirmation promotes a candidate to 'held_for_filing'. Local Ollama, $0.  target: id | 'ripe'."""
+    """DISCERNMENT PASS — gather DEEP, client-scoped evidence per element (facts + full document
+    text) and judge whether it ESTABLISHES the element as to the named respondent. Downgrades
+    keyword-coincidence; only an evidence-read confirmation promotes to 'held_for_filing'.
+    Local Ollama, $0.  target: id | 'ripe' | 'all' (all non-seed candidates)."""
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
         if not _table_exists(cur, "ombudsman_candidates"):
             print("No candidates. Run --scan first.")
             return
         if str(target).isdigit():
             cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s", (int(target),))
+        elif str(target).lower() == "all":
+            cur.execute("SELECT * FROM ombudsman_candidates WHERE status <> 'seed' ORDER BY score DESC")
         else:
             cur.execute("SELECT * FROM ombudsman_candidates WHERE status='ripe' ORDER BY score DESC")
         rows = cur.fetchall()
@@ -708,16 +760,19 @@ def cmd_verify(target):
             return
         for r in rows:
             elements = dict(r["elements"])
-            all_fids = {f for ev in elements.values() for f in _fact_ids_from_handles(ev.get("handle"))}
-            texts = _fetch_fact_texts(cur, all_fids)
-            print(f"\n[verify] #{r['id']} {r['official']} — {r['statute']}")
+            vtmpl = VIOLATIONS.get(r["violation_code"], {})
+            tokens = _official_tokens(cur, r["official"])
+            print(f"\n[verify] #{r['id']} {r['official']} — {r['statute']}  (deep, scoped {MATTER_SCOPE})")
             proven = 0
             notes = []
             for ekey, ev in elements.items():
-                if ev["state"] == "missing":
+                if ev["state"] == "missing" and ekey not in vtmpl.get("elements", {}):
                     continue
-                fids = _fact_ids_from_handles(ev.get("handle"))
-                excerpts = "\n".join(f"- (fact {i}) {texts.get(i,'')[:300]}" for i in fids) or "(no excerpt)"
+                espec = vtmpl.get("elements", {}).get(ekey, {})
+                sigs = espec.get("needs", []) + espec.get("weak", [])
+                evidence = _gather_element_evidence(cur, tokens, sigs) if sigs else []
+                ev["handle"] = [h for h, _sn in evidence]   # store the DEEP evidence handles
+                excerpts = "\n".join(f"- ({h}) {sn}" for h, sn in evidence) or "(no in-scope evidence found)"
                 prompt = (
                     "You are a strict Philippine anti-graft evidence auditor. Judge ONLY whether the "
                     "evidence below ESTABLISHES the specific element as to the named respondent. Be "
