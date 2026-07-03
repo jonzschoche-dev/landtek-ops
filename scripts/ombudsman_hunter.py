@@ -703,6 +703,158 @@ def cmd_hunt(query):
               "run --verify to element-test the promoted candidates. Filing stays human-gated.")
 
 
+# ── CASE-REASONING LAYER (the "think like a prosecutor" brain) ───────────────
+# Legal-status doctrine: is this role a public officer, in what forum, on what clock. Answers the
+# threshold question (e.g. "is the Mayor's Chief of Staff chargeable?"). Periods NEEDS-COUNSEL-VERIFY.
+STATUS_DOCTRINE = [
+    (r"mayor|vice.?mayor|governor|councilor|kagawad|sanggunian|punong",
+     "elective local official — a public officer",
+     "Ombudsman → Sandiganbayan (SG 27 for a mayor; verify SG for others)"),
+    (r"chief of staff|personal assistant|confidential|coterminous",
+     "coterminous/confidential LGU staff — TREAT as a public officer, but CONFIRM the appointment/"
+     "plantilla; if he is in fact private, he is still chargeable ONLY in CONSPIRACY with the officers "
+     "(Go v. Sandiganbayan)",
+     "Ombudsman (criminal) / CSC (admin) — or via conspiracy if private"),
+    (r"assessor|treasurer|engineer|building official|register|registrar|draftsman|clerk|department head",
+     "appointive/career public officer",
+     "Ombudsman (criminal) / CSC (administrative)"),
+    (r"prosecutor|commissioner|director|undersecretary|adjudicator",
+     "national appointive officer",
+     "Ombudsman"),
+]
+DEFAULT_STATUS = ("status UNCONFIRMED — if a PRIVATE person, chargeable ONLY in conspiracy with public "
+                  "officers (Go v. Sandiganbayan); if a public officer, directly",
+                  "Ombudsman (directly, or via conspiracy)")
+
+# The favored insiders (beneficiaries) — grounded, for the conspiracy / common-design model.
+BENEFICIARIES = [
+    ("Antonio Teope", "Mayor's Chief of Staff",
+     "occupies a portion of the heirs' titled land; a cement cottage is under construction there; the "
+     "recipient of the officials' non-enforcement",
+     "§3(e) CONSPIRACY (recipient of the unwarranted preference); Grave Misconduct IF his Chief-of-Staff "
+     "post is confirmed a public office"),
+    ("Miguel Baliza", "draftsman in the Municipal Assessor's office",
+     "claims 1 hectare 'purchased for ₱3.4M from the late Cesar de la Fuente' (the void CV-26360 source); "
+     "the Treasurer declines to collect his RPT",
+     "§3(e) CONSPIRACY; his office-insider status + the void source are the partiality evidence"),
+]
+
+# For each thin/missing element, the ONE fact that would clinch it (self-critique → next hunt).
+CLINCH_HINTS = {
+    "injury_or_benefit": "a quantified figure of the heirs' loss (fees paid for an undelivered service) OR a "
+                         "record pinning the unwarranted preference to the insider (a permit/tax entry favoring Teope/Baliza)",
+    "purpose": "a document showing the officials KNEW of the insider's illegal occupation and declined to act because of his status",
+    "unjustified_refusal": "the received/stamped refusal, or the Charter-clock breach in the officer's own hand",
+    "flagrant_breach": "the officer's own record of the conflict (CART minutes naming him) or the unlawful requirement",
+    "modality": "the conflict-of-interest record (sitting on his own complaint) or the unlawful-requirement document",
+    "official_document": "the received official communication bearing the false/omitted statement",
+    "untruthful_narration": "the officer's own statement contradicted by a received copy (a provable false denial)",
+    "communication": "the received/stamped request letter proving the demand reached the office",
+    "due_demand": "the received/stamped demand letter",
+    "public_officer": "the appointment/plantilla record confirming the office",
+}
+
+
+def _classify_status(name, office):
+    blob = f"{name} {office}".lower()
+    for pat, basis, forum in STATUS_DOCTRINE:
+        if re.search(pat, blob):
+            return basis, forum
+    return DEFAULT_STATUS
+
+
+def cmd_reason(client):
+    """CASE-REASONING: assemble the verified candidates into a prosecutor's THEORY OF THE CASE —
+    actor/role/legal-STATUS map, the common-design/CONSPIRACY thread, counts ranked by real strength,
+    a defense pre-mortem, and the single CLINCHING fact each thin count needs. Deterministic ($0);
+    grounded in the verified candidate rows. This is what turns leads into a case."""
+    scope = (client if client.endswith("%") else client + "%")
+    with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+        if not _table_exists(cur, "ombudsman_candidates"):
+            print("No candidates. Run --scan then --verify first.")
+            return
+        cur.execute("SELECT * FROM ombudsman_candidates ORDER BY score DESC")
+        rows = [r for r in cur.fetchall()]
+        if not rows:
+            print("No candidates. Run --scan / --verify.")
+            return
+        # actors = officials with at least one non-seed count
+        by_off = {}
+        for r in rows:
+            by_off.setdefault(r["official"], []).append(r)
+        actors = {o: cs for o, cs in by_off.items() if any(c["status"] != "seed" for c in cs)}
+
+        print(f"══════ OMBUDSMAN HUNTER — THEORY OF THE CASE: {client} ══════\n")
+        print("I. THE SCHEME (common design)")
+        print("   The principals denied the ABSENTEE AMERICAN heirs their own property records — on a")
+        print("   citizenship pretext (EO 2) and an unlawful All-Heirs-SPA requirement — WHILE tolerating")
+        print("   and favoring municipal INSIDERS occupying, building on, and claiming the heirs' titled")
+        print("   land. Refusal of the owners + preference to insiders = manifest partiality, not neglect.\n")
+
+        print("II. ACTORS, ROLES & LEGAL STATUS")
+        for official, cs in sorted(actors.items(), key=lambda kv: -max(c["score"] for c in kv[1])):
+            office = cs[0]["office"]
+            basis, forum = _classify_status(official, office)
+            best = max(cs, key=lambda c: (c["status"] == "held_for_filing", c["score"]))
+            verified = "✓verified" if best["provenance"] == "operator" else "unverified"
+            print(f"   [PRINCIPAL] {official}  ({office})")
+            print(f"       status: {basis}")
+            print(f"       forum : {forum}")
+            counts = ", ".join(f"{c['violation_code']}={c['status']}" for c in sorted(cs, key=lambda c: -c['score']) if c['status'] != 'seed')
+            print(f"       counts: {counts}  [{verified}]")
+        for name, role, conduct, theory in BENEFICIARIES:
+            basis, forum = _classify_status(name, role)
+            print(f"   [BENEFICIARY / CONSPIRATOR] {name}  ({role})")
+            print(f"       status: {basis}")
+            print(f"       conduct: {conduct}")
+            print(f"       theory : {theory}")
+        print()
+
+        print("III. COUNTS — ranked by verified strength")
+        ranked = sorted([c for c in rows if c["status"] != "seed"],
+                        key=lambda c: (c["status"] == "held_for_filing", c["score"]), reverse=True)
+        for c in ranked[:10]:
+            thin = [ek for ek, ev in dict(c["elements"]).items() if ev.get("state") != "have"]
+            ready = "READY" if c["status"] == "held_for_filing" else c["status"].upper()
+            print(f"   • [{ready:<9}] {c['official']} — {c['statute'].split(';')[0][:52]}  (score {c['score']})")
+            if c["status"] == "held_for_filing":
+                print("        clinch: none — elements established; ready for counsel.")
+            else:
+                wk = thin[0] if thin else "?"
+                print(f"        WEAK LINK: {wk} — CLINCH: {CLINCH_HINTS.get(wk, 'pin this element to a received document')}")
+        print()
+
+        print("IV. DEFENSE PRE-MORTEM")
+        print("   • EO-2 citizenship limitation — COLORABLE (EO 2 restricts FOI to citizens); REBUT: a")
+        print("     property owner's OWN records aren't pure FOI; citizenship is no bar under RA 11032; the")
+        print("     rule was applied DISCRIMINATORILY (dismiss heirs / favor insiders) — that IS the purpose.")
+        print("   • Good faith / workload — NEGATED by the CART conflict + Balane's self-dealing (his office")
+        print("     approved the subdivision to his mother).")
+        print("   • 'Unpermitted' construction — currently DRAFT-only; neutralize by obtaining a certificate")
+        print("     of no permit before pleading it as fact.")
+        print()
+
+        print("V. WHAT TO GET NEXT (clinching facts, ranked)")
+        needs = []
+        for c in ranked:
+            if c["status"] == "held_for_filing":
+                continue
+            for ek, ev in dict(c["elements"]).items():
+                if ev.get("state") != "have" and ek in CLINCH_HINTS:
+                    needs.append((c["official"], c["violation_code"], ek, CLINCH_HINTS[ek]))
+        seen = set()
+        for off, vc, ek, hint in needs:
+            key = (ek, hint)
+            if key in seen:
+                continue
+            seen.add(key)
+            print(f"   • [{ek}] {hint}")
+        print("   • Teope's appointment/plantilla status (public officer? → own counts vs conspiracy-only).")
+        print("   • Certificate of NO building permit for the Teope structure (converts 'reported' → proven).")
+        print("\n(This is a grounded case-theory scaffold from the VERIFIED rows. Filing stays human-gated; "
+              "intent is argued circumstantially; jurisprudence + periods are NEEDS-COUNSEL-VERIFICATION.)")
+
+
 def cmd_officers():
     """Show the LIVE roster the engine learned from the corpus (discovered vs curated seed)."""
     with _conn() as conn, conn.cursor() as cur:
@@ -1028,6 +1180,7 @@ def main():
     ap.add_argument("--playbook", type=int, metavar="ID", help="emit a case_synthesizer playbook for a ripe lead")
     ap.add_argument("--verify", metavar="ID|ripe", help="DISCERNMENT PASS: read each cited fact + judge grounding "
                     "(local LLM $0); promotes only what survives to held_for_filing. 'ripe' verifies all ripe leads")
+    ap.add_argument("--reason", metavar="CLIENT", help="CASE-REASONING: assemble verified candidates into a prosecutor's theory of the case — actor/role/legal-status map, conspiracy thread, ranked counts, defense pre-mortem, clinching fact per thin count (e.g. --reason MWK)")
     ap.add_argument("--hunt", metavar="NAME|seven", help="DEEP per-individual corpus hunt — mines matter_facts AND full document text, builds an element-proof map. 'seven' = the 7 core individuals")
     ap.add_argument("--officers", action="store_true", help="show the LIVE roster the engine learned from the corpus (discovered + seed)")
     ap.add_argument("--law-check", action="store_true", help="is the RA 3019/6713/6770 law library embedded?")
@@ -1036,6 +1189,8 @@ def main():
 
     if a.doctrine:
         cmd_doctrine()
+    elif a.reason is not None:
+        cmd_reason(a.reason)
     elif a.hunt is not None:
         cmd_hunt(a.hunt)
     elif a.officers:
