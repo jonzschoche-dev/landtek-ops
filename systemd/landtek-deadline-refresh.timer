@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh surfaced_deadlines every 6h (+2min after boot) so the client-facing dates never go silently stale — closes the STABLE-axis freshness gap the dependability harness flagged.
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=6h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

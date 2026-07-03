@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek deadline refresh — re-runs deadlines.py --write so surfaced_deadlines (the client-facing dates) stays fresh instead of only updating on a manual run. Pure data refresh, NO Telegram push (that is the separate proactive_deadlines.py job). $0, deterministic.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/deadlines.py --write
+StandardOutput=append:/var/log/landtek_deadline_refresh.log
+StandardError=append:/var/log/landtek_deadline_refresh.log
