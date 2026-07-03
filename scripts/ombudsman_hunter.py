@@ -707,14 +707,15 @@ def cmd_hunt(query):
 # Legal-status doctrine: is this role a public officer, in what forum, on what clock. Answers the
 # threshold question (e.g. "is the Mayor's Chief of Staff chargeable?"). Periods NEEDS-COUNSEL-VERIFY.
 STATUS_DOCTRINE = [
-    (r"mayor|vice.?mayor|governor|councilor|kagawad|sanggunian|punong",
-     "elective local official — a public officer",
-     "Ombudsman → Sandiganbayan (SG 27 for a mayor; verify SG for others)"),
+    # chief-of-staff FIRST — else "Mayor's Chief of Staff" wrongly matches the elective 'mayor' rule
     (r"chief of staff|personal assistant|confidential|coterminous",
      "coterminous/confidential LGU staff — TREAT as a public officer, but CONFIRM the appointment/"
      "plantilla; if he is in fact private, he is still chargeable ONLY in CONSPIRACY with the officers "
      "(Go v. Sandiganbayan)",
      "Ombudsman (criminal) / CSC (admin) — or via conspiracy if private"),
+    (r"\bmayor\b|vice.?mayor|governor|councilor|kagawad|sanggunian|punong",
+     "elective local official — a public officer",
+     "Ombudsman → Sandiganbayan if SG ≥ 27 (a mayor is SG 27; verify the SG)"),
     (r"assessor|treasurer|engineer|building official|register|registrar|draftsman|clerk|department head",
      "appointive/career public officer",
      "Ombudsman (criminal) / CSC (administrative)"),
@@ -818,10 +819,14 @@ def cmd_reason(client):
             ready = "READY" if c["status"] == "held_for_filing" else c["status"].upper()
             print(f"   • [{ready:<9}] {c['official']} — {c['statute'].split(';')[0][:52]}  (score {c['score']})")
             if c["status"] == "held_for_filing":
-                print("        clinch: none — elements established; ready for counsel.")
-            else:
-                wk = thin[0] if thin else "?"
+                print("        clinch: none — elements established (evidence-verified); ready for counsel.")
+            elif c["provenance"] != "operator":
+                print("        UNVERIFIED (keyword-scan only) — run --verify to element-test before relying.")
+            elif thin:
+                wk = thin[0]
                 print(f"        WEAK LINK: {wk} — CLINCH: {CLINCH_HINTS.get(wk, 'pin this element to a received document')}")
+            else:
+                print("        verified but sub-ceiling — re-run --verify (evidence may have shifted).")
         print()
 
         print("IV. DEFENSE PRE-MORTEM")
