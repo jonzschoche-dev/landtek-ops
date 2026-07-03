@@ -19,12 +19,23 @@ Filing an Ombudsman complaint against a named public officer is outward, adversa
 The deterministic engine is `scripts/ombudsman_hunter.py`. It does the $0 mechanical work; you do the legal judgment on top.
 ```
 python3 scripts/ombudsman_hunter.py --doctrine        # the templates + roster (dry, no DB)
-python3 scripts/ombudsman_hunter.py --scan            # corpus scan -> ranked candidate leads
-python3 scripts/ombudsman_hunter.py --board           # phone-friendly ranked leads
-python3 scripts/ombudsman_hunter.py --candidate N     # one lead: element gate + evidence handles + gaps
+python3 scripts/ombudsman_hunter.py --scan            # corpus scan -> ranked candidate leads (UNVERIFIED)
+python3 scripts/ombudsman_hunter.py --verify ripe     # DISCERNMENT PASS — read each cited fact, promote only what survives
+python3 scripts/ombudsman_hunter.py --board           # phone-friendly ranked leads (shows verified vs keyword-scan)
+python3 scripts/ombudsman_hunter.py --candidate N     # one lead: element gate + per-element verdict + handles + gaps
 python3 scripts/ombudsman_hunter.py --playbook N      # emit a case_synthesizer playbook (drafting only)
 python3 scripts/ombudsman_hunter.py --law-check       # is RA 3019/6713/6770 embedded in the law library?
 ```
+
+**The two-stage discernment discipline (do NOT skip stage 2).** `--scan` is a cheap keyword net — it
+casts wide and its ripeness is UNVERIFIED (keyword presence ≠ element proof; it can attach a fact that
+merely mentions the office/town). It caps at `ripe` and can never declare a case ready. **`--verify`
+actually READS each cited fact with the local reasoner and judges whether it establishes the element
+for that respondent** — downgrading keyword-coincidence matches. Only a `--verify` confirmation
+promotes a lead to `held_for_filing`. Never present a `ripe` (unverified) lead as a real case: run
+`--verify` first, then reason over what survived. Evidence-quality is tiered: for §3(e) *undue injury*,
+mere delay is a FLOOR ('thin'), not proof — actual, quantified damage (a receipt/fee for an unrendered
+service) is what makes it 'have' (the *Llorente* rule, baked in).
 Downstream, do not reinvent: `scripts/case_synthesizer.py --playbook P --out O [--frontier]` renders the grounded dossier; `scripts/legal_authority.py` (`retrieve_chunks("OMBUDSMAN", q)`) is the verbatim law library; `play_engine.py` already carries the `ombudsman_3e` play; `cross_matter.py` links one officer's acts across matters.
 
 ## The doctrine you reason with (the templates the engine encodes)

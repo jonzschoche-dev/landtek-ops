@@ -80,8 +80,8 @@ VIOLATIONS = {
             "public_officer":  {"needs": ["official_capacity"],   "label": "respondent is a public officer in official/administrative functions"},
             "modality":        {"needs": ["manifest_partiality", "bad_faith", "gross_negligence"], "any": True,
                                 "label": "acted with manifest partiality, evident bad faith, or gross inexcusable negligence"},
-            "injury_or_benefit": {"needs": ["undue_injury", "unwarranted_benefit"], "any": True,
-                                "label": "caused undue injury OR gave an unwarranted benefit/advantage"},
+            "injury_or_benefit": {"needs": ["injury_actual", "unwarranted_benefit"], "weak": ["injury_delay"], "any": True,
+                                "label": "caused undue injury (ACTUAL damage) OR gave an unwarranted benefit/advantage"},
         },
         "prescription": "20 years from commission (R.A. 3019 Sec. 11 as amended by R.A. 10910, 2016; "
                         "15 years for acts before 16-Jul-2016) — NEEDS-COUNSEL-VERIFICATION",
@@ -94,7 +94,7 @@ VIOLATIONS = {
         "elements": {
             "public_officer":  {"needs": ["official_capacity"], "label": "respondent is a public officer"},
             "due_demand":      {"needs": ["due_demand", "records_refusal"], "any": True, "label": "a matter pending after due demand"},
-            "unjustified_refusal": {"needs": ["records_refusal", "delay_past_charter", "false_denial"], "any": True,
+            "unjustified_refusal": {"needs": ["records_refusal", "false_denial"], "weak": ["delay_past_charter", "injury_delay"], "any": True,
                                 "label": "refused/neglected to act without sufficient justification"},
             "purpose":         {"needs": ["discrimination", "unwarranted_benefit"], "any": True,
                                 "label": "for the purpose of favoring/discriminating (or obtaining benefit)"},
@@ -133,8 +133,8 @@ VIOLATIONS = {
         "forum_default": "OMBUDSMAN",
         "elements": {
             "public_officer":  {"needs": ["official_capacity"], "label": "respondent is a public officer"},
-            "flagrant_breach": {"needs": ["conflict_of_interest", "additional_requirement", "records_refusal", "false_denial"], "any": True,
-                                "label": "a flagrant/corrupt breach (conflict of interest, unlawful requirement, sustained refusal)"},
+            "flagrant_breach": {"needs": ["conflict_of_interest", "additional_requirement", "false_denial"], "weak": ["records_refusal"], "any": True,
+                                "label": "a flagrant/corrupt breach (conflict of interest or unlawful requirement — a bare refusal is only 'thin')"},
         },
         "prescription": "administrative — grave misconduct does not prescribe (settled) "
                         "— NEEDS-COUNSEL-VERIFICATION",
@@ -157,11 +157,12 @@ SIGNAL_PATTERNS = {
     "public_spend":        r"\b(public funds?|₱[\d,]+|appropriat\w+|disbursed|spent .*(?:funds|budget)|"
                            r"P[\d,]{4,}|expenditure|contract)\b",
     "knowledge_admission": r"\b(admit\w+|acknowledg\w+|aware|knew|admission|minutes .*present)\b",
-    # In a records-refusal graft case the "undue injury" is the deprivation of records the heirs are
-    # entitled to + the quantified delay (undue delay / obstruction over N months). NB: under Llorente
-    # v. Sandiganbayan, Sec. 3(e) undue injury wants ACTUAL, quantified damage — these facts are the
-    # FLOOR; counsel must quantify. §3(f) (refusal, no damage-quantum) + grave misconduct are sturdier.
-    "undue_injury":        r"\b(injur\w+|damage|deprived|deprivation|prevented|prejudic\w+|loss to the heirs?|"
+    # Sec. 3(e) undue injury is TIERED for discernment (Llorente v. Sandiganbayan wants ACTUAL,
+    # quantified damage). injury_actual = money out of pocket / a receipt for an unrendered service
+    # (satisfies the element); injury_delay = mere delay/deprivation/obstruction (the FLOOR → 'thin').
+    "injury_actual":       r"\b(official receipt|OR No\.?\s*\d|research fee|paid[^.]{0,30}(?:fee|₱|PHP|under protest)|"
+                           r"remittance|out.of.pocket|₱[\d,]{2,}|PHP[\s]*[\d,]{2,})\b",
+    "injury_delay":        r"\b(injur\w+|damage|deprived|deprivation|prevented|prejudic\w+|loss to the heirs?|"
                            r"undue delay|obstruct\w+|failure to render service|"
                            r"over (?:eight|nine|ten|eleven|twelve|\d+) months?)\b",
     "unwarranted_benefit": r"\b(unwarranted (?:benefit|advantage)|favor\w+|preference|benefit to)\b",
@@ -232,12 +233,53 @@ def _fetch_facts(cur):
     return cur.fetchall()
 
 
+def _fetch_docmap(cur):
+    """source_id (as text) -> document filename, for identity-bearing evidence handles."""
+    if not _table_exists(cur, "documents"):
+        return {}
+    cur.execute("SELECT id::text, COALESCE(original_filename,'') FROM documents")
+    return {r[0]: r[1] for r in cur.fetchall()}
+
+
+def _fetch_fact_texts(cur, fact_ids):
+    """id -> statement, for the discernment pass to READ the actual evidence."""
+    if not fact_ids:
+        return {}
+    cur.execute("SELECT id, COALESCE(statement,'') FROM matter_facts WHERE id = ANY(%s)",
+                (list(fact_ids),))
+    return {r[0]: r[1] for r in cur.fetchall()}
+
+
 def _ensure_table(cur):
     if _table_exists(cur, "ombudsman_candidates"):
         return
     print("[hunter] ombudsman_candidates table missing — run migrations/deploy_NN_ombudsman_hunter.sql "
           "on the VPS first (executor step). Aborting write.", file=sys.stderr)
     sys.exit(2)
+
+
+# ── Discernment reasoner (local Ollama — sovereign, $0) ──────────────────────
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+VERIFY_MODEL = os.environ.get("LANDTEK_OMBUDS_MODEL", "qwen2.5:14b-instruct")
+
+
+def _ollama(prompt):
+    import urllib.request
+    body = {"model": VERIFY_MODEL, "prompt": prompt, "stream": False,
+            "format": "json", "options": {"temperature": 0.0, "num_ctx": 8192}}
+    req = urllib.request.Request(OLLAMA_URL + "/api/generate", data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=180) as r:
+        return json.loads(r.read().decode()).get("response", "").strip()
+
+
+def _fact_ids_from_handles(handles):
+    ids = []
+    for h in handles or []:
+        m = re.search(r"fact:(\d+)", h)
+        if m:
+            ids.append(int(m.group(1)))
+    return ids
 
 
 # ── Stages ───────────────────────────────────────────────────────────────────
@@ -265,8 +307,10 @@ def _scan_signals(text):
     return hits
 
 
-def cull_and_profile(facts):
-    """official -> {matters:set, incidents:[(fact_id, doc_handle, signals, matter)]}"""
+def cull_and_profile(facts, docmap=None):
+    """official -> {matters:set, incidents:[(fact_id, doc_handle, signals, matter)]}. Handles carry
+    the document's IDENTITY (filename) so downstream never mislabels a pleading as a receipt."""
+    docmap = docmap or {}
     profiles = {}
     tokens_by_official = {}
     for official, office, capacity, match_tokens, note in ROSTER:
@@ -281,29 +325,36 @@ def cull_and_profile(facts):
                 sigs = _scan_signals(stmt)
                 if not sigs:
                     continue
-                handle = f"fact:{fid}" + (f"|doc:{src}" if src else "")
+                if src:
+                    dname = docmap.get(str(src), "")
+                    handle = f"fact:{fid}|doc:{src}" + (f" ({dname[:48]})" if dname else "")
+                else:
+                    handle = f"fact:{fid}"
                 profiles[official]["matters"].add(matter)
                 profiles[official]["incidents"].append((fid, handle, sigs, matter))
     return profiles
 
 
 def _element_gate(vtemplate, present_signals):
-    """Return (elements_report, strength) for one violation template against the present signals."""
+    """Return (elements_report, strength). A 'weak' signal only yields 'thin' — it never proves an
+    element (evidence-quality tiering, so keyword presence ≠ element proof)."""
     report = {}
     proven = 0
     for ekey, espec in vtemplate["elements"].items():
         needs = espec["needs"]
+        weak = espec.get("weak", [])
         any_mode = espec.get("any", False)
         got = [s for s in needs if s in present_signals]
+        got_weak = [s for s in weak if s in present_signals]
         if (any_mode and got) or (not any_mode and len(got) == len(needs)):
             state = "have"
             proven += 1
-        elif got:
+        elif got or got_weak:
             state = "thin"
         else:
             state = "missing"
         report[ekey] = {"state": state, "label": espec["label"],
-                        "handle": sorted({present_signals[s] for s in got if s in present_signals})}
+                        "handle": sorted({present_signals[s] for s in (got + got_weak) if s in present_signals})}
     strength = round(proven / max(1, len(vtemplate["elements"])), 3)
     return report, strength
 
@@ -336,25 +387,31 @@ def build_candidates(profiles):
             if strength == 0:
                 continue  # no element even thinly supported — not a lead
             forum = _route_forum(prof["capacity"], vtmpl)
-            # ripeness: every element 'have' AND official identified (capacity known)
             all_have = all(e["state"] == "have" for e in report.values())
             identified = prof["capacity"] in ("elective", "appointive", "career")
-            if all_have and identified:
-                status = "held_for_filing"   # ripe ceiling; filing is a human decision
-            elif strength >= 0.5:
-                status = "ripe" if all_have else "building"
+            n_facts = len({fid for fid, _h, _s, _m in prof["incidents"]})
+            # DISCERNMENT RULE: the deterministic keyword scan caps at 'ripe' — keyword presence
+            # alone can NOT declare a case ready. Only the evidence-reading pass (--verify), which
+            # actually reads each cited fact, promotes 'ripe' -> 'held_for_filing'. A single fact is
+            # never 'ripe' (needs >=2 distinct grounding facts).
+            if all_have and identified and n_facts >= 2:
+                status = "ripe"
+            elif (all_have or strength >= 0.5) and identified:
+                status = "building"
             else:
                 status = "seed"
             gaps = [f"pin element '{report[e]['label']}'" for e in report if report[e]["state"] != "have"]
+            if status == "ripe":
+                gaps.append("run --verify: an evidence-read must confirm each element before this is filing-ready")
             if not identified:
                 gaps.append("confirm respondent identity + term/appointment of record (elective vs appointive)")
-            # leverage: strategy_engine names the Ombudsman lever at the top of the north-star
             leverage = 5 if prof["capacity"] == "elective" else 4
             forum_fit = 1.0 if forum == "OMBUDSMAN" else 0.7
             score = round(strength * leverage * forum_fit, 3)
             signals_handles = {s: [h] for s, h in agg.items()}
-            rationale = (f"{status.upper()}: {int(strength*100)}% of {vtmpl['statute']} elements supported "
-                         f"across {len(prof['matters'])} matter(s); forum {forum}.")
+            rationale = (f"{status.upper()} (keyword-scan, UNVERIFIED): {int(strength*100)}% of "
+                         f"{vtmpl['statute']} elements keyword-supported across {n_facts} fact(s), "
+                         f"{len(prof['matters'])} matter(s); forum {forum}. Needs --verify.")
             cands.append({
                 "official": official, "office": prof["office"], "capacity": prof["capacity"],
                 "matters": sorted(prof["matters"]), "violation_code": vcode,
@@ -394,13 +451,87 @@ def cmd_scan():
         if not facts:
             print("[hunter] no matter_facts found — nothing to scan (is PG_DSN pointed at the live DB?)")
             return
-        profiles = cull_and_profile(facts)
+        docmap = _fetch_docmap(cur)
+        profiles = cull_and_profile(facts, docmap)
         cands = build_candidates(profiles)
         upsert(cur, cands)
-        ripe = sum(1 for c in cands if c["status"] in ("ripe", "held_for_filing"))
+        ripe = sum(1 for c in cands if c["status"] == "ripe")
         print(f"[hunter] scanned {len(facts)} facts -> {len(cands)} candidate lead(s) "
               f"across {sum(1 for p in profiles.values() if p['incidents'])} official(s); "
-              f"{ripe} at ripe/held-for-filing. Filing is human-gated — none auto-advanced.")
+              f"{ripe} at 'ripe' (keyword-scan, UNVERIFIED). None are filing-ready until --verify "
+              f"reads the evidence; filing stays human-gated.")
+
+
+def cmd_verify(target):
+    """DISCERNMENT PASS — actually READ each cited fact and judge whether it establishes the element
+    (not just contains a keyword). Downgrades keyword-coincidence matches; only an evidence-read
+    confirmation promotes a candidate to 'held_for_filing'. Local Ollama, $0.  target: id | 'ripe'."""
+    with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+        if not _table_exists(cur, "ombudsman_candidates"):
+            print("No candidates. Run --scan first.")
+            return
+        if str(target).isdigit():
+            cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s", (int(target),))
+        else:
+            cur.execute("SELECT * FROM ombudsman_candidates WHERE status='ripe' ORDER BY score DESC")
+        rows = cur.fetchall()
+        if not rows:
+            print("Nothing to verify (no matching 'ripe' candidate). Run --board to see statuses.")
+            return
+        for r in rows:
+            elements = dict(r["elements"])
+            all_fids = {f for ev in elements.values() for f in _fact_ids_from_handles(ev.get("handle"))}
+            texts = _fetch_fact_texts(cur, all_fids)
+            print(f"\n[verify] #{r['id']} {r['official']} — {r['statute']}")
+            proven = 0
+            notes = []
+            for ekey, ev in elements.items():
+                if ev["state"] == "missing":
+                    continue
+                fids = _fact_ids_from_handles(ev.get("handle"))
+                excerpts = "\n".join(f"- (fact {i}) {texts.get(i,'')[:300]}" for i in fids) or "(no excerpt)"
+                prompt = (
+                    "You are a strict Philippine anti-graft evidence auditor. Judge ONLY whether the "
+                    "evidence below ESTABLISHES the specific element as to the named respondent. Be "
+                    "skeptical: a fact that merely mentions the office/town, or is about someone else, "
+                    "does NOT establish it.\n\n"
+                    f"STATUTE: {r['statute']}\n"
+                    f"ELEMENT TO PROVE: {ev['label']}\n"
+                    f"RESPONDENT: {r['official']} ({r['office']})\n"
+                    f"EVIDENCE:\n{excerpts}\n\n"
+                    'Reply STRICT JSON: {"verdict":"have|thin|no","why":"<=15 words"}. '
+                    '"have"=evidence directly establishes it; "thin"=related but incomplete; "no"=does not.')
+                try:
+                    v = json.loads(_ollama(prompt))
+                    verdict = v.get("verdict", "thin").lower()
+                    why = str(v.get("why", ""))[:90]
+                except Exception as e:  # noqa
+                    verdict, why = "thin", f"verifier-error: {e}"
+                if verdict not in ("have", "thin", "no"):
+                    verdict = "thin"
+                new_state = {"have": "have", "thin": "thin", "no": "missing"}[verdict]
+                ev["state"] = new_state
+                ev["verify"] = {"verdict": verdict, "why": why}
+                if new_state == "have":
+                    proven += 1
+                notes.append(f"{ekey}:{verdict} ({why})")
+                print(f"    [{new_state:<7}] {ekey} — {why}")
+            total = len(elements)
+            strength = round(proven / max(1, total), 3)
+            all_have = all(ev["state"] == "have" for ev in elements.values())
+            identified = r["capacity"] in ("elective", "appointive", "career")
+            status = "held_for_filing" if (all_have and identified) else ("building" if strength >= 0.5 else "seed")
+            forum_fit = 1.0 if r["forum"] == "OMBUDSMAN" else 0.7
+            score = round(strength * (r["leverage"] or 3) * forum_fit, 3)
+            gaps = [f"pin element '{ev['label']}'" for ev in elements.values() if ev["state"] != "have"]
+            rationale = (f"{status.upper()} (VERIFIED by evidence-read): {int(strength*100)}% of "
+                         f"{r['statute']} elements established. " + " · ".join(notes))
+            cur.execute("""UPDATE ombudsman_candidates
+                           SET elements=%s, status=%s, strength=%s, score=%s, gaps=%s, rationale=%s,
+                               provenance='operator', updated_at=now() WHERE id=%s""",
+                        (json.dumps(elements), status, strength, score, json.dumps(gaps), rationale, r["id"]))
+            print(f"  => {status.upper()}  (strength {int(strength*100)}%, score {score})")
+        print("\n[verify] done. Filing remains human-gated — 'held_for_filing' is the ceiling.")
 
 
 def cmd_board():
@@ -413,13 +544,17 @@ def cmd_board():
         if not rows:
             print("No candidates yet. Run --scan.")
             return
-        print("OMBUDSMAN HUNTER — ranked leads (filing is held; these are LEADS, not verified facts)\n")
+        print("OMBUDSMAN HUNTER — ranked leads (filing is held; these are LEADS, not verified facts)")
+        print("  RIPE = keyword-scan only, UNVERIFIED.  READY = evidence-read confirmed (--verify).\n")
         for r in rows:
+            vtag = "✓verified" if r["provenance"] == "operator" else "unverified"
             flag = {"held_for_filing": "READY (hold)", "ripe": "RIPE", "building": "building",
                     "seed": "seed"}.get(r["status"], r["status"])
-            print(f"  #{r['id']:>3}  [{flag:<12}] score {r['score']:<5}  {r['official']} — {r['statute']}")
+            print(f"  #{r['id']:>3}  [{flag:<12}] {vtag:<10} score {r['score']:<5}  {r['official']} — {r['statute']}")
             print(f"        {r['rationale']}")
-        print("\nNext: --candidate N for the element/evidence map; --playbook N to draft (still not filed).")
+        n_ripe = sum(1 for r in rows if r["status"] == "ripe")
+        print(f"\n{n_ripe} 'ripe' lead(s) await evidence-read. Next: --verify ripe (reads the facts, "
+              "promotes only what survives); --candidate N; --playbook N (draft; still not filed).")
 
 
 def cmd_candidate(cid):
@@ -435,9 +570,13 @@ def cmd_candidate(cid):
         print(f"  Forum      : {r['forum']}")
         print(f"  Matters    : {', '.join(r['matters'])}")
         print(f"  Prescript. : {r['prescription']}")
+        vtag = "VERIFIED by evidence-read" if r["provenance"] == "operator" else "keyword-scan only (run --verify)"
+        print(f"  Grounding  : {vtag}")
         print("\n  Element gate (each 'have' points to an evidence handle):")
         for ek, ev in r["elements"].items():
             print(f"    [{ev['state']:<7}] {ev['label']}")
+            if ev.get("verify"):
+                print(f"              verdict: {ev['verify'].get('verdict')} — {ev['verify'].get('why')}")
             if ev.get("handle"):
                 print(f"              handles: {', '.join(ev['handle'])}")
         if r["gaps"]:
@@ -543,6 +682,8 @@ def main():
     ap.add_argument("--board", action="store_true", help="phone-friendly ranked leads")
     ap.add_argument("--candidate", type=int, metavar="ID", help="one lead: elements + evidence handles + gaps")
     ap.add_argument("--playbook", type=int, metavar="ID", help="emit a case_synthesizer playbook for a ripe lead")
+    ap.add_argument("--verify", metavar="ID|ripe", help="DISCERNMENT PASS: read each cited fact + judge grounding "
+                    "(local LLM $0); promotes only what survives to held_for_filing. 'ripe' verifies all ripe leads")
     ap.add_argument("--law-check", action="store_true", help="is the RA 3019/6713/6770 law library embedded?")
     ap.add_argument("--doctrine", action="store_true", help="print templates + roster (dry, no DB)")
     a = ap.parse_args()
@@ -557,6 +698,8 @@ def main():
         cmd_candidate(a.candidate)
     elif a.playbook is not None:
         cmd_playbook(a.playbook)
+    elif a.verify is not None:
+        cmd_verify(a.verify)
     elif a.law_check:
         cmd_law_check()
     else:
