@@ -1,0 +1,8 @@
+[
+  {"gr":"G.R. No. 203880","date":"August 10, 2016","title":"Echanes v. Spouses Hailar","holding":"Ejectment (forcible entry/unlawful detainer) determines possession de facto only; the court decides who has the better right to physical possession.","forum":"CIVIL","links":[
+    {"matter":"MWK-CV26360","element_code":"ejectment_possession_de_facto","relevance":"The summary case resolves physical possession, not title; ownership is only incidental.","note":"Bounds what the MTC decides on Aug 12."}]},
+  {"gr":"G.R. No. L-27402","date":"July 25, 1981","title":"Guardianship of Incompetent Leonora Navarro v. San Agustin","holding":"A sale of a ward's real property by a judicial guardian without prior authority from the guardianship court is void and cannot be validated by subsequent approval from another court or by agreement among heirs.","forum":"CIVIL","links":[
+    {"matter":"MWK-GUARDIANSHIP","element_code":"guardian_sale_void","relevance":"A guardian's sale without prior guardianship-court authority is void and unratifiable.","note":"Void-and-unratifiable rule; exclusive authority in the guardianship court."}]},
+  {"gr":"G.R. No. 256343","date":"April 2, 2025","title":"Ocampo v. Batara-Sapad","holding":"Guardians, whether in fact or in law, have no power to dispose of or encumber their wards' properties without a court order.","forum":"CIVIL","links":[
+    {"matter":"MWK-GUARDIANSHIP","element_code":"guardian_no_disposal_without_court","relevance":"No disposition/encumbrance of a ward's property without prior guardianship-court approval.","note":"Core guardianship-authority limit (2025)."}]}
+]
