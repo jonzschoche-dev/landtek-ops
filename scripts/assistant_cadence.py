@@ -18,17 +18,26 @@ Modes:
 Design: docs/scheduling_assistant_design.md
 """
 import argparse
+import json
 import sys
 from datetime import datetime, timedelta, timezone
 
 # reuse the agenda spine — one source of truth, no duplicate gather logic
 from calendar_sync import (
-    db, table_exists, columns_of, load_matters_index,
+    db, table_exists, columns_of, load_matters_index, load_env,
     gather_from_matters, gather_from_events, gather_from_case_actions,
 )
 
 JONATHAN_CHAT_ID = "6513067717"
+JONATHAN_EMAIL = "jonathan@hayuma.org"  # self-only; never an external address
 TZ = "Asia/Manila"
+OAUTH_CLIENT_PATH = "/root/landtek/gmail_oauth_client.json"
+
+SUBJECTS = {
+    "morning_brief": "LandTek — your week ahead",
+    "day_before": "LandTek — tomorrow's agenda",
+    "on_demand": "LandTek — what's coming",
+}
 
 
 def manila_today():
@@ -143,29 +152,65 @@ MODES = {
 }
 
 
-def run_mode(cur, mode_key, items, today, chat_id, dry):
+def email_send(subject, body_text, to=JONATHAN_EMAIL):
+    """Send a plain-text brief via the (send-scoped) Gmail token. Self-only.
+    Degrades gracefully: returns (False, reason) if the token can't send."""
+    try:
+        import base64
+        from email.mime.text import MIMEText
+        from googleapiclient.discovery import build
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+        env = load_env()
+        rt = env.get("GMAIL_REFRESH_TOKEN")
+        if not rt:
+            return False, "no GMAIL_REFRESH_TOKEN"
+        with open(OAUTH_CLIENT_PATH) as f:
+            conf = json.load(f)
+        c = conf.get("web") or conf.get("installed")
+        cr = Credentials(token=None, refresh_token=rt,
+                         token_uri="https://oauth2.googleapis.com/token",
+                         client_id=c["client_id"], client_secret=c["client_secret"])
+        cr.refresh(Request())
+        svc = build("gmail", "v1", credentials=cr, cache_discovery=False)
+        msg = MIMEText(body_text, "plain")
+        msg["To"], msg["From"], msg["Subject"] = to, to, subject
+        raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+        r = svc.users().messages().send(userId="me", body={"raw": raw}).execute()
+        return True, r.get("id")
+    except Exception as e:  # noqa: BLE001 — degrade, don't crash a timer
+        return False, f"gmail send failed: {e}"
+
+
+def run_mode(cur, mode_key, items, today, dry, channel="telegram", chat_id=JONATHAN_CHAT_ID):
     kind, composer = MODES[mode_key]
     text = composer(items, today)
     if not text:
-        print(f"[{mode_key}] nothing to say — staying quiet.")
+        print(f"[{mode_key}/{channel}] nothing to say — staying quiet.")
         return
+    # channel-aware dedup so telegram + email of the same brief don't block each other
+    dkey = kind if channel == "telegram" else f"{kind}:{channel}"
+    dest = chat_id if channel == "telegram" else JONATHAN_EMAIL
     if dry:
-        print(f"[{mode_key}] WOULD SEND → {chat_id}:\n  {text}")
+        print(f"[{mode_key}/{channel}] WOULD SEND → {dest}:\n  {text}")
         return
     on_demand = mode_key == "now"  # on-demand: no once-a-day dedup
-    if not on_demand and already_sent(cur, kind, today):
-        print(f"[{mode_key}] already sent for {today} — skip (dedup).")
+    if not on_demand and already_sent(cur, dkey, today):
+        print(f"[{mode_key}/{channel}] already sent for {today} — skip (dedup).")
         return
-    from tg_send import send
-    ok, info = send(chat_id=chat_id, text=text, source="assistant_cadence",
-                    recipient_name="Jonathan")
+    if channel == "email":
+        ok, info = email_send(SUBJECTS.get(kind, "LandTek — calendar"), text)
+    else:
+        from tg_send import send
+        ok, info = send(chat_id=chat_id, text=text, source="assistant_cadence",
+                        recipient_name="Jonathan")
     if ok:
         if not on_demand:
-            mark_sent(cur, kind, today, text)
-        print(f"[{mode_key}] sent.")
+            mark_sent(cur, dkey, today, text)
+        print(f"[{mode_key}/{channel}] sent{'' if channel=='telegram' else ' (id '+str(info)+')'}.")
     else:
-        # S14 gate (e.g. awaiting-reply / rate limit) — expected, not a failure.
-        print(f"[{mode_key}] not sent ({info}). Will retry next run.")
+        # tg S14 gate / gmail hiccup — expected-ish, not a crash. Retry next run.
+        print(f"[{mode_key}/{channel}] not sent ({info}). Will retry next run.")
 
 
 def main():
@@ -173,9 +218,11 @@ def main():
     ap.add_argument("--morning", action="store_true", help="send week-ahead brief")
     ap.add_argument("--evening", action="store_true", help="send day-before nudge")
     ap.add_argument("--now", action="store_true", help="on-demand 'what's coming' (no dedup)")
+    ap.add_argument("--email", action="store_true", help="deliver via email to Jonathan (self only)")
     ap.add_argument("--dry", action="store_true", help="preview only, send nothing")
-    ap.add_argument("--to", default=JONATHAN_CHAT_ID, help="recipient chat_id")
+    ap.add_argument("--to", default=JONATHAN_CHAT_ID, help="telegram recipient chat_id")
     args = ap.parse_args()
+    channel = "email" if args.email else "telegram"
 
     conn = db()
     cur = conn.cursor()
@@ -192,7 +239,7 @@ def main():
         modes = ["morning", "evening"]
 
     for m in modes:
-        run_mode(cur, m, items, today, args.to, dry)
+        run_mode(cur, m, items, today, dry, channel=channel, chat_id=args.to)
     conn.commit()
     conn.close()
 
