@@ -196,15 +196,15 @@ SEED_ROSTER = [
     ("Sangguniang Bayan (Mercedes)", "Sangguniang Bayan, Mercedes",               "elective",
      ["Sangguniang", "Kagawad", "Councilor"],
      "playbook ombudsman_1891 — members present/participating at the CART, did not inhibit"),
-    ("Municipal Assessor",           "Office of the Municipal Assessor, Mercedes", "appointive",
-     ["Assessor"],
+    ("Gemma P. Abla — Mun. Assessor", "Office of the Municipal Assessor, Mercedes", "appointive",
+     ["Abla", "Gemma Abla"],
      "records-refusal track (27-May-2025 request) — CSC parallel track"),
-    ("Municipal Treasurer",          "Office of the Municipal Treasurer, Mercedes","appointive",
-     ["Treasurer"],
+    ("Loida E. Macale — Mun. Treasurer", "Office of the Municipal Treasurer, Mercedes", "appointive",
+     ["Macale"],
      "records-refusal track (28-May-2025 request) — CSC parallel track"),
-    ("Municipal Engineer",           "Office of the Municipal Engineer, Mercedes", "appointive",
-     ["Municipal Engineer", "Engr"],   # NB: fact 6469 names 'Engr. Balane' as Mun. Engineer — do NOT conflate with Gloria Balane (CV-26360)
-     "cross-department refusal — CSC parallel track"),
+    ("Erwin H. Balane — Mun. Engineer", "Office of the Municipal Engineer, Mercedes", "appointive",
+     ["Erwin Balane", "Engr. Balane", "Engr Balane"],   # NAMED respondent — do NOT conflate with Gloria Balane (CV-26360)
+     "cross-department refusal + defendant in CV-26360 (personal-conflict bad-faith booster)"),
     ("PENRO Fortuno",                "PENRO, Camarines Norte (DENR)",              "career",
      ["Fortuno", "PENRO"],
      "ARTA-1319 respondent; Joint Response 18-Feb-2026 — false-denial angle"),
@@ -290,21 +290,17 @@ def discover_officers(cur):
 
 
 def build_roster(cur):
-    """LIVE roster = corpus-discovered officers ∪ curated seed overlay (deduped). Generic office
-    seeds are dropped once a NAMED officer covers that office."""
+    """LIVE roster = corpus-discovered officers ∪ curated seed overlay. A seed is kept UNLESS a
+    discovered officer already shares one of its distinctive tokens (same person) — so named seed
+    respondents (Abla/Macale/Balane/Pajarillo) are never dropped just because a DIFFERENT officer
+    shares their office word."""
     discovered = discover_officers(cur)
     disc_tokens = {t.lower() for _n, _o, _c, toks, _no, _s in discovered for t in toks}
-    disc_offices = " ".join((n + " " + o).lower() for n, o, _c, _t, _no, _s in discovered)
     roster = [(n, o, c, t, no, "discovered") for (n, o, c, t, no, _s) in discovered]
     for name, office, cap, toks, note in SEED_ROSTER:
-        # drop a generic office seed if a named officer already covers that office
-        if name in ("Municipal Assessor", "Municipal Treasurer", "Municipal Engineer"):
-            offword = name.split()[-1].lower()
-            if offword in disc_offices:
-                continue
-        # skip an exact seed already present by token (avoid duplicates); else keep the seed overlay
-        if any(t.lower() in disc_tokens for t in toks) and name not in (
-                "Mayor Alexander Pajarillo",):  # always keep the flagship's curated provenance
+        # skip a seed only if the SAME person was already discovered (shared distinctive token);
+        # always keep the flagship's curated provenance
+        if any(t.lower() in disc_tokens for t in toks) and name != "Mayor Alexander Pajarillo":
             continue
         roster.append((name, office, cap, toks, note, "seed"))
     return roster
