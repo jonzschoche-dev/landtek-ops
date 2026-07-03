@@ -74,6 +74,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("health", "/health", "Health"),
         ("trajectory", "/trajectory", "Trajectory"),
         ("awareness", "/awareness", "Awareness"),
+        ("dependability", "/dependability", "Dependability"),
         ("parcels", "/parcels", "Parcels"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
@@ -2456,3 +2457,99 @@ def awareness():
   <table><tr><th>Matter</th><th>Verified</th><th>Inferred</th></tr>{cov}</table></div>
 """
     return _layout("Awareness", body, active="awareness")
+
+
+@bp.route("/dependability")
+def dependability():
+    """The DEPENDABILITY gate — per-proof-client score (0-100), ship verdict, and the ranked gap
+    list, read from the latest client_dependability run (scripts/client_dependability.py --write).
+
+    This is the internal gate that decides whether a client should be handed their link. It is
+    HONEST by construction: it renders whatever the harness measured, however low — a green here
+    means the harness found zero correctness failures AND score >= threshold, nothing softer.
+    If no run exists yet, it says so plainly rather than implying dependability."""
+    conn = _db(); conn.autocommit = True
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    proof = ["MWK-001", "Paracale-001"]
+    blocks = []
+    top_cards = ""
+    ran_any = False
+    for cc in proof:
+        row = _safe_fetch(cur, conn, """
+            SELECT client_code, score, ship, sub_correct, sub_complete, sub_stable,
+                   n_fail, n_warn, detail, run_at
+              FROM client_dependability WHERE client_code=%s
+             ORDER BY run_at DESC LIMIT 1
+        """, (cc,), default=None, one=True)
+        if not row:
+            blocks.append(f'<div class="card"><h2>{_esc(cc)}</h2>'
+                          f'<p class="empty">No dependability run yet — run '
+                          f'<code>python3 scripts/client_dependability.py --write</code>.</p></div>')
+            continue
+        ran_any = True
+        detail = row["detail"] or {}
+        if isinstance(detail, str):
+            try:
+                detail = json.loads(detail)
+            except Exception:
+                detail = {}
+        score = row["score"] or 0
+        ship = row["ship"]
+        thresh = detail.get("ship_threshold", 90)
+        verdict_badge = ('<span class="badge badge-ok">READY TO SHIP</span>' if ship
+                         else '<span class="badge badge-bad">NOT HANDOFF-READY</span>')
+        score_cls = "ok" if ship else ("warn" if score >= 60 else "bad")
+        top_cards += (f'<div class="card"><h2>{_esc(cc)}</h2>'
+                      f'<div class="stat {score_cls}">{score:.0f}<span style="font-size:14px">/100</span></div>'
+                      f'<div class="stat-sub">{verdict_badge} · {row["n_fail"]} fail · {row["n_warn"]} warn</div></div>')
+
+        comp = detail.get("complete", {}) or {}
+        stab = detail.get("stable", {}) or {}
+        sub_rows = (
+            f"<tr><th>Correct</th><td>{row['sub_correct']:.0f}</td>"
+            f"<td>{row['n_fail']} fabricated/leak fails · {row['n_warn']} warns</td></tr>"
+            f"<tr><th>Complete</th><td>{row['sub_complete']:.0f}</td>"
+            f"<td>action-dated {comp.get('action_dated','?')}/{comp.get('action_matters','?')} · "
+            f"docs {comp.get('docs_readable','?')}/{comp.get('docs_total','?')} readable · "
+            f"verified {comp.get('facts_verified','?')}/{comp.get('facts','?')}</td></tr>"
+            f"<tr><th>Stable</th><td>{row['sub_stable']:.0f}</td>"
+            f"<td>portal {'ok' if stab.get('reach_ok') else 'BROKEN'} · "
+            f"matters {stab.get('matters_rendered_ok','?')}/{stab.get('matters_total','?')} render · "
+            f"fresh {stab.get('freshness_days','?')}d · "
+            f"daemon {'ok' if stab.get('daemon_ok') else 'OFF'} · "
+            f"failed units {stab.get('systemctl_failed','?')}</td></tr>"
+        )
+        gap_rows = ""
+        for g in (detail.get("gaps") or [])[:20]:
+            cls = "bad" if "/FAIL]" in g else ("warn" if "/WARN]" in g else "muted")
+            gap_rows += f"<tr><td class='{cls}'>{_esc(g)}</td></tr>"
+        if not gap_rows:
+            gap_rows = "<tr><td class='ok'>No open gaps.</td></tr>"
+        blocks.append(
+            f'<div class="card" style="margin-bottom:16px">'
+            f'<h2>{_esc(cc)} — {verdict_badge}</h2>'
+            f'<p class="muted" style="font-size:12px">score {score:.1f}/100 (ship at &ge; {thresh} '
+            f'& zero correctness fails) · measured {_esc(str(row["run_at"])[:16])} '
+            f'· deadline surface {_esc(detail.get("as_of","?"))}</p>'
+            f'<table>{sub_rows}</table>'
+            f'<div class="section-title" style="margin-top:12px">Ranked gap list '
+            f'<span class="muted">(fix top-down)</span></div>'
+            f'<table>{gap_rows}</table></div>'
+        )
+    conn.close()
+    intro = ('This gate decides whether a proof client can be handed their link. It is honest by '
+             'construction — a green verdict requires ZERO correctness failures and score &ge; the '
+             'threshold; anything softer stays red.')
+    if not ran_any:
+        intro += ' <strong>No run recorded yet.</strong>'
+    body = f"""
+<h1>Dependability gate</h1>
+<p class="lead">{intro}</p>
+<div class="grid grid-2" style="margin-bottom:16px">{top_cards}</div>
+{''.join(blocks)}
+<p class="muted" style="margin-top:16px;font-size:12px">
+  Correct = per-fact grounding / no phantom date / no stale surface / no internal-fragment or
+  draft leak / client-matter separation, audited on the LIVE rendered client view. One correctness
+  failure tanks the score and blocks the gate. Refresh: <code>client_dependability.py --write</code>.</p>
+"""
+    return _layout("Dependability", body, active="dependability")

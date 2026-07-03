@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek dependability harness — measures the per-proof-client Dependability Score (Correct/Complete/Stable/Trustworthy) over the LIVE client-visible portal render, and persists it to client_dependability for the /ops/dependability gate. $0, deterministic, no LLM.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/client_dependability.py --write
+StandardOutput=append:/var/log/landtek_dependability.log
+StandardError=append:/var/log/landtek_dependability.log

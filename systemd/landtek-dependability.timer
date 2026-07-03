@@ -1,0 +1,10 @@
+[Unit]
+Description=Dependability harness — every 6h + 3min after boot (re-scores MWK-001 + Paracale-001 against the live client render; the ship gate stays current as data/daemons change)
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=6h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
