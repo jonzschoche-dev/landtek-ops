@@ -805,7 +805,9 @@ def cmd_verify(target):
                     continue
                 espec = vtmpl.get("elements", {}).get(ekey, {})
                 sigs = espec.get("needs", []) + espec.get("weak", [])
-                evidence = _gather_element_evidence(cur, tokens, sigs) if sigs else []
+                # intent elements need the FULL pattern, not 6 scattered snippets, to infer from
+                lim = 12 if ekey in INTENT_ELEMENTS else 6
+                evidence = _gather_element_evidence(cur, tokens, sigs, limit=lim) if sigs else []
                 ev["handle"] = [h for h, _sn in evidence]   # store the DEEP evidence handles
                 excerpts = "\n".join(f"- ({h}) {sn}" for h, sn in evidence) or "(no in-scope evidence found)"
                 if ekey in INTENT_ELEMENTS:
