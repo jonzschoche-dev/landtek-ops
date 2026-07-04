@@ -164,8 +164,24 @@ def _link_matters(cur, auth_id, links):
                     (lk["matter"], auth_id, lk.get("element_code", ""), lk.get("relevance", ""), lk.get("note", "")))
 
 
-def _process(cur, t, status_only):
+def _has_real_chunks(cur, citation):
+    cur.execute("SELECT count(*) FROM legal_chunks WHERE citation=%s AND text NOT ILIKE '%%TEXT PENDING%%'",
+                (citation,))
+    return cur.fetchone()[0] > 0
+
+
+def _process(cur, t, status_only, force=False):
     citation = _citation(t.get("gr", ""), t.get("date", ""))
+    # IDEMPOTENCY: if this case is already embedded, do NOT re-fetch lawphil or re-embed it (unless --force).
+    # Re-running a manifest is then network-free and cheap — the corpus is never needlessly re-downloaded.
+    # (Matter-links are still ensured below via ON CONFLICT DO NOTHING, so re-runs can add new links.)
+    if not status_only and not force and _has_real_chunks(cur, citation):
+        cur.execute("SELECT id FROM legal_authorities WHERE citation=%s AND authority_type='case' LIMIT 1", (citation,))
+        row = cur.fetchone()
+        if row:
+            _link_matters(cur, row[0], t.get("links"))  # cheap: idempotent link top-up, no fetch/embed
+        print(f"  = present  {citation}  (skip re-download; --force to re-embed)")
+        return True
     url, text_or_reason = _resolve_and_verify(t)
     if not url:
         print(f"  ✗ REJECT  {citation} — {text_or_reason}")
@@ -188,6 +204,7 @@ def main():
     ap.add_argument("--upgrade-existing", action="store_true",
                     help="fetch full verbatim text for cases already in legal_authorities (uses stored source_url)")
     ap.add_argument("--status", action="store_true", help="resolve+verify only; write nothing")
+    ap.add_argument("--force", action="store_true", help="re-fetch + re-embed even if already present (default: skip present)")
     a = ap.parse_args()
 
     c = la._conn(); cur = c.cursor(); la._ensure(cur)
@@ -207,7 +224,7 @@ def main():
         sys.exit("nothing to do — pass --file <manifest.json> and/or --upgrade-existing")
 
     print(f"=== jurisprudence ingest — {len(targets)} target(s){' [STATUS ONLY]' if a.status else ''} ===")
-    ok = sum(_process(cur, t, a.status) for t in targets)
+    ok = sum(_process(cur, t, a.status, a.force) for t in targets)
     print(f"\n=== {ok}/{len(targets)} verified{'' if a.status else ' and embedded'} ===")
 
 
