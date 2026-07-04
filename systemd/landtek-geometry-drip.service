@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek geometry drip — geometry_pipeline.py: re-OCR the next few geometry_priority docs with Gemini vision (Drive-fetch fallback, key×model ladder) to fix garbled technical descriptions, then strip_plot_info parses the clean metes-and-bounds into `parcels` shapes. Drains a few pages/day within the Gemini free tier; stops CLEANLY on QuotaExhausted (exit 0) and resumes after the daily reset. Never fabricates geometry.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/geometry_pipeline.py --max 6
+StandardOutput=append:/var/log/landtek_geometry_drip.log
+StandardError=append:/var/log/landtek_geometry_drip.log

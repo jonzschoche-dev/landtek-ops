@@ -1,0 +1,10 @@
+[Unit]
+Description=Drip the geometry_priority queue once daily (+8min after boot) — re-OCR a few pages within the Gemini free tier and parse them into parcel shapes, so the corpus's plot geometry gets recovered steadily without a paid quota.
+
+[Timer]
+OnBootSec=8min
+OnUnitActiveSec=24h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
