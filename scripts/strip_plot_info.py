@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""strip_plot_info.py — mine plottable geometry OUT of the corpus (titles + survey/
+plan text) into the `parcels` relative-shape store.
+
+"Strip the plot info from the maps/titles": a title's or survey plan's metes-and-bounds
+block (bearing + distance calls) fully determines the parcel's SHAPE and AREA. This
+sweeper finds every corpus doc that carries such calls, runs survey_geometry over them
+(pure Python, $0 — NO vision/API), computes polygon + area + closure error, cross-checks
+the area against the title's registered area, and persists to `parcels` — the RELATIVE
+(local-meter, un-georeferenced) shape layer. Absolute placement on the world map
+(`map_parcels`) is a later step that needs a tie point (see the BLLM tie-line report below).
+
+Quality gate — the honest part: corpus OCR garbles technical descriptions
+(`N. 40 deg. $5'E`, `deg`→`dog`, `E`→`B`). Garbled calls parse to a bad polygon with a
+large CLOSURE ERROR. We do not pretend those are good geometry — they're flagged
+`needs_reocr` and NOT written (unless --write-weak). Nothing is ever fabricated: if the
+calls don't parse to >=3 courses, the doc is reported and skipped, never guessed.
+
+Usage:
+  python3 strip_plot_info.py --matter MWK-001            # dry-run report, one matter
+  python3 strip_plot_info.py --matter MWK-001 --write    # persist good/weak parcels
+  python3 strip_plot_info.py --doc 13                     # single doc
+  python3 strip_plot_info.py --all                        # whole corpus (dry-run)
+
+Matter separation: scoped by case_file/matter_code. Each parcel row is per-title; this
+sweeper asserts NO chain relationships (T-30683 Manguisoc / T-4494 are their own parcels,
+never folded into the T-4497 family — that stays the title_chain's job).
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import sys
+
+import psycopg2
+import psycopg2.extras
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import survey_geometry as sg
+import parcels as P
+
+DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+
+# Loose candidate finder (the real parser is survey_geometry._CALL). Tolerant of OCR:
+# a bearing letter, degrees, deg/dog/°, a second letter, then a distance.
+_CAND = re.compile(r"[NSns][.\s]?\s*\d{1,3}\s*(?:deg|dog|°|d)\b", re.I)
+# "... containing an area of ... ( 8,706 ) square met..."  → stated sqm from text
+_AREA_TXT = re.compile(r"area\s+of\b[^()]{0,80}?\(?\s*([0-9][0-9,\.]{2,})\s*\)?\s*"
+                       r"(?:square|sq\.?)\s*met", re.I)
+# tie line to a control monument: "... 2952.29 m. from BLLM No. 1, Mp. of Mercedes"
+_TIE = re.compile(r"([0-9][0-9,\.]{2,})\s*m\.?\s*from\s+(BL[LB]M[^.;\n]{0,40})", re.I)
+
+CLOSURE_GOOD_M = 2.0     # <= this: trustworthy closure
+CLOSURE_WEAK_M = 8.0     # in (good, weak]: usable but shaky; > weak: needs re-OCR
+
+
+def _conn():
+    c = psycopg2.connect(DSN); c.autocommit = True; return c
+
+
+def _stated_ha(cur, doc_id, text):
+    """Best available registered area, in hectares. titles.area_sqm first (verified-ish),
+    then a text parse of 'containing an area of (N) square meters', then documents.area_sqm."""
+    cur.execute("SELECT area_sqm FROM titles WHERE source_doc_id=%s AND area_sqm IS NOT NULL "
+                "ORDER BY area_sqm DESC LIMIT 1", (doc_id,))
+    r = cur.fetchone()
+    if r and r[0]:
+        return float(r[0]) / 10000.0, "titles.area_sqm"
+    m = _AREA_TXT.search(text or "")
+    if m:
+        try:
+            return float(m.group(1).replace(",", "")) / 10000.0, "text:area-of"
+        except ValueError:
+            pass
+    cur.execute("SELECT area_sqm FROM documents WHERE id=%s", (doc_id,))
+    r = cur.fetchone()
+    if r and r[0]:
+        return float(r[0]) / 10000.0, "documents.area_sqm"
+    return None, None
+
+
+def _title_no(cur, doc_id, text, fname):
+    cur.execute("SELECT tct_number FROM titles WHERE source_doc_id=%s AND tct_number IS NOT NULL "
+                "LIMIT 1", (doc_id,))
+    r = cur.fetchone()
+    if r and r[0]:
+        return r[0]
+    m = re.search(r"T-?\s?0?7?9?-?\d{3,}", fname or "") or re.search(r"\bT-\s?\d{3,}", text or "")
+    return (m.group(0).replace(" ", "") if m else None)
+
+
+def _quality(a):
+    if not a.get("ok"):
+        return "reject"
+    ce = a.get("closure_error_m") or 0.0
+    if ce <= CLOSURE_GOOD_M:
+        return "good"
+    if ce <= CLOSURE_WEAK_M:
+        return "weak"
+    return "needs_reocr"
+
+
+def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=False):
+    conn = _conn(); cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    if doc_id:
+        cur.execute("SELECT id, case_file, matter_code, extracted_text, original_filename, "
+                    "document_title FROM documents WHERE id=%s", (doc_id,))
+    else:
+        q = ("SELECT id, case_file, matter_code, extracted_text, original_filename, "
+             "document_title FROM documents WHERE extracted_text ~* "
+             "'[NSns][.[:space:]]?[0-9]{1,3} ?(deg|dog|d)'")
+        args = []
+        if matter and not all_corpus:
+            q += " AND (case_file ILIKE %s OR matter_code ILIKE %s)"
+            args += [f"%{matter}%", f"%{matter}%"]
+        q += " ORDER BY id"
+        cur.execute(q, args)
+    docs = cur.fetchall()
+
+    rows, ties = [], []
+    tally = {"good": 0, "weak": 0, "needs_reocr": 0, "reject": 0}
+    for d in docs:
+        text = d["extracted_text"] or ""
+        if not _CAND.search(text):
+            continue
+        fname = d["original_filename"] or d["document_title"] or ""
+        title_no = _title_no(cur, d["id"], text, fname)
+        stated_ha, area_src = _stated_ha(cur, d["id"], text)
+        a = sg.cross_check(text, stated_ha) if stated_ha else sg.analyze(text)
+        q = _quality(a)
+        tally[q] += 1
+        tm = _TIE.search(text)
+        if tm:
+            ties.append((d["id"], title_no, tm.group(0).strip()))
+        rows.append(dict(doc=d["id"], matter=d["case_file"], title=title_no,
+                         calls=a.get("calls"), ok=a.get("ok"),
+                         area_ha=a.get("area_ha"), stated_ha=stated_ha, area_src=area_src,
+                         area_matches=a.get("area_matches"),
+                         closure_m=a.get("closure_error_m"), quality=q,
+                         reason=a.get("reason")))
+        if write and q in (("good", "weak") if write_weak else ("good",)):
+            # idempotent: this sweeper owns the row for this source_doc_id
+            cur.execute("DELETE FROM parcels WHERE source_doc_id=%s", (d["id"],))
+            P.upsert_parcel(d["case_file"] or matter, title_no, text, d["id"], stated_ha)
+
+    # ---- report ----
+    print(f"\n{'doc':>5} {'title':<16} {'calls':>5} {'area_ha':>9} {'stated':>8} "
+          f"{'clos_m':>7}  quality")
+    print("-" * 72)
+    for r in sorted(rows, key=lambda x: (x["quality"], -(x["calls"] or 0))):
+        ah = f"{r['area_ha']:.3f}" if r["area_ha"] else "—"
+        st = f"{r['stated_ha']:.3f}" if r["stated_ha"] else "—"
+        cm = f"{r['closure_m']:.1f}" if r["closure_m"] is not None else "—"
+        mark = "" if r["area_matches"] is None else ("✓" if r["area_matches"] else "✗area")
+        print(f"{r['doc']:>5} {str(r['title'] or '?'):<16} {str(r['calls'] or 0):>5} "
+              f"{ah:>9} {st:>8} {cm:>7}  {r['quality']} {mark}")
+
+    print(f"\nSummary: {len(rows)} docs with calls · "
+          f"good={tally['good']} weak={tally['weak']} "
+          f"needs_reocr={tally['needs_reocr']} reject={tally['reject']}")
+    if ties:
+        print(f"\nTIE LINES found ({len(ties)}) — georeferencing anchors for the map_parcels bridge:")
+        for did, tno, snip in ties:
+            print(f"  doc {did} ({tno or '?'}): …{snip}…")
+    if write:
+        wq = "good+weak" if write_weak else "good"
+        print(f"\nWROTE parcels for quality={wq}. needs_reocr/reject were NOT written "
+              f"(flag for vision re-OCR — never fabricated).")
+    else:
+        print("\n(dry-run — nothing written. add --write to persist good parcels, "
+              "--write --write-weak to include shaky ones.)")
+    cur.close(); conn.close()
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Strip plot geometry from corpus titles/plans")
+    ap.add_argument("--matter", help="case_file / matter code (e.g. MWK-001)")
+    ap.add_argument("--doc", type=int, help="single document id")
+    ap.add_argument("--all", action="store_true", help="sweep the whole corpus")
+    ap.add_argument("--write", action="store_true", help="persist good parcels")
+    ap.add_argument("--write-weak", action="store_true", help="also persist weak-closure parcels")
+    args = ap.parse_args()
+    if not (args.matter or args.doc or args.all):
+        ap.error("give --matter, --doc, or --all")
+    sweep(matter=args.matter, doc_id=args.doc, all_corpus=args.all,
+          write=args.write, write_weak=args.write_weak)
+
+
+if __name__ == "__main__":
+    main()
