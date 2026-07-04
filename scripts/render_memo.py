@@ -105,16 +105,24 @@ def render(md_path, out_path, footer_left=DEFAULT_FOOTER):
     # inline markup spanning wrapped source lines (bold/italic/links) resolves — real markdown behavior.
     block, kind = [], ["body"]   # kind: body | bullet | number | note
 
+    def _safe(markup, style, prefix=""):
+        # Crash-safe: malformed inline markup (e.g. interleaved **/*) must degrade to plain text,
+        # never abort the whole document. Fall back to markup-stripped, escaped text on parse error.
+        try:
+            return Paragraph(prefix + _inline(markup), style)
+        except Exception:  # noqa
+            return Paragraph(prefix + html.escape(re.sub(r"[*_`]", "", markup)), style)
+
     def flush_block():
         if not block:
             return
         text = " ".join(block); block.clear(); k = kind[0]; kind[0] = "body"
         if k == "bullet":
-            flow.append(Paragraph("&bull;&nbsp; " + _inline(text), bdy))
+            flow.append(_safe(text, bdy, "&bull;&nbsp; "))
         elif k == "note":
-            flow.append(Paragraph(_inline(text.strip("*")), note))
+            flow.append(_safe(text.strip("*"), note))
         else:  # body or number (numbered text keeps its "N. " prefix)
-            flow.append(Paragraph(_inline(text), bdy))
+            flow.append(_safe(text, bdy))
 
     for raw in open(md_path):
         t = raw.rstrip("\n").strip()
