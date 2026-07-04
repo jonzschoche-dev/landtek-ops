@@ -696,8 +696,21 @@ def render_matter_detail(client_code: str, matter_code: str,
            -- document "on file" (matches the deliverables-card discipline).
            AND COALESCE(d.classification,'')                                NOT ILIKE '%%draft%%'
            AND COALESCE(NULLIF(d.smart_filename,''), d.original_filename,'') NOT ILIKE '%%draft%%'
+           -- SEPARATION (defence-in-depth, deploy_674): never render a document whose OWN
+           -- case_file is a DIFFERENT real client than this matter's client, even if a stray
+           -- document_matter_links row points here. Mirrors the deliverables-card discipline
+           -- above + client_dependability's cross_client_doc check, so the leak is structurally
+           -- impossible rather than merely absent. Blank / 'Owner' / own-client docs pass; a
+           -- non-client scoping tag passes; only real OTHER clients (MWK/Paracale/NIBDC) are cut.
+           AND (
+                COALESCE(d.case_file,'') IN ('', 'Owner', %s)
+                OR d.case_file NOT IN (
+                     SELECT client_code FROM clients
+                      WHERE COALESCE(client_code,'') NOT IN ('', 'Owner', 'Archive', 'PENDING_TRIAGE')
+                )
+           )
          ORDER BY d.doc_date ASC NULLS LAST, d.id ASC
-    """, (matter_code,), default=[])
+    """, (matter_code, client_code), default=[])
 
     cur.close()
     conn.close()
