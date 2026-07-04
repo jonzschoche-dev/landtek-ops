@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the parcel plot-vs-title area audit daily (+5min after boot) so area deviations on plotted parcels are caught continuously, not only when someone runs it by hand.
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=24h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

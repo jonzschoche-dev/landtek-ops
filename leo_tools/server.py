@@ -83,6 +83,13 @@ except Exception as _e:
     import sys as _sys
     print(f"WARN: client access (/client/) blueprint not registered: {_e}", file=_sys.stderr)
 
+try:
+    from mapping import bp as _mapping_bp
+    app.register_blueprint(_mapping_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: mapping (/ops/map, /client/<t>/map) blueprint not registered: {_e}", file=_sys.stderr)
+
 def db():
     return psycopg2.connect(PG_DSN)
 

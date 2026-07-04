@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek parcel audit — mapping_agent.py audit --write: recomputes each plotted parcel's area from its geometry and flags any parcel whose plotted area deviates >15% from the title's stated area (a rough-plot error OR a real encroachment/double-titling signal). Read-mostly; writes only parcels.area_flag; never edits geometry, never files/sends. $0, deterministic, local.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/mapping_agent.py audit --write
+StandardOutput=append:/var/log/landtek_parcel_audit.log
+StandardError=append:/var/log/landtek_parcel_audit.log
