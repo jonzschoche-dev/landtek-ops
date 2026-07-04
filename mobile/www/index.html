@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>LandTek</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <!-- LOGIN SHELL ---------------------------------------------------------
+       Shown on first launch and after "Sign out". The client pastes the
+       access code from their magic-link. We store it in the iOS Keychain and
+       then navigate the WebView to https://leo.hayuma.org/client/<token>.
+  --------------------------------------------------------------------------->
+  <main id="login" class="screen" hidden>
+    <div class="card">
+      <div class="brand">
+        <div class="mark">LT</div>
+        <h1>LandTek</h1>
+        <p class="sub">Your matter workspace</p>
+      </div>
+
+      <label for="token">Access code</label>
+      <input
+        id="token"
+        type="text"
+        inputmode="text"
+        autocomplete="one-time-code"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+        placeholder="Paste the code from your invite"
+      />
+      <p class="hint">
+        This is the code (or the part after <code>/client/</code> in the link)
+        from the invitation LandTek sent you.
+      </p>
+
+      <button id="signin" class="primary">Open my workspace</button>
+      <p id="error" class="error" role="alert" hidden></p>
+    </div>
+
+    <p class="foot">
+      Your code is stored only on this device, in the iOS Keychain.
+    </p>
+  </main>
+
+  <!-- LOADING ------------------------------------------------------------->
+  <main id="loading" class="screen" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Opening your workspace…</p>
+  </main>
+
+  <!-- Classic scripts (no bundler). notifications.js defines
+       window.LandTekNotifications and must load before app.js uses it. -->
+  <script src="notifications.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

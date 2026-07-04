@@ -1,0 +1,19 @@
+# Capacitor / iOS scaffold — keep source, ignore generated + heavy artifacts.
+node_modules/
+
+# `npx cap add ios` generates this native project ON THE MAC. It is large and
+# machine-specific. Commit it ONLY if you want the native project in git; by
+# default we regenerate it from capacitor.config.ts + www/ on each machine.
+ios/
+
+# Build output
+dist/
+DerivedData/
+*.ipa
+*.xcarchive
+
+# macOS
+.DS_Store
+
+# Local env
+.env

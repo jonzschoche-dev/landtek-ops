@@ -1,0 +1,26 @@
+<!--
+  Info.plist ADDITIONS for the LandTek iOS app.
+
+  After `npx cap add ios`, the native project is at:
+      mobile/ios/App/App/Info.plist
+
+  Merge the keys below into that Info.plist (Xcode: right-click Info.plist ->
+  Open As -> Source Code, and paste inside the top-level <dict>). These are the
+  strings/permissions Apple reviewers and the runtime need.
+-->
+
+<!-- Why we schedule local notifications (shown in the iOS permission prompt).
+     Required or the LocalNotifications permission request looks opaque. -->
+<key>NSUserNotificationsUsageDescription</key>
+<string>LandTek reminds you before your matter deadlines so you never miss a filing or hearing.</string>
+
+<!-- Human-readable app name under the icon. -->
+<key>CFBundleDisplayName</key>
+<string>LandTek</string>
+
+<!--
+  App Transport Security: the app talks ONLY to the portal over HTTPS. We do NOT
+  add any NSAllowsArbitraryLoads exception — cleartext stays blocked. leo.hayuma.org
+  must present a valid TLS cert (it does, via nginx). No ATS additions needed;
+  this block is here to document that the default (secure) posture is intentional.
+-->

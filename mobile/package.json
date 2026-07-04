@@ -1,0 +1,24 @@
+{
+  "name": "landtek-client-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LandTek client workspace — native iOS shell (Capacitor) around the live token-scoped portal.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "sync": "cap sync",
+    "sync:ios": "cap sync ios",
+    "open:ios": "cap open ios",
+    "add:ios": "cap add ios",
+    "copy": "cap copy"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/preferences": "^6.0.2",
+    "@capacitor/local-notifications": "^6.1.0",
+    "capacitor-secure-storage-plugin": "^0.11.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
