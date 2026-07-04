@@ -4,9 +4,9 @@
 Beyond "pretty map", the mapping agent earns its keep by cross-checking plotted
 geometry against the paper record and against neighboring parcels:
 
-  1. AREA CHECK — plotted area vs. the title's stated area (parcels.stated_area_sqm).
+  1. AREA CHECK — plotted area vs. the title's stated area (map_parcels.stated_area_sqm).
      A large deviation means the rough plot is wrong OR the title's area is off
-     (a real fraud/encroachment signal on this matter). Writes parcels.area_flag.
+     (a real fraud/encroachment signal on this matter). Writes map_parcels.area_flag.
 
   2. OVERLAP CHECK — do two parcels' polygons intersect? A cross-OWNER overlap is
      an encroachment / double-titling signal (exactly the T-4497 attack surface).
@@ -51,7 +51,7 @@ def _db():
 
 def _load(client=None):
     q = ("SELECT parcel_code, client_code, label, geom_geojson, accuracy_tier, "
-         "area_sqm, stated_area_sqm FROM parcels WHERE geom_geojson IS NOT NULL")
+         "area_sqm, stated_area_sqm FROM map_parcels WHERE geom_geojson IS NOT NULL")
     args = []
     if client:
         q += " AND client_code=%s"; args.append(client)
@@ -93,7 +93,7 @@ def audit(client=None, write=False):
     if write and updates:
         conn = _db(); conn.autocommit = True; cur = conn.cursor()
         for flag, pc in updates:
-            cur.execute("UPDATE parcels SET area_flag=%s, updated_at=now() "
+            cur.execute("UPDATE map_parcels SET area_flag=%s, updated_at=now() "
                         "WHERE parcel_code=%s", (flag, pc))
         cur.close(); conn.close()
         print(f"\nWrote area_flag on {len(updates)} parcel(s).")

@@ -1,7 +1,8 @@
 """mapping — the LandTek Mapping subsystem (Flask blueprint).
 
 Registered in leo_tools/server.py. Serves three surfaces off the same table
-(`parcels`, deploy_682):
+(`map_parcels`, deploy_683 — the absolute WGS84 client-map layer, distinct from
+the relative survey-shape `parcels` table in scripts/parcels.py):
 
   OPS (behind nginx basic-auth, /ops/*):
     GET  /ops/map                     — parcel list + status
@@ -53,7 +54,7 @@ def ops_map_index():
     conn = _db(); cur = conn.cursor()
     cur.execute(
         "SELECT parcel_code, client_code, label, accuracy_tier, area_sqm, "
-        "stated_area_sqm, area_flag, status FROM parcels ORDER BY client_code, parcel_code"
+        "stated_area_sqm, area_flag, status FROM map_parcels ORDER BY client_code, parcel_code"
     )
     rows = cur.fetchall(); cur.close(); conn.close()
     trs = []
@@ -89,7 +90,7 @@ def ops_map_draw():
     conn = _db(); cur = conn.cursor()
     cur.execute(
         "SELECT parcel_code, client_code, label, geom_geojson, accuracy_tier, "
-        "centroid_lat, centroid_lng, source_note FROM parcels WHERE parcel_code=%s",
+        "centroid_lat, centroid_lng, source_note FROM map_parcels WHERE parcel_code=%s",
         (parcel,),
     )
     row = cur.fetchone(); cur.close(); conn.close()
@@ -133,7 +134,7 @@ def ops_map_save():
 
     conn = _db(); conn.autocommit = True; cur = conn.cursor()
     cur.execute(
-        "UPDATE parcels SET geom_geojson=%s, accuracy_tier=%s, area_sqm=%s, "
+        "UPDATE map_parcels SET geom_geojson=%s, accuracy_tier=%s, area_sqm=%s, "
         "centroid_lat=%s, centroid_lng=%s, source_note=%s, plotted_by=%s, "
         "plotted_at=now(), updated_at=now(), status=%s WHERE parcel_code=%s",
         (json.dumps(geom) if geom is not None else None, tier if geom is not None else None,
@@ -150,7 +151,7 @@ def ops_map_save():
 def ops_parcels_geojson():
     client = (request.args.get("client") or "").strip()
     q = ("SELECT parcel_code, client_code, label, geom_geojson, accuracy_tier, "
-         "area_sqm, stated_area_sqm FROM parcels WHERE geom_geojson IS NOT NULL")
+         "area_sqm, stated_area_sqm FROM map_parcels WHERE geom_geojson IS NOT NULL")
     args = []
     if client:
         q += " AND client_code=%s"; args.append(client)
@@ -169,10 +170,10 @@ def client_parcels_geojson(token):
     if not client_code:
         abort(404)
     conn = _db(); cur = conn.cursor()
-    # parcels_client already excludes un-plotted rows and exposes `approximate`.
+    # map_parcels_client already excludes un-plotted rows and exposes `approximate`.
     cur.execute(
         "SELECT parcel_code, client_code, label, geom_geojson, accuracy_tier, "
-        "area_sqm, stated_area_sqm FROM parcels_client WHERE client_code=%s",
+        "area_sqm, stated_area_sqm FROM map_parcels_client WHERE client_code=%s",
         (client_code,),
     )
     rows = cur.fetchall(); cur.close(); conn.close()
@@ -188,7 +189,7 @@ def client_map(token):
     cur.execute(
         "SELECT centroid_lat, centroid_lng, "
         "bool_or(accuracy_tier IS DISTINCT FROM 'ortho') "
-        "FROM parcels_client WHERE client_code=%s "
+        "FROM map_parcels_client WHERE client_code=%s "
         "GROUP BY centroid_lat, centroid_lng LIMIT 1",
         (client_code,),
     )

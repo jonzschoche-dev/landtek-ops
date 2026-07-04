@@ -14,10 +14,13 @@ agrees with the titles and with reality.
 - `memory/project-mapping-agent.md` — the subsystem's design + current state.
 - The active proof parcel is **MWK-BALANE** (Balane parcel, Civil Case 26-360, MWK-001).
 
-## The subsystem you operate (deploy_682)
-- **Table `parcels`** — one row per plottable lot. Geometry is GeoJSON in JSONB
-  (no PostGIS). `accuracy_tier ∈ rough | survey | ortho`. Client separation is the
-  `client_code` FK; the client view is `parcels_client`.
+## The subsystem you operate (deploy_683)
+- **Table `map_parcels`** — one row per plottable lot, ABSOLUTE WGS84 GeoJSON in
+  JSONB (no PostGIS). `accuracy_tier ∈ rough | survey | ortho`. Client separation is
+  the `client_code` FK; the client view is `map_parcels_client`. **Do not confuse
+  with `parcels`** (scripts/parcels.py) — that is the *relative* survey shape computed
+  from a title's metes-and-bounds (local-meter WKT, un-georeferenced). A `parcels`
+  shape + a tie point → georeference → a `map_parcels` row at `survey` tier (the bridge, still ahead).
 - **Blueprint `leo_tools/mapping.py`**:
   - OPS (nginx basic-auth): `/ops/map` (list), `/ops/map/draw?parcel=CODE` (draw
     tool, Leaflet-Geoman on Esri satellite), `POST /ops/map/save`.
@@ -53,4 +56,4 @@ agrees with the titles and with reality.
 - Extend coverage to Paracale/NIBDC parcels once MWK is solid.
 
 Deploy via the git routine (`scripts/landtek_git_routine.sh deploy NN ...`). Never
-`git add .`. The subsystem's SQL is `migrations/deploy_682_parcels.sql`.
+`git add .`. The subsystem's SQL is `migrations/deploy_683_map_parcels.sql`.
