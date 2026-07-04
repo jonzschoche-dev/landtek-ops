@@ -1,0 +1,32 @@
+[
+  {
+    "gr": "G.R. No. 154521",
+    "date": "September 30, 2005",
+    "title": "Civil Service Commission v. Ledesma",
+    "holding": "Defines grave misconduct: misconduct is a transgression of an established rule; it is GRAVE where the elements of corruption, clear intent to violate the law, or flagrant disregard of an established rule are present. Grounds the Grave-Misconduct characterization in Counts I & II.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "grave_misconduct", "relevance": "grave-misconduct standard for the CART-conflict counts", "note": "Counts I & II"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 169241",
+    "date": "May 2, 2006",
+    "title": "Office of the Ombudsman v. Miedes",
+    "holding": "Applies the grave-misconduct standard (corruption / clear intent / flagrant disregard) and the Ombudsman's disciplinary authority over erring public officers.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "grave_misconduct", "relevance": "Ombudsman disciplinary authority + grave-misconduct standard", "note": "Counts I & II"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 153166",
+    "date": "December 16, 2005",
+    "title": "Vertudes v. Buenaflor",
+    "holding": "Reiterates the grave-misconduct elements and that flagrant disregard of an established rule elevates misconduct to grave.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "grave_misconduct", "relevance": "flagrant-disregard prong", "note": "corroborating authority"}
+    ]
+  }
+]
