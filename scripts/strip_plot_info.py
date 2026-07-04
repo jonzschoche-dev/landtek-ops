@@ -65,8 +65,8 @@ def _stated_ha(cur, doc_id, text):
     cur.execute("SELECT area_sqm FROM titles WHERE source_doc_id=%s AND area_sqm IS NOT NULL "
                 "ORDER BY area_sqm DESC LIMIT 1", (doc_id,))
     r = cur.fetchone()
-    if r and r[0]:
-        return float(r[0]) / 10000.0, "titles.area_sqm"
+    if r and r["area_sqm"]:
+        return float(r["area_sqm"]) / 10000.0, "titles.area_sqm"
     m = _AREA_TXT.search(text or "")
     if m:
         try:
@@ -75,8 +75,8 @@ def _stated_ha(cur, doc_id, text):
             pass
     cur.execute("SELECT area_sqm FROM documents WHERE id=%s", (doc_id,))
     r = cur.fetchone()
-    if r and r[0]:
-        return float(r[0]) / 10000.0, "documents.area_sqm"
+    if r and r["area_sqm"]:
+        return float(r["area_sqm"]) / 10000.0, "documents.area_sqm"
     return None, None
 
 
@@ -84,8 +84,8 @@ def _title_no(cur, doc_id, text, fname):
     cur.execute("SELECT tct_number FROM titles WHERE source_doc_id=%s AND tct_number IS NOT NULL "
                 "LIMIT 1", (doc_id,))
     r = cur.fetchone()
-    if r and r[0]:
-        return r[0]
+    if r and r["tct_number"]:
+        return r["tct_number"]
     m = re.search(r"T-?\s?0?7?9?-?\d{3,}", fname or "") or re.search(r"\bT-\s?\d{3,}", text or "")
     return (m.group(0).replace(" ", "") if m else None)
 
