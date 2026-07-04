@@ -51,7 +51,21 @@ revenue internal bureau capital gains documentary stamp clearance issued issuing
 name names last middle initial address resident residence age legal married single filipino citizen
 heirs late deceased spouse husband wife children child son daughter mother father
 mary worrick keesey zschoche balane fuente llamanzares cesar gloria benjamin patricia jonathan
-camarines norte daet mercedes vicente san roque poblacion""".split()
+camarines norte daet mercedes vicente san roque poblacion
+ang ng nang sa mga na ay ako ikaw siya kami tayo kayo sila ito iyan iyon dito diyan doon
+po ho opo hindi oo wala meron mayroon may kung kapag dahil sapagkat upang para pero ngunit subalit
+kaya bawat lahat iba ibang bilang tungkol laban gawa ginawa aking iyong kanyang aming inyong
+kanilang namin ninyo nila natin akin kanya bahay lupa lupang bilihan bumili binili nagbenta ibinenta
+salaysay sinumpaang testimonya saksi nagsasalaysay pinatutunayan kasunduan kasulatan katibayan
+maaari dapat noon ngayon bukas kahapon taon buwan araw oras pangalan gulang asawa anak magulang
+ina ama nasa naninirahan tirahan purok barangay bayan lalawigan lungsod kalye tanong sagot
+hukuman korte huwes reklamo isinampa kaso nagreklamo inireklamo kinatawan abogado notaryo
+pinawalang bisa karapatan batas saligang dokumento titulo tanggapan pilipino may-ari mayari""".split()
+# NOTE (deploy_675): the dict now also carries common Filipino/Tagalog function+legal words.
+# PH judicial affidavits/deeds/complaints are routinely bilingual (English caption + Tagalog
+# body); the English-only dict scored readable Tagalog prose as garbage (~0.15) -> false-
+# flagged -> locked out of the fact-harvester. Additive only: raises Filipino-doc scores,
+# never lowers an English score (zero false-MISSING risk).
 _DICT = set(_DICT)
 
 

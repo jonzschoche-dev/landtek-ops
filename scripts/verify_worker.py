@@ -178,6 +178,9 @@ def process_doc(cur, w, go):
         raise RuntimeError("all inference tiers unavailable (ollama down + gemini quota)")
     nv = npr = 0; shown = []
     for f in (facts or []):
+        if not isinstance(f, dict):
+            continue  # local model sometimes emits a bare string instead of {statement,excerpt,...};
+                      # skip it rather than crash the whole batch (degrade gracefully, no wrong fact).
         stmt = (f.get("statement") or "").strip()
         exc = (f.get("excerpt") or "").strip()
         conf = float(f.get("confidence") or 0)
@@ -214,6 +217,9 @@ def run(limit, go, loop, rpm, matter=None):
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     _ensure(cur)
     total_v = total_p = 0
+    consec_fail = 0
+    MAX_CONSEC_FAIL = 4  # tolerate transient per-doc inference failures (Ollama timeout under load);
+                          # only a genuine outage produces this many in a row -> then stop.
     while True:
         docs = _next_docs(cur, limit, matter)
         if not docs:
@@ -221,8 +227,15 @@ def run(limit, go, loop, rpm, matter=None):
         for w in docs:
             try:
                 r = process_doc(cur, w, go)
+                consec_fail = 0
             except RuntimeError:
-                print("[worker] Gemini quota exhausted — resume on reset"); loop = False; break
+                consec_fail += 1
+                print(f"[worker] doc:{w['id']} inference unavailable (ollama down + gemini quota) "
+                      f"— skip ({consec_fail}/{MAX_CONSEC_FAIL})", flush=True)
+                if consec_fail >= MAX_CONSEC_FAIL:
+                    print("[worker] too many consecutive inference failures — stopping; resume on reset")
+                    loop = False; break
+                continue
             total_v += r.get("verified", 0); total_p += r.get("proposed", 0)
             tag = f"+{r.get('verified',0)}v/{r.get('proposed',0)}p" if go else "(dry)"
             print(f"  doc:{r['doc']} [{r.get('matter','?')}] {r.get('tier','?')} {tag}", flush=True)
