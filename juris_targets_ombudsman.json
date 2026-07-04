@@ -1,0 +1,72 @@
+[
+  {
+    "gr": "G.R. No. 145368",
+    "date": "April 12, 2002",
+    "title": "Laurel v. Desierto",
+    "holding": "Defines 'public officer' broadly for anti-graft purposes: one who performs public functions/duties by virtue of a delegation of sovereign authority, whether or not on the plantilla or receiving compensation — grounds charging the Mayor's Chief of Staff (Teope) as a public officer.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "public_officer", "relevance": "Teope/Baliza public-officer status", "note": "coterminous/confidential staff performing public functions"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 122166",
+    "date": "March 11, 1998",
+    "title": "Llorente v. Sandiganbayan",
+    "holding": "For R.A. 3019 Sec. 3(e), 'undue injury' must be ACTUAL damage — specified, quantified, and proven like civil-law damages; it cannot be presumed from mere delay. Sets the actual-damage floor for the injury element.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-1321", "element_code": "3e_undue_injury", "relevance": "the P300 OR is actual damage; delay alone insufficient", "note": "the Llorente floor cited in Count IV"}
+    ]
+  },
+  {
+    "gr": "G.R. Nos. 162314-17",
+    "date": "October 25, 2004",
+    "title": "Cabrera v. Sandiganbayan",
+    "holding": "States the three elements of R.A. 3019 Sec. 3(e): (1) the accused is a public officer discharging official/administrative/judicial functions; (2) he acted with manifest partiality, evident bad faith, or gross inexcusable negligence; (3) his action caused undue injury OR gave any private party unwarranted benefit/advantage/preference.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "3e_elements", "relevance": "the controlling element framework", "note": "Count IV element map"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 170339",
+    "date": "March 9, 2010",
+    "title": "Sison v. People",
+    "holding": "Defines the modalities of Sec. 3(e): 'manifest partiality' = clear, notorious inclination to favor one side; 'evident bad faith' = a palpably dishonest purpose/breach of duty through ill will; 'gross inexcusable negligence' = want of even slight care. Any one mode suffices.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "3e_modality", "relevance": "manifest partiality via the CART conflict + insider favoring", "note": "Count IV modality"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 168539",
+    "date": "March 25, 2014",
+    "title": "People v. Henry T. Go",
+    "holding": "A PRIVATE person who conspires with a public officer may be indicted and held liable under R.A. 3019 — and may be prosecuted even if the public officer co-conspirator has died. Grounds charging the insider co-respondents (Teope/Baliza) in conspiracy.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "conspiracy_private", "relevance": "Teope/Baliza chargeable in conspiracy regardless of officer status", "note": "cast + conspiracy framing"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 130140",
+    "date": "October 25, 1999",
+    "title": "Presidential Ad Hoc Fact-Finding Committee on Behest Loans v. Desierto",
+    "holding": "On prescription of R.A. 3019 offenses: the prescriptive period is reckoned, where the violation is not immediately known, from discovery of the offense — relevant to the Sec. 11 prescription analysis.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "prescription", "relevance": "prescription posture (acts 2025-2026, well within)", "note": "Gaps 4"}
+    ]
+  },
+  {
+    "gr": "G.R. No. 164015",
+    "date": "February 26, 2009",
+    "title": "Albert v. Sandiganbayan",
+    "holding": "Clarifies that the three modes of Sec. 3(e) (manifest partiality, evident bad faith, gross inexcusable negligence) are distinct and may be alleged in the alternative; proof of any one supports conviction.",
+    "forum": "OMBUDSMAN",
+    "links": [
+      {"matter": "MWK-ARTA-0747", "element_code": "3e_modality", "relevance": "alternative modes pleading", "note": "supports the circumstantial modality"}
+    ]
+  }
+]
