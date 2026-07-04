@@ -48,3 +48,12 @@ def service_worker():
 @bp.route("/icons/<path:name>")
 def icon(name: str):
     return send_from_directory(_ICON_DIR, name, max_age=60 * 60 * 24 * 30)
+
+
+@bp.route("/install")
+def install():
+    """Client-facing 'Add to Home Screen' onboarding card. Token-less + static, so it
+    can be linked from the portal ('Install this app') or sent to a client directly."""
+    with open(os.path.join(_PWA_DIR, "install.html"), "rb") as f:
+        body = f.read()
+    return Response(body, mimetype="text/html")
