@@ -223,6 +223,30 @@ def build_digest_sections():
     except Exception:
         sections["health"] = "⚙️ <b>System</b>: watchdog state file unavailable"
 
+    # 8. Inference tier health (24h) — is the sovereign local tier carrying load?
+    try:
+        cur.execute("""
+            SELECT count(*) AS total,
+                   count(*) FILTER (WHERE model_tier = 'tier1') AS tier1,
+                   count(*) FILTER (WHERE NOT success)          AS failed,
+                   count(*) FILTER (WHERE fallback_reason IS NOT NULL) AS fallbacks,
+                   max(timestamp) FILTER (WHERE success AND model_tier='tier1') AS last_local
+              FROM inference_audit
+             WHERE timestamp > now() - interval '24 hours';
+        """)
+        s = cur.fetchone()
+        if s and s["total"]:
+            pct = round(100 * s["tier1"] / s["total"])
+            local = s["last_local"]
+            flag = "" if (local and (datetime.now(timezone.utc) - local).total_seconds() < 43200) else " ⚠️ stale"
+            sections["inference"] = (
+                f"🧠 <b>Inference (24h)</b>: {s['total']} calls · {pct}% local · "
+                f"{s['fallbacks']} fallback(s) · {s['failed']} failed{flag}")
+        else:
+            sections["inference"] = "🧠 <b>Inference (24h)</b>: ⚠️ no local calls logged (tier may be down)"
+    except Exception:
+        pass
+
     cur.close(); conn.close()
     return sections
 
@@ -233,7 +257,7 @@ def render_digest_messages():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     header = f"📊 <b>LandTek Daily Digest — {today}</b>\n\n"
 
-    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health"]
+    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health", "inference"]
     msgs = []
     buf = header
     for k in order:
