@@ -127,3 +127,46 @@ already installed**, currently idle.
    security + DR lightly.
 3. **Hardware ceiling:** accept the 32 GB / ≤32B local ceiling, or plan a 64–128 GB box later to run
    70B-class models in-house (closer to frontier, fully sovereign)?
+
+---
+
+## 8. Ontology-upgrade proposal — graded response (2026-07-05)
+
+An external "Suggested Ontology Upgrades" roadmap (8 items: formalize a Pydantic/SQLAlchemy ontology
+module; bitemporal modeling; multi-dim provenance; cadastral integration; agent-native validation;
+portfolio/mining layer; PH-law taxonomy; explainability) was assessed against the **live schema**. Verdict:
+**a good *vision* doc that under-credits what's built and proposes peacetime enterprise architecture during
+wartime.** Roughly half already exists; the genuinely-new half is mostly scale-we-don't-have-yet.
+
+**Reality check (grounded, not from memory):**
+
+| Proposal item | Ground truth |
+|---|---|
+| Temporal / lifespan axiom | 🟢 **Already shipped** — `deploy_341` `actor_lifespan` + `enforce_actor_lifespan_on_instruments` trigger + `v_actor_lifespan_violations`; already caught the Cesar-post-death fraud. Full bitemporal is new but low wartime value. |
+| Multi-dim provenance | 🟡 **~70% exists** — `provenance_level`+`confidence`+`verification_lock`+`content_hash`+`cited_by_compound_claims`+`field_consensus`+`holes/`. Only crypto-anchor is new (already pillar-6 roadmap). |
+| Cadastral first-class | 🟡 Exists — `map_parcels`,`parcels`,`subdivision_plans`,`mapping_agent.py` (overlap detection). Needs plotting, not ontology. |
+| PH-law + jurisprudence | 🟡 Exists — `legal_authorities`,`matter_authorities`,`doc_requirements_law`, jurisprudence ingest. |
+| Explainability | 🟡 Exists — `truth_audit_log`,`inference_audit`,`matter_facts.excerpt`,`_safe` views. Needs surfacing. |
+| Portfolio / mining layer | 🔵 New — but this is Paracale monetization, explicitly deferred behind Aug-12. |
+| Pydantic ontology module (#1) | 🔵 New — **pushed back on** (below). |
+| Agent-native validator (#5) | 🔵 New — **best idea in the doc**; adopted DB-resident. |
+
+**The dangerous premise.** Items #1/#5 want enforcement in a **Python Pydantic/SQLAlchemy layer**. Our
+design deliberately enforces in **Postgres triggers + `_safe` views** — framework-agnostic so *every*
+writer is bound, including Leo's n8n LangChain.js path (our most hallucination-prone writer). Moving the
+authority into Python creates two sources of enforcement truth and **exempts the n8n path** unless every
+node is refactored — a regression dressed as an upgrade. §2 keeps framework-freeness as a feature. A
+Pydantic ontology is fine as a typed *projection SDK*; the **gate stays in the DB**.
+
+**Adopted (wartime-safe, both cheap, both on-grain):**
+1. **`ONTOLOGY.md`** — canonical concept→table registry generated against the live schema; names the 4
+   drift tables (`chain_of_title`, `finance_transactions`, `cases`, `fact_edges`) so drift stops
+   compounding without touching a writer. *(Shipped.)*
+2. **`docs/ontology_validator_spec.md`** — the proposal's #5 done right: a **DB-resident** shape-gate beside
+   the existing grounding-gate, shipping shadow-mode-first, failing to `holes/`. *(Spec shipped; DDL
+   unapplied — needs operator go before any live trigger during the litigation window.)*
+
+**Parked with eyes open (post-Aug-12 / product bucket):** the Pydantic package, full bitemporal, the
+portfolio/mining layer, crypto-anchoring. All legitimate; none unblock the SJ motion, guardianship, or
+Aug-12 cross-exam, and the binding constraint remains the **inference tier** (gap #1), not ontology
+formality.
