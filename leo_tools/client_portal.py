@@ -224,7 +224,16 @@ def _client_layout(title: str, body: str, client_name: str | None = None,
             if back_url else "")
     return f"""<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="manifest" href="/client/_app/manifest.webmanifest">
+<meta name="theme-color" content="#0B2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LandTek">
+<link rel="apple-touch-icon" href="/client/_app/icons/icon-180.png">
 <title>{_esc(title)} — LandTek</title>{CSS}
+<script>
+if('serviceWorker' in navigator){{window.addEventListener('load',function(){{navigator.serviceWorker.register('/client/_app/sw.js',{{scope:'/client/'}}).catch(function(){{}});}});}}
+</script>
 <style>
   /* Client chrome: brand only, no nav, product-grade, comfortable on a phone. */
   .topbar {{ justify-content:flex-start; gap:12px; padding:14px 20px;

@@ -84,6 +84,13 @@ except Exception as _e:
     print(f"WARN: client access (/client/) blueprint not registered: {_e}", file=_sys.stderr)
 
 try:
+    from client_pwa import bp as _client_pwa_bp
+    app.register_blueprint(_client_pwa_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: client PWA assets (/client/_app/) not registered: {_e}", file=_sys.stderr)
+
+try:
     from mapping import bp as _mapping_bp
     app.register_blueprint(_mapping_bp)
 except Exception as _e:
