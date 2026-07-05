@@ -235,15 +235,23 @@ def build_digest_sections():
              WHERE timestamp > now() - interval '24 hours';
         """)
         s = cur.fetchone()
+        # 24h + 7d paid spend (cost governance — keeps MASTER_PLAN §3's "invisible cost"
+        # from ever going dark again). NB: llm_calls is the DIRECT-caller ledger; it does NOT
+        # see n8n/Leo LangChain-node spend — that path stays a known blind spot.
+        cur.execute("""SELECT round(coalesce(sum(cost_usd) FILTER (WHERE called_at > now()-interval '24 hours'),0)::numeric,2) d1,
+                              round(coalesce(sum(cost_usd) FILTER (WHERE called_at > now()-interval '7 days'),0)::numeric,2) d7
+                         FROM llm_calls;""")
+        c = cur.fetchone()
+        spend = f" · 💸 ${c['d1']}/24h (${c['d7']}/7d)" if c else ""
         if s and s["total"]:
             pct = round(100 * s["tier1"] / s["total"])
             local = s["last_local"]
             flag = "" if (local and (datetime.now(timezone.utc) - local).total_seconds() < 43200) else " ⚠️ stale"
             sections["inference"] = (
                 f"🧠 <b>Inference (24h)</b>: {s['total']} calls · {pct}% local · "
-                f"{s['fallbacks']} fallback(s) · {s['failed']} failed{flag}")
+                f"{s['fallbacks']} fallback(s) · {s['failed']} failed{flag}{spend}")
         else:
-            sections["inference"] = "🧠 <b>Inference (24h)</b>: ⚠️ no local calls logged (tier may be down)"
+            sections["inference"] = f"🧠 <b>Inference (24h)</b>: ⚠️ no local calls logged (tier may be down){spend}"
     except Exception:
         pass
 

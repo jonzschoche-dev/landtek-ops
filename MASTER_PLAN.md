@@ -39,7 +39,7 @@
 - **✅ Ingestion:** Gemini vision OCR (free tier — exhausted) + **local Tesseract via PyMuPDF** (the cost-driven pivot). Qdrant Cloud embeddings (gemini-embedding-001).
 - **✅ Reasoning:** Claude `sonnet-4-5`; `truth_negotiator` + `truth_judge` + `claim_truth_verdicts`; `_safe` views; provenance grading (verified / inferred_strong / inferred_weak).
 
-**⚠️➜🔴 COST — the biggest open liability.** Real burn ~**$40/day**, driven by `leo-simulator` running through n8n (439 execs/24h). `cost_governor` (deploy_420) enforces a daily cap **but does not see n8n spend** → `llm_spend` reads **$0**. **Cost is invisible to our own telemetry.** Simulator ROI ≈ 1 verified improvement per 1,744 probes. **Decision pending (Jonathan): throttle / instrument / cap the sim** (do not auto-stop — operator's standing rule).
+**✅➜ COST — liability largely RESOLVED (re-grounded 2026-07-05).** The old "~$40/day invisible burn" was the **simulator** through n8n's Anthropic node — but the sim is kept **OFF** (standing rule, 2026-06-14) and Anthropic credits are **depleted** (API returns 400 "credit balance too low"), so recorded spend is now **~$0.15 / 7 days** (only `truth_negotiator`'s challenger calls, per the `llm_calls` ledger). The primary tier is the **free local Ollama** (~99% of inference; see the §3 Inference row / `ARCHITECTURE.md` §5). Ongoing visibility: `anthropic_spend_bridge` (deploy_427) + a **daily-digest spend line** (deploy_697) so cost never goes dark again. **Residual blind spot (now moot):** n8n LangChain-node spend still isn't itemized in `llm_calls` — irrelevant while the sim is off and credits are depleted, but **re-instrument before re-enabling the sim or topping up Anthropic credits.**
 
 ## 4. Strategic frame (carried forward — still sound)
 
