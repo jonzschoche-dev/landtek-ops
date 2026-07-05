@@ -13,7 +13,7 @@
 
 ## 1. The case in one paragraph
 
-The Keesey heirs own a 2,587 sqm parcel in Brgy. San Roque, Mercedes, tracing to mother title **TCT T-4497**, immediately held as **TCT T-52540**. Their former attorney-in-fact **Cesar M. de la Fuente** purported to sell it to **Gloria Balane in September 2016** under a **March 16, 1992 Special Power of Attorney**. That SPA gave him power only to *negotiate* a sale, **not to execute one** — and in any event his authority had been **revoked in 2005**, a decade before the sale. The void sale cancelled T-52540 and produced **TCT T-079-2021002126 in Gloria Balane's name (2021)**. Plaintiff sues to void the sale, cancel Balane's title, reinstate T-52540 in the co-owners' names, recover possession, and for accounting + damages.
+The Keesey heirs own a 2,587 sqm parcel in Brgy. San Roque, Mercedes, tracing to mother title **TCT T-4497**, immediately held as **TCT T-52540**. Their former attorney-in-fact **Cesar M. de la Fuente** purported to sell it to **Gloria Balane in September 2016** under a **March 16, 1992 Special Power of Attorney**. That SPA was a **special power of limited object** — it let him sell **only** to holders of a Contract to Sell from the prior administrator Ben Llamanzares, a class **Balane was not in** (she entered as a tenant via Kenneth Asistin) — and in any event his authority had been **revoked in 2005**, a decade before the sale. The void sale cancelled T-52540 and produced **TCT T-079-2021002126 in Gloria Balane's name (2021)**. Plaintiff sues to void the sale, cancel Balane's title, reinstate T-52540 in the co-owners' names, recover possession, and for accounting + damages.
 
 ---
 
@@ -23,7 +23,7 @@ The Keesey heirs own a 2,587 sqm parcel in Brgy. San Roque, Mercedes, tracing to
 
 Summary judgment because the dispositive facts are admitted in the pleadings — no genuine issue to try (except damages). Two independent prongs:
 
-- **PRONG A — the 1992 SPA grants no power to SELL (the kill-shot).** The SPA authorizes de la Fuente only to *"negotiate"* a sale / subdivide — it contains **no express authority to sell**. Under ***Bautista-Spille v. Nicorp*** (G.R. 214057, 19 Oct 2015), authority to sell land must be **express and in clear, unmistakable language**; general terms confer only acts of administration. **Verified against source:** doc 416 (Exhibit 7, the 1992 SPA) — full-text scan shows "negotiate" present, "sell" absent (OCR of a consular CTC — *read the operative clause clean before filing*). **Why this wins cleanly:** a sale by an agent with no authority to sell is **void**, and *good faith cannot cure a void sale* (*nemo dat quod non habet*). This prong **bypasses the entire good-faith fight** and turns on undisputed document text → ideal for SJ.
+- **PRONG A — the 1992 SPA authorized sale only to a class Balane is outside of (the kill-shot, REFRAMED 2026-07-05).** The clean **doc 246** (2025 LRA-certified CTC; doc 416 is a garbled consular-scan OCR — corroborative only) shows the SPA is a **special power of *limited object***: de la Fuente could sell **only** *"in favor of third persons in possession of CONTRACTS TO SELL executed by the previous administrator, MR. BEN LLAMANZARES"* / down-payment holders, after prior consultation — **not** an at-large power to sell. **Do NOT lead with the bare "negotiate, not sell" slogan** — doc 246 also empowers the agent *"to sign and execute the necessary documents … and to receive the proceeds of the aforementioned sale,"* so that framing loses on the clean text. Under Civil Code **Arts. 1877–1878**, authority to sell an immovable must be **express and confined to the special object**; the "any and every act" general clause is read down to that object (***Bautista-Spille v. Nicorp***, G.R. 214057, 19 Oct 2015). **Balane is outside the authorized class** — by her own Judicial Affidavit (doc 1089 T13/T18–19/T21–22) she entered via Kenneth Asistin, was a ₱50/mo tenant, and holds **no Llamanzares contract**. **Why this wins cleanly:** a sale outside the agent's mandate is **void as to Balane**, *good faith cannot cure it* (*nemo dat quod non habet*), and it is proven by the defense's **own affidavit** — it bypasses the good-faith fight and **moots the revocation-timing dispute**. Ideal for SJ. *(doc 246 primary; the flat "negotiate ≠ sell" theory is retired.)*
 
 - **PRONG B — even if it authorized a sale, it was revoked in 2005.** Defendants don't deny the revocation; they only say they weren't *notified*. Barandon's answer (doc 393 ¶¶8–9, 12): a buyer dealing with **an agent rather than the registered owner** must "discover on her own peril" the fact and extent of the agent's authority (***Yoshizaki v. Joy Training Center***, G.R. 174978, 31 Jul 2013). Defendants **admit Gloria only "inspected the Torrens title"** — short of the required diligence. So lack of notice ≠ innocent purchaser.
 
@@ -48,7 +48,7 @@ Her excluded Judicial Affidavit **is in corpus** (doc 1089, full text). It hands
 - **She paid RENT (₱50/mo) to the owners' side** (Ben Llamanzares via Manuel Violeta) — T18–T19. → She admits **tenancy**; a lessee acknowledges the lessor's ownership. Possession as a tenant is **not** possession in the concept of owner and cannot support a good-faith *purchase of ownership*.
 - **She never communicated with the Keesey owners before the sale** — T43: *"Wala po akong naging tuwirang komunikasyon kina Patricia, Geraldine, Marcia bago ang bentahan."* → Direct admission she **failed the duty of inquiry** owed by one dealing with an agent (*Yoshizaki*). This is Prong B, conceded.
 - **The family's origin on the land was buying "rights and possession" from a third party** (wedding godfather Kenneth Asistin Jr., ₱16,500) — T13. → Not an ownership root.
-- **She relied on Cesar's verbal explanation of the SPA**, not its text — T30 (his description) vs T56 (she "looked at" it). She identifies the operative SPA as the **16 Mar 1992 SPA, Exhibit "6" = doc 416** (T34). → If that text says "negotiate" not "sell" (Prong A), her belief is legally irrelevant.
+- **She relied on Cesar's verbal explanation of the SPA**, not its text — T30 (his description) vs T56 (she "looked at" it). She identifies the operative SPA as the **16 Mar 1992 SPA, Exhibit "6"** (T34; clean text = doc 246). → Since that SPA authorized sale only to Llamanzares CTS holders and she was not one (Prong A), her belief about it is legally irrelevant.
 - **She was a Barangay Kagawad (1997–2004) and town Konsehal (2004–2017)** — T59. → A **public official** is held to a *higher* standard of diligence, and she held office across both the 2005 revocation and the 2016 sale.
 - **Down payment ₱3,000 had no receipt** (allegedly logged in Violeta's "brown columnar book") — T21–T22. → Weak proof of the "prior buyer" status she claims under the SPA.
 - **She concedes the revocation publication "happened only in 2020, years after the 2016 sale"** — T64 — and that she learned of the revocation only ~Aug 2025 — T63. (Her good-faith pillar; answered by Prongs A & B.)
@@ -107,7 +107,7 @@ Our SJ prayer asks the court to **cancel …2126 and REINSTATE T-52540** in the 
 
 | Date | Event | Source | Grade |
 |---|---|---|---|
-| **16 Mar 1992** | SPA to de la Fuente — power to **negotiate** (NOT sell) | **doc 416** (Exhibit 7); also doc 329 (19 Mar 1992) | VERIFIED (read) |
+| **16 Mar 1992** | SPA to de la Fuente — **limited-object** power: sell only to Llamanzares CTS holders | **doc 246** (clean LRA CTC); doc 416 corroborative; doc 329 (19 Mar 1992) | VERIFIED (read clean 2026-07-05) |
 | ~1995 | de la Fuente's authorized period referenced as ending | doc 1132 (handwritten) | INFERRED (garbled OCR) |
 | **19 Feb 1999** | Gerry Hoppe writes de la Fuente: heirs transferring POA to Ida Buenaventura | **doc 1134** | VERIFIED (read) |
 | **15 Aug 2005** | de la Fuente's SPA **REVOKED** | doc 76 (2020 publication) + doc 79 (RD letter "since 2005") | VERIFIED (2 sources) |
@@ -132,7 +132,8 @@ Revocation (2005) precedes sale (2016) by 11 years. Publication (2020) post-date
 | **1089** | **Gloria Balane's Judicial Affidavit** (Annex 1) — the defense's principal testimony | sworn 12 May 2026 | **Full text in corpus (29.5k)** — see cross-exam map §2d |
 | **407 / 408 / 409** | Judicial Affidavits: Salvador Osum dela Fuente / Princess Balane Torralba / Engr. Erwin Balane | 2023–2026 | Full text — defense's other witnesses captured |
 | **441 / 445** | Jonathan Zschoche's Judicial Affidavit (+ draft) | 1992 / 2025 | Full text — your direct testimony |
-| **416** | **1992 SPA (Exhibit 7)** — the operative instrument; Prong A turns on it | 16 Mar 1992 | Full text (consular CTC, OCR — read operative clause clean) |
+| **246** | **1992 SPA — clean LRA-certified CTC** — the operative instrument; Prong A turns on it (limited-object clause, p3) | 16 Mar 1992 | Clean text (`drafts/ocr_pending_write/246.txt`) — PRIMARY |
+| **416** | 1992 SPA (Exhibit 7) — garbled consular scan | 16 Mar 1992 | OCR unreliable — corroborative only |
 | **423** | Court Order dated 6 Feb 2026 | 9 Feb 2026 | OCR'd |
 | **76** | Affidavit of Publication of Notice of Revocation (Bicol Post) | 25 Sep 2020 | Read |
 | **79** | RD Daet letter: SPA "revoked since 2005"; no conveyances on T-4497 | 30 Sep 2020 | Read |
@@ -160,7 +161,7 @@ Plus: the Complaint + its Exhibits (docs 426–436, "Exhibit … - Complaint - C
 1. **OCR Balane's excluded Judicial Affidavit** (Annexes 1/1-A inside doc 1088) — it's the defense's whole case; we need its exact text to rebut. Scanned, not OCR'd.
 2. **Make the 1999/handwritten revocation instruments exhibit-grade** (docs 1132–1134) — vision-OCR the two handwritten ones.
 3. **Obtain the Sept 2016 Deed of Absolute Sale to Balane** (CTC from RD Daet) — not in corpus.
-4. **Read the 1992 SPA operative clause clean** (doc 416 / fresh CTC) — confirm "negotiate, not sell" verbatim for Prong A; this is the most-quoted text in the SJ.
+4. ~~**Read the 1992 SPA operative clause clean**~~ **DONE 2026-07-05** — doc 246 (clean LRA CTC) read; SPA is a limited-object power (sell only to Llamanzares CTS holders). Prong A reframed accordingly. Remaining: pull the **2016 Balane Deed CTC (RD Daet)** and confirm **no Llamanzares CTS in Balane's name** — now tracked as work_orders #4 and #5.
 5. ~~**Close the T-32917 → T-52540 chain hole**~~ **RESOLVED 2026-07-05** (§3): derivation grounded in docs 288/50/48/96/272; DB fix drafted (add T-49061→T-52540, relabel T-32917→T-52540 as verified ancestor). Residual: the granular intermediate hops (2-X-6 → 2-X-6-I) rest on property-tree doc 288 only — corroborative, not load-bearing.
 6. **Finish-process the case filings** — 791 MWK-001 docs sit at `pending_classification`, 95 in `error`; classify + exhibit-tier the ~12 live 26-360 pleadings first.
 7. **Reconcile CLAUDE.md** per §6.
@@ -169,7 +170,7 @@ Plus: the Complaint + its Exhibits (docs 426–436, "Exhibit … - Complaint - C
 
 ## 8. What this means
 
-- **Summary Judgment (now):** strong, primarily on **Prong A** (1992 SPA = no power to sell → void sale → good faith irrelevant), with Prong B (revocation + duty of inquiry) as backup. Defendants' counter is good faith — but their key witness's affidavit is **excluded**, and their best facts (long possession, payments) are double-edged or post-date the SPA. If the court keeps the affidavit out and accepts Prong A, this resolves without trial.
+- **Summary Judgment (now):** strong, primarily on **Prong A reframed** (1992 SPA = limited-object power to sell only to Llamanzares CTS holders → Balane outside that class → sale void as to her → good faith irrelevant), with Prong B (revocation + duty of inquiry) as backup. Defendants' counter is good faith — but their key witness's affidavit is **excluded**, and their best facts (long possession, payments) are double-edged or post-date the SPA. If the court keeps the affidavit out and accepts Prong A, this resolves without trial.
 - **Your 12 Aug 2026 testimony** (if the case proceeds): you carry the plaintiff's case as attorney-in-fact. Be airtight that the 1992 SPA never authorized a sale; that the family withdrew de la Fuente's authority (1999 Hoppe letter) and revoked it (2005); and on the chain of ownership. Stay precise: **revoked 2005, published 2020.** Expect cross on Balane's good faith / the Balanes' long occupancy.
 
 ---
@@ -180,7 +181,7 @@ Ordered by the SJ logic. Each row is a `government_issued` or `executed` corpus 
 
 | # | Exhibit (doc_id) | Grade | Element it proves |
 |---|---|---|---|
-| **A** | **1992 SPA — doc 416** (Exhibit 7) | VERIFIED (consular CTC, OCR — *read operative clause clean before filing*) | **Prong A kill-shot:** de la Fuente's authority was to *negotiate*, not *sell*. Authority to sell land must be express (*Bautista-Spille*). No power to sell → sale void → good faith irrelevant. |
+| **A** | **1992 SPA — doc 246** (clean LRA-certified CTC; doc 416 corroborative) | VERIFIED (doc 246 clean text layer) | **Prong A kill-shot (reframed):** SPA is a special power of *limited object* — sell only to Llamanzares Contract-to-Sell holders. Balane is outside that class (doc 1089). Sale exceeded the mandate → void as to Balane; good faith irrelevant (Arts. 1877–1878; *Bautista-Spille*). |
 | B | Revocation publication — doc 76 (Affidavit of Publication, Bicol Post) | VERIFIED (read) | SPA **revoked 15 Aug 2005** (published 2020). Predates the 2016 sale by 11 yrs. Prong B. |
 | B-2 | RD Daet letter — doc 79 (30 Sep 2020) | VERIFIED (read) | RD confirms SPA "revoked since 2005"; no conveyances of record on T-4497 mother title. Corroborates revocation + clean owner-side chain. |
 | B-3 | Hoppe→de la Fuente letter — doc 1134 (19 Feb 1999) | VERIFIED (typed, legible) | Heirs were transferring the POA to Ida Buenaventura in 1999 — de la Fuente's authority was being withdrawn years before the sale. |
@@ -194,7 +195,7 @@ Ordered by the SJ logic. Each row is a `government_issued` or `executed` corpus 
 | H | Complaint + Exhibits — docs 424/419-421/426-427; Jonathan's Judicial Affidavit — doc 441 | VERIFIED (executed_filed) | Standing (Patricia = co-owner via Jonathan as attorney-in-fact), the cause of action, prayer. |
 | — | **Gloria Balane's Judicial Affidavit — doc 1089** | corpus full text (EXCLUDED at pre-trial) | Not our exhibit — but the source of the admissions in §2d/§10 we use on cross if it comes in. |
 
-**Note on grade:** docs 410 and 415 were OCR'd (`ocr_used=t`); the T-52540 CTCs (272/96/48) and deeds (233) are `ocr_used=f` (clean text layer). Exhibit A (doc 416, the 1992 SPA) is the one exhibit still resting on OCR of a consular CTC — **worklist item 4: read its operative clause clean before it anchors the SJ.**
+**Note on grade:** docs 410 and 415 were OCR'd (`ocr_used=t`); the T-52540 CTCs (272/96/48) and deeds (233) are `ocr_used=f` (clean text layer). **Exhibit A is now doc 246** (the clean 2025 LRA-certified CTC of the 1992 SPA) — operative clause read clean 2026-07-05 (`drafts/ocr_pending_write/246.txt`), resolving old worklist item 4. Doc 416 (garbled consular scan) is corroborative only, no longer the primary.
 
 ---
 
@@ -203,7 +204,7 @@ Ordered by the SJ logic. Each row is a `government_issued` or `executed` corpus 
 ### 10a. Your direct spine (what you affirm)
 1. You are attorney-in-fact for Patricia Keesey Zschoche, one of three co-owners (with Geraldine Keesey Hoppe, Marcia Ellen Keesey) — doc 441.
 2. The parcel (2,587 sqm, Lot 2-X-6-I-4-C, Brgy. San Roque, Mercedes) was titled **T-52540 in the co-owners' name** (Geraldine K. Hoppe of record) — docs 272, 233.
-3. **The 1992 SPA authorized de la Fuente to *negotiate*, not to sell** — doc 416. *(Stay on "negotiate, not sell." Do not overstate; quote the clause.)*
+3. **The 1992 SPA let de la Fuente sell only to Ben Llamanzares's Contract-to-Sell holders — Balane was not one** — doc 246. *(Do NOT say "he couldn't sell at all" — the SPA authorizes a sale, just to a class Balane is outside of. Quote the clause; don't overstate.)*
 4. The family withdrew his authority (1999 Hoppe letter, doc 1134) and **revoked the SPA on 15 Aug 2005** — docs 76, 79.
 5. **Revoked 2005, published 2020.** Say it in that order, every time. Never imply the publication was contemporaneous.
 6. The 2016 deed to Balane was executed by de la Fuente "as attorney-in-fact" after his authority was gone; it cancelled T-52540 and produced Balane's …2126 — docs 415/233, 410, 388.
