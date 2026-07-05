@@ -37,21 +37,14 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 KINDS = {
     "evidence_gap": {
         "title": "Evidence gap closure",
+        # Gaps are DERIVED from v_evidence_gaps (deploy_709), not asserted by the strategist. So a gap
+        # work order routes straight to a strategist gather then a human hold — the corpus-existence
+        # check lives in the data model (the view) now, not in runtime prose checks (deploy_707/708 removed).
         "steps": [
-            # ground FIRST: is what this gap seeks already in the corpus? (the check missing when
-            # #4/#5 were created). If a strong candidate exists → held for human, don't spend a gather.
-            {"name": "ground", "agent": "corpus_check",           "mode": "ground",  "tier": "T1"},
             {"name": "gather", "agent": "case-26360-strategist",  "mode": "handoff", "tier": "T2"},
             {"name": "hold",   "agent": "human",                  "mode": "handoff", "tier": "T3"},
         ],
     },
-}
-
-# Words to ignore when grounding a gap title against the corpus (verbs/filler, not discriminators).
-GROUND_STOPWORDS = {
-    "gap", "obtain", "confirm", "pull", "check", "from", "that", "this", "with", "into",
-    "need", "already", "exist", "exists", "corpus", "before", "proof", "which", "does",
-    "have", "held", "there", "their", "must", "should", "reframed", "prong", "reanalyze",
 }
 
 # Verbs that mean an outward/irreversible action — fail-closed even if mis-tagged (GOVERNED_ACTIONS §0).
@@ -80,53 +73,6 @@ def governance_block(step: dict) -> bool:
     if any(v in hay for v in OUTWARD_VERBS):     # outward verb regardless of tag
         return True
     return False
-
-
-def _ground_search(cur, text: str):
-    """Corpus-existence check on free text: does what it describes already exist? → [(id,title,score)].
-    Deterministic keyword scoring over `documents`. Used both to ground a gap work order's title AND
-    to ground gap-CLAIMS inside a strategist's gather output (before they spawn phantom work orders).
-    Soft signal: strong candidates → held for human review, never a hard block."""
-    import re
-    text = text or ""
-    terms = sorted({w for w in re.findall(r"[a-z0-9]{4,}", text.lower()) if w not in GROUND_STOPWORDS})
-    if len(terms) < 2:
-        return []
-    like = " + ".join(["(CASE WHEN _hay LIKE %s THEN 1 ELSE 0 END)"] * len(terms))
-    sql = f"""SELECT id, coalesce(document_title,original_filename,file_name,'?') AS t, score FROM (
-                SELECT id, document_title, original_filename, file_name,
-                       ({like}) AS score
-                FROM (SELECT id, document_title, original_filename, file_name,
-                             lower(coalesce(document_title,'')||' '||coalesce(original_filename,'')||' '||coalesce(file_name,'')) AS _hay
-                      FROM documents) d
-              ) s WHERE score >= %s ORDER BY score DESC LIMIT 5"""
-    thresh = max(2, len(terms) // 2)
-    cur.execute(sql, tuple(f"%{t}%" for t in terms) + (thresh,))
-    return [(r["id"], r["t"], r["score"]) for r in cur.fetchall()]
-
-
-# Phrases in a gather output that CLAIM something is missing → must be grounded before trusted.
-GAP_MARKERS = ("not in corpus", "not in the corpus", "not yet in corpus", "missing from",
-               "is missing", "obtain the", "pull the", "pull from", "from rd", "not held",
-               "need to get", "request from", "gap #", "gap:", "does not exist", "absent from",
-               "not yet held", "we lack", "no ctc", "not on file")
-
-
-def _ground_gather(cur, text: str):
-    """Ground every gap-CLAIM in a strategist's gather output. Returns [(claim_snippet, candidates)].
-    A claim that something is 'not in corpus / obtain / pull from RD' is checked against the corpus;
-    if strong candidates exist, the claim is SUSPECT (the thing may already be held) — exactly the
-    #4/#5 failure, now caught at gather-complete before it can spawn a phantom work order."""
-    import re
-    suspects = []
-    for line in re.split(r"[\n.;]+", text or ""):
-        low = line.lower()
-        if not any(m in low for m in GAP_MARKERS):
-            continue
-        cands = _ground_search(cur, line)
-        if cands:
-            suspects.append((line.strip()[:110], cands))
-    return suspects
 
 
 def _audit(order: dict, frm: str, to: str, note: str) -> list:
@@ -213,29 +159,9 @@ def cmd_complete(cur, oid, result):
     steps = r["steps"]; cs = r["current_step"]
     steps[cs]["status"] = "done"
     steps[cs]["result"] = result
-
-    # GROUND THE GATHER OUTPUT: any "X is not in corpus / obtain X" claim is corpus-checked before it
-    # can advance and spawn work. Suspect claims (the thing may already exist) hold the order for a human.
-    suspects = _ground_gather(cur, result) if steps[cs]["name"] == "gather" else []
-    if suspects:
-        note = ("GATHER GROUNDING HOLD — proposed gap(s) may already be in corpus; verify before "
-                "creating work orders: " + " | ".join(
-                    f"\"{claim}\" -> " + ", ".join(f"doc {c[0]}({c[2]})" for c in cands[:3])
-                    for claim, cands in suspects[:4]))
-        audit = _audit(r, "awaiting_handoff", "blocked_governance", note)
-        cur.execute("""UPDATE work_orders SET steps=%s, status='blocked_governance',
-                         updated_at=now(), audit=%s WHERE id=%s""",
-                    (json.dumps(steps), json.dumps(audit), oid))
-        print(f"#{oid}: gather done but HELD — {len(suspects)} proposed gap(s) may already exist:")
-        for claim, cands in suspects:
-            print(f"    \"{claim}\" -> " + ", ".join(f"doc {c[0]}({c[1][:26]}, {c[2]})" for c in cands[:3]))
-        print(f"  Reconcile, then: supervisor.py resolve {oid} --note ...  (or cancel {oid} --reason ...)")
-        return 0
-
     nxt = cs + 1
     new_status = "done" if nxt >= len(steps) else "queued"
-    done_note = f"handoff '{steps[cs]['name']}' completed" + (" (gather grounded clean)" if steps[cs]["name"] == "gather" else "")
-    audit = _audit(r, "awaiting_handoff", new_status, done_note)
+    audit = _audit(r, "awaiting_handoff", new_status, f"handoff '{steps[cs]['name']}' completed")
     cur.execute("""UPDATE work_orders SET steps=%s, current_step=%s, status=%s,
                      updated_at=now(), audit=%s WHERE id=%s""",
                 (json.dumps(steps), nxt, new_status, json.dumps(audit), oid))
@@ -299,22 +225,7 @@ def cmd_tick(cur, dry):
                  f"step '{step['name']}' (tier {step.get('tier')}) held for human — no autonomous outward action", dry)
             continue
         # (b) execute by mode
-        if step["mode"] == "ground":
-            cands = _ground_search(cur, r.get("title") or "")
-            if cands:
-                note = ("GROUNDING HOLD — may already exist in corpus: "
-                        + "; ".join(f"doc {c[0]} ({c[1][:32]}, match={c[2]})" for c in cands)
-                        + ". Verify this is a REAL gap before spending a gather.")
-                _set(cur, r, "blocked_governance", note, dry)
-            else:
-                print(f"  #{r['id']}: ground passed (no corpus match) → advancing to '{steps[cs+1]['name']}'")
-                if not dry:
-                    steps[cs]["status"] = "done"; steps[cs]["result"] = "grounding: no existing corpus match"
-                    audit = _audit(r, "queued", "queued", "ground: confirmed real gap, advancing")
-                    cur.execute("""UPDATE work_orders SET steps=%s, current_step=%s, status='queued',
-                                     updated_at=now(), audit=%s WHERE id=%s""",
-                                (json.dumps(steps), cs + 1, json.dumps(audit), r["id"]))
-        elif step["mode"] == "handoff":
+        if step["mode"] == "handoff":
             _set(cur, r, "awaiting_handoff",
                  f"awaiting handoff: '{step['name']}' → {step['agent']} (run it, then: supervisor.py complete {r['id']} --result ...)", dry)
         elif step["mode"] == "auto":
