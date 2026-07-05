@@ -54,10 +54,19 @@ TIER_2_CONFIG = {
 TIER_3_CONFIG = {
     "name": "anthropic",
     "models": {
-        "default": "claude-sonnet-4-5",
-        "reasoning": "claude-opus-4-6",
+        # NB: Tier 3 is currently credit-depleted (API returns 400 "credit balance too low")
+        # — the executor is correct and activates when credits return. claude-sonnet-5 is the
+        # current id; opus (claude-opus-4-8) is opt-in for heavy reasoning.
+        "default": "claude-sonnet-5",
+        "reasoning": "claude-sonnet-5",
     },
+    "api_url": "https://api.anthropic.com/v1/messages",
+    "version": "2023-06-01",
+    "max_tokens": 1024,
+    "timeout_sec": 60,
 }
+
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
 
 SYSTEM_PROMPTS = {
     "verify": """You are a legal fact-checker. Read the document excerpt and verify the stated fact.
@@ -82,6 +91,15 @@ TEMPERATURE = {
     "classify": 0.2,    # mostly consistent
     "ocr_assist": 0.0,  # deterministic
     "reason": 0.5,      # allow some variation for reasoning
+}
+
+# Task → model-quality mapping (shared by pick() and the cascade helper).
+TASK_QUALITY = {
+    "verify": "default",
+    "extract": "default",
+    "classify": "fast",
+    "reason": "reasoning",
+    "ocr_assist": "fast",
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -125,26 +143,19 @@ tier1_last_health_check = 0
 
 def health_check_tier1(timeout_sec=3) -> Tuple[bool, Optional[str]]:
     """
-    Lightweight health probe for Tier 1.
-    Returns (is_healthy, failure_reason or None).
+    Lightweight *reachability* probe for Tier 1.
+
+    Uses /api/tags (lists loaded models, no generation) — NOT /api/generate. The old probe
+    ran a real generation with a 3s cap, so a COLD model (first call after idle loads ~9GB)
+    false-negatived tier1 as 'unavailable' and silently pushed all inference to Gemini,
+    defeating the $0 sovereign tier. Reachability is the right availability signal; cold-start
+    latency is absorbed by the actual call (120s timeout) + the cascade.
     """
     try:
-        start = time.time()
-        resp = requests.post(
-            f"{TIER_1_CONFIG['base_url']}/api/generate",
-            json={
-                "model": TIER_1_CONFIG["models"]["default"],
-                "prompt": "Reply with OK.",
-                "stream": False,
-            },
-            timeout=timeout_sec
-        )
-        latency_ms = int((time.time() - start) * 1000)
-        
+        resp = requests.get(f"{TIER_1_CONFIG['base_url']}/api/tags", timeout=timeout_sec)
         if resp.status_code == 200:
             return (True, None)
-        else:
-            return (False, f"HTTP {resp.status_code}")
+        return (False, f"HTTP {resp.status_code}")
     except requests.Timeout:
         return (False, "timeout")
     except requests.ConnectionError:
@@ -215,15 +226,7 @@ def pick(task_type: str, data_size: Optional[str] = None, prefer_tier: Optional[
     if override:
         prefer_tier = f"tier{override}"
     
-    # Task → model-quality mapping
-    task_quality = {
-        "verify": "default",
-        "extract": "default",
-        "classify": "fast",
-        "reason": "reasoning",
-        "ocr_assist": "fast",
-    }
-    quality = task_quality.get(task_type, "default")
+    quality = TASK_QUALITY.get(task_type, "default")
     
     # Tier-by-tier routing
     
@@ -309,28 +312,61 @@ def call_model(
     # Use task-specific temperature if not overridden
     temperature = kwargs.get("temperature", TEMPERATURE.get(task_type, 0.3))
 
-    if routed_config["provider"] == "ollama_local":
-        result = _call_ollama(
-            routed_config, prompt, task_type, system_prompt,
-            request_id, doc_id, matter_id, temperature, **kwargs
-        )
-    elif routed_config["provider"] == "gemini":
-        result = _call_gemini(
-            routed_config, prompt, task_type, system_prompt,
-            request_id, doc_id, matter_id, temperature, **kwargs
-        )
-    elif routed_config["provider"] == "anthropic":
-        result = _call_anthropic(
-            routed_config, prompt, task_type, system_prompt,
-            request_id, doc_id, matter_id, temperature, **kwargs
-        )
-    else:
-        result = {"error": f"unknown provider {routed_config['provider']}",
-                  "request_id": request_id, "success": False, "tier": routed_config.get("tier")}
+    # CASCADE: try the routed tier; on failure degrade to the next available tier
+    # (tier1 local → tier2 Gemini → tier3 Anthropic) within this single call, so a sleeping
+    # Mac degrades to paid inference instead of erroring. Rare in practice (tier1 ~99% up).
+    # Every attempt is logged. `allow_cascade=False` disables (e.g. cost-sensitive callers).
+    allow_cascade = kwargs.get("allow_cascade", True)
+    cfg, tried, last = routed_config, [], None
+    while cfg and cfg.get("provider"):
+        result = _dispatch(cfg, prompt, task_type, system_prompt,
+                           request_id, doc_id, matter_id, temperature, **kwargs)
+        _log_inference(result, task_type, doc_id, matter_id)
+        tried.append(cfg.get("tier"))
+        if result.get("success"):
+            if len(tried) > 1:
+                result["cascaded_from"] = tried[:-1]
+            return result
+        last = result
+        if not allow_cascade:
+            break
+        # find the next lower tier that is available
+        cfg = None
+        for nt in (t for t in (1, 2, 3) if t > (tried[-1] or 0)):
+            nxt = _config_for_tier(nt, task_type)
+            if nxt:
+                cfg = nxt
+                break
+    return last or {"error": "All inference tiers unavailable", "request_id": request_id,
+                    "success": False, "tier": None, "provider": None}
 
-    # Single observability point — every routed call is logged (best-effort, never raises).
-    _log_inference(result, task_type, doc_id, matter_id)
-    return result
+
+def _dispatch(cfg, prompt, task_type, system_prompt, request_id, doc_id, matter_id, temperature, **kwargs):
+    """Execute one tier (no cascade, no logging — call_model owns those)."""
+    if cfg["provider"] == "ollama_local":
+        return _call_ollama(cfg, prompt, task_type, system_prompt, request_id, doc_id, matter_id, temperature, **kwargs)
+    if cfg["provider"] == "gemini":
+        return _call_gemini(cfg, prompt, task_type, system_prompt, request_id, doc_id, matter_id, temperature, **kwargs)
+    if cfg["provider"] == "anthropic":
+        return _call_anthropic(cfg, prompt, task_type, system_prompt, request_id, doc_id, matter_id, temperature, **kwargs)
+    return {"error": f"unknown provider {cfg.get('provider')}", "request_id": request_id,
+            "success": False, "tier": cfg.get("tier"), "provider": cfg.get("provider")}
+
+
+def _config_for_tier(tier: int, task_type: str) -> Optional[Dict]:
+    """Build a routed config for a specific tier if that tier is available (for cascade)."""
+    quality = TASK_QUALITY.get(task_type, "default")
+    if tier == 1 and check_tier1_available():
+        return {"provider": "ollama_local", "tier": 1, "base_url": TIER_1_CONFIG["base_url"],
+                "timeout_sec": TIER_1_CONFIG["timeout_sec"], "error": None,
+                "model": TIER_1_CONFIG["models"].get(quality, TIER_1_CONFIG["models"]["default"])}
+    if tier == 2 and check_tier2_available():
+        return {"provider": "gemini", "tier": 2, "base_url": None, "error": None,
+                "model": TIER_2_CONFIG["models"].get(quality, TIER_2_CONFIG["models"]["default"])}
+    if tier == 3 and check_tier3_available():
+        return {"provider": "anthropic", "tier": 3, "base_url": None, "error": None,
+                "model": TIER_3_CONFIG["models"].get(quality, TIER_3_CONFIG["models"]["default"])}
+    return None
 
 def _call_ollama(
     config: Dict, prompt: str, task_type: str, system_prompt: str,
@@ -406,28 +442,86 @@ def _call_gemini(
     request_id: str, doc_id: Optional[str], matter_id: Optional[str],
     temperature: float, **kwargs
 ) -> Dict:
-    """Call Gemini API (Tier 2). Stub for now."""
-    # TODO: Implement Gemini integration
-    return {
-        "error": "Gemini integration not yet implemented",
-        "request_id": request_id,
-        "tier": 2,
-        "provider": "gemini",
+    """Call Gemini free-tier (Tier 2) via generateContent REST. Matches comprehend.py's pattern.
+    Tries GEMINI_API_KEY then GEMINI_API_KEY_FALLBACK (429-rotation)."""
+    start = time.time()
+    keys = [k for k in (os.environ.get("GEMINI_API_KEY", ""),
+                        os.environ.get("GEMINI_API_KEY_FALLBACK", "")) if k]
+    if not keys:
+        return {"error": "no GEMINI_API_KEY", "request_id": request_id, "provider": "gemini",
+                "tier": 2, "model": config["model"], "success": False, "fallback_reason": "no_key"}
+    body = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "systemInstruction": {"parts": [{"text": system_prompt}]},
+        "generationConfig": {"temperature": temperature},
     }
+    last = ""
+    for key in keys:
+        try:
+            resp = requests.post(
+                GEMINI_API_URL.format(model=config["model"], key=key),
+                json=body, timeout=45)
+            if resp.status_code == 429:
+                last = "429_quota"; continue
+            resp.raise_for_status()
+            out = resp.json()
+            text = "".join(p.get("text", "")
+                           for p in out["candidates"][0]["content"]["parts"])
+            um = out.get("usageMetadata", {})
+            return {
+                "text": text, "provider": "gemini", "model": config["model"], "tier": 2,
+                "latency_ms": int((time.time() - start) * 1000),
+                "tokens_prompt": um.get("promptTokenCount", 0),
+                "tokens_completion": um.get("candidatesTokenCount", 0),
+                "cost": 0, "success": True, "error": None, "request_id": request_id,
+                "fallback_reason": None,
+            }
+        except Exception as e:
+            last = str(e)
+    return {"error": f"Gemini failed: {last}", "request_id": request_id, "provider": "gemini",
+            "tier": 2, "model": config["model"], "success": False, "fallback_reason": last,
+            "latency_ms": int((time.time() - start) * 1000)}
 
 def _call_anthropic(
     config: Dict, prompt: str, task_type: str, system_prompt: str,
     request_id: str, doc_id: Optional[str], matter_id: Optional[str],
     temperature: float, **kwargs
 ) -> Dict:
-    """Call Anthropic API (Tier 3). Stub for now."""
-    # TODO: Implement Anthropic integration
-    return {
-        "error": "Anthropic integration not yet implemented",
-        "request_id": request_id,
-        "tier": 3,
-        "provider": "anthropic",
-    }
+    """Call Anthropic (Tier 3, frontier) via the Messages REST API (x-api-key header)."""
+    start = time.time()
+    key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not key:
+        return {"error": "no ANTHROPIC_API_KEY", "request_id": request_id, "provider": "anthropic",
+                "tier": 3, "model": config["model"], "success": False, "fallback_reason": "no_key"}
+    try:
+        resp = requests.post(
+            TIER_3_CONFIG["api_url"],
+            headers={"x-api-key": key, "anthropic-version": TIER_3_CONFIG["version"],
+                     "content-type": "application/json"},
+            json={
+                "model": config["model"],
+                "max_tokens": kwargs.get("max_tokens", TIER_3_CONFIG["max_tokens"]),
+                "temperature": temperature,
+                "system": system_prompt,
+                "messages": [{"role": "user", "content": prompt}],
+            },
+            timeout=TIER_3_CONFIG["timeout_sec"])
+        resp.raise_for_status()
+        out = resp.json()
+        text = "".join(b.get("text", "") for b in out.get("content", []) if b.get("type") == "text")
+        usage = out.get("usage", {})
+        return {
+            "text": text, "provider": "anthropic", "model": config["model"], "tier": 3,
+            "latency_ms": int((time.time() - start) * 1000),
+            "tokens_prompt": usage.get("input_tokens", 0),
+            "tokens_completion": usage.get("output_tokens", 0),
+            "cost": 0, "success": True, "error": None, "request_id": request_id,
+            "fallback_reason": None,
+        }
+    except Exception as e:
+        return {"error": f"Anthropic failed: {e}", "request_id": request_id, "provider": "anthropic",
+                "tier": 3, "model": config["model"], "success": False, "fallback_reason": str(e),
+                "latency_ms": int((time.time() - start) * 1000)}
 
 # ─────────────────────────────────────────────────────────────
 # OBSERVABILITY — the inference_audit write the docstring promises

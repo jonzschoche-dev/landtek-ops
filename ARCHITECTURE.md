@@ -89,9 +89,13 @@ mostly **hardening + an owned inference tier**, not a redesign.
 > 120s; (2) `reasoning` pointed at an unpulled `qwen2.5:32b` (404) → remapped to 14b (32b = opt-in pull);
 > (3) the promised `inference_audit` logging was never wired → now written on every routed call; (4) new
 > `landtek-inference-sentinel` timer (6h) writes a HIGH-severity holes row if the Mac tier goes unreachable.
-> **What's genuinely left:** pull 32b for heavier reasoning (optional, 32GB ceiling), and implement the
-> Tier-2/Tier-3 fallback stubs in `model_router` (currently `not yet implemented` — `verify_worker` and the
-> direct-Anthropic callers don't depend on them, but the router's own fallback is a mirage until they exist).
+> **Update (deploy_695): the fallback stubs are now implemented.** `model_router` Tier-2 (Gemini
+> generateContent, key-rotation on 429) and Tier-3 (Anthropic Messages) are real executors, plus an
+> **in-call cascade** (tier1→tier2→tier3 on failure, each attempt logged, `cascaded_from` recorded). Also
+> fixed a health-probe bug: it ran a real `/api/generate` with a 3s cap, so cold-start false-negatived
+> tier1 and silently pushed inference to Gemini — now a lightweight `/api/tags` reachability probe.
+> **Genuinely left:** Tier-3 is **credit-depleted** (API returns 400 "credit balance too low") — the
+> executor is correct and activates on top-up; and pulling 32b for heavier reasoning (optional, 32GB ceiling).
 
 
 **Hardware you already own:** Mac Studio **M2 Max, 32 GB**, on Tailscale (`100.117.118.47`), **Ollama
