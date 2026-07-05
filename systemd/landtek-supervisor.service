@@ -1,0 +1,14 @@
+[Unit]
+Description=LandTek Supervisor — scripts/supervisor.py tick: advances queued work_orders one step, enforcing FAIL-CLOSED governance (T3/outward steps are blocked and held for a human, never executed autonomously). Handoff steps are surfaced for a Claude session/human. v1: no auto-execution. Additive; touches only the work_orders table. No LLM, $0.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+# tick returns 0 normally; treat a transient error (1) as success for systemd hygiene
+# (keep `systemctl --failed` at zero) — state is durable in work_orders, next tick retries.
+SuccessExitStatus=0 1
+ExecStart=/usr/bin/python3 /root/landtek/scripts/supervisor.py tick
+StandardOutput=append:/var/log/landtek_supervisor.log
+StandardError=append:/var/log/landtek_supervisor.log

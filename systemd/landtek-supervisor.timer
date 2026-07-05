@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the LandTek Supervisor tick every 30 min (+9min after boot) — low frequency by design (v1 validation). Advances work_orders through their steps and enforces governed holds; most steps wait on a human handoff, so cadence is deliberately slow.
+
+[Timer]
+OnBootSec=9min
+OnUnitActiveSec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
