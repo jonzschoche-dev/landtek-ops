@@ -35,11 +35,18 @@ access model; see §6).
 ## 1. The organizing axiom
 
 > **A `document` is the only source of truth. Every other fact-bearing row is a provenance-gated
-> projection of one or more documents, and carries `provenance_level ∈ {verified, inferred_strong,
-> inferred_weak}`.** Nothing is "verified" unless it names a `source_doc_id` (or `source_id`) + an
-> excerpt. ~40 tables carry a foreign key back to `documents`. This is enforced in DB triggers
-> (`deploy_341`), not in application code, so **every** writer is bound — Python workers, `psql`, and
+> projection of one or more documents, and carries a `provenance_level`.** Nothing is "verified"
+> unless it names a `source_doc_id` (or `source_id`) + an excerpt. ~40 tables carry a foreign key
+> back to `documents`. This is enforced in DB triggers (`deploy_341` + the `ontology_validator` of
+> `deploy_691`), not in application code, so **every** writer is bound — Python workers, `psql`, and
 > Leo's n8n LangChain.js path alike.
+
+**Provenance vocabulary (canonical set — grounded on live values 2026-07-05):**
+`verified` · `operator` (operator-asserted) · `inferred_strong` · `inferred_corroborated`
+(corroboration ladder) · `inferred_weak`. *(An earlier draft listed only 3; the live set is 5.)*
+**Known exception:** `knowledge_graph_triples.provenance_level` is **overloaded** — it stores
+extraction-method strings (`verified_from_court_caption`, `llm_sonnet_4_6_triple`, …) rather than a
+tier. That is a schema smell on the books as backlog; `scripts/ontology_check.py` flags it every run.
 
 ---
 
@@ -157,10 +164,10 @@ claims (what we must prove) ──▶ truth_negotiations ──▶ claim_truth_v
 | # | Axiom | Enforcement |
 |---|---|---|
 | A1 | Every fact-bearing row has a non-null `provenance_level`. | 🟢 **DB `NOT NULL`** (deploy_341) |
-| A2 | `verified` ⇒ a real `source_doc_id`/`source_id` + excerpt exists. | 🟢 provenance write-gate + `_safe` views |
+| A2 | `verified` ⇒ a real `source_doc_id`/`source_id` + excerpt exists. | 🟢 provenance write-gate + `_safe` views + **`ontology_validator` V3 (shadow, deploy_691)** |
 | A3 | No instrument may be executed by an actor outside their lifespan. | 🟢 **trigger** `enforce_actor_lifespan_on_instruments` + `v_actor_lifespan_violations` |
 | A4 | A locked/cited row (`verification_lock`, `cited_by_compound_claims`) is immutable until unlocked. | 🟢 lock columns + content_hash |
-| A5 | A matter belongs to exactly one client; client data never crosses (`client_code`). | 🟡 **partial** — FK on `matters`/`map_parcels`/`assets`; corpus isolates on looser `case_file`/`matter_code` text (§5) |
+| A5 | A matter belongs to exactly one client; client data never crosses (`client_code`). | 🟡 **partial** — FK on `matters`/`map_parcels`/`assets`; corpus isolates on looser `case_file`/`matter_code` text (§5). **Detector live:** `ontology_validator` V4 view `v_ontology_client_cross` (deploy_691) — caught + re-homed 6 Paracale facts mis-filed under MWK on first run. |
 | A6 | Inference substituted for source content is flagged inline, never silent. | 🟡 asserted (MASTER_PLAN §4 principle 9); known past violations |
 
 **A5 is the load-bearing gap.** It is the extension point for the `ontology_validator`
@@ -194,4 +201,9 @@ drift, diff the live table list against §2–§3 (a `scripts/ontology_check.py`
 step — spec'd but not yet built; it belongs to the `ontology_validator` work, not this doc).
 
 **Change log**
+- v0.2 (2026-07-05) — `ontology_validator` applied in **shadow** (deploy_691): V1 drift-guard (4 tables),
+  V3 grounding (matter_facts, 0 false positives), V4 client-isolation detector. V4 caught + re-homed
+  **6 Paracale (Allan Inocalla / OCT P-1616) facts mis-filed under MWK-TCT4497** → moved to PAR-TCT1616;
+  contamination now 0. Provenance vocab corrected to the real 5-value set. `scripts/ontology_check.py`
+  added (whole-corpus linter). Enforcement still `log`-only — flip to `block` after a 72h clean run.
 - v0.1 (2026-07-05) — first canonical baseline; grounded on live schema; drift list = 4 tables.

@@ -1,8 +1,9 @@
 # Spec — `ontology_validator` (gate extension)
 
-> **Status: SPEC ONLY (2026-07-05). Nothing here is applied to the live DB.** Applying a new
-> trigger/gate during the Aug-12 litigation window requires Jonathan's explicit go. This document
-> is the design; the DDL at the end is ready-to-apply but **unapplied**.
+> **Status: APPLIED IN SHADOW (deploy_691, 2026-07-05).** V1/V3/V4 are live on the DB in `log` mode —
+> they log to `holes_findings` and **block nothing**. Enforcement (`block` mode) still requires Jonathan's
+> explicit go after a 72h clean shadow run (see §5, §7). The DDL sketch in §6 is superseded by the
+> applied migration `migrations/apply_deploy_691_ontology_validator.py` (idempotent; `--rollback` reverts).
 >
 > **Origin.** Graded response to the "Agent-Native Ontology Enforcement" proposal (see `ARCHITECTURE.md`
 > §8). We adopt its *intent* — reject non-conforming agent output at write time — but **keep enforcement
@@ -140,8 +141,11 @@ V1/V3 when the shadow migration is authored.)*
 
 ## 7. Definition of done (v1)
 
-- [ ] Shadow migration authored (`migrations/apply_deploy_NNN_ontology_validator.sql`) — V1–V4 in `log` mode.
-- [ ] 72h shadow run; V1–V3 false-positive rate = 0 confirmed in `holes_findings`.
-- [ ] V1–V3 flipped to `block`; one rollback drill executed.
-- [ ] `scripts/ontology_check.py` regenerates `ONTOLOGY.md` §2–§3 from live schema (closes the loop).
-- [ ] V4 contamination triaged; deferred to post-Aug-12 A5 hardening.
+- [x] Shadow migration authored + **applied** (`migrations/apply_deploy_691_ontology_validator.py`) — V1/V3/V4 in `log` mode; crash-proof logger self-tested on apply. *(deploy_691, 2026-07-05)*
+- [x] `scripts/ontology_check.py` whole-corpus linter built + running (V3 grounding, V4 isolation, drift-table watch, provenance-vocab audit, unregistered-table review). Closes the loop.
+- [x] **V4 fired on first run** — caught 6 verified facts (Allan Inocalla / OCT P-1616, Paracale) mis-filed under `MWK-TCT4497`; **re-homed to `PAR-TCT1616`**; `v_ontology_client_cross` now returns 0.
+- [x] V3 confirmed 0 false positives at apply time (0 ungrounded verified facts).
+- [ ] 72h shadow run; V1 false-positive rate = 0 confirmed in `holes_findings` (V1 drift-writes should be 0; `chain_of_title`/`cases` hold *pre-existing* rows, not new writes).
+- [ ] V1/V3 flipped to `block` (`UPDATE ontology_validator_config SET mode='block' WHERE check_code IN ('V1','V3');`); one rollback drill (`--rollback`) executed.
+- [ ] `knowledge_graph_triples.provenance_level` overload (extraction-method values, not tiers) reconciled — backlog.
+- [ ] V4 kept as detector; enforce post-Aug-12 once A5 (`case_file`/`matter_code`) is FK-hardened.
