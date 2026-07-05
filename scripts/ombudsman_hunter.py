@@ -176,7 +176,7 @@ SIGNAL_PATTERNS = {
     # political-favor / insider motive (partly inferential — the voter-support angle is argument,
     # the named-insider favoring is grounded). Feeds the §3(f) discriminatory-purpose element.
     "political_favor":     r"\b(chief of staff|personal assistant|the mayor'?s (?:man|ally|staff|aide)|"
-                           r"voter|constituent|re-?election|political (?:support|ally)|insider|crony|Teope|Baliza)\b",
+                           r"voter|constituent|re-?election|political (?:support|ally)|insider|crony)\b",
     "due_demand":          r"\b(demand\w*|request\w*|follow-?up|letter of|written request)\b",
     "official_document":   r"\b(letter|memorandum|resolution|order|certification|joint response|"
                            r"official (?:communication|document)|minutes)\b",
@@ -317,7 +317,7 @@ def build_roster(cur):
     for name, office, cap, toks, note in SEED_ROSTER:
         # skip a seed only if the SAME person was already discovered (shared distinctive token);
         # always keep the flagship's curated provenance
-        if any(t.lower() in disc_tokens for t in toks) and name != "Mayor Alexander Pajarillo":
+        if any(t.lower() in disc_tokens for t in toks) and name != (active_case().get("flagship") or ""):
             continue
         roster.append((name, office, cap, toks, note, "seed"))
     return roster
@@ -333,9 +333,89 @@ def _table_exists(cur, name):
 # (e.g. the Paracale mining matter PAR-CASE-88750) must never contaminate a MWK Ombudsman lead.
 MATTER_SCOPE = os.environ.get("LANDTEK_OMBUDS_SCOPE", "MWK%")
 
+# ── MULTI-CLIENT CASE THEORY ──────────────────────────────────────────────────
+# The ONLY client-specific knowledge lives here; the rest of the engine (violations, signals, status
+# doctrine, discovery, scan/verify/reason algorithm) is UNIVERSAL and works for any client. The
+# ANALYTICAL commands (--scan/--hunt/--verify/--officers/--board) generalize to ANY client via corpus
+# discovery + scope; this registry only enriches --reason with the case narrative. Add a client = add
+# an entry (or externalize to a config file). `--client KEY` selects the active case.
+CASES = {
+    "MWK": {
+        "scope": "MWK%",
+        "flagship": "Mayor Alexander Pajarillo",
+        "insider_names": ["Teope", "Baliza"],
+        "scheme": [
+            "The principals denied the ABSENTEE AMERICAN heirs their own property records — on a",
+            "citizenship pretext (EO 2) and an unlawful All-Heirs-SPA requirement — WHILE tolerating",
+            "and favoring municipal INSIDERS occupying, building on, and claiming the heirs' titled",
+            "land. Refusal of the owners + preference to insiders = manifest partiality, not neglect.",
+        ],
+        "beneficiaries": [
+            ("Antonio Teope", "Mayor's Chief of Staff",
+             "occupies a portion of the heirs' titled land; a cement cottage is under construction there; "
+             "the recipient of the officials' non-enforcement",
+             "§3(e) CONSPIRACY (recipient of the unwarranted preference); Grave Misconduct IF his "
+             "Chief-of-Staff post is confirmed a public office"),
+            ("Miguel Baliza", "draftsman in the Municipal Assessor's office",
+             "claims 1 hectare 'purchased for ₱3.4M from the late Cesar de la Fuente' (the void CV-26360 "
+             "source); the Treasurer declines to collect his RPT",
+             "§3(e) CONSPIRACY; his office-insider status + the void source are the partiality evidence"),
+        ],
+        "defense": [
+            "• EO-2 citizenship limitation — COLORABLE (EO 2 restricts FOI to citizens); REBUT: a",
+            "  property owner's OWN records aren't pure FOI; citizenship is no bar under RA 11032; the",
+            "  rule was applied DISCRIMINATORILY (dismiss heirs / favor insiders) — that IS the purpose.",
+            "• Good faith / workload — NEGATED by the CART conflict + Balane's self-dealing (his office",
+            "  approved the subdivision to his mother).",
+            "• 'Unpermitted' construction — currently DRAFT-only; neutralize by obtaining a certificate",
+            "  of no permit before pleading it as fact.",
+        ],
+        "next_facts": [
+            "• Teope's appointment/plantilla status (public officer? → own counts vs conspiracy-only).",
+            "• Certificate of NO building permit for the Teope structure (converts 'reported' → proven).",
+        ],
+    },
+}
+GENERIC_CASE = {
+    "scope": None, "flagship": None, "insider_names": [], "beneficiaries": [],
+    "scheme": ["(No case-theory configured for this client — the ACTORS / COUNTS / CLINCH below are",
+               " data-driven and client-agnostic; add a CASES entry to get the scheme narrative.)"],
+    "defense": ["• (No client-specific defense pre-mortem configured — see the per-count gaps.)"],
+    "next_facts": ["• (Run --hunt on each respondent to surface the clinching facts.)"],
+}
+_ACTIVE_CLIENT = ["MWK"]
 
-def _fetch_facts(cur, scope=MATTER_SCOPE):
+
+def active_case():
+    return CASES.get(_ACTIVE_CLIENT[0], GENERIC_CASE)
+
+
+def _scope():
+    """The active client's matter scope (client separation)."""
+    return active_case().get("scope") or MATTER_SCOPE
+
+
+def set_client(key):
+    """Select the active client (e.g. MWK, PAR, NIBDC). Scope = the case's scope or KEY + '%'."""
+    _ACTIVE_CLIENT[0] = key
+    if key not in CASES:
+        CASES[key] = dict(GENERIC_CASE, scope=(key.rstrip("%") + "%"))
+    _COMPILED.clear()
+
+
+# Compiled signal patterns (built once) + the active client's insider surnames injected — fast combing.
+_COMPILED = {}
+
+
+def _compile_signals():
+    _COMPILED.clear()
+    for sig, pat in SIGNAL_PATTERNS.items():
+        _COMPILED[sig] = re.compile(pat, re.IGNORECASE)
+
+
+def _fetch_facts(cur, scope=None):
     """Every in-scope matter_fact we can scan. Scoped to the client's matters (client separation)."""
+    scope = scope or _scope()
     if not _table_exists(cur, "matter_facts"):
         return []
     cur.execute("""
@@ -415,10 +495,15 @@ def _match_official(fact_stmt, match_tokens):
 
 
 def _scan_signals(text):
-    hits = {}
-    for sig, pat in SIGNAL_PATTERNS.items():
-        if re.search(pat, text, re.IGNORECASE):
-            hits[sig] = True
+    if not _COMPILED:
+        _compile_signals()
+    hits = {sig: True for sig, rx in _COMPILED.items() if rx.search(text)}
+    # the active client's named insiders trigger political_favor (parameterized, not hardcoded)
+    names = active_case().get("insider_names") or []
+    if names and "political_favor" not in hits:
+        low = text.lower()
+        if any(n.lower() in low for n in names):
+            hits["political_favor"] = True
     return hits
 
 
@@ -612,7 +697,8 @@ def _windows(text, tokens, half=140, cap=8):
     return wins
 
 
-def _scoped_docs(cur, rx, scope=MATTER_SCOPE):
+def _scoped_docs(cur, rx, scope=None):
+    scope = scope or _scope()
     """Documents whose text matches AND are linked to the client's matters (client separation)."""
     if _table_exists(cur, "document_matter_links"):
         cur.execute("""SELECT DISTINCT d.id, COALESCE(d.original_filename,''), COALESCE(d.extracted_text,'')
@@ -630,7 +716,7 @@ def _hunt_one(cur, label, tokens, capacity):
     cur.execute("""SELECT id, matter_code, COALESCE(statement,''), COALESCE(source_id::text,'')
                    FROM matter_facts
                    WHERE statement ~* %s AND matter_code LIKE %s
-                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, MATTER_SCOPE))
+                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, _scope()))
     facts = cur.fetchall()
     # 2) the FULL document corpus (what the old hunt ignored) — SCOPED to client-linked docs
     docs = _scoped_docs(cur, rx)
@@ -727,18 +813,7 @@ DEFAULT_STATUS = ("status UNCONFIRMED — if a PRIVATE person, chargeable ONLY i
                   "officers (Go v. Sandiganbayan); if a public officer, directly",
                   "Ombudsman (directly, or via conspiracy)")
 
-# The favored insiders (beneficiaries) — grounded, for the conspiracy / common-design model.
-BENEFICIARIES = [
-    ("Antonio Teope", "Mayor's Chief of Staff",
-     "occupies a portion of the heirs' titled land; a cement cottage is under construction there; the "
-     "recipient of the officials' non-enforcement",
-     "§3(e) CONSPIRACY (recipient of the unwarranted preference); Grave Misconduct IF his Chief-of-Staff "
-     "post is confirmed a public office"),
-    ("Miguel Baliza", "draftsman in the Municipal Assessor's office",
-     "claims 1 hectare 'purchased for ₱3.4M from the late Cesar de la Fuente' (the void CV-26360 source); "
-     "the Treasurer declines to collect his RPT",
-     "§3(e) CONSPIRACY; his office-insider status + the void source are the partiality evidence"),
-]
+# (The favored insiders / beneficiaries now live per-client in CASES[...]["beneficiaries"].)
 
 # For each thin/missing element, the ONE fact that would clinch it (self-critique → next hunt).
 CLINCH_HINTS = {
@@ -769,7 +844,8 @@ def cmd_reason(client):
     actor/role/legal-STATUS map, the common-design/CONSPIRACY thread, counts ranked by real strength,
     a defense pre-mortem, and the single CLINCHING fact each thin count needs. Deterministic ($0);
     grounded in the verified candidate rows. This is what turns leads into a case."""
-    scope = (client if client.endswith("%") else client + "%")
+    set_client(client.rstrip("%"))   # align the active case theory with the --reason target
+    scope = _scope()
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
         if not _table_exists(cur, "ombudsman_candidates"):
             print("No candidates. Run --scan then --verify first.")
@@ -785,12 +861,12 @@ def cmd_reason(client):
             by_off.setdefault(r["official"], []).append(r)
         actors = {o: cs for o, cs in by_off.items() if any(c["status"] != "seed" for c in cs)}
 
+        cfg = active_case()
         print(f"══════ OMBUDSMAN HUNTER — THEORY OF THE CASE: {client} ══════\n")
         print("I. THE SCHEME (common design)")
-        print("   The principals denied the ABSENTEE AMERICAN heirs their own property records — on a")
-        print("   citizenship pretext (EO 2) and an unlawful All-Heirs-SPA requirement — WHILE tolerating")
-        print("   and favoring municipal INSIDERS occupying, building on, and claiming the heirs' titled")
-        print("   land. Refusal of the owners + preference to insiders = manifest partiality, not neglect.\n")
+        for ln in cfg["scheme"]:
+            print("   " + ln)
+        print()
 
         print("II. ACTORS, ROLES & LEGAL STATUS")
         for official, cs in sorted(actors.items(), key=lambda kv: -max(c["score"] for c in kv[1])):
@@ -803,7 +879,7 @@ def cmd_reason(client):
             print(f"       forum : {forum}")
             counts = ", ".join(f"{c['violation_code']}={c['status']}" for c in sorted(cs, key=lambda c: -c['score']) if c['status'] != 'seed')
             print(f"       counts: {counts}  [{verified}]")
-        for name, role, conduct, theory in BENEFICIARIES:
+        for name, role, conduct, theory in cfg["beneficiaries"]:
             basis, forum = _classify_status(name, role)
             print(f"   [BENEFICIARY / CONSPIRATOR] {name}  ({role})")
             print(f"       status: {basis}")
@@ -830,13 +906,8 @@ def cmd_reason(client):
         print()
 
         print("IV. DEFENSE PRE-MORTEM")
-        print("   • EO-2 citizenship limitation — COLORABLE (EO 2 restricts FOI to citizens); REBUT: a")
-        print("     property owner's OWN records aren't pure FOI; citizenship is no bar under RA 11032; the")
-        print("     rule was applied DISCRIMINATORILY (dismiss heirs / favor insiders) — that IS the purpose.")
-        print("   • Good faith / workload — NEGATED by the CART conflict + Balane's self-dealing (his office")
-        print("     approved the subdivision to his mother).")
-        print("   • 'Unpermitted' construction — currently DRAFT-only; neutralize by obtaining a certificate")
-        print("     of no permit before pleading it as fact.")
+        for ln in cfg["defense"]:
+            print("   " + ln)
         print()
 
         print("V. WHAT TO GET NEXT (clinching facts, ranked)")
@@ -854,8 +925,8 @@ def cmd_reason(client):
                 continue
             seen.add(key)
             print(f"   • [{ek}] {hint}")
-        print("   • Teope's appointment/plantilla status (public officer? → own counts vs conspiracy-only).")
-        print("   • Certificate of NO building permit for the Teope structure (converts 'reported' → proven).")
+        for ln in cfg["next_facts"]:
+            print("   " + ln)
         print("\n(This is a grounded case-theory scaffold from the VERIFIED rows. Filing stays human-gated; "
               "intent is argued circumstantially; jurisprudence + periods are NEEDS-COUNSEL-VERIFICATION.)")
 
@@ -898,7 +969,7 @@ def _gather_element_evidence(cur, tokens, signals, limit=6):
     out, seen = [], set()
     cur.execute("""SELECT id, COALESCE(statement,'') FROM matter_facts
                    WHERE statement ~* %s AND matter_code LIKE %s
-                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, MATTER_SCOPE))
+                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, _scope()))
     for fid, stmt in cur.fetchall():
         if sset & set(_scan_signals(stmt)) and f"fact:{fid}" not in seen:
             seen.add(f"fact:{fid}"); out.append((f"fact:{fid}", stmt[:300]))
@@ -960,7 +1031,7 @@ def cmd_verify(target):
             elements = dict(r["elements"])
             vtmpl = VIOLATIONS.get(r["violation_code"], {})
             tokens = _official_tokens(cur, r["official"])
-            print(f"\n[verify] #{r['id']} {r['official']} — {r['statute']}  (deep, scoped {MATTER_SCOPE})")
+            print(f"\n[verify] #{r['id']} {r['official']} — {r['statute']}  (deep, scoped {_scope()})")
             proven = 0
             notes = []
             for ekey, ev in elements.items():
@@ -1190,7 +1261,12 @@ def main():
     ap.add_argument("--officers", action="store_true", help="show the LIVE roster the engine learned from the corpus (discovered + seed)")
     ap.add_argument("--law-check", action="store_true", help="is the RA 3019/6713/6770 law library embedded?")
     ap.add_argument("--doctrine", action="store_true", help="print templates + seed overlay (dry, no DB)")
+    ap.add_argument("--client", default=os.environ.get("LANDTEK_OMBUDS_CLIENT", "MWK"),
+                    help="which client to hunt (MWK | PAR | NIBDC | any matter-code prefix). Sets the "
+                         "corpus scope; the analytical commands work for any client, --reason enriches "
+                         "for configured cases. Default MWK.")
     a = ap.parse_args()
+    set_client(a.client)     # scope + active case theory + (re)compile signals for this client
 
     if a.doctrine:
         cmd_doctrine()
