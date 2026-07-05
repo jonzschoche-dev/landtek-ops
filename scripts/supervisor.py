@@ -167,6 +167,26 @@ def cmd_complete(cur, oid, result):
     return 0
 
 
+def cmd_resolve(cur, oid, note):
+    """Human clears a held order (blocked_governance / awaiting_handoff) → done, with a note.
+    This is the ONLY path out of a T3 governance hold — a human decision, by design."""
+    cur.execute("SELECT * FROM work_orders WHERE id=%s FOR UPDATE", (oid,))
+    r = cur.fetchone()
+    if not r:
+        print(f"no work_order #{oid}"); return 2
+    if r["status"] not in ("blocked_governance", "awaiting_handoff", "queued", "in_progress"):
+        print(f"#{oid} is '{r['status']}' — nothing to resolve"); return 2
+    steps, cs = r["steps"], r["current_step"]
+    if cs < len(steps):
+        steps[cs]["status"] = "resolved"
+        steps[cs]["result"] = note
+    audit = _audit(r, r["status"], "done", f"HUMAN-RESOLVED: {note}")
+    cur.execute("UPDATE work_orders SET steps=%s, status='done', updated_at=now(), audit=%s WHERE id=%s",
+                (json.dumps(steps), json.dumps(audit), oid))
+    print(f"#{oid}: resolved by human → status=done — {note}")
+    return 0
+
+
 def cmd_tick(cur, dry):
     """One processing cycle. Claims queued/in_progress orders (SKIP LOCKED), advances one step each.
     Governance is checked FIRST on every step. Handoff → awaiting_handoff. Auto → fail-closed (v1)."""
@@ -215,6 +235,7 @@ def main():
     l = sub.add_parser("list"); l.add_argument("--awaiting", action="store_true")
     s = sub.add_parser("status"); s.add_argument("id", nargs="?", type=int)
     c = sub.add_parser("complete"); c.add_argument("id", type=int); c.add_argument("--result", required=True)
+    rs = sub.add_parser("resolve"); rs.add_argument("id", type=int); rs.add_argument("--note", required=True)
     t = sub.add_parser("tick"); t.add_argument("--dry", action="store_true")
     a = ap.parse_args()
 
@@ -229,6 +250,8 @@ def main():
             rc = cmd_status(cur, a.id)
         elif a.cmd == "complete":
             rc = cmd_complete(cur, a.id, a.result)
+        elif a.cmd == "resolve":
+            rc = cmd_resolve(cur, a.id, a.note)
         elif a.cmd == "tick":
             rc = cmd_tick(cur, a.dry)
         else:

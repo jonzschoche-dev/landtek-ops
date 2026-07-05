@@ -207,7 +207,7 @@ Ordered by the SJ logic. Each row is a `government_issued` or `executed` corpus 
 3. **The 1992 SPA let de la Fuente sell only to Ben Llamanzares's Contract-to-Sell holders — Balane was not one** — doc 246. *(Do NOT say "he couldn't sell at all" — the SPA authorizes a sale, just to a class Balane is outside of. Quote the clause; don't overstate.)*
 4. The family withdrew his authority (1999 Hoppe letter, doc 1134) and **revoked the SPA on 15 Aug 2005** — docs 76, 79.
 5. **Revoked 2005, published 2020.** Say it in that order, every time. Never imply the publication was contemporaneous.
-6. The 2016 deed to Balane was executed by de la Fuente "as attorney-in-fact" after his authority was gone; it cancelled T-52540 and produced Balane's …2126 — docs 415/233, 410, 388.
+6. The 2016 deed to Balane was executed by de la Fuente "as attorney-in-fact" after his authority was gone; it cancelled T-52540 and produced Balane's …2126 — docs 415/233 (the deed), 410 (Balane's title recites "T-52540 TOTALLY CANCELLED"). *(Dropped stray cite to doc 388 — that's a 2025 demand letter, not cancellation proof.)*
 
 ### 10b. Cross you should expect (their equities) — and your answer
 | Opposing thrust | Anchored in | Your answer |
