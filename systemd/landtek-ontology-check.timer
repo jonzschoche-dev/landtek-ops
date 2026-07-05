@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the LandTek ontology sentinel daily (+7min after boot) so cross-client contamination and ungrounded verified facts are caught within 24h, not only when someone runs the check by hand.
+
+[Timer]
+OnBootSec=7min
+OnUnitActiveSec=24h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -10,6 +10,10 @@ mutates nothing. Runs on the VPS (needs the container-internal DSN).
 Usage:
   python3 scripts/ontology_check.py            # full report
   python3 scripts/ontology_check.py --brief    # phone-friendly one-screen summary
+  python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes ONE
+                                               # high-severity holes_findings row ONLY on NEW
+                                               # actionable contamination (V3/V4 > 0). Standing
+                                               # backlog (drift tables, vocab creep) never alerts.
 
 Exit code: 0 = clean, 1 = drift/contamination found (usable as a health gate).
 """
@@ -67,9 +71,11 @@ def is_plumbing(t: str) -> bool:
 
 def main():
     brief = "--brief" in sys.argv
+    sentinel = "--sentinel" in sys.argv
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
     problems = 0
+    v3 = v4 = 0
     out = []
     with conn.cursor() as cur:
         # 1. validator installed?
@@ -126,11 +132,38 @@ def main():
             if unreg:
                 out.append(f"[i] {len(unreg)} domain table(s) not in ONTOLOGY.md registry (review): {unreg[:25]}{'...' if len(unreg) > 25 else ''}")
 
+    # --sentinel: alert ONLY on new actionable contamination (V3/V4), never on standing backlog.
+    if sentinel and (v3 or v4):
+        bits = []
+        if v4:
+            bits.append(f"{v4} verified fact(s) cite a cross-client document (V4)")
+        if v3:
+            bits.append(f"{v3} verified fact(s) missing source/excerpt (V3)")
+        desc = ("ontology_check daily sentinel: " + "; ".join(bits)
+                + ". Triage: SELECT * FROM v_ontology_client_cross; re-home to the doc's matter (see ONTOLOGY.md A5).")
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO holes_findings(routine_name, routine_version, finding_id_hash,
+                         severity, hole_type, description, metadata, status)
+                       VALUES ('ontology_check','v1', md5(%s), 'high', 'ontology_contamination',
+                         %s, jsonb_build_object('v3',%s,'v4',%s), 'open')""",
+                    (desc[:200], desc, v3, v4),
+                )
+        except Exception:
+            pass  # sentinel must never crash the timer
+
     conn.close()
-    print("=== ontology_check " + ("(brief) " if brief else "") + "===")
+    print("=== ontology_check " + ("(brief) " if brief else "") + ("(sentinel) " if sentinel else "") + "===")
     for line in out:
         print("  " + line)
     print(f"=== {'CLEAN' if problems == 0 else str(problems) + ' PROBLEM(S)'} ===")
+    # Interactive/gate mode: non-zero on any drift so it's usable as a health gate.
+    # Sentinel mode: exit reflects ONLY actionable contamination (V3/V4) — the standing
+    # backlog (vocab creep, pre-existing drift rows) must not put the daily oneshot into
+    # a systemd 'failed' state (keep `systemctl --failed` at zero).
+    if sentinel:
+        sys.exit(1 if (v3 or v4) else 0)
     sys.exit(1 if problems else 0)
 
 

@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek ontology sentinel — scripts/ontology_check.py --sentinel: daily whole-corpus ontology audit (V3 grounding + V4 client-isolation + drift-table watch + provenance-vocab creep). Complements the write-time ontology_validator triggers (deploy_691). Read-only except: writes ONE high-severity holes_findings row ONLY on NEW actionable contamination (verified fact citing a cross-client doc, or ungrounded verified fact); silent on the standing backlog. Never files/sends, no LLM, $0.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/ontology_check.py --sentinel
+StandardOutput=append:/var/log/landtek_ontology_check.log
+StandardError=append:/var/log/landtek_ontology_check.log
