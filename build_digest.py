@@ -255,6 +255,27 @@ def build_digest_sections():
     except Exception:
         pass
 
+    # 9. Governance visibility — autonomous internal writes worth eyes (GOVERNED_ACTIONS.md §3)
+    gov = []
+    try:
+        cur.execute("SELECT count(*) AS n FROM entity_resolution_log WHERE created_at > now() - interval '24 hours';")
+        n = cur.fetchone()["n"]
+        if n:
+            gov.append(f"  🔀 Entity auto-merges (24h): {n}{' ⚠️ unusually high' if n > 15 else ''}")
+    except Exception:
+        pass
+    try:
+        cur.execute("SELECT ts, n_facts AS nf, n_keystones AS nk, changed FROM constitution_regen_log ORDER BY ts DESC LIMIT 1;")
+        cr = cur.fetchone()
+        if cr:
+            recent = (datetime.now(timezone.utc) - cr["ts"]).total_seconds() < 86400
+            flag = " ⚠️ changed" if (cr["changed"] and recent) else ""
+            gov.append(f"  📜 Constitution: {cr['nf']} facts · {cr['nk']} keystones (regen {cr['ts'].strftime('%m-%d %H:%M')} UTC){flag}")
+    except Exception:
+        pass
+    if gov:
+        sections["governance"] = "🛡 <b>Governance (autonomous writes)</b>\n" + "\n".join(gov)
+
     cur.close(); conn.close()
     return sections
 
@@ -265,7 +286,7 @@ def render_digest_messages():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     header = f"📊 <b>LandTek Daily Digest — {today}</b>\n\n"
 
-    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health", "inference"]
+    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health", "inference", "governance"]
     msgs = []
     buf = header
     for k in order:

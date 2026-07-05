@@ -258,11 +258,46 @@ def main():
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     out = render(gather(cur), now_iso)
     if a.write:
+        old_hash = _content_hash(_read_file(OUT))
         with open(OUT, "w") as f:
             f.write(out)
         print(f"[constitution] wrote {OUT} ({len(out)} bytes)")
+        _log_regen(c, cur, _content_hash(out), old_hash)
     else:
         sys.stdout.write(out)
+
+
+def _read_file(path):
+    try:
+        with open(path) as f:
+            return f.read(800)  # header lives at the top
+    except Exception:
+        return ""
+
+
+def _content_hash(text):
+    """Pull the content-hash out of the generated header (format: 'content-hash: XXXX ·')."""
+    marker = "content-hash: "
+    i = (text or "").find(marker)
+    return text[i + len(marker):].split(" ", 1)[0].strip() if i != -1 else None
+
+
+def _log_regen(conn, cur, new_hash, old_hash):
+    """Best-effort governance-visibility row: count deltas when the constitution actually changes.
+    Never raises — a logging failure must not break the regen (GOVERNED_ACTIONS.md §3)."""
+    try:
+        # NB: _cur() is a RealDictCursor → fetchone() returns a dict; alias + key access.
+        cur.execute("SELECT count(*) AS c FROM matter_facts WHERE provenance_level='verified'")
+        nf = cur.fetchone()["c"]
+        cur.execute("SELECT count(*) AS c FROM keystones")
+        nk = cur.fetchone()["c"]
+        cur.execute(
+            """INSERT INTO constitution_regen_log(content_hash, n_facts, n_keystones, changed)
+               VALUES (%s,%s,%s,%s)""",
+            (new_hash, nf, nk, bool(new_hash and new_hash != old_hash)))
+        conn.commit()
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
