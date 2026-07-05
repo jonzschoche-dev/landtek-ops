@@ -1,0 +1,10 @@
+[Unit]
+Description=Probe the sovereign local inference tier every 6h (+8min after boot) so a silent degrade to the quota-capped API tiers is caught within hours, not by stalled legal work.
+
+[Timer]
+OnBootSec=8min
+OnUnitActiveSec=6h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

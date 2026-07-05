@@ -1,0 +1,14 @@
+[Unit]
+Description=LandTek inference-tier sentinel — scripts/inference_tier_sentinel.py: probes the Mac Studio's Ollama (Tier 1, the sovereign local inference tier) and writes a HIGH-severity holes_findings row if it is unreachable (Mac asleep / off Tailscale / Ollama down), so a silent degrade to the quota-capped API tiers is caught within the cadence instead of by stalled legal work. Also rolls up 24h inference_audit (local %, fallbacks). Read-only except the outage holes write. No LLM, $0.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+# Exit 1 = tier down; the HIGH-severity holes_findings row is the real alert, so treat 1 as
+# success for systemd hygiene (keep `systemctl --failed` at zero — expected-vs-real is in holes).
+SuccessExitStatus=0 1
+ExecStart=/usr/bin/python3 /root/landtek/scripts/inference_tier_sentinel.py
+StandardOutput=append:/var/log/landtek_inference_sentinel.log
+StandardError=append:/var/log/landtek_inference_sentinel.log

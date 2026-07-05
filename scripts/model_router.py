@@ -29,9 +29,17 @@ TIER_1_CONFIG = {
     "models": {
         "default": "qwen2.5:14b-instruct",
         "fast": "qwen2.5:7b-instruct",
-        "reasoning": "qwen2.5:32b-instruct",  # use for dense/complex docs
+        # 32b is NOT pulled on the Mac (32GB ceiling) → referencing it 404s and silently
+        # falls through to the (stub) API tiers. Map reasoning to 14b until 32b is pulled.
+        # To enable the bigger model: `ollama pull qwen2.5:32b-instruct` then set this to it.
+        "reasoning": "qwen2.5:14b-instruct",
     },
-    "timeout_sec": 5,
+    # timeout_sec gates the GENERATION call, not just the health probe. Warm 14b latency is
+    # ~1-2s, but the FIRST call after idle must load ~9GB into RAM (cold start >5s). The old
+    # 5s killed every cold-start call, opened the breaker, and forced fallback to the stub
+    # API tiers — i.e. the "sovereign local tier" was effectively offline for real work.
+    # Health probe stays fast (its own 3s param); this only affects real generations.
+    "timeout_sec": 120,
     "health_check_interval_sec": 300,
 }
 
@@ -282,37 +290,47 @@ def call_model(
     """
     
     request_id = str(uuid.uuid4())
-    
+
     if not routed_config["provider"]:
-        return {
+        result = {
             "error": routed_config.get("error", "No tier available"),
             "request_id": request_id,
             "provider": None,
             "tier": None,
+            "success": False,
         }
-    
+        _log_inference(result, task_type, doc_id, matter_id)
+        return result
+
     # Use task-specific system prompt if not provided
     if not system_prompt:
         system_prompt = SYSTEM_PROMPTS.get(task_type, "You are a helpful legal assistant.")
-    
+
     # Use task-specific temperature if not overridden
     temperature = kwargs.get("temperature", TEMPERATURE.get(task_type, 0.3))
-    
+
     if routed_config["provider"] == "ollama_local":
-        return _call_ollama(
+        result = _call_ollama(
             routed_config, prompt, task_type, system_prompt,
             request_id, doc_id, matter_id, temperature, **kwargs
         )
     elif routed_config["provider"] == "gemini":
-        return _call_gemini(
+        result = _call_gemini(
             routed_config, prompt, task_type, system_prompt,
             request_id, doc_id, matter_id, temperature, **kwargs
         )
     elif routed_config["provider"] == "anthropic":
-        return _call_anthropic(
+        result = _call_anthropic(
             routed_config, prompt, task_type, system_prompt,
             request_id, doc_id, matter_id, temperature, **kwargs
         )
+    else:
+        result = {"error": f"unknown provider {routed_config['provider']}",
+                  "request_id": request_id, "success": False, "tier": routed_config.get("tier")}
+
+    # Single observability point — every routed call is logged (best-effort, never raises).
+    _log_inference(result, task_type, doc_id, matter_id)
+    return result
 
 def _call_ollama(
     config: Dict, prompt: str, task_type: str, system_prompt: str,
@@ -410,6 +428,43 @@ def _call_anthropic(
         "tier": 3,
         "provider": "anthropic",
     }
+
+# ─────────────────────────────────────────────────────────────
+# OBSERVABILITY — the inference_audit write the docstring promises
+# ─────────────────────────────────────────────────────────────
+
+def _log_inference(result: Dict, task_type: str,
+                   doc_id: Optional[str], matter_id: Optional[str],
+                   created_by: str = "model_router") -> None:
+    """Best-effort row into inference_audit. NEVER raises — logging must not break inference.
+
+    This is what makes the module docstring's '100% observability' claim true: every routed
+    call (local success, local timeout/fallback, or a stub API tier) leaves a trace so we can
+    see whether the sovereign local tier is actually carrying load or silently degrading."""
+    try:
+        import psycopg2
+        dsn = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+        conn = psycopg2.connect(dsn, connect_timeout=3)
+        conn.autocommit = True
+        with conn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO inference_audit
+                   (request_id, model_tier, model_name, task_type, doc_id, matter_id,
+                    tokens_prompt, tokens_completion, latency_ms, fallback_reason,
+                    success, error_message, created_by)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (result.get("request_id"),
+                 f"tier{result.get('tier')}" if result.get("tier") else None,
+                 result.get("model"), task_type,
+                 str(doc_id) if doc_id is not None else None,
+                 str(matter_id) if matter_id is not None else None,
+                 result.get("tokens_prompt"), result.get("tokens_completion"),
+                 result.get("latency_ms"), result.get("fallback_reason"),
+                 bool(result.get("success", False)), result.get("error"),
+                 created_by))
+        conn.close()
+    except Exception:
+        pass  # best-effort; never break the caller's inference
 
 # ─────────────────────────────────────────────────────────────
 # CLI FOR TESTING

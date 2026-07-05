@@ -31,8 +31,8 @@ requirement (privileged documents must not leave the perimeter). Everything else
 
 | Layer | What exists | Honest state |
 |---|---|---|
-| **Compute** | 1× VPS (Tailscale), Docker: n8n + Postgres. Mac Studio M2 Max / 32 GB on Tailscale. | Single node, no failover. **Mac Studio idle** (only runs the git-sync daemon). |
-| **Inference** | API-only: Anthropic (depleted), Gemini free-tier (daily-capped), OpenAI. `model_router.py` ladder. | **THE binding constraint.** No owned compute; quota/credits gate everything. |
+| **Compute** | 1× VPS (Tailscale), Docker: n8n + Postgres. Mac Studio M2 Max / 32 GB on Tailscale. | Single node, no failover. **Mac Studio serves Ollama Tier 1** (qwen2.5 14b/7b) via `com.landtek.ollama-host` launchd + git-sync daemon. *(Was "idle" — corrected 2026-07-05.)* |
+| **Inference** | Tier 1 **owned local Ollama on the Mac (qwen2.5:14b default)** → Tier 2 Gemini free-tier → Tier 3 Anthropic. `model_router.py` ladder + `verify_worker`'s own client. | **Gap #1 substantially CLOSED (2026-07-05):** `inference_audit` shows **~99% of 24h inference on the local tier**, ~1-2s warm latency, rare fallbacks. Owned compute is live; quota is no longer the binding constraint for verification. See §5. |
 | **Data** | Postgres (n8n DB): documents, titles, title_chain, entities, matter_facts/parties/causes, gmail_messages. PostGIS parcels. | Solid schema. Single instance, no replication/PITR. |
 | **Knowledge / truth** | Provenance write-gate (verified/operator/inferred), hardened verbatim-excerpt grounding, `_safe` views. | **Strong** — the core differentiator. Enforced in DB triggers, framework-agnostic. |
 | **Pipelines (agents)** | verify_loop (scout) → verify_worker (reader) → gate → matter_facts → case_dossier; deadlines; cross_client_sentinel; comprehend; corpus_backfill (OCR). | Working, de-facto agents. Orchestrated by **systemd timers + Postgres state + the gate as contract** — deliberately framework-free. |
@@ -79,6 +79,20 @@ mostly **hardening + an owned inference tier**, not a redesign.
 ---
 
 ## 5. The #1 gap in detail — owned, tiered inference
+
+> **⚠️ STATUS CORRECTION (2026-07-05): this gap is substantially CLOSED — the section below is the
+> original 2026-06-21 assessment, kept for context.** Ground-truth check found the local tier already
+> stood up and carrying load: Ollama runs on the Mac (`com.landtek.ollama-host` launchd), the VPS reaches
+> it (200 in 0.1s), and `inference_audit` shows **~99% of 24h inference on Tier 1** (`verify_worker`, ~1-2s
+> warm). Remaining hardening shipped the same day: (1) `model_router.py` had a **5s generation timeout that
+> killed cold-start calls** (forcing silent fallback for the 12 synthesis tools that use it) → raised to
+> 120s; (2) `reasoning` pointed at an unpulled `qwen2.5:32b` (404) → remapped to 14b (32b = opt-in pull);
+> (3) the promised `inference_audit` logging was never wired → now written on every routed call; (4) new
+> `landtek-inference-sentinel` timer (6h) writes a HIGH-severity holes row if the Mac tier goes unreachable.
+> **What's genuinely left:** pull 32b for heavier reasoning (optional, 32GB ceiling), and implement the
+> Tier-2/Tier-3 fallback stubs in `model_router` (currently `not yet implemented` — `verify_worker` and the
+> direct-Anthropic callers don't depend on them, but the router's own fallback is a mirage until they exist).
+
 
 **Hardware you already own:** Mac Studio **M2 Max, 32 GB**, on Tailscale (`100.117.118.47`), **Ollama
 already installed**, currently idle.
