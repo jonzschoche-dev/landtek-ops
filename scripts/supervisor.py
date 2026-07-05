@@ -83,20 +83,52 @@ def _audit(order: dict, frm: str, to: str, note: str) -> list:
 
 # ── Commands ────────────────────────────────────────────────────────────────────────────────
 
-def cmd_enqueue(cur, kind, matter, title, by):
+# Kinds whose orders must DERIVE from v_evidence_gaps (gaps are queried, not asserted).
+GAP_KINDS = {"evidence_gap"}
+
+
+def cmd_enqueue(cur, kind, matter, title, by, gap_key=None, override=None):
     spec = KINDS.get(kind)
     if not spec:
         print(f"unknown kind '{kind}'. known: {', '.join(KINDS)}")
         return 2
+
+    # ENFORCEMENT (supervision): a gap order cannot be born from free text. It must cite a real
+    # gap_key from v_evidence_gaps (the single derived source), or an explicit --override that is
+    # audited. This is the mechanical replacement for the deleted prose-checks — gated at BIRTH.
+    provenance = None
+    if kind in GAP_KINDS:
+        if gap_key:
+            cur.execute("SELECT case_file, needed, derived_status FROM v_evidence_gaps WHERE gap_key=%s", (gap_key,))
+            row = cur.fetchone()
+            if not row:
+                print(f"gap_key '{gap_key}' not in v_evidence_gaps. Run: "
+                      "SELECT gap_key, needed FROM v_evidence_gaps WHERE derived_status='missing';")
+                return 2
+            if row["derived_status"] != "missing":
+                print(f"gap_key '{gap_key}' is '{row['derived_status']}' — candidate docs already exist; "
+                      "this is NOT a confirmed gap. Verify before enqueuing.")
+                return 2
+            provenance = f"v_evidence_gaps:{gap_key}"
+        elif override:
+            provenance = f"OVERRIDE:{override}"
+        else:
+            print("evidence_gap orders must derive from the view — pass --gap-key <k> "
+                  "(SELECT gap_key FROM v_evidence_gaps WHERE derived_status='missing') "
+                  "OR --override '<reason a gap is real but not yet in the register>'. Gaps are derived, not asserted.")
+            return 2
+
     steps = [dict(s, status="pending", result=None) for s in spec["steps"]]
+    note = f"enqueued kind={kind}" + (f" · gap_source={provenance}" if provenance else "")
     cur.execute(
         """INSERT INTO work_orders (kind, matter_code, title, status, steps, current_step,
              created_by, audit)
            VALUES (%s,%s,%s,'queued',%s,0,%s,%s) RETURNING id""",
         (kind, matter, title or spec["title"], json.dumps(steps), by,
-         json.dumps([{"ts": _now(), "from": None, "to": "queued", "note": f"enqueued kind={kind}"}])))
+         json.dumps([{"ts": _now(), "from": None, "to": "queued", "note": note}])))
     oid = cur.fetchone()["id"]  # RealDictCursor → dict, not tuple
-    print(f"enqueued work_order #{oid} ({kind}, matter={matter}) — status=queued, {len(steps)} steps")
+    print(f"enqueued work_order #{oid} ({kind}, matter={matter}) — status=queued, {len(steps)} steps"
+          + (f" [gap_source: {provenance}]" if provenance else ""))
     return 0
 
 
@@ -251,6 +283,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     e = sub.add_parser("enqueue"); e.add_argument("--kind", required=True); e.add_argument("--matter")
     e.add_argument("--title"); e.add_argument("--by", default="operator")
+    e.add_argument("--gap-key", dest="gap_key"); e.add_argument("--override")
     l = sub.add_parser("list"); l.add_argument("--awaiting", action="store_true")
     s = sub.add_parser("status"); s.add_argument("id", nargs="?", type=int)
     c = sub.add_parser("complete"); c.add_argument("id", type=int); c.add_argument("--result", required=True)
@@ -263,7 +296,7 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     try:
         if a.cmd == "enqueue":
-            rc = cmd_enqueue(cur, a.kind, a.matter, a.title, a.by)
+            rc = cmd_enqueue(cur, a.kind, a.matter, a.title, a.by, a.gap_key, a.override)
         elif a.cmd == "list":
             rc = cmd_list(cur, a.awaiting)
         elif a.cmd == "status":
