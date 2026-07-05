@@ -20,6 +20,7 @@ Exit code: 0 = clean, 1 = drift/contamination found (usable as a health gate).
 from __future__ import annotations
 import os
 import sys
+import json
 import psycopg2
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
@@ -72,10 +73,12 @@ def is_plumbing(t: str) -> bool:
 def main():
     brief = "--brief" in sys.argv
     sentinel = "--sentinel" in sys.argv
+    as_json = "--json" in sys.argv
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
     problems = 0
     v3 = v4 = 0
+    drift_counts, bad, unreg = {}, [], []
     out = []
     with conn.cursor() as cur:
         # 1. validator installed?
@@ -105,32 +108,31 @@ def main():
         for t in DRIFT_TABLES:
             cur.execute(f"SELECT count(*) FROM {t};")
             n = cur.fetchone()[0]
+            drift_counts[t] = n
             if n:
                 out.append(f"[!] drift '{t}': {n} row(s) present — canonical target in ONTOLOGY.md sec3 (do not add more)")
             elif not brief:
                 out.append(f"[ok] drift '{t}': empty")
 
         # 5. provenance vocab creep
-        if not brief:
-            bad = []
-            for t in PROVENANCE_TABLES:
-                cur.execute(f"SELECT DISTINCT provenance_level FROM {t} WHERE provenance_level IS NOT NULL;")
-                for (v,) in cur.fetchall():
-                    if v not in PROVENANCE_VOCAB:
-                        bad.append(f"{t}:{v}")
-            if bad:
-                problems += 1
+        for t in PROVENANCE_TABLES:
+            cur.execute(f"SELECT DISTINCT provenance_level FROM {t} WHERE provenance_level IS NOT NULL;")
+            for (v,) in cur.fetchall():
+                if v not in PROVENANCE_VOCAB:
+                    bad.append(f"{t}:{v}")
+        if bad:
+            problems += 1
+            if not brief:
                 out.append(f"[X] provenance vocab creep: {bad} (canonical set: {sorted(PROVENANCE_VOCAB)})")
-            else:
-                out.append(f"[ok] provenance vocab: all values in canonical set of {len(PROVENANCE_VOCAB)}")
+        elif not brief:
+            out.append(f"[ok] provenance vocab: all values in canonical set of {len(PROVENANCE_VOCAB)}")
 
         # 6. unregistered domain tables (candidate drift → update ONTOLOGY.md sec2)
-        if not brief:
-            cur.execute("SELECT relname FROM pg_stat_user_tables;")
-            live = {r[0] for r in cur.fetchall()}
-            unreg = sorted(t for t in live if not is_plumbing(t) and t not in REGISTERED)
-            if unreg:
-                out.append(f"[i] {len(unreg)} domain table(s) not in ONTOLOGY.md registry (review): {unreg[:25]}{'...' if len(unreg) > 25 else ''}")
+        cur.execute("SELECT relname FROM pg_stat_user_tables;")
+        live = {r[0] for r in cur.fetchall()}
+        unreg = sorted(t for t in live if not is_plumbing(t) and t not in REGISTERED)
+        if unreg and not brief:
+            out.append(f"[i] {len(unreg)} domain table(s) not in ONTOLOGY.md registry (review): {unreg[:25]}{'...' if len(unreg) > 25 else ''}")
 
     # --sentinel: alert ONLY on new actionable contamination (V3/V4), never on standing backlog.
     if sentinel and (v3 or v4):
@@ -154,6 +156,24 @@ def main():
             pass  # sentinel must never crash the timer
 
     conn.close()
+
+    if as_json:
+        report = {
+            "status": "clean" if problems == 0 else "problems",
+            "problems": problems,
+            "actionable_contamination": bool(v3 or v4),  # the only thing that should page you
+            "checks": {
+                "v3_ungrounded_verified": v3,
+                "v4_cross_client_facts": v4,
+                "drift_table_rows": drift_counts,
+                "provenance_vocab_creep": bad,
+                "unregistered_tables": len(unreg),
+            },
+            "validator_mode": {c: m for c, m in cfg} if cfg else None,
+        }
+        print(json.dumps(report, indent=2))
+        sys.exit((1 if (v3 or v4) else 0) if sentinel else (1 if problems else 0))
+
     print("=== ontology_check " + ("(brief) " if brief else "") + ("(sentinel) " if sentinel else "") + "===")
     for line in out:
         print("  " + line)

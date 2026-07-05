@@ -147,5 +147,5 @@ V1/V3 when the shadow migration is authored.)*
 - [x] V3 confirmed 0 false positives at apply time (0 ungrounded verified facts).
 - [ ] 72h shadow run; V1 false-positive rate = 0 confirmed in `holes_findings` (V1 drift-writes should be 0; `chain_of_title`/`cases` hold *pre-existing* rows, not new writes).
 - [ ] V1/V3 flipped to `block` (`UPDATE ontology_validator_config SET mode='block' WHERE check_code IN ('V1','V3');`); one rollback drill (`--rollback`) executed.
-- [ ] `knowledge_graph_triples.provenance_level` overload (extraction-method values, not tiers) reconciled — backlog.
+- [x] `knowledge_graph_triples.provenance_level` overload reconciled (deploy_693: split to `extraction_method` col; vocab now clean).
 - [ ] V4 kept as detector; enforce post-Aug-12 once A5 (`case_file`/`matter_code`) is FK-hardened.

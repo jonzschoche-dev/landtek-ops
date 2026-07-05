@@ -44,9 +44,9 @@ access model; see §6).
 **Provenance vocabulary (canonical set — grounded on live values 2026-07-05):**
 `verified` · `operator` (operator-asserted) · `inferred_strong` · `inferred_corroborated`
 (corroboration ladder) · `inferred_weak`. *(An earlier draft listed only 3; the live set is 5.)*
-**Known exception:** `knowledge_graph_triples.provenance_level` is **overloaded** — it stores
-extraction-method strings (`verified_from_court_caption`, `llm_sonnet_4_6_triple`, …) rather than a
-tier. That is a schema smell on the books as backlog; `scripts/ontology_check.py` flags it every run.
+*(Resolved deploy_693: `knowledge_graph_triples.provenance_level` was formerly overloaded with
+extraction-method strings; the method moved to a new `extraction_method` column and the tier was
+rewritten to the canonical vocab. `scripts/ontology_check.py` now reports vocab clean.)*
 
 ---
 
