@@ -86,12 +86,12 @@ so they are named here for explicit oversight (each already has, or now has, a d
 
 1. **Fact promotion → `matter_facts`** — mitigated by provenance gate + `ontology_validator` V3 (grounding). ✅
 2. **Cross-client fact/link writes** — `ontology_validator` V4 caught 6 mis-filed Paracale facts on day one. ✅ detector live
-3. **Entity-canon auto-merge** (`cross_client_sentinel --apply-canon`) — a wrong merge silently corrupts identity resolution. *Control: `verification_lock`; recommend a periodic "auto-merges last 24h" line in the digest.* ⬜
+3. **Entity-canon auto-merge** (`entity_resolve --apply-auto`) — a wrong merge silently corrupts identity resolution. *Control: `verification_lock` + **digest "🔀 Entity auto-merges (24h)" line, ⚠️ if >15 (deploy_699)**.* ✅
 4. **`comprehend` high-confidence overwrite of title status** — a confident-but-wrong OCR read overwrites a default. *Control: reconciles vs. verified `title_chain`; low-conf flags operator.* ✅ (per `title-comprehension-layer`)
-5. **Constitution regeneration** — auto-rewrites the system's knowledge boundary. *Control: `_safe`-views only; recommend a diff-summary on regen.* ⬜
+5. **Constitution regeneration** — auto-rewrites the system's knowledge boundary. *Control: `_safe`-views only + **`constitution_regen_log` + digest "📜 Constitution" line, ⚠️ if changed <24h (deploy_699)**.* ✅
 
-The two ⬜ items are the only *net-new* governance suggestions this registry surfaces — both are **cheap
-digest/log additions**, not enforcement systems.
+All five watch-items now have a detector or visibility line. The two net-new ones (3, 5) shipped as
+**cheap digest/log additions** in deploy_699 — visibility, not enforcement, per §4.
 
 ---
 
