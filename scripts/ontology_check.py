@@ -78,7 +78,7 @@ def main():
     conn.autocommit = True
     problems = 0
     v3 = v4 = 0
-    drift_counts, bad, unreg = {}, [], []
+    drift_counts, bad, unreg, inference = {}, [], [], {}
     out = []
     with conn.cursor() as cur:
         # 1. validator installed?
@@ -134,6 +134,28 @@ def main():
         if unreg and not brief:
             out.append(f"[i] {len(unreg)} domain table(s) not in ONTOLOGY.md registry (review): {unreg[:25]}{'...' if len(unreg) > 25 else ''}")
 
+        # 7. inference tier (24h) — unify the health surface so /health JSON carries BOTH
+        #    data-integrity and inference signals (mirrors the inference_tier_sentinel rollup).
+        try:
+            cur.execute("""
+                SELECT count(*) AS total,
+                       count(*) FILTER (WHERE model_tier='tier1')          AS tier1,
+                       count(*) FILTER (WHERE fallback_reason IS NOT NULL) AS fallbacks,
+                       count(*) FILTER (WHERE NOT success)                 AS failed,
+                       max(timestamp) FILTER (WHERE success AND model_tier='tier1') AS last_local
+                  FROM inference_audit WHERE timestamp > now() - interval '24 hours';""")
+            r = cur.fetchone()
+            if r and r[0]:
+                inference = {"calls_24h": r[0], "tier1": r[1], "tier1_pct": round(100 * r[1] / r[0]),
+                             "fallbacks": r[2], "failed": r[3],
+                             "last_local_ok": r[4].isoformat() if r[4] else None}
+                if not brief:
+                    out.append(f"[i] inference tier (24h): {r[0]} calls · {inference['tier1_pct']}% local · {r[2]} fallback(s)")
+            else:
+                inference = {"calls_24h": 0}
+        except Exception:
+            inference = {"error": "inference_audit unavailable"}
+
     # --sentinel: alert ONLY on new actionable contamination (V3/V4), never on standing backlog.
     if sentinel and (v3 or v4):
         bits = []
@@ -169,6 +191,7 @@ def main():
                 "provenance_vocab_creep": bad,
                 "unregistered_tables": len(unreg),
             },
+            "inference_tier": inference,
             "validator_mode": {c: m for c, m in cfg} if cfg else None,
         }
         print(json.dumps(report, indent=2))
