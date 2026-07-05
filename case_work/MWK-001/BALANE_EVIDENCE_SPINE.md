@@ -59,17 +59,47 @@ Her excluded Judicial Affidavit **is in corpus** (doc 1089, full text). It hands
 
 ---
 
-## 3. Verified title lineage
+## 3. Verified title lineage — and the T-32917→T-52540 edge, RESOLVED (2026-07-05)
 
-Source: `title_chain` where `provenance_level='verified'`.
+Source: `title_chain` where `provenance_level='verified'` + the derivation instruments read this session.
 
 ```
 OCT T-106  ──VERIFIED──▶  T-4497 (mother; Heirs of Mary Worrick Keesey)
-T-4497     ──VERIFIED──▶  T-32917 (Lot 2-X-6, San Roque)
-   ⚠ GAP  ──────────────▶  T-52540  (no verified edge connects T-32917 → T-52540)
-T-52540    ──VERIFIED──▶  T-079-2021002126  ◀── Gloria Balane (the contested title)
+T-4497     ──VERIFIED──▶  T-32917 (Lot 2-X-6, San Roque · PSD 256008 · 85,149 sqm)
+T-32917    ──(multi-hop, all lots in the 2-X-6 tree)──▶  T-49061 (Lot 2-X-6-I-4 · Psd-051607-014971)
+T-49061    ──VERIFIED (Psd-05-026197 segregation)──▶  T-52540 (Lot 2-X-6-I-4-C · 2,587 sqm)
+T-52540    ──VERIFIED──▶  T-079-2021002126  ◀── Gloria Balane (Lot 2-X-6-I-4-C-1, the contested title)
 ```
-Our SJ prayer asks the court to **cancel …2126 and REINSTATE T-52540** in the names of Patricia, Geraldine, and Marcia. The one chain hole (T-32917 → T-52540) is GAP #3 — close it so the lineage is unbroken on the stand.
+
+**Status: the "hole" is NOT a genuine evidence gap — the derivation IS in the corpus.** The DB edge `T-32917 → T-52540` (`inferred_strong`, NULL source) is a *multi-hop compression* that skips the true immediate parent **T-49061 (Lot 2-X-6-I-4)**. Every hop is documented:
+
+| Link | Instrument in corpus | Verbatim excerpt |
+|---|---|---|
+| T-32917 = Lot 2-X-6 (the root lot of this whole subtree) | **doc 288** (Property Tree of Titles, RD-sourced) | `TITLE NO. T-32917 / LOT NO. Lot2-X-6 / PSD 256008 / AREA 85,149 sqm` and the tree threads Lot 2-X-6 → 2-X-6-I → 2-X-6-I-4 (T-49061) → 2-X-6-I-4-C (T-52540) → 2-X-6-I-4-C-1 (Balane …2126) |
+| Lot 2-X-6-I-4 = T-49061 → segregated into 2-X-6-I-4-C under Psd-05-026197 | **doc 50** (CTC of T-49061, RD Cam. Norte) | Entry `P-238420 ... April 24, 2000 ... for segregation and issuance of separate title, for Lot 2-X-6-I-4 ... of plan Psd-05-026197` |
+| T-52540 = Lot 2-X-6-I-4-C, 2,587 sqm, being a portion of Lot 2-X-6-I-4 | **doc 272 / doc 96 / doc 48** (three CTCs of T-52540, RD Cam. Norte, Ref. 2023000015) | tech-desc: `Lot 2-X-6-I-4-C ... being a portion of Lot 2-X-6-I-4, Psd-05-019929`; and `PORTION SOLD TO GLORIA H. BALANE PREVIOUSLY IDENTIFIED UNDER LOT 2-X-6-I-4-C ... AREA OF 2,587 SQM` |
+| T-52540 → Balane …2126 (the cancellation) | **doc 410** (Exhibit 1, Balane's TCT …2126) + **doc 388** (Demand Letter) | doc 410: `T-52540 (TOTALLY CANCELLED) by virtue hereof`; doc 388: `TCT No. T-52540 ... has been cancelled and ... TCT No. 079-2021002126 has been illegally issued in the name of Gloria H. Balane` |
+| T-52540 was registered to the co-owner Hoppe (ownership root of the sold parcel) | **doc 233** (Deed of Confirmation, 2017) | `the portion ... previously identified under Lot 2-X-6-I-4-C (portion) is the same parcel of land now covered and identified under TCT No. T-52540 registered in the name of GERALDINE K. HOPPE` |
+
+**DB action (hand to Jonathan — do NOT auto-execute; note the edge is a compression, so cite the multi-hop, not a single source_doc_id):**
+The cleanest fix is to *record the intermediate hop* rather than force a false single-doc citation onto a compressed edge. Recommended:
+```sql
+-- 1) Add the true immediate parent edge, sourced to the T-52540 CTC face:
+INSERT INTO title_chain (parent_title, child_title, relationship, case_file,
+       provenance_level, source_doc_id, provenance_quote, notes)
+VALUES ('T-49061','T-52540','derivative','MWK-001','verified', 272,
+  'Lot 2-X-6-I-4-C being a portion of Lot 2-X-6-I-4, Psd-05-019929; segregated under Psd-05-026197 per T-49061 entry P-238420 (doc 50)',
+  'Immediate parent recovered 2026-07-05: T-52540 = Lot 2-X-6-I-4-C, a portion of Lot 2-X-6-I-4 (T-49061). Faces docs 48/96/272; property tree doc 288; T-49061 segregation entry doc 50.');
+-- 2) Re-label the existing T-32917→T-52540 edge as a verified multi-hop ancestry (NOT immediate):
+UPDATE title_chain SET provenance_level='verified', source_doc_id=288,
+  relationship='ancestor',
+  provenance_quote='Property Tree of Titles (doc 288): Lot 2-X-6 (T-32917) → 2-X-6-I → 2-X-6-I-4 (T-49061) → 2-X-6-I-4-C (T-52540)',
+  notes='2026-07-05: upgraded from inferred_strong. T-32917 is the ANCESTOR (Lot 2-X-6 root), not the immediate parent (that is T-49061). Multi-hop grounded in docs 288/50/48/96/272.'
+WHERE parent_title='T-32917' AND child_title='T-52540';
+```
+*(Inference flag: I have not eyeballed each intermediate title face between Lot 2-X-6 and Lot 2-X-6-I — that granular hop rests on the RD-sourced property tree doc 288, which is `government_issued`. For the stand, the load-bearing facts are the three you can wave: (i) T-52540 = Lot 2-X-6-I-4-C, 2,587 sqm [doc 272 face], (ii) it was registered to co-owner Hoppe [doc 233], (iii) it was cancelled to create Balane's …2126 [doc 410]. Ancestry to the MWK mother title is corroborative, not the crux — the crux is that **T-52540 stood in the co-owners' name and the sale that cancelled it was void**.)*
+
+Our SJ prayer asks the court to **cancel …2126 and REINSTATE T-52540** in the co-owners' names. **The chain is now presentable end-to-end** — see the cross-exam handling in §9 if opposing counsel probes the T-32917→T-52540 link.
 
 ---
 
@@ -131,7 +161,7 @@ Plus: the Complaint + its Exhibits (docs 426–436, "Exhibit … - Complaint - C
 2. **Make the 1999/handwritten revocation instruments exhibit-grade** (docs 1132–1134) — vision-OCR the two handwritten ones.
 3. **Obtain the Sept 2016 Deed of Absolute Sale to Balane** (CTC from RD Daet) — not in corpus.
 4. **Read the 1992 SPA operative clause clean** (doc 416 / fresh CTC) — confirm "negotiate, not sell" verbatim for Prong A; this is the most-quoted text in the SJ.
-5. **Close the T-32917 → T-52540 chain hole** (§3) + T-52540 cancellation paperwork.
+5. ~~**Close the T-32917 → T-52540 chain hole**~~ **RESOLVED 2026-07-05** (§3): derivation grounded in docs 288/50/48/96/272; DB fix drafted (add T-49061→T-52540, relabel T-32917→T-52540 as verified ancestor). Residual: the granular intermediate hops (2-X-6 → 2-X-6-I) rest on property-tree doc 288 only — corroborative, not load-bearing.
 6. **Finish-process the case filings** — 791 MWK-001 docs sit at `pending_classification`, 95 in `error`; classify + exhibit-tier the ~12 live 26-360 pleadings first.
 7. **Reconcile CLAUDE.md** per §6.
 
@@ -142,4 +172,58 @@ Plus: the Complaint + its Exhibits (docs 426–436, "Exhibit … - Complaint - C
 - **Summary Judgment (now):** strong, primarily on **Prong A** (1992 SPA = no power to sell → void sale → good faith irrelevant), with Prong B (revocation + duty of inquiry) as backup. Defendants' counter is good faith — but their key witness's affidavit is **excluded**, and their best facts (long possession, payments) are double-edged or post-date the SPA. If the court keeps the affidavit out and accepts Prong A, this resolves without trial.
 - **Your 12 Aug 2026 testimony** (if the case proceeds): you carry the plaintiff's case as attorney-in-fact. Be airtight that the 1992 SPA never authorized a sale; that the family withdrew de la Fuente's authority (1999 Hoppe letter) and revoked it (2005); and on the chain of ownership. Stay precise: **revoked 2005, published 2020.** Expect cross on Balane's good faith / the Balanes' long occupancy.
 
-*Work product for MWK-001, grounded in corpus as of 2026-06-12. Items marked GAP/INFERRED are not yet court-grade — upgrade before use.*
+---
+
+## 9. SJ exhibit list — exhibit → element it proves → doc_id (built 2026-07-05)
+
+Ordered by the SJ logic. Each row is a `government_issued` or `executed` corpus doc; grade noted. Prong A is the kill-shot; the chain exhibits support the cancellation/reinstatement prayer.
+
+| # | Exhibit (doc_id) | Grade | Element it proves |
+|---|---|---|---|
+| **A** | **1992 SPA — doc 416** (Exhibit 7) | VERIFIED (consular CTC, OCR — *read operative clause clean before filing*) | **Prong A kill-shot:** de la Fuente's authority was to *negotiate*, not *sell*. Authority to sell land must be express (*Bautista-Spille*). No power to sell → sale void → good faith irrelevant. |
+| B | Revocation publication — doc 76 (Affidavit of Publication, Bicol Post) | VERIFIED (read) | SPA **revoked 15 Aug 2005** (published 2020). Predates the 2016 sale by 11 yrs. Prong B. |
+| B-2 | RD Daet letter — doc 79 (30 Sep 2020) | VERIFIED (read) | RD confirms SPA "revoked since 2005"; no conveyances of record on T-4497 mother title. Corroborates revocation + clean owner-side chain. |
+| B-3 | Hoppe→de la Fuente letter — doc 1134 (19 Feb 1999) | VERIFIED (typed, legible) | Heirs were transferring the POA to Ida Buenaventura in 1999 — de la Fuente's authority was being withdrawn years before the sale. |
+| C | 2016 Deed of Absolute Sale — doc 415 (Exhibit 6) / doc 233 | VERIFIED (executed_notarized) | The void act: de la Fuente "as attorney-in-fact" → Balane, **2,587 sqm, Lot 2-X-6-I-4-C, covered by TCT T-52540**. This is the instrument sought to be annulled. |
+| D | Deed of Confirmation — doc 233 (2017) | VERIFIED (executed_notarized) | The sold parcel "is the same parcel ... now covered ... under TCT No. T-52540 **registered in the name of Geraldine K. Hoppe**" — i.e., the parcel stood in a **co-owner's** name; de la Fuente had no title to convey. |
+| **E** | **CTC of TCT T-52540 — doc 272** (RD Cam. Norte, Ref. 2023000015; corroborated by docs 96, 48) | VERIFIED (government_issued) | **The reinstatement target.** T-52540 = Lot 2-X-6-I-4-C, 2,587 sqm; face shows portion "sold to Gloria H. Balane"; encumbrance page logs de la Fuente's 2016 affidavit of loss before Atty. Belen. |
+| F | Balane's TCT …2126 — doc 410 (Exhibit 1) | VERIFIED (government_issued, OCR) | The contested title to cancel. Its face recites predecessor **"T-52540 (TOTALLY CANCELLED) by virtue hereof."** Closes the chain T-52540 → …2126. |
+| F-2 | Barandon Demand Letter — doc 388 (18 Aug 2025) | VERIFIED (read) | Independent statement that T-52540 was cancelled and …2126 "illegally issued in the name of Gloria H. Balane." Names the correct title (…2126). |
+| G | CTC of T-49061 — doc 50 | VERIFIED (government_issued) | Immediate-parent hop: Lot 2-X-6-I-4 segregated under Psd-05-026197 (entry P-238420, Apr 2000) → the plan that produced Lot 2-X-6-I-4-C (=T-52540). Chain corroboration. |
+| G-2 | Property Tree of Titles — doc 288 | VERIFIED (government_issued, RD-sourced) | Ancestry T-32917 (Lot 2-X-6) → T-49061 → T-52540 → …2126 on one page. Chain-of-title demonstrative. |
+| H | Complaint + Exhibits — docs 424/419-421/426-427; Jonathan's Judicial Affidavit — doc 441 | VERIFIED (executed_filed) | Standing (Patricia = co-owner via Jonathan as attorney-in-fact), the cause of action, prayer. |
+| — | **Gloria Balane's Judicial Affidavit — doc 1089** | corpus full text (EXCLUDED at pre-trial) | Not our exhibit — but the source of the admissions in §2d/§10 we use on cross if it comes in. |
+
+**Note on grade:** docs 410 and 415 were OCR'd (`ocr_used=t`); the T-52540 CTCs (272/96/48) and deeds (233) are `ocr_used=f` (clean text layer). Exhibit A (doc 416, the 1992 SPA) is the one exhibit still resting on OCR of a consular CTC — **worklist item 4: read its operative clause clean before it anchors the SJ.**
+
+---
+
+## 10. Cross-examination outline — Jonathan as Patricia's witness (12 Aug 2026)
+
+### 10a. Your direct spine (what you affirm)
+1. You are attorney-in-fact for Patricia Keesey Zschoche, one of three co-owners (with Geraldine Keesey Hoppe, Marcia Ellen Keesey) — doc 441.
+2. The parcel (2,587 sqm, Lot 2-X-6-I-4-C, Brgy. San Roque, Mercedes) was titled **T-52540 in the co-owners' name** (Geraldine K. Hoppe of record) — docs 272, 233.
+3. **The 1992 SPA authorized de la Fuente to *negotiate*, not to sell** — doc 416. *(Stay on "negotiate, not sell." Do not overstate; quote the clause.)*
+4. The family withdrew his authority (1999 Hoppe letter, doc 1134) and **revoked the SPA on 15 Aug 2005** — docs 76, 79.
+5. **Revoked 2005, published 2020.** Say it in that order, every time. Never imply the publication was contemporaneous.
+6. The 2016 deed to Balane was executed by de la Fuente "as attorney-in-fact" after his authority was gone; it cancelled T-52540 and produced Balane's …2126 — docs 415/233, 410, 388.
+
+### 10b. Cross you should expect (their equities) — and your answer
+| Opposing thrust | Anchored in | Your answer |
+|---|---|---|
+| "The Balanes have occupied since 1975 — 50 years." | Balane JA doc 1089 T13, T18 | Occupancy is not ownership. She entered by **buying "rights and possession" from a third party** (Kenneth Asistin, ₱16,500 — T13), and **paid RENT (₱50/mo) to the owners' side** (T18-19). A tenant acknowledges the lessor's title; that defeats possession *in the concept of owner*. |
+| "She bought in good faith for value." | doc 1089 | Good faith cannot cure a **void** sale (Prong A). And she **never contacted the Keesey owners before buying** (T43) and **relied on de la Fuente's verbal say-so about the SPA** (T30/T56) — she failed the duty of inquiry owed by one dealing with an agent (*Yoshizaki*). |
+| "She had no notice of the 2005 revocation." | doc 1089 T63-64 | Immaterial under Prong A (void sale). And she was a **sitting local official 1997-2017** (T59) — held to higher diligence — across both the 2005 revocation and the 2016 sale. |
+| "She paid taxes / built improvements." | doc 1089 | Goes only to the improvements/possession equities and damages — not to title. Title fails at the void deed. |
+
+### 10c. WHERE THE T-32917→T-52540 CHAIN COULD BE PROBED — and how to handle it
+Opposing counsel's cleanest chain attack is: *"Mr. Zschoche, how does your T-52540 connect back to the mother title T-4497? Isn't there a gap?"* **The gap is now CLOSED (§3) — but keep the answer simple and documentary, do not free-lawyer the survey lots:**
+
+- **Anchor answer (stay here):** "T-52540 is the certificate of title that covered this exact 2,587-sqm parcel, Lot 2-X-6-I-4-C, and it stood **in the name of the co-owner, Geraldine Hoppe** — that's on the certified copy and confirmed by the 2017 Deed of Confirmation." (docs 272, 233). *You do not need the mother-title genealogy to win — you need that T-52540 was the co-owners' title and the sale that cancelled it was void.*
+- **If pushed on ancestry:** "T-52540 is Lot 2-X-6-I-4-C. It comes from Lot 2-X-6-I-4, title T-49061, which was segregated under survey plan Psd-05-026197 — that's on the register (doc 50). Lot 2-X-6 is the parent, title T-32917. The Registry's own property tree lays out that line." (doc 288). **Then stop.** Do not attempt to recite every intermediate sub-lot from memory.
+- **Trap to avoid:** do NOT accept a framing that "T-52540 came directly from T-32917" — it did not; the immediate parent is **T-49061**. If counsel tries to catch you on that, agree that T-32917 is the *root lot* (Lot 2-X-6) and T-49061 (Lot 2-X-6-I-4) is the *immediate predecessor*; the certified titles show both. The correction *helps* you — it shows command of the record.
+- **Fallback if a certified intermediate is demanded and not in hand:** the load-bearing certified documents (T-52540 CTC doc 272; Balane …2126 doc 410 reciting "T-52540 TOTALLY CANCELLED"; Deed of Confirmation doc 233) are sufficient to prove the parcel was the co-owners' and passed illegally to Balane. Ancestry to T-4497 is corroborative. *(Still worth pulling a fresh CTC of T-49061 and of the 2-X-6-I segregation if counsel signals a genealogy fight — see worklist.)*
+
+---
+
+*Work product for MWK-001, grounded in corpus. §3/§9/§10 added 2026-07-05 (chain-hole resolution + SJ exhibit list + cross-exam outline). Items marked GAP/INFERRED are not yet court-grade — upgrade before use.*
