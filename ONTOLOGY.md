@@ -170,10 +170,22 @@ The hand-curated §2 missed genuine evidence-grade concepts. These are **core, g
 | `finance_transactions` | 0 | **Schema drift.** Cleaner `client_code`/`matter_code` columns but never populated. | `transactions` (~174, holds the data) — *or* migrate data into `finance_transactions` and retire `transactions`; **pick one, don't keep both** |
 | `cases` | ~2 | **Legacy.** Older matter concept keyed on `client_id` (int); superseded. | `matters` (~38, keyed on `client_code`) |
 | `fact_edges` | 0 | **Aspirational.** Empty KG-edge table. | leave until §2.5 pipeline needs edges |
+| `document_entities` | 0 | **Superseded.** Empty variant of the doc↔entity join. | `doc_entities` (~8,928 — holds the data) |
+| `audit_log` · `audit_events` | 0 | **Superseded.** Generic audit, never populated. | `truth_audit_log` + `holes_findings` (the real audit) |
+| `document_matter_links_unlinked_bak` | ~95 | **Backup.** One-time snapshot of purged links. | `document_matter_links` (prunable after review) |
+| **re-OCR result overlap** — `re_ocr_results` (78) · `reocr_log` (44) · `reocr_backup` (54) · `heightened_ocr_results` (0) | — | **Overlap (4 tables, one concept).** Three populated variants of "re-OCR output" built across iterations + the intended DIC target. | **consolidate to one** as part of DIC/remediation activation (§8.10); `reocr_backup` is prunable |
+| `event_kind_canonical_def` (13) · `event_kind_taxonomy` (83) | — | **Possible overlap** — two event-taxonomy tables; confirm before consolidating. | pick the canonical event taxonomy |
 
 > **Reconciliation is a post-Aug-12 chore, not a wartime task.** Listing them here *is* the fix for now:
 > it stops the drift from compounding by naming the canonical target. Do not migrate live tables during
 > the litigation window.
+
+**Built-but-not-acted-upon (a loop, not drift — flagged, not consolidated):** `proposed_facts` (213, ALL
+`pending`, still growing) — the reconciler *writes* candidate facts but nothing adjudicates them; the
+propose→adjudicate→promote loop never closes (the direct `verify_worker`→gate path is the one that works).
+`entity_merge_proposals` (135 accepted / 72 held) was acted upon then went **dormant June 15**. Decision
+for the operator: activate the adjudication loop, or mark `proposed_facts` legacy/secondary. Not an
+ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 
 ---
 

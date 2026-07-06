@@ -10,8 +10,8 @@ drift the way the hand-curated §8 map did (same discipline as `ontology_check.p
 Usage:
   agent_concept_map.py            # agent → writes/reads (the binding) + summary
   agent_concept_map.py --json     # full machine-readable map (agents + reverse table→agents)
-  agent_concept_map.py --orphans  # tables NO python agent touches (dead-by-code candidates) +
-                                  # agents that touch NO table (pure orchestration/compute)
+  agent_concept_map.py --orphans  # tables NO python agent touches (dead-by-code candidates)
+  agent_concept_map.py --review   # built-not-consumed (written, never read) + overlap candidates (§3)
 
 Honest caveat: some tables are written by n8n/Leo (LangChain.js) or DB triggers, NOT a python script,
 so "no agent touches" means "no python writer/reader" — a signal to investigate, not a death verdict.
@@ -23,6 +23,7 @@ import sys
 import json
 import glob
 import psycopg2
+from collections import defaultdict
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -111,6 +112,30 @@ def main():
         print(f"     DB trigger · n8n/Leo (LangChain.js) · seed/migration · shell · dynamic SQL. Confirm each:")
         for t, n in active:
             print(f"       [{n:>6}]  {t}")
+        return
+
+    if "--review" in sys.argv:
+        dom = {t for t in live if not is_plumbing(t)}
+        # BUILT-NOT-CONSUMED: a python agent WRITES it, none READS it.
+        wnr = sorted((t for t in writers if t not in readers and t in dom), key=lambda t: -live.get(t, 0))
+        terminal = [t for t in wnr if any(k in t for k in ("log", "audit", "queue", "block", "sent",
+                                                            "alert", "heartbeat", "snapshot", "runs", "_bak"))]
+        investigate = [t for t in wnr if t not in terminal]
+        print(f"=== BUILT-NOT-CONSUMED — {len(wnr)} tables written by an agent, read by none ===")
+        print(f"  terminal sinks ({len(terminal)}) — logs/audit/queues/backups, consumed by dashboards/humans/n8n (EXPECTED):")
+        print("     " + ", ".join(terminal))
+        print(f"  ⚠️  produced-but-unconsumed ({len(investigate)}) — a loop may not be closing:")
+        for t in investigate:
+            print(f"       [{live.get(t, 0):>6}] {t:30} written by {sorted(writers[t])[:2]}")
+        # OVERLAP CANDIDATES — name-stem clusters (confirm distinct vs redundant; see ONTOLOGY §3).
+        clusters = defaultdict(list)
+        for t in dom:
+            toks = t.split("_")
+            clusters["_".join(toks[:2]) if len(toks) > 2 else toks[0]].append(t)
+        print("\n=== OVERLAP CANDIDATES — name-stem clusters (>1 table) — confirm distinct vs redundant (§3) ===")
+        for stem, ts in sorted(clusters.items()):
+            if len(ts) > 1:
+                print(f"   {stem:18} {sorted(ts)}")
         return
 
     print(f"=== agent ↔ concept binding — {len(agents)} scripts touch the DB ===")
