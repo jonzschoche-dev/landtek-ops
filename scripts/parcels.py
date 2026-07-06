@@ -33,7 +33,8 @@ def _conn():
 def ensure(cur):
     cur.execute("""CREATE TABLE IF NOT EXISTS parcels (
         id serial PRIMARY KEY,
-        matter_code text, title_no text, source_doc_id int,
+        matter_code text, client_code text,  -- client_code: A9 isolation (deploy_733), FK added by migration
+        title_no text, source_doc_id int,
         area_sqm numeric, area_ha numeric, closure_error_m numeric, calls int,
         geom_wkt text,                      -- local-meter polygon; PostGIS-ready
         stated_ha numeric, area_matches bool,
@@ -46,12 +47,15 @@ def upsert_parcel(matter_code, title_no, calls_text, source_doc_id=None, stated_
     if not a.get("ok"):
         return a
     c = _conn(); cur = c.cursor(); ensure(cur)
+    # client_code (deploy_733, axiom A9): resolved from matter_code via the same _client_of()
+    # the ontology_validator uses (matters→clients OR clients directly). NULL if unresolvable —
+    # nullable by design (degrade-don't-crash); V6 treats NULL as "no declared client".
     cur.execute("""INSERT INTO parcels
-        (matter_code, title_no, source_doc_id, area_sqm, area_ha, closure_error_m, calls,
+        (matter_code, client_code, title_no, source_doc_id, area_sqm, area_ha, closure_error_m, calls,
          geom_wkt, stated_ha, area_matches)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
-        (matter_code, title_no, source_doc_id, a["area_sqm"], a["area_ha"], a["closure_error_m"],
-         a["calls"], a["wkt_local"], stated_ha, a.get("area_matches")))
+        VALUES (%s, _client_of(%s), %s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
+        (matter_code, matter_code, title_no, source_doc_id, a["area_sqm"], a["area_ha"],
+         a["closure_error_m"], a["calls"], a["wkt_local"], stated_ha, a.get("area_matches")))
     a["parcel_id"] = cur.fetchone()[0]
     cur.close(); c.close()
     return a

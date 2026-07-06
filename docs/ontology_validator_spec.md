@@ -155,18 +155,13 @@ V1/V3 when the shadow migration is authored.)*
 ## 8. V6 — Geometry client isolation (A9) · **SHADOW DRAFT, NOT APPLIED** (deploy_732 prep)
 
 Extends the §3 family with a sixth check for the Mapping domain (ONTOLOGY.md §2.4, axiom A9): a parcel's
-geometry belongs to exactly one client. This is the geometry analogue of V4. **Drafted only — no view, no
-config row, no trigger has been created on the DB.** It ships `log` first (like V4) *after* the blocker
-below is resolved.
+geometry belongs to exactly one client. The geometry analogue of V4. **Drafted only — no view, no config
+row, no trigger has been created on the DB.** It ships `log` first (like V4).
 
-**The blocker (decision required):** `map_parcels` carries a **declared** `client_code`, so it can be
-cross-checked against the client resolved from its `matter_code`. **`parcels` carries NO `client_code`** —
-there is no declared client to contradict, so the parcels layer cannot be validated the same clean way.
-Resolving A9 for `parcels` requires a choice:
-- **(a)** ADD `parcels.client_code` (a **schema change** — symmetric with `map_parcels`, cleanest), or
-- **(b)** accept a weaker transitive detector (`parcels.matter_code` vs the `parcels.source_doc_id` doc's client).
-
-Until (a)/(b) is chosen, **V6 covers `map_parcels` ONLY**; the `parcels` arm stays unenforced (flagged).
+**Blocker RESOLVED (deploy_733 — operator decision 7.1 = option (a)):** `parcels.client_code` was added
+(nullable, FK→`clients`, forward-filled by `_client_of(matter_code)` at write). **Both** geometry layers
+now carry a declared `client_code`, so V6 covers **both arms uniformly** — the draft below is updated
+accordingly. Applying it (even in `log`) is the separate **7.2** approval and has NOT been done.
 
 ```sql
 -- ===== V6 (geometry client isolation, A9) — SHADOW DRAFT, DO NOT APPLY =====
@@ -175,19 +170,25 @@ Until (a)/(b) is chosen, **V6 covers `map_parcels` ONLY**; the `parcels` arm sta
 --   ('V6','log','geometry client-isolation (A9) via v_ontology_geometry_cross')
 -- ON CONFLICT DO NOTHING;
 
--- Detector view — the map_parcels arm (has a DECLARED client_code to cross-check).
--- Reuses _client_of() (the same resolver V4 uses: matters->clients OR clients directly).
+-- Detector view — BOTH arms now (each has a DECLARED client_code). Reuses _client_of()
+-- (the same resolver V4 uses: matters->clients OR clients directly).
 CREATE OR REPLACE VIEW v_ontology_geometry_cross AS
-SELECT mp.parcel_code,
-       mp.matter_code,
-       mp.client_code               AS declared_client,
-       _client_of(mp.matter_code)   AS resolved_client
+SELECT 'map_parcels' AS layer, mp.parcel_code::text AS ref, mp.matter_code,
+       mp.client_code AS declared_client, _client_of(mp.matter_code) AS resolved_client
 FROM   map_parcels mp
-WHERE  mp.matter_code IS NOT NULL
+WHERE  mp.matter_code IS NOT NULL AND mp.client_code IS NOT NULL
   AND  _client_of(mp.matter_code) IS NOT NULL
-  AND  mp.client_code IS DISTINCT FROM _client_of(mp.matter_code);
+  AND  mp.client_code IS DISTINCT FROM _client_of(mp.matter_code)
+UNION ALL
+SELECT 'parcels' AS layer, p.id::text AS ref, p.matter_code,
+       p.client_code AS declared_client, _client_of(p.matter_code) AS resolved_client
+FROM   parcels p
+WHERE  p.matter_code IS NOT NULL AND p.client_code IS NOT NULL
+  AND  _client_of(p.matter_code) IS NOT NULL
+  AND  p.client_code IS DISTINCT FROM _client_of(p.matter_code);
 
--- Write-time trigger fn (map_parcels only — the clean arm). Same shape as ontvv_grounded_verified.
+-- Write-time trigger fn. Generic over the ref column (map_parcels PK=parcel_code, parcels PK=id).
+-- Same shape as ontvv_grounded_verified.
 CREATE OR REPLACE FUNCTION ontvv_geometry_isolation() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE m text; resolved text; BEGIN
   SELECT mode INTO m FROM ontology_validator_config WHERE check_code='V6';
@@ -195,29 +196,30 @@ DECLARE m text; resolved text; BEGIN
   IF NEW.matter_code IS NOT NULL AND NEW.client_code IS NOT NULL THEN
     resolved := _client_of(NEW.matter_code);
     IF resolved IS NOT NULL AND NEW.client_code <> resolved THEN
+      -- generic over both tables: reference only matter_code/client_code (present on each).
       PERFORM ontology_reject('ONTOLOGY_GEOMETRY_CLIENT_CROSS',
-        'map_parcels '||COALESCE(NEW.parcel_code,'?')||' client_code='||NEW.client_code
+        TG_TABLE_NAME||' matter_code='||NEW.matter_code||' client_code='||NEW.client_code
         ||' but matter resolves to '||resolved);
       IF m='block' THEN
-        RAISE EXCEPTION 'ontology_validator V6: map_parcels.client_code (%) must match the client of matter_code % (%) — A9',
-          NEW.client_code, NEW.matter_code, resolved;
+        RAISE EXCEPTION 'ontology_validator V6: %.client_code (%) must match the client of matter_code % (%) — A9',
+          TG_TABLE_NAME, NEW.client_code, NEW.matter_code, resolved;
       END IF;
     END IF;
   END IF;
   RETURN NEW;
 END $$;
--- attach in shadow ONLY after the parcels.client_code decision (uncomment then):
+-- attach in shadow ONLY on 7.2 approval (uncomment then) — BOTH arms, same fn:
 -- CREATE TRIGGER ontvv_v6_map_parcels BEFORE INSERT OR UPDATE ON map_parcels
 --   FOR EACH ROW EXECUTE FUNCTION ontvv_geometry_isolation();
-
--- parcels ARM — BLOCKED (no client_code). Do NOT author until decision (a)/(b) above.
+-- CREATE TRIGGER ontvv_v6_parcels BEFORE INSERT OR UPDATE ON parcels
+--   FOR EACH ROW EXECUTE FUNCTION ontvv_geometry_isolation();   -- UNBLOCKED by deploy_733
 ```
 
-**Definition of done (V6) — none checked; all gated on the decision:**
-- [ ] `parcels.client_code` decision made (add column **or** accept transitive detector).
-- [ ] `v_ontology_geometry_cross` created; returns 0 on the live seed (MWK-BALANE) — expected clean.
-- [ ] V6 config row inserted `mode='log'`; trigger attached to `map_parcels`; ≥72h shadow, 0 false positives.
-- [ ] Flip `map_parcels` arm to `block`; author the `parcels` arm per the chosen option.
+**Definition of done (V6):**
+- [x] `parcels.client_code` decision made → **option (a), added deploy_733** (writer forward-fills via `_client_of`).
+- [ ] `v_ontology_geometry_cross` created; returns 0 on the live seed (MWK-BALANE) — expected clean. *(7.2)*
+- [ ] V6 config row inserted `mode='log'`; both triggers attached; ≥72h shadow, 0 false positives. *(7.2)*
+- [ ] Flip both arms to `block` after a clean shadow window. *(post-7.2)*
 
 ---
 
