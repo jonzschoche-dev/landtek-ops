@@ -41,6 +41,7 @@ REGISTRY = [
     ("holes.b2_expected_evidence", "B2_ExpectedEvidence"),
     ("holes.b3_stage_claim_backtest", "B3_StageClaimBacktest"),
     ("holes.b4_untouched_entities", "B4_UntouchedEntities"),
+    ("holes.b5_relevance_link_hygiene", "B5_RelevanceLinkHygiene"),
     ("holes.c1_provenance_drift",  "C1_ProvenanceDrift"),
     ("holes.c2_ops_language_leak", "C2_OpsLanguageLeak"),
     ("holes.c3_simulator_regression", "C3_SimulatorRegression"),
