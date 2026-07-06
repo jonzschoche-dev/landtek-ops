@@ -34,10 +34,18 @@ import sys
 import psycopg2
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import reocr_gemini as R
+import reocr_gemini as R          # token backend (Gemini) — has QuotaExhausted
+import reocr_local as L           # creditless backend (owned Mac Ollama vision)
 import strip_plot_info as S
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+
+# Backends the drip can use to clean garbled OCR before parsing geometry.
+# 'local' = owned Mac Ollama vision, $0, no tokens (the default — the stack must move
+# without credits). 'gemini' = token path, sharper but quota-gated.
+BACKENDS = {"local": L, "gemini": R}
+# the exception each backend raises when its tier is unavailable → drip stops CLEANLY
+_TIER_DOWN = {"local": L.LocalTierDown, "gemini": R.QuotaExhausted}
 
 
 def _pending(limit, docs=None):
@@ -56,23 +64,27 @@ def _pending(limit, docs=None):
     return rows
 
 
-def run(max_docs=6, docs=None, strip_only=False, matter="MWK-001", rpm=8, write_weak=True):
+def run(max_docs=6, docs=None, strip_only=False, matter="MWK-001", rpm=8,
+        write_weak=True, backend="local"):
+    R_backend = BACKENDS[backend]
+    tier_down = _TIER_DOWN[backend]
     matters = set()
     if not strip_only:
         pending = _pending(max_docs, docs)
         if not pending:
             print("[geometry] no pending priority docs to re-OCR.")
         else:
-            R._RPM = max(0, rpm)  # throttle to be a good free-tier citizen
-            print(f"[geometry] re-OCR {len(pending)} priority doc(s): "
+            if backend == "gemini":
+                R._RPM = max(0, rpm)  # throttle to be a good free-tier citizen
+            print(f"[geometry] backend={backend} · re-OCR {len(pending)} priority doc(s): "
                   f"{[d[0] for d in pending]}", flush=True)
             for doc_id, title_no, mcode in pending:
                 matters.add(mcode or matter)
                 try:
-                    r = R.reocr(doc_id, go=True)
-                except R.QuotaExhausted:
-                    print(f"[geometry] Gemini quota exhausted — stopping cleanly at doc {doc_id}; "
-                          f"remaining docs drain after the next daily reset.", flush=True)
+                    r = R_backend.reocr(doc_id, go=True)
+                except tier_down as e:
+                    print(f"[geometry] {backend} tier unavailable ({str(e)[:80]}) — stopping "
+                          f"cleanly at doc {doc_id}; remaining docs drain on the next run.", flush=True)
                     break
                 if r.get("error"):
                     print(f"  doc {doc_id} ({title_no}): re-OCR error: {r['error']}", flush=True)
@@ -96,10 +108,12 @@ def main():
     ap.add_argument("--strip-only", action="store_true", help="skip re-OCR; just parse clean text")
     ap.add_argument("--matter", default="MWK-001")
     ap.add_argument("--rpm", type=int, default=8)
+    ap.add_argument("--backend", choices=["local", "gemini"], default="local",
+                    help="local = owned Mac Ollama vision ($0, default); gemini = token path")
     args = ap.parse_args()
     docs = [int(x) for x in args.docs.split(",")] if args.docs else None
     run(max_docs=args.max, docs=docs, strip_only=args.strip_only,
-        matter=args.matter, rpm=args.rpm)
+        matter=args.matter, rpm=args.rpm, backend=args.backend)
 
 
 if __name__ == "__main__":
