@@ -36,6 +36,11 @@ from pathlib import Path
 import psycopg2
 import psycopg2.extras
 
+try:  # outward-action chokepoint (deploy_717) — optional import, never break sends if absent
+    import outward_guard
+except Exception:
+    outward_guard = None
+
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
 # Rate limits: max N messages per chat_id per window_seconds
@@ -197,6 +202,25 @@ def send(chat_id, text, source, recipient_name=None,
     if not override_rate_limit:
         ok, reason = _check_rate(cur, chat_id, source)
         if not ok:
+            cur.execute(
+                "INSERT INTO outbound_blocks (chat_id, source, reason, content_preview) VALUES (%s, %s, %s, %s)",
+                (chat_id, source, reason, preview),
+            )
+            cur.close()
+            conn.close()
+            return False, reason
+
+    # Outward-action chokepoint (deploy_717). SHADOW: logs what it would do, never blocks. BLOCK:
+    # holds an un-approved outward send at T3 and does NOT dispatch. Internal (Jonathan/sim) always
+    # passes. Fail-safe: a guard error allows the send. Jonathan/sim are also floor-classified.
+    if outward_guard is not None:
+        try:
+            _decision, _ginfo = outward_guard.guard(
+                "telegram", chat_id, content_hash=chash, source=source, preview=preview, cur=cur)
+        except Exception:
+            _decision, _ginfo = "allow", {}
+        if _decision == "hold":
+            reason = f"outward_hold: {_ginfo.get('reason', 'held for approval')} (order #{_ginfo.get('order')})"
             cur.execute(
                 "INSERT INTO outbound_blocks (chat_id, source, reason, content_preview) VALUES (%s, %s, %s, %s)",
                 (chat_id, source, reason, preview),

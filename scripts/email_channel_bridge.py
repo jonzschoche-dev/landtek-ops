@@ -24,6 +24,12 @@ from email.mime.text import MIMEText
 import psycopg2
 import psycopg2.extras
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:  # outward-action chokepoint (deploy_717)
+    import outward_guard
+except Exception:
+    outward_guard = None
+
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 ADAPTER = os.environ.get("CHANNEL_EMAIL_URL", "http://localhost:8765/api/channel/email")
 JONATHAN_ADDRS = ("jonzschoche@gmail.com", "jonathan@hayuma.org")
@@ -90,6 +96,17 @@ def send():
             mime = MIMEText(r["text_content"] or "")
             mime["To"] = r["channel_user_id"]
             mime["Subject"] = (meta.get("subject") if isinstance(meta, dict) else None) or "Re:"
+            # Outward chokepoint (deploy_717) — shadow logs; block holds an un-approved outward email.
+            if outward_guard is not None:
+                try:
+                    _d, _gi = outward_guard.guard("email", r["channel_user_id"],
+                                                  source="email_channel_bridge",
+                                                  preview=(r["text_content"] or "")[:200])
+                except Exception:
+                    _d = "allow"
+                if _d == "hold":
+                    cur.execute("UPDATE channel_messages SET status='held_outward' WHERE id=%s", (r["id"],))
+                    continue
             raw = base64.urlsafe_b64encode(mime.as_bytes()).decode()
             svc.users().messages().send(userId="me", body={"raw": raw}).execute()
             cur.execute("UPDATE channel_messages SET status='sent' WHERE id=%s", (r["id"],))

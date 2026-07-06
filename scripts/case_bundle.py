@@ -26,6 +26,11 @@ from reportlab.platypus import Paragraph, PageBreak, SimpleDocTemplate, Spacer
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from humanize import doc_titles as _doc_titles, matter_names as _matter_names, humanize as _humanize
 
+try:  # outward-action chokepoint (deploy_717) — closes the raw-sendDocument bypass
+    import outward_guard
+except Exception:
+    outward_guard = None
+
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 CHAT = "6513067717"
 
@@ -317,6 +322,16 @@ def main():
     print(f"[bundle] {mc}: {kind} — {nex} exhibits bound → {path} ({kb} KB)")
     if "--send" in sys.argv:
         tok = _tok()
+        # Outward chokepoint (deploy_717) — shadow logs; block holds an un-approved outward bundle.
+        if outward_guard is not None:
+            try:
+                _d, _gi = outward_guard.guard("telegram", CHAT, source="case_bundle",
+                                              preview=f"{mc} {kind} ({nex} exhibits) [document]")
+            except Exception:
+                _d = "allow"
+            if _d == "hold":
+                print(f"[send] HELD by outward_guard (order #{_gi.get('order')}) — not sent")
+                return
         r = subprocess.run(["curl", "-s", "-F", f"chat_id={CHAT}", "-F", f"caption={mc} — {kind} ({nex} exhibits)",
                             "-F", f"document=@{path}", f"https://api.telegram.org/bot{tok}/sendDocument"],
                            capture_output=True, text=True)

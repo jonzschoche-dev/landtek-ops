@@ -19,6 +19,10 @@ import sys
 import psycopg2
 
 from agent_alert import emit  # unified decision log (scripts/ is on sys.path when run as a script)
+try:  # outward-action chokepoint (deploy_717) — a mark-FILED is a T3 outward claim
+    import outward_guard
+except Exception:
+    outward_guard = None
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 TG_SEND = "/root/landtek/scripts/tg_send.py"
@@ -92,6 +96,16 @@ def main():
         i = a.index("--set"); cid, st = int(a[i + 1]), a[i + 2]
         if st not in STAGES:
             print(f"status must be one of {STAGES}"); return
+        # Outward chokepoint (deploy_717): marking FILED asserts an outward filing happened (T3).
+        # Shadow logs it; block would hold. (Block-mode for filing awaits operator-vs-agent origin.)
+        if st == "filed" and outward_guard is not None:
+            try:
+                _d, _gi = outward_guard.guard("filing", f"action:{cid}", source="execution_tracker",
+                                              preview=f"mark case_action {cid} FILED")
+            except Exception:
+                _d = "allow"
+            if _d == "hold":
+                print(f"[mark-filed] HELD by outward_guard (order #{_gi.get('order')}) — status unchanged"); return
         cur.execute("UPDATE case_actions SET status=%s, updated_at=now() WHERE id=%s", (st, cid))
         print(f"✓ action {cid} → {st}" if cur.rowcount else "no such action")
     elif "--report" in a:
