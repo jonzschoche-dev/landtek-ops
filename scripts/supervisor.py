@@ -45,6 +45,16 @@ KINDS = {
             {"name": "hold",   "agent": "human",                  "mode": "handoff", "tier": "T3"},
         ],
     },
+    # Supervises the SEPARATE OCR remediation pipeline: I gate how its output re-connects to the
+    # corpus; the pipeline does the preprocess/re-OCR/reconcile (the 'remediate' handoff).
+    "ocr_remediation": {
+        "title": "OCR remediation + corpus re-connect",
+        "steps": [
+            {"name": "remediate",      "agent": "ocr-pipeline", "mode": "handoff", "tier": "T2"},
+            {"name": "connect-verify", "agent": "supervisor",   "mode": "check",   "tier": "T1"},
+            {"name": "certify",        "agent": "human",        "mode": "handoff", "tier": "T3"},
+        ],
+    },
 }
 
 # Verbs that mean an outward/irreversible action — fail-closed even if mis-tagged (GOVERNED_ACTIONS §0).
@@ -81,16 +91,50 @@ def _audit(order: dict, frm: str, to: str, note: str) -> list:
     return log
 
 
+def _connect_verify(cur, target_ref: str):
+    """SUPERVISION gate for OCR remediation: did the remediated doc actually re-connect to the stack?
+    Returns (ok, issues). Checks the real connection points (deploy grounding): new text + provenance,
+    ocr_quality re-scored, re-embedded, document_type set. A half-connected remediation is rejected."""
+    if not target_ref or not target_ref.startswith("doc:"):
+        return False, ["no target doc (enqueue with --target doc:<id>)"]
+    doc_id = target_ref.split(":", 1)[1]
+    if not doc_id.isdigit():
+        return False, [f"bad target_ref '{target_ref}'"]
+    cur.execute("""
+        SELECT length(coalesce(d.extracted_text,'')) AS txt, d.model_used, d.document_type,
+               (SELECT score FROM ocr_quality q WHERE q.doc_id = d.id ORDER BY scored_at DESC LIMIT 1) AS q,
+               (SELECT embedded FROM corpus_backfill_state c WHERE c.doc_id = d.id) AS emb
+        FROM documents d WHERE d.id = %s""", (int(doc_id),))
+    r = cur.fetchone()
+    if not r:
+        return False, [f"doc {doc_id} not found"]
+    issues = []
+    if (r["txt"] or 0) < 50:      issues.append("no/empty extracted_text (remediation produced no usable text)")
+    if not r["model_used"]:       issues.append("provenance missing (model_used unset — which engine read it?)")
+    if r["q"] is None:            issues.append("ocr_quality not re-scored")
+    if r["emb"] is not True:      issues.append("not re-embedded (corpus_backfill_state.embedded ≠ true — search stale)")
+    if not r["document_type"]:    issues.append("document_type not set (corpus not structurally connected)")
+    return (len(issues) == 0), issues
+
+
 # ── Commands ────────────────────────────────────────────────────────────────────────────────
 
 # Kinds whose orders must DERIVE from v_evidence_gaps (gaps are queried, not asserted).
 GAP_KINDS = {"evidence_gap"}
 
 
-def cmd_enqueue(cur, kind, matter, title, by, gap_key=None, override=None):
+# Kinds that must point at a target document (target_ref = 'doc:<id>').
+TARGET_KINDS = {"ocr_remediation"}
+
+
+def cmd_enqueue(cur, kind, matter, title, by, gap_key=None, override=None, target=None):
     spec = KINDS.get(kind)
     if not spec:
         print(f"unknown kind '{kind}'. known: {', '.join(KINDS)}")
+        return 2
+
+    if kind in TARGET_KINDS and not (target and target.startswith("doc:") and target.split(":", 1)[1].isdigit()):
+        print(f"{kind} orders require --target doc:<id> (the document to remediate + connect-verify).")
         return 2
 
     # ENFORCEMENT (supervision): a gap order cannot be born from free text. It must cite a real
@@ -119,16 +163,17 @@ def cmd_enqueue(cur, kind, matter, title, by, gap_key=None, override=None):
             return 2
 
     steps = [dict(s, status="pending", result=None) for s in spec["steps"]]
-    note = f"enqueued kind={kind}" + (f" · gap_source={provenance}" if provenance else "")
+    src = provenance or (f"target={target}" if target else None)
+    note = f"enqueued kind={kind}" + (f" · {src}" if src else "")
     cur.execute(
         """INSERT INTO work_orders (kind, matter_code, title, status, steps, current_step,
-             created_by, audit)
-           VALUES (%s,%s,%s,'queued',%s,0,%s,%s) RETURNING id""",
-        (kind, matter, title or spec["title"], json.dumps(steps), by,
+             created_by, target_ref, audit)
+           VALUES (%s,%s,%s,'queued',%s,0,%s,%s,%s) RETURNING id""",
+        (kind, matter, title or spec["title"], json.dumps(steps), by, target,
          json.dumps([{"ts": _now(), "from": None, "to": "queued", "note": note}])))
     oid = cur.fetchone()["id"]  # RealDictCursor → dict, not tuple
     print(f"enqueued work_order #{oid} ({kind}, matter={matter}) — status=queued, {len(steps)} steps"
-          + (f" [gap_source: {provenance}]" if provenance else ""))
+          + (f" [{src}]" if src else ""))
     return 0
 
 
@@ -260,6 +305,21 @@ def cmd_tick(cur, dry):
         if step["mode"] == "handoff":
             _set(cur, r, "awaiting_handoff",
                  f"awaiting handoff: '{step['name']}' → {step['agent']} (run it, then: supervisor.py complete {r['id']} --result ...)", dry)
+        elif step["mode"] == "check":
+            # supervisor-internal deterministic gate (NOT an external agent) — e.g. connect-verify.
+            ok, issues = _connect_verify(cur, r.get("target_ref")) if step["name"] == "connect-verify" else (False, [f"no check for '{step['name']}'"])
+            if ok:
+                print(f"  #{r['id']}: connect-verify PASSED → advancing to '{steps[cs+1]['name']}'")
+                if not dry:
+                    steps[cs]["status"] = "done"; steps[cs]["result"] = "connect-verify: doc correctly re-connected"
+                    audit = _audit(r, "queued", "queued", "connect-verify passed, advancing")
+                    cur.execute("""UPDATE work_orders SET steps=%s, current_step=%s, status='queued',
+                                     updated_at=now(), audit=%s WHERE id=%s""",
+                                (json.dumps(steps), cs + 1, json.dumps(audit), r["id"]))
+            else:
+                _set(cur, r, "blocked_governance",
+                     "CONNECT-VERIFY failed — remediation left the doc half-integrated: "
+                     + "; ".join(issues) + ". Fix these before the remediated text is accepted into the corpus.", dry)
         elif step["mode"] == "auto":
             _set(cur, r, "blocked_governance",
                  f"auto step '{step['name']}' not supported in v1 (Phase 3 adapter) — fail-closed", dry)
@@ -283,7 +343,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     e = sub.add_parser("enqueue"); e.add_argument("--kind", required=True); e.add_argument("--matter")
     e.add_argument("--title"); e.add_argument("--by", default="operator")
-    e.add_argument("--gap-key", dest="gap_key"); e.add_argument("--override")
+    e.add_argument("--gap-key", dest="gap_key"); e.add_argument("--override"); e.add_argument("--target")
     l = sub.add_parser("list"); l.add_argument("--awaiting", action="store_true")
     s = sub.add_parser("status"); s.add_argument("id", nargs="?", type=int)
     c = sub.add_parser("complete"); c.add_argument("id", type=int); c.add_argument("--result", required=True)
@@ -296,7 +356,7 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     try:
         if a.cmd == "enqueue":
-            rc = cmd_enqueue(cur, a.kind, a.matter, a.title, a.by, a.gap_key, a.override)
+            rc = cmd_enqueue(cur, a.kind, a.matter, a.title, a.by, a.gap_key, a.override, a.target)
         elif a.cmd == "list":
             rc = cmd_list(cur, a.awaiting)
         elif a.cmd == "status":
