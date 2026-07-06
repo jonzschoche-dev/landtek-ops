@@ -12,60 +12,104 @@
 
 ---
 
-## 1. The five logical layers
+## 1. The named sections
 
-Every line in `ONTOLOGY.md` belongs to exactly one of five layers. They answer five different
-questions and must never be blended within a section.
+Every line in `ONTOLOGY.md` belongs to exactly one **named section**. Each answers a different question
+and must never be blended with another. *(Earlier drafts labelled these "Layer I–V"; the Roman numerals
+were dropped — plain section names are clearer to reference.)*
 
-| Layer | Question it answers | Where it lives today |
+| Section | Question it answers | Content granularity |
 |---|---|---|
-| **I. Core Concepts** | *What concepts exist, and which table is canonical for each?* | §2 concept registry (§2.1–§2.3, §2.7) |
-| **II. Invariants** | *What must always be true, and is it enforced or merely asserted?* | §4 (the A-series) |
-| **III. Domain Models** | *How does one domain work end-to-end — concepts, states, components, invariants?* | §2.4 + §2.8–§2.13 (full-rigor domain sections) |
-| **IV. Cross-Cutting Concerns** | *What spans every domain — provenance, tenancy, governance, access?* | §1, §5, §6 |
-| **V. Component Mapping** | *Which agent/service reads and writes which concept?* | §8 Oriented Map + `agent_concept_map.py` (derived) |
+| **Core Concept Registry** | *What concepts exist, and which table is canonical for each?* | lightweight rows (concept → 🟢 table → notes) |
+| **Domain Models** | *How does one domain work end-to-end — concepts, states, components, invariants?* | full rigor (mature, agent-heavy domains only) |
+| **System Invariants** | *What must always be true, and is it enforced or merely asserted?* | the A-series, one monotonic registry |
+| **Cross-Cutting Concerns** | *What spans every domain — client isolation, provenance, exposure, access?* | universal rules, one home each |
+| **Component Mapping** | *Which agent/service reads and writes which concept?* | mostly *derived* (`agent_concept_map.py`) |
+| **Future Domains** | *What is planned but not yet built?* | ○ placeholders, one line each |
+| **Maintenance & Evolution** | *How does the ontology grow and stay honest?* | rules (this file) |
 
-**Supporting layers:** **Drift/Legacy** (§3 — do-not-write tables) and **Future Domains** (§9 — planned,
-unbuilt) bracket the live content. **Maintenance** rules live in this file (§6 below).
-
-> **Rule of placement.** A registry *row* (concept → canonical table) goes in Layer I. A *full domain
-> write-up* (definition + concept table + invariants + component mapping) goes in Layer III. If a domain
-> is important enough to have its own agents, it earns a Layer III section; until then it is a Layer I row.
+> **Rule of placement.** A concept starts life as a **Future Domain** placeholder, graduates to a
+> lightweight **Registry** row when it gets a canonical table, and earns a full **Domain Model** only once
+> it has meaningful agents, invariants, or governance requirements. A registry row that never grows agents
+> stays a registry row — do not over-model. (Full lifecycle in the Domain Progression Model, §2.1 below.)
 
 ---
 
-## 2. Target table of contents
+## 2. Target table of contents (the v1.0 structure)
 
-The clean structure the document converges toward. Existing section numbers are **stable** (referenced
-across the codebase and memory) — we grow by *adding*, not renumbering. New domains append to §2 (as
-§2.N) and, when they mature, get a Layer III model.
+This is the clean structure the document converges toward — the physical split of the lightweight
+registry from full domain models. **It is the target for the planned v1.0 major bump, NOT the current
+live numbering** (see §6, Migration to v1.0). The live doc reaches it in one mechanical migration, not
+piecemeal.
 
 ```
-0.  Ground planes .......... domain vs n8n plumbing (never model across)
-1.  The organizing axiom ... document = source of truth; provenance vocabulary   [Layer IV]
-2.  Concept registry ....... canonical table per concept, grouped by family      [Layer I + III]
-      2.1  Corpus / provenance root
-      2.2  Real-world actors & tenancy
-      2.3  Title / chain-of-title
-      2.4  Geometry / Mapping                 (Layer III — full model)
-      2.5  Knowledge / claims / facts
-      2.6  Strategy / matter reasoning
-      2.7  Interface / comms
-      2.8–2.13  Domain models                 (Layer III — Case Theory … Truth & Reconciliation)
-      2.N  <next domain>                       ← new domains append here
-3.  Drift / legacy ......... do-not-write tables + consolidation backlog          [Supporting]
-4.  Invariants ............. the A-series (system + domain), with enforcement     [Layer II]
-5.  Client isolation ....... the tenancy firewall                                 [Layer IV]
-6.  Access-model note ...... LandTek access vs n8n RBAC                           [Layer IV]
-7.  How to regenerate ...... re-grounding protocol                               [Maintenance]
-8.  Oriented Operational Map  concept → purpose → connection → state              [Layer V]
-9.  Future Domains ......... planned, unbuilt (○ placeholders)                    [Supporting]
+1.  Purpose & Design Principles ... why this ontology exists + how to use it
+2.  Core Concept Registry ......... fast lookup: canonical table per concept (lightweight rows)
+      2.1  Corpus & Documents
+      2.2  Actors, Clients & Tenancy
+      2.3  Land Titles & Property
+      2.4  Geometry & Mapping
+      2.5  Facts & Provenance
+      2.6  Communications
+      2.7  Supervision & Workflow
+      2.N  <lightweight registry entries append here>
+3.  Domain Models ................. full rigor — MATURE, agent-heavy domains only
+      3.1  Property Mapping & Geometry
+      3.2  Document Intake & Corpus Connectivity
+      3.3  Entity Resolution & Canonical Knowledge Base
+      3.4  Client & Matter Separation
+      3.5  Fact Harvesting & Truth
+      3.6  Supervision & Governed Actions
+      3.7  Communications & Platform Coordination
+      3.N  <mature domains append here>
+4.  System Invariants ............. the A-series, one monotonic registry, enforcement-marked
+5.  Cross-Cutting Concerns
+      5.1  Client Isolation
+      5.2  Provenance & Truth
+      5.3  External Exposure & Governance
+      5.4  Access Control & Visibility
+6.  Component Mapping ............. concept ↔ agent/table (derived from agent_concept_map.py)
+7.  Future Domains & Planned Capabilities ... ○ placeholders
+8.  Maintenance, Evolution & Governance Rules
 ```
 
-> **Known convergence debt (documented, not urgent):** (a) a duplicate `§2.6` heading (Strategy vs the
-> deploy_719 "Gated-core" addendum) should be renamed on the next major bump; (b) §8's Oriented Map
-> overlaps the §2.8–§2.13 domain models — as each domain graduates to a Layer III model, its §8 row
-> becomes a one-line pointer. Neither is load-bearing; both are tracked in the change log.
+**Why this beats the current layout:** it separates the lightweight **Registry** (fast lookup, grows
+often) from full **Domain Models** (heavy, mature-only), so the document stays legible as it scales to
+many agents; it gives invariants and cross-cutting rules dedicated homes instead of scattering them
+across §1/§5/§6; and it makes the growth lifecycle (§5) explicit.
+
+### Current → target section map (for the v1.0 migration)
+
+| Current (live) | Target (v1.0) |
+|---|---|
+| §0 Ground planes + §1 Axiom | §1 Purpose & Design Principles (+ the axiom stays as a principle) |
+| §2.1–§2.3, §2.5–§2.7 registry rows | §2 Core Concept Registry |
+| §2.4, §2.8–§2.14 domain models | §3 Domain Models (§3.1–§3.N) |
+| §4 Invariants (A-series) | §4 System Invariants *(A-numbers unchanged)* |
+| §1 provenance + §5 client-iso + §6 access | §5 Cross-Cutting Concerns (5.1–5.4) |
+| §8 Oriented Operational Map | §6 Component Mapping |
+| §9 Future Domains | §7 Future Domains |
+| §3 Drift/legacy + §7 regenerate + this file | §8 Maintenance, Evolution & Governance |
+
+> **Invariant A-numbers never change** across this migration — only section numbers move — so every
+> mechanical guard that cites `A5`/`A7`/`A15` (the `truth_tests`) is migration-safe.
+
+### 2.1 Domain progression model (the lifecycle every domain follows)
+
+A domain is never born a full model. It earns its place by maturing through four stages — this prevents
+ad-hoc growth and keeps the heavy §3 Domain-Models section reserved for things that actually have agents.
+
+| Stage | Lives in | What it is | Example |
+|---|---|---|---|
+| **1 · Future / Planned** | §7 Future Domains | a placeholder — name + one-line intent, ○ marker, no schema | Payments, Construction, Tenant Management |
+| **2 · Registry Entry** | §2 Core Concept Registry | lightweight: canonical table(s) + basic notes; concept exists and is written | most current §2 rows |
+| **3 · Full Domain Model** | §3 Domain Models | complete: definition + concept table + component mapping + 2–3 invariants | Property Mapping, Document Intake, Communications |
+| **4 · Deprecated / Legacy** | §8 Maintenance (Drift/Legacy) | superseded; marked 🔴 with its canonical successor named | `audit_log`→`truth_audit_log`, `chain_of_title`→`title_chain` |
+
+> **Promotion rule.** A domain advances **2 → 3 (earns a full model) only when it has meaningful agents,
+> invariants, or governance requirements.** Until then it stays a registry row (stage 2) or a placeholder
+> (stage 1). Demotion (3/2 → 4) happens the moment a canonical successor exists — record it, don't delete
+> it (carry the lineage). Every promotion is a version bump + change-log entry + a green `--coverage`.
 
 ---
 
@@ -90,7 +134,7 @@ policy enforced by process, e.g. mechanical-over-LLM).
 
 ## 4. The new-domain template (copy-paste)
 
-When a domain earns a Layer III model, copy this skeleton verbatim and fill it in. Match the voice of
+When a domain earns a full Domain Model (§3), copy this skeleton verbatim and fill it in. Match the voice of
 §2.4 / §2.10 exactly: one-sentence definition, a state-marked concept table, a component-mapping line,
 and 2–3 invariants continuing the A-series.
 
@@ -120,7 +164,7 @@ and 2–3 invariants continuing the A-series.
 
 ---
 
-## 5. Invariant conventions (Layer II)
+## 5. Invariant conventions
 
 Invariants are the load-bearing part of the ontology: they are what a mechanical guard can check.
 
@@ -172,7 +216,7 @@ sections/invariants touched and *why*. The change log is the audit trail — nev
 - `ontology_check.py --coverage` — every populated domain table must be named in the map (200/200 today).
   Wired to the daily sentinel; a new unnamed table raises a finding. **"Nothing orphaned" is a check, not a claim.**
 - `agent_concept_map.py --triage / --review / --orphans` — derives the concept↔agent binding from code+DB,
-  so Layer V can't silently drift from reality.
+  so Component Mapping (§6) can't silently drift from reality.
 - Re-ground rowcounts before trusting any older than a few weeks; the header dates the last grounding.
 
 **Golden rules (learned the hard way):**
@@ -181,10 +225,33 @@ sections/invariants touched and *why*. The change log is the audit trail — nev
 2. **Grow by appending.** Add §2.N and A-numbers; never renumber live sections — cross-references break.
 3. **Honesty over optics.** 🟡/○/**flagged** is the correct state for unbuilt or unenforced things; a
    wall of green that isn't true is worse than an honest amber.
-4. **A domain earns its Layer III model when it earns agents.** Until then it is a Layer I row or a §9
+4. **A domain earns its full Domain Model when it earns agents.** Until then it is a registry row or a §9
    Future-Domains placeholder — don't over-model vaporware.
 5. **One concept, one canonical table.** Two tables for one concept ⇒ one is 🔴 drift; record it in §3.
 
 **Adding a new AI agent/service:** register what it reads/writes (it will appear in `agent_concept_map`),
 confirm every table it writes is a named concept (or add it), and confirm it inherits the system
 invariants (§5) — especially client separation and the outward chokepoint. No agent ships outside those.
+
+### 6.1 Migration to v1.0 (the deferred renumber — planned, not now)
+
+The v1.0 target TOC (§2) physically splits the registry from domain models and gives cross-cutting rules
+their own section. It is the right end-state — but it is a **`major` bump that renumbers live sections**,
+so it is executed **once, mechanically, deliberately — not piecemeal and not yet.**
+
+**Reference-breakage cost (measured 2026-07-06):** ~15–20 external references to ONTOLOGY section numbers
+across ~6 files (`ontology_check.py`, `agent_concept_map.py`, `test_superseded_tables_empty.py`,
+`ontology_validator_spec.md`, the `*_INTEGRATION.md` docs) + ~19 internal `§8.x` self-references. All
+mechanically fixable with the §2 current→target map. **The A-series numbers do not move**, so every
+`truth_tests` guard is migration-safe.
+
+**Why deferred (both conditions must clear first):**
+1. **Litigation window.** Pre-Aug-12 is a no-risky-migration period (CLAUDE.md; and the drift-consolidation
+   note in ONTOLOGY §3 is itself a "post-Aug-12 chore"). A whole-doc renumber is exactly that risk.
+2. **Concurrent authorship.** The ontology is being actively extended by a parallel session (Communications
+   §2.14, A25–A29 landed mid-edit). A big-bang renumber would collide; migrate only when authorship quiesces.
+
+**Execution plan when both clear:** (1) branch; (2) apply the §2 current→target map in one pass; (3) `sed`
+the ~35 references using the map; (4) run `ontology_check.py --coverage` (must stay green) + the full
+`truth_tests` suite; (5) `major` version bump + change-log entry. Until then, keep growing under the
+current numbering by **appending** — the target structure is the compass, not a same-day action.
