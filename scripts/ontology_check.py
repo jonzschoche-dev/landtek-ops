@@ -19,6 +19,7 @@ Exit code: 0 = clean, 1 = drift/contamination found (usable as a health gate).
 """
 from __future__ import annotations
 import os
+import re
 import sys
 import json
 import psycopg2
@@ -70,12 +71,48 @@ def is_plumbing(t: str) -> bool:
                  "api_keys", "user_api_keys") or t.startswith(PLUMBING_PREFIX)
 
 
+def _named_in(doc: str, t: str) -> bool:
+    """True iff table name `t` appears as a WHOLE snake_case token in the doc (not as a substring of
+    a longer name). Precise coverage check — `entities` must not count as covered by `doc_entities`."""
+    return re.search(r'(?<![a-z0-9_])' + re.escape(t) + r'(?![a-z0-9_])', doc, re.I) is not None
+
+
+def cmd_coverage(cur) -> int:
+    """AUTHORITATIVE coverage: every POPULATED domain table must be NAMED in ONTOLOGY.md.
+    Reads the actual file — this is what makes 'nothing orphaned' a CHECK, not a hand-curated claim
+    (deploy_718's §8 silently missed 100 tables). Exit 1 on any gap so it's a tracked invariant."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        with open(os.path.join(repo, "ONTOLOGY.md")) as f:
+            doc = f.read()
+    except Exception as e:
+        print(f"cannot read ONTOLOGY.md: {e}"); return 2
+    cur.execute("SELECT relname, n_live_tup FROM pg_stat_user_tables WHERE n_live_tup > 0 ORDER BY n_live_tup DESC;")
+    rows = [(t, n) for (t, n) in cur.fetchall() if not is_plumbing(t)]
+    missing = [(t, n) for (t, n) in rows if not _named_in(doc, t)]
+    print("=== ONTOLOGY.md coverage — populated domain tables named in the map ===")
+    print(f"  named: {len(rows) - len(missing)}/{len(rows)}")
+    if missing:
+        print(f"  ORIENTATION GAPS — {len(missing)} populated domain tables NOT named (rows shown):")
+        for t, n in missing:
+            print(f"    [{n:>7}]  {t}")
+        print("  → orient each in ONTOLOGY.md (§2 if gated-core evidence; §8 with a state otherwise).")
+    else:
+        print("  ✓ every populated domain table is named — nothing orphaned (VERIFIED, not claimed).")
+    return 1 if missing else 0
+
+
 def main():
     brief = "--brief" in sys.argv
     sentinel = "--sentinel" in sys.argv
     as_json = "--json" in sys.argv
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
+    if "--coverage" in sys.argv:
+        with conn.cursor() as cur:
+            rc = cmd_coverage(cur)
+        conn.close()
+        sys.exit(rc)
     problems = 0
     v3 = v4 = 0
     drift_counts, bad, unreg, inference = {}, [], [], {}

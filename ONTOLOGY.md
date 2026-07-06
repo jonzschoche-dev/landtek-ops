@@ -144,6 +144,24 @@ claims (what we must prove) ──▶ truth_negotiations ──▶ claim_truth_v
 
 ---
 
+### 2.6 Gated-core tables the first pass omitted (added after the deploy_719 coverage audit)
+
+The hand-curated §2 missed genuine evidence-grade concepts. These are **core, gated** (not §8):
+
+| Concept | Table | Notes |
+|---|---|---|
+| Document ↔ matter join | `document_matter_links` (+ `document_matter_links_unlinked_bak` backup) · `document_links` | the corpus-to-matter connection |
+| Per-transfer documents | `transfer_documents` | the evidence-gap engine's doc side |
+| The named transferees/defendants | `transferees` | the case's core actors (20) |
+| Title fraud flags | `fraud_indicators` | visual title anomalies (CLAUDE.md key) |
+| Evidence chain | `evidence_trail` · `evidence_trail_proposals` | fact → supporting doc |
+| Gap register (feeds `v_evidence_gaps`) | `record_gaps` | governance depends on it |
+| Chunk stores | `legal_chunks` · `document_chunks` | law + doc RAG chunks |
+| Matter structure | `matter_parties` · `matter_causes` | parties + causes of action |
+| Adjudications / prep | `resolutions` · `prep_requirements` | forum outcomes + prep |
+| Case events / lifecycle | `case_events` · `case_stage_transitions` · `case_intelligence_log` · `case_reports` · `case_keywords` · `title_tax_links` · `thread_relationships` | matter timeline + linkage |
+| Truth-guard | `hallucination_log` | logged hallucination catches (near provenance) |
+
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
 
 | 🔴 Table | Rows | Verdict | Canonical instead |
@@ -265,11 +283,41 @@ served by a named successor · `⚙️ INFRA` n8n/platform plumbing, not a domai
 ### 8.13 Infra (⚙️ excluded — not domain concepts)
 n8n/platform: `workflow_*` · `execution_*` · `chat_hub_*` · `instance_ai_*` · `oauth_*` · `credential*`/`token_*` · `role`/`scope`/`user` · `folder`/`project`/`variables` · `data_table*`.
 
-**Orientation summary:** ~205 live + connected · a whole **dormant business/valuation/geometry/extraction layer** (a roadmap, not dead weight) · ~4 healthy-empty sentinels · a handful superseded-with-successor · the rest infra. Nothing orphaned; every concept has a purpose, a connection, and a state.
+### 8.14 Autonomous-stack health & self-heal — *where the ~38 report-health agents write*
+`system_heartbeat` (16k — the fleet's pulse) · `sentinel_alerts` · `cron_health_state` · `system_analyzer_findings` · `agent_audit` · `escalations` · `escalations_log` · `bottlenecks` · `service_recoveries` · `token_health` · `awareness_log` · `comms_health_alert_state` · `cooldown_log` · `phase_log` · `sim_monitor_state`. **🟢 ACTIVE** — this is the data footprint of the T0/T1 report-health tier in `SUPERVISION_DIRECTIVE.md` §1.
+
+### 8.15 Simulator / Smartness-loop QA — *the adversarial self-improvement subsystem*
+`leo_qa_runs` (490k) · `leo_qa_sim_payloads` · `leo_qa_violations` · `leo_qa_probes` · `leo_workflow_snapshots` · `leo_improvement_proposals` · `simulator_budget_log` · `simulator_session_results` · `simulator_sessions` · `back_test_suite`. **🟢 ACTIVE** (its own CLAUDE.md section). Governs Leo's learning loop; not evidence — mapped, not gated.
+
+### 8.16 Scheduling / assistant / deadlines / actions
+`calendar_events` · `deadline_alerts` · `calendar_briefs_sent` · `calendar_sync_map` · `email_briefs_sent` · `action_items` · `pending_questions` · `pending_inquiries`. **🟢 ACTIVE** — the agentic-calendar + operator-nudge layer → `matters`/`case_deadlines`.
+
+### 8.17 Strategy-prep & adversary modeling
+`planned_moves` · `opposing_responses` · `stage_intake_template` · `stage_intake_response` · `prep_requirements`. **🟢/🌱** — scenario-tree + intake scaffolds → `matters`/`matter_plays`.
+
+### 8.18 Operational logs, dedup, config & credentials (the minor tail — mapped, low-stakes)
+- **Verify/triage/re-OCR pipeline state:** `matter_relevance` · `doc_relevance_triage` · `doc_triage_pushed` · `fact_encoding_log` · `re_ocr_results` · `reocr_log` · `reocr_backup` · `ocr_browser_log` · `llm_extracted_lineage` · `doc_link_candidates`.
+- **Entity-graph / resolution:** `entity_resolution_log` · `entity_types` (with the dormant `entity_relationships`/`entity_aliases`, §8.12).
+- **Comms extra:** `gmail_messages_archived` · `correspondence_events` · `email_sender_disposition` · `channel_users`.
+- **Forums / obligations:** `agency_mandates` · `jurisprudence_wishlist` · `landtek_obligations` · `landtek_duties` · `firm_goals`.
+- **Client extra:** `client_dependability` · `client_issues` · `client_needs` · `associates` · `assessments`.
+- **Dedup / ops / config:** `deploy_log` · `unauth_attempts` · `vault_sections` · `drive_duplicates` · `docs_dupes` · `event_kind_taxonomy` · `event_kind_canonical_def` · `constitution_regen_log` · `forensic_findings` · `extraction_budget` · `landtek_config` · `gemini_key_state` · `tg_update_cursor` · `gmail_oauth_tokens`.
+
+**Orientation summary (VERIFIED by `ontology_check.py --coverage`, not claimed):** every populated domain
+table is now named — §2 gated-core (incl. the 2.6 additions), §8.1–8.13 operational clusters, and the
+§8.14–8.18 subsystems the first hand-curated pass missed. A whole **dormant business/valuation/geometry/
+extraction layer** stands as a roadmap; ~4 healthy-empty sentinels; superseded tables carry successors.
+The `--coverage` check is the guard: "nothing orphaned" is now a mechanical invariant, not a claim.
 
 ---
 
 **Change log**
+- v0.4 (2026-07-06) — **coverage audit falsified "nothing orphaned"** (§8 hand-curation silently missed
+  100 populated domain tables incl. `system_heartbeat`, `document_matter_links`, `transferees`,
+  `fraud_indicators`, and two whole subsystems). Fix: `ontology_check.py --coverage` now diffs live
+  populated domain tables vs the actual file (token-precise) → **completeness is a CHECK, not a claim**.
+  Filled §2.6 (gated-core omissions) + §8.14 (autonomous health) + §8.15 (simulator QA) + §8.16–8.18
+  (scheduling, strategy-prep, ops tail). Re-verified: **201/201 named, 0 gaps.**
 - v0.3 (2026-07-06) — added §8 **Oriented Operational Map**: all ~53 agents' concepts across 10 domains
   given purpose · core-connection · orientation-state (Active/Dormant/Healthy-empty/Superseded/Infra).
   Surfaces the dormant valuation/geometry/extraction layer as an activation backlog; registers the
