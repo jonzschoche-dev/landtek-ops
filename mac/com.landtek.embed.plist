@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.landtek.embed</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/jonathanzschoche/landtek/scripts/embed_sweep.sh</string>
+    </array>
+
+    <!-- every 6h, matching the VPS case-corpus-sweep cadence; embedding is idempotent + $0 -->
+    <key>StartInterval</key>
+    <integer>21600</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>LANDTEK_REPO</key>
+        <string>/Users/jonathanzschoche/landtek</string>
+        <key>HOME</key>
+        <string>/Users/jonathanzschoche</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/jonathanzschoche/Library/Logs/landtek_embed.stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/jonathanzschoche/Library/Logs/landtek_embed.stderr.log</string>
+</dict>
+</plist>
