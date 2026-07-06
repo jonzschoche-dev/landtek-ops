@@ -167,10 +167,10 @@ claims (what we must prove) ──▶ truth_negotiations ──▶ claim_truth_v
 | A2 | `verified` ⇒ a real `source_doc_id`/`source_id` + excerpt exists. | 🟢 provenance write-gate + `_safe` views + **`ontology_validator` V3 (shadow, deploy_691)** |
 | A3 | No instrument may be executed by an actor outside their lifespan. | 🟢 **trigger** `enforce_actor_lifespan_on_instruments` + `v_actor_lifespan_violations` |
 | A4 | A locked/cited row (`verification_lock`, `cited_by_compound_claims`) is immutable until unlocked. | 🟢 lock columns + content_hash |
-| A5 | A matter belongs to exactly one client; client data never crosses (`client_code`). | 🟡 **partial** — FK on `matters`/`map_parcels`/`assets`; corpus isolates on looser `case_file`/`matter_code` text (§5). **Detector live:** `ontology_validator` V4 view `v_ontology_client_cross` (deploy_691) — caught + re-homed 6 Paracale facts mis-filed under MWK on first run. |
+| A5 | A matter belongs to exactly one client; client data never crosses (`client_code`). | 🟢 **ENFORCED (deploy_716)** — `ontology_validator` V4 is now a `block` write-trigger on `matter_facts`: a fact cannot cite a document owned by a different client (verified live: MWK fact citing Paracale doc 637 rejected). Client resolved via `_client_of()` = matters→clients OR clients directly (handles `case_file≠matter_code`, e.g. the 'MWK-001' client-code tags). Backed by the `matters.client_code→clients` FK. *(A rigid `matter_code→matters` column FK was rejected — `matter_code` legitimately holds matter-or-client codes; a trigger is the correct instrument.)* |
 | A6 | Inference substituted for source content is flagged inline, never silent. | 🟡 asserted (MASTER_PLAN §4 principle 9); known past violations |
 
-**A5 is the load-bearing gap.** It is the extension point for the `ontology_validator`
+**A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
 
 ---
