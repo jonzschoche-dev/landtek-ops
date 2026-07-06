@@ -14,7 +14,9 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.11 (2026-07-06).** §2.14 Communications extended with **UnifiedClientPersona**
+> **Ontology version: v0.12 (2026-07-06).** §2.14 hardened: added **A30** (channel activation needs an
+> auditable `channel_audit` record) + enriched the definition (consistent persona/memory; audited exposure).
+> **v0.11:** §2.14 Communications extended with **UnifiedClientPersona**
 > (🟡 — same personality/memory per client, every channel) and **CrossChannelThread** (○ — one conversation
 > across channels), + invariants **A28** (consistent persona) / **A29** (cross-channel thread continuity).
 > **v0.10:** Communications & Omnichannel formalized as a Layer III model (§2.14) — CommunicationChannel ·
@@ -341,9 +343,9 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 ## 2.14 Communications & Omnichannel — *one identity, many doors, one governed exit*
 
 > **Definition.** The multi-channel reach layer: a person contacts LandTek (and Leo replies) over any
-> supported channel (Telegram · Email · WhatsApp · Viber · Messenger), normalized onto a single bus,
-> resolved to one client identity, and released outward only through the exposure gate. *(Elevates the
-> terse §2.7 and the §8.6 operational cluster.)*
+> supported channel (Telegram · Email · WhatsApp · Viber · Messenger), meeting **one consistent persona and
+> memory**, normalized onto a single bus, resolved to one client identity, and released outward only through
+> an **audited** exposure gate. *(Elevates the terse §2.7 and the §8.6 operational cluster.)*
 
 | Concept | Canonical home | State | Notes |
 |---|---|---|---|
@@ -353,7 +355,7 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 | **ChannelMessage** | 🟢 `channel_messages` (~20) · `outbound_messages` (~1,898) · `outbound_blocks` (~14,346) | active | inbound/outbound on the bus; older stores (`leo_interactions` ~2,994, `gmail_messages`) still carry most live traffic — the bus is the *intended* single normalizer, not yet universal (A27) |
 | **CrossChannelThread** | ○ *(none — planned; `channel_messages.reply_to_id` is intra-channel only)* | **NET-NEW** | one logical conversation spanning channels for the same person; continuity resolves via the same `client_code` as A25 (A29) |
 | **PlatformCoordinator** | ○ *(none — planned)* | **NET-NEW** | cross-channel identity resolver + unified router + per-channel health daemon; the concrete future enforcement point for A26/A27; today scattered across adapters + bridges + timers; **do not build without governance sign-off** |
-| **ExternalExposureGate** | 🟡 `internal_targets` (4) · `outward_guard_config` · `outbound_blocks` | partial | *when* a message may leave the system; email splits inbound/send, inline-send channels gate on the token = the switch (A26); rides A21 + `no-external-exposure-until-ready` |
+| **ExternalExposureGate** | 🟡 `internal_targets` (4) · `outward_guard_config` · `outbound_blocks` · `channel_audit` (activation record) | partial | *when* a channel may reach outside; email splits inbound/send, inline-send channels gate on the token = the switch (A26); channel activation needs an audit row (A30); rides A21 + `no-external-exposure-until-ready` |
 
 > ⚠️ **Token-as-switch (do not confuse the two send models).** Email separates inbound (internal, safe to
 > schedule) from `--send` (outward). WhatsApp/Viber/Messenger send **inline** — gated only by whether the
@@ -370,7 +372,7 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 `{email,whatsapp,viber}_channel_bridge.py` (feed + backlog drain) · `landtek-{email,whatsapp,viber}-bridge.timer`
 · `channel_audit` (activation/adapter audit) · `conversation_context`/`conversation_chunks` (persona memory, 🌱) ·
 `platform_coordinator.py` (○ future — the enforcement point) · `outward_guard.py` · `_client_of()`.
-**Invariants: A25–A29.***
+**Invariants: A25–A30.***
 
 ---
 
@@ -434,6 +436,7 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A27 | Every comms event, inbound or outbound, on any channel normalizes onto the unified bus (`channels`/`channel_messages`), and any message reaching Jonathan passes the S14 human-readability + no-double-tap pacing gate; no adapter may send outside the bus-plus-guard path. When built, the `PlatformCoordinator` is the concrete chokepoint that enforces this. | 🟡 **asserted / flagged** — S14 enforced in `tg_send` (14,346 blocks); adapters route through one onboarding path, but universal bus-normalization + a single PlatformCoordinator are ○ planned |
 | A28 | The AI presents a **consistent persona** — personality, memory, and relationship context — to a client regardless of channel; a `UnifiedClientPersona` is keyed to `client_code`, never re-initialized per channel. | 🟡 **asserted / flagged** — one shared `systemMessage` gives a uniform personality, but cross-channel memory (`conversation_context`) is 🌱 dormant + not persona-keyed, so continuity is not yet guaranteed |
 | A29 | Messages from the same resolved person continue a **single logical thread** (`CrossChannelThread`) spanning channels, not a fresh context per channel; thread continuity resolves through the same `client_code` as A25. | 🟡 **asserted / flagged** — model defined; no cross-channel thread store exists (`channel_messages.reply_to_id` is intra-channel only) — the concept that operationalizes A28 |
+| A30 | A channel becomes **externally active** (webhook registered / outbound sending enabled) only with an **auditable activation record** in `channel_audit`; activation is a governed outward action, never silent. | 🟡 **asserted / flagged** — `channel_audit` exists (deploy_114); activations to date (email 654 · whatsapp 662 · viber 663) are recorded in deploys/migrations but not yet systematically written as `channel_audit` activation rows — the "arm but hold the external switch" pattern is the interim discipline |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -619,6 +622,16 @@ cleanly instead of inventing a parallel structure. **○ = planned; do not build
 ---
 
 **Change log**
+- v0.12 (2026-07-06) — **§2.14 hardened — channel-activation audit + governance prose.** Added **A30**
+  (a channel goes externally active only with an auditable activation record in `channel_audit`; activation
+  is a governed outward action, never silent) — the one genuinely-new axiom in a stronger incoming proposal.
+  Enriched the §2.14 definition (consistent persona/memory; *audited* exposure gate) and the
+  ExternalExposureGate row (`channel_audit` as the activation-audit home). **Numbering reconciliation (again):**
+  the incoming proposal used A28–A32; three collided with just-committed invariants. Mapped to the real
+  monotonic series: proposed A28 → existing **A28** (persona), A29 → existing **A29** (thread), A30
+  (ChannelUser→one client_code) → existing **A25**, A31 (activation audit record) → **new A30**, A32
+  (outbound governed routing) → existing **A27**. Net: one new invariant, nothing renumbered.
+  **Doc-only — no schema, no code, no enforcement change.**
 - v0.11 (2026-07-06) — **§2.14 Communications extended — persona + cross-channel continuity.** Added two
   concepts to the §2.14 table: **UnifiedClientPersona** (🟡 — the AI's persistent identity/tone/memory/
   relationship state per client, the *same* persona on every channel; relationship data lives in
