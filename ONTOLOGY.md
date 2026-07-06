@@ -14,7 +14,10 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.9 (2026-07-06).** Six core domains formalized to the §2.4 rigor — Case Theory
+> **Ontology version: v0.10 (2026-07-06).** Communications & Omnichannel formalized as a Layer III model
+> (§2.14) — CommunicationChannel · ChannelUser · ChannelMessage · PlatformCoordinator (○ planned) ·
+> ExternalExposureGate — with invariants **A25** (cross-channel identity is client-scoped), **A26**
+> (outbound comms is exposure-gated; token-as-switch), **A27** (one bus, one S14 guard). **v0.9:** Six core domains formalized to the §2.4 rigor — Case Theory
 > (§2.8), Entity Resolution (§2.9), Client/Matter Separation (§2.10), Fact Harvesting & Provenance (§2.11),
 > Supervision & Work Ordering (§2.12), Truth & Reconciliation (§2.13) — with invariants A12–A24. **v0.7**
 > formalized the Geometry/Mapping `GeometrySource` + `MapVisibility` vocabularies (§2.4) + staged geometry
@@ -332,6 +335,33 @@ guard). A8 (MMK≠MWK) is an entity-conflation carrier. **Invariants: A15–A16.
 *Doctrine: mechanical > LLM (A24). Enforcement: `ontology_validator` V1/V3/V4, `truth_tests/run_all.py`.
 The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 
+## 2.14 Communications & Omnichannel — *one identity, many doors, one governed exit*
+
+> **Definition.** The multi-channel reach layer: a person contacts LandTek (and Leo replies) over any
+> supported channel (Telegram · Email · WhatsApp · Viber · Messenger), normalized onto a single bus,
+> resolved to one client identity, and released outward only through the exposure gate. *(Elevates the
+> terse §2.7 and the §8.6 operational cluster.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| **CommunicationChannel** | 🟢 `channels` (~9) → `channel_messages` (~20) | active | a supported medium; per-channel readiness varies — Telegram 🟢 live · Email 🟢 inbound-live/send-held (deploy_654) · WhatsApp 🟡 armed/tokenless (662) · Viber 🟡 armed/tokenless (663) · Messenger ○ not built |
+| **ChannelUser** | 🟡 `channel_users.mapped_client_code` | partial | a person across ≥1 channel → **one** `client_code`; slot exists, resolver + separation-guard not built (A25) |
+| **ChannelMessage** | 🟢 `channel_messages` (~20) · `outbound_messages` (~1,898) · `outbound_blocks` (~14,346) | active | inbound/outbound on the bus; older stores (`leo_interactions` ~2,994, `gmail_messages`) still carry most live traffic — the bus is the *intended* single normalizer, not yet universal (A27) |
+| **PlatformCoordinator** | ○ *(none — planned)* | **NET-NEW** | cross-channel identity resolver + unified router + per-channel health daemon; today scattered across adapters + bridges + timers; **do not build without governance sign-off** |
+| **ExternalExposureGate** | 🟡 `internal_targets` (4) · `outward_guard_config` · `outbound_blocks` | partial | *when* a message may leave the system; email splits inbound/send, inline-send channels gate on the token = the switch (A26); rides A21 + `no-external-exposure-until-ready` |
+
+> ⚠️ **Token-as-switch (do not confuse the two send models).** Email separates inbound (internal, safe to
+> schedule) from `--send` (outward). WhatsApp/Viber/Messenger send **inline** — gated only by whether the
+> provider token + webhook are provisioned, so provisioning IS opening the channel (an outward action).
+> ⚠️ **The bus is not yet the single point of truth** — `channel_messages` (~20) is light; convergence
+> onto it is the PlatformCoordinator's remit. Do **not** assert the older comms stores as drift (§3) yet.
+> **Enforcement:** S14 (human-readable · one-point · no-double-tap) in `tg_send.py` → `outbound_blocks`;
+> outward funnels through `outward_guard` (A21, shadow). Client identity across channels rides A5 (A25).
+
+*Components: `leo_tools/channel_adapters.py` (webhooks + `/api/channel/send`) · `tg_send.py` (S14) ·
+`{email,whatsapp,viber}_channel_bridge.py` (feed + backlog drain) · `landtek-{email,whatsapp,viber}-bridge.timer`
+· `outward_guard.py` · `_client_of()`. **Invariants: A25–A27.***
+
 ---
 
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
@@ -389,6 +419,9 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A22 | A `work_orders` step executes only via a governed path (tier ≤ T2, tagged, non-outward); T3/untagged/outward-verb steps hold for a human. | 🟢 **ENFORCED** — `governance_block()` fail-closed (Phase-1) |
 | A23 | `verified_claims` derive only from an adjudicated `claim_truth_verdicts` row citing its negotiation + evidence; a claim is never "verified" by assertion. | 🟡 **asserted** — model defined; layer underused (6 verdicts / 1 verified) |
 | A24 | Truth invariants are checked **mechanically** (`truth_tests/` + `ontology_validator`), never by a standing LLM-interrogation harness. | 🟢 **doctrine** — enforced by the `truth_qa` retirement (below); mechanical suite is the deploy gate |
+| A25 | A `ChannelUser` resolves to **at most one** `client_code`; the same human across multiple channels resolves to a single client identity, and no channel identity is mapped across two clients. | 🟡 **asserted / flagged** — extends A5/A16 to the comms identity layer; `channel_users.mapped_client_code` is the slot, but no resolver or block-guard exists yet (comms client-separation is discipline, not guarantee) |
+| A26 | No `ChannelMessage` is delivered to an **external** recipient except through the outward chokepoint (A21) under `no-external-exposure-until-ready`. *Corollary (token-as-switch):* for inline-send channels (WhatsApp/Viber/Messenger) the provider credential IS the external switch, so provisioning it is an outward action requiring sign-off; email alone splits inbound (internal) from send (outward). | 🟡 **asserted / flagged** — email split live (deploy_654); Meta/Viber armed-but-tokenless by design (662/663); S14 + `outbound_blocks` + `outward_guard` partially enforce; block-mode dormant |
+| A27 | Every comms event, inbound or outbound, on any channel normalizes onto the unified bus (`channels`/`channel_messages`), and any message reaching Jonathan passes the S14 human-readability + no-double-tap pacing gate; no adapter may send outside the bus-plus-guard path. | 🟡 **asserted / flagged** — S14 enforced in `tg_send` (14,346 blocks); adapters route through one onboarding path, but universal bus-normalization + a single PlatformCoordinator are ○ planned |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -472,7 +505,7 @@ served by a named successor · `⚙️ INFRA` n8n/platform plumbing, not a domai
 `ombudsman_candidates` (graft/misconduct leads, ripeness-gated) → `entities` (officials) + `matters`. **🟢 ACTIVE** (filing held T3).
 
 ### 8.6 Comms / Omnichannel — *reach, governed by S14*
-`channels`/`channel_messages` · `outbound_messages` · `outbound_blocks` (S14, 14k) · `leo_interactions` · `conversations` · `chat_notes` · `correspondence_links`/`events` · `telegram_inbox`/`tg_inquiry_queue` · `gmail_messages` · `client_history` → `documents`/`matters`/`clients`. **🟢 ACTIVE.** `conversation_context`/`conversation_chunks` = **🌱 DORMANT** (Leo long-term memory — activation: wire the comms-memory write).
+`channels`/`channel_messages` · `outbound_messages` · `outbound_blocks` (S14, 14k) · `leo_interactions` · `conversations` · `chat_notes` · `correspondence_links`/`events` · `telegram_inbox`/`tg_inquiry_queue` · `gmail_messages` · `client_history` → `documents`/`matters`/`clients`. **🟢 ACTIVE.** `conversation_context`/`conversation_chunks` = **🌱 DORMANT** (Leo long-term memory — activation: wire the comms-memory write). **→ elevated to a Layer III model in §2.14 (Communications & Omnichannel; invariants A25–A27).**
 
 ### 8.7 Client & Matter Management — *the tenancy spine*
 `clients` · `client_goals`/`needs`/`issues`/`dependability` · `client_access_tokens` · `authorized_users` → the `client_code` isolation key (A5, now enforced). **🟢 ACTIVE.** `contact_roles` = **🌱 DORMANT** (party-role graph).
@@ -562,7 +595,7 @@ cleanly instead of inventing a parallel structure. **○ = planned; do not build
 | **Tenant / Lease Management** | occupancy, lease terms, rent roll on managed parcels | ○ planned | client separation · provenance |
 | **Construction / Project Delivery** | build scopes, milestones, contractor + permit tracking per property | ○ planned | client separation · outward (permits/filings) |
 | **Calendar & Deadlines** *(partial today)* | agentic calendar, forum clocks, operator nudges — has tables (§8.16), not yet a Layer III model | 🟡 partial | provenance · governance |
-| **Client Portal & Access** *(partial today)* | token-gated client surface (status, map, documents) — `client_access_tokens` live, external switch held | 🟡 partial | client separation · no-external-exposure |
+| **Client Portal & Access** *(partial today)* | token-gated client surface (status, map, documents) — `client_access_tokens` live, external switch held; sits on the Communications reach layer (§2.14) | 🟡 partial | client separation · no-external-exposure |
 | **Revenue / Valuation / Portfolio** | asset valuation, portfolio ROI — dormant business layer (§8.8) | ○ dormant | provenance · client separation |
 | **Agent Fleet Registry** | a first-class model of the ~50 agents themselves (capability, tier, cadence) — today derived, not modeled | ○ planned | governance · component-mapping (Layer V) |
 
@@ -574,6 +607,17 @@ cleanly instead of inventing a parallel structure. **○ = planned; do not build
 ---
 
 **Change log**
+- v0.10 (2026-07-06) — **Communications & Omnichannel formalized (§2.14).** Elevated the terse §2.7 +
+  the §8.6 operational cluster to a full Layer III model: five concepts (CommunicationChannel 🟢 ·
+  ChannelUser 🟡 · ChannelMessage 🟢 · **PlatformCoordinator ○ planned** · ExternalExposureGate 🟡),
+  state-marked and mapped to the live bus (`channels`/`channel_messages`/`channel_users`/`outbound_blocks`)
+  + adapters/bridges (deploys 114·654·662·663). Added three honestly-🟡-asserted invariants: **A25**
+  (a `ChannelUser` resolves to ≤1 `client_code` — extends the A5 firewall to comms; resolver not built —
+  **flagged, the highest-value gap**), **A26** (outbound comms exposure-gated; *token-as-switch* for
+  inline-send channels, email alone splits inbound/send), **A27** (one bus, one S14 guard). §8.6 pointer +
+  §9 Client-Portal cross-ref added. **Doc-only — no schema, no code, no enforcement change.** No new table
+  names introduced (all already named), so `ontology_check.py --coverage` cannot regress — re-run on the
+  VPS as the mechanical confirmation, and re-ground the comms rowcounts there before trusting them.
 - v0.9 (2026-07-06) — **Ontology framework + Future Domains.** Added §9 **Future Domains** registry
   (Payments, Tenant/Lease, Construction, Calendar, Client Portal, Revenue/Valuation, Agent-Fleet — ○/🟡
   growth slots) and `docs/ONTOLOGY_STRUCTURE.md` (the five logical layers · state-marker vocabulary ·
