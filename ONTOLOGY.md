@@ -10,7 +10,9 @@
 > **This file is checked against reality, not authored from memory.** Re-ground before trusting a
 > rowcount older than a few weeks (`scripts/landtek_git_routine.sh` era).
 >
-> **Ontology version: v0.5 (2026-07-06).** Mapping/Geospatial domain formalized (§2.4, A9–A11). Semver:
+> **Ontology version: v0.6 (2026-07-06).** Six core domains formalized to the §2.4 rigor — Case Theory
+> (§2.8), Entity Resolution (§2.9), Client/Matter Separation (§2.10), Fact Harvesting & Provenance (§2.11),
+> Supervision & Work Ordering (§2.12), Truth & Reconciliation (§2.13) — with invariants A12–A24. Semver:
 > patch = new alias/deprecation noted; minor = new concept class; major = a canonical table changes.
 
 ---
@@ -176,6 +178,125 @@ The hand-curated §2 missed genuine evidence-grade concepts. These are **core, g
 | Case events / lifecycle | `case_events` · `case_stage_transitions` · `case_intelligence_log` · `case_reports` · `case_keywords` · `title_tax_links` · `thread_relationships` | matter timeline + linkage |
 | Truth-guard | `hallucination_log` | logged hallucination catches (near provenance) |
 
+## 2.8 Case Theory & Legal Reasoning — *what we must prove, and the move that proves it*
+
+> **Definition.** The layer that turns a matter into a litigable position — the **elements** a cause of
+> action requires, the **objectives** and **plays** that advance it, and the **authorities** that ground
+> it — the bridge from raw facts (§2.5) to a forum-ready argument. *(Elevates the terse §2.6.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| Matter (the proceeding) | 🟢 `matters` (38) | active | `legal_theory`·`forum`·`current_stage`·`next_deadline`; `client_code` FK |
+| Cause of action | 🟢 `matter_causes` (9) | active | legal-theory instances per matter |
+| Element to prove | 🟢 `matter_elements` (169) | active | the atomic burdens a cause decomposes into |
+| Objective | 🟢 `matter_objectives` (21) | active | what a win looks like for the matter |
+| Strategic play | 🟢 `matter_plays` (40) | active | `readiness`·`urgency_days`·`score` (Strategy Engine) |
+| Party | 🟢 `matter_parties` (19) | active | who is on each side |
+| Legal authority | 🟢 `legal_authorities` (60) → `matter_authorities` (88) | active | statute/jurisprudence ↔ matter |
+| Litigation claim | 🟢 `claims` (6) | 🟡 underused | `required_to_prove`; distinct from facts |
+| Keystone / cascade | 🟢 `keystones` (3) | active | controlling fact → `cascade_matters[]` |
+| Offense lead | 🟢 `ombudsman_candidates` (40) · `arta_cases` (9) | active | element/prescription-gated |
+| Case thread | 🟢 `case_threads` (5) | active | `thread_scope_sql` |
+
+*Components: Strategy Engine (`strategy_engine/`, `play_engine`), `load_issue_spine`, `case_theories/` module
+(per-matter theories + `_clients.py` allowlist). **Invariants: A12–A14.***
+
+## 2.9 Entity Resolution & Canonical Knowledge Base — *one real-world actor, one canonical node*
+
+> **Definition.** The layer that collapses many document mentions of the same person/org/reference into
+> one **canonical entity**, maintains the merge graph, and exposes the entity↔document role index the whole
+> knowledge base joins on. *(Elevates the entity portion of §2.2.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| Canonical entity | 🟢 `entities` (4,820) | active | `canonical_id` self-ref = merge graph; `phonetic_key` (Keesey/Keesee); `verification_lock` |
+| Doc↔actor role | 🟢 `doc_entities` (8,928) | active | performative `role` + excerpt per doc (the join spine) |
+| Entity type vocab | 🟢 `entity_types` (10) | active | controlled kind vocabulary |
+| Merge proposal | 🟢 `entity_merge_proposals` (207) | 🟡 dormant | acted-on then idle since Jun 15 (§3) |
+| Resolution audit | 🟢 `entity_resolution_log` (126) | active | applied merges |
+| Alias / relationship | 🟡 `entity_aliases` (0) · `entity_relationships` (0) | ○ dormant | schema present, unpopulated — KG-edge aspiration |
+| KG triple | 🟡 `knowledge_graph_triples` (74) | 🟡 underused | subject–relation–object over entities |
+| Generic change proposal | 🟡 `proposed_changes` (275) | 🟡 partial | entity/data change inbox |
+
+*Components: `entity_resolve`·`consolidate_entities`·`promote_proposals`; `cross_client_sentinel` (merge-drift
+guard). A8 (MMK≠MWK) is an entity-conflation carrier. **Invariants: A15–A16.***
+
+## 2.10 Client & Matter Separation Model — *the tenancy firewall*
+
+> **Definition.** The multi-client isolation model: every matter, document, fact, and geometry belongs to
+> exactly one **client** (`client_code`), and no data — fact citation, entity merge, doc link, or map — may
+> cross that boundary except through an audited allowlist. *(Elevates §5.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| Client (tenancy root) | 🟢 `clients` (7) | 🟢 enforced | `client_code` = the isolation key |
+| Matter ↔ client | 🟢 `matters.client_code` FK (38) | 🟢 enforced | A5 |
+| Doc ↔ matter link | 🟢 `document_matter_links` (2,302) | 🟡 asserted | cross-client link guard = A18 (asserted, not blocked) |
+| Cross-client principal allowlist | 🟢 `case_theories/_clients.py` | active | the legitimate-overlap exception (`test_cross_client_integrity`) |
+| Internal-vs-outward registry | 🟢 `internal_targets` (4) | active | operator + sim; the `outward_guard` classifier |
+| Cross-client drift flag | 🟢 `cross_client_flags` (0) | 🟢 clean | detector output (0 = clean) |
+
+*Enforcement: A5 (V4 block-trigger on `matter_facts`), `cross_client_sentinel`, `test_cross_client_integrity`
+(3 assertions), `_client_of()` resolver. **Invariants: A17–A18.***
+
+## 2.11 Fact Harvesting & Provenance — *how a document becomes a citable fact*
+
+> **Definition.** The gated pipeline that lifts raw document text into the **verified fact ledger**: candidate
+> facts land in an inbox, pass a provenance gate (cited doc + verbatim excerpt), and only then become
+> authoritative `matter_facts` that legal output may quote. *(Elevates §2.5 + §1.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| Verified fact ledger | 🟢 `matter_facts` (15,554) | active | `fact_kind`·`element_code`·`excerpt`·`as_of`; the authoritative store |
+| Proposed fact (pre-gate) | 🟢 `proposed_facts` (213) | 🟡 loop-open | HITL inbox; adjudication loop unclosed (§3) — NOT authoritative |
+| Provenance tier | 🟢 `matter_facts.provenance_level` | 🟢 enforced | 5-value vocab (§1); A1 NOT NULL |
+| Evidence chain | 🟢 `evidence_trail` (30) · `evidence_trail_proposals` (72) | 🟡 partial | fact → supporting doc |
+| Encoding audit | 🟢 `fact_encoding_log` (1,326) | active | harvest trace |
+| Hallucination catch log | 🟢 `hallucination_log` (2) | active | logged truth-guard catches |
+| Gap register | 🟢 `record_gaps` (6) → `v_evidence_gaps` (457) | active | what's missing (derived) |
+
+*Enforcement: `enforce_provenance_facts` trigger (excerpt = verbatim substring), `ontology_validator` V3 (A2),
+`_safe` views. Components: `harvest_facts`·`source_read_facts`·`reconciler`. **Invariants: A19–A20.***
+
+## 2.12 Supervision & Work Ordering — *governed execution across the fleet*
+
+> **Definition.** The Postgres-native coordination layer that routes a unit of work through multi-step,
+> resumable **work orders** under fail-closed governance, funnels every outward action through one
+> chokepoint, and continuously self-audits the ~50-agent fleet via the holes framework. *(Elevates §8.11/§8.14.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| Work order (state machine) | 🟢 `work_orders` (4) | 🟡 Phase-1 | JSONB steps + `current_step` + audit; fail-closed `governance_block()` |
+| Outward chokepoint | 🟢 `internal_targets` (4) + `outward_shadow_log` (0) | 🟡 shadow | `outward_guard` at the exits; block-mode dormant |
+| Gap-finding routine ledger | 🟢 `holes_findings` (22) · `holes_runs` (3,018) | active | self-audit (dispatcher every 15m) |
+| Fleet health / pulse | 🟢 `system_heartbeat` (16,377) · `sentinel_alerts` (826) · `agent_audit` (7) | active | T0/T1 report-health tier |
+| Comms guardrail log | 🟢 `outbound_blocks` (14,346) | active | S14 — the most-exercised control |
+| Derived work source | 🟢 `v_evidence_gaps` (457) | active | the enforced gap-order write-path |
+
+*Components: `supervisor.py` (KINDS registry), `SUPERVISION_DIRECTIVE.md` (tier model), `outward_guard.py`,
+`holes/` framework + `dispatcher.py`. **Invariants: A21–A22.***
+
+## 2.13 Truth & Reconciliation — *is the claim actually true against the record?*
+
+> **Definition.** The adversarial verification layer that tests claims against the verified record and law,
+> records verdicts, and — post-`truth_qa` — does so **mechanically** (SQL assertions + write-triggers) rather
+> than by LLM interrogation, keeping a durable audit of every truth check. *(Elevates §2.5 + §8.1.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| Truth negotiation | 🟢 `truth_negotiations` (820) | active | challenger runs (`truth_negotiator`) |
+| Claim verdict | 🟢 `claim_truth_verdicts` (6) → `verified_claims` (1) | 🟡 underused | adjudicated truth on a `claims` row |
+| Back-test suite | 🟢 `back_test_suite` (5) → `back_test_runs` (175) | active | calibration cases (hourly `systems_analyzer` + daily `a1`) |
+| Contradiction register | 🟢 `contradictions` (40) | 🟡 out-of-lane | detected internal conflicts |
+| Truth audit ledger | 🟢 `truth_audit_log` (2,360) | active | the durable audit (successor to `audit_log`) |
+| Mechanical assertion suite | 🟢 `truth_tests/` (82 assertions) | active | deploy-gate + nightly; the `truth_qa` replacement |
+| Egress hallucination canary | 🟢 `holes.a3` (mechanical) | active | ungrounded-title guard (deploy_728) |
+
+*Doctrine: mechanical > LLM (A24). Enforcement: `ontology_validator` V1/V3/V4, `truth_tests/run_all.py`.
+The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
+
+---
+
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
 
 | 🔴 Table | Rows | Verdict | Canonical instead |
@@ -218,6 +339,19 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A9 | A parcel's geometry belongs to exactly one client; a `map_parcels`/`parcels` row may only carry or expose geometry for its own `client_code` (resolved via `matter_code`→`matters`→`clients`). | 🟡 **asserted** — extends A5; enforcement blocked on `parcels.client_code` (**flagged**); V6 geometry-isolation drafted **shadow-only**, not applied |
 | A10 | User/device location is **ephemeral and client-side**; it is NEVER persisted server-side without a consent record. | 🟡 **asserted** — satisfied today (point-in-polygon runs in-browser; no location table exists, by design) |
 | A11 | No `MappedProperty` reaches an external or public surface (published status, KML/Earth/Maps link, tile export) except through an audited **publish gate** consistent with `no-external-exposure-until-ready`. | 🟡 **asserted** — no external-publish path built; `ExternalMapReference` held **○ planned** |
+| A12 | Every strategy object (`matter_plays`/`matter_objectives`/`matter_elements`/`matter_causes`) belongs to a `matters` row carrying a `client_code` — no orphan or client-less strategy. | 🟡 **asserted** — FK to `matters` present; client resolution rides A5 |
+| A13 | A `claims` row is "proven" only when each `required_to_prove` element is backed by a `verified` `matter_facts` row — never from `proposed_facts`. | 🟡 **asserted** — model defined; `claims` underused (6), not yet gate-checked |
+| A14 | A `keystones`/`cross_matter_links` cascade edge must name a `proof_doc_id`; cross-matter support is evidence-gated, never assumed. | 🟢 **asserted** — `cross_matter_links` is `proof_doc_id`-gated (§2.5) |
+| A15 | `entities.canonical_id` forms a DAG (no merge cycles); a merged entity resolves to exactly one canonical head. | 🟡 **asserted** — merge-graph invariant; not yet cycle-checked mechanically (**flagged**) |
+| A16 | An entity merge joining actors of two different clients requires the cross-client principal allowlist (`case_theories/_clients.py`). | 🟢 **asserted** — `test_cross_client_integrity::no_cross_principal` |
+| A17 | `internal_targets` is the single source of truth for internal-vs-outward classification; every comms/outward guard resolves against it (with a hardcoded floor for offline-sovereignty). | 🟢 **asserted** — `outward_guard` + `tg_send` consult it |
+| A18 | No `document_matter_links` row may connect a document to a matter of a different client than the document's owner. | 🟡 **asserted** — extends A5 to the link table; detector-only, not yet a block-trigger (**flagged**) |
+| A19 | `proposed_facts` is an inbox, never authoritative; only gated `matter_facts` may be quoted in legal output (via `_safe` views). | 🟢 **asserted** — `_safe` views read `matter_facts` only; propose→adjudicate loop open (§3) |
+| A20 | Every `verified` `matter_facts` row's `excerpt` is a verbatim substring of its cited document. | 🟢 **ENFORCED** — `enforce_provenance_facts` trigger |
+| A21 | Every outward action (send/file/publish/invoice) funnels through the `outward_action` chokepoint / `outward_guard`, fail-closed (held for human on any ambiguity). | 🟡 **shadow** — guard wired at the exits; block-mode dormant, exit-criteria pending |
+| A22 | A `work_orders` step executes only via a governed path (tier ≤ T2, tagged, non-outward); T3/untagged/outward-verb steps hold for a human. | 🟢 **ENFORCED** — `governance_block()` fail-closed (Phase-1) |
+| A23 | `verified_claims` derive only from an adjudicated `claim_truth_verdicts` row citing its negotiation + evidence; a claim is never "verified" by assertion. | 🟡 **asserted** — model defined; layer underused (6 verdicts / 1 verified) |
+| A24 | Truth invariants are checked **mechanically** (`truth_tests/` + `ontology_validator`), never by a standing LLM-interrogation harness. | 🟢 **doctrine** — enforced by the `truth_qa` retirement (below); mechanical suite is the deploy gate |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -378,6 +512,13 @@ The `--coverage` check is the guard: "nothing orphaned" is now a mechanical inva
 ---
 
 **Change log**
+- v0.6 (2026-07-06) — **Six core domains formalized to §2.4 rigor.** Added §2.8 Case Theory & Legal
+  Reasoning, §2.9 Entity Resolution & Canonical KB, §2.10 Client & Matter Separation, §2.11 Fact
+  Harvesting & Provenance, §2.12 Supervision & Work Ordering, §2.13 Truth & Reconciliation — each with a
+  concept table (state-marked), a component mapping, and 2–3 invariants (A12–A24). All rowcounts re-grounded
+  live (matter_facts 8,853→15,554; proposed_facts→213; entity_aliases/entity_relationships confirmed 0).
+  Doc-only — no schema/enforcement change; new invariants are honestly marked 🟡 asserted / **flagged**
+  where not yet mechanically enforced (A15 merge-cycle check, A18 doc-link block-trigger).
 - v0.5 (2026-07-06) — **Mapping/Geospatial domain formalized.** §2.4 expanded from 2 tables to the full
   **7-concept model** (MappedProperty · SurveyGeometry rel/abs · GeometrySource · AreaAssertion · the
   net-new **ExternalMapReference ○** · **MapVisibility 🟡** · **UserLocationContext ⛔-schemaless**). Added
