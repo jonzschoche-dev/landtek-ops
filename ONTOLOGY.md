@@ -10,8 +10,8 @@
 > **This file is checked against reality, not authored from memory.** Re-ground before trusting a
 > rowcount older than a few weeks (`scripts/landtek_git_routine.sh` era).
 >
-> **Ontology version: v0.1 (2026-07-05).** First canonical baseline. Semver: patch = new alias/
-> deprecation noted; minor = new concept class; major = a canonical table changes.
+> **Ontology version: v0.5 (2026-07-06).** Mapping/Geospatial domain formalized (§2.4, A9–A11). Semver:
+> patch = new alias/deprecation noted; minor = new concept class; major = a canonical table changes.
 
 ---
 
@@ -90,16 +90,30 @@ Legend: 🟢 canonical (write here) · 🟡 staging/index (feeds a canonical) ·
 | Title ↔ matter link | 🟢 `title_matter_links` | ~24 | |
 | Raw per-chunk chain extraction | 🔴 `chain_of_title` | ~174 | **staging** from `extraction_chunks`; NOT the curated chain — see §3 |
 
-### 2.4 Geometry / cadastral — **two distinct layers, NOT redundant**
+### 2.4 Geometry / Mapping — the user-facing spatial domain (7 concepts, 2 layers)
 
-| Concept | Canonical table | Rows | Notes |
+The client-facing mapping surface ("see my property; stand inside my boundary"). Two geometry
+**layers** (relative vs absolute — never consolidate) carry seven concepts. Legend adds:
+**○ planned** (net-new, no schema yet — do NOT build without governance sign-off) ·
+**⛔ intentionally schema-less** (an invariant, not a store).
+
+| Concept | Canonical home | State | Notes |
 |---|---|---|---|
-| Parcel on the world (absolute WGS84) | 🟢 `map_parcels` | ~1 | GeoJSON-in-JSONB; client-facing map; `accuracy_tier` rough→survey→ortho |
-| Survey shape (relative local metres) | 🟢 `parcels` | 0 | metes-and-bounds; `geom_wkt`, `closure_error_m`, `calls` — un-georeferenced |
+| **MappedProperty** | 🟢 `map_parcels` (row) | seeded (~1) | a property w/ geometry; `client_code`+`matter_code`+`title_no`. Per-LOT today; a multi-parcel property aggregate would bridge to `property_assets` (§8.8) — modeling choice, **flagged** |
+| **SurveyGeometry** (relative) | 🟢 `parcels` | empty | metes-and-bounds; `geom_wkt`, `closure_error_m`, `calls`; local metres, un-georeferenced |
+| **SurveyGeometry** (absolute) | 🟢 `map_parcels.geom_geojson` | seeded | WGS84; the relative shape placed on the globe |
+| **GeometrySource** | 🟡 `map_parcels.accuracy_tier`+`source_note` · `parcels.provenance_level` · `reocr_log.note` | partial | HOW geometry was produced (local-vision-ocr / gemini-ocr / operator-trace / survey-plan / satellite / ortho); controlled vocab TBD — **tier ≠ source** |
+| **AreaAssertion** | 🟢 `titles.area_sqm` (gated) · `map_parcels.stated_area_sqm`/`area_sqm` · `parcels.stated_ha`/`area_matches` | active | stated (title) vs computed (courses) vs operator-asserted; each provenance-tagged (T-4497=13.9 ha set via truth-override is the pattern) |
+| **ExternalMapReference** | ○ `map_parcels.ortho_tiles_url` only | **NET-NEW** | Google Earth/Maps deep-links, KML/KMZ, embedded/tile URLs. Publishing **exports client geometry to a third party** → outward-guarded; **do not build without sign-off** |
+| **MapVisibility** | 🟡 `map_parcels.status` (awaiting_plot/plotted/published) + `client_access_tokens` | partial | who sees it via which surface (internal / token-client / earth / app / public); `published` = the held switch (`no-external-exposure-until-ready`) |
+| **UserLocationContext** | ⛔ schema-less by design | invariant | device GPS is ephemeral + client-side (browser point-in-polygon in `leo_tools/mapping.py`); **NEVER persisted server-side** (A10) |
 
-> ⚠️ **Do not "consolidate" `parcels` into `map_parcels`.** They are different layers: `parcels` is the
-> relative survey shape from metes-and-bounds; `map_parcels` is that shape placed on the globe. The bridge
-> is a tie-point georeference (`parcels` → `survey`-tier `map_parcels`). This is a known trap.
+> ⚠️ **Do not "consolidate" `parcels` into `map_parcels`** — relative survey shape vs globe-placed shape;
+> the bridge is a tie-point georeference (`parcels` → `survey`-tier `map_parcels`). Known trap.
+> ⚠️ **`survey_geometry` is a SCRIPT** (`scripts/survey_geometry.py`, the courses→polygon math), **not a table**.
+> ⚠️ **`parcels` has no `client_code`** — geometry isolation (A9) resolves via `matter_code`→`matters`→`clients`; adding the column is a **flagged** decision.
+> **Enforcement:** geometry is *mapped, not gated* (derived shapes, not truth-claims) — but it carries its OWN
+> mechanical validators: `closure_error_m` + area-vs-title cross-check. **AreaAssertions that feed legal output stay gated** (they ride provenance-locked `titles`).
 
 ### 2.5 Knowledge / claims / facts — **a pipeline, not duplicates**
 
@@ -201,6 +215,9 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A6 | Inference substituted for source content is flagged inline, never silent. | 🟡 asserted (MASTER_PLAN §4 principle 9); known past violations |
 | A7 | T-30683 (Manguisoc) & T-4494 (Cabanbanan) are SEPARATE matters — never derivatives of T-4497. | 🟢 **asserted** `truth_tests/test_separate_matters.py` (direct-edge + recursive-descendant, deploy gate + nightly) |
 | A8 | MMK ≠ MWK — no entity conflates Mary Worrick Keesey with MMK. | 🟢 **asserted** `truth_tests/test_separate_matters.py::no_mmk_mwk_conflation` |
+| A9 | A parcel's geometry belongs to exactly one client; a `map_parcels`/`parcels` row may only carry or expose geometry for its own `client_code` (resolved via `matter_code`→`matters`→`clients`). | 🟡 **asserted** — extends A5; enforcement blocked on `parcels.client_code` (**flagged**); V6 geometry-isolation drafted **shadow-only**, not applied |
+| A10 | User/device location is **ephemeral and client-side**; it is NEVER persisted server-side without a consent record. | 🟡 **asserted** — satisfied today (point-in-polygon runs in-browser; no location table exists, by design) |
+| A11 | No `MappedProperty` reaches an external or public surface (published status, KML/Earth/Maps link, tile export) except through an audited **publish gate** consistent with `no-external-exposure-until-ready`. | 🟡 **asserted** — no external-publish path built; `ExternalMapReference` held **○ planned** |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -299,7 +316,7 @@ served by a named successor · `⚙️ INFRA` n8n/platform plumbing, not a domai
 **Activation flow:** the `revenue-engineer` + portfolio/valuation domain (parked behind Aug-12 per MASTER_PLAN). This is the operation's *intended* business shape sitting latent — a backlog, not scaffolding.
 
 ### 8.9 Mapping / Geospatial — *the client can stand inside their boundary*
-`map_parcels` (world-placed, seeded) 🟢 · `subdivision_plans` (64) 🟢 · `parcels` (relative survey shape) **🌱** · `geometry_priority`/`survey_geometry` **🌱**. **Activation:** vision-OCR of survey plans → `survey_geometry` → `parcels` → georeference → `map_parcels`. → `titles`/`matters`/`clients`.
+`map_parcels` (world-placed, seeded) 🟢 · `subdivision_plans` (64) 🟢 · `parcels` (relative survey shape) **🌱** · `geometry_priority` (drip queue, 8) **🌱**. `survey_geometry` is a **script** (`scripts/survey_geometry.py`, the courses→polygon math), **not a table**. **Pipeline:** creditless **local-vision OCR** (`reocr_local.py`, Mac Ollama `qwen2.5vl` over Tailscale — the $0 default; `reocr_gemini.py` = token path) cleans garbled title/plan text → `strip_plot_info.py` → `survey_geometry` → `parcels` → tie-point georeference → `map_parcels`. **Full 7-concept model in §2.4.** **Activation frontier:** the `GeometrySource` controlled vocab, and the **○ planned** `ExternalMapReference`/`MapVisibility` surfaces (held behind governance — A10/A11). → `titles`/`matters`/`clients`.
 
 ### 8.10 Structured Extraction (DIC) — *typed fields, not just text*
 `extraction_contract` (8 contracts incl `court_order`/`spa`/`deed`/`affidavit` — schema 🟢) · `heightened_ocr_queue` (159) 🟢 · `heightened_ocr_results` **🌱 DORMANT**. **Activation:** wire classify→contract routing so contracts run automatically → typed fields on `documents`. *This is the corpus-connection frontier (`model_used`=0).*
@@ -361,6 +378,17 @@ The `--coverage` check is the guard: "nothing orphaned" is now a mechanical inva
 ---
 
 **Change log**
+- v0.5 (2026-07-06) — **Mapping/Geospatial domain formalized.** §2.4 expanded from 2 tables to the full
+  **7-concept model** (MappedProperty · SurveyGeometry rel/abs · GeometrySource · AreaAssertion · the
+  net-new **ExternalMapReference ○** · **MapVisibility 🟡** · **UserLocationContext ⛔-schemaless**). Added
+  asserted axioms **A9** (geometry client isolation — extends A5; blocked on `parcels.client_code`),
+  **A10** (user location ephemeral/client-side; no server store without consent), **A11** (no external map
+  surface without an audited publish gate). §8.9 corrected (`survey_geometry` is a script; creditless
+  local-vision OCR is the default path). Mechanical hardening: `parcels` added to `ontology_check.py`
+  `PROVENANCE_TABLES`; new **`ACCURACY_VOCAB`** audit for `map_parcels.accuracy_tier` (kept **separate**
+  from the 5-value provenance set). **Conservative scope:** no schema changes; no external-publish path or
+  location storage built (held ○ planned behind governance); V6 geometry-isolation drafted **shadow-only**,
+  not applied. Coverage unaffected (all geometry tables already named).
 - v0.4 (2026-07-06) — **coverage audit falsified "nothing orphaned"** (§8 hand-curation silently missed
   100 populated domain tables incl. `system_heartbeat`, `document_matter_links`, `transferees`,
   `fraud_indicators`, and two whole subsystems). Fix: `ontology_check.py --coverage` now diffs live

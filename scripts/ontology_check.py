@@ -38,8 +38,13 @@ DRIFT_TABLES = ["chain_of_title", "cases", "finance_transactions", "fact_edges"]
 PROVENANCE_TABLES = [
     "matter_facts", "entities", "titles", "title_chain", "title_transfers",
     "doc_entities", "transferees", "legal_authorities", "knowledge_graph_triples",
-    "subdivision_plans", "transactions",
+    "subdivision_plans", "transactions", "parcels",
 ]
+
+# Geometry ACCURACY is a SEPARATE controlled vocabulary from provenance (ONTOLOGY.md §2.4,
+# GeometrySource). A map_parcels accuracy_tier is NOT a provenance_level — kept distinct on
+# purpose so the two vocabularies never bleed. rough→survey→ortho is the fidelity ladder.
+ACCURACY_VOCAB = {"rough", "survey", "ortho"}
 
 # Tables named in ONTOLOGY.md sec2 (canonical + staging). New public tables NOT in this
 # set are candidate drift → flagged for registry review. n8n plumbing is excluded.
@@ -172,6 +177,19 @@ def main():
                 out.append(f"[X] provenance vocab creep: {bad} (canonical set: {sorted(PROVENANCE_VOCAB)})")
         elif not brief:
             out.append(f"[ok] provenance vocab: all values in canonical set of {len(PROVENANCE_VOCAB)}")
+
+        # 5b. geometry accuracy vocab — a SEPARATE controlled vocabulary (ONTOLOGY.md §2.4 GeometrySource).
+        #     map_parcels.accuracy_tier is NOT a provenance_level; audited on its own set, never merged.
+        bad_tier = []
+        cur.execute("SELECT DISTINCT accuracy_tier FROM map_parcels WHERE accuracy_tier IS NOT NULL;")
+        for (v,) in cur.fetchall():
+            if v not in ACCURACY_VOCAB:
+                bad_tier.append(f"map_parcels:{v}")
+        if bad_tier:
+            problems += 1
+            out.append(f"[X] accuracy vocab creep: {bad_tier} (canonical set: {sorted(ACCURACY_VOCAB)})")
+        elif not brief:
+            out.append(f"[ok] accuracy vocab: all map_parcels.accuracy_tier in canonical set of {len(ACCURACY_VOCAB)}")
 
         # 6. ONTOLOGY.md coverage — AUTHORITATIVE (vs the actual file, not a hardcoded REGISTERED list).
         cov_named, cov_total, cov_missing = coverage_gaps(cur)
