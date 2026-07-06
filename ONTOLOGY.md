@@ -10,10 +10,12 @@
 > **This file is checked against reality, not authored from memory.** Re-ground before trusting a
 > rowcount older than a few weeks (`scripts/landtek_git_routine.sh` era).
 >
-> **Ontology version: v0.6 (2026-07-06).** Six core domains formalized to the §2.4 rigor — Case Theory
+> **Ontology version: v0.7 (2026-07-06).** Six core domains formalized to the §2.4 rigor — Case Theory
 > (§2.8), Entity Resolution (§2.9), Client/Matter Separation (§2.10), Fact Harvesting & Provenance (§2.11),
-> Supervision & Work Ordering (§2.12), Truth & Reconciliation (§2.13) — with invariants A12–A24. Semver:
-> patch = new alias/deprecation noted; minor = new concept class; major = a canonical table changes.
+> Supervision & Work Ordering (§2.12), Truth & Reconciliation (§2.13) — with invariants A12–A24. **v0.7**
+> formalizes the Geometry/Mapping `GeometrySource` + `MapVisibility` controlled vocabularies (§2.4) and
+> stages geometry governance (V6 shadow-draft + high-risk-surface boundaries) in `docs/ontology_validator_spec.md`.
+> Semver: patch = new alias/deprecation noted; minor = new concept class; major = a canonical table changes.
 
 ---
 
@@ -116,6 +118,34 @@ The client-facing mapping surface ("see my property; stand inside my boundary").
 > ⚠️ **`parcels` has no `client_code`** — geometry isolation (A9) resolves via `matter_code`→`matters`→`clients`; adding the column is a **flagged** decision.
 > **Enforcement:** geometry is *mapped, not gated* (derived shapes, not truth-claims) — but it carries its OWN
 > mechanical validators: `closure_error_m` + area-vs-title cross-check. **AreaAssertions that feed legal output stay gated** (they ride provenance-locked `titles`).
+
+**GeometrySource — controlled vocabulary (formalized v0.7).** *How* a geometry was produced, ordered by
+fidelity. A SEPARATE axis from `accuracy_tier` (the resulting confidence): a source *implies* a tier, but
+they are not the same field. Canonical set:
+
+`local_vision_ocr` · `gemini_ocr` · `operator_trace` · `survey_plan` · `satellite_rough` · `tie_point_georef` · `orthomosaic`
+
+| Source | typical `accuracy_tier` | notes |
+|---|---|---|
+| `satellite_rough` / `operator_trace` | `rough` | hand-placed on imagery; the "APPROXIMATE" banner path |
+| `local_vision_ocr` / `gemini_ocr` / `survey_plan` | `survey`(-pending) | courses read from a title/plan → `parcels`; closure-error validated |
+| `tie_point_georef` | `survey` | relative `parcels` shape placed absolutely via a control monument |
+| `orthomosaic` | `ortho` | sub-metre drone; the only tier that clears the APPROXIMATE banner |
+
+> ⚠️ **No `source` COLUMN exists yet** — today it's implicit in `map_parcels.source_note` / `reocr_log.note`
+> (`ok:local:qwen2.5vl`) / `parcels.provenance_level`. Promoting it to a typed column + enum check is a
+> **schema change → flagged, NOT done here.** The vocabulary is fixed now so a future column has a target.
+
+**MapVisibility — surfaces & audiences (formalized v0.7).** Two axes. **Lifecycle** = `map_parcels.status`
+(`awaiting_plot` → `plotted` → `published`). **Audience/surface** (canonical set):
+
+`internal_ops` (behind ops-auth) · `token_client` (a `client_access_tokens` magic-link — the only *live*
+external surface) · `google_earth` · `app` · `public`
+
+> The last three are **○ planned** and gated by **A11** (audited publish gate) + `no-external-exposure-until-ready`.
+> `status='published'` is the switch; flipping it for any audience beyond `internal_ops`/`token_client` is an
+> **outward action** → belongs under the outward-guard. Governance boundary detail + the V6 draft live in
+> `docs/ontology_validator_spec.md` §8–§9.
 
 ### 2.5 Knowledge / claims / facts — **a pipeline, not duplicates**
 
@@ -512,6 +542,15 @@ The `--coverage` check is the guard: "nothing orphaned" is now a mechanical inva
 ---
 
 **Change log**
+- v0.7 (2026-07-06) — **Geometry/Mapping governance-readiness prep.** Formalized two controlled
+  vocabularies in §2.4: **`GeometrySource`** (`local_vision_ocr`/`gemini_ocr`/`operator_trace`/`survey_plan`/
+  `satellite_rough`/`tie_point_georef`/`orthomosaic` — separate axis from `accuracy_tier`; no column yet →
+  schema change flagged) and **`MapVisibility`** (lifecycle `status` × audience `internal_ops`/`token_client`/
+  `google_earth`/`app`/`public` — the last three ○ planned, A11-gated). Staged geometry governance in
+  `docs/ontology_validator_spec.md`: **V6 (geometry client isolation, A9) shadow-DRAFT — view+config+trigger,
+  NOT applied**, blocked on the `parcels.client_code` decision; plus §9 governance boundaries for the two
+  high-risk surfaces (`ExternalMapReference` publishing, stored `UserLocationContext`). **Conservative: no
+  schema changes, no new tables, no enforcement applied.**
 - v0.6 (2026-07-06) — **Six core domains formalized to §2.4 rigor.** Added §2.8 Case Theory & Legal
   Reasoning, §2.9 Entity Resolution & Canonical KB, §2.10 Client & Matter Separation, §2.11 Fact
   Harvesting & Provenance, §2.12 Supervision & Work Ordering, §2.13 Truth & Reconciliation — each with a

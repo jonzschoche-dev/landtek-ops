@@ -149,3 +149,101 @@ V1/V3 when the shadow migration is authored.)*
 - [ ] V1/V3 flipped to `block` (`UPDATE ontology_validator_config SET mode='block' WHERE check_code IN ('V1','V3');`); one rollback drill (`--rollback`) executed.
 - [x] `knowledge_graph_triples.provenance_level` overload reconciled (deploy_693: split to `extraction_method` col; vocab now clean).
 - [ ] V4 kept as detector; enforce post-Aug-12 once A5 (`case_file`/`matter_code`) is FK-hardened.
+
+---
+
+## 8. V6 — Geometry client isolation (A9) · **SHADOW DRAFT, NOT APPLIED** (deploy_732 prep)
+
+Extends the §3 family with a sixth check for the Mapping domain (ONTOLOGY.md §2.4, axiom A9): a parcel's
+geometry belongs to exactly one client. This is the geometry analogue of V4. **Drafted only — no view, no
+config row, no trigger has been created on the DB.** It ships `log` first (like V4) *after* the blocker
+below is resolved.
+
+**The blocker (decision required):** `map_parcels` carries a **declared** `client_code`, so it can be
+cross-checked against the client resolved from its `matter_code`. **`parcels` carries NO `client_code`** —
+there is no declared client to contradict, so the parcels layer cannot be validated the same clean way.
+Resolving A9 for `parcels` requires a choice:
+- **(a)** ADD `parcels.client_code` (a **schema change** — symmetric with `map_parcels`, cleanest), or
+- **(b)** accept a weaker transitive detector (`parcels.matter_code` vs the `parcels.source_doc_id` doc's client).
+
+Until (a)/(b) is chosen, **V6 covers `map_parcels` ONLY**; the `parcels` arm stays unenforced (flagged).
+
+```sql
+-- ===== V6 (geometry client isolation, A9) — SHADOW DRAFT, DO NOT APPLY =====
+-- Config (mirrors V4; ships 'log' first):
+-- INSERT INTO ontology_validator_config(check_code,mode,note) VALUES
+--   ('V6','log','geometry client-isolation (A9) via v_ontology_geometry_cross')
+-- ON CONFLICT DO NOTHING;
+
+-- Detector view — the map_parcels arm (has a DECLARED client_code to cross-check).
+-- Reuses _client_of() (the same resolver V4 uses: matters->clients OR clients directly).
+CREATE OR REPLACE VIEW v_ontology_geometry_cross AS
+SELECT mp.parcel_code,
+       mp.matter_code,
+       mp.client_code               AS declared_client,
+       _client_of(mp.matter_code)   AS resolved_client
+FROM   map_parcels mp
+WHERE  mp.matter_code IS NOT NULL
+  AND  _client_of(mp.matter_code) IS NOT NULL
+  AND  mp.client_code IS DISTINCT FROM _client_of(mp.matter_code);
+
+-- Write-time trigger fn (map_parcels only — the clean arm). Same shape as ontvv_grounded_verified.
+CREATE OR REPLACE FUNCTION ontvv_geometry_isolation() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE m text; resolved text; BEGIN
+  SELECT mode INTO m FROM ontology_validator_config WHERE check_code='V6';
+  IF m IS NULL OR m='off' THEN RETURN NEW; END IF;
+  IF NEW.matter_code IS NOT NULL AND NEW.client_code IS NOT NULL THEN
+    resolved := _client_of(NEW.matter_code);
+    IF resolved IS NOT NULL AND NEW.client_code <> resolved THEN
+      PERFORM ontology_reject('ONTOLOGY_GEOMETRY_CLIENT_CROSS',
+        'map_parcels '||COALESCE(NEW.parcel_code,'?')||' client_code='||NEW.client_code
+        ||' but matter resolves to '||resolved);
+      IF m='block' THEN
+        RAISE EXCEPTION 'ontology_validator V6: map_parcels.client_code (%) must match the client of matter_code % (%) — A9',
+          NEW.client_code, NEW.matter_code, resolved;
+      END IF;
+    END IF;
+  END IF;
+  RETURN NEW;
+END $$;
+-- attach in shadow ONLY after the parcels.client_code decision (uncomment then):
+-- CREATE TRIGGER ontvv_v6_map_parcels BEFORE INSERT OR UPDATE ON map_parcels
+--   FOR EACH ROW EXECUTE FUNCTION ontvv_geometry_isolation();
+
+-- parcels ARM — BLOCKED (no client_code). Do NOT author until decision (a)/(b) above.
+```
+
+**Definition of done (V6) — none checked; all gated on the decision:**
+- [ ] `parcels.client_code` decision made (add column **or** accept transitive detector).
+- [ ] `v_ontology_geometry_cross` created; returns 0 on the live seed (MWK-BALANE) — expected clean.
+- [ ] V6 config row inserted `mode='log'`; trigger attached to `map_parcels`; ≥72h shadow, 0 false positives.
+- [ ] Flip `map_parcels` arm to `block`; author the `parcels` arm per the chosen option.
+
+---
+
+## 9. Mapping high-risk-surface governance boundaries (prep — **NOT built**)
+
+Two Mapping concepts touch surfaces the evidence core never does: a **third party** (external map services)
+and **personal data** (a user's real-time location). Both are ○ planned in ONTOLOGY.md §2.4 and axiom-guarded
+(A11, A10). **Neither may be built until the governance below exists.**
+
+### 9.1 ExternalMapReference (A11) — publishing geometry off-platform
+Boundary: creating or serving a Google Earth/Maps deep-link, KML/KMZ, embed, or tile-set is an **outward
+action** that exports one client's survey geometry beyond LandTek. Required before any build:
+1. A per-reference audit row: `client_code` + `created_by` + `audience` + `created_at`.
+2. **Client isolation enforced** (not asserted): a reference may expose ONLY its own client's geometry (A9/A5).
+3. **Outward-guard integration** (`outward_guard_config`, ONTOLOGY.md §8.11): a publish is a governed, logged,
+   human-authorized flip — the same discipline as an outbound message (S14).
+4. An explicit **publish gate** wired to `map_parcels.status='published'` + `no-external-exposure-until-ready`.
+
+> Do **not** create an `external_map_references` table or any publish path until 1–4 are signed off.
+
+### 9.2 UserLocationContext (A10) — storing device location
+Boundary: today device GPS is **ephemeral + client-side** (point-in-polygon runs in the browser; nothing
+leaves the device, nothing is stored) — **safe**. The moment location is **persisted** it becomes personal
+data. Required before any storage:
+1. A **consent record** (who consented, when, to what) — no location row may exist without one.
+2. A **retention/erasure policy** (how long; deletion on request).
+3. Purpose limitation + client isolation (a client's location tied to their own map only).
+
+> Recommended default: **keep it ephemeral.** Do not add a location table; A10 is the guardrail.
