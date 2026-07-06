@@ -45,6 +45,18 @@ KINDS = {
             {"name": "hold",   "agent": "human",                  "mode": "handoff", "tier": "T3"},
         ],
     },
+    # THE CHOKEPOINT. Every OUTWARD/irreversible move — across ALL domains (legal filing, ombudsman
+    # complaint, message to a party/official/client, client-facing exposure, invoice/retainer, product
+    # release) — funnels through this ONE governed kind, parameterized by --target <domain:ref>. The
+    # domain agent PREPARES the artifact (handoff); the move then HOLDS fail-closed for a human. The
+    # system never dispatches outward autonomously. One kind, not one-per-domain (anti-sprawl).
+    "outward_action": {
+        "title": "Outward action — governed chokepoint (held for human)",
+        "steps": [
+            {"name": "prepare", "agent": "domain-agent", "mode": "handoff", "tier": "T2"},
+            {"name": "approve", "agent": "human",        "mode": "handoff", "tier": "T3"},
+        ],
+    },
     # Supervises the SEPARATE OCR remediation pipeline: I gate how its output re-connects to the
     # corpus; the pipeline does the preprocess/re-OCR/reconcile (the 'remediate' handoff).
     "ocr_remediation": {
@@ -133,8 +145,13 @@ def cmd_enqueue(cur, kind, matter, title, by, gap_key=None, override=None, targe
         print(f"unknown kind '{kind}'. known: {', '.join(KINDS)}")
         return 2
 
-    if kind in TARGET_KINDS and not (target and target.startswith("doc:") and target.split(":", 1)[1].isdigit()):
-        print(f"{kind} orders require --target doc:<id> (the document to remediate + connect-verify).")
+    if kind == "ocr_remediation" and not (target and target.startswith("doc:") and target.split(":", 1)[1].isdigit()):
+        print("ocr_remediation requires --target doc:<id> (the document to remediate + connect-verify).")
+        return 2
+    if kind == "outward_action" and not target:
+        print("outward_action requires --target <domain:ref> — the outward move being requested, e.g. "
+              "forum:CV-26360 · ombudsman:officer-X · client:MWK-portal · revenue:invoice-123 · map:parcel-Y. "
+              "It PREPARES (domain agent) then HOLDS for human approval; the system never sends outward itself.")
         return 2
 
     # ENFORCEMENT (supervision): a gap order cannot be born from free text. It must cite a real

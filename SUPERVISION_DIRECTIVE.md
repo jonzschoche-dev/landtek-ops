@@ -100,6 +100,47 @@ Classify every agent's **actions** by tier (`GOVERNED_ACTIONS.md`), and connect 
 
 ## 6. The coordination invariant (one line)
 
-> **Every consequential (T2/T3) action in the fleet is a governed `work_order`; everything reversible
-> (T0/T1) stays autonomous and merely reports health. The Supervisor is where the fleet agrees on what
-> work exists, what it's allowed to do, and whether its output actually connected.**
+> **Every *outward or irreversible* move the operation makes — legal filing, offensive complaint,
+> message to a party/official/client, client-facing exposure, invoice/retainer, product release — is a
+> T3 `work_order` held for a human, no matter which domain agent originates it. Internal work in every
+> domain (analysis, drafting, mapping-audit, verification, OCR) stays autonomous under its own gate.**
+
+The Supervisor is not a document coordinator — it is **the single governed chokepoint for the whole
+operation's outward moves.** Documents/OCR are one lane; the coordination that matters spans all domains.
+
+---
+
+## 7. The fleet is more than documents — classification by domain × tier
+
+The ~52 agents run a full legal/land-ops operation. Group them by DOMAIN, then apply the tier:
+
+| Domain | Consequential move | Tier |
+|---|---|---|
+| **Evidence & knowledge** (verify, gaps, OCR remediation, contradiction) | promote fact · close gap | T2-write · T2-flow |
+| **Legal strategy** (analyst, case_synthesizer, legal_agent, brief_drafter, cross_matter, strategist) | adopt a case theory · commit a prong | T2-flow |
+| **Forums & procedure** (agency:ARTA/CIVIL/CSC/OMBUDSMAN, forum_router, execution_tracker, filing_monitor) | route to forum · **file a pleading** | T2 → **T3** |
+| **Offense** (ombudsman_hunter) | rank officer · **file a Complaint-Affidavit** | T2 → **T3** |
+| **Comms / omnichannel** (leo, channels, build_digest, correspondence) | message operator (T2/S14) · **message a party/official/client** | T2 → **T3** |
+| **Client & matter mgmt** (matter_readiness, case_builder_ui, onboarding) | onboard matter · **expose a client cockpit** | T2-flow → **T3** |
+| **Revenue & GTM** (revenue-engineer, retainers, ROI) | price a retainer · **send an invoice/retainer** | T2 → **T3** |
+| **Mapping / geospatial** (mapping-agent, parcel audits) | plot/audit · **hand out a client map link** | T1 → **T3** |
+| **Product / shipping** (ship-packager, product-hardener) | build surface · **expose it to a client** | T2 → **T3** |
+| **Governance / QA** (truth-qa-gate, dossier_verify, cross_client_sentinel) | gate everything before it ships | T1 |
+
+**Every "→ T3" cell above funnels through ONE governed kind: `outward_action`.**
+
+## 8. The outward chokepoint — `outward_action` (the mechanism)
+
+Any domain agent that wants to make an outward move does NOT send it — it enqueues:
+```
+supervisor.py enqueue --kind outward_action --target <domain:ref> --title "<what's going out>"
+   # e.g. --target ombudsman:officer-X · forum:CV-26360 · client:MWK-portal · revenue:invoice-123 · map:parcel-Y
+```
+Flow: `prepare` (handoff — the domain agent drafts the artifact) → `approve` (**T3 — held fail-closed for a
+human**). The system **never dispatches outward autonomously**; reaching `approve` means a human is cleared
+to send. **One kind, domain-parameterized — not one kind per domain** (anti-sprawl). This is the single
+place the whole operation's outward moves converge and are governed.
+
+**Distribution of the fleet:** ~38 T1 (report health) · ~3 T2-write (DB write-gate governs them) ·
+~10 T2-flow (register a work order) · every outward move → `outward_action`. So "connecting 52 agents"
+is: ~41 just report health, ~10 register flows, and **all outward moves share one held chokepoint.**
