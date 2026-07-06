@@ -6,6 +6,12 @@
 > as **§10 (V7)**, continuing the V1–V6 family, once that file's in-flight edits land. It follows the **V6
 > pattern exactly** (§8 of that spec): the comms analogue of V4 (client isolation on `matter_facts`) and V6
 > (client isolation on geometry). Ships `log` (shadow) first; **zero false positives before any `block`.**
+>
+> **Naming (do not conflate two series).** This is check **V7** — the 7th in the validator's sequential
+> V-series (V1 drift · V2 enum · V3 grounding · V4 `matter_facts` isolation · V5 lifespan · V6 geometry
+> isolation · **V7 comms isolation**). It *enforces* ontology invariant **A25**. The check-number (V-series)
+> and the invariant-number (A-series) are independent — a draft that labelled this "V25" conflated them
+> (there are not 25 checks). Correct: **V7 enforces A25.**
 
 ---
 
@@ -51,6 +57,9 @@ client that does not exist — the row-level slice of A25.
 -- ON CONFLICT DO NOTHING;
 
 -- Detector view — a channel identity's declared client must resolve to a real, single client.
+-- Allowlist (adopted from the reconciled draft): operators, sim personas, and non-client roles are
+-- OUT OF SCOPE for client-isolation — they legitimately carry no client. Excluded explicitly so they
+-- can never register as a false positive.
 CREATE OR REPLACE VIEW v_ontology_channel_cross AS
 SELECT cu.id                                AS ref,
        cu.channel_id,
@@ -59,14 +68,22 @@ SELECT cu.id                                AS ref,
        _client_of(cu.mapped_client_code)    AS resolved_client
 FROM   channel_users cu
 WHERE  cu.mapped_client_code IS NOT NULL
-  AND  _client_of(cu.mapped_client_code) IS NULL;   -- declared client resolves to NOTHING → invalid
+  AND  _client_of(cu.mapped_client_code) IS NULL       -- declared client resolves to NOTHING → invalid
+  AND  coalesce(cu.mapped_operator,'') = ''             -- exclude internal operators
+  AND  coalesce(cu.role,'') <> 'operator'               -- exclude operator role
+  AND  cu.channel_user_id NOT LIKE '999000%';           -- exclude sim personas (S1 range)
 
 -- Write-time trigger fn (same shape as ontvv_grounded_verified / ontvv_geometry_isolation).
 CREATE OR REPLACE FUNCTION ontvv_channel_isolation() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE m text; BEGIN
   SELECT mode INTO m FROM ontology_validator_config WHERE check_code='V7';
   IF m IS NULL OR m='off' THEN RETURN NEW; END IF;
-  IF NEW.mapped_client_code IS NOT NULL AND _client_of(NEW.mapped_client_code) IS NULL THEN
+  -- same allowlist as the view: only client-bearing, non-operator, non-sim rows are in scope.
+  IF NEW.mapped_client_code IS NOT NULL
+     AND coalesce(NEW.mapped_operator,'') = ''
+     AND coalesce(NEW.role,'') <> 'operator'
+     AND NEW.channel_user_id NOT LIKE '999000%'
+     AND _client_of(NEW.mapped_client_code) IS NULL THEN
     PERFORM ontology_reject('ONTOLOGY_CHANNEL_BAD_CLIENT',
       'channel_users id='||coalesce(NEW.id::text,'?')||' mapped_client_code='||NEW.mapped_client_code
       ||' does not resolve to a known client');
@@ -114,23 +131,44 @@ for the corpus, and the honest state of the A25 row today.
 
 ---
 
-## 5. Definition of done (V7)
+## 5. Enforcement roadmap (phased — adopted from the reconciled draft)
 
-- [ ] `v_ontology_channel_cross` (Part 1) created; returns **0** on live `channel_users` (expected clean —
-      few rows today). *(shadow prep — re-ground on the VPS; this Mac session cannot reach the DB)*
-- [ ] V7 config row inserted `mode='log'`; `ontvv_v7_channel_users` trigger attached; ≥72h shadow;
-      `ONTOLOGY_CHANNEL_BAD_CLIENT` false-positive rate = 0 in `holes_findings`.
-- [ ] Flip V7 Part 1 to `block` after the clean window + operator go
-      (`UPDATE ontology_validator_config SET mode='block' WHERE check_code='V7';`).
-- [ ] **Part 2 blocker — operator decision** on `channel_users.entity_id` (the cross-channel person key).
-      Until then, A25(b) stays discipline-only and this doc records why.
-- [ ] On apply, update the ONTOLOGY.md **A25** enforcement marker from *"resolver + block-guard not built"*
-      → *"V7 Part 1 shadow-applied; Part 2 blocked on `entity_id` decision"* (a marker update, not a prose
-      refinement of §2.14).
+Drives V7 up the enforcement ladder (`documented → asserted → shadow → ENFORCED`), gated on clean windows,
+mirroring V4's post-Aug-12 discipline:
+
+| Phase | Mode | Action | Gate to enter |
+|---|---|---|---|
+| 1 (now) | `log` (shadow) | detector view + trigger record `ONTOLOGY_CHANNEL_BAD_CLIENT` to `holes_findings`; block nothing | this spec approved + applied |
+| 2 | `log` + alert | daily/weekly summary surfaced in the ops digest | Phase 1 running |
+| 3 | `log` + warn | warn in logs/digest on each hit | ≥7–14 days, 0 false positives |
+| 4 | `block` | trigger `RAISE EXCEPTION` on invalid client write | **post-Aug-12 + explicit operator approval** |
+
+**Definition of done (Part 1):**
+- [ ] `v_ontology_channel_cross` created; returns **0** on live `channel_users` (expected clean — few rows).
+      *(re-ground on the VPS; this Mac session cannot reach the DB)*
+- [ ] V7 config row `mode='log'`; `ontvv_v7_channel_users` trigger attached; ≥72h shadow; FP rate = 0.
+- [ ] Flip to `block` per Phase 4 (`UPDATE ontology_validator_config SET mode='block' WHERE check_code='V7';`).
+- [ ] On apply, update the ONTOLOGY.md **A25** marker from *"resolver + block-guard not built"* →
+      *"V7 Part 1 shadow-applied; Part 2 blocked on `entity_id` decision"* (a marker update, not a §2.14
+      prose refinement).
+
+**Part 2 (cross-channel):** blocked — operator decision on `channel_users.entity_id` (§4). Discipline-only until then.
+
+## 6. Open questions — answered (raised by the reconciled draft)
+
+1. **How does `channel_users` resolve a client?** *Directly* — via `mapped_client_code`. It has **no**
+   `matter_code` and no matter join, so there is nothing to compare the declared client *against* at row
+   level except validity (does the code name a real client). A row-vs-row comparison (the true A25) needs
+   the person-key of §4. This is why the draft's `_client_of(cu.matter_code)` view cannot run.
+2. **Exclude which channels/roles?** Operators (`mapped_operator` set OR `role='operator'`) and sim personas
+   (`channel_user_id LIKE '999000%'`, the S1 range) — now excluded in both the view and the trigger.
+3. **Also flag NULL `mapped_client_code`?** Not under V7 (isolation). A client-role row with a NULL client is
+   an *unresolved-identity gap*, not cross-client leakage — a different, lower-severity lint (WARN), better
+   homed with the A25 resolver's "who is this person" coverage than the isolation check. Kept separate.
 
 ---
 
-## 6. How this folds into `docs/ontology_validator_spec.md`
+## 7. How this folds into `docs/ontology_validator_spec.md`
 
 Paste §1–§5 above as a new **§10 (V7)** after that spec's §9, and add a `('V7','log',…)` line to the config
 list in §6. No change to V1–V6. `ontology_check.py --coverage` is unaffected (no new *domain* tables; the
