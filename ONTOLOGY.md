@@ -214,9 +214,16 @@ legal data. Do not model LandTek permissions on them. (Full governance map: `ARC
 
 ## 7. How to regenerate / re-ground
 
-This file is hand-curated but **verified against the live schema**. To re-ground rowcounts and catch new
-drift, diff the live table list against §2–§3 (a `scripts/ontology_check.py` generator is the natural next
-step — spec'd but not yet built; it belongs to the `ontology_validator` work, not this doc).
+This file is hand-curated but its **completeness is now machine-verified** — two live guards keep it honest
+so it can't silently drift the way §8's first pass did (it missed 100 tables):
+
+- **`ontology_check.py --coverage`** — diffs every *live populated* domain table against the actual text of
+  this file (token-precise). "Nothing orphaned" is a CHECK: 201/201 named, exit-1 on any gap. Wired into the
+  daily sentinel — a new unnamed table writes a `holes_findings` row (`ontology_coverage_gap`).
+- **`agent_concept_map.py`** — the **agent↔concept join**, DERIVED from code+DB: parses each agent script for
+  the tables it reads/writes → binds the control plane (`SUPERVISION_DIRECTIVE.md` agents) to this data
+  plane. `--orphans` lists tables no python agent touches (n8n/trigger/dormant candidates). Regenerated, so
+  the binding can't drift.
 
 ## 8. The Oriented Operational Map — every concept its purpose, connection, and state
 

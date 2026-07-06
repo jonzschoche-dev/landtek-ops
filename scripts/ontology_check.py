@@ -77,21 +77,30 @@ def _named_in(doc: str, t: str) -> bool:
     return re.search(r'(?<![a-z0-9_])' + re.escape(t) + r'(?![a-z0-9_])', doc, re.I) is not None
 
 
-def cmd_coverage(cur) -> int:
-    """AUTHORITATIVE coverage: every POPULATED domain table must be NAMED in ONTOLOGY.md.
-    Reads the actual file — this is what makes 'nothing orphaned' a CHECK, not a hand-curated claim
-    (deploy_718's §8 silently missed 100 tables). Exit 1 on any gap so it's a tracked invariant."""
+def coverage_gaps(cur):
+    """Return (named_count, total, [(table, rows) gaps]) — populated domain tables NOT named in
+    ONTOLOGY.md. Reusable by cmd_coverage AND the daily sentinel so completeness stays a live check."""
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     try:
         with open(os.path.join(repo, "ONTOLOGY.md")) as f:
             doc = f.read()
-    except Exception as e:
-        print(f"cannot read ONTOLOGY.md: {e}"); return 2
+    except Exception:
+        return None, None, None
     cur.execute("SELECT relname, n_live_tup FROM pg_stat_user_tables WHERE n_live_tup > 0 ORDER BY n_live_tup DESC;")
     rows = [(t, n) for (t, n) in cur.fetchall() if not is_plumbing(t)]
     missing = [(t, n) for (t, n) in rows if not _named_in(doc, t)]
+    return len(rows) - len(missing), len(rows), missing
+
+
+def cmd_coverage(cur) -> int:
+    """AUTHORITATIVE coverage: every POPULATED domain table must be NAMED in ONTOLOGY.md.
+    Reads the actual file — this is what makes 'nothing orphaned' a CHECK, not a hand-curated claim
+    (deploy_718's §8 silently missed 100 tables). Exit 1 on any gap so it's a tracked invariant."""
+    named, total, missing = coverage_gaps(cur)
+    if missing is None:
+        print("cannot read ONTOLOGY.md"); return 2
     print("=== ONTOLOGY.md coverage — populated domain tables named in the map ===")
-    print(f"  named: {len(rows) - len(missing)}/{len(rows)}")
+    print(f"  named: {named}/{total}")
     if missing:
         print(f"  ORIENTATION GAPS — {len(missing)} populated domain tables NOT named (rows shown):")
         for t, n in missing:
@@ -164,12 +173,13 @@ def main():
         elif not brief:
             out.append(f"[ok] provenance vocab: all values in canonical set of {len(PROVENANCE_VOCAB)}")
 
-        # 6. unregistered domain tables (candidate drift → update ONTOLOGY.md sec2)
-        cur.execute("SELECT relname FROM pg_stat_user_tables;")
-        live = {r[0] for r in cur.fetchall()}
-        unreg = sorted(t for t in live if not is_plumbing(t) and t not in REGISTERED)
-        if unreg and not brief:
-            out.append(f"[i] {len(unreg)} domain table(s) not in ONTOLOGY.md registry (review): {unreg[:25]}{'...' if len(unreg) > 25 else ''}")
+        # 6. ONTOLOGY.md coverage — AUTHORITATIVE (vs the actual file, not a hardcoded REGISTERED list).
+        cov_named, cov_total, cov_missing = coverage_gaps(cur)
+        unreg = [t for (t, n) in (cov_missing or [])]
+        if unreg:
+            out.append(f"[!] ontology coverage: {len(unreg)} populated domain table(s) NOT named in ONTOLOGY.md → run --coverage: {unreg[:20]}")
+        elif not brief:
+            out.append(f"[ok] ontology coverage: {cov_named}/{cov_total} populated domain tables named (nothing orphaned)")
 
         # 7. inference tier (24h) — unify the health surface so /health JSON carries BOTH
         #    data-integrity and inference signals (mirrors the inference_tier_sentinel rollup).
@@ -213,6 +223,23 @@ def main():
                 )
         except Exception:
             pass  # sentinel must never crash the timer
+
+    # coverage regression: a NEW populated domain table appeared unnamed → keep the map honest.
+    if sentinel and unreg:
+        cdesc = (f"ontology coverage regression: {len(unreg)} populated domain table(s) not named in "
+                 f"ONTOLOGY.md — {unreg[:15]}. Orient each (§2 gated-core or §8 with a state); run "
+                 f"scripts/ontology_check.py --coverage.")
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO holes_findings(routine_name, routine_version, finding_id_hash,
+                         severity, hole_type, description, metadata, status)
+                       VALUES ('ontology_check','v1', md5(%s), 'medium', 'ontology_coverage_gap',
+                         %s, jsonb_build_object('unnamed',%s), 'open')""",
+                    (str(sorted(unreg))[:200], cdesc, len(unreg)),
+                )
+        except Exception:
+            pass
 
     conn.close()
 
