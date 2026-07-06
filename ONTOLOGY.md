@@ -14,7 +14,9 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.14 (2026-07-07).** §2.15: formalized the **Client-Facing Projection** layer
+> **Ontology version: v0.15 (2026-07-07).** A25 enforcement begins: **V7 applied in shadow** (deploy_743,
+> `log` mode) on `channel_users` — the first comms invariant off the page and onto the DB; A25 marker
+> asserted→shadow (Part 1 validity live; Part 2 held on `entity_id`). **v0.14:** §2.15: formalized the **Client-Facing Projection** layer
 > (`ClientProjection`/`ClientFacingView`/`ClientSafeField`) + invariants **A32–A34** (client-safe projection is
 > mandatory · totality with logged safe-generic fallback · provenance→plain confidence). Presentation companion
 > to `UnifiedClientPersona` (A28 = the VOICE; projection = the safe PRESENTATION of facts). **v0.13:** §2.14: added **A31** (the `PlatformCoordinator`, once built, is
@@ -470,7 +472,7 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A22 | A `work_orders` step executes only via a governed path (tier ≤ T2, tagged, non-outward); T3/untagged/outward-verb steps hold for a human. | 🟢 **ENFORCED** — `governance_block()` fail-closed (Phase-1) |
 | A23 | `verified_claims` derive only from an adjudicated `claim_truth_verdicts` row citing its negotiation + evidence; a claim is never "verified" by assertion. | 🟡 **asserted** — model defined; layer underused (6 verdicts / 1 verified) |
 | A24 | Truth invariants are checked **mechanically** (`truth_tests/` + `ontology_validator`), never by a standing LLM-interrogation harness. | 🟢 **doctrine** — enforced by the `truth_qa` retirement (below); mechanical suite is the deploy gate |
-| A25 | A `ChannelUser` resolves to **at most one** `client_code`; the same human across multiple channels resolves to a single client identity, and no channel identity is mapped across two clients. | 🟡 **asserted / flagged** — extends A5/A16 to the comms identity layer; `channel_users.mapped_client_code` is the slot, but no resolver or block-guard exists yet (comms client-separation is discipline, not guarantee) |
+| A25 | A `ChannelUser` resolves to **at most one** `client_code`; the same human across multiple channels resolves to a single client identity, and no channel identity is mapped across two clients. | 🟡 **shadow** — extends A5/A16 to the comms identity layer. **V7 Part 1 APPLIED IN SHADOW (deploy_743, `log` mode):** trigger `ontvv_v7_channel_users` + view `v_ontology_channel_cross` on `channel_users` (declared `mapped_client_code` must resolve via `_client_of()`); 0 live violations on apply. Validity half live; **Part 2 (cross-channel same-human → one client) blocked on the held `channel_users.entity_id` decision.** Flip to `block` post-Aug-12 + approval |
 | A26 | No `ChannelMessage` is delivered to an **external** recipient except through the outward chokepoint (A21) under `no-external-exposure-until-ready`. *Corollary (token-as-switch):* for inline-send channels (WhatsApp/Viber/Messenger) the provider credential IS the external switch, so provisioning it is an outward action requiring sign-off; email alone splits inbound (internal) from send (outward). | 🟡 **asserted / flagged** — email split live (deploy_654); Meta/Viber armed-but-tokenless by design (662/663); S14 + `outbound_blocks` + `outward_guard` partially enforce; block-mode dormant |
 | A27 | Every comms event, inbound or outbound, on any channel normalizes onto the unified bus (`channels`/`channel_messages`), and any message reaching Jonathan passes the S14 human-readability + no-double-tap pacing gate; no adapter may send outside the bus-plus-guard path. When built, the `PlatformCoordinator` is the concrete chokepoint that enforces this. | 🟡 **asserted / flagged** — S14 enforced in `tg_send` (14,346 blocks); adapters route through one onboarding path, but universal bus-normalization + a single PlatformCoordinator are ○ planned |
 | A28 | The AI presents a **consistent persona** — personality, memory, and relationship context — to a client regardless of channel; a `UnifiedClientPersona` is keyed to `client_code`, never re-initialized per channel. | 🟡 **asserted / flagged** — one shared `systemMessage` gives a uniform personality, but cross-channel memory (`conversation_context`) is 🌱 dormant + not persona-keyed, so continuity is not yet guaranteed |
@@ -665,6 +667,13 @@ cleanly instead of inventing a parallel structure. **○ = planned; do not build
 ---
 
 **Change log**
+- v0.15 (2026-07-07) — **A25 enforcement begins — V7 applied in shadow.** First comms invariant driven off
+  the page and onto the DB: `migrations/apply_deploy_743_ontology_validator_v7.py` applied live on the VPS in
+  `log` mode — trigger `ontvv_v7_channel_users` + detector view `v_ontology_channel_cross` on `channel_users`
+  (reuses deploy_691's `ontology_reject` logger + deploy_716's `_client_of()`), self-test confirmed
+  non-blocking, **0 live violations**. A25 marker: 🟡 asserted → 🟡 **shadow** (Part 1 = declared-client
+  validity). A25 **Part 2** (cross-channel same-human → one client) stays blocked on the held
+  `channel_users.entity_id` decision. Flip to `block` post-Aug-12 + approval. No prose change to §2.14.
 - v0.14 (2026-07-07) — **§2.15 — Client-Facing Projection layer formalized.** The client dashboard was leaking
   raw internal typed fields (snake_case `current_stage`, "/"-mashed `forum`, `next_event` prose full of
   `gmail#`/`CTN`/`§`/matter-code tokens, raw §4B provenance tags) to paying clients. Modeled the governed
