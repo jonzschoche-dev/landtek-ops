@@ -200,7 +200,81 @@ This file is hand-curated but **verified against the live schema**. To re-ground
 drift, diff the live table list against §2–§3 (a `scripts/ontology_check.py` generator is the natural next
 step — spec'd but not yet built; it belongs to the `ontology_validator` work, not this doc).
 
+## 8. The Oriented Operational Map — every concept its purpose, connection, and state
+
+§2–§6 govern the **evidence-grade core** (facts/titles/entities/docs) — the only tier that is
+provenance-gated + validator-enforced. But the ~53 agents run a **10-domain operation**, and ~205 live
++ ~46 dormant domain tables sit *outside* that gated core. **None of them is dead weight** — each was
+built for a purpose. This section orients them: purpose · how each connects to the core · and its state.
+
+**Enforcement scope is unchanged.** Everything below is **mapped, not gated** — these are process,
+comms, valuation, and governance concepts, not truth-claims, so they are named here for a shared
+vocabulary but never provenance-enforced (gating `work_orders` or `channels` would be a category error).
+
+**Orientation-state legend:**
+`🟢 ACTIVE` populated + connected + serving · `🌱 DORMANT` purpose-built, awaiting the named activation
+flow · `⚪ HEALTHY-EMPTY` an exception log; empty *is* the healthy state · `🔁 SUPERSEDED` purpose now
+served by a named successor · `⚙️ INFRA` n8n/platform plumbing, not a domain concept.
+
+### 8.1 Verification & Truth machinery — *is every fact earned?*
+| Cluster | Purpose | → core | State |
+|---|---|---|---|
+| `verification_queue` (52k) · `verify_worker_log` · `field_consensus` · `ocr_quality` · `corpus_backfill_state` | scout→reader pipeline that turns docs into cited facts | feeds `matter_facts` | 🟢 |
+| `truth_audit_log` · `truth_negotiations` · `claim_truth_verdicts` · `truth_qa_results` · `verified_claims` | the truth-test / negotiation ledger | gates `matter_facts`/`claims` | 🟢 |
+| `holes_runs`/`holes_findings` · `coverage_audit_findings` · `contradictions` · `back_test_runs`/`suite` | diligence self-heal + regression on the truth base | audits the core | 🟢 |
+
+### 8.2 Proposals & Adjudication — *the human-in-loop gate*
+`proposed_facts` · `proposed_changes` · `proposed_actions` · `doc_role_proposals` · `doc_classification_proposals` · `entity_merge_proposals` · `review_queue` → propose → gate → `matter_facts`/`entities`/`documents`. **🟢 ACTIVE** (the reconciler flow).
+
+### 8.3 Legal Strategy — *what move, and why*
+`matter_plays` · `keystones` · `cross_matter_links` · `matter_state` · `matter_elements` · `matter_objectives` · `matter_authorities` → hang off `matters` + `matter_facts`. **🟢 ACTIVE.**
+
+### 8.4 Forums & Procedure — *the adversarial clocks*
+`case_forums` · `arta_cases` · `case_deadlines`/`surfaced_deadlines` · `case_party_filings` · `case_threads`/`case_thread_documents` · `filing_alerts` · `execution_audit` → `matters`/`documents`. **🟢 ACTIVE.**
+
+### 8.5 Offense — *turn defense into pressure on officials*
+`ombudsman_candidates` (graft/misconduct leads, ripeness-gated) → `entities` (officials) + `matters`. **🟢 ACTIVE** (filing held T3).
+
+### 8.6 Comms / Omnichannel — *reach, governed by S14*
+`channels`/`channel_messages` · `outbound_messages` · `outbound_blocks` (S14, 14k) · `leo_interactions` · `conversations` · `chat_notes` · `correspondence_links`/`events` · `telegram_inbox`/`tg_inquiry_queue` · `gmail_messages` · `client_history` → `documents`/`matters`/`clients`. **🟢 ACTIVE.** `conversation_context`/`conversation_chunks` = **🌱 DORMANT** (Leo long-term memory — activation: wire the comms-memory write).
+
+### 8.7 Client & Matter Management — *the tenancy spine*
+`clients` · `client_goals`/`needs`/`issues`/`dependability` · `client_access_tokens` · `authorized_users` → the `client_code` isolation key (A5, now enforced). **🟢 ACTIVE.** `contact_roles` = **🌱 DORMANT** (party-role graph).
+
+### 8.8 Revenue / Valuation / Portfolio — **the dormant business layer (the roadmap)**
+| Cluster | Purpose | State |
+|---|---|---|
+| `assets` · `asset_valuations` · `property_assets` · `asset_risks` | the land/asset register + valuations | 🟢 (partial) |
+| `transactions` · `accounts` · `monthly_overhead` · `llm_calls` · `inference_audit` · `llm_spend` · `leo_operational_costs` | the cost/finance ledger | 🟢 |
+| `market_observations` · `dominion_value_estimates` · `valuation_change_events` · `value_extraction_events` · `asset_development_plans` · `legal_outcome_estimates` · `financial_projections` · `legal_cost_actuals` · `risk_change_events` · `priority_signals` · `settlement_valuations`/`settlement_scenarios` | the **valuation/revenue/risk engine** — schema built, FK-wired to `assets`/`matters` | **🌱 DORMANT** |
+
+**Activation flow:** the `revenue-engineer` + portfolio/valuation domain (parked behind Aug-12 per MASTER_PLAN). This is the operation's *intended* business shape sitting latent — a backlog, not scaffolding.
+
+### 8.9 Mapping / Geospatial — *the client can stand inside their boundary*
+`map_parcels` (world-placed, seeded) 🟢 · `subdivision_plans` (64) 🟢 · `parcels` (relative survey shape) **🌱** · `geometry_priority`/`survey_geometry` **🌱**. **Activation:** vision-OCR of survey plans → `survey_geometry` → `parcels` → georeference → `map_parcels`. → `titles`/`matters`/`clients`.
+
+### 8.10 Structured Extraction (DIC) — *typed fields, not just text*
+`extraction_contract` (8 contracts incl `court_order`/`spa`/`deed`/`affidavit` — schema 🟢) · `heightened_ocr_queue` (159) 🟢 · `heightened_ocr_results` **🌱 DORMANT**. **Activation:** wire classify→contract routing so contracts run automatically → typed fields on `documents`. *This is the corpus-connection frontier (`model_used`=0).*
+
+### 8.11 Governance / Supervision / QA — *the pillars (now registered in their own ontology)*
+`ontology_validator_config` · `v_evidence_gaps` · `v_ontology_client_cross` · `holes_findings` · `work_orders`(+`target_ref`) · `internal_targets` · `outward_guard_config` → they govern the core. **🟢 ACTIVE** (outward-guard in 🌱 shadow). `sim_leak_incidents` · `cross_client_flags` · `audit_rejected_messages` · `real_traffic_violations` = **⚪ HEALTHY-EMPTY** (no incidents = the good state).
+
+### 8.12 Superseded / drift (oriented, not deleted — carry the lineage)
+`document_entities`→`doc_entities` · `finance_transactions`→`transactions` · `audit_log`/`audit_events`→`truth_audit_log` · `chain_of_title`→`title_chain` (§3) · `cases`→`matters` (§3) · `fact_edges` = 🌱 aspirational KG-edge layer (activation: fact-graph build).
+
+### 8.13 Infra (⚙️ excluded — not domain concepts)
+n8n/platform: `workflow_*` · `execution_*` · `chat_hub_*` · `instance_ai_*` · `oauth_*` · `credential*`/`token_*` · `role`/`scope`/`user` · `folder`/`project`/`variables` · `data_table*`.
+
+**Orientation summary:** ~205 live + connected · a whole **dormant business/valuation/geometry/extraction layer** (a roadmap, not dead weight) · ~4 healthy-empty sentinels · a handful superseded-with-successor · the rest infra. Nothing orphaned; every concept has a purpose, a connection, and a state.
+
+---
+
 **Change log**
+- v0.3 (2026-07-06) — added §8 **Oriented Operational Map**: all ~53 agents' concepts across 10 domains
+  given purpose · core-connection · orientation-state (Active/Dormant/Healthy-empty/Superseded/Infra).
+  Surfaces the dormant valuation/geometry/extraction layer as an activation backlog; registers the
+  governance/supervision pillars. Enforcement scope unchanged (evidence core only). Also: V4
+  client-isolation flipped to **block** (deploy_716) — A5 enforced.
 - v0.2 (2026-07-05) — `ontology_validator` applied in **shadow** (deploy_691): V1 drift-guard (4 tables),
   V3 grounding (matter_facts, 0 false positives), V4 client-isolation detector. V4 caught + re-homed
   **6 Paracale (Allan Inocalla / OCT P-1616) facts mis-filed under MWK-TCT4497** → moved to PAR-TCT1616;
