@@ -10,6 +10,8 @@ mutates nothing. Runs on the VPS (needs the container-internal DSN).
 Usage:
   python3 scripts/ontology_check.py            # full report
   python3 scripts/ontology_check.py --brief    # phone-friendly one-screen summary
+  python3 scripts/ontology_check.py --coverage # every populated domain table must be NAMED in ONTOLOGY.md
+  python3 scripts/ontology_check.py --structure # STRUCTURE lint (no DB): unique section numbers + heading depth
   python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes ONE
                                                # high-severity holes_findings row ONLY on NEW
                                                # actionable contamination (V3/V4 > 0). Standing
@@ -22,7 +24,10 @@ import os
 import re
 import sys
 import json
-import psycopg2
+try:
+    import psycopg2                       # DB paths need it; --structure is a pure file lint and must
+except ImportError:                       # run anywhere (e.g. the Mac during migration authoring)
+    psycopg2 = None
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 
@@ -116,10 +121,58 @@ def cmd_coverage(cur) -> int:
     return 1 if missing else 0
 
 
+def cmd_structure() -> int:
+    """STRUCTURE lint of ONTOLOGY.md (no DB needed — pure file parse). Two mechanical rules:
+      1. No DUPLICATE section number (the live doc has two `§2.6`).
+      2. Markdown heading depth must equal the dotted-number depth + 1 — so `## 2.8` (an H2 carrying a
+         two-part number) is a violation; it must be `### 2.8`. (`## 2`→H2, `### 2.1`→H3, `#### 2.6.1`→H4.)
+    Catches exactly the debt that crept in during the v0.9→v0.13 authoring burst (dup §2.6; §2.8–2.14
+    authored as H2 instead of H3). Read-only; exit 1 on any violation. This is the acceptance test for
+    the ONTOLOGY.md v1.0 renumber (docs/ONTOLOGY_STRUCTURE.md §6.1) — NOT yet wired to the deploy gate,
+    because the current doc intentionally still carries these violations until that migration runs."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        with open(os.path.join(repo, "ONTOLOGY.md")) as f:
+            lines = f.read().splitlines()
+    except Exception:
+        print("cannot read ONTOLOGY.md"); return 2
+    # A numbered heading: leading '#'s, space, a dotted number (2 · 2.6 · 8.19 · 2.6.1), then a boundary.
+    heading = re.compile(r'^(#{1,6})\s+(\d+(?:\.\d+)*)\b')
+    problems, seen = [], {}
+    for ln, line in enumerate(lines, 1):
+        m = heading.match(line)
+        if not m:
+            continue
+        depth, num = len(m.group(1)), m.group(2)
+        expected = num.count(".") + 2   # '2'→2(##) · '2.6'→3(###) · '8.19'→3 · '2.6.1'→4
+        if num in seen:
+            problems.append(f"DUPLICATE §{num}: line {seen[num]} and line {ln} — '{line.strip()[:48]}'")
+        else:
+            seen[num] = ln
+        if depth != expected:
+            problems.append(f"DEPTH §{num}: heading is H{depth}, expected H{expected} "
+                            f"({num.count('.')} dot(s)) at line {ln} — '{line.strip()[:48]}'")
+    print("=== ONTOLOGY.md structure lint (unique section numbers · heading depth == dots+1) ===")
+    if problems:
+        print(f"  ✗ {len(problems)} structural violation(s):")
+        for p in problems:
+            print(f"    - {p}")
+        print("  → resolve in the ONTOLOGY.md v1.0 renumber (docs/ONTOLOGY_STRUCTURE.md §6.1). "
+              "Rule: section numbers unique; heading depth == dotted-number depth + 1.")
+        return 1
+    print("  ✓ every numbered heading is unique and at the correct depth.")
+    return 0
+
+
 def main():
     brief = "--brief" in sys.argv
     sentinel = "--sentinel" in sys.argv
     as_json = "--json" in sys.argv
+    if "--structure" in sys.argv:   # pure file lint — no DB, dispatch before connecting
+        sys.exit(cmd_structure())
+    if psycopg2 is None:
+        print("psycopg2 not installed — DB checks need the VPS; only --structure runs offline.")
+        sys.exit(2)
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
     if "--coverage" in sys.argv:
