@@ -37,13 +37,18 @@ PLUMBING = ("workflow", "execution", "credentials", "shared_", "oauth", "chat_hu
             "invalid_auth", "api_keys")
 
 
+PLUMBING_NAMES = {"role", "scope", "role_scope", "user", "settings", "migrations", "auth_identity",
+                  "binary_data", "credential_dependency", "event_destinations", "gmail_oauth_tokens",
+                  "instance_version_history", "token_exchange_jti", "auth_provider_sync_history"}
+
+
 def is_plumbing(t):
-    return t.startswith(PLUMBING) or t in ("role", "scope", "role_scope", "user", "settings", "migrations")
+    return t.startswith(PLUMBING) or t in PLUMBING_NAMES
 
 
 def live_tables(cur):
-    cur.execute("SELECT relname FROM pg_stat_user_tables;")
-    return {r[0] for r in cur.fetchall()}
+    cur.execute("SELECT relname, n_live_tup FROM pg_stat_user_tables;")
+    return {r[0]: r[1] for r in cur.fetchall()}
 
 
 def scan(path, live):
@@ -58,7 +63,14 @@ def scan(path, live):
 
 def build(cur):
     live = live_tables(cur)
-    files = sorted(glob.glob(os.path.join(REPO, "scripts", "*.py")) + glob.glob(os.path.join(REPO, "*.py")))
+    # Walk ALL agent code (scripts/, root, holes/, heightened_ocr/, worker/, leo_tools/, autonomous/,
+    # n8n_code_nodes/, …) — not just scripts/+root, or subdir agents show as false orphans.
+    skip = {".git", "archive", "node_modules", ".claude", "staging", "snapshots", "drafts", "__pycache__"}
+    files = []
+    for root, dirs, fs in os.walk(REPO):
+        dirs[:] = [d for d in dirs if d not in skip and not d.startswith(".")]
+        files += [os.path.join(root, fn) for fn in fs if fn.endswith(".py")]
+    files.sort()
     agents, writers, readers = {}, {}, {}
     for f in files:
         name = os.path.basename(f)[:-3]
@@ -89,11 +101,16 @@ def main():
         return
 
     if "--orphans" in sys.argv:
-        print(f"=== tables NO python agent writes or reads ({len(orphaned)}) — dead-by-code candidates ===")
-        print("   (may be written by n8n/Leo or DB triggers — a signal, not a verdict)")
-        for t in orphaned:
-            print(f"   {t}")
-        no_tbl = sorted(n for n, m in agents.items() if not m["writes"] and not m["reads"])
+        dormant = [t for t in orphaned if not live.get(t)]
+        active = sorted(((t, live[t]) for t in orphaned if live.get(t)), key=lambda x: -x[1])
+        print(f"=== {len(orphaned)} domain tables with NO python agent writer/reader — oriented ===")
+        print(f"\n  🌱 DORMANT / empty ({len(dormant)}) — EXPECTED: awaiting an activation flow, or superseded")
+        print(f"     (already oriented in ONTOLOGY §8.8/8.10/8.12). No writer is correct — nothing to fix.")
+        print("     " + ", ".join(dormant))
+        print(f"\n  ⚠️  ACTIVE but python-unbound ({len(active)}) — has rows, no python writer. Legit sources:")
+        print(f"     DB trigger · n8n/Leo (LangChain.js) · seed/migration · shell · dynamic SQL. Confirm each:")
+        for t, n in active:
+            print(f"       [{n:>6}]  {t}")
         return
 
     print(f"=== agent ↔ concept binding — {len(agents)} scripts touch the DB ===")
