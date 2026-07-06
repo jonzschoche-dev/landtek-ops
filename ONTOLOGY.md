@@ -10,11 +10,18 @@
 > **This file is checked against reality, not authored from memory.** Re-ground before trusting a
 > rowcount older than a few weeks (`scripts/landtek_git_routine.sh` era).
 >
-> **Ontology version: v0.7 (2026-07-06).** Six core domains formalized to the §2.4 rigor — Case Theory
+> **Structure & growth:** how this document is organized (the five logical layers, state markers, the
+> new-domain template, invariant conventions, and the maintenance protocol) is defined in
+> `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
+>
+> **Ontology version: v0.9 (2026-07-06).** Six core domains formalized to the §2.4 rigor — Case Theory
 > (§2.8), Entity Resolution (§2.9), Client/Matter Separation (§2.10), Fact Harvesting & Provenance (§2.11),
 > Supervision & Work Ordering (§2.12), Truth & Reconciliation (§2.13) — with invariants A12–A24. **v0.7**
-> formalizes the Geometry/Mapping `GeometrySource` + `MapVisibility` controlled vocabularies (§2.4) and
-> stages geometry governance (V6 shadow-draft + high-risk-surface boundaries) in `docs/ontology_validator_spec.md`.
+> formalized the Geometry/Mapping `GeometrySource` + `MapVisibility` vocabularies (§2.4) + staged geometry
+> governance. **v0.8** resolves the A9 blocker: **`parcels.client_code` added (deploy_733)** → both geometry
+> layers now carry a declared client; V6 authored for both arms (shadow-DRAFT, not applied). **v0.9** adds §9
+> **Future Domains** registry + the `docs/ONTOLOGY_STRUCTURE.md` growth framework, and drives A15 (entity
+> merge-graph DAG) to 🟢 mechanically enforced (`test_entity_merge_dag.py`, deploy_732).
 > Semver: patch = new alias/deprecation noted; minor = new concept class; major = a canonical table changes.
 
 ---
@@ -115,7 +122,7 @@ The client-facing mapping surface ("see my property; stand inside my boundary").
 > ⚠️ **Do not "consolidate" `parcels` into `map_parcels`** — relative survey shape vs globe-placed shape;
 > the bridge is a tie-point georeference (`parcels` → `survey`-tier `map_parcels`). Known trap.
 > ⚠️ **`survey_geometry` is a SCRIPT** (`scripts/survey_geometry.py`, the courses→polygon math), **not a table**.
-> ⚠️ **`parcels` has no `client_code`** — geometry isolation (A9) resolves via `matter_code`→`matters`→`clients`; adding the column is a **flagged** decision.
+> ✅ **`parcels` now carries `client_code`** (deploy_733 — nullable, FK→`clients`, populated by `_client_of(matter_code)` at write) — symmetric with `map_parcels`; A9 now has a DECLARED client on **both** geometry layers, so V6 covers both arms uniformly (the blocker is resolved; V6 is authored shadow-DRAFT, still not applied).
 > **Enforcement:** geometry is *mapped, not gated* (derived shapes, not truth-claims) — but it carries its OWN
 > mechanical validators: `closure_error_m` + area-vs-title cross-check. **AreaAssertions that feed legal output stay gated** (they ride provenance-locked `titles`).
 
@@ -366,7 +373,7 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A6 | Inference substituted for source content is flagged inline, never silent. | 🟡 asserted (MASTER_PLAN §4 principle 9); known past violations |
 | A7 | T-30683 (Manguisoc) & T-4494 (Cabanbanan) are SEPARATE matters — never derivatives of T-4497. | 🟢 **asserted** `truth_tests/test_separate_matters.py` (direct-edge + recursive-descendant, deploy gate + nightly) |
 | A8 | MMK ≠ MWK — no entity conflates Mary Worrick Keesey with MMK. | 🟢 **asserted** `truth_tests/test_separate_matters.py::no_mmk_mwk_conflation` |
-| A9 | A parcel's geometry belongs to exactly one client; a `map_parcels`/`parcels` row may only carry or expose geometry for its own `client_code` (resolved via `matter_code`→`matters`→`clients`). | 🟡 **asserted** — extends A5; enforcement blocked on `parcels.client_code` (**flagged**); V6 geometry-isolation drafted **shadow-only**, not applied |
+| A9 | A parcel's geometry belongs to exactly one client; a `map_parcels`/`parcels` row may only carry or expose geometry for its own `client_code`. | 🟡 **asserted** — extends A5. **Blocker resolved (deploy_733): `parcels.client_code` added**, so both geometry layers now carry a declared client. V6 geometry-isolation is authored for **both arms** (validator spec §8), **shadow-DRAFT, not yet applied** — ready for a shadow (`log`) run on approval |
 | A10 | User/device location is **ephemeral and client-side**; it is NEVER persisted server-side without a consent record. | 🟡 **asserted** — satisfied today (point-in-polygon runs in-browser; no location table exists, by design) |
 | A11 | No `MappedProperty` reaches an external or public surface (published status, KML/Earth/Maps link, tile export) except through an audited **publish gate** consistent with `no-external-exposure-until-ready`. | 🟡 **asserted** — no external-publish path built; `ExternalMapReference` held **○ planned** |
 | A12 | Every strategy object (`matter_plays`/`matter_objectives`/`matter_elements`/`matter_causes`) belongs to a `matters` row carrying a `client_code` — no orphan or client-less strategy. | 🟡 **asserted** — FK to `matters` present; client resolution rides A5 |
@@ -400,7 +407,7 @@ confirm it bites). **Do not resurrect the LLM harness; add cheap SQL assertions 
 ## 5. Client isolation — the one to watch
 
 `clients.client_code` is the intended tenancy key for the whole multi-matter story, but only
-`matters`, `map_parcels`, `assets`, and `conversation_context` carry a real FK to it. The corpus
+`matters`, `map_parcels`, `parcels` (added deploy_733), `assets`, and `conversation_context` carry a real FK to it. The corpus
 (`documents`) isolates on the **looser text columns** `case_file` / `matter_code`, which are not
 FK-constrained. Until A5 is hardened, **client separation is a discipline, not a guarantee** — the exact
 risk flagged in `memory/client-separation-invariants.md`.
@@ -541,7 +548,45 @@ The `--coverage` check is the guard: "nothing orphaned" is now a mechanical inva
 
 ---
 
+## 9. Future Domains — *planned surfaces of the platform (○ placeholders, not yet built)*
+
+The platform is a full Philippine property operation; these domains are **on the roadmap but not yet
+modeled**. Each is a growth slot — when it earns a schema and agents, it graduates to a Layer III model
+(§2.N) via the template in `docs/ONTOLOGY_STRUCTURE.md §4`, inheriting the system invariants (§5 of that
+doc / A5·A21·A24 here). Listing them here is deliberate: it reserves the shape so a future agent slots in
+cleanly instead of inventing a parallel structure. **○ = planned; do not build without governance sign-off.**
+
+| Future domain | One-line intent | State | Inherits (system invariants) |
+|---|---|---|---|
+| **Payments & Billing** | retainer invoicing, receipts, per-matter cost/margin ledger | ○ planned | provenance · client separation · outward chokepoint (invoice = outward) |
+| **Tenant / Lease Management** | occupancy, lease terms, rent roll on managed parcels | ○ planned | client separation · provenance |
+| **Construction / Project Delivery** | build scopes, milestones, contractor + permit tracking per property | ○ planned | client separation · outward (permits/filings) |
+| **Calendar & Deadlines** *(partial today)* | agentic calendar, forum clocks, operator nudges — has tables (§8.16), not yet a Layer III model | 🟡 partial | provenance · governance |
+| **Client Portal & Access** *(partial today)* | token-gated client surface (status, map, documents) — `client_access_tokens` live, external switch held | 🟡 partial | client separation · no-external-exposure |
+| **Revenue / Valuation / Portfolio** | asset valuation, portfolio ROI — dormant business layer (§8.8) | ○ dormant | provenance · client separation |
+| **Agent Fleet Registry** | a first-class model of the ~50 agents themselves (capability, tier, cadence) — today derived, not modeled | ○ planned | governance · component-mapping (Layer V) |
+
+> **How a Future Domain graduates:** (1) it gets a schema → a §3 canonical-table decision; (2) it gets an
+> agent → it appears in `agent_concept_map.py`; (3) it earns a §2.N Layer III model + 2–3 invariants; (4)
+> version bump + change-log entry; (5) `--coverage` stays green. No domain reaches a client surface without
+> the outward chokepoint (A21) and client-separation (A5) wired first.
+
+---
+
 **Change log**
+- v0.9 (2026-07-06) — **Ontology framework + Future Domains.** Added §9 **Future Domains** registry
+  (Payments, Tenant/Lease, Construction, Calendar, Client Portal, Revenue/Valuation, Agent-Fleet — ○/🟡
+  growth slots) and `docs/ONTOLOGY_STRUCTURE.md` (the five logical layers · state-marker vocabulary ·
+  new-domain copy-paste template · system-invariant set · versioning + re-grounding maintenance protocol).
+  Drove **A15** (entity merge-graph is a DAG) from 🟡 flagged → 🟢 enforced via `test_entity_merge_dag.py`
+  (recursive cycle-walk + no-dangling; negative-tested to bite; suite 82→84). Doc + one assertion; no
+  schema change. Structure is additive-only — existing section numbers unchanged.
+- v0.8 (2026-07-06) — **A9 blocker resolved: `parcels.client_code` added** (deploy_733, operator decision
+  7.1). Nullable, FK→`clients`, populated by `_client_of(matter_code)` at write (`parcels.py`); `parcels`
+  is empty so backfill is a no-op. Both geometry layers now carry a declared `client_code` → **V6 geometry
+  client-isolation authored for BOTH arms** (`docs/ontology_validator_spec.md` §8), still **shadow-DRAFT,
+  NOT applied** (enforcement is the separate 7.2 approval; ships `log` first). §5 FK list + A9 updated.
+  Schema change is additive + idempotent; no enforcement turned on.
 - v0.7 (2026-07-06) — **Geometry/Mapping governance-readiness prep.** Formalized two controlled
   vocabularies in §2.4: **`GeometrySource`** (`local_vision_ocr`/`gemini_ocr`/`operator_trace`/`survey_plan`/
   `satellite_rough`/`tie_point_georef`/`orthomosaic` — separate axis from `accuracy_tier`; no column yet →
