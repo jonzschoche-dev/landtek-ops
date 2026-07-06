@@ -245,11 +245,14 @@ across ~6 files (`ontology_check.py`, `agent_concept_map.py`, `test_superseded_t
 mechanically fixable with the §2 current→target map. **The A-series numbers do not move**, so every
 `truth_tests` guard is migration-safe.
 
-**Why deferred (both conditions must clear first):**
-1. **Litigation window.** Pre-Aug-12 is a no-risky-migration period (CLAUDE.md; and the drift-consolidation
-   note in ONTOLOGY §3 is itself a "post-Aug-12 chore"). A whole-doc renumber is exactly that risk.
-2. **Concurrent authorship.** The ontology is being actively extended by a parallel session (Communications
-   §2.14, A25–A29 landed mid-edit). A big-bang renumber would collide; migrate only when authorship quiesces.
+**Why deferred — one live blocker (checked, not assumed):**
+- **Concurrent authorship.** The ontology is under **active, high-cadence authorship by a parallel
+  session** — ONTOLOGY.md shipped v0.10→v0.13 across deploy_736–739 at roughly one push every ~8 minutes,
+  and that session is itself **reconciling the A-series numbering** (A25–A33, "A20–A23 reconciled"). A
+  whole-doc renumber now would collide on the peer's next push and risk corrupting their in-flight
+  invariant reconciliation. **This is the only gate: migrate the moment ONTOLOGY.md commits go quiet**
+  (a settle window of clean status + no new commits, not a calendar date). *(An earlier draft also cited
+  the pre-Aug-12 litigation window; that is not a constraint — the sole real gate is authorship quiescence.)*
 
 **Execution plan when both clear:** (1) branch; (2) apply the §2 current→target map in one pass; (3) `sed`
 the ~35 references using the map; (4) run `ontology_check.py --coverage` (must stay green) + the full
