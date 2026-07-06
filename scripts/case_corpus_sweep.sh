@@ -32,6 +32,38 @@ EOSQL
 # 3) refresh the per-matter case-file snapshots (the view is live; these are the readable copies)
 python3 scripts/case_file.py --all || true
 
+# 3.5) CONNECT — bring every newly-ingested doc up to the connect-verify signals (deploy_712 gate).
+#      Re-score OCR quality, stamp engine-provenance from the doc's OWN extraction_runs record
+#      (truthful — never fabricated), and type the doc from its existing classification (deterministic
+#      map). The other two gate signals are owned elsewhere: text by ingest/re-OCR, embedding Mac-side
+#      by com.landtek.embed (fastembed, $0 — the 1GB VPS can't hold the model). So each sweep closes the
+#      three VPS-derivable signals and a new doc self-connects instead of landing half-wired.
+#      All $0, deterministic, idempotent.
+python3 scripts/ocr_quality.py --scan --go 2>&1 | tail -1 || true             # signal: ocr_quality (re-score)
+docker exec -i n8n-postgres-1 psql -U n8n -d n8n <<'EOSQL' || true
+-- signal: provenance (model_used) <- latest COMPLETED extraction_runs.model (honest source; never invented)
+WITH latest AS (
+  SELECT DISTINCT ON (doc_id) doc_id, model FROM extraction_runs
+  WHERE status='completed' AND coalesce(model,'')<>'' ORDER BY doc_id, completed_at DESC NULLS LAST)
+UPDATE documents d SET model_used = latest.model FROM latest
+  WHERE latest.doc_id=d.id AND coalesce(d.model_used,'')='';
+-- signal: document_type <- classification (deterministic map; only fills blanks, never overwrites)
+UPDATE documents SET document_type = CASE
+    WHEN lower(classification) LIKE 'title%'                                          THEN 'TCT'
+    WHEN lower(classification) = 'deed'                                               THEN 'Deed'
+    WHEN lower(classification) LIKE '%power of attorney'                              THEN 'SPA'
+    WHEN lower(classification) LIKE '%affidavit%'                                     THEN 'Affidavit'
+    WHEN lower(classification) IN ('resolution','order','decision')                  THEN 'Court Order'
+    WHEN lower(classification) IN ('complaint','motion','reply','petition','court filing') THEN 'Court Filing'
+    WHEN lower(classification) = 'tax document'                                       THEN 'Tax Document'
+    WHEN lower(classification) IN ('letter','correspondence','demand letter','email','notice','memorandum') THEN 'Correspondence'
+    WHEN lower(classification) = 'receipt'                                            THEN 'Receipt'
+    WHEN lower(classification) = 'contract'                                           THEN 'Contract'
+    WHEN lower(classification) = 'government submission'                              THEN 'Government Submission'
+    ELSE document_type END
+  WHERE (document_type IS NULL OR document_type='') AND classification IS NOT NULL;
+EOSQL
+
 # 4) KNOWLEDGE + STRATEGY refresh — close the ingest->knowledge->strategy lockstep gap.
 #    Newly-ingested docs land in the DIGITAL corpus (documents); without this they stay invisible to
 #    the KNOWLEDGE layer (matter_facts) and the strategy engine reasons on stale inputs. This promotes

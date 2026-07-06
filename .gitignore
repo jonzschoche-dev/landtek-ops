@@ -105,3 +105,18 @@ ocr_pending_write/
 corpus_store/
 # editor/backup artifacts
 *.bak_matrix
+
+# Per-matter case-file snapshots — the readable copies of the always-live case_timeline
+# view, rewritten every run by case_corpus_sweep.sh / case_file.py on the VPS. Tracking them
+# dirtied the tree every daily cycle → the multi-agent pull-guard skipped → the VPS drifted
+# behind origin and risked reverting live pillars on the next pull (the deploy_715 reconcile).
+# The DB is the source of truth; regenerate with: python3 scripts/case_file.py --all
+case_dossiers/
+
+# Superseded jurisprudence-target scratch (root-level) — consolidated into the tracked
+# jurisprudence/batch*.json; these were orphaned working files that re-dirtied the tree.
+juris_targets*.json
+
+# Misplaced migration duplicates — canonical migrations live in migrations/. Copies that
+# land in scripts/ are exact dupes that only dirty the tree; never track them here.
+scripts/deploy_*.sql
