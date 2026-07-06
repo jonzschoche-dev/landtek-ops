@@ -12,6 +12,7 @@ Usage:
   agent_concept_map.py --json     # full machine-readable map (agents + reverse table→agents)
   agent_concept_map.py --orphans  # tables NO python agent touches (dead-by-code candidates)
   agent_concept_map.py --review   # built-not-consumed (written, never read) + overlap candidates (§3)
+  agent_concept_map.py --triage   # SCRIPT-level KEEP/ARCHIVE/PROTECT/REVIEW sort (mechanical, re-runnable)
 
 Honest caveat: some tables are written by n8n/Leo (LangChain.js) or DB triggers, NOT a python script,
 so "no agent touches" means "no python writer/reader" — a signal to investigate, not a death verdict.
@@ -136,6 +137,64 @@ def main():
         for stem, ts in sorted(clusters.items()):
             if len(ts) > 1:
                 print(f"   {stem:18} {sorted(ts)}")
+        return
+
+    if "--triage" in sys.argv:
+        # SCRIPT-level triage — inverts the table map to bucket each agent by MECHANICAL signal.
+        # Same discipline as --coverage/--orphans/--review: derived, re-runnable, no hand-curation.
+        TERMINAL = ("log", "audit", "queue", "block", "sent", "alert", "heartbeat",
+                    "snapshot", "runs", "_bak", "backup", "state")
+        # PROTECTED = the three meta-layers + ingestion/OCR ladder + verify/inference core +
+        # deliverable producers + sentinels. Auto-shielded from KILL by DESIGN, not judgment.
+        PROTECT_RE = re.compile(
+            r"(sentinel|monitor|watch|health|guard|"                                  # monitors — doctrine-protected
+            r"ontology|supervis|agent_concept|governance|outward|constitution|"       # governance/supervision meta
+            r"ingest|_ocr|ocr_|reocr|heighten|per_page|embed|extract|tct|"            # ingestion/OCR ladder
+            r"verify_worker|model_router|inference|"                                   # verify/inference core
+            r"dossier|case_bundle|case_memo|case_corpus|case_forward|"                # deliverable producers
+            r"git_routine|tg_send)", re.I)                                            # egress plumbing
+
+        def terminal(t):
+            return any(k in t for k in TERMINAL)
+
+        def consumed(t):
+            return bool(readers.get(t)) or terminal(t)   # read by an agent, OR a sink humans/dashboards read
+
+        prot, arch, dead, active = [], [], [], []
+        for name in sorted(agents):
+            wr = set(agents[name]["writes"])
+            if name.startswith("apply_deploy_"):
+                arch.append(name); continue
+            if PROTECT_RE.search(name):
+                prot.append(name); continue
+            if wr and all(not consumed(t) for t in wr):     # writes only to unconsumed/dormant tables
+                dead.append((name, sorted(wr, key=lambda t: -live.get(t, 0)))); continue
+            active.append(name)
+
+        print(f"=== SCRIPT TRIAGE — {len(agents)} DB-touching scripts, bucketed mechanically ===\n")
+        print(f"🟢 KEEP / ACTIVE ({len(active)}) — output is read downstream or pure consumer. No action.")
+        print(f"🛡️  PROTECTED ({len(prot)}) — meta-layer · ingest/OCR · verify core · deliverable · sentinel. Never KILL.")
+        print(f"📦 ARCHIVE ({len(arch)}) — apply_deploy_* one-shot migration appliers = the schema ledger (history, not KILL).")
+        print(f"🔴 REVIEW / DEAD-PRODUCER ({len(dead)}) — writes ONLY to unconsumed/dormant tables; a loop isn't closing:")
+        for name, ts in dead:
+            tt = ", ".join(f"{t}[{live.get(t, 0)}]" for t in ts[:3])
+            print(f"     {name:28} → {tt}")
+
+        # OVERLAP (cross-cutting; can include PROTECTED — consolidating ≠ killing): tables written by
+        # ≥2 non-migration scripts. Narrow (2–3 writers) = duplicated effort; hub (≥4) = shared pipeline.
+        narrow, hub = [], []
+        for t, ws in writers.items():
+            if is_plumbing(t):
+                continue
+            real = sorted(s for s in ws if not s.startswith("apply_deploy_"))
+            if len(real) < 2:
+                continue
+            (hub if len(real) >= 4 else narrow).append((t, real, live.get(t, 0)))
+        narrow.sort(key=lambda x: (-len(x[1]), x[0]))
+        print(f"\n🟡 OVERLAP — NARROW ({len(narrow)}) — 2–3 scripts writing ONE table = duplicated effort, confirm vs pipeline:")
+        for t, real, n in narrow:
+            print(f"     {t:26} [{n:>6}]  {real}")
+        print(f"\n   OVERLAP — HUB ({len(hub)}) — ≥4 writers = shared pipeline table (documents/matter_facts), NOT overlap. Skipped.")
         return
 
     print(f"=== agent ↔ concept binding — {len(agents)} scripts touch the DB ===")
