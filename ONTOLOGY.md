@@ -14,7 +14,10 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.13 (2026-07-06).** §2.14: added **A31** (the `PlatformCoordinator`, once built, is
+> **Ontology version: v0.14 (2026-07-07).** §2.15: formalized the **Client-Facing Projection** layer
+> (`ClientProjection`/`ClientFacingView`/`ClientSafeField`) + invariants **A32–A34** (client-safe projection is
+> mandatory · totality with logged safe-generic fallback · provenance→plain confidence). Presentation companion
+> to `UnifiedClientPersona` (A28 = the VOICE; projection = the safe PRESENTATION of facts). **v0.13:** §2.14: added **A31** (the `PlatformCoordinator`, once built, is
 > the single authoritative enforcement point for comms identity + routing/exposure). **v0.12:** added **A30**
 > (channel activation needs an auditable `channel_audit` record) + enriched the definition (consistent
 > persona/memory; audited exposure). **v0.11:** §2.14 Communications extended with **UnifiedClientPersona**
@@ -377,6 +380,41 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 
 ---
 
+### 2.15 Client-Facing Projection — the client-safe presentation layer
+
+> **The problem it solves.** The domain model stores RAW internal typed fields — snake_case
+> `current_stage`, "/"-mashed `forum`, `legal_theory` strategy paragraphs, `next_event` prose full
+> of `gmail#`/`CTN`/docket/`§`/matter-code tokens, and §4B provenance tags (`[OPERATOR-ATTESTED]`,
+> `[HUMAN VERIFY]`, `[v:…]`). Rendering any of these to a paying client is a defect. This layer is the
+> **governed translation** from typed internal concepts → a controlled, client-safe vocabulary. It is the
+> **presentation companion to `UnifiedClientPersona`** (§2.14, A28): *persona is the AI's VOICE per client;
+> projection is the safe PRESENTATION of facts.* It **rides A5** (isolation — only this client's data reaches
+> the view; separation is upstream, not this layer's job), **A6** (inference-flagged — realized client-side as
+> plain confidence), and **A11** (no external exposure — the view is token-gated; projection governs WORDING,
+> not access).
+
+| Concept | Canonical | State | Notes |
+|---|---|---|---|
+| **ClientProjection** | 🟢 `leo_tools/client_ontology.py` | **built (this pass)** | the governed translator: `client_stage`(status) · `client_forum`(venue) · `client_matter_kind` · `client_provenance`/`client_confidence`(confidence) · `client_next_step`(clean step) · `friendly_title`/`friendly_date`. Pure, $0, deterministic — no LLM at render. |
+| **ClientSafeVocabulary** | 🟢 the enumerated maps inside `ClientProjection` | built | exact-match → keyword → safe-generic, per field; keyed on the LIVE distinct values. |
+| **ClientSafeField** | *(concept, not a table)* | — | a field value that has passed through `ClientProjection`; the **only** unit permitted on a `ClientFacingView`. |
+| **ClientFacingView** | 🟡 `leo_tools/client_portal.py` (portal + matter-detail); future: client email, the installable PWA/app | partial | any surface a client sees; must render ONLY `ClientSafeField`s. Today it still renders some raw fields — wiring it to render THROUGH `ClientProjection` is the **next step** (A32 not yet enforced). |
+| **UnmappedValueLog** | 🟢 `client_ontology.unmapped_report()` | built | records any value that hit the safe-generic fallback → drives principled extension of the vocab; the audit trail of A33 totality. |
+
+> **Governance — what a client MAY vs MAY NOT see.**
+> **MAY:** plain matter *kind*; plain *status* (from `current_stage`); plain *venue* (from `forum`); a deadline
+> *date* + friendly countdown; a *clean next-step*; grounded facts at `verified`/`operator` tier with plain
+> confidence; servable **received** (non-draft) documents. **MAY NOT:** raw internal codes (`matter_code`,
+> docket/`CTN`/`SL`, `gmail#`/`doc#`); `§` statute cites; `legal_theory` strategy paragraphs; operator notes /
+> internal reasoning (`case_stage_transitions.notes`); raw §4B tags; **draft** documents; `inferred_weak`
+> claims as settled fact; anything belonging to another client (A5). **Changing the `ClientSafeVocabulary` is a
+> governance act** — a client-facing phrase is reviewed like a truth-QA change; the `UnmappedValueLog` drives
+> extension (add a mapping when a real value appears — never guess).
+
+**Invariants: A32–A34.***
+
+---
+
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
 
 | 🔴 Table | Rows | Verdict | Canonical instead |
@@ -439,6 +477,9 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A29 | Messages from the same resolved person continue a **single logical thread** (`CrossChannelThread`) spanning channels, not a fresh context per channel; thread continuity resolves through the same `client_code` as A25. | 🟡 **asserted / flagged** — model defined; no cross-channel thread store exists (`channel_messages.reply_to_id` is intra-channel only) — the concept that operationalizes A28 |
 | A30 | A channel becomes **externally active** (webhook registered / outbound sending enabled) only with an **auditable activation record** in `channel_audit`; activation is a governed outward action, never silent. | 🟡 **asserted / flagged** — `channel_audit` exists (deploy_114); activations to date (email 654 · whatsapp 662 · viber 663) are recorded in deploys/migrations but not yet systematically written as `channel_audit` activation rows — the "arm but hold the external switch" pattern is the interim discipline |
 | A31 | Once implemented, the `PlatformCoordinator` is the **single authoritative component** for cross-channel identity resolution (A25/A28/A29) and governed routing + exposure enforcement (A26/A27/A30); no parallel coordinator or bypass path may resolve comms identity or release messages. | 🟡 **asserted / flagged** — `PlatformCoordinator` is ○ planned; reserves the enforcement locus so it isn't fragmented across half-built coordinators when it graduates (per §9) |
+| A32 | No value reaches a `ClientFacingView` except through the `ClientProjection` layer (§2.15); a raw internal field, code, docket/`CTN`/ref (`gmail#`/`doc#`), `§` statute cite, `legal_theory` strategy string, operator note, or raw §4B/provenance tag on a client surface is a violation. | 🟡 **asserted / flagged** — `ClientProjection` (`leo_tools/client_ontology.py`) built this pass; the portal does not yet render fully THROUGH it (wiring is the next step). Enforcement locus = a future `ontology_validator`/render-audit check; graduates 🟡→🟢 once the view renders only `ClientSafeField`s and the check is applied. |
+| A33 | The `ClientProjection` is **total**: every projected field maps to a defined client-safe output; an unmapped value falls back to a safe generic phrase **and** is logged (`UnmappedValueLog`) — the raw string never reaches the client. | 🟢 **by construction** — every `client_ontology` function returns a mapped/keyword/generic value, never its raw input; each fallback calls `_flag_unmapped()`. |
+| A34 | Provenance is projected to **meaning-preserving** plain confidence: raw provenance levels / §4B tags never render to a client; their uncertainty is translated (never dropped, **never upgraded**) into plain language, and a sub-`operator` tier is never presented as settled fact. Client-side companion to A6. | 🟡 **asserted** — `client_provenance`/`client_confidence` built; "never upgraded" rides the source `provenance_level`; the show-as-fact gate (`provenance_is_solid`) is available for the view to honor. |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -624,6 +665,18 @@ cleanly instead of inventing a parallel structure. **○ = planned; do not build
 ---
 
 **Change log**
+- v0.14 (2026-07-07) — **§2.15 — Client-Facing Projection layer formalized.** The client dashboard was leaking
+  raw internal typed fields (snake_case `current_stage`, "/"-mashed `forum`, `next_event` prose full of
+  `gmail#`/`CTN`/`§`/matter-code tokens, raw §4B provenance tags) to paying clients. Modeled the governed
+  translation layer that fixes it BY CONSTRUCTION: **`ClientProjection`** (🟢 `leo_tools/client_ontology.py` —
+  typed concept → controlled client-safe vocabulary, total with logged safe-generic fallback), **`ClientFacingView`**
+  (🟡 the portal, not yet rendering fully through it), **`ClientSafeField`** / **`ClientSafeVocabulary`** /
+  **`UnmappedValueLog`**. Three new invariants, monotonic from A31 (nothing renumbered): **A32** (client-safe
+  projection is mandatory — no raw internal token on a client surface), **A33** (projection is total + safe-generic
+  fallback + logged), **A34** (provenance→meaning-preserving plain confidence; client-side companion to A6;
+  sub-`operator` tiers never shown as settled fact). Presentation companion to **`UnifiedClientPersona`** (A28 = the
+  VOICE; projection = the safe PRESENTATION of facts). NEXT: wire the portal to render THROUGH the layer, then a
+  validator/render-audit check to graduate A32 🟡→🟢, then the visual redesign.
 - v0.13 (2026-07-06) — **§2.14 — single-authoritative-coordinator invariant.** Added **A31** (once
   implemented, the `PlatformCoordinator` is the single authoritative component for cross-channel identity
   resolution + governed routing/exposure enforcement; no parallel coordinator or bypass path) — reserving
