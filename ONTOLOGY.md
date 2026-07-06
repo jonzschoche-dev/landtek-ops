@@ -199,9 +199,20 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A4 | A locked/cited row (`verification_lock`, `cited_by_compound_claims`) is immutable until unlocked. | 🟢 lock columns + content_hash |
 | A5 | A matter belongs to exactly one client; client data never crosses (`client_code`). | 🟢 **ENFORCED (deploy_716)** — `ontology_validator` V4 is now a `block` write-trigger on `matter_facts`: a fact cannot cite a document owned by a different client (verified live: MWK fact citing Paracale doc 637 rejected). Client resolved via `_client_of()` = matters→clients OR clients directly (handles `case_file≠matter_code`, e.g. the 'MWK-001' client-code tags). Backed by the `matters.client_code→clients` FK. *(A rigid `matter_code→matters` column FK was rejected — `matter_code` legitimately holds matter-or-client codes; a trigger is the correct instrument.)* |
 | A6 | Inference substituted for source content is flagged inline, never silent. | 🟡 asserted (MASTER_PLAN §4 principle 9); known past violations |
+| A7 | T-30683 (Manguisoc) & T-4494 (Cabanbanan) are SEPARATE matters — never derivatives of T-4497. | 🟢 **asserted** `truth_tests/test_separate_matters.py` (direct-edge + recursive-descendant, deploy gate + nightly) |
+| A8 | MMK ≠ MWK — no entity conflates Mary Worrick Keesey with MMK. | 🟢 **asserted** `truth_tests/test_separate_matters.py::no_mmk_mwk_conflation` |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
+
+**Retired: the LLM truth_qa harness (deploy_725).** `truth_qa.py`/`truth_qa_loop.py`/`truth_judge.py`
+interrogated Leo in natural language via the **Anthropic API** to check the truth invariants — expensive,
+died 2026-06-12, gave no signal for 3+ weeks, not a protected sentinel. Its checks were re-homed to the
+**mechanical, creditless** layer: A2/A5 by `ontology_validator` V3/V4 write-triggers (block at source),
+and A7/A8 + T-4497 ownership + client isolation by `truth_tests/` SQL assertions (deploy gate + nightly).
+When the harness was removed, an audit (2026-07-06) found A7/A8 were the one gap the mechanical suite did
+NOT yet cover → `test_separate_matters.py` was added to close it (76→79 assertions; negative-tested to
+confirm it bites). **Do not resurrect the LLM harness; add cheap SQL assertions instead.**
 
 ---
 
