@@ -53,6 +53,20 @@ def live_tables(cur):
     return {r[0]: r[1] for r in cur.fetchall()}
 
 
+def view_consumed_tables(cur):
+    """Tables read by a SQL VIEW — a real consumer --triage's python-only scan can't see.
+    Without this, a table fed to a view (map_parcels→map_parcels_client, opposing_responses→
+    v_planned_moves_with_predictions) false-flags as a dead producer."""
+    cur.execute("""
+        SELECT DISTINCT src.relname
+        FROM pg_depend d
+        JOIN pg_rewrite r ON d.objid = r.oid
+        JOIN pg_class v ON r.ev_class = v.oid
+        JOIN pg_class src ON d.refobjid = src.oid
+        WHERE v.relkind IN ('v','m') AND src.relkind = 'r' AND v.relname <> src.relname;""")
+    return {r[0] for r in cur.fetchall()}
+
+
 def scan(path, live):
     try:
         txt = open(path, encoding="utf-8", errors="ignore").read().lower()
@@ -92,6 +106,7 @@ def main():
     conn = psycopg2.connect(DSN); conn.autocommit = True
     with conn.cursor() as cur:
         live, agents, writers, readers, orphaned = build(cur)
+        view_consumed = view_consumed_tables(cur)
     conn.close()
 
     if "--json" in sys.argv:
@@ -117,8 +132,9 @@ def main():
 
     if "--review" in sys.argv:
         dom = {t for t in live if not is_plumbing(t)}
-        # BUILT-NOT-CONSUMED: a python agent WRITES it, none READS it.
-        wnr = sorted((t for t in writers if t not in readers and t in dom), key=lambda t: -live.get(t, 0))
+        # BUILT-NOT-CONSUMED: a python agent WRITES it, none READS it (nor any SQL view).
+        wnr = sorted((t for t in writers if t not in readers and t not in view_consumed and t in dom),
+                     key=lambda t: -live.get(t, 0))
         terminal = [t for t in wnr if any(k in t for k in ("log", "audit", "queue", "block", "sent",
                                                             "alert", "heartbeat", "snapshot", "runs", "_bak"))]
         investigate = [t for t in wnr if t not in terminal]
@@ -158,7 +174,8 @@ def main():
             return any(k in t for k in TERMINAL)
 
         def consumed(t):
-            return bool(readers.get(t)) or terminal(t)   # read by an agent, OR a sink humans/dashboards read
+            # read by a python agent, OR a SQL view, OR a terminal sink humans/dashboards read
+            return bool(readers.get(t)) or t in view_consumed or terminal(t)
 
         prot, arch, dead, active = [], [], [], []
         for name in sorted(agents):
