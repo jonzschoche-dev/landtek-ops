@@ -13,6 +13,7 @@ Usage:
   python3 scripts/ontology_check.py --coverage # every populated domain table must be NAMED in ONTOLOGY.md
   python3 scripts/ontology_check.py --structure # STRUCTURE lint (no DB): unique section numbers + heading depth
   python3 scripts/ontology_check.py --invariants # every §4 invariant's named enforcement artifact must EXIST
+  python3 scripts/ontology_check.py --render-audit # A32: projected client output must carry NO internal token
   python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes a
                                                # holes_findings row on NEW V3/V4 contamination,
                                                # a coverage regression, OR a broken §4 invariant
@@ -225,6 +226,94 @@ def cmd_invariants(cur) -> int:
     return 0
 
 
+# A32 RENDER-AUDIT — internal tokens that must NEVER survive projection onto a client surface
+# (the §2.15 "MAY NOT" list). If one appears in PROJECTED output, the projection has a gap = a client leak.
+FORBIDDEN_RENDER = {
+    "matter_code":    re.compile(r"\b[A-Z]{2,4}-[A-Z0-9-]*\d{3,}"),  # MWK-CV26360 · MWK-001 · MWK-ARTA-0690 · PAR-CASE-88750
+    "section_cite":   re.compile(r"§\s*\d|\bSec(?:tion)?\.?\s*\d+\b"),
+    "ra_cite":        re.compile(r"\bR\.?\s*A\.?\s*\d{3,}\b"),
+    "docket_ctn_sl":  re.compile(r"\bCTN\b|\bSL[\s-]*\d|\b\d{4}-\d{3,4}-\d{3,4}\b"),
+    "ref_hash":       re.compile(r"\b(?:gmail|doc)\s*#\s*\d+|(?<!\w)#\d{3,}\b"),
+    "inference_tag":  re.compile(r"\[(?:OCR|STRUCTURE|v|HUMAN[ _]?VERIFY|OPERATOR|\?)[^\]]*\]"),
+    "raw_provenance": re.compile(r"\b(?:inferred_weak|inferred_strong|inferred_corroborated)\b"),
+    "control_code":   re.compile(r"\b(?:SPA|NOR|OAC-?L|MOA|MOU|CTC)-\s*\d"),
+}
+
+
+def render_leaks(cur):
+    """Run each leak-prone field's RAW values through its `client_ontology` projector and scan the PROJECTED
+    output for a FORBIDDEN token. Returns (checked, leaks, unmapped) — reused by cmd_render_audit (prints)
+    and the sentinel (writes). Total / fail-safe: a projector that RAISES on a value is itself counted a leak.
+    Returns (None, None, None) if client_ontology can't be imported."""
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
+        import client_ontology as co
+    except Exception:
+        return None, None, None
+    fields = [
+        ("current_stage",    "SELECT DISTINCT current_stage FROM matters WHERE current_stage IS NOT NULL",
+         lambda v: co.client_stage(v)),
+        ("forum",            "SELECT DISTINCT forum FROM matters WHERE forum IS NOT NULL",
+         lambda v: co.client_forum(v)),
+        ("provenance_level", "SELECT DISTINCT provenance_level FROM matter_facts WHERE provenance_level IS NOT NULL",
+         lambda v: co.client_provenance(v)),
+        ("matters.title",    "SELECT DISTINCT title FROM matters WHERE title IS NOT NULL",
+         lambda v: co.friendly_title(v)),
+        ("next_event",       "SELECT DISTINCT next_event FROM matters WHERE next_event IS NOT NULL",
+         lambda v: co.client_next_step(None, v)),
+        ("document_name",    "SELECT DISTINCT original_filename FROM documents WHERE original_filename IS NOT NULL LIMIT 400",
+         lambda v: co.client_doc_name(v)),
+    ]
+    checked, leaks = 0, []
+    for label, sql, project in fields:
+        try:
+            cur.execute(sql)
+            raws = [r[0] for r in cur.fetchall()]
+        except Exception:
+            continue                                            # column/table absent on this schema — skip
+        for raw in raws:
+            checked += 1
+            try:
+                out = project(raw) or ""
+            except Exception as e:                              # fail-safe: an unhandled value is a potential leak
+                leaks.append((label, "projector_error", str(raw)[:60], f"<raised {type(e).__name__}>"))
+                continue
+            for cls, rx in FORBIDDEN_RENDER.items():
+                if rx.search(out):
+                    leaks.append((label, cls, str(raw)[:60], out[:90]))
+                    break
+    try:
+        unmapped = co.unmapped_report()
+    except Exception:
+        unmapped = []
+    return checked, leaks, unmapped
+
+
+def cmd_render_audit(cur) -> int:
+    """A32 RENDER-AUDIT — prove the client projection layer prevents raw internal tokens from reaching a
+    client surface. For every leak-prone field it projects each RAW value via `client_ontology` and scans the
+    PROJECTED output for a forbidden token (matter code · § / R.A. cite · docket / CTN / SL · gmail#/doc# ·
+    §4B inference tag · raw provenance enum · control code). A survivor = a projection gap = a client leak →
+    exit 1. Read-only. Makes A32 mechanical instead of asserted (sibling of --invariants/--coverage)."""
+    checked, leaks, unmapped = render_leaks(cur)
+    if checked is None:
+        print("cannot import leo_tools/client_ontology.py — A32 render-audit unavailable"); return 2
+    print("=== A32 render-audit — projected client output must be free of internal tokens ===")
+    print(f"  scanned {checked} raw value(s) across client-facing fields")
+    if leaks:
+        print(f"  ✗ {len(leaks)} projected value(s) STILL carry a forbidden token (projection gap → client leak):")
+        for label, cls, raw, out in leaks[:40]:
+            print(f"    [{label} · {cls}]  raw='{raw}'  →  projected='{out}'")
+        print("  → extend the matching client_ontology projector so the token is stripped; re-run until 0.")
+    else:
+        print("  ✓ no forbidden token survives projection on any sampled field.")
+    if unmapped:
+        print(f"  ⚠ {len(unmapped)} value(s) hit the safe-generic FALLBACK (fail-safe A33, but flags vocab gaps to fill):")
+        for kind, val in unmapped[:20]:
+            print(f"    [{kind}] {str(val)[:60]}")
+    return 1 if leaks else 0
+
+
 def cmd_structure() -> int:
     """STRUCTURE lint of ONTOLOGY.md (no DB needed — pure file parse). Two mechanical rules:
       1. No DUPLICATE section number (the live doc has two `§2.6`).
@@ -286,6 +375,11 @@ def main():
     if "--invariants" in sys.argv:
         with conn.cursor() as cur:
             rc = cmd_invariants(cur)
+        conn.close()
+        sys.exit(rc)
+    if "--render-audit" in sys.argv:
+        with conn.cursor() as cur:
+            rc = cmd_render_audit(cur)
         conn.close()
         sys.exit(rc)
     problems = 0
@@ -441,6 +535,31 @@ def main():
                            VALUES ('ontology_check','v1', md5(%s), 'high', 'ontology_invariant_broken',
                              %s, jsonb_build_object('broken',%s), 'open')""",
                         (key[:200], idesc, len(fails)),
+                    )
+        except Exception:
+            pass  # sentinel must never crash the timer
+
+    # A32 client render-audit: a raw internal token survived projection onto a client-facing field → a
+    # client-visible leak. Alert (shadow — this guard never blocks); silent when clean.
+    if sentinel:
+        try:
+            with conn.cursor() as cur:
+                _checked, leaks, _unmapped = render_leaks(cur)
+            if leaks:
+                classes = sorted({cls for _, cls, _, _ in leaks})
+                fields = sorted({f for f, _, _, _ in leaks})
+                key = "client_render_leak:" + ",".join(classes) + "|" + ",".join(fields)
+                rdesc = (f"A32 client render-audit: {len(leaks)} projected client value(s) still carry a "
+                         f"forbidden internal token — classes {classes} in fields {fields}. A raw internal "
+                         f"string would reach a client surface. Extend the client_ontology projector(s); "
+                         f"run scripts/ontology_check.py --render-audit for the raw→projected list.")
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """INSERT INTO holes_findings(routine_name, routine_version, finding_id_hash,
+                             severity, hole_type, description, metadata, status)
+                           VALUES ('ontology_check','v1', md5(%s), 'high', 'client_render_leak',
+                             %s, jsonb_build_object('leaks',%s,'classes',%s), 'open')""",
+                        (key[:200], rdesc, len(leaks), json.dumps(classes)),
                     )
         except Exception:
             pass  # sentinel must never crash the timer
