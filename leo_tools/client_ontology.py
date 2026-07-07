@@ -575,17 +575,37 @@ def client_next_step(current_stage: str | None, next_event: str | None = None,
 # human part. Never invents; if a title reduces to nothing legible, keeps the original
 # minus the loudest codes.
 
+# Spelled-out statute section cite ("Sec. 21", "Section 21(b)") — companion to §/R.A.
+_STRIP_SEC_WORD_RE = re.compile(r"\bSec(?:tion)?\.?\s*\d+[A-Za-z0-9().]*", re.IGNORECASE)
+# Internal ops annotation that sometimes contaminates a matters.title, e.g.
+# "(referenced docs#753, 817 — matter missing from inventory)". Strip the WHOLE
+# parenthetical when it carries an internal marker — a client must never read it.
+_STRIP_TITLE_OPS_RE = re.compile(
+    r"\([^)]*\b(?:referenced\s+docs?|missing\s+from\s+inventory|inventory|internal|"
+    r"ops[\s-]?note|placeholder|matter\s+missing)\b[^)]*\)",
+    re.IGNORECASE)
+# Instrument / control-code prefixes on document filenames (SPA-001, NOR-, OAC-L, etc.)
+_STRIP_INSTR_RE = re.compile(r"\b(?:SPA|NOR|OAC-?L|MOA|MOU|CTC|CL)-?\s*\d*\b", re.IGNORECASE)
+# A bare control-tracking number (…2026-0128-1210…) or trailing "(1212)" docket suffix.
+_STRIP_BAREDOCKET_RE = re.compile(r"\b\d{4}-\d{3,4}-\d{3,4}\b")
+_STRIP_TRAILDOCKET_RE = re.compile(r"\(\s*\d{3,4}\s*\)")
+# CTN written with spaces instead of dashes ("CTN SL 2026-0128-1210").
+_STRIP_CTN_SPACE_RE = re.compile(r"\b(?:CTN\s+)?SL\s+\d{4}[-\s]\d{3,4}[-\s]\d{3,4}", re.IGNORECASE)
+_STRIP_EXT_RE = re.compile(r"\.(?:pdf|png|jpe?g|docx?|xlsx?|zip|tiff?)$", re.IGNORECASE)
+
 _TITLE_STRIP = [
-    _STRIP_CTN_RE, _STRIP_SECTION_RE, _STRIP_RA_RE, _STRIP_HASH_RE, _STRIP_TAG_RE,
+    _STRIP_TITLE_OPS_RE, _STRIP_CTN_RE, _STRIP_SECTION_RE, _STRIP_SEC_WORD_RE,
+    _STRIP_RA_RE, _STRIP_HASH_RE, _STRIP_TAG_RE,
 ]
 
 
 def friendly_title(title: str | None, matter_code: str | None = None) -> str:
-    """A clean, human matter title for display. Strips docket/statute/§ jargon; keeps the
-    descriptive human phrase. Falls back to the raw title (de-coded) then matter_code."""
+    """A clean, human matter title for display. Strips docket/statute/§ jargon and internal
+    ops annotations; keeps the descriptive human phrase. NEVER returns a matter_code (that is
+    a forbidden internal token on a client surface) — falls back to a safe generic."""
     raw = (title or "").strip()
     if not raw:
-        return matter_code or "Your matter"
+        return "Your matter"
     t = raw
     for rx in _TITLE_STRIP:
         t = rx.sub(" ", t)
@@ -596,10 +616,41 @@ def friendly_title(title: str | None, matter_code: str | None = None) -> str:
     t = re.sub(r"\s{2,}", " ", t).strip(" \t—–-:·")
     letters = re.sub(r"[^A-Za-z]", "", t)
     if len(letters) < 4:
-        # Nothing human survived — return the raw title minus the loudest codes.
-        fallback = _STRIP_CTN_RE.sub("", raw)
-        fallback = re.sub(r"\s{2,}", " ", fallback).strip(" —–-:·")
-        return fallback or matter_code or "Your matter"
+        # Nothing human survived — de-code the raw title (incl. the ops annotation) and
+        # keep only if legible; otherwise a safe generic. NEVER expose the matter_code.
+        fb = raw
+        for rx in (_STRIP_TITLE_OPS_RE, _STRIP_CTN_RE, _STRIP_SEC_WORD_RE, _STRIP_HASH_RE):
+            fb = rx.sub(" ", fb)
+        fb = re.sub(r"^\s*ARTA\b[\s—:-]*", "", fb, flags=re.IGNORECASE)
+        fb = re.sub(r"\s{2,}", " ", fb).strip(" —–-:·")
+        return fb if len(re.sub(r"[^A-Za-z]", "", fb)) >= 4 else "Your matter"
+    return t
+
+
+def client_doc_name(name: str | None, classification: str | None = None) -> str:
+    """Project a raw document FILENAME into a clean client-facing label. A filename is
+    free-text operator metadata (CTN/SL/OAC-L control numbers, instrument-code prefixes,
+    matter codes, §/R.A. cites, §4B tags) — strip every such form, and defer to the TYPED
+    `classification` when the residue is too thin to identify the document. Total: always
+    returns something clean, never a forbidden token."""
+    fallback = ((classification or "").strip() or "Document")
+    t = name or ""
+    t = _STRIP_EXT_RE.sub("", t)          # drop the file extension
+    t = t.replace("_", " ")               # underscore filenames → words
+    for rx in (_STRIP_CTN_SPACE_RE, _STRIP_CTN_RE, _STRIP_DOCKET_RE, _STRIP_INSTR_RE,
+               _STRIP_MATTER_RE, _STRIP_SECTION_RE, _STRIP_SEC_WORD_RE, _STRIP_RA_RE,
+               _STRIP_TAG_RE, _STRIP_HASH_RE, _STRIP_BAREDOCKET_RE, _STRIP_TRAILDOCKET_RE):
+        t = rx.sub(" ", t)
+    # Debris cleanup: an unbalanced trailing "(...." left by removing a docket, orphaned
+    # docket-fragment numbers (a standalone 3–4 digit run is a control number, not content),
+    # and orphaned dashes/punctuation.
+    t = re.sub(r"\([^)]*$", " ", t)                     # trailing unbalanced "(...."
+    t = re.sub(r"(?<![A-Za-z])\d{3,4}(?![A-Za-z])", " ", t)  # orphaned docket-fragment numbers
+    t = re.sub(r"\s*[-–—]\s*(?=[-–—]|$)", " ", t)       # orphaned trailing dashes
+    t = re.sub(r"[(),]\s*(?=[(),]|$)", " ", t)          # orphaned punctuation clusters
+    t = re.sub(r"\s{2,}", " ", t).strip(" -–—:·.,[]()")
+    if len(re.sub(r"[^A-Za-z]", "", t)) < 4:
+        return fallback
     return t
 
 

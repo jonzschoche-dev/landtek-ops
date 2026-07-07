@@ -34,6 +34,14 @@ from flask import Blueprint, abort
 # Reuse the cockpit chrome + DB plumbing so this is ONE app, one style.
 from ops_dashboard import CSS, PG_DSN, _esc, _layout, _safe_fetch, _stat_card
 
+# The ONTOLOGY → CLIENT PROJECTION LAYER (deploy_744). EVERY client-visible field is
+# rendered THROUGH this module — raw internal fields (snake_case stage codes, "/"-mashed
+# forums, next_event prose full of gmail#/CTN/§/doc#/[OPERATOR-ATTESTED] tokens, matter
+# codes, dockets) NEVER reach the client HTML. The projection is total: any value it has
+# not enumerated returns a clean safe generic (logged via co.unmapped_report()), never the
+# raw string. This is ontology invariant A32 enforced at the render boundary.
+import client_ontology as co
+
 bp = Blueprint("client_portal", __name__, url_prefix="/ops")
 
 # Aug 12 is counsel's PLANNED testimony date (operator-confirmed 2026-07-01), NOT a written
@@ -175,6 +183,32 @@ def _safe_label(surfaced_label: str | None, next_event: str | None,
     if current_stage and not _is_internal_fragment(current_stage):
         return current_stage
     return "—"
+
+
+# A document FILENAME is free-text operator metadata (e.g.
+# "CTN SL 2026-0128-1210 TO MUNICIPAL MAYOR ... .pdf",
+# "RESOLUTION_NOC_CTN_SL_2026_0128_1210_..._v_LGU.PDF") — NOT a typed ontology value, so
+# co.friendly_title (which targets matter-TITLE jargon) does not clean the space/underscore
+# control-number forms that appear in filenames. This composes the projection's OWN strip
+# regexes (referenced read-only) with the free-text CTN/SL/CL control forms, and falls back
+# to the TYPED classification when nothing legible survives — so a client-forbidden docket
+# ref (CTN / SL- / CL-) can never reach the client from a document name.
+#   NOTE: the durable fix is to extend co.friendly_title's control-number regex to the
+#   space/underscore forms; that lives in client_ontology.py (out of scope for this pass).
+_DOCNAME_EXT_RE = re.compile(r"\.(pdf|png|jpe?g|docx?|xlsx?|txt|heic)$", re.IGNORECASE)
+_DOCNAME_CTRL_RE = re.compile(r"\b(?:CTN|NSR|NOC)\b", re.IGNORECASE)
+_DOCNAME_CTRLNUM_RE = re.compile(
+    r"\b(?:SL|CL)[\s_-]*\d{4}[\s_-]*\d{2,4}[\s_-]*\d{2,4}\b", re.IGNORECASE)
+_DOCNAME_CTRLNUM2_RE = re.compile(r"\b(?:SL|CL)\s*\d{4}[-\d]*\b", re.IGNORECASE)
+_DOCNAME_TRAILSL_RE = re.compile(r"[\s_-]+(?:SL|CL)\s*$", re.IGNORECASE)
+
+
+def _client_doc_name(name: str | None, classification: str | None = None) -> str:
+    """Client-facing document label. Delegates to the ontology projection
+    (`client_ontology.client_doc_name`) so document-filename cleaning is governed in ONE
+    place (A32) — hardened there to strip OAC-L / SPA- / bare-docket / spelled-out Sec.
+    forms the earlier local version missed."""
+    return co.client_doc_name(name, classification)
 
 
 def _truncate_keep_tags(text: str, cap: int = 200) -> str:
@@ -343,7 +377,8 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
     # keep every active/advisory matter so NEEDS-A-DATE is shown honestly.
     matters = _safe_fetch(cur, conn, """
         SELECT matter_code, title, status, current_stage,
-               next_deadline, next_event, matter_type, docket_number, court_or_agency
+               next_deadline, next_event, matter_type, docket_number,
+               court_or_agency, forum
           FROM matters
          WHERE client_code = %s
            AND matter_code NOT LIKE 'AUTO-%%'
@@ -429,17 +464,32 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
         # date (e.g. 2026-09-14) as a hard, court-confirmed deadline.
         estimated = due is not None and _has_tag(next_event, s.get("label") if s else None)
 
+        # PROJECTION (A32): every client-visible field goes THROUGH client_ontology —
+        # a clean plain-language phrase, never the raw internal field. `label` (the raw
+        # next-action prose full of gmail#/CTN/§/[OPERATOR-ATTESTED]) is replaced by the
+        # stage-derived / fully-sanitized client_next_step; forum/docket collapse to a
+        # plain venue; matter_code is DROPPED from the client view entirely.
         rows.append({
             "matter_code": mc,
-            "title": m.get("title"),
-            "stage": m.get("current_stage") or m.get("status") or "—",
+            "title": co.friendly_title(m.get("title"), mc),
+            "kind": co.client_matter_kind(m.get("matter_type"), mc),
+            "stage": co.client_stage(m.get("current_stage"), m.get("status")),
             "due": due,
             "days_out": days_out,
             "bucket": bucket,
-            "label": label,
+            # clean next step: stage template, or fully-sanitized next_event prose.
+            "next_step": co.client_next_step(m.get("current_stage"), next_event, mc),
+            # honesty preserved in plain words: a short pill + a full sentence.
+            "confidence_badge": (co.client_confidence_badge(next_event, s.get("label") if s else None)
+                                 if estimated else None),
+            "confidence_note": (co.client_confidence(next_event, s.get("label") if s else None)
+                                if estimated else None),
             "estimated": estimated,
-            "forum": m.get("court_or_agency") or m.get("matter_type") or "",
-            "docket": m.get("docket_number") or "",
+            # plain venue ONLY (lead venue, humanized) — no "/"-mashup, no docket/CTN.
+            # Venue comes from forum/court_or_agency ONLY; matter_type is the KIND field
+            # (rendered separately) and must NOT be fed to client_forum (it's not a venue,
+            # and doing so logs a spurious unmapped forum for kind values like 'business').
+            "venue": co.client_forum(m.get("forum"), m.get("court_or_agency")),
             "no_date_ok": _is_no_date_ok(m.get("current_stage")),
         })
 
@@ -484,29 +534,35 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
         for r in brows:
             badge = _BUCKET_BADGE.get(b, "badge-off")
             when = _countdown(r["days_out"])
-            # BLOCKER 2: an estimated date is shown as estimated, never as a hard date —
-            # both on the date cell and the countdown.
+            # BLOCKER 2 / honesty: an estimated date is shown as estimated — but in PLAIN
+            # words via the projection, never with a raw §4B tag and never "(est)" jargon.
             est = r.get("estimated")
-            due_txt = (_esc(str(r["due"])) + (" (est)" if est else "")) if r["due"] else "—"
+            due_txt = _esc(co.friendly_date(r["due"])) if r["due"] else "—"
             when_badge = f"<span class='badge {badge}'>{_esc(when)}</span>"
-            est_badge = (' <span class="badge badge-warn">estimated · awaiting confirmation</span>'
-                         if est else "")
-            # BLOCKER 3: cap length WITHOUT severing a §4B caveat tag (preserve it after the cut).
-            label = _truncate_keep_tags(r["label"] or "")
+            # confidence pill/note come from client_confidence_badge/client_confidence —
+            # plain language, raw [OPERATOR-ATTESTED]/[HUMAN VERIFY] tags never render.
+            cb = r.get("confidence_badge")
+            est_badge = (f' <span class="badge badge-warn">{_esc(cb)}</span>' if cb else "")
+            # The next step is ALREADY clean+bounded (stage template or sanitized prose);
+            # no raw-label truncation needed — projection guarantees no internal token.
+            next_step = r.get("next_step") or "—"
+            cnote = r.get("confidence_note")
             note = ""
             if b == "NEEDS-A-DATE" and r["no_date_ok"]:
                 note = ' <span class="badge badge-off">advisory — no deadline expected</span>'
             elif b == "NEEDS-A-DATE":
                 note = ' <span class="badge badge-warn">awaiting a confirmed date</span>'
+            # plain venue + "what this is" subline — matter_code and docket DROPPED.
+            sub_bits = [b_ for b_ in (r.get("kind"), r.get("venue")) if b_]
+            subline = (" · ".join(_esc(x) for x in sub_bits)) if sub_bits else ""
             mdurl = _esc(matter_detail_url(r["matter_code"]))
             trs.append(
                 f"<tr><td>{when_badge}</td>"
                 f"<td>{due_txt}</td>"
                 f"<td><a href='{mdurl}'><strong>{_esc(r['title'] or r['matter_code'])}</strong></a>"
-                f"<div class='muted' style='font-size:12px'><code>{_esc(r['matter_code'])}</code>"
-                f"{(' · ' + _esc(r['forum'])) if r['forum'] else ''}"
-                f"{(' · ' + _esc(r['docket'])) if r['docket'] else ''}</div></td>"
-                f"<td>{_esc(label)}{est_badge}{note}</td></tr>"
+                f"{('<div class=\"muted\" style=\"font-size:12px\">' + subline + '</div>') if subline else ''}</td>"
+                f"<td>{_esc(next_step)}{est_badge}{note}"
+                f"{('<div class=\"muted\" style=\"font-size:12px\">' + _esc(cnote) + '</div>') if cnote else ''}</td></tr>"
             )
         bucket_blocks.append(
             f'<div class="section-title">{_esc(b)} '
@@ -549,13 +605,16 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
     if deliverables:
         drows = []
         for d in deliverables:
-            dt = _esc(str(d["doc_date"])) if d.get("doc_date") else ""
-            nm = _esc((d.get("name") or "Deliverable")[:110])
+            dt = _esc(co.friendly_date(d["doc_date"])) if d.get("doc_date") else ""
+            nm = _esc(_client_doc_name((d.get("name") or "Deliverable")[:110],
+                                       d.get("classification")))
             durl = _esc(doc_url(int(d["id"])))
+            # drop the internal doc#NNN ref from the client view — a plain "prepared <date>"
+            # line only (the projection carries no internal identifier to the client HTML).
             drows.append(
                 f"<tr><td><a href='{durl}'>{nm}</a>"
                 f"<div class='muted' style='font-size:12px'>"
-                f"{('as of ' + dt) if dt else 'counsel deliverable'} · doc#{int(d['id'])}</div></td>"
+                f"{('prepared ' + dt) if dt else 'counsel deliverable'}</div></td>"
                 f"<td><a class='badge badge-ok' href='{durl}'>view / download</a></td></tr>"
             )
         deliverable_block = (
@@ -576,8 +635,10 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
 
     # Per-matter document lists route through the injected builder: token-scoped
     # (/client/<token>/m/<code>) in client chrome, /files/c/m/ only for the ops view.
+    # LINK TEXT is the friendly matter title (projected) — the raw matter_code is only
+    # ever in the href path segment (a token-scoped route id), never client-visible text.
     doc_links = " · ".join(
-        f"<a href='{_esc(matter_url(r['matter_code']))}'>{_esc(r['matter_code'])}</a>"
+        f"<a href='{_esc(matter_url(r['matter_code']))}'>{_esc(r['title'] or 'Matter')}</a>"
         for r in rows
     )
     docs_block = (
@@ -589,8 +650,7 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
 
     body = f"""
 <h1>{_esc(client.get('name') or client_code)}</h1>
-<p class="lead">Your matters and deadlines · <code>{_esc(client_code)}</code>
-  · as of {now}</p>
+<p class="lead">Your matters and deadlines · Updated {_esc(co.friendly_today())}</p>
 {ns_banner}
 {quiet_banner}
 <div class="grid grid-4" style="margin-bottom:8px">{stat_cards}</div>
@@ -598,11 +658,10 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
 {deliverable_block}
 {docs_block}
 <p class="muted" style="margin-top:16px;font-size:12px">
-  Dates are read from the grounded deadline record (latest surface {_esc(str(today))}).
-  Items marked <code>[HUMAN VERIFY]</code> or <code>[verify-img]</code> are still being
-  confirmed against the source document and are shown with that caveat — they are not
-  presented as settled fact. Matters awaiting a confirmed date are listed openly rather
-  than hidden.</p>
+  Dates and stages are read from the grounded record. Anything not yet confirmed against
+  the source document is shown with a plain "estimated" or "awaiting confirmation" note —
+  it is never presented as settled fact. Matters awaiting a confirmed date are listed
+  openly rather than hidden.</p>
 """
     title = f"{client.get('name') or client_code} — portal"
     return title, body
@@ -721,55 +780,63 @@ def render_matter_detail(client_code: str, matter_code: str,
         due = s["due_date"]
         days_out = (due - today).days
         bucket = _bucket_for(days_out)
-        label = _safe_label(s.get("label"), next_event, m.get("current_stage"))
     elif m.get("next_deadline") is not None:
         due = m["next_deadline"]
         days_out = (due - today).days
         bucket = _bucket_for(days_out)
-        label = _safe_label(None, next_event, m.get("current_stage"))
     else:
         due = None
         days_out = None
         bucket = "NEEDS-A-DATE"
-        label = _safe_label(None, next_event, m.get("current_stage"))
     estimated = due is not None and _has_tag(next_event, s.get("label") if s else None)
-    label = _truncate_keep_tags(label or "")
+    # PROJECTION (A32): the next action is the stage-derived / fully-sanitized clean step —
+    # never the raw next_event prose (no gmail#/CTN/§/doc#/[OPERATOR-ATTESTED] reaches here).
+    next_step = co.client_next_step(m.get("current_stage"), next_event, matter_code)
+    # honesty: a plain confidence pill + sentence when the date is not court-confirmed.
+    confidence_badge = (co.client_confidence_badge(next_event, s.get("label") if s else None)
+                        if estimated else None)
+    confidence_note = (co.client_confidence(next_event, s.get("label") if s else None)
+                       if estimated else None)
 
     badge = _BUCKET_BADGE.get(bucket, "badge-off")
     when = _countdown(days_out)
     when_badge = f"<span class='badge {badge}'>{_esc(when)}</span>"
     if due is not None:
-        due_txt = _esc(str(due)) + (" (estimated · awaiting confirmation)" if estimated else "")
+        due_txt = _esc(co.friendly_date(due))
     else:
         due_txt = "awaiting a confirmed date"
 
-    forum = m.get("court_or_agency") or m.get("forum") or m.get("matter_type") or ""
-    docket = m.get("docket_number") or ""
-    stage = m.get("current_stage") or m.get("status") or "—"
+    # Plain venue + "what this is" — matter_code and docket DROPPED from the client view.
+    # Venue from forum/court_or_agency ONLY (matter_type is the KIND field, rendered
+    # separately; feeding it to client_forum would log a spurious unmapped forum).
+    venue = co.client_forum(m.get("forum"), m.get("court_or_agency"))
+    kind = co.client_matter_kind(m.get("matter_type"), matter_code)
+    stage = co.client_stage(m.get("current_stage"), m.get("status"))
 
-    # --- Facts card (title / forum / docket / stage). ---
+    # --- Facts card (what this is / venue / status). No internal code or docket. ---
     fact_rows = []
-    fact_rows.append(f"<tr><th>Matter</th><td><code>{_esc(matter_code)}</code></td></tr>")
-    if forum:
-        fact_rows.append(f"<tr><th>Forum</th><td>{_esc(forum)}</td></tr>")
-    if docket:
-        fact_rows.append(f"<tr><th>Docket / ref</th><td>{_esc(docket)}</td></tr>")
-    fact_rows.append(f"<tr><th>Current stage</th><td>{_esc(stage)}</td></tr>")
+    if kind:
+        fact_rows.append(f"<tr><th>What this is</th><td>{_esc(kind)}</td></tr>")
+    if venue:
+        fact_rows.append(f"<tr><th>Where</th><td>{_esc(venue)}</td></tr>")
+    fact_rows.append(f"<tr><th>Status</th><td>{_esc(stage)}</td></tr>")
     if m.get("date_opened"):
-        fact_rows.append(f"<tr><th>Opened</th><td>{_esc(str(m['date_opened']))}</td></tr>")
+        fact_rows.append(f"<tr><th>Opened</th><td>{_esc(co.friendly_date(m['date_opened']))}</td></tr>")
     facts_block = (
         '<div class="card"><table>' + "".join(fact_rows) + "</table></div>"
     )
 
     # --- Deadline / next-action card. ---
-    est_note = (' <span class="badge badge-warn">estimated · awaiting confirmation</span>'
-                if estimated else "")
+    est_note = (f' <span class="badge badge-warn">{_esc(confidence_badge)}</span>'
+                if confidence_badge else "")
+    conf_line = (f'<div class="muted" style="font-size:12px">{_esc(confidence_note)}</div>'
+                 if confidence_note else "")
     deadline_block = (
         '<div class="section-title">Deadline &amp; next action</div>'
         '<div class="card"><table>'
         f'<tr><th>Countdown</th><td>{when_badge}</td></tr>'
-        f'<tr><th>Due</th><td>{due_txt}</td></tr>'
-        f'<tr><th>Next action</th><td>{_esc(label)}{est_note}</td></tr>'
+        f'<tr><th>Due</th><td>{due_txt}{est_note}</td></tr>'
+        f'<tr><th>Next action</th><td>{_esc(next_step)}{conf_line}</td></tr>'
         '</table></div>'
     )
 
@@ -779,18 +846,22 @@ def render_matter_detail(client_code: str, matter_code: str,
         tl_rows = []
         for ev in timeline:
             when_ts = ev.get("transitioned_at")
-            when_disp = _esc(str(when_ts)[:10]) if when_ts else "—"
-            to_stage = _esc(ev.get("to_stage") or "")
+            when_disp = _esc(co.friendly_date(str(when_ts)[:10])) if when_ts else "—"
+            # PROJECTION (A32): stage codes are snake_case internal values — render the
+            # plain client STATUS phrase for both ends of the move, never the raw code.
+            to_disp = _esc(co.client_stage(ev.get("to_stage")))
             frm = ev.get("from_stage")
-            move = (f"{_esc(frm)} &rarr; {to_stage}" if frm else to_stage)
+            move = (f"{_esc(co.client_stage(frm))} &rarr; {to_disp}" if frm else to_disp)
             note = ev.get("notes")
-            # notes is the stage classifier's INTERNAL reasoning string — gate it through
-            # the same internal-fragment guard as labels; raw internal shorthand or a
-            # cross-matter reference must never reach a client (security Vuln 1a).
+            # notes is the stage classifier's INTERNAL reasoning string. Keep the existing
+            # internal-fragment guard, THEN additionally run it through the projection's
+            # sanitizer so any surviving raw token (gmail#/CTN/§/doc#/matter code / §4B tag)
+            # is stripped; if nothing clean survives, the note is dropped (shown as nothing
+            # rather than as internal scratch). No raw tag/code can reach the client.
             if note and _is_internal_fragment(note):
                 note = None
-            # surviving notes may carry §4B caveat tags — preserve them, cap without severing.
-            note_disp = _esc(_truncate_keep_tags(note)) if note else ""
+            note_clean = co._sanitize_next_event(note) if note else ""
+            note_disp = _esc(note_clean) if note_clean else ""
             note_html = (f"<div class='muted' style='font-size:12px'>{note_disp}</div>"
                          if note_disp else "")
             doc_link = ""
@@ -824,19 +895,23 @@ def render_matter_detail(client_code: str, matter_code: str,
         drows = []
         avail = 0
         for d in docs:
-            nm = _esc((d.get("name") or "Document")[:90])
-            dt = _esc(str(d["doc_date"])) if d.get("doc_date") else ""
-            cls = _esc((d.get("classification") or "")[:28])
+            # _client_doc_name strips control-tracking (CTN/SL-/CL-) + code/§ jargon from the
+            # raw filename and defers to the typed classification when thin; the raw doc#NNN
+            # identifier is DROPPED from the client view (kept only in the href route id).
+            nm = _esc(_client_doc_name((d.get("name") or "Document")[:90],
+                                       d.get("classification")))
+            dt = _esc(co.friendly_date(d["doc_date"])) if d.get("doc_date") else ""
+            cls = _esc((d.get("classification") or "")[:40])
             if d.get("servable"):
                 du = _esc(doc_url(int(d["id"])))
                 link = f"<a href='{du}'>view / download</a>"
                 avail += 1
             else:
                 link = '<span class="muted">no scan on file yet</span>'
+            cls_html = (f"<div class='muted' style='font-size:12px'>{cls}</div>" if cls else "")
             drows.append(
                 f"<tr><td style='white-space:nowrap'>{dt}</td>"
-                f"<td>{nm}<div class='muted' style='font-size:12px'>"
-                f"{cls}{(' · ' if cls else '')}doc#{int(d['id'])}</div></td>"
+                f"<td>{nm}{cls_html}</td>"
                 f"<td>{link}</td></tr>"
             )
         docs_block = (
@@ -853,20 +928,18 @@ def render_matter_detail(client_code: str, matter_code: str,
             'matter yet.</p></div>'
         )
 
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     body = f"""
-<h1>{_esc(m.get('title') or matter_code)}</h1>
-<p class="lead">One matter in your workspace · as of {now}</p>
+<h1>{_esc(co.friendly_title(m.get('title'), matter_code))}</h1>
+<p class="lead">One matter in your workspace · Updated {_esc(co.friendly_today())}</p>
 {facts_block}
 {deadline_block}
 {timeline_block}
 {docs_block}
 <p class="muted" style="margin-top:16px;font-size:12px">
-  Dates and stages are read from the grounded record. Items marked
-  <code>[HUMAN VERIFY]</code>, <code>[OPERATOR-ATTESTED]</code> or
-  <code>[verify-img]</code> are still being confirmed against the source document
-  and are shown with that caveat — they are not presented as settled fact. A matter
-  awaiting a confirmed date is shown openly rather than hidden.</p>
+  Dates and stages are read from the grounded record. Anything not yet confirmed against
+  the source document is shown with a plain "estimated" or "awaiting confirmation" note —
+  it is never presented as settled fact. A matter awaiting a confirmed date is shown
+  openly rather than hidden.</p>
 """
-    title = f"{m.get('title') or matter_code} — {client_name or client_code}"
+    title = f"{co.friendly_title(m.get('title'), matter_code)} — {client_name or client_code}"
     return title, body
