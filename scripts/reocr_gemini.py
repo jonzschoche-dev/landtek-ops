@@ -114,15 +114,23 @@ def _call_gemini(png_b64, key, model):
     return "".join(p.get("text", "") for p in out["candidates"][0]["content"]["parts"])
 
 
+def _key_label(k):
+    """Human label for the key that succeeded (for the earned-provenance stamp)."""
+    if k and k == GEMINI_KEY:          return "GEMINI_API_KEY"
+    if k and k == GEMINI_KEY_FALLBACK: return "GEMINI_API_KEY_FALLBACK"
+    return "GEMINI_KEY"
+
+
 def _gemini_page(png_b64):
     """Transcribe one page, walking the key×model ladder: (primary,2.5)->(primary,2.0)->
     (fallback,2.5)->(fallback,2.0). 429 advances to the next combo; one timeout retry per combo.
-    Raises QuotaExhausted only when every combo is 429 (true free-tier exhaustion)."""
+    Returns (text, engine_label) — the engine_label names the model+key that ACTUALLY read the page,
+    so the caller can earn provenance (A42). Raises QuotaExhausted only when every combo is 429."""
     _throttle(); _CALLS[0] += 1
     for key, model in _ladder():
         for attempt in (1, 2):  # one timeout retry per combo
             try:
-                return _call_gemini(png_b64, key, model)
+                return _call_gemini(png_b64, key, model), f"{model} / {_key_label(key)}"
             except urllib.error.HTTPError as e:
                 if e.code in (429, 500, 502, 503, 504):  # quota OR transient overload -> next combo
                     time.sleep(1); _throttle()
@@ -136,7 +144,10 @@ def _gemini_page(png_b64):
     raise QuotaExhausted("all gemini key/model combos returned 429/5xx")
 
 
-def reocr(doc_id, go=False):
+def reocr(doc_id, go=False, stamp=False):
+    """Re-OCR one doc. go=write text. stamp=EARN provenance (A42): on an accepted read, record a real
+    extraction_runs row (status='completed') and set documents.model_used from it. stamp=False (default)
+    is SHADOW: it logs the model_used it WOULD stamp but writes no provenance — verify before enabling."""
     if not GEMINI_KEY:
         return {"error": "no GEMINI_API_KEY"}
     import fitz
@@ -163,10 +174,12 @@ def reocr(doc_id, go=False):
         cur.close(); c.close(); return {"doc": doc_id, "error": f"open: {e}"}
     pages = min(d.page_count, MAXPAGES)
     chunks = []
+    models = []
     for i in range(pages):
         try:
             png = d[i].get_pixmap(matrix=fitz.Matrix(2.2, 2.2)).tobytes("png")
-            chunks.append(_gemini_page(base64.b64encode(png).decode()))
+            txt, mdl = _gemini_page(base64.b64encode(png).decode())
+            chunks.append(txt); models.append(mdl)
         except QuotaExhausted:
             # leave the doc untouched (no partial write, no failure log) — retry after quota reset
             if tmp:
@@ -180,6 +193,9 @@ def reocr(doc_id, go=False):
         except Exception as e:
             chunks.append(f"[page {i+1} failed: {str(e)[:60]}]")
     text = "\n\n".join(chunks).strip()
+    # the engine(s) that ACTUALLY read this doc — the truthful basis for the earned-provenance stamp (A42)
+    engine = " ; ".join(sorted(set(models))) if models else MODEL
+    model_str = f"{engine} (reocr_gemini vision)"
     res = {"doc": doc_id, "pages": pages, "chars_before": before, "chars_after": len(text),
            "sample": text[:300]}
     if go and len(text) >= 50:
@@ -189,6 +205,15 @@ def reocr(doc_id, go=False):
                        WHERE id=%s""", (text[:300000], len(text), doc_id))
         _log_reocr(cur, doc_id, before, len(text), "ok")
         res["written"] = True
+        # PROVENANCE (A42) — earn model_used ONLY from a real extraction_runs record; never fabricated.
+        if stamp:
+            cur.execute("""INSERT INTO extraction_runs (doc_id, model, status, started_at, completed_at, fields_extracted)
+                           VALUES (%s, %s, 'completed', now(), now(), %s)""", (doc_id, model_str, len(text)))
+            cur.execute("UPDATE documents SET model_used=%s WHERE id=%s AND coalesce(model_used,'')=''",
+                        (model_str, doc_id))
+            res["provenance"] = f"earned:{engine}"
+        else:
+            res["provenance_shadow"] = model_str   # what enabling --stamp WOULD earn
     if tmp:
         try: os.remove(tmp)
         except Exception: pass
@@ -196,9 +221,10 @@ def reocr(doc_id, go=False):
     return res
 
 
-def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False):
+def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False, stamp=False):
     """Drain the re-OCR queue (ocr_quality.flagged) worst-first, rate-limited + resumable.
-    Economy: only flagged docs, page-capped, one Gemini ladder call per page, bounded per run."""
+    Economy: only flagged docs, page-capped, one Gemini ladder call per page, bounded per run.
+    stamp=False (default) = SHADOW: log the model_used each accept WOULD earn, write no provenance."""
     global _RPM
     _RPM = max(0, rpm)
     c = _conn(); cur = c.cursor()
@@ -217,14 +243,15 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False):
     ids = [r[0] for r in cur.fetchall()]
     if limit:
         ids = ids[:limit]
-    print(f"[sweep] queue={len(ids)} rpm={rpm} max_calls={max_calls} model={MODEL}->{FALLBACK_MODEL}", flush=True)
-    done = ok = 0
+    print(f"[sweep] queue={len(ids)} rpm={rpm} max_calls={max_calls} model={MODEL}->{FALLBACK_MODEL} "
+          f"provenance={'STAMP (writing)' if stamp else 'SHADOW (log-only)'}", flush=True)
+    done = ok = prov = 0
     for did in ids:
         if _CALLS[0] >= max_calls:
             print(f"[sweep] reached max_calls={max_calls} after {done} docs — resume next run", flush=True)
             break
         try:
-            r = reocr(did, go=True)
+            r = reocr(did, go=True, stamp=stamp)
         except QuotaExhausted:
             print(f"[sweep] Gemini quota exhausted (all keys/models 429) after {done} docs — "
                   f"stopping; resume after reset (doc {did} left for retry)", flush=True)
@@ -236,12 +263,17 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False):
             r = {"error": str(e)[:120]}
         if r.get("written"):
             ok += 1
-            print(f"  doc {did}: {r.get('chars_before')}->{r.get('chars_after')} ok calls={_CALLS[0]}", flush=True)
+            if r.get("provenance"):
+                prov += 1; provnote = f"prov={r['provenance']}"
+            else:
+                provnote = f"SHADOW would-earn[{r.get('provenance_shadow','?')}]"
+            print(f"  doc {did}: {r.get('chars_before')}->{r.get('chars_after')} ok {provnote} calls={_CALLS[0]}", flush=True)
         else:
             _log_reocr(cur, did, 0, -1, (r.get("error") or "no_text")[:200])
             print(f"  doc {did}: SKIP [{r.get('error','no_text')}] calls={_CALLS[0]}", flush=True)
         done += 1
-    print(f"[sweep] processed={done} rewritten={ok} total_gemini_calls={_CALLS[0]}", flush=True)
+    print(f"[sweep] processed={done} rewritten={ok} provenance_{'earned' if stamp else 'shadow'}={prov if stamp else ok} "
+          f"total_gemini_calls={_CALLS[0]}", flush=True)
     cur.close(); c.close()
 
 
@@ -255,7 +287,7 @@ if __name__ == "__main__":
     if "--sweep" in a:
         sweep(limit=_arg(a, "--limit", None, int), rpm=_arg(a, "--rpm", 10, int),
               max_calls=_arg(a, "--max-calls", 250, int),
-              force="--force" in a, retry_failed="--retry-failed" in a)
+              force="--force" in a, retry_failed="--retry-failed" in a, stamp="--stamp" in a)
         sys.exit(0)
     ids = []
     if "--doc" in a:
@@ -265,4 +297,4 @@ if __name__ == "__main__":
     if not ids:
         print(__doc__); sys.exit(0)
     for did in ids:
-        print(json.dumps(reocr(did, go=go), indent=2)[:700])
+        print(json.dumps(reocr(did, go=go, stamp="--stamp" in a), indent=2)[:700])
