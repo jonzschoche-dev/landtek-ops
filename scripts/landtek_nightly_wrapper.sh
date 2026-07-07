@@ -29,6 +29,12 @@ else
     OVERALL_RC=$rc
 fi
 
+# 1.5 incorporation status — governed visibility (Phase 3): daily snapshot + trend log.
+#     (A41 consistency of the view is asserted by step 1 above: test_incorporation_view_consistency.)
+echo "[$TS] incorporation status:"
+python3 scripts/incorporation_status.py --log 2>&1 | sed 's/^/  /' \
+    | tee -a /var/log/landtek/incorporation.log || true
+
 # 2. n8n execution health
 echo "[$TS] running scripts/monitor_n8n_executions.py"
 if python3 scripts/monitor_n8n_executions.py >>/var/log/landtek/n8n_health.log 2>&1; then
