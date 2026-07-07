@@ -12,6 +12,7 @@ Usage:
   python3 scripts/ontology_check.py --brief    # phone-friendly one-screen summary
   python3 scripts/ontology_check.py --coverage # every populated domain table must be NAMED in ONTOLOGY.md
   python3 scripts/ontology_check.py --structure # STRUCTURE lint (no DB): unique section numbers + heading depth
+  python3 scripts/ontology_check.py --invariants # every §4 invariant's named enforcement artifact must EXIST
   python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes ONE
                                                # high-severity holes_findings row ONLY on NEW
                                                # actionable contamination (V3/V4 > 0). Standing
@@ -87,6 +88,12 @@ def _named_in(doc: str, t: str) -> bool:
     return re.search(r'(?<![a-z0-9_])' + re.escape(t) + r'(?![a-z0-9_])', doc, re.I) is not None
 
 
+def _doc_path():
+    """The ONTOLOGY.md to lint: an explicit `*.md` arg (for a draft/alternate copy) or the repo file."""
+    p = next((a for a in sys.argv if a.endswith(".md")), None)
+    return p or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ONTOLOGY.md")
+
+
 def coverage_gaps(cur):
     """Return (named_count, total, [(table, rows) gaps]) — populated domain tables NOT named in
     ONTOLOGY.md. Reusable by cmd_coverage AND the daily sentinel so completeness stays a live check."""
@@ -121,6 +128,90 @@ def cmd_coverage(cur) -> int:
     return 1 if missing else 0
 
 
+# A "specific artifact" reference in §4 enforcement prose — something that MUST exist as a real
+# trigger / function / view / test file / code def. (Conceptual names like `ontology_validator`,
+# `_safe views`, `matter_facts` are NOT required to resolve — they describe, they don't name an artifact.)
+ARTIFACT_STRONG = re.compile(r'(\.py(\b|::)|\(\)|^ontvv_|^trg_|^enforce_|^test_|^v_[a-z]|^truth_tests/)')
+
+
+def cmd_invariants(cur) -> int:
+    """INVARIANT INTEGRATION check — the governance↔ontology loop-closer. Parses every A# row in
+    ONTOLOGY.md §4 and verifies that each SPECIFIC named enforcement artifact (a trigger, function,
+    view, `truth_tests/*.py`, or code def) actually EXISTS. A 🟢 invariant that names an artifact which
+    is missing is 'green that isn't true' → FAIL (exit 1). Invariants enforced conceptually (schema
+    NOT NULL, `_safe` views) or still amber (🟡/flagged/shadow) are reported, not failed. Makes
+    'governance is integrated with the ontology' a CHECK, not a claim (sibling of --coverage/--structure)."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        with open(_doc_path()) as f:
+            doc = f.read()
+    except Exception:
+        print("cannot read ONTOLOGY.md"); return 2
+    # Ground-truth artifact universe: live DB triggers/functions/views + code defs + test/script files.
+    cur.execute("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal")
+    known = {r[0] for r in cur.fetchall()}
+    cur.execute("SELECT proname FROM pg_proc")
+    known |= {r[0] for r in cur.fetchall()}
+    cur.execute("SELECT viewname FROM pg_views WHERE schemaname = 'public'")
+    known |= {r[0] for r in cur.fetchall()}
+    skip = {".git", "archive", "node_modules", "__pycache__", "staging", "snapshots", "drafts"}
+    for root, dirs, fns in os.walk(repo):          # walk ALL repo code — enforcement fns live in
+        dirs[:] = [d for d in dirs if d not in skip and not d.startswith(".")]  # scripts/holes/leo_tools/…
+        for fn in fns:
+            if fn.endswith(".py"):
+                try:
+                    for line in open(os.path.join(root, fn), encoding="utf-8", errors="ignore"):
+                        m = re.match(r'\s*(?:def|class)\s+(\w+)', line)
+                        if m:
+                            known.add(m.group(1))
+                except Exception:
+                    pass
+
+    def resolves(tok):
+        t = tok.split("::")[0].split("(")[0].strip().strip("`")
+        if not t:
+            return False
+        if t.endswith(".py") or "/" in t:                       # a test/script file path
+            return os.path.exists(os.path.join(repo, t.split("::")[0]))
+        if t in known:
+            return True
+        return any(os.path.exists(os.path.join(repo, d, t + ".py")) for d in ("scripts", "holes", "truth_tests"))
+
+    fails, oks, conceptual, amber = [], [], [], []
+    for line in doc.splitlines():
+        if not re.match(r'^\|\s*A\d+\s*\|', line):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        aid, enf = cells[0], cells[-1]
+        green = "🟢" in enf
+        strong = [t for t in re.findall(r'`([^`]+)`', enf) if ARTIFACT_STRONG.search(t)]
+        missing = [t for t in strong if not resolves(t)]
+        verified = [t for t in strong if resolves(t)]
+        if missing and green:
+            fails.append((aid, missing, enf[:70]))
+        elif verified:
+            oks.append((aid, verified))
+        elif green:
+            conceptual.append(aid)                              # 🟢 but enforcement is schema/prose — unverifiable by name
+        else:
+            amber.append(aid)                                   # 🟡/flagged/shadow — expected gap, not a failure
+
+    print("=== ONTOLOGY §4 invariant integration — every named enforcement artifact must exist ===")
+    print(f"  🟢 backed by a VERIFIED artifact ({len(oks)}): " + ", ".join(a for a, _ in oks))
+    print(f"  🟢 conceptual/schema enforcement, no specific artifact named ({len(conceptual)}): " + ", ".join(conceptual))
+    print(f"  🟡 asserted/flagged/shadow — expected amber ({len(amber)}): " + ", ".join(amber))
+    if fails:
+        print(f"\n  ✗ {len(fails)} GREEN invariant(s) naming an artifact that does NOT exist (green-that-isn't-true):")
+        for aid, miss, enf in fails:
+            print(f"    - {aid}: missing {miss}  —  “{enf}…”")
+        print("  → fix the artifact name in §4, or build/confirm the artifact. Governance is not fully integrated until 0.")
+        return 1
+    print("\n  ✓ every 🟢 invariant that names a specific artifact resolves to a real one — no broken enforcement refs.")
+    return 0
+
+
 def cmd_structure() -> int:
     """STRUCTURE lint of ONTOLOGY.md (no DB needed — pure file parse). Two mechanical rules:
       1. No DUPLICATE section number (the live doc has two `§2.6`).
@@ -130,9 +221,8 @@ def cmd_structure() -> int:
     authored as H2 instead of H3). Read-only; exit 1 on any violation. This is the acceptance test for
     the ONTOLOGY.md v1.0 renumber (docs/ONTOLOGY_STRUCTURE.md §6.1) — NOT yet wired to the deploy gate,
     because the current doc intentionally still carries these violations until that migration runs."""
-    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     try:
-        with open(os.path.join(repo, "ONTOLOGY.md")) as f:
+        with open(_doc_path()) as f:
             lines = f.read().splitlines()
     except Exception:
         print("cannot read ONTOLOGY.md"); return 2
@@ -178,6 +268,11 @@ def main():
     if "--coverage" in sys.argv:
         with conn.cursor() as cur:
             rc = cmd_coverage(cur)
+        conn.close()
+        sys.exit(rc)
+    if "--invariants" in sys.argv:
+        with conn.cursor() as cur:
+            rc = cmd_invariants(cur)
         conn.close()
         sys.exit(rc)
     problems = 0
