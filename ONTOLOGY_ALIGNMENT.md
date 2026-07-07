@@ -130,6 +130,59 @@ domain is *product roadmap not yet built* (finance/tenants/forensic), the ontolo
 
 ---
 
+---
+
+## 7. Mechanisms — how the plan references invariants (the standing practice)
+
+The bridge is only useful if it's *operated*, not just written once. Three lightweight, machine-parseable
+conventions turn §5 from a table into a habit:
+
+**7.1 The `Respects:` tag (inline in MASTER_PLAN).** Every roadmap item, pillar, or agent that writes
+governed data (client / fact / geometry / comms / matter) carries a one-line tag naming the invariants it
+must honor:
+```
+- W1 Discovery agent → wire to Leo HIGH alert.   Respects: A5, A21, A22
+- Client dashboard per-matter status view.        Respects: A5, A11, A32, A33, A34
+- Finance ledger + per-matter ROI (v1.5).         Respects: —   (GAP: no cost/ledger invariant yet)
+```
+Parse: `Respects:\s*(—|A\d+(?:\s*,\s*A\d+)*)`. The tag lives *in the plan*, so a plan reader sees the
+governance without cross-referencing — and a `—` is a visible, grep-able gap.
+
+**7.2 The domain-admission gate (before a new domain/agent enters MASTER_PLAN).** A 3-question checklist,
+answerable in a minute:
+1. **Home?** Does it have an ontology concept (§2.N registry row) or a §9 Future-Domains placeholder? If no → add one first.
+2. **Inheritance?** Does it inherit the system invariants — **A5** (client sep), **A1/A2/A20** (provenance),
+   **A21** (outward chokepoint)? These are non-negotiable; a new domain never re-litigates them.
+3. **New invariant?** Does it need a domain-specific invariant (e.g. Finance→cost/ledger, Forensic→
+   chain-of-custody)? If yes → it's a `Respects: —` gap until that invariant is authored.
+Fail any → the item is admitted **with an explicit `Respects: —` gap**, not silently.
+
+**7.3 The `—` is a tracked gap, not a blank.** A `Respects: —` means *planned but ungoverned* — it must be
+closed **before build**, not after. The live list of ungoverned-but-planned work is
+`grep 'Respects: —' MASTER_PLAN.md`. Today that list is: **Finance (G1), Property/Tenant (G2), Forensic (G3)**.
+
+**7.4 Optional mechanical guard (recommended, not yet built).** A `ontology_check.py --alignment` mode could
+(a) grep MASTER_PLAN for governed items missing a `Respects:` tag, and (b) verify every `A#` the plan cites
+exists in ONTOLOGY §4 (no dangling reference). This would make alignment a *check*, like `--coverage`. Flagged
+as a small follow-on — meta-layer, in-lane.
+
+## 8. Priority items to map now (active work — assign `Respects:` this cycle)
+
+These are the near-term MASTER_PLAN items (Aug-12 focus + product surface) that should carry `Respects:` tags
+immediately; the future pillars (Finance/Property/Forensic) stay `—` gaps until modeled:
+
+| Priority | MASTER_PLAN item | `Respects:` |
+|---|---|---|
+| 1 | Client dashboard / per-client status + next-action (product surface) | **A5, A11, A32, A33, A34** |
+| 2 | Legal case mgmt · dossier · chain-of-title (Aug-12 deliverable) | **A2, A3, A4, A13, A14, A20** |
+| 3 | Wave-1 agent wiring to Leo (Discovery/Execution/Deadline/Narrative) | **A5, A21, A22** |
+| 4 | Omnichannel go-live (Email→Meta/Viber) + PlatformCoordinator | **A5, A25–A31, A38–A40** |
+| 5 | Mapping rollout (client parcel map) | **A5, A9, A10, A11** |
+| 6 | Ombudsman offense (leads only, filing human-gated) | **A5, A35, A36, A37** |
+| — | Finance / Property-Tenant / Forensic | **—** (close the gap before build — §2, G1–G3) |
+
+---
+
 *Companion files: `MASTER_PLAN.md` (execution) · `ONTOLOGY.md` (concepts + invariants) ·
 `docs/ONTOLOGY_STRUCTURE.md` (how the ontology grows) · `ontology_check.py --invariants/--coverage/--structure`
 (the mechanical guards that keep all three honest).*
