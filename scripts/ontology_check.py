@@ -170,8 +170,8 @@ def invariant_gaps(cur):
         t = tok.split("::")[0].split("(")[0].strip().strip("`")
         if not t:
             return False
-        if t.endswith(".py") or "/" in t:                       # a test/script file path
-            return os.path.exists(os.path.join(repo, t.split("::")[0]))
+        if t.endswith(".py") or "/" in t:                       # a test/script file path (+ maybe a CLI flag)
+            return os.path.exists(os.path.join(repo, t.split("::")[0].split()[0]))
         if t in known:
             return True
         return any(os.path.exists(os.path.join(repo, d, t + ".py")) for d in ("scripts", "holes", "truth_tests"))
@@ -184,7 +184,8 @@ def invariant_gaps(cur):
         if len(cells) < 3:
             continue
         aid, enf = cells[0], cells[-1]
-        green = "🟢" in enf
+        # green iff the LEADING state marker is 🟢 — not any 🟢 mentioned in prose (e.g. "graduation to 🟢")
+        green = next((c for c in enf if c in "🟢🟡🔴○⛔"), None) == "🟢"
         strong = [t for t in re.findall(r'`([^`]+)`', enf) if ARTIFACT_STRONG.search(t)]
         missing = [t for t in strong if not resolves(t)]
         verified = [t for t in strong if resolves(t)]

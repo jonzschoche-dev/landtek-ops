@@ -14,7 +14,20 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.16 (2026-07-07).** A27/A30 given mechanical floors: `truth_tests/test_comms_bus_integrity.py`
+> **Ontology version: v0.17 (2026-07-07).** **§2.14 Communications deepened + reconciled to the live coordinator.**
+> The `PlatformCoordinator`'s four responsibilities (identity resolution · bus routing · exposure enforcement ·
+> activation lifecycle) and the `UnifiedClientPersona`↔`CrossChannelThread` composition (WHO vs WHAT, both keyed
+> to `client_code`) are now explicit. **Reconciled to deploy_752: the INTERNAL half went LIVE** —
+> `platform_coordinator.py --tick` (`--resolve` conservative identity binder + `--audit` + heartbeat, on
+> `landtek-coordinator.timer`) — so PlatformCoordinator/A31 move ○→🟡, and A38 (resolve-before-act) is now
+> **asserted** (a real resolver that leaves NULL when unsure). The OUTWARD half (routing/exposure) stays gated.
+> New comms invariants **A38** (resolve-before-act), **A39** (per-message exposure decision is
+> traceable), **A40** (activation record complete + deactivation symmetric). **New §2.16 Offensive Leverage
+> (Ombudsman)** domain model + **A35–A37** (client-scoped candidates/reads/seed-knowledge) landing the
+> deploy_750 isolation work in the doc. Corrected the §8.10 stale premise (`model_used` is earned-only 86/1579,
+> not 0). *(Note: the corpus-connectivity 5-signal domain is drafted for §2.17 / A41–A43 / shadow V8 — handed
+> in reconciled, not yet applied; a pasted directive targeting §2.8/A7–A9/V5 was stale and NOT used.)*
+> **v0.16:** A27/A30 given mechanical floors: `truth_tests/test_comms_bus_integrity.py`
 > (bus normalization) + `test_comms_activation_audit.py` (held-channel silent-activation guard) — suite 84→89,
 > negative-tested to bite (deploy_746). **v0.15:** A25 enforcement begins: **V7 applied in shadow** (deploy_743,
 > `log` mode) on `channel_users` — the first comms invariant off the page and onto the DB; A25 marker
@@ -362,7 +375,7 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 | **UnifiedClientPersona** | 🟡 `conversation_context`/`conversation_chunks` (🌱 dormant) · `chat_notes` · `client_history` · `leo_interactions` + the shared AI `systemMessage` (config, ⛔ not a table) | partial | the AI's persistent identity, tone, memory & relationship state **per client** — the same persona on every channel; relationship data exists but cross-channel memory is dormant + not persona-keyed (A28) |
 | **ChannelMessage** | 🟢 `channel_messages` (~20) + `channel_audit` · `outbound_messages` (~1,898) · `outbound_blocks` (~14,346) | active | inbound/outbound on the bus, `channel_audit` the event/audit companion; older stores (`leo_interactions` ~2,994, `gmail_messages`) still carry most live traffic — the bus is the *intended* single normalizer, not yet universal (A27) |
 | **CrossChannelThread** | ○ *(none — planned; `channel_messages.reply_to_id` is intra-channel only)* | **NET-NEW** | one logical conversation spanning channels for the same person; continuity resolves via the same `client_code` as A25 (A29) |
-| **PlatformCoordinator** | ○ *(none — planned)* | **NET-NEW** | cross-channel identity resolver + unified router + per-channel health daemon; the **single authoritative** future enforcement point for A26/A27 and comms identity (A31); today scattered across adapters + bridges + timers; **do not build without governance sign-off** |
+| **PlatformCoordinator** | 🟡 `scripts/platform_coordinator.py` (`--tick` via `landtek-coordinator.timer`) | **partial — internal live** | **INTERNAL half is live (deploy_752):** `--resolve` (conservative identity resolver → binds a `channel_users` identity to one `client_code` only on a unique match, leaves NULL when unsure — never guesses/crosses, A25/A38) · `--audit` (writes `channel_audit` activation records, A30) · health heartbeat. **Still ○ planned:** the OUTWARD half — unified bus routing (A27) + per-message exposure enforcement (A26/A39) stay gated behind `outward_guard`; the single-authoritative-for-all-four graduation (A31) is not yet complete. **Do not wire the outward half without governance sign-off.** |
 | **ExternalExposureGate** | 🟡 `internal_targets` (4) · `outward_guard_config` · `outbound_blocks` · `channel_audit` (activation record) | partial | *when* a channel may reach outside; email splits inbound/send, inline-send channels gate on the token = the switch (A26); channel activation needs an audit row (A30); rides A21 + `no-external-exposure-until-ready` |
 
 > ⚠️ **Token-as-switch (do not confuse the two send models).** Email separates inbound (internal, safe to
@@ -376,11 +389,39 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 > **Enforcement:** S14 (human-readable · one-point · no-double-tap) in `tg_send.py` → `outbound_blocks`;
 > outward funnels through `outward_guard` (A21, shadow). Client identity across channels rides A5 (A25).
 
+> **PlatformCoordinator — the four responsibilities (INTERNAL half live deploy_752; A31 the single locus).**
+> It owns exactly four duties, previously **scattered** across adapters, bridges, and timers — the
+> fragmentation A31 exists to prevent. Two are now live in `platform_coordinator.py --tick`, two remain gated:
+> 1. **Identity resolution** 🟡 **live (`--resolve`)** — resolve a `ChannelUser` to one `client_code` before any
+>    reply or persona-memory write (A38), or hold it `unresolved`; the v1 resolver binds only on a unique match
+>    and leaves NULL when unsure — never guesses, never crosses clients (A25).
+> 2. **Routing / bus normalization** ○ **planned** — land every event on the unified bus and dispatch to the
+>    right handler and client persona (A27); still distributed across the bridges.
+> 3. **Exposure enforcement** ○ **planned** — release outward only through the gate with a per-message recorded
+>    decision (A26/A39); today `outward_guard` holds this separately (shadow).
+> 4. **Channel health + activation lifecycle** 🟡 **live (`--audit`)** — write the audited activation record
+>    for each active surface into `channel_audit` (A30/A40); deactivation symmetry + full completeness pending.
+> **The internal half (resolve/audit/heartbeat) is safe and running; do NOT wire the outward half (2 & 3)
+> without governance sign-off** (§9) — that is the outward-enforcement chokepoint.
+>
+> **Persona vs Thread — they compose, they don't overlap.** `UnifiedClientPersona` is the **WHO**: the AI's
+> identity, tone, memory and relationship state, keyed to `client_code` (A28). `CrossChannelThread` is the
+> **WHAT**: one continuous conversation for that person spanning channels (A29). The thread is what makes the
+> persona's memory *coherent* across doors — moving from Telegram to email continues the **same** thread, so
+> the persona recalls the same history. Persona without thread = consistent voice but amnesiac continuity;
+> thread without persona = a continuous log with no relationship. **Both resolve through the same `client_code`
+> (A25), so identity resolution (A38) is the prerequisite for either** — which is why all three converge on the
+> PlatformCoordinator as the one place resolution happens.
+
 *Components: `leo_tools/channel_adapters.py` (webhooks + `/api/channel/send`) · `tg_send.py` (S14) ·
 `{email,whatsapp,viber}_channel_bridge.py` (feed + backlog drain) · `landtek-{email,whatsapp,viber}-bridge.timer`
 · `channel_audit` (activation/adapter audit) · `conversation_context`/`conversation_chunks` (persona memory, 🌱) ·
-`platform_coordinator.py` (○ future — the enforcement point) · `outward_guard.py` · `_client_of()`.
-**Invariants: A25–A31.***
+`internal_targets`/`outward_guard.py` (exposure gate) · `truth_tests/test_comms_bus_integrity.py` +
+`test_comms_activation_audit.py` (the A27/A30 mechanical floors, deploy_746) · `scripts/platform_coordinator.py`
+(🟡 `--tick` LIVE — resolve+audit+heartbeat via `landtek-coordinator.timer`, deploy_752; the internal enforcement
+point, A31) · `_client_of()`. Lineage: deploy_114 (bus) → 654 (email) → 662/663 (Meta/Viber armed) → 736–747
+(§2.14 formalized, A25–A31 + shadow V7 + floors) → **752 (PlatformCoordinator internal half live)**.
+**Invariants: A25–A31, A38–A40.***
 
 ---
 
@@ -416,6 +457,26 @@ The LLM `truth_qa` retirement is recorded in §4. **Invariants: A23–A24.***
 > extension (add a mapping when a real value appears — never guess).
 
 **Invariants: A32–A34.***
+
+---
+
+## 2.16 Offensive Leverage (Ombudsman) — *turning the client's grievance into pressure on officials*
+
+> **Definition.** The offense engine: from one client's verified corpus it derives ranked, element-gated
+> graft/misconduct leads against public officers (RA 3019 / 6713 / RPC), assembles a prosecutor's theory,
+> and holds every filing for a human. It runs **within one client** — a hunt for client X never sees, seeds,
+> or reasons over client Y's officials, allies, or candidates. (Elevates the §8.5 operational cluster.)
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| **OmbudsmanMatter** | 🟡 `matters` row + `client_code` (the offense track) | partial | the tenancy root; a hunt runs *within* one `client_code`, scoped by `MATTER_SCOPE` |
+| **CandidateFinding** | 🟢 `ombudsman_candidates` (+ `client_code`) | active | one client per row; identity `(client_code, official, violation_code)` — the collision fix (A35) |
+| **CaseTheory** | ⛔ *schema-less by design* (assembled at read by `--reason`) | invariant | derived **only** from the active client's findings — never persisted, never cross-client (A36) |
+| **SignalPattern** | 🟡 `CASES[client]['roster'/'ourside']` + `THEORY_HINTS` (code config) | partial | the seed roster + own-side exclusion + hints — **client-scoped knowledge** (A37); non-MWK starts empty |
+
+*Components: `scripts/ombudsman_hunter.py` (scan/hunt/verify/reason, all `_client_code()`-scoped) ·
+`ontvv_v5_ombudsman` (shadow client-isolation trigger, deploy_750) · `ombudsman_candidates` · `_client_of()`.
+**Invariants: A35–A37.*** Filing stays human-gated — these are LEADS, not facts.
 
 ---
 
@@ -480,10 +541,16 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A28 | The AI presents a **consistent persona** — personality, memory, and relationship context — to a client regardless of channel; a `UnifiedClientPersona` is keyed to `client_code`, never re-initialized per channel. | 🟡 **asserted / flagged** — one shared `systemMessage` gives a uniform personality, but cross-channel memory (`conversation_context`) is 🌱 dormant + not persona-keyed, so continuity is not yet guaranteed |
 | A29 | Messages from the same resolved person continue a **single logical thread** (`CrossChannelThread`) spanning channels, not a fresh context per channel; thread continuity resolves through the same `client_code` as A25. | 🟡 **asserted / flagged** — model defined; no cross-channel thread store exists (`channel_messages.reply_to_id` is intra-channel only) — the concept that operationalizes A28 |
 | A30 | A channel becomes **externally active** (webhook registered / outbound sending enabled) only with an **auditable activation record** in `channel_audit`; activation is a governed outward action, never silent. | 🟡 **asserted** — `channel_audit` exists (deploy_114); **interim floor now mechanical: `truth_tests/test_comms_activation_audit.py`** (audit-surface-present · held-channels-no-silent-delivery; deploy_746, negative-tested to bite). Systematic activation-logging into `channel_audit` still pending — until then the "arm but hold the external switch" pattern is the discipline the floor guards |
-| A31 | Once implemented, the `PlatformCoordinator` is the **single authoritative component** for cross-channel identity resolution (A25/A28/A29) and governed routing + exposure enforcement (A26/A27/A30); no parallel coordinator or bypass path may resolve comms identity or release messages. | 🟡 **asserted / flagged** — `PlatformCoordinator` is ○ planned; reserves the enforcement locus so it isn't fragmented across half-built coordinators when it graduates (per §9) |
+| A31 | Once implemented, the `PlatformCoordinator` is the **single authoritative component** for cross-channel identity resolution (A25/A28/A29) and governed routing + exposure enforcement (A26/A27/A30); no parallel coordinator or bypass path may resolve comms identity or release messages. | 🟡 **partial (deploy_752)** — `scripts/platform_coordinator.py --tick` is live for the INTERNAL half (identity `--resolve` + `--audit` + heartbeat, on `landtek-coordinator.timer`); it is now the concrete resolver/auditor. The OUTWARD half (routing/exposure release) still rides `outward_guard`, so "single authoritative for ALL of A26/A27/A30" is not yet complete — the graduation to 🟢 is when the outward half converges here too. |
 | A32 | No value reaches a `ClientFacingView` except through the `ClientProjection` layer (§2.15); a raw internal field, code, docket/`CTN`/ref (`gmail#`/`doc#`), `§` statute cite, `legal_theory` strategy string, operator note, or raw §4B/provenance tag on a client surface is a violation. | 🟡 **asserted / flagged** — `ClientProjection` (`leo_tools/client_ontology.py`) built this pass; the portal does not yet render fully THROUGH it (wiring is the next step). Enforcement locus = a future `ontology_validator`/render-audit check; graduates 🟡→🟢 once the view renders only `ClientSafeField`s and the check is applied. |
 | A33 | The `ClientProjection` is **total**: every projected field maps to a defined client-safe output; an unmapped value falls back to a safe generic phrase **and** is logged (`UnmappedValueLog`) — the raw string never reaches the client. | 🟢 **by construction** — every `client_ontology` function returns a mapped/keyword/generic value, never its raw input; each fallback calls `_flag_unmapped()`. |
 | A34 | Provenance is projected to **meaning-preserving** plain confidence: raw provenance levels / §4B tags never render to a client; their uncertainty is translated (never dropped, **never upgraded**) into plain language, and a sub-`operator` tier is never presented as settled fact. Client-side companion to A6. | 🟡 **asserted** — `client_provenance`/`client_confidence` built; "never upgraded" rides the source `provenance_level`; the show-as-fact gate (`provenance_is_solid`) is available for the view to honor. |
+| A35 | Every `ombudsman_candidates` row belongs to exactly one client (`client_code` NOT NULL, the canonical `clients.client_code`); candidate identity is client-scoped `(client_code, official, violation_code)` — two clients' same official+violation are distinct rows, never a merged UPSERT (§2.16). | 🟡 **shadow** — V5 trigger `ontvv_v5_ombudsman` (deploy_750, `log`) rejects a candidate citing another client's matter (`_client_of` mismatch); UNIQUE re-keyed client-scoped + 40 rows canonicalized to `MWK-001`; negative-tested to bite (cross-client rejected in block, same-client allowed). Flip `block` after soak. |
+| A36 | No candidate report (`--reason`/`--board`/`--verify`/`--candidate`/`--playbook`) reads an `ombudsman_candidates` row outside the active `client_code`; a candidate never enters another client's theory of the case. | 🟢 **asserted (code, deploy_750)** — all five reads scoped by `_client_code()`; the mechanical `truth_tests` grep-floor (no unscoped `SELECT * FROM ombudsman_candidates`) is the pending assertion (**flagged**). |
+| A37 | The offense engine's seed knowledge — roster (`SEED_ROSTER`), own-side exclusion (`_OURSIDE_RE`), entity-keyed hints — is client-scoped; an official or ally registered under one client never seeds or filters another's hunt. | 🟢 **asserted (code, deploy_750)** — moved into per-client `CASES[...]`; a non-MWK client starts with an empty roster + a generic own-side pattern (no MWK allies leak in). |
+| A38 | No inbound message is acted on (replied, written to persona memory, or routed) before its `ChannelUser` is resolved to a `client_code` or explicitly held `unresolved`; an unresolved identity never inherits another client's persona or thread. | 🟡 **asserted (deploy_752)** — sharpens A25 (resolution must PRECEDE action). `platform_coordinator.py --resolve` is the live v1 resolver: it binds only on a unique-contact match and **leaves NULL when unsure** (the explicit `unresolved` hold), so it never guesses a client. The remaining gap is the *ordering* guarantee — that no reply/memory-write fires before resolve runs — which the coordinator's routing half (○ planned) must enforce. |
+| A39 | Every outbound `ChannelMessage` to an external recipient carries a recorded exposure decision (the `outward_guard` verdict + its approval/hold reference); an external send whose decision cannot be reconstructed from the record is a violation. | 🟡 **asserted / flagged** — sharpens A26; `outbound_blocks` logs holds and `outward_guard` shadow-logs decisions, but per-message *allow*-decision logging on real external sends is pending (block-mode dormant). |
+| A40 | A `channel_audit` activation record is COMPLETE (channel · surface · actor · timestamp · approval ref) and BOTH activation and deactivation are recorded; a channel's external-active state is always reconstructable from `channel_audit` alone. | 🟡 **asserted / flagged** — sharpens A30 (completeness + deactivation symmetry); `truth_tests/test_comms_activation_audit.py` floors the surface, systematic per-activation rows still pending. |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -585,7 +652,7 @@ served by a named successor · `⚙️ INFRA` n8n/platform plumbing, not a domai
 `map_parcels` (world-placed, seeded) 🟢 · `subdivision_plans` (64) 🟢 · `parcels` (relative survey shape) **🌱** · `geometry_priority` (drip queue, 8) **🌱**. `survey_geometry` is a **script** (`scripts/survey_geometry.py`, the courses→polygon math), **not a table**. **Pipeline:** creditless **local-vision OCR** (`reocr_local.py`, Mac Ollama `qwen2.5vl` over Tailscale — the $0 default; `reocr_gemini.py` = token path) cleans garbled title/plan text → `strip_plot_info.py` → `survey_geometry` → `parcels` → tie-point georeference → `map_parcels`. **Full 7-concept model in §2.4.** **Activation frontier:** the `GeometrySource` controlled vocab, and the **○ planned** `ExternalMapReference`/`MapVisibility` surfaces (held behind governance — A10/A11). → `titles`/`matters`/`clients`.
 
 ### 8.10 Structured Extraction (DIC) — *typed fields, not just text*
-`extraction_contract` (8 contracts incl `court_order`/`spa`/`deed`/`affidavit` — schema 🟢) · `heightened_ocr_queue` (159) 🟢 · `heightened_ocr_results` **🌱 DORMANT**. **Activation:** wire classify→contract routing so contracts run automatically → typed fields on `documents`. *This is the corpus-connection frontier (`model_used`=0).*
+`extraction_contract` (8 contracts incl `court_order`/`spa`/`deed`/`affidavit` — schema 🟢) · `heightened_ocr_queue` (159) 🟢 · `heightened_ocr_results` **🌱 DORMANT**. **Activation:** wire classify→contract routing so contracts run automatically → typed fields on `documents`. *This is the corpus-connection frontier — `model_used` is **EARNED-only**: 86/1579 stamped from `extraction_runs` as of 2026-07-06 (0/388 Paracale); never fabricated. See the connectivity 5-signal contract (○ to be modeled §2.17).*
 
 ### 8.11 Governance / Supervision / QA — *the pillars (now registered in their own ontology)*
 `ontology_validator_config` · `v_evidence_gaps` · `v_ontology_client_cross` · `holes_findings` · `work_orders`(+`target_ref`) · `internal_targets` · `outward_guard_config` → they govern the core. **🟢 ACTIVE** (outward-guard in 🌱 shadow). `sim_leak_incidents` · `cross_client_flags` · `audit_rejected_messages` · `real_traffic_violations` = **⚪ HEALTHY-EMPTY** (no incidents = the good state).
