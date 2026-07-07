@@ -238,6 +238,9 @@ FORBIDDEN_RENDER = {
     "raw_provenance": re.compile(r"\b(?:inferred_weak|inferred_strong|inferred_corroborated)\b"),
     "control_code":   re.compile(r"\b(?:SPA|NOR|OAC-?L|MOA|MOU|CTC)-\s*\d"),
 }
+# Government PERMIT/agreement identifiers a client legitimately owns and may see (like a TCT number) —
+# they match the matter_code shape but are NOT internal codes. Excluded from the matter_code leak class.
+PERMIT_SAFE = {"EXPA", "APSA", "MPSA", "FTAA", "SSMP", "SSMPA", "MPP", "EPEP", "CSAG", "EP", "IPO"}
 
 
 def render_leaks(cur):
@@ -279,9 +282,13 @@ def render_leaks(cur):
                 leaks.append((label, "projector_error", str(raw)[:60], f"<raised {type(e).__name__}>"))
                 continue
             for cls, rx in FORBIDDEN_RENDER.items():
-                if rx.search(out):
-                    leaks.append((label, cls, str(raw)[:60], out[:90]))
-                    break
+                m = rx.search(out)
+                if not m:
+                    continue
+                if cls == "matter_code" and m.group(0).split("-")[0].upper() in PERMIT_SAFE:
+                    continue   # a client-safe government permit/agreement ID (their own), not an internal code
+                leaks.append((label, cls, str(raw)[:60], out[:90]))
+                break
     try:
         unmapped = co.unmapped_report()
     except Exception:
