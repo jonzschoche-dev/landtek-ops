@@ -120,6 +120,26 @@ Any cross-layer output that substitutes inferred content for source content uses
 
 Parse: `\[(?:OCR|STRUCTURE|v|HUMAN VERIFY|\?)[^\]]*\]`. Layers must PRESERVE upstream tags (OCR→comprehend→bible→brief); stripping them is a violation. Raw OCR noise (bearings / lot codes the OCR mangled) stays in a verbatim `[RAW OCR DUMP] … [end]` block, never silently cleaned.
 
+## 4C. Conventions — governance tags (`Respects:` — links execution to the Ontology)
+
+Every roadmap item / agent that writes governed data (client · fact · geometry · comms · matter) carries a
+one-line **`Respects:`** tag naming the ONTOLOGY invariants it must honor. Governance is then visible *in the
+plan*, and an ungoverned item is a grep-able gap. Full rationale + mechanisms in `ONTOLOGY_ALIGNMENT.md` §7.
+Mechanically checked by `scripts/ontology_check.py --alignment` (every cited `A#` must exist in ONTOLOGY §4).
+
+- Client dashboard / per-client status + next-action surface.   **Respects: A5, A11, A32, A33, A34**
+- Legal case mgmt · dossier · chain-of-title (Aug-12 deliverable). **Respects: A2, A3, A4, A13, A14, A20**
+- Wave-1 agent wiring to Leo (Discovery/Execution/Deadline/Narrative). **Respects: A5, A21, A22**
+- Omnichannel go-live (Email→Meta/Viber) + PlatformCoordinator.   **Respects: A5, A25–A31, A38–A40**
+- Mapping rollout (client parcel map, "locate me").              **Respects: A5, A9, A10, A11**
+- Ombudsman offense (leads only; filing human-gated).            **Respects: A5, A35, A36, A37**
+- Finance (v1.5) · Property/Tenant (v2.0) · Forensic.            **Respects: —**  *(GAP: no domain invariant yet — close before build; §4A pillars 3/4/6)*
+
+> **Rule.** A new domain/agent doesn't enter this plan without a `Respects:` tag (or an explicit `Respects: —`
+> gap). It inherits the system invariants for free — **A5** (client separation), **A1/A2/A20** (provenance),
+> **A21** (outward chokepoint) — and never re-litigates them. `Respects: —` = *planned but ungoverned*, to be
+> closed before build, not after (`grep 'Respects: —' MASTER_PLAN.md` is the live gap list).
+
 ## 5. Operating model (multi-agent — condensed; full git protocol in CLAUDE.md)
 
 - **Two agents:** VPS Claude (`/root/landtek`, runtime/ops) + Mac Claude (`~/landtek`, authoring/design). Both push to `landtek-ops`. Mac auto-sync launchd pulls every 2 min (fast-forward only).

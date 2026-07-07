@@ -14,6 +14,7 @@ Usage:
   python3 scripts/ontology_check.py --structure # STRUCTURE lint (no DB): unique section numbers + heading depth
   python3 scripts/ontology_check.py --invariants # every §4 invariant's named enforcement artifact must EXIST
   python3 scripts/ontology_check.py --render-audit # A32: projected client output must carry NO internal token
+  python3 scripts/ontology_check.py --alignment  # MASTER_PLAN/bridge A# citations must exist in ONTOLOGY §4 (no DB)
   python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes a
                                                # holes_findings row on NEW V3/V4 contamination,
                                                # a coverage regression, OR a broken §4 invariant
@@ -321,6 +322,65 @@ def cmd_render_audit(cur) -> int:
     return 1 if leaks else 0
 
 
+def cmd_alignment() -> int:
+    """ALIGNMENT check (no DB) — keeps MASTER_PLAN.md, ONTOLOGY_ALIGNMENT.md, and ONTOLOGY.md §4 in sync
+    (ONTOLOGY_ALIGNMENT.md §7.4). Two mechanical rules: (1) every invariant `A#` cited in the plan or the
+    bridge must EXIST in ONTOLOGY §4 — no dangling reference (catches a renumber/typo silently breaking the
+    map); (2) report the `Respects:` tag coverage + the `Respects: —` ungoverned-but-planned gap list.
+    Exit 1 on a dangling reference. Ranges like `A25–A31` are expanded."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        ont = open(_doc_path()).read()
+    except Exception:
+        print("cannot read ONTOLOGY.md"); return 2
+    valid = {int(n) for n in re.findall(r'^\|\s*A(\d+)\s*\|', ont, re.M)}
+    if not valid:
+        print("no invariants parsed from ONTOLOGY §4 — stale/empty doc? (aborting)"); return 2
+
+    def cited_in(txt):
+        c = set()
+        for a, b in re.findall(r'\bA(\d+)\s*[–—-]\s*A(\d+)\b', txt):     # ranges: A25–A31
+            c |= set(range(int(a), int(b) + 1))
+        c |= {int(n) for n in re.findall(r'\bA(\d+)\b', txt)}
+        return c
+
+    hi = max(valid)
+    dangling, forward = [], []
+    for fn in ("MASTER_PLAN.md", "ONTOLOGY_ALIGNMENT.md"):
+        try:
+            txt = open(os.path.join(repo, fn)).read()
+        except Exception:
+            continue
+        cited = cited_in(txt)
+        bad = sorted(n for n in cited if n not in valid and n <= hi)     # a HOLE in the defined range = error
+        fwd = sorted(n for n in cited if n > hi)                          # above the max = planned forward-ref
+        if bad:
+            dangling.append((fn, bad))
+        if fwd:
+            forward.append((fn, fwd))
+    try:
+        mp = open(os.path.join(repo, "MASTER_PLAN.md")).read()
+    except Exception:
+        mp = ""
+    tags = re.findall(r'\*\*Respects:\s*(—|A\d[\dA,\s–—-]*?)\*\*', mp)   # only the bold roadmap tags, not prose
+    gaps = sum(1 for t in tags if t.strip() == "—")
+
+    print("=== MASTER_PLAN ↔ ONTOLOGY alignment ===")
+    print(f"  ONTOLOGY §4: A1..A{hi} ({len(valid)} invariants defined)")
+    print(f"  MASTER_PLAN `Respects:` tags: {len(tags)} total · {gaps} are '—' (ungoverned-but-planned gap)")
+    if forward:
+        for fn, fwd in forward:
+            print(f"  ℹ {fn} forward-references planned invariants (above A{hi}, OK): {['A' + str(n) for n in fwd]}")
+    if dangling:
+        print("  ✗ DANGLING invariant reference(s) — cited but NOT defined in ONTOLOGY §4:")
+        for fn, bad in dangling:
+            print(f"     {fn}: {['A' + str(n) for n in bad]}")
+        print("  → fix the citation or add the invariant. The docs must not reference a non-existent A#.")
+        return 1
+    print("  ✓ every A# cited in the plan/bridge exists in ONTOLOGY §4 — no dangling reference.")
+    return 0
+
+
 def cmd_structure() -> int:
     """STRUCTURE lint of ONTOLOGY.md (no DB needed — pure file parse). Two mechanical rules:
       1. No DUPLICATE section number (the live doc has two `§2.6`).
@@ -369,6 +429,8 @@ def main():
     as_json = "--json" in sys.argv
     if "--structure" in sys.argv:   # pure file lint — no DB, dispatch before connecting
         sys.exit(cmd_structure())
+    if "--alignment" in sys.argv:   # pure file check — no DB
+        sys.exit(cmd_alignment())
     if psycopg2 is None:
         print("psycopg2 not installed — DB checks need the VPS; only --structure runs offline.")
         sys.exit(2)
