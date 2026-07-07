@@ -34,6 +34,12 @@ fi
 echo "[$TS] incorporation status:"
 python3 scripts/incorporation_status.py --log 2>&1 | sed 's/^/  /' \
     | tee -a /var/log/landtek/incorporation.log || true
+# 1.6 rollout guard (Phase 5): alert if connected count fell below the high-water mark (a signal un-set).
+if ! python3 scripts/incorporation_status.py --check-regression >>/var/log/landtek/incorporation.log 2>&1; then
+    echo "[$TS] nightly: incorporation REGRESSION — connected count fell below high-water; see /var/log/landtek/incorporation.log" \
+        >> /root/landtek/notifications/pending.txt
+    OVERALL_RC=1
+fi
 
 # 2. n8n execution health
 echo "[$TS] running scripts/monitor_n8n_executions.py"

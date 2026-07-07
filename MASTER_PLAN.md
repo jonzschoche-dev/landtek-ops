@@ -253,19 +253,24 @@ a degraded doc — is *earned* by a real engine read. Paracale = 0 earned; corpu
 else moves Paracale off zero. Fabricating `model_used` to pass the gate is forbidden (ontology A8).
 
 **Workstreams (prioritized):**
-1. **W1 — OCR Remediation Tier (flagship; earns provenance + text).** Tier-4 image path (`ocr_preprocess`
-   gray/blue/bw@450 → frontier-vision read → **reconcile to the doc's own totals**), keystone-first. One pass
-   writes text + **stamps `model_used`** + re-scores quality + re-embeds + types → passes `connect-verify` →
-   **certify (T3 human)** via the `ocr_remediation` work-kind. Building it = pipeline-desk work; the live
-   layer plans + sequences it. Stays a drip within OCR-ladder quota (no Gemini-free-as-primary, no 72B).
+1. **W1 — OCR Remediation Tier (earns provenance + text). BUILT · SHADOW (deploys 763–767).** `reocr_gemini.py`
+   now implements the atomic accept: conditional gray preprocess (`_page_png`) → vision read → **strict-improvement
+   guard** → in one txn re-score quality + set type + (only when all 5 hold) earn `model_used` via a real
+   `extraction_runs` row — **A41-safe by construction**. Runs SHADOW (`--stamp` off on the timer). Guardrails:
+   §3.5 backfill 4-signal-gated (deploy_767), A42 truth_test (`test_provenance_earned_from_run`), A41 truth_test.
+   **Enable = supervised-first via the `ocr_remediation` work-kind** (not a blanket timer flip) — rollout runbook +
+   go/no-go gates in `docs/INGESTION_DIRECTIVE.md` §ROLLOUT. **Blockers: Gemini 429 + the pilot.** Frontier-vision
+   crop+magnify and reconcile-to-totals stay agent-in-loop. Drip within OCR-ladder quota (no Gemini-primary, no 72B).
 2. **W2 — Deterministic connect (keep + extend).** §3.5 sweep + Mac embed are live/creditless. Extend
    `document_type` to Paracale's **71 unclassified** via a local qwen classify pass → the deterministic map
    then types them. Keep sweep/embed timers green (`systemctl --failed` = 0).
 3. **W3 — Embedded-source reconciliation.** Gate reads `corpus_backfill_state.embedded` (1489); embedder
    writes `rag_local` (1492) → **3 diverge**. Make `corpus_backfill_state.embedded` canonical + have the
    embedder set it. Removes false gate-holds.
-4. **W4 — Measurement as a runtime signal.** Per-matter live dashboard over the exact 5 gate signals, logged
-   each sweep so "connected %" must move (like `awareness_log`). One definition — the gate's, never a second.
+4. **W4 — Measurement as a runtime signal. DONE (deploy_766).** `v_incorporation_status` / `v_doc_connectivity`
+   (mirror A41 exactly) + `scripts/incorporation_status.py` (snapshot/`--matter`/`--log`/`--check`/`--check-regression`)
+   + `incorporation_log` trend, wired into the nightly. A41-consistency + regression are truth-tested/alerted. One
+   definition — the gate's.
 5. **W5 — Matter priority.** MWK (Aug-12 docs) first, Paracale second; within a matter, keystone/element-
    proving docs first — connectivity spend buys evidentiary value.
 
@@ -276,8 +281,12 @@ deterministic sweep + embed keep the 4 cheap signals current on every ingest.
 **Metrics.** Provenance-earned rising off 86/0 (headline) · fully-connected % up each sweep · **zero fabricated
 provenance** · timers green, `connect-verify` hold-rate falling as docs genuinely connect.
 
-**Handoff to the ontology layer (by directive, not self-edit):** formalize §2.8 ConnectedDocument + invariants
-A7–A9, retire the "`model_used`=0" premise, ratify the canonical embedded source. Directive issued 2026-07-07.
+**Handoff to the ontology layer (by directive, not self-edit):** §2.17 ConnectedDocument + A41–A43 are now
+DEFINED by the ontology agent (ONTOLOGY v0.20) and consistent with the built flow — no invariant change needed.
+**One open directive:** build the **V8 DB-trigger** — a `BEFORE INSERT/UPDATE OF model_used ON documents`
+validator in the DB-resident `ontology_validator` (log mode) that flags any stamp lacking a matching
+`extraction_runs(status='completed')` row (write-time A42 enforcement, complementing the deploy-gated
+`test_provenance_earned_from_run`). A42 already flagged V8 as "candidate, not built here." Directive issued 2026-07-08.
 
 ## 6.5 Activation — flip the stack ON when credits land (architecture is in place)
 
@@ -313,6 +322,15 @@ confirm `/ops/spend` shows recorded n8n spend + the cap enforcing, and that Leo 
 
 ## 8. Slip / change log
 
+- **2026-07-08** — **Automated ingestion + preprocessing operative shipped, SHADOW (deploys 762–767; §6B W1/W4).**
+  5 phases: (1) `reocr_gemini` earns provenance on accept via a real `extraction_runs` row (A42); (2) atomic
+  5-signal accept — conditional gray preprocess + strict-improvement guard + re-score quality/type + stamp only
+  when all 5 hold (A41-safe by construction), `--stamp` shadow-default; (3) governed visibility (`v_incorporation_status`
+  + `incorporation_status.py` + trend, nightly-wired, A41-consistency truth-tested); (4) governance — closed a
+  latent A41 hole (§3.5 backfill was ungated → now 4-signal-gated) + A42 truth_test (`test_provenance_earned_from_run`)
+  + V8 DB-trigger handed to the ontology desk; (5) rollout runbook + go/no-go gates + regression alert
+  (`--check-regression`). Full suite 94 assertions green throughout. **Enable is supervised-first via the
+  `ocr_remediation` work-kind, blocked on Gemini 429 + pilot — NOT yet on.**
 - **2026-07-07** — **LIVE-LAYER master plan set (§6B); role split.** The live layer (corpus
   connectivity / intake / remediation — *mutates the corpus*) is separated from the ontology layer
   (`ONTOLOGY.md` / validators — fed by directive, never self-edited). "Connected" is now the deploy_712

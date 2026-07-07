@@ -121,16 +121,36 @@ def log_snapshot(cur):
     print(f"[incorporation] logged {tot['connected']}/{tot['total']} connected · high-water {r['hw']} (today {r['cur']})")
 
 
+def check_regression(cur):
+    """Fail-closed rollout guard: alert if the corpus-wide connected count fell BELOW the historical
+    high-water mark — that means a connectivity signal was un-set (a regression), which the A41/A42
+    consistency tests do NOT catch (they check consistency, not a drop). Exit 1 on regression."""
+    cur.execute("SELECT connected FROM v_incorporation_status WHERE is_total = 1")
+    now = cur.fetchone()["connected"]
+    cur.execute("SELECT coalesce(max(connected), 0) AS hw FROM incorporation_log")
+    hw = cur.fetchone()["hw"]
+    if now < hw:
+        print(f"[incorporation] REGRESSION: connected {now} < high-water {hw} — a connectivity signal was "
+              f"un-set since the peak. Investigate before enabling/continuing rollout.")
+        return False
+    print(f"[incorporation] no regression: connected {now} >= high-water {hw}")
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--matter", help="drill into one case_file's missing-signal backlog")
     ap.add_argument("--log", action="store_true", help="append today's snapshot to incorporation_log")
     ap.add_argument("--check", action="store_true", help="assert the view reconciles with A41 (exit 1 on drift)")
+    ap.add_argument("--check-regression", action="store_true", dest="check_regression",
+                    help="exit 1 if connected count fell below the high-water mark (rollout guard)")
     a = ap.parse_args()
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     try:
         if a.check:
             sys.exit(0 if check_consistency(cur) else 1)
+        if a.check_regression:
+            sys.exit(0 if check_regression(cur) else 1)
         if a.matter:
             matter_detail(cur, a.matter); return
         snapshot(cur)

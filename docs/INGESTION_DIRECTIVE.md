@@ -85,6 +85,28 @@ trust Drive's OCR for a document's *existence* (it missed the 1985 Undertaking e
 > §6B W1. `corpus_backfill.py` (no-text path) still OCRs raw at dpi 120 and does not preprocess — a separate
 > follow-on. Reconcile-to-totals remains agent-in-loop.
 
+### ROLLOUT — enabling provenance stamping (shadow → pilot → enabled)
+
+The Phase-1+2 capability is BUILT and SHADOW (`--stamp` off). Enable it **supervised-first — never a blanket
+timer flip.** Every step has a monitoring window; any red truth_test or connectivity regression PAUSES the rollout.
+
+**Go / no-go gates (ALL must hold before advancing a step):**
+- `truth_tests/run_all.py` green — esp. `connectivity.provenance_implies_all_5_signals` (A41),
+  `provenance.earned_stamp_traces_to_run` (A42), `incorporation.view_reconciles_with_a41`.
+- `python3 scripts/incorporation_status.py --check-regression` clean (connected ≥ high-water mark).
+- On the pilot batch: accept-rate reasonable and the stamped docs verified truly 5/5.
+
+**Sequence:**
+1. **SHADOW (now).** Timer runs `reocr_gemini --sweep` with **no** `--stamp`: improves text/quality/type, logs
+   `would-stamp`, writes no provenance. Watch `incorporation_status.py` + the nightly. (Live reads blocked on Gemini 429.)
+2. **PILOT (supervised, per-doc).** When quota returns, enable via the `ocr_remediation` work-kind on a few
+   keystone docs — `reocr_gemini.py --doc <id> --go --stamp` under the T3 chokepoint. After each: run the three
+   truth_tests + `--check-regression`. Expect ~6 already-ready docs to move provenance 86 → ~92.
+3. **EXPAND.** Only after a clean pilot, widen the supervised set. Add `--stamp` to `landtek-reocr-sweep.service`
+   for volume **only** after several clean supervised rounds.
+4. **ROLLBACK.** If a truth_test reddens or `--check-regression` fires: remove `--stamp` / `git revert` the
+   enabling change. Text/quality/type writes are non-regressing (strict-improvement guard), so there is no data to undo.
+
 ## STAGE 2 — CONNECT (get the metadata in line)
 Run in order (each feeds the next):
 1. `scripts/routine_entity_doc_linker.py --max <N>` → populates **`doc_entities`** (entities per doc)
