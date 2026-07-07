@@ -74,11 +74,16 @@ failed or unreconciled read · quote an unreconciled digit in a filing · self-h
 *worse* — confident hallucination without self-check) · rely on Gemini free-tier as a primary (chronic 429) ·
 trust Drive's OCR for a document's *existence* (it missed the 1985 Undertaking entirely).
 
-> **Implementation status (2026-07-08) — RATIFIED SPEC, staged rollout.** This operative is the standard.
-> *Today* the automated re-OCR sweep (`reocr_gemini.py` on `landtek-reocr-sweep.timer`) reads the RAW page and
-> does **not** yet preprocess, reconcile, or stamp `model_used`; `corpus_backfill.py` OCRs raw at dpi 120. The
-> preprocess→read→reconcile→earn-provenance wiring rolls out in shadow first — see MASTER_PLAN §6B W1 and the
-> roadmap below. Until enabled, `ocr_preprocess.py` remains a manual tool, not yet auto-invoked.
+> **Implementation status (2026-07-08) — BUILT · SHADOW · enable pending.** The automated re-OCR path
+> (`reocr_gemini.py` on `landtek-reocr-sweep.timer`) now IMPLEMENTS this operative: conditional gray preprocess
+> (`_page_png`) → vision read → **strict-improvement guard** (never regress good text) → atomic re-score
+> `ocr_quality` + `document_type` + (only when all 5 signals hold) earn `model_used` via a real `extraction_runs`
+> row — **A41-safe by construction**. It runs in **SHADOW**: `--stamp` is OFF on the timer, so no provenance is
+> written until enabled. Governance guardrails are in place (deploy_767): the §3.5 sweep backfill is 4-signal-
+> gated, and `truth_tests/test_provenance_earned_from_run.py` (A42) + `test_connected_document_count.py` (A41)
+> gate every deploy/nightly. **Blockers to enabling:** (1) Gemini free-tier 429; (2) the pilot in MASTER_PLAN
+> §6B W1. `corpus_backfill.py` (no-text path) still OCRs raw at dpi 120 and does not preprocess — a separate
+> follow-on. Reconcile-to-totals remains agent-in-loop.
 
 ## STAGE 2 — CONNECT (get the metadata in line)
 Run in order (each feeds the next):

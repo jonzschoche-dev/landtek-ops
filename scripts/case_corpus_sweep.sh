@@ -41,12 +41,19 @@ python3 scripts/case_file.py --all || true
 #      All $0, deterministic, idempotent.
 python3 scripts/ocr_quality.py --scan --go 2>&1 | tail -1 || true             # signal: ocr_quality (re-score)
 docker exec -i n8n-postgres-1 psql -U n8n -d n8n <<'EOSQL' || true
--- signal: provenance (model_used) <- latest COMPLETED extraction_runs.model (honest source; never invented)
+-- signal: provenance (model_used) <- latest COMPLETED extraction_runs.model (honest source; never invented).
+-- A41-SAFE (deploy_767): stamp ONLY when the doc clears the other 4 gate signals, so provenance never lands
+-- on a half-connected doc (would redden test_connected_document_count.py). Mirrors reocr_gemini Phase-2 accept.
+-- (document_type is set by the map just below; a doc typed this cycle earns its stamp on the next sweep.)
 WITH latest AS (
   SELECT DISTINCT ON (doc_id) doc_id, model FROM extraction_runs
   WHERE status='completed' AND coalesce(model,'')<>'' ORDER BY doc_id, completed_at DESC NULLS LAST)
 UPDATE documents d SET model_used = latest.model FROM latest
-  WHERE latest.doc_id=d.id AND coalesce(d.model_used,'')='';
+  WHERE latest.doc_id=d.id AND coalesce(d.model_used,'')=''
+    AND coalesce(length(d.extracted_text),0) >= 50
+    AND d.document_type IS NOT NULL
+    AND EXISTS (SELECT 1 FROM ocr_quality q WHERE q.doc_id=d.id)
+    AND EXISTS (SELECT 1 FROM corpus_backfill_state c WHERE c.doc_id=d.id AND c.embedded IS TRUE);
 -- signal: document_type <- classification (deterministic map; only fills blanks, never overwrites)
 UPDATE documents SET document_type = CASE
     WHEN lower(classification) LIKE 'title%'                                          THEN 'TCT'
