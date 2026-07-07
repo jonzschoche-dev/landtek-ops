@@ -105,6 +105,7 @@ def _page_png(page, enhance=True, variant="gray"):
     """Render a PDF page to PNG bytes. For an eligible re-OCR, apply the validated preprocessing
     enhancement (gray default — the winner; blue over-thins faded ink) BEFORE the vision read. Same
     Gemini call count, better input. Fails OPEN to the raw render — never lose a read over a preprocess hiccup."""
+    import fitz  # local import (module keeps fitz optional at import-time, per reocr())
     mat = float(os.environ.get("REOCR_MATRIX", "2.2"))   # raise toward the 450-dpi doctrine via env when quota allows
     raw = page.get_pixmap(matrix=fitz.Matrix(mat, mat)).tobytes("png")
     if not enhance:
