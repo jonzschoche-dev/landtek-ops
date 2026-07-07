@@ -294,7 +294,7 @@ def discover_officers(cur):
              OR affiliation ~* '(municipal|provincial|LGU|DENR|register of deeds|civil service|anti-red tape|ARTA|RTC|MTC|office of|government|city of)' )
           AND (COALESCE(role,'') || ' ' || COALESCE(affiliation,'') || ' ' || canonical_name) !~* %s
         ORDER BY mentions_count DESC NULLS LAST
-    """, (_OURSIDE_RE,))
+    """, (active_ourside(),))
     out = []
     for eid, name, aliases, role, aff, mc in cur.fetchall():
         blob = f"{name} {role} {aff}"
@@ -314,7 +314,7 @@ def build_roster(cur):
     discovered = discover_officers(cur)
     disc_tokens = {t.lower() for _n, _o, _c, toks, _no, _s in discovered for t in toks}
     roster = [(n, o, c, t, no, "discovered") for (n, o, c, t, no, _s) in discovered]
-    for name, office, cap, toks, note in SEED_ROSTER:
+    for name, office, cap, toks, note in active_roster():
         # skip a seed only if the SAME person was already discovered (shared distinctive token);
         # always keep the flagship's curated provenance
         if any(t.lower() in disc_tokens for t in toks) and name != (active_case().get("flagship") or ""):
@@ -376,13 +376,23 @@ CASES = {
         ],
     },
 }
+# Universal own-side terms — litigant ROLE words only, NO client-specific names. A client that has
+# no configured own-side falls back to this, so one client's allies (Keesey/Barandon…) never leak in.
+GENERIC_OURSIDE = r"plaintiff|complainant|petitioner|our client|attorney-in-fact|\bheir\b|private"
 GENERIC_CASE = {
     "scope": None, "flagship": None, "insider_names": [], "beneficiaries": [],
+    "client_code": None,                        # canonical clients.client_code; None → falls back to the key
+    "roster": [], "ourside": GENERIC_OURSIDE,   # A37: unknown clients start with NO seed roster
     "scheme": ["(No case-theory configured for this client — the ACTORS / COUNTS / CLINCH below are",
                " data-driven and client-agnostic; add a CASES entry to get the scheme narrative.)"],
     "defense": ["• (No client-specific defense pre-mortem configured — see the per-count gaps.)"],
     "next_facts": ["• (Run --hunt on each respondent to surface the clinching facts.)"],
 }
+# A37: the MWK-specific seed roster + own-side exclusion are CLIENT-SCOPED knowledge — bind them to the
+# MWK case, never a global default. active_roster()/active_ourside() resolve per active client below.
+CASES["MWK"]["roster"] = SEED_ROSTER
+CASES["MWK"]["ourside"] = _OURSIDE_RE
+CASES["MWK"]["client_code"] = "MWK-001"   # the canonical clients.client_code _client_of() resolves MWK matters to
 _ACTIVE_CLIENT = ["MWK"]
 
 
@@ -400,6 +410,26 @@ def set_client(key):
     _ACTIVE_CLIENT[0] = key
     if key not in CASES:
         CASES[key] = dict(GENERIC_CASE, scope=(key.rstrip("%") + "%"))
+
+
+def _client_code():
+    """The active client's CANONICAL isolation code (the `clients.client_code` that `_client_of()`
+    resolves to — e.g. 'MWK-001', NOT the short 'MWK' key) — written to ombudsman_candidates.client_code
+    and used to scope EVERY candidate read/write (A35/A36). Configured per client in CASES[...]['client_code'];
+    falls back to the de-wildcarded key for an unconfigured client."""
+    return active_case().get("client_code") or _ACTIVE_CLIENT[0].rstrip("%")
+
+
+def active_roster():
+    """The active client's curated seed roster — client-scoped (A37). Non-MWK clients start empty
+    (corpus discovery only), so an official seeded under one client never seeds another's hunt."""
+    return active_case().get("roster", [])
+
+
+def active_ourside():
+    """The active client's own-side exclusion regex — client-scoped (A37). One client's allies are
+    never applied to another; an unconfigured client gets only universal litigant-role words."""
+    return active_case().get("ourside") or GENERIC_OURSIDE
     _COMPILED.clear()
 
 
@@ -630,16 +660,16 @@ def upsert(cur, cands):
     for c in cands:
         cur.execute("""
             INSERT INTO ombudsman_candidates
-              (official, office, capacity, matters, violation_code, statute, forum, elements, signals,
-               prescription, status, strength, leverage, score, gaps, rationale, provenance, updated_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'inferred_strong', now())
-            ON CONFLICT (official, violation_code) DO UPDATE SET
+              (client_code, official, office, capacity, matters, violation_code, statute, forum, elements,
+               signals, prescription, status, strength, leverage, score, gaps, rationale, provenance, updated_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'inferred_strong', now())
+            ON CONFLICT (client_code, official, violation_code) DO UPDATE SET
               office=EXCLUDED.office, capacity=EXCLUDED.capacity, matters=EXCLUDED.matters,
               statute=EXCLUDED.statute, forum=EXCLUDED.forum, elements=EXCLUDED.elements,
               signals=EXCLUDED.signals, prescription=EXCLUDED.prescription, status=EXCLUDED.status,
               strength=EXCLUDED.strength, leverage=EXCLUDED.leverage, score=EXCLUDED.score,
               gaps=EXCLUDED.gaps, rationale=EXCLUDED.rationale, updated_at=now()
-        """, (c["official"], c["office"], c["capacity"], c["matters"], c["violation_code"],
+        """, (_client_code(), c["official"], c["office"], c["capacity"], c["matters"], c["violation_code"],
               c["statute"], c["forum"], json.dumps(c["elements"]), json.dumps(c["signals"]),
               c["prescription"], c["status"], c["strength"], c["leverage"], c["score"],
               json.dumps(c["gaps"]), c["rationale"]))
@@ -850,7 +880,8 @@ def cmd_reason(client):
         if not _table_exists(cur, "ombudsman_candidates"):
             print("No candidates. Run --scan then --verify first.")
             return
-        cur.execute("SELECT * FROM ombudsman_candidates ORDER BY score DESC")
+        cur.execute("SELECT * FROM ombudsman_candidates WHERE client_code=%s ORDER BY score DESC",
+                    (_client_code(),))
         rows = [r for r in cur.fetchall()]
         if not rows:
             print("No candidates. Run --scan / --verify.")
@@ -1018,11 +1049,14 @@ def cmd_verify(target):
             print("No candidates. Run --scan first.")
             return
         if str(target).isdigit():
-            cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s", (int(target),))
+            cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s AND client_code=%s",
+                        (int(target), _client_code()))
         elif str(target).lower() == "all":
-            cur.execute("SELECT * FROM ombudsman_candidates WHERE status <> 'seed' ORDER BY score DESC")
+            cur.execute("SELECT * FROM ombudsman_candidates WHERE client_code=%s AND status <> 'seed' ORDER BY score DESC",
+                        (_client_code(),))
         else:
-            cur.execute("SELECT * FROM ombudsman_candidates WHERE status='ripe' ORDER BY score DESC")
+            cur.execute("SELECT * FROM ombudsman_candidates WHERE client_code=%s AND status='ripe' ORDER BY score DESC",
+                        (_client_code(),))
         rows = cur.fetchall()
         if not rows:
             print("Nothing to verify (no matching 'ripe' candidate). Run --board to see statuses.")
@@ -1099,8 +1133,8 @@ def cmd_verify(target):
                          f"{r['statute']} elements established. " + " · ".join(notes))
             cur.execute("""UPDATE ombudsman_candidates
                            SET elements=%s, status=%s, strength=%s, score=%s, gaps=%s, rationale=%s,
-                               provenance='operator', updated_at=now() WHERE id=%s""",
-                        (json.dumps(elements), status, strength, score, json.dumps(gaps), rationale, r["id"]))
+                               provenance='operator', updated_at=now() WHERE id=%s AND client_code=%s""",
+                        (json.dumps(elements), status, strength, score, json.dumps(gaps), rationale, r["id"], _client_code()))
             print(f"  => {status.upper()}  (strength {int(strength*100)}%, score {score})")
         print("\n[verify] done. Filing remains human-gated — 'held_for_filing' is the ceiling.")
 
@@ -1110,7 +1144,8 @@ def cmd_board():
         if not _table_exists(cur, "ombudsman_candidates"):
             print("No candidates yet. Run --scan (after applying the migration on the VPS).")
             return
-        cur.execute("SELECT * FROM ombudsman_candidates ORDER BY score DESC")
+        cur.execute("SELECT * FROM ombudsman_candidates WHERE client_code=%s ORDER BY score DESC",
+                    (_client_code(),))
         rows = cur.fetchall()
         if not rows:
             print("No candidates yet. Run --scan.")
@@ -1130,7 +1165,7 @@ def cmd_board():
 
 def cmd_candidate(cid):
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-        cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s", (cid,))
+        cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s AND client_code=%s", (cid, _client_code()))
         r = cur.fetchone()
         if not r:
             print(f"No candidate #{cid}.")
@@ -1161,7 +1196,7 @@ def cmd_candidate(cid):
 def cmd_playbook(cid):
     """Emit a case_synthesizer playbook JSON for a ripe candidate (drafting only — not a filing)."""
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-        cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s", (cid,))
+        cur.execute("SELECT * FROM ombudsman_candidates WHERE id=%s AND client_code=%s", (cid, _client_code()))
         r = cur.fetchone()
         if not r:
             print(f"No candidate #{cid}.")
@@ -1244,7 +1279,7 @@ def cmd_doctrine():
         print(f"      prescription: {v['prescription']}")
     print("\nSEED ROSTER OVERLAY (the LIVE roster also LEARNS officers from the entities graph "
           "— run --officers):")
-    for o, off, cap, toks, note in SEED_ROSTER:
+    for o, off, cap, toks, note in active_roster():
         print(f"  {o:<28} [{cap}] {off}\n      match: {toks}\n      seed: {note}")
 
 
