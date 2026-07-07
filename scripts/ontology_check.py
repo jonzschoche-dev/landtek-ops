@@ -13,10 +13,11 @@ Usage:
   python3 scripts/ontology_check.py --coverage # every populated domain table must be NAMED in ONTOLOGY.md
   python3 scripts/ontology_check.py --structure # STRUCTURE lint (no DB): unique section numbers + heading depth
   python3 scripts/ontology_check.py --invariants # every §4 invariant's named enforcement artifact must EXIST
-  python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes ONE
-                                               # high-severity holes_findings row ONLY on NEW
-                                               # actionable contamination (V3/V4 > 0). Standing
-                                               # backlog (drift tables, vocab creep) never alerts.
+  python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes a
+                                               # holes_findings row on NEW V3/V4 contamination,
+                                               # a coverage regression, OR a broken §4 invariant
+                                               # enforcement ref (--invariants). Standing amber
+                                               # backlog (drift, vocab creep, 🟡 invariants) never alerts.
 
 Exit code: 0 = clean, 1 = drift/contamination found (usable as a health gate).
 """
@@ -134,19 +135,17 @@ def cmd_coverage(cur) -> int:
 ARTIFACT_STRONG = re.compile(r'(\.py(\b|::)|\(\)|^ontvv_|^trg_|^enforce_|^test_|^v_[a-z]|^truth_tests/)')
 
 
-def cmd_invariants(cur) -> int:
-    """INVARIANT INTEGRATION check — the governance↔ontology loop-closer. Parses every A# row in
-    ONTOLOGY.md §4 and verifies that each SPECIFIC named enforcement artifact (a trigger, function,
-    view, `truth_tests/*.py`, or code def) actually EXISTS. A 🟢 invariant that names an artifact which
-    is missing is 'green that isn't true' → FAIL (exit 1). Invariants enforced conceptually (schema
-    NOT NULL, `_safe` views) or still amber (🟡/flagged/shadow) are reported, not failed. Makes
-    'governance is integrated with the ontology' a CHECK, not a claim (sibling of --coverage/--structure)."""
+def invariant_gaps(cur):
+    """Parse ONTOLOGY §4 and resolve each invariant's named enforcement artifact against the live DB +
+    repo code. Returns (oks, conceptual, amber, fails) — reused by cmd_invariants (prints) AND the daily
+    sentinel (writes a finding on `fails`). `fails` = 🟢 invariants naming an artifact that doesn't exist.
+    Returns None on unreadable doc."""
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     try:
         with open(_doc_path()) as f:
             doc = f.read()
     except Exception:
-        print("cannot read ONTOLOGY.md"); return 2
+        return None
     # Ground-truth artifact universe: live DB triggers/functions/views + code defs + test/script files.
     cur.execute("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal")
     known = {r[0] for r in cur.fetchall()}
@@ -197,7 +196,20 @@ def cmd_invariants(cur) -> int:
             conceptual.append(aid)                              # 🟢 but enforcement is schema/prose — unverifiable by name
         else:
             amber.append(aid)                                   # 🟡/flagged/shadow — expected gap, not a failure
+    return oks, conceptual, amber, fails
 
+
+def cmd_invariants(cur) -> int:
+    """INVARIANT INTEGRATION check — the governance↔ontology loop-closer. Parses every A# row in
+    ONTOLOGY.md §4 and verifies that each SPECIFIC named enforcement artifact (a trigger, function,
+    view, `truth_tests/*.py`, or code def) actually EXISTS. A 🟢 invariant that names an artifact which
+    is missing is 'green that isn't true' → FAIL (exit 1). Invariants enforced conceptually (schema
+    NOT NULL, `_safe` views) or still amber (🟡/flagged/shadow) are reported, not failed. Makes
+    'governance is integrated with the ontology' a CHECK, not a claim (sibling of --coverage/--structure)."""
+    result = invariant_gaps(cur)
+    if result is None:
+        print("cannot read ONTOLOGY.md"); return 2
+    oks, conceptual, amber, fails = result
     print("=== ONTOLOGY §4 invariant integration — every named enforcement artifact must exist ===")
     print(f"  🟢 backed by a VERIFIED artifact ({len(oks)}): " + ", ".join(a for a, _ in oks))
     print(f"  🟢 conceptual/schema enforcement, no specific artifact named ({len(conceptual)}): " + ", ".join(conceptual))
@@ -406,6 +418,31 @@ def main():
                 )
         except Exception:
             pass
+
+    # invariant-integration regression: a 🟢 §4 invariant names an enforcement artifact that no longer
+    # EXISTS (green-that-isn't-true) → governance has drifted from what the ontology claims. Alert on any
+    # broken ref; NEVER on the standing amber backlog (🟡/flagged/shadow are expected, not failures).
+    if sentinel:
+        try:
+            with conn.cursor() as cur:
+                res = invariant_gaps(cur)
+            fails = res[3] if res else []
+            if fails:
+                key = "; ".join(f"{a}:{','.join(m)}" for a, m, _ in fails)
+                idesc = (f"ontology invariant-integration regression: {len(fails)} 🟢 §4 invariant(s) name an "
+                         f"enforcement artifact that does NOT exist — {[a for a, _, _ in fails]}. Green-that-isn't-"
+                         f"true: §4 claims enforcement the DB/code can't back. Fix the artifact name or build it; "
+                         f"run scripts/ontology_check.py --invariants.")
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """INSERT INTO holes_findings(routine_name, routine_version, finding_id_hash,
+                             severity, hole_type, description, metadata, status)
+                           VALUES ('ontology_check','v1', md5(%s), 'high', 'ontology_invariant_broken',
+                             %s, jsonb_build_object('broken',%s), 'open')""",
+                        (key[:200], idesc, len(fails)),
+                    )
+        except Exception:
+            pass  # sentinel must never crash the timer
 
     conn.close()
 
