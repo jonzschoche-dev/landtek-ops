@@ -14,7 +14,14 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.18 (2026-07-07).** **A32 enforcement begins — client render-audit shadow guard.**
+> **Ontology version: v0.19 (2026-07-08).** **New §2.17 Document Connectivity & Provenance** — models the
+> live §6B connectivity work: `ConnectedDocument` (⊂ IngestionComplete) · the 5-signal fail-closed
+> `ConnectivityGate` (`supervisor.py::_connect_verify`) · `DeterministicConnectStage` vs the EARNED
+> `ProvenanceStamp` (`documents.model_used`) · the deterministic-vs-earned boundary + embedded's one canonical
+> source (`corpus_backfill_state.embedded`, not `rag_local`). Invariants **A41** (all-5-signals),
+> **A42** (`model_used` earned, never fabricated — candidate shadow V8, flagged), **A43** (gate fail-closed).
+> Resolves the `ONTOLOGY_ALIGNMENT.md` G4 gap; A41–A43 were the guard's forward-references, now defined.
+> **v0.18:** **A32 enforcement begins — client render-audit shadow guard.**
 > `scripts/ontology_check.py --render-audit` (+ daily sentinel) projects every leak-prone field's raw values
 > through `client_ontology` and flags any forbidden internal token (matter_code/§/docket/CTN/gmail#/§4B-tag/
 > raw-provenance) that survives → `holes_findings` `client_render_leak`. Negative-tested (catches flagship
@@ -485,6 +492,37 @@ point, A31) · `_client_of()`. Lineage: deploy_114 (bus) → 654 (email) → 662
 
 ---
 
+## 2.17 Document Connectivity & Provenance — *is a document actually wired into the stack, or just sitting in it?*
+
+> **Definition.** The contract for a document being *connected* — not merely stored. A `ConnectedDocument`
+> has cleared the **5-signal ConnectivityGate** (`supervisor.py::_connect_verify`), the fail-closed check that
+> a (re-)ingested doc actually re-wired to the corpus. It is a strict *subset* of `IngestionComplete` (the
+> 6-signal "done" of `docs/INGESTION_DIRECTIVE.md`). The governing distinction is **deterministic vs earned**:
+> four signals a *stage mechanically produces*, and one — provenance — that can only be **earned** from a real
+> extraction run and must never be fabricated to make a doc "look connected." Live: **86/1579 fully connected;
+> 0/388 Paracale** (provenance is the binding scarcity).
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| **ConnectedDocument** | 🟡 a `documents` row clearing all 5 gate signals | partial (**86/1579**; 0/388 Paracale) | `⊂ IngestionComplete`; "in the DB" ≠ "connected" |
+| **ConnectivityGate** | 🟢 `scripts/supervisor.py::_connect_verify` | **enforced** at the OCR-remediation chokepoint | the 5-signal check; returns ok **only** when zero issues (A43) |
+| **DeterministicConnectStage** | 🟢 OCR ladder · `ocr_quality.py` · `rag_embed_local` · `doc_classification` | active | the stages that *produce* the 4 deterministic signals (text · quality · embedded · type) |
+| **ProvenanceStamp** (the EARNED signal) | 🟡 `documents.model_used` ← `extraction_runs` | asserted / **earned-only** | the ONE signal a stage can't just set: which engine actually read the doc. 86 earned, **0 fabricated** (A42) |
+| **IngestionComplete** (the 6-signal superset) | 🟡 `docs/INGESTION_DIRECTIVE.md` "DONE" | partial | gate's 5 + entity-resolution + `matter_facts` harvest + tracker-baseline — the fuller per-matter target |
+
+> **The 5 gate signals + their ONE canonical source each:** text (`documents.extracted_text` ≥ 50) · provenance
+> (`documents.model_used`) · quality (`ocr_quality.score`, latest) · **embedded (`corpus_backfill_state.embedded`
+> = true — NOT `rag_local` presence;** the two can diverge, so the gate reads the flag, not the vector store) ·
+> type (`documents.document_type`). ⚠ **Deterministic ≠ earned:** the first/third/fourth/fifth are produced by a
+> stage; `model_used` is **earned** — backfilled only from a real `extraction_runs` record (the 86 truthful
+> stamps came from there), never written to satisfy the gate. Fabricating it is the failure A42 forbids.
+
+*Components: `supervisor.py` (`_connect_verify` + the `ocr_remediation` work-order kind that gates remediation
+output) · `corpus_backfill_state` (embedded flag) · `ocr_quality` · `extraction_runs` (provenance source) ·
+`rag_embed_local` · `docs/INGESTION_DIRECTIVE.md` (the 6-signal runbook). **Invariants: A41–A43.***
+
+---
+
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
 
 | 🔴 Table | Rows | Verdict | Canonical instead |
@@ -556,6 +594,9 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A38 | No inbound message is acted on (replied, written to persona memory, or routed) before its `ChannelUser` is resolved to a `client_code` or explicitly held `unresolved`; an unresolved identity never inherits another client's persona or thread. | 🟡 **asserted (deploy_752)** — sharpens A25 (resolution must PRECEDE action). `platform_coordinator.py --resolve` is the live v1 resolver: it binds only on a unique-contact match and **leaves NULL when unsure** (the explicit `unresolved` hold), so it never guesses a client. The remaining gap is the *ordering* guarantee — that no reply/memory-write fires before resolve runs — which the coordinator's routing half (○ planned) must enforce. |
 | A39 | Every outbound `ChannelMessage` to an external recipient carries a recorded exposure decision (the `outward_guard` verdict + its approval/hold reference); an external send whose decision cannot be reconstructed from the record is a violation. | 🟡 **asserted / flagged** — sharpens A26; `outbound_blocks` logs holds and `outward_guard` shadow-logs decisions, but per-message *allow*-decision logging on real external sends is pending (block-mode dormant). |
 | A40 | A `channel_audit` activation record is COMPLETE (channel · surface · actor · timestamp · approval ref) and BOTH activation and deactivation are recorded; a channel's external-active state is always reconstructable from `channel_audit` alone. | 🟡 **asserted / flagged** — sharpens A30 (completeness + deactivation symmetry); `truth_tests/test_comms_activation_audit.py` floors the surface, systematic per-activation rows still pending. |
+| A41 | A `ConnectedDocument` satisfies ALL 5 ConnectivityGate signals (text · `model_used` · `ocr_quality` · `corpus_backfill_state.embedded` · `document_type`); a half-connected doc is never treated as fully connected or absorbed as evidence (§2.17). | 🟢 **ENFORCED at the chokepoint** — `scripts/supervisor.py::_connect_verify` gates every `ocr_remediation` work order fail-closed (rejects on any missing signal). 🟡 **asserted corpus-wide** — the standing 86/1579 aren't all retroactively gate-checked; the gate binds *remediation output*, not legacy rows. |
+| A42 | `documents.model_used` (the ProvenanceStamp) is **EARNED** — set only from a real `extraction_runs` record, and **NEVER fabricated** to make a document "look connected." Provenance is the one signal a stage cannot simply assert. | 🟡 **asserted** — 86 stamps earned from `extraction_runs`, 0 Paracale, 0 fabricated; the deterministic-vs-earned boundary is doctrine (§2.17). **Candidate shadow V8** (a `log`-mode validator guarding `documents.model_used` writes) is a code follow-on — **flagged, NOT built here**. |
+| A43 | The `ConnectivityGate` is **FAIL-CLOSED** — any missing signal → the document is rejected/held, never partially absorbed; connectivity is **proven, never assumed**. | 🟢 **ENFORCED** — `_connect_verify` returns ok **only** when `issues == []`; a missing text/provenance/quality/embed/type each blocks. Verified: `model_used`=0 corpus-wide once meant 0 docs passed — the gate did not lie. |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).

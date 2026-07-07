@@ -52,6 +52,7 @@ PLAN = [
     ("2.14", "3.7", "authored", "Communications → Domain Models"),
     ("2.15", "3.9", "authored", "Client-Facing Projection → Domain Models"),
     ("2.16", "3.10", "authored", "Offensive Leverage (Ombudsman) → Domain Models"),
+    ("2.17", "3.11", "authored", "Document Connectivity & Provenance → Domain Models"),
     # top-level renumbers — deterministic, safe to auto-rewrite
     ("8",    "6",   "certain",  "Oriented Operational Map → Component Mapping (all §8.x → §6.x)"),
     ("9",    "7",   "certain",  "Future Domains → §7"),
