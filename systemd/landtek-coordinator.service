@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek Platform Coordinator (comms governance) — refresh channel_audit activation records (A30) + resolve channel_users->client (A25). Reads token presence only; sends nothing outward.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/platform_coordinator.py --tick
+StandardOutput=append:/var/log/landtek_coordinator.log
+StandardError=append:/var/log/landtek_coordinator.log
