@@ -148,7 +148,11 @@ Parse: `\[(?:OCR|STRUCTURE|v|HUMAN VERIFY|\?)[^\]]*\]`. Layers must PRESERVE ups
 - **Operator:** Gemini Advanced browser OCR of the garbage docs (worklist provided; `ocr_browser_adapter.py --write-ocr` flows it back).
 - **Designer:** refine the OCR/comprehend prompts; script the full OCR-worklist generator; add ChatGPT/Grok browser transports to the adapter; sharpen the element frameworks. **Design only — no execution.**
 
-### OCR attack (current operation — drain 341 flagged / no-text docs)
+### OCR attack (2026-06-14 — SUPERSEDED by §6B; kept for history)
+
+> **Superseded 2026-07-07 by the Live-Layer master plan (§6B).** "Connected" is now the deploy_712
+> `connect-verify` 5-signal definition, not the "drain 341 flagged" frame below. The remediation/OCR
+> work continues under §6B W1 (earns provenance) + W2 (deterministic connect). Text below is historical.
 
 - **Engine (REVISED 2026-06-14 — Gemini not accurate enough for exhibits):** legal-critical docs (titles / SPAs / deeds — Waves 1–2) → **Claude vision direct on the local PDF** (executor session; reads + OCRs + comprehends in one pass; most accurate, $0 on the subscription). Low-value searchable bulk (Wave 3 images/surveys) → Gemini browser is acceptable. **Preprocess faded paper titles first: `ocr_preprocess.py --variants gray`, then read the GRAY image** — validated on doc 87 (gray = grayscale+autocontrast+unsharp+denoise reads cleanly; blue-channel isolation OVER-THINS faded ink into fragments; reserve blue for saturated modern blue-ink). Every result flows back through `scripts/ocr_browser_adapter.py` (re-scores quality, backs up old text, feeds RAG + comprehension). Goal: `--status` pending_ocr **341 → 0**; `knowledge_coverage` "documents readable" **66% → ~95%**.
 - **Priority (already encoded in `--next-ocr`):** text-bearing garbage first (titles / SPAs / deeds), worst score first; then no-text images/surveys; skip zip/docx/xlsx (handled elsewhere).
@@ -210,6 +214,51 @@ from `awareness_log` + `surfaced_deadlines` + per-matter verified-fact coverage)
 `/ops/awareness` page + the structured `/api/deadlines` feed; then the credit-gated comprehension
 pass to raise verified-fact coverage.
 
+## 6B. Live Layer — Corpus Connectivity master plan (2026-07-07)
+
+**Scope.** The runtime that *mutates the corpus* — intake, OCR remediation, connectivity, provenance-
+earning. Owned by the live-layer agent; the ontology layer (`ONTOLOGY.md` / validators) is a **separate
+desk, fed by directive, never edited from here.** Supersedes the 2026-06-14 "OCR attack" op (§5A) with the
+`connect-verify` framing.
+
+**North star.** Every matter's corpus reaches **fully-connected = the 5 `connect-verify` signals** (text ·
+provenance `model_used` · `ocr_quality` · `document_type` · embedded), with **provenance EARNED, never
+faked**, sequenced by evidentiary value for Aug 12. Baseline (2026-07-06): **86/1579** connected corpus-
+wide, **0/388** Paracale. Authoritative "done" runbook = `docs/INGESTION_DIRECTIVE.md` (a 6-signal superset).
+
+**Binding constraint = provenance.** 4 of 5 signals are deterministic + already automated (quality/type/embed
+via `case_corpus_sweep.sh` §3.5 + Mac `com.landtek.embed`, deploy_715/716). Only **provenance** — and text for
+a degraded doc — is *earned* by a real engine read. Paracale = 0 earned; corpus = 86 (truthful
+`extraction_runs` backfill). So the flagship job is the remediation tier that **earns** provenance; nothing
+else moves Paracale off zero. Fabricating `model_used` to pass the gate is forbidden (ontology A8).
+
+**Workstreams (prioritized):**
+1. **W1 — OCR Remediation Tier (flagship; earns provenance + text).** Tier-4 image path (`ocr_preprocess`
+   gray/blue/bw@450 → frontier-vision read → **reconcile to the doc's own totals**), keystone-first. One pass
+   writes text + **stamps `model_used`** + re-scores quality + re-embeds + types → passes `connect-verify` →
+   **certify (T3 human)** via the `ocr_remediation` work-kind. Building it = pipeline-desk work; the live
+   layer plans + sequences it. Stays a drip within OCR-ladder quota (no Gemini-free-as-primary, no 72B).
+2. **W2 — Deterministic connect (keep + extend).** §3.5 sweep + Mac embed are live/creditless. Extend
+   `document_type` to Paracale's **71 unclassified** via a local qwen classify pass → the deterministic map
+   then types them. Keep sweep/embed timers green (`systemctl --failed` = 0).
+3. **W3 — Embedded-source reconciliation.** Gate reads `corpus_backfill_state.embedded` (1489); embedder
+   writes `rag_local` (1492) → **3 diverge**. Make `corpus_backfill_state.embedded` canonical + have the
+   embedder set it. Removes false gate-holds.
+4. **W4 — Measurement as a runtime signal.** Per-matter live dashboard over the exact 5 gate signals, logged
+   each sweep so "connected %" must move (like `awareness_log`). One definition — the gate's, never a second.
+5. **W5 — Matter priority.** MWK (Aug-12 docs) first, Paracale second; within a matter, keystone/element-
+   proving docs first — connectivity spend buys evidentiary value.
+
+**Sequencing.** *Now:* W2 (Paracale 71 classify) · W3 (embed-source fix) · W4 (dashboard). *Next:* W1 stood up
+on a small keystone batch to prove the earn-provenance loop end-to-end, then scale by W5. *Continuous:* the
+deterministic sweep + embed keep the 4 cheap signals current on every ingest.
+
+**Metrics.** Provenance-earned rising off 86/0 (headline) · fully-connected % up each sweep · **zero fabricated
+provenance** · timers green, `connect-verify` hold-rate falling as docs genuinely connect.
+
+**Handoff to the ontology layer (by directive, not self-edit):** formalize §2.8 ConnectedDocument + invariants
+A7–A9, retire the "`model_used`=0" premise, ratify the canonical embedded source. Directive issued 2026-07-07.
+
 ## 6.5 Activation — flip the stack ON when credits land (architecture is in place)
 
 Everything is built cold and **inert**: the spend-bridge timer is disabled, the synthetic loops
@@ -232,6 +281,11 @@ confirm `/ops/spend` shows recorded n8n spend + the cap enforcing, and that Leo 
 - Paracale-001: active, or maintenance mode?
 - Don Qi role (client vs co-principal).
 - Recovery vs. settlement posture per transferee (the 20-transferee campaign).
+- **Live layer — build the tier-4 OCR remediation path?** (§6B W1) — the only lever that *earns*
+  provenance, so the only way Paracale docs reach fully-connected (0/388 today). Pipeline-desk build.
+- **Ratify `corpus_backfill_state.embedded` as the canonical "embedded" source?** (§6B W3) — small
+  embedder change; removes the 3-doc gate/embedder divergence.
+- **Remediation priority — MWK before Paracale?** (§6B W5) — bears on "Paracale active vs maintenance" above.
 - ~~Product versioning kickoff~~ — **DECIDED 2026-06-30: develop the product relentlessly.** A
   dedicated commercialization subagent fleet now exists at `.claude/agents/` (product-hardener ·
   ship-packager · revenue-engineer · truth-qa-gate) driving toward a retainer-ready workspace for the
@@ -239,6 +293,15 @@ confirm `/ops/spend` shows recorded n8n spend + the cap enforcing, and that Leo 
 
 ## 8. Slip / change log
 
+- **2026-07-07** — **LIVE-LAYER master plan set (§6B); role split.** The live layer (corpus
+  connectivity / intake / remediation — *mutates the corpus*) is separated from the ontology layer
+  (`ONTOLOGY.md` / validators — fed by directive, never self-edited). "Connected" is now the deploy_712
+  `connect-verify` 5 signals (text · provenance · `ocr_quality` · `document_type` · embedded); baseline
+  **86/1579** corpus, **0/388** Paracale. Binding constraint = **provenance, earned not faked**: 4/5 signals
+  are deterministic + automated (sweep §3.5 + `com.landtek.embed`, deploy_715/716); only provenance + text
+  are earned by a real engine read → flagship = the tier-4 remediation path (W1). The 2026-07-06 backlog run
+  already moved Paracale embed **102→385**, quality **301→388**, corpus provenance **0→86**. §5A "OCR attack"
+  superseded; ontology changes handed off by directive.
 - **2026-07-04** — **GEOMETRY-INTAKE ("strip the plot info from the maps/titles") built (deploy_684/685/687).** Goal: mine plottable geometry out of the corpus → `parcels` shapes → later georeference into `map_parcels`. `scripts/strip_plot_info.py` (deploy_684, fixed _685) sweeps titles/plans for metes-and-bounds → `survey_geometry` → `parcels`, closure-error quality-gated, never fabricates. **KEY FINDING (MWK-001 run): the plot info IS in the corpus but standard OCR garbled it beyond use — 0 usable of 54 candidate docs** (the 3 that parse have km-scale closure; computed 489 ha vs 0.9 ha registered). Text-only extraction yields nothing plottable. **Real path = vision re-OCR** (reocr_gemini's prompt preserves bearings exactly → the $0 text-parse then works). Blocked only by **Gemini free-tier 429** (confirmed exhausted today). Jonathan's call: **drip-drain on free tier, Balane chain first** → deploy_687: `geometry_priority` queue (Balane chain parents seeded — subdivision plan + T-4497→T-32917→T-52540; Balane's own lot T-079-2021002126 NOT in corpus, awaits RD CTC) + `scripts/geometry_pipeline.py` (reocr→strip per doc, `--max 6`/run, stops clean on QuotaExhausted) + daily `landtek-geometry-drip.timer`. Reuses `reocr_gemini.py`'s Drive-fetch + key×model ladder + resumable log (no rebuild). Tie-lines (BLLM anchors) confirmed present → absolute georeference → `survey`-tier `map_parcels` feasible once calls are clean. Escalation open: paid Gemini billing = whole chain in one pass.
 - **2026-07-04** — **MAPPING subsystem v1 SHIPPED + APPLIED (deploy_682 → corrected by deploy_683).** New client-facing capability: a client opens a token-gated mobile map, sees their parcel drawn on Esri satellite, and taps "Locate me" to learn whether they're standing **inside their boundary** and the distance to the nearest edge (device GPS + on-device point-in-polygon). Resolves the old "geospatial needs a separate PostGIS DB" blocker (§4A) by storing geometry as **GeoJSON in JSONB** on the production DB with area/centroid/overlap math in pure Python. **Correction:** deploy_682 named the table `parcels` and collided with a pre-existing (empty, but code-referenced) survey-extraction table of the same name (`scripts/parcels.py` — relative local-meter WKT from metes-and-bounds); `CREATE TABLE IF NOT EXISTS` silently skipped and the apply half-failed. deploy_683 renames the client-map layer to **`map_parcels`** / **`map_parcels_client`** and documents the two as distinct complementary layers (relative survey shape vs. absolute placed parcel; bridge = tie-point georeference). Pieces: `migrations/deploy_683_map_parcels.sql` (MWK-BALANE seeded UNPLOTTED — no fabricated coords), `leo_tools/geo_math.py`, `leo_tools/mapping.py` (blueprint: `/ops/map` draw tool [Leaflet-Geoman, basic-auth] + `/client/<token>/map` [reuses `client_access` token = one client] + GeoJSON feeds + save), `scripts/mapping_agent.py` (`audit` plot-vs-title area, `overlaps` cross-owner encroachment leads), `.claude/agents/mapping-agent.md`, `systemd/landtek-parcel-audit.{service,timer}` (daily). Accuracy is a provenance tier: `rough`→`survey`→`ortho`; every non-ortho parcel renders an "APPROXIMATE — not a survey" banner. **Switch held OFF** (internal proof on MWK-BALANE only). **Next:** plot MWK-BALANE at `/ops/map/draw?parcel=MWK-BALANE`. Local-tested (geo_math area/centroid exact on a 50m square; both HTML templates + module compile clean).
 - **2026-07-03** — **DEPENDABILITY harness + per-client ship gate built (product-hardener, $0, NOT yet committed/deployed — change set handed to operator).** Replaces the reactive whack-a-mole (fabricated Aug-1 date / phantom overdue / garbled label fixed one at a time) with a STANDING, systematic measurement over the *exact facts a client SEES* on the live portal + matter-detail render. New: `scripts/client_dependability.py` (audits Correct/Complete/Stable → a 0–100 Dependability Score + SHIP gate = score ≥90 AND zero correctness fails; CORRECT weighted 60, one fabricated/leak fact tanks the score to 0), `client_dependability` results table, `/ops/dependability` cockpit page (route + nav added to `ops_dashboard.py`; tested in isolation, LIVE service untouched), `systemd/landtek-dependability.{service,timer}` (6h; built, NOT enabled). Reuses (no rebuild) `client_portal.render_*`/guards, `deadlines.py` freshness, `knowledge_coverage` verified-fact ratio. **Measured NOW (honest, low): MWK-001 = 25.8/100 (25 correctness FAILs), Paracale-001 = 14.9/100 (10 FAILs) — BOTH FAIL the gate, 0/2 handoff-ready.** Top defect the harness surfaced = a **live client-separation breach**: docs whose `case_file` is one client are linked via `document_matter_links` to another client's matters and RENDER on the client page (PAR-CAPACUAN shows 84 downloadable docs incl. MWK + NIBDC files; reverse too). Also flagged: **no timer runs `deadlines.py --write`**, so `surfaced_deadlines` (the client-facing dates) is only as fresh as the last manual run — silent-staleness risk (NB: `landtek-proactive.timer` = a *separate* Telegram-push job `proactive_deadlines.py`, disabled — NOT the data refresher; agent mis-identified it, corrected here); `logrotate.service` in `systemctl --failed`. Separation fix spun off as its own task (data-cleanup + render guard). Next: fix separation → re-score; add a `deadlines.py --write` refresh timer; then completeness (only 9/15 MWK + 0/4 Paracale action-matters are dated; verified-fact cov 25%/14%).
