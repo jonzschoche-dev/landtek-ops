@@ -254,7 +254,19 @@ mechanically fixable with the §2 current→target map. **The A-series numbers d
   (a settle window of clean status + no new commits, not a calendar date). *(An earlier draft also cited
   the pre-Aug-12 litigation window; that is not a constraint — the sole real gate is authorship quiescence.)*
 
-**Execution plan when both clear:** (1) branch; (2) apply the §2 current→target map in one pass; (3) `sed`
-the ~35 references using the map; (4) run `ontology_check.py --coverage` (must stay green) + the full
-`truth_tests` suite; (5) `major` version bump + change-log entry. Until then, keep growing under the
-current numbering by **appending** — the target structure is the compass, not a same-day action.
+**Staged tooling (ready to fire — `scripts/ontology_migrate.py`, deploy_747):** the deterministic parts are
+built, tested, and fail-closed; the authored parts are flagged, never auto-changed. It NEVER edits
+ONTOLOGY.md prose.
+- `--preflight` — reads the LIVE doc, maps every numbered heading against the plan, and **fails closed** on
+  any heading the plan doesn't cover (i.e. the doc changed since the plan was authored → update the plan
+  before firing). Verified clean today: 45 headings, all covered.
+- `--refs [--write]` — rewrites only the **CERTAIN** ONTOLOGY cross-references (§8.x→§6.x, §9→§7, §5→§5.1,
+  §6→§5.4, §3/§7→§8); **context-guarded** so references into *other* docs' numbering (`ONTOLOGY_STRUCTURE
+  §6.1`, `ARCHITECTURE §8`) are skipped, and the §2→§3 domain splits are flagged for hand-fixing.
+
+**Fire runbook (when ONTOLOGY.md commits go quiet):** (1) `git checkout -b ontology-v1`; (2)
+`ontology_migrate.py --preflight` must be clean; (3) **author** the body per the §2 map (split registry rows
+from domain models — the one human step; A-numbers do NOT move); (4) `ontology_migrate.py --refs --write` +
+hand-fix the flagged §2→§3 refs; (5) `ontology_check.py --structure` must go GREEN; (6) `--coverage` + full
+`truth_tests` green; (7) `major` bump + change-log; (8) wire `--structure` into the deploy gate. Until then,
+keep growing by **appending** — the target structure is the compass, not a same-day action.
