@@ -23,18 +23,62 @@ A corpus is "genuinely connected" when **every doc clears all six** — measured
 - **Force-tag `case_file` at intake** — never auto-classify across clients (client-separation invariant; ontology V4 guards it).
 - **⚠ TRIAGE before embedding — do NOT embed noise.** The FB-export lesson: 513 photos, only 172 were documents. Rule: keyword-sweep via **Google's OCR index** (free) to separate document-photos from personal/family photos → ingest documents, **archive the rest** (a vision drip only for the OCR-missed remainder). Never let 300 vacation photos into the knowledge base.
 
-## STAGE 1 — THE OCR LADDER (hardcoded; escalate only as needed)
-1. **DocAI** (bulk, creditless) — the default engine. Proven good on the FB batch.
-2. **Quality gate** (`scripts/ocr_quality.py`): if text is thin / garbled / low-score → escalate.
-3. **Preprocess** (`scripts/ocr_preprocess.py --variants gray,blue,bw --dpi 450`):
-   - `blue` = blue-channel isolation → for "UNOFFICIAL COPY IF NOT IN BLUE COLOR" security-ink titles/CTCs
-   - `gray` = grayscale + autocontrast + unsharp → for **faded old typescript** (the winning variant on the 1992 Partition)
-   - `bw` = adaptive threshold → Tesseract baseline
-4. **Frontier-vision read (agent-in-loop, no key):** read the enhanced image; for a hard region, **crop + magnify** it (the royalty column only became legible cropped & 3× upscaled).
-5. **RECONCILE against the document's own internal totals/structure.** This is the step that *beat the raw VLMs*: on the faded royalty %s, Qwen returned 106% and Gemini 101% because they guessed glyphs in isolation; preprocess + magnify + **reconcile-to-100%** produced the self-consistent read. Always sanity-check extracted numbers against a stated total.
-6. **Physical original / macro phone photo** — ONLY for a court-certified digit that remains ribbon-broken after all the above.
+## STAGE 1 — THE OCR LADDER (automatic · conditional · fail-closed)
 
-**NEVER:** quote a fabricated/unreconciled digit in a filing · self-host a 72B VLM (empirically *worse* — confident hallucination without self-check — and won't run on the 32GB Mac) · rely on Gemini free-tier as a primary (chronic 429) · trust Drive's OCR for *existence* (it missed the 1985 Undertaking entirely).
+**Automatic trigger — the remediation predicate.** A doc is remediation-eligible when it HAS a source
+image AND its text is unusable, measured mechanically (no human in the loop to decide *whether*):
+- **no usable text:** `text_length < 50` (extraction empty/failed), **OR**
+- **garbled text:** `ocr_quality.flagged` = true (`score < 0.30` with a source present).
+
+Clean docs (`score ≥ 0.30` and `text_length ≥ 50`) are **NEVER preprocessed** — enhancing a clean page
+wastes work and can degrade it. Preprocessing fires **only** on the eligible set. This is the whole point:
+preprocessing becomes a regular automatic step, gated by a measurable quality condition.
+
+**Order of operations (per eligible doc — the operative):**
+1. **Baseline read** — DocAI (bulk, creditless) / local Tesseract as the doc arrives. If it clears the gate
+   (`score ≥ 0.30`), STOP — no remediation.
+2. **Quality gate** (`scripts/ocr_quality.py --scan --go`): re-score; if flagged → escalate to (3).
+3. **Conditional preprocess** (`scripts/ocr_preprocess.py --variants gray,blue,bw --dpi 450`) — render the
+   source page(s) into the three enhanced variants. **Pass `--dpi 450` explicitly** — the tool *defaults to
+   300*; the operative runs at 450. Variant roles (unchanged, validated):
+   - `gray` = grayscale + autocontrast + unsharp + light denoise → **faded old typescript** (tried **first**;
+     the validated winner on the 1992 Partition — `blue` over-thins faded ink into fragments)
+   - `blue` = blue-channel isolation → **only** for "UNOFFICIAL COPY IF NOT IN BLUE COLOR" security-ink titles/CTCs
+   - `bw`   = adaptive threshold → Tesseract fallback
+4. **Vision/OCR read of the ENHANCED image** (OCR-ladder engine, within quota; frontier-vision is
+   agent-in-loop, no key). Read `gray` first; escalate to `blue` for blue-security-ink docs, `bw` last. For a
+   hard region, **crop + magnify** (~3×) before reading (the royalty column only became legible cropped & upscaled).
+5. **RECONCILE against the doc's own internal totals/structure** — the step that *beat the raw VLMs* (Qwen
+   returned 106%, Gemini 101% guessing glyphs in isolation; preprocess + magnify + reconcile-to-100% produced
+   the self-consistent read). If the doc states a total, verify the extracted line-items sum to it; on
+   mismatch, **flag — do not trust the digit.**
+6. **Re-score** the new read (`ocr_quality`).
+7. **Accept ONLY on improvement (fail-closed).** Write the new text only if it scores **strictly better** than
+   the prior read — never overwrite good text with worse. On accept, in ONE transaction: back up old text →
+   write `extracted_text`/`text_length`/`ocr_used` → **record the read in `extraction_runs`
+   (`doc_id, model, status='completed'`)** so `model_used` is **EARNED** from a real run (A42 — never fabricated
+   to pass the gate) → re-score `ocr_quality` → re-embed (set `corpus_backfill_state.embedded = true`) → set
+   `document_type`. These are exactly the 5 `ConnectivityGate` signals — so an accepted doc passes by construction.
+8. **Gate + certify** — the `ocr_remediation` work-kind runs `supervisor.py::_connect_verify` (the 5 signals,
+   A41/A43); court-critical docs then require `certify` (T3, human).
+9. **Physical original / macro phone photo** — ONLY for a court-certified digit still ribbon-broken after all the above.
+
+**Failure handling — no infinite loops, no silent holes.** If the enhanced read still scores `< 0.30` after
+all variants, escalate the variant ladder (`gray → blue → bw → frontier crop+magnify`). If still failing, cap
+attempts (**≤ 3**, like `corpus_backfill`) and mark the doc `remediation_exhausted` on the human worklist
+(`case_work/OCR_WORKLIST.md`) — **NEVER** stamp `model_used`, **NEVER** pass the gate on a failed read. Gemini
+429 leaves the doc untouched for retry (no partial write, no failure log).
+
+**NEVER:** preprocess a clean page · overwrite better text with worse · fabricate/stamp `model_used` on a
+failed or unreconciled read · quote an unreconciled digit in a filing · self-host a 72B VLM (empirically
+*worse* — confident hallucination without self-check) · rely on Gemini free-tier as a primary (chronic 429) ·
+trust Drive's OCR for a document's *existence* (it missed the 1985 Undertaking entirely).
+
+> **Implementation status (2026-07-08) — RATIFIED SPEC, staged rollout.** This operative is the standard.
+> *Today* the automated re-OCR sweep (`reocr_gemini.py` on `landtek-reocr-sweep.timer`) reads the RAW page and
+> does **not** yet preprocess, reconcile, or stamp `model_used`; `corpus_backfill.py` OCRs raw at dpi 120. The
+> preprocess→read→reconcile→earn-provenance wiring rolls out in shadow first — see MASTER_PLAN §6B W1 and the
+> roadmap below. Until enabled, `ocr_preprocess.py` remains a manual tool, not yet auto-invoked.
 
 ## STAGE 2 — CONNECT (get the metadata in line)
 Run in order (each feeds the next):
