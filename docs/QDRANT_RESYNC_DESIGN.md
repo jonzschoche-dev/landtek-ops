@@ -105,4 +105,32 @@ Only then: alias cutover. Old collection retained for rollback.
 3. `--build v2` full → gates → **hold for cutover approval**.
 4. Cutover (alias) → monitor → drop old collection after the rollback window.
 
+## 10. Consumer map & cutover requirements (Phase 0, grounded 2026-07-08)
+
+**Current state — Qdrant is effectively UNUSED in production:**
+- **`leo_tools/unified_search.py`** (`/api/search`, the live endpoint leo/n8n hit) uses **Postgres text/trigram
+  only.** Its own comment marks Qdrant semantic ranking a "next iteration" that was never built.
+- **`scripts/evidence_strategist.py:165`** is the **only** Qdrant search consumer — and it embeds the query with
+  **Gemini `gemini-embedding-001` (768d)**, which is 429-blocked → **the path is currently dead.** (This is why
+  the collection froze: the whole Gemini-embed lineage died together.)
+- Live semantic retrieval today runs on **`rag_local`/pgvector** (`case_synthesizer`, `legal_authority`,
+  `agents`, `rag_embed_local --search`) — the local path, unaffected by this work.
+
+**Cutover requirements (REQUIRED — the re-sync revives a dead path, it doesn't feed a live one):**
+1. **`evidence_strategist.py` must switch its query embedder Gemini-768d → local bge-small-384d** at cutover, or
+   the new 384d collection is unqueryable for it. (Embed the query with the SAME local model the collection uses.)
+2. **`unified_search.py` semantic wiring is a high-value POST-cutover follow-on**, not a prerequisite — the
+   deferred "next iteration," now unblocked.
+3. **Fallback:** both consumers degrade to `rag_local`/pgvector when Qdrant is unreachable (offline-sovereignty).
+
+**Isolation gap handling (from the dry-run, A5-preserving):**
+- **`case_file` is the client boundary** (present on all but 184 docs) and is the A5 filter; **`matter_codes`**
+  (from `document_matter_links`, array) refines within a client — **null on 354/1492 (23%)**, which is fine for
+  client isolation.
+- **184 no-`case_file` docs → EXCLUDED** from `landtek_documents_v2` (unattributable to a client = never surfaced
+  in a client-scoped query; the safe default). Logged as an upstream data-quality backlog.
+- **354 no-`matter_codes` docs → INCLUDED** (case_file present) but flagged as a **matter-linking backlog**
+  (upstream fix, not papered over in payload).
+
+---
 *Prepared 2026-07-08 (ingestion agent). Companion: `docs/INGESTION_DIRECTIVE.md`, `MASTER_PLAN §6B`, `docs/DOCUMENT_MODEL_DRAFT.md` (§2.17). Parity script archived in session scratch.*
