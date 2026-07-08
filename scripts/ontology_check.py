@@ -15,6 +15,7 @@ Usage:
   python3 scripts/ontology_check.py --invariants # every §4 invariant's named enforcement artifact must EXIST
   python3 scripts/ontology_check.py --render-audit # A32: projected client output must carry NO internal token
   python3 scripts/ontology_check.py --alignment  # MASTER_PLAN/bridge A# citations must exist in ONTOLOGY §4 (no DB)
+  python3 scripts/ontology_check.py --shadow-status [N]  # log-mode validators: findings in last N days (def 7) + flip-readiness
   python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes a
                                                # holes_findings row on NEW V3/V4 contamination,
                                                # a coverage regression, OR a broken §4 invariant
@@ -322,6 +323,63 @@ def cmd_render_audit(cur) -> int:
     return 1 if leaks else 0
 
 
+# Maps each ontology_validator check to how its shadow findings appear in holes_findings, so --shadow-status
+# can attribute them. (hole_type, detail_substring-or-None). V5 shares ONTOLOGY_CLIENT_CROSS with V4(block),
+# disambiguated by the 'ombudsman_candidates' detail. Extend when a new validator is added.
+SHADOW_REGISTRY = {
+    "V5": ("ombudsman client-isolation",  "ONTOLOGY_CLIENT_CROSS",          "ombudsman_candidates"),
+    "V6": ("geometry client-isolation",   "ONTOLOGY_GEOMETRY_CLIENT_CROSS", None),
+    "V7": ("comms channel-identity",      "ONTOLOGY_CHANNEL_BAD_CLIENT",    None),
+    "V8": ("provenance earned-from-run",  "ONTOLOGY_PROVENANCE_UNEARNED",   None),
+}
+
+
+def cmd_shadow_status(cur, days=7) -> int:
+    """Consolidated readout of every ontology_validator in `log` (shadow) mode — the go/no-go for flipping to
+    `block`. For each log-mode check: findings in the last N days (from holes_findings, the source of truth),
+    most-recent finding, and a readiness flag (0 findings = flip-ready). Read-only; writes nothing. This is
+    the mechanical replacement for eyeballing the digest (§2.17 V8 observation-window workflow)."""
+    cur.execute("SELECT check_code FROM ontology_validator_config WHERE mode = 'log' ORDER BY check_code")
+    log_checks = [r[0] for r in cur.fetchall()]
+    print(f"=== ontology_validator SHADOW status — findings in the last {days} day(s) ===")
+    if not log_checks:
+        print("  (no validators in log/shadow mode)"); return 0
+    ready, hold, unmapped = [], [], []
+    for cc in log_checks:
+        reg = SHADOW_REGISTRY.get(cc)
+        if not reg:
+            unmapped.append(cc)
+            print(f"  {cc:4} ⚠ UNMAPPED — add to SHADOW_REGISTRY so its findings can be attributed")
+            continue
+        name, htype, dlike = reg
+        # window count + all-time count (all-time last-finding shows observation history when it exists)
+        sql = ("SELECT count(*) FILTER (WHERE created_at > now() - make_interval(days => %s)), "
+               "count(*), max(created_at) FROM holes_findings WHERE hole_type = %s")
+        params = [days, htype]
+        if dlike:
+            sql += " AND description ILIKE %s"
+            params.append(f"%{dlike}%")
+        cur.execute(sql, params)
+        n_win, n_all, last = cur.fetchone()
+        laststr = last.strftime("%Y-%m-%d %H:%M") if last else "never"
+        flag = f"⚠ {n_win} in window — HOLD" if n_win else "✓ 0 in window — flip candidate"
+        print(f"  {cc:4} {name:26} log · {n_win:>3} in {days}d · {n_all:>4} all-time · last {laststr:12} {flag}")
+        (hold if n_win else ready).append(cc)
+    print()
+    if ready:
+        in_list = ", ".join("'%s'" % c for c in ready)
+        print(f"  FLIP CANDIDATES (0 findings in {days}d): {', '.join(ready)}")
+        print(f"    UPDATE ontology_validator_config SET mode='block' WHERE check_code IN ({in_list});")
+    if hold:
+        print(f"  HOLD — findings present, investigate first: {', '.join(hold)}")
+    if unmapped:
+        print(f"  UNMAPPED log-mode checks (extend SHADOW_REGISTRY): {', '.join(unmapped)}")
+    print(f"  NOTE: '0 in window' is necessary, not sufficient — before flipping, confirm the validator has "
+          f"actually observed ≥{days}d of ACTIVE pipeline (a freshly-deployed guard is trivially clean). "
+          f"No reliable in-shadow-since is tracked in-DB; judge from its deploy date.")
+    return 0
+
+
 def cmd_alignment() -> int:
     """ALIGNMENT check (no DB) — keeps MASTER_PLAN.md, ONTOLOGY_ALIGNMENT.md, and ONTOLOGY.md §4 in sync
     (ONTOLOGY_ALIGNMENT.md §7.4). Two mechanical rules: (1) every invariant `A#` cited in the plan or the
@@ -449,6 +507,12 @@ def main():
     if "--render-audit" in sys.argv:
         with conn.cursor() as cur:
             rc = cmd_render_audit(cur)
+        conn.close()
+        sys.exit(rc)
+    if "--shadow-status" in sys.argv:
+        days = next((int(a) for a in sys.argv if a.isdigit()), 7)   # optional window: e.g. `--shadow-status 14`
+        with conn.cursor() as cur:
+            rc = cmd_shadow_status(cur, days)
         conn.close()
         sys.exit(rc)
     problems = 0
