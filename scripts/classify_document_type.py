@@ -28,23 +28,32 @@ import psycopg2.extras
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 
-# Controlled vocabulary — the document_type values already in use (align, don't invent new ones).
+# Controlled vocabulary — existing types + the real categories this mining/civil-registry corpus needs.
+# WIDE ON PURPOSE (v2): a too-narrow list force-fits the model into confidently-wrong picks (v1 mislabeled
+# birth certs / business clearances / permits as "Certificate of Death" at 0.9+). 'Other Document' is the
+# honest escape hatch — the prompt forbids force-fitting.
 VOCAB = [
     "TCT", "Deed", "SPA", "Affidavit", "Court Order", "Court Filing", "Tax Document", "Correspondence",
-    "Receipt", "Contract", "Government Submission", "Certificate of Death", "Newspaper", "Chat Screenshot",
-    "Working Draft", "Document (photographed)",
+    "Receipt", "Contract", "Government Submission", "Newspaper", "Chat Screenshot", "Working Draft",
+    "Certificate of Birth", "Certificate of Death", "Marriage Certificate", "Business Permit",
+    "Sanitary Permit", "Mining Permit", "Environmental Document", "License", "Permit", "Application",
+    "Technical Report", "Clearance", "Certification", "Map or Plan", "Photograph",
+    "Document (photographed)", "Other Document",
 ]
 _VOCAB_LC = {v.lower(): v for v in VOCAB}
 
-SYS = ("You are a precise document classifier for a Philippine land/legal case corpus. You classify a "
-       "document into EXACTLY ONE type from a controlled list and reply ONLY with a single JSON object.")
+SYS = ("You are a precise document classifier for a Philippine land/mining/civil-registry case corpus. You "
+       "classify a document into EXACTLY ONE type from a controlled list and reply ONLY with a single JSON "
+       "object. Accuracy matters more than specificity: a wrong specific label is a corruption.")
 
 PROMPT_TMPL = (
     "Classify the document below into EXACTLY ONE of these types:\n{vocab}\n\n"
-    "Rules: pick the single best fit. Use 'Chat Screenshot' for social-media/messenger captures; "
-    "'Document (photographed)' for a photo/scan of a document with no clearer category; 'Correspondence' "
-    "for letters/emails/notices; 'Court Filing' for pleadings/motions/complaints; 'Court Order' for "
-    "orders/resolutions/decisions; 'Government Submission' for forms/applications filed with an agency. "
+    "Rules: pick the single best fit from the list. Distinguish carefully — a 'Certificate of Birth' is NOT a "
+    "'Certificate of Death'; a 'Business Permit'/'Clearance'/'Sanitary Permit' is NOT a civil-registry "
+    "certificate. Use 'Chat Screenshot' for messenger/social captures; 'Correspondence' for letters/emails/"
+    "notices; 'Court Filing' for pleadings/motions/complaints; 'Court Order' for orders/resolutions/decisions. "
+    "**If NO type on the list clearly fits, answer 'Other Document' with confidence <= 0.5 — do NOT force-fit "
+    "a specific type you are unsure of. Prefer 'Other Document' over a wrong specific guess.** "
     "Reply with ONLY this JSON, no prose:\n"
     '{{"document_type": "<one exactly from the list>", "confidence": <0.0-1.0>, "reason": "<=12 words"}}\n\n'
     "DOCUMENT TEXT (may be OCR-noisy):\n{body}"
