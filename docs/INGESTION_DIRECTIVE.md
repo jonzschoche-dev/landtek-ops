@@ -243,4 +243,40 @@ circuit-breaker. Governance: `ontology_validator` (V1–V8), `truth_tests/`, `on
 the V8 flip. Full plan: `MASTER_PLAN.md` §6B + this file's §ROLLOUT.
 
 ---
+
+## ARCHITECTURE DIRECTION — PROPOSED 2026-07-08 (pending review · NOT yet adopted · nothing built)
+
+> Design-only, to review before any implementation. Grounding: the corpus is ALREADY a half-adopted
+> signal model — 8 signal/provenance tables exist (`ocr_quality`, `corpus_backfill_state`, `extraction_runs`,
+> `rag_local`, `doc_entities`, `document_matter_links`, `document_type_proposals`, `extraction_chunks`); only
+> 3 of the 5 gate signals live as wide `documents` columns (`extracted_text`, `model_used`, `document_type`).
+> So this is *consistency + extensibility*, not a rebuild.
+
+**Three ADDITIVE, reversible moves (no migration of the working gate):**
+1. **Formalize provenance & classification as first-class records (name what exists).** `extraction_runs`
+   IS the `ProvenanceRecord` (A42 source); `documents.model_used` is its denormalized cache. Generalize
+   `document_type_proposals` → `document_classifications` (doc_id · dimension type/role · value · method
+   deterministic|llm|human · model · confidence · status) — every type/role gains an audit trail; the
+   `document_type`/`doc_role` columns become caches of the accepted row.
+2. **Extensible `document_signals` table (additive, shadow).** New/experimental/agentic signals write here
+   (doc_id · signal_type · value · confidence · provenance_ref · source · is_current) with NO `ALTER TABLE`.
+   The 5 CANONICAL gate signals STAY in their fast homes — the gate (`_connect_verify`) is untouched, A41
+   unchanged. A `v_document_signals` view unions canonical + extended for one queryable surface.
+3. **W3 embed unification (the one concrete fix worth doing first).** Single canonical flag =
+   `corpus_backfill_state.embedded` (gate already reads it); make the Mac embedder set it when it writes
+   `rag_local` → removes the 1492-vs-1489 divergence, prevents future drift.
+
+**Design-only, HELD for approval (external-facing / not blocking connectivity):** `DocumentFiling`
+(doc_id · front leo|gdrive · canonical_path/url · filed_name · checksum · status), `FilingRule` (naming +
+folder convention, e.g. `<matter>/<doc_type>/<YYYY-MM-DD>_<title>_<docid>`), `DocumentInventory` (a view over
+`documents` + filing + `drive_file_id` showing per-doc presence across digital/Drive/leo + a sync sentinel).
+leo.hayuma.org is client-facing (see the "no external exposure until ready" rule); filing writes/renames are
+outward + hard to reverse → design now, switch held.
+
+**Safety:** all additive (new tables, no `documents` `ALTER`, no gate change); shadow-first; A41/A42/A43 + V8
+untouched (gate reads the same canonical sources); rollback = DROP the new tables (nothing depends on them
+until a separate, approval-gated flip). **Explicitly NOT proposed:** migrating the 5 gate signals into an EAV
+table (query cost + migration risk, no near-term payoff). Least-moves; the Aug-12/provenance path stays primary.
+
+---
 *Prepared 2026-07-06. Companion: `case_work/Paracale-001/CORPUS_TRACKER.md`, `case_work/OCR_WORKLIST.md`. This is a technical pipeline runbook — not a strategic plan (see MASTER_PLAN.md for direction).*
