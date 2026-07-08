@@ -49,6 +49,17 @@ def _copy(tsv):
         raise RuntimeError("COPY failed: " + r.stderr[:300])
 
 
+def _reconcile_cbs():
+    """W3 embed unification: the ConnectivityGate reads `corpus_backfill_state.embedded` as THE canonical
+    embed signal (ONTOLOGY §2.17) — NOT rag_local presence. Keep them in lockstep so a fastembed doc actually
+    satisfies `_connect_verify`. Truthful (the doc has vectors), A41-safe (sets embed only, no provenance).
+    One idempotent upsert, run after every embed pass so the stores never diverge again."""
+    _psql("INSERT INTO corpus_backfill_state (doc_id, embedded) "
+          "SELECT DISTINCT doc_id, true FROM rag_local "
+          "ON CONFLICT (doc_id) DO UPDATE SET embedded=true, updated_at=now()")
+    print("[embed] reconciled corpus_backfill_state.embedded ← rag_local (W3: single canonical embed signal)")
+
+
 def setup():
     out = _psql("CREATE EXTENSION IF NOT EXISTS vector; "
                 "CREATE TABLE IF NOT EXISTS rag_local (id serial PRIMARY KEY, doc_id int, chunk_index int, "
@@ -107,6 +118,7 @@ def embed_all(limit=None):
         if batch_docs == 0:
             break
     print(f"[embed] DONE docs={done} chunks={chunks_total} (local bge-small, $0)")
+    _reconcile_cbs()   # W3: keep the gate's canonical embed signal in lockstep with rag_local
 
 
 def status():
