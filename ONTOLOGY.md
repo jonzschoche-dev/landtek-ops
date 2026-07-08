@@ -14,7 +14,14 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.21 (2026-07-08).** **A42 DB write-guard built — V8 shadow.** `ontvv_v8_provenance_earned`
+> **Ontology version: v0.22 (2026-07-08).** **Extended document/semantic model GRADUATED** (converged design of
+> the ontology desk + ingestion agent, deploy_785/787). §2.17 extended (DocumentSignal · DocumentClassification ·
+> DocumentRole · DocumentFiling/Inventory + the Semantic layer Entity/Fact/Relationship) + **invariants A44–A49**.
+> **A48 was GROUNDED-corrected before graduating:** the draft "a Fact ⇐ a ConnectedDocument" was falsified (971
+> fact-source docs, only 84 connected; even verified-tier scoping too strong at 13/484) → A48 now asserts a Fact
+> requires the **`text` signal** (not the 5-signal gate), backed by `truth_tests/test_fact_requires_text.py`
+> (suite 94→96, negative-tested). Q6: `knowledge_graph_triples` canonical, `entity_relationships` drift. All
+> additive; A41–A43 + `_connect_verify` untouched. **v0.21:** **A42 DB write-guard built — V8 shadow.** `ontvv_v8_provenance_earned`
 > trigger (`BEFORE INSERT OR UPDATE OF model_used ON documents`, config `V8='log'`, deploy_769) logs
 > `ONTOLOGY_PROVENANCE_UNEARNED` when a `model_used` stamp lacks a completed `extraction_runs` row — the
 > real-time complement to the batch `test_provenance_earned_from_run.py`. Resilient, non-blocking in shadow;
@@ -525,9 +532,24 @@ point, A31) · `_client_of()`. Lineage: deploy_114 (bus) → 654 (email) → 662
 > stage; `model_used` is **earned** — backfilled only from a real `extraction_runs` record (the 86 truthful
 > stamps came from there), never written to satisfy the gate. Fabricating it is the failure A42 forbids.
 
+**Extended document/signal model (graduated deploy_788 — converged design of the ontology desk + ingestion agent).**
+The connectivity core above is one layer of a fuller model — full detail + the layered frame (Raw→Signal→
+Semantic→Projection→Agent) in `docs/DOCUMENT_MODEL_DRAFT.md`. First-class concepts, each grounded in live or
+proposed tables: **DocumentSignal** (the 5 mandatory gate signals + an extensible `document_signals` ○ store, A44)
+· **DocumentClassification** (`documents.document_type`/`doc_role` ← `document_type_proposals` → the proposed
+`document_classifications` adjudication layer; **inferred/LLM types are proposals, deterministic-map exempt**, A45)
+· **DocumentRole** (intrinsic `doc_role` vs contextual per-matter `relation_kind`, A47) · **DocumentFiling /
+FilingLocation / DocumentInventory / FilingRule / SyncRule** (leo primary + Drive secondary + vault; leo-filing is
+**outward**, held, A46) · and the **Semantic layer** — `Entity` (§2.2) · `EntityLink` (`doc_entities`) · `Fact`
+(`matter_facts`) · `Relationship` (🟢 `knowledge_graph_triples` canonical; `entity_relationships` is drift) —
+which **rises from a document's `text` signal and stays cited** (A48), and to which agents contribute only through
+the write-gate (A49). All additive/shadow-first; A41–A43 + `_connect_verify` + earned-provenance are untouched.
+
 *Components: `supervisor.py` (`_connect_verify` + the `ocr_remediation` work-order kind that gates remediation
 output) · `corpus_backfill_state` (embedded flag) · `ocr_quality` · `extraction_runs` (provenance source) ·
-`rag_embed_local` · `docs/INGESTION_DIRECTIVE.md` (the 6-signal runbook). **Invariants: A41–A43.***
+`rag_embed_local` · `document_type_proposals` · `truth_tests/test_fact_requires_text.py` (A48) ·
+`docs/INGESTION_DIRECTIVE.md` (6-signal runbook) + `DOCUMENT_MODEL_DRAFT.md` (the extended model).
+**Invariants: A41–A49.***
 
 ---
 
@@ -605,6 +627,12 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A41 | A `ConnectedDocument` satisfies ALL 5 ConnectivityGate signals (text · `model_used` · `ocr_quality` · `corpus_backfill_state.embedded` · `document_type`); a half-connected doc is never treated as fully connected or absorbed as evidence (§2.17). | 🟢 **ENFORCED at the chokepoint** (`scripts/supervisor.py::_connect_verify`, fail-closed) **+ 🟢 asserted CORPUS-WIDE** (`truth_tests/test_connected_document_count.py`, deploy gate + nightly): every `model_used`-stamped doc must clear all 5 signals — a **count-independent consistency** check (not a `==86` threshold, which would punish progress), negative-tested to bite (stamp + null `document_type` → RED). The 86/1579 is now a governed, printed number, not an anecdote. Legacy backlog (1493 docs missing ≥1 signal) is tracked, not asserted-red. |
 | A42 | `documents.model_used` (the ProvenanceStamp) is **EARNED** — set only from a real `extraction_runs` record, and **NEVER fabricated** to make a document "look connected." Provenance is the one signal a stage cannot simply assert. | 🟢 **asserted (batch) + SHADOW WRITE-GUARD (V8, deploy_769)** — batch: `truth_tests/test_provenance_earned_from_run.py` (deploy+nightly, corpus-wide). Real-time: **`ontvv_v8_provenance_earned` trigger** `BEFORE INSERT OR UPDATE OF model_used ON documents` (config `V8='log'`) logs `ONTOLOGY_PROVENANCE_UNEARNED` to `holes_findings` when a stamp lacks a completed `extraction_runs` row; **shadow — blocks nothing**. Resilient (check errors degrade to allow); verified: 0/86 false-fire, non-blocking self-test PASS, block-mode RAISE proven. **Flip to enforce:** `UPDATE ontology_validator_config SET mode='block' WHERE check_code='V8';` (after clean shadow + approval). |
 | A43 | The `ConnectivityGate` is **FAIL-CLOSED** — any missing signal → the document is rejected/held, never partially absorbed; connectivity is **proven, never assumed**. | 🟢 **ENFORCED** — `_connect_verify` returns ok **only** when `issues == []`; a missing text/provenance/quality/embed/type each blocks. Verified: `model_used`=0 corpus-wide once meant 0 docs passed — the gate did not lie. |
+| A44 | The A41 `ConnectivityGate` is exactly the **5 mandatory** `DocumentSignal`s; a new/experimental/agentic signal is **additive** (a proposed `document_signals` shadow store) and never enters the gate except by explicit governance promotion (version bump + invariant edit). | 🟡 **asserted-in-principle** — the gate is stable (A41/A43); the extensible `document_signals` table is ○ proposed (ingestion architecture, deploy_785), not built. Protects A41's stability as the corpus grows. §2.17 · `docs/DOCUMENT_MODEL_DRAFT.md` §1. |
+| A45 | An **inferred/LLM** `document_type`/`doc_role` is written to a proposals layer (`document_type_proposals` → generalizing to `document_classifications`) with confidence + method + source; only an adjudicated proposal (`status`) sets the cached `documents.document_type`/`doc_role`. **Deterministic-map classification is exempt** — a rule-set type is directly authoritative. | 🟡 **asserted** — `document_type_proposals` (71) is the live proposal layer (Q1 sign-off: A45 governs *inferred* classification only); the generalized `document_classifications` is ○ proposed. Classification analogue of A19. |
+| A46 | A `DocumentFiling` copy in a non-corpus location must reconcile to the corpus (checksum); a divergence is a `DocumentInventory` gap, never silent. **A filing write/rename to leo.hayuma.org is an OUTWARD action (client-facing front) held behind the exposure gate (A11/A21); Drive/vault filing is internal.** | 🟡 **asserted** — Drive (`drive_*`) + vault (`vault_*`) columns exist; unified `DocumentInventory`/`FilingRule`/`SyncRule` are ○ proposed (design-only, held). Rides offline-sovereignty + no-external-exposure. |
+| A47 | A contextual `DocumentRole` (`document_matter_links.relation_kind`) is per doc-matter link and inherits client separation (A5); intrinsic role (`documents.doc_role`) is global. A role never crosses a document into another client's theory. | 🟡 **asserted** — `relation_kind` + `doc_role` exist; rides A5. Intrinsic-vs-contextual role split endorsed by the ingestion sign-off (deploy_787). |
+| A48 | A `Fact`/`Relationship` must cite a **source document with a usable `text` signal** (`text_length ≥ 50`) — knowledge is never extracted from a textless doc; `verified` additionally requires a verbatim `excerpt` (A2/A20). **The full 5-signal `ConnectivityGate` is NOT a fact prerequisite** — connectivity governs a doc's *completeness* (A41), not whether its text yields a cited fact. | 🟢 **asserted** — `truth_tests/test_fact_requires_text.py` (deploy gate + nightly). **Grounded correction (2026-07-08):** the draft "fact ⇐ ConnectedDocument" was FALSIFIED — all 971 fact-source docs have text (0 violations) while only 84 are fully connected; even the "scope to `verified`" fallback was too strong (only 13/484 verified-fact docs are connected). Text is the true signal→semantic dependency. Negative-tested to bite. |
+| A49 | An agent (or any projection) contributes to the semantic layer only through the propose→adjudicate→`verified` write-gate; none writes a `verified` `Fact`/`Relationship` directly, nor reads a sub-`verified` tier out as settled fact. | 🟡 **asserted / ○** — the `matter_facts` write-gate (`enforce_provenance_facts`) + `_safe` views enforce it today; the Agent Interaction layer that will inherit it is ○ planned. Extends A19. |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).

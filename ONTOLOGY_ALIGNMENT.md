@@ -90,12 +90,14 @@ domain is *product roadmap not yet built* (finance/tenants/forensic), the ontolo
   check the touched pillar has an ontology home.
 - ~~Model the Connectivity domain~~ **DONE (deploy_760: §2.17 / A41–A43; deploy_769: shadow-V8 write-guard on `model_used`).**
 - Land the client-projection **A32 render-audit** guard (G6) — the highest product-impact enforcement.
-- **Extended document/semantic model — DRAFTED, pending ingestion coordination (deploy_784).** `docs/DOCUMENT_MODEL_DRAFT.md`
-  models the layered signal→semantic→projection architecture (DocumentSignal · DocumentClassification · DocumentRole ·
-  DocumentFiling/FilingLocation/DocumentInventory + the already-modeled Entity/Fact/Relationship) with DRAFT invariants
-  **A44–A49**, grounded in existing columns (no schema). **Not yet finalized into §2.17/§4** — graduates only on the
-  ingestion agent's confirmation of the 6 coordination questions (§8). This is modeling of existing reality, so it
-  adds no new *gap* — it formalizes what's built + reserves the agentic/projection locus.
+- **Extended document/semantic model — GRADUATED (deploy_788).** `docs/DOCUMENT_MODEL_DRAFT.md` (the converged
+  design of the ontology desk + ingestion agent, deploy_785/787) is now folded into ONTOLOGY **§2.17 + A44–A49**:
+  DocumentSignal · DocumentClassification · DocumentRole · DocumentFiling/Inventory + the Semantic layer
+  (Entity/Fact/Relationship). **A48 was grounded-corrected before graduating** — falsified as "fact ⇐ ConnectedDocument"
+  (971 fact-source docs, 84 connected), re-asserted as fact-requires-`text` (`truth_tests/test_fact_requires_text.py`).
+  Q6: `knowledge_graph_triples` canonical. Additive/design-only; `document_signals`/`document_classifications`/filing
+  stores are ○ proposed (ingestion agent's to build, shadow-first). No new gap — formalizes reality + reserves the
+  agentic/projection locus.
 
 **Medium term (as pillars 3/6 get built):**
 - Add a **Finance** registry row + move `finance_transactions` off drift → a canonical table + a
