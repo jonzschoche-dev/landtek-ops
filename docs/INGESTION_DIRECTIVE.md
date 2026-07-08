@@ -126,10 +126,38 @@ timer flip.** Every step has a monitoring window; any red truth_test or connecti
   provenance correctly, in the right order); (c) THEN flip V8→block so the guard hard-rejects any future unearned
   stamp; (d) expand. V8-shadow *proves* the ordering is safe before V8-block *enforces* it — zero-corruption by
   construction.
-- **Recommended hardening (scoped follow-ons, NOT yet built):** (1) **pilot-time elevation** — a V8 finding is
-  `info` today (won't alert); while `--stamp` is enabled it should page (P0). (2) **accept-rate circuit-breaker** —
-  auto-PAUSE the sweep if a batch's accept-rate drops below a floor or errors spike (extends the per-doc
-  strict-improvement guard to per-batch).
+- **O-pathways — now BUILT (deploys 773/774/776):**
+  1. **Pilot-time V8→P0 elevation (deploy_773/774).** `scripts/v8_provenance_p0_elevator.py` + a 3-min timer
+     promote any open V8 `ONTOLOGY_PROVENANCE_UNEARNED` finding **info→P0** (so `holes.p0_pusher` pages) and drop a
+     **PAUSE-THE-PILOT** note (naming the doc) into `notifications/pending.txt`. Dormant until a real finding.
+  2. **Batch circuit-breaker (deploy_776).** `reocr_gemini --sweep` trips if accept-rate `< cb_rate` (default 34%)
+     after `cb_min` docs (default 6) — reads not improving → stop, protect quota. Tune with `--cb-rate`/`--cb-min`.
+  3. **Instant stamp off-ramp (deploy_776).** `touch /root/landtek/notifications/STOP_STAMP` → stamping degrades to
+     **shadow** per-doc immediately (text/quality/type still improve); `rm` resumes. Fail-safe (unreadable path →
+     off). No code/systemd edit, no data undo.
+
+**Degradation matrix (what happens when a thing fails — all fail toward safety):**
+| Condition | Behavior |
+|---|---|
+| Preprocess (gray) errors | `_page_png` fails **open** to the raw render — never loses the read |
+| Gemini 429 / all combos quota'd | `QuotaExhausted` → sweep stops clean, doc left for retry (no partial write) |
+| New read scores ≤ prior | **rejected** (strict-improvement guard) — prior text kept, nothing written |
+| 4 deterministic signals not all present | provenance **withheld** (never a half-connected stamp) — A41 safe |
+| Batch accept-rate < floor | **circuit-breaker** stops the sweep |
+| Need to halt stamping NOW | **off-ramp** (`STOP_STAMP`) → degrade to shadow |
+| Stamp-before-run (V8 finding) | **P0 page + PAUSE** (elevator) — the corruption tripwire |
+
+**Supervised pilot procedure (per keystone doc, when quota returns):**
+```
+supervisor.py enqueue ocr_remediation --target doc:<id>     # opens the governed order
+supervisor.py tick                                          # → 'remediate' handoff
+reocr_gemini.py --doc <id> --go --stamp                     # THE atomic accept (earns provenance iff all 5 hold)
+#   run the 4 gates:  truth_tests/run_all.py · incorporation_status.py --check-regression ·
+#                     ontology_check.py --shadow-status (V8=0) · verify the doc is truly 5/5
+supervisor.py complete <order_id> --result "remediated doc <id>"   # advance
+supervisor.py tick                                          # → connect-verify (auto 5-signal gate) → certify (T3)
+```
+Any gate red / V8 finding / breaker trip → `touch STOP_STAMP`, stop, investigate; do NOT advance or expand.
 
 ## STAGE 2 — CONNECT (get the metadata in line)
 Run in order (each feeds the next):

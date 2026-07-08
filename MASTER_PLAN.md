@@ -259,8 +259,14 @@ else moves Paracale off zero. Fabricating `model_used` to pass the gate is forbi
    `extraction_runs` row — **A41-safe by construction**. Runs SHADOW (`--stamp` off on the timer). Guardrails:
    §3.5 backfill 4-signal-gated (deploy_767), A42 truth_test (`test_provenance_earned_from_run`), A41 truth_test.
    **Enable = supervised-first via the `ocr_remediation` work-kind** (not a blanket timer flip) — rollout runbook +
-   go/no-go gates in `docs/INGESTION_DIRECTIVE.md` §ROLLOUT. **Blockers: Gemini 429 + the pilot.** Frontier-vision
-   crop+magnify and reconcile-to-totals stay agent-in-loop. Drip within OCR-ladder quota (no Gemini-primary, no 72B).
+   go/no-go gates in `docs/INGESTION_DIRECTIVE.md` §ROLLOUT. **O-pathways BUILT (773–776):** V8→P0 elevator (pilot
+   tripwire pages), batch circuit-breaker (accept-rate floor), instant `STOP_STAMP` off-ramp (degrade to shadow),
+   full degradation matrix — all fail toward safety. Frontier-vision crop+magnify and reconcile-to-totals stay
+   agent-in-loop. Drip within OCR-ladder quota (no Gemini-primary, no 72B).
+   **Status: PILOT-READY=0 — QUOTA-stuck, not switch-stuck.** Earning a stamp needs a fresh completed `extraction_runs`
+   row = a live Gemini re-OCR; Gemini is 429. **Next milestones:** (1) quota returns → run the supervised per-doc
+   pilot under V8-shadow; (2) confirm V8=0 across the pilot; (3) request the V8 `log→block` flip (ontology desk);
+   (4) expand, then consider timer `--stamp`. W2's `document_type` classify pass is the parallel unblock for Paracale.
 2. **W2 — Deterministic connect (keep + extend).** §3.5 sweep + Mac embed are live/creditless. Extend
    `document_type` to Paracale's **71 unclassified** via a local qwen classify pass → the deterministic map
    then types them. Keep sweep/embed timers green (`systemctl --failed` = 0).
