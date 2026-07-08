@@ -180,9 +180,11 @@ verified), never write `verified` directly. These stay ○ until built; naming t
 - **A45 (classification is a proposal until adjudicated)** — An LLM/deterministic `document_type` is written to
   `document_type_proposals` with confidence + source; only an adjudicated proposal (`status='committed'`) sets
   `documents.document_type`. No classifier auto-writes the canonical type as fact. *Classification analogue of A19.*
-- **A46 (filing integrity)** — A `DocumentFiling` copy in a non-corpus location (Drive/vault) must be
-  reconcilable to the corpus (checksum for binary; the corpus holds the citable knowledge). A divergent or
-  missing checksum is an inventory gap, never silent. *Rides offline-sovereignty.*
+- **A46 (filing integrity + outward gating)** — A `DocumentFiling` copy in a non-corpus location must be
+  reconcilable to the corpus (checksum for binary; the corpus holds the citable knowledge); a divergent/missing
+  checksum is an inventory gap, never silent. **And: a filing write/rename to leo.hayuma.org is an OUTWARD action
+  (client-facing front) — it is held behind the exposure gate (A11/A21); Drive/vault filing is internal.**
+  *Rides offline-sovereignty + no-external-exposure.*
 - **A47 (role is client-scoped)** — A contextual `DocumentRole` (`relation_kind`) is per doc-matter link and
   therefore inherits client separation; a role never crosses a document into another client's theory. *Extends A5.*
 - **A48 (semantic rises from connected + cited)** — A `Fact`/`Relationship` may be extracted only from a
@@ -228,5 +230,37 @@ finalized until you confirm.** On your sign-off I graduate §1–§4 into ONTOLO
 update `ONTOLOGY_ALIGNMENT.md`.
 
 ---
-*DRAFT prepared 2026-07-08 by the ontology desk. Grounded against the live schema. Companion: `ONTOLOGY.md` §2.17,
-`docs/INGESTION_DIRECTIVE.md`, `MASTER_PLAN.md` §6B.*
+
+## 9. Reconciliation with the ingestion agent's proposal (deploy_785)
+
+The ingestion layer **independently drafted a convergent architecture** (`INGESTION_DIRECTIVE.md` §ARCHITECTURE
+DIRECTION) — strong validation that the model is right, not invented. The two agree on ProvenanceRecord
+(`extraction_runs`), an extensible signals store, W3 embed unification, and held external-facing filing. **Two
+refinements from their proposal are ADOPTED into this draft:**
+
+1. **Classification + Role unify into one `document_classifications` table** (their design): `doc_id · dimension
+   (type|role) · value · method (deterministic|llm|human) · model · confidence · status`, with
+   `documents.document_type`/`doc_role` becoming **caches of the accepted row**. This is cleaner than my split
+   §2/§3 — one governed adjudication store for *both* what-a-doc-is and its *intrinsic* role, A45 governing all of
+   it. (The **contextual, per-matter** role stays on `document_matter_links.relation_kind`, A47 — that's a
+   different axis: intrinsic identity vs role-in-a-matter's-theory.)
+2. **leo.hayuma.org filing writes are OUTWARD actions** (their governance point, sharper than mine): leo is the
+   client-facing front, so a `DocumentFiling` write/rename to it is an outward, hard-to-reverse action — it rides
+   **A11/A21** and is **held behind the exposure gate**. Drive/vault filing is internal; leo filing is not. A46
+   below is updated to carry this.
+
+**Their concrete extensible stores** (`document_signals` shadow table · `document_classifications`) are the
+*implementation* of my §1 A44 (signal extensibility) and §2 A45 (classification-as-proposal) — additive,
+shadow-first, no `documents ALTER`, gate untouched, rollback = DROP. **This draft's additions on top of theirs:**
+the layered frame (§0), the **semantic layer** (§5, Entity/Fact/Relationship + A48 signal→semantic-rise), and the
+**agentic layer** (A49). Together = one converged model: their signal/classification/filing *stores* + this desk's
+layered frame + semantic/agent *invariants*.
+
+**Remaining coordination (§8):** their proposal answers Q1 (classification adjudication = `document_classifications.status`),
+Q3 (DocumentInventory = a view + sync sentinel), Q4 (`document_signals` for new signals). Still open: **Q5** (does
+extraction require a ConnectedDocument first — A48) and **Q6** (`entity_relationships` empty vs `knowledge_graph_triples`
+canonical). These two graduate the model into §2.17/§4 once confirmed.
+
+---
+*DRAFT prepared 2026-07-08 by the ontology desk. Grounded against the live schema. Reconciled with the ingestion
+agent's convergent proposal (deploy_785). Companion: `ONTOLOGY.md` §2.17, `docs/INGESTION_DIRECTIVE.md`, `MASTER_PLAN.md` §6B.*
