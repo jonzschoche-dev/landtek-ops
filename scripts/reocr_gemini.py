@@ -58,6 +58,31 @@ def _conn():
 # ── Phase 2: atomic 5-signal acceptance (A41/A42/A43-safe by construction) ────────────────────
 OCR_THRESHOLD = float(os.environ.get("OCR_QUALITY_THRESHOLD", "0.30"))
 
+# ── O-pathways: stamp off-ramp + batch circuit-breaker (pilot safety; constrain writes, never enable) ──────
+STOP_STAMP_FILE = os.environ.get("REOCR_STOP_STAMP_FILE", "/root/landtek/notifications/STOP_STAMP")
+
+
+def _stamp_offramp():
+    """Instant off-ramp. If the STOP_STAMP sentinel file exists, provenance stamping is DISABLED — the run
+    DEGRADES to shadow (text/quality/type still improve, no `model_used` written). `touch <file>` halts
+    stamping mid-run without editing code or systemd; `rm` resumes. Graceful, no data undo. Fail-safe:
+    any error reading the path is treated as 'off-ramp engaged' (safer to withhold provenance than risk it)."""
+    try:
+        return os.path.exists(STOP_STAMP_FILE)
+    except Exception:
+        return True
+
+
+def _circuit_break(processed, accepted, cb_min, cb_rate):
+    """Batch circuit-breaker. After a minimum sample, trip if the accept-rate falls below cb_rate — a low
+    rate means reads are NOT improving (Gemini degraded / preprocess hurting / unfit docs), so stop burning
+    quota and surface it rather than grind. Withheld-provenance docs still count as accepted (the read WAS
+    good); only genuine no-improvement rejects lower the rate."""
+    if cb_min <= 0 or processed < cb_min:
+        return False
+    return (accepted / processed) < cb_rate
+
+
 # document_type ← classification (deterministic map; mirrors migrations/deploy_710 + case_corpus_sweep §3.5).
 # Only fills blanks, never overwrites; yields nothing when classification is NULL (those docs stay untyped).
 _DOCTYPE_SQL = """
@@ -279,9 +304,14 @@ def reocr(doc_id, go=False, stamp=False, enhance=None):
     # new read scores strictly higher than the prior read. (This is also what makes preprocessing safe to
     # enable un-piloted: a worse-enhanced read is simply rejected, never written.)
     improved = len(text) >= 50 and (before < 50 or old_score is None or new_score > old_score)
+    # O-PATHWAY off-ramp: the STOP_STAMP sentinel disables provenance stamping instantly → degrade to shadow
+    # (text/quality/type still improve). Checked per-doc, so a mid-run `touch` halts stamping immediately.
+    offramp = bool(stamp and _stamp_offramp())
+    if offramp:
+        stamp = False
     res = {"doc": doc_id, "pages": pages, "chars_before": before, "chars_after": len(text),
            "old_score": old_score, "new_score": round(new_score, 4), "improved": improved,
-           "enhanced": bool(enhance), "sample": text[:200]}
+           "enhanced": bool(enhance), "offramp": offramp, "sample": text[:200]}
     if go and improved:
         # ATOMIC 5-SIGNAL ACCEPT — ONE transaction. A41 stays green because provenance is stamped ONLY when
         # all 5 signals hold at commit time (never a stamped-but-half-connected doc). All-or-nothing on error.
@@ -331,12 +361,17 @@ def reocr(doc_id, go=False, stamp=False, enhance=None):
     return res
 
 
-def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False, stamp=False):
+def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False, stamp=False,
+          cb_min=None, cb_rate=None):
     """Drain the re-OCR queue (ocr_quality.flagged) worst-first, rate-limited + resumable.
     Economy: only flagged docs, page-capped, one Gemini ladder call per page, bounded per run.
-    stamp=False (default) = SHADOW: log the model_used each accept WOULD earn, write no provenance."""
+    stamp=False (default) = SHADOW: log the model_used each accept WOULD earn, write no provenance.
+    O-pathways: circuit-breaker trips if accept-rate < cb_rate after cb_min docs; STOP_STAMP off-ramp
+    (per-doc) degrades stamping to shadow instantly; Gemini 429 stops clean (resumable)."""
     global _RPM
     _RPM = max(0, rpm)
+    cb_min = int(os.environ.get("REOCR_CB_MIN", "6")) if cb_min is None else cb_min
+    cb_rate = float(os.environ.get("REOCR_CB_RATE", "0.34")) if cb_rate is None else cb_rate
     c = _conn(); cur = c.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS reocr_log (doc_id int PRIMARY KEY, ts timestamptz DEFAULT now(),
                    chars_before int, chars_after int, note text)""")
@@ -354,11 +389,17 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False, st
     if limit:
         ids = ids[:limit]
     print(f"[sweep] queue={len(ids)} rpm={rpm} max_calls={max_calls} model={MODEL}->{FALLBACK_MODEL} "
-          f"provenance={'STAMP (writing)' if stamp else 'SHADOW (log-only)'}", flush=True)
-    done = ok = prov = would = rejected = 0
+          f"provenance={'STAMP (writing)' if stamp else 'SHADOW (log-only)'} "
+          f"circuit-breaker=<{cb_rate:.0%} after {cb_min}", flush=True)
+    done = ok = prov = would = rejected = offramps = 0
     for did in ids:
         if _CALLS[0] >= max_calls:
             print(f"[sweep] reached max_calls={max_calls} after {done} docs — resume next run", flush=True)
+            break
+        if _circuit_break(done, ok, cb_min, cb_rate):
+            print(f"[sweep] CIRCUIT-BREAKER TRIPPED: accept-rate {ok}/{done} < {cb_rate:.0%} after {done} docs "
+                  f"— reads not improving (Gemini degraded / preprocess hurting / unfit docs). Stopping to "
+                  f"protect quota. Investigate, then resume with --force once fixed.", flush=True)
             break
         try:
             r = reocr(did, go=True, stamp=stamp)
@@ -371,12 +412,16 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False, st
             break
         except Exception as e:
             r = {"error": str(e)[:120]}
+        if r.get("offramp"):
+            offramps += 1
         if r.get("written"):
             ok += 1
             if r.get("provenance"):
                 prov += 1; provnote = f"prov={r['provenance']}"
             elif r.get("provenance_withheld") is not None:
                 provnote = f"prov-WITHHELD(missing={','.join(r['provenance_withheld']) or 'none'})"
+            elif r.get("offramp"):
+                provnote = "prov-OFFRAMP(STOP_STAMP → shadow)"
             else:
                 if r.get("would_stamp"): would += 1
                 provnote = f"SHADOW would-stamp={r.get('would_stamp')}"
@@ -390,7 +435,8 @@ def sweep(limit=None, rpm=10, max_calls=250, force=False, retry_failed=False, st
             print(f"  doc {did}: SKIP [{r.get('error','no_text')}] calls={_CALLS[0]}", flush=True)
         done += 1
     tail = (f"provenance_earned={prov}" if stamp else f"provenance_shadow_would_stamp={would}/{ok}")
-    print(f"[sweep] processed={done} accepted={ok} rejected_no_improve={rejected} {tail} "
+    offnote = f" offramp_degraded={offramps}" if offramps else ""
+    print(f"[sweep] processed={done} accepted={ok} rejected_no_improve={rejected} {tail}{offnote} "
           f"total_gemini_calls={_CALLS[0]}", flush=True)
     cur.close(); c.close()
 
@@ -405,7 +451,8 @@ if __name__ == "__main__":
     if "--sweep" in a:
         sweep(limit=_arg(a, "--limit", None, int), rpm=_arg(a, "--rpm", 10, int),
               max_calls=_arg(a, "--max-calls", 250, int),
-              force="--force" in a, retry_failed="--retry-failed" in a, stamp="--stamp" in a)
+              force="--force" in a, retry_failed="--retry-failed" in a, stamp="--stamp" in a,
+              cb_min=_arg(a, "--cb-min", None, int), cb_rate=_arg(a, "--cb-rate", None, float))
         sys.exit(0)
     ids = []
     if "--doc" in a:
