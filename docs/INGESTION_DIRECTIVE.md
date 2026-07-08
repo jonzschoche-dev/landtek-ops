@@ -176,4 +176,43 @@ Per `case_file`: `% with text` · `% entity-linked` · `% matter-linked` · `% f
 4. `paracale_corpus_watch --update` to re-baseline.
 
 ---
+
+## DIRECTIVE — Governance/Ontology layer → Ingestion layer (2026-07-08, deploy_772)
+
+*(Handoff by directive, not self-edit — the mirror of §6B's "Handoff to the ontology layer." Governance owns
+the invariants/validators/mechanical gates + the V8 flip decision; the ingestion layer owns the pipeline code
+and the pilot execution. This block hands you the actionable items from the enablement plan (§ROLLOUT).)*
+
+**Governed status (verified 2026-07-08).** SHADOW is clean and running; **all four go/no-go gates are GREEN**
+(94 truth_tests · `--shadow-status` V8=0 · `--check-regression` 86=high-water · `--alignment` clean). The pilot
+is correctly **Gemini-gated**, and provenance is **quota-stuck at 86, not switch-stuck**: **PILOT-READY = 0** —
+no doc can be stamped without a *fresh* completed `extraction_runs` row. Nothing to enable until quota returns.
+
+**Your action items (ingestion layer — these are yours to execute):**
+1. **When Gemini quota returns — run the Phase-2 pilot, supervised, UNDER V8 shadow.** 1–3 keystone docs via the
+   `ocr_remediation` work-kind: `reocr_gemini.py --doc <id> --go --stamp` under the T3 chokepoint. After **each**
+   doc, run all four gates. Report the results **before** expanding — do not batch-run the pilot.
+2. **Honor the O-pathway (zero-corruption).** During `--stamp`, V8 must stay at **0** findings. A single
+   `ONTOLOGY_PROVENANCE_UNEARNED` means you stamped `model_used` *before* the `extraction_runs` row committed —
+   a transaction-ordering corruption. **That finding is the circuit-breaker: PAUSE the pilot immediately** and fix
+   the ordering (run/commit the extraction_runs row, THEN set model_used) before resuming.
+3. **Build the per-batch accept-rate circuit-breaker** (pipeline code, yours): auto-PAUSE the sweep if a batch's
+   accept-rate drops below a floor or errors spike — extends the per-doc strict-improvement guard to per-batch.
+4. **Do NOT enable `--stamp` on `landtek-reocr-sweep` / in production** until a verified supervised pilot **and**
+   explicit sign-off. Blanket timer-flip is out; supervised-first only.
+
+**What governance (this layer) owns and will do — do NOT do these yourself:**
+- **The V8 `log→block` flip.** You don't flip it; when your pilot is clean and `--shadow-status` shows V8=0
+  across it, **request the flip** and governance executes it (V8-shadow proves the ordering *before* V8-block
+  enforces it). Flipping block first would risk breaking a legitimate stamp — held on purpose.
+- **Arming the pilot-time tripwire:** governance will elevate a V8 finding to a paging alert *while `--stamp` is
+  enabled* (it's `info` today). Tell governance when you're about to start the pilot so the alert is armed first.
+- The mechanical gates (`truth_tests`, `--invariants`, `--shadow-status`, `--check-regression`, `--alignment`)
+  and the ontology invariants A41–A43 — do not edit `ONTOLOGY.md` or the validators; request changes by directive.
+
+**Boundary.** You: `reocr_gemini.py`, `forensic_ocr_healer.py`, the sweep/timer, the §3.5 CONNECT path, the
+circuit-breaker. Governance: `ontology_validator` (V1–V8), `truth_tests/`, `ontology_check.py`, `ONTOLOGY.md`,
+the V8 flip. Full plan: `MASTER_PLAN.md` §6B + this file's §ROLLOUT.
+
+---
 *Prepared 2026-07-06. Companion: `case_work/Paracale-001/CORPUS_TRACKER.md`, `case_work/OCR_WORKLIST.md`. This is a technical pipeline runbook — not a strategic plan (see MASTER_PLAN.md for direction).*
