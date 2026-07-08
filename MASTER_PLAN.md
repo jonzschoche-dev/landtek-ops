@@ -267,9 +267,15 @@ else moves Paracale off zero. Fabricating `model_used` to pass the gate is forbi
    row = a live Gemini re-OCR; Gemini is 429. **Next milestones:** (1) quota returns → run the supervised per-doc
    pilot under V8-shadow; (2) confirm V8=0 across the pilot; (3) request the V8 `log→block` flip (ontology desk);
    (4) expand, then consider timer `--stamp`. W2's `document_type` classify pass is the parallel unblock for Paracale.
-2. **W2 — Deterministic connect (keep + extend).** §3.5 sweep + Mac embed are live/creditless. Extend
-   `document_type` to Paracale's **71 unclassified** via a local qwen classify pass → the deterministic map
-   then types them. Keep sweep/embed timers green (`systemctl --failed` = 0).
+2. **W2 — Deterministic connect + classify. §3.5 sweep + Mac embed live. `document_type` classify: SHADOW DONE,
+   commit pending review-approval (deploys 778–780).** `scripts/classify_document_type.py` types the deterministic-
+   map residue from doc TEXT via the owned local qwen (`model_router` Tier-1, $0, logged) → shadow proposals in
+   `document_type_proposals`, `--review`, gated `--commit` (NULL-only, A41-safe, reversible). Ran on Paracale's
+   **71 untyped: all 71 classified, 0 model-errors, 0 below 0.6 conf.** Review caught + fixed a v1 systematic error
+   (too-narrow vocab force-fit birth-certs/permits → "Certificate of Death" at 0.9+; v2 widened vocab + "don't
+   force-fit → Other Document"; v3 synonym-normalized). **Impact on commit:** Paracale `document_type` **315 → ~386**
+   (of 388; 2 have no text) → the type signal goes near-complete; **provenance (Gemini-gated) becomes Paracale's
+   sole remaining connectivity blocker.** Keep sweep/embed timers green (`systemctl --failed` = 0).
 3. **W3 — Embedded-source reconciliation.** Gate reads `corpus_backfill_state.embedded` (1489); embedder
    writes `rag_local` (1492) → **3 diverge**. Make `corpus_backfill_state.embedded` canonical + have the
    embedder set it. Removes false gate-holds.
