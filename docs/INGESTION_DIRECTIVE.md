@@ -107,6 +107,30 @@ timer flip.** Every step has a monitoring window; any red truth_test or connecti
 4. **ROLLBACK.** If a truth_test reddens or `--check-regression` fires: remove `--stamp` / `git revert` the
    enabling change. Text/quality/type writes are non-regressing (strict-improvement guard), so there is no data to undo.
 
+**Grounded status (2026-07-08) + the O-pathway (zero-corruption) additions (deploy_771):**
+- **All go/no-go gates currently GREEN:** `truth_tests/run_all.py` 94 pass (A41 `provenance_implies_all_5_signals`,
+  A42 `earned_stamp_traces_to_run`, `incorporation.view_reconciles_with_a41`); `incorporation_status.py
+  --check-regression` clean (connected **86 = high-water**); and **new Gate 4** — `ontology_check.py --shadow-status`
+  shows V8 (and V5/V6/V7) at **0 findings**. Run all four before advancing any step.
+- **Provenance is QUOTA-stuck at 86, not switch-stuck.** Verified 2026-07-08: **PILOT-READY = 0** — *no* doc has all
+  4 deterministic signals + a completed `extraction_runs` row yet missing only the stamp. Earning a NEW stamp
+  requires a *fresh* completed run = a live Gemini re-OCR. So the earlier "~6 ready docs → 92" estimate is
+  superseded: the pilot cannot stamp anything until Gemini quota returns AND a supervised re-OCR produces the run.
+  SHADOW keeps running (hourly `landtek-reocr-sweep`, active — text/quality/type only, no provenance).
+- **V8 is the corruption tripwire — run the pilot UNDER V8 shadow.** V8 (`log`) already watches every
+  `documents.model_used` write. During the supervised `--stamp` pilot, V8 must stay at **0** findings — a single
+  `ONTOLOGY_PROVENANCE_UNEARNED` means the pipeline stamped *before* its `extraction_runs` row completed (a
+  transaction-ordering corruption). **That finding is the circuit-breaker: pause the pilot immediately.**
+- **Corrected flip order (the O-pathway):** do NOT flip V8→block before the pilot. Sequence: (a) run the supervised
+  `--stamp` pilot with V8 in shadow; (b) confirm `--shadow-status` V8 = 0 across the whole pilot (the pipeline earns
+  provenance correctly, in the right order); (c) THEN flip V8→block so the guard hard-rejects any future unearned
+  stamp; (d) expand. V8-shadow *proves* the ordering is safe before V8-block *enforces* it — zero-corruption by
+  construction.
+- **Recommended hardening (scoped follow-ons, NOT yet built):** (1) **pilot-time elevation** — a V8 finding is
+  `info` today (won't alert); while `--stamp` is enabled it should page (P0). (2) **accept-rate circuit-breaker** —
+  auto-PAUSE the sweep if a batch's accept-rate drops below a floor or errors spike (extends the per-doc
+  strict-improvement guard to per-batch).
+
 ## STAGE 2 — CONNECT (get the metadata in line)
 Run in order (each feeds the next):
 1. `scripts/routine_entity_doc_linker.py --max <N>` → populates **`doc_entities`** (entities per doc)

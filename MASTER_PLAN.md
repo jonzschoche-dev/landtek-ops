@@ -281,6 +281,15 @@ deterministic sweep + embed keep the 4 cheap signals current on every ingest.
 **Metrics.** Provenance-earned rising off 86/0 (headline) · fully-connected % up each sweep · **zero fabricated
 provenance** · timers green, `connect-verify` hold-rate falling as docs genuinely connect.
 
+**Enablement status (2026-07-08).** SHADOW live (hourly `landtek-reocr-sweep`, active). **All go/no-go gates
+GREEN** — 94 truth_tests (A41/A42/incorporation), `ontology_check.py --shadow-status` V8=0, `incorporation_status.py
+--check-regression` clean (86 = high-water). **Pilot is Gemini-gated, and provenance is quota-stuck at 86, not
+switch-stuck:** verified PILOT-READY = 0 (a new stamp needs a *fresh* completed `extraction_runs` row = a live
+re-OCR), so 86 holds until quota returns AND a supervised pilot runs. **O-pathway locked in** (`INGESTION_DIRECTIVE`
+§ROLLOUT, deploy_771): run the `--stamp` pilot UNDER V8-shadow — a V8 `ONTOLOGY_PROVENANCE_UNEARNED` finding is the
+corruption tripwire (pause immediately); flip V8→block only AFTER a clean pilot proves the stamp-after-run ordering.
+Respects: A41, A42, A43. **`--stamp` stays OFF in production until a verified supervised pilot.**
+
 **Handoff to the ontology layer (by directive, not self-edit):** §2.17 ConnectedDocument + A41–A43 are now
 DEFINED by the ontology agent (ONTOLOGY v0.20) and consistent with the built flow — no invariant change needed.
 **One open directive:** build the **V8 DB-trigger** — a `BEFORE INSERT/UPDATE OF model_used ON documents`
