@@ -177,7 +177,7 @@ def commit(cur, matter, min_conf):
     print(f"[classify] COMMIT: wrote document_type on {len(wrote)} doc(s) at confidence >= {min_conf} "
           f"(NULL-only, no provenance stamped — A41 stays green). Reversible.")
     for r in wrote[:15]:
-        print(f"    doc {r[0]} → {r[1]} ({r[2]})")
+        print(f"    doc {r['id']} → {r['proposed_type']} ({r['confidence']})")
 
 
 def main():
