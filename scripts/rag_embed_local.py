@@ -30,8 +30,14 @@ _MODEL = None
 def _model():
     global _MODEL
     if _MODEL is None:
+        import os
         from fastembed import TextEmbedding
-        _MODEL = TextEmbedding("BAAI/bge-small-en-v1.5")
+        # Persistent cache — NOT the default /var/folders temp dir, which macOS purges and leaves a partial
+        # cache (missing model_optimized.onnx → onnxruntime NO_SUCHFILE). That intermittently broke this
+        # embedder AND com.landtek.embed. A stable path under $HOME fixes both.
+        cache = os.path.expanduser("~/.cache/landtek_fastembed")
+        os.makedirs(cache, exist_ok=True)
+        _MODEL = TextEmbedding("BAAI/bge-small-en-v1.5", cache_dir=cache)
     return _MODEL
 
 
