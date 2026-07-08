@@ -1,0 +1,10 @@
+[Unit]
+Description=Elevate V8 ONTOLOGY_PROVENANCE_UNEARNED findings info->P0 (arms the pilot-time V8->P0 alert; p0_pusher then pages)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment="PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
+ExecStart=/usr/bin/python3 /root/landtek/scripts/v8_provenance_p0_elevator.py
+StandardOutput=append:/var/log/landtek/v8-provenance-p0.log
+StandardError=append:/var/log/landtek/v8-provenance-p0.log

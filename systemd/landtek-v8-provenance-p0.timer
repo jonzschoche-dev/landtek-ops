@@ -1,0 +1,10 @@
+[Unit]
+Description=Elevate V8 provenance-unearned findings to P0 every 3 min (ahead of the 5-min p0_pusher)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=3min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
