@@ -19,6 +19,7 @@ something actually stamps unearned. Idempotent, read-mostly, creditless.
   python3 scripts/v8_provenance_p0_elevator.py --status # read-only: how many open V8 findings, at what severity
 """
 import os
+import re
 import sys
 
 import psycopg2
@@ -51,7 +52,17 @@ def elevate(cur):
     if not hit:
         print(f"[v8-elevator] nothing to elevate (0 open non-P0 {HOLE} findings)")
         return 0
-    docs = sorted({str(r["doc_id"]) for r in hit if r["doc_id"] is not None})
+    # ontology_reject does not populate holes_findings.doc_id — the doc id lives in the description
+    # ('documents id=<N> ...'); prefer the column, fall back to parsing the text, so the P0 names the doc.
+    docs = set()
+    for r in hit:
+        if r["doc_id"] is not None:
+            docs.add(str(r["doc_id"]))
+        else:
+            m = re.search(r"documents id=(\d+)", r["description"] or "")
+            if m:
+                docs.add(m.group(1))
+    docs = sorted(docs)
     msg = (f"[P0][v8-provenance] PAUSE THE --stamp PILOT. V8 flagged {len(hit)} ONTOLOGY_PROVENANCE_UNEARNED "
            f"finding(s) — a documents.model_used stamp with NO completed extraction_runs row (A42: provenance "
            f"fabricated / stamped-before-run). Affected doc(s): {', '.join(docs) or '?'}. Halt --stamp, "
