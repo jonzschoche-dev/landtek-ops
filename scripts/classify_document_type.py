@@ -42,6 +42,16 @@ VOCAB = [
 ]
 _VOCAB_LC = {v.lower(): v for v in VOCAB}
 
+# Synonyms → canonical vocab (the model often spells out or varies a type that IS on the list).
+SYN = {
+    "transfer certificate of title": "TCT", "tct": "TCT",
+    "special power of attorney": "SPA", "spa": "SPA",
+    "complaint": "Court Filing", "pleading": "Court Filing", "motion": "Court Filing", "petition": "Court Filing",
+    "letter": "Correspondence", "letter/email": "Correspondence", "email": "Correspondence", "memo": "Correspondence",
+    "certificate of business name": "Certification", "certificate of business name registration": "Certification",
+    "business name certificate": "Certification", "certificate": "Certification",
+}
+
 SYS = ("You are a precise document classifier for a Philippine land/mining/civil-registry case corpus. You "
        "classify a document into EXACTLY ONE type from a controlled list and reply ONLY with a single JSON "
        "object. Accuracy matters more than specificity: a wrong specific label is a corruption.")
@@ -80,8 +90,9 @@ def _parse(txt):
     except Exception:
         return None, 0.0, "bad-json", "parse_error"
     raw = str(d.get("document_type", "")).strip()
-    typ = _VOCAB_LC.get(raw.lower())
-    if not typ:  # off-list → keep raw but flag low so review catches it
+    key = raw.lower()
+    typ = _VOCAB_LC.get(key) or SYN.get(key) or SYN.get(re.sub(r"[^a-z ]", "", key).strip())
+    if not typ:  # genuinely off-list → keep raw but flag low so review catches it
         return raw or None, float(d.get("confidence", 0) or 0) * 0.5, (d.get("reason") or "off-vocab")[:120], "off_vocab"
     try:
         conf = max(0.0, min(1.0, float(d.get("confidence", 0) or 0)))
