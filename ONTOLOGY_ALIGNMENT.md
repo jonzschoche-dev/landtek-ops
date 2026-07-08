@@ -31,6 +31,24 @@ domains**:
   The last follow-on — the shadow **V8** DB write-guard on `model_used` — is now **BUILT (deploy_769, `log` mode)**,
   so this domain is fully modeled AND enforced (gate + batch + write-guard). Connectivity has no remaining ontology gap.
 
+> **▶ Governance → Ontology desk — handoff/report (2026-07-08, deploy_773/774).** The **pilot-time V8→P0 alert
+> is now ARMED** (governance-owned; mirror of the deploy_772 ingestion handoff). *Why it was needed:* V8 logs
+> `ONTOLOGY_PROVENANCE_UNEARNED` via `ontology_reject`, which writes **every** finding at `severity='info'`, but
+> `holes.p0_pusher` only Telegram-pushes `severity='P0'` — so a V8 finding (the O-pathway stamp-before-run
+> corruption tripwire) would have sat **silent** during the `--stamp` pilot. *What governance added:*
+> `scripts/v8_provenance_p0_elevator.py` + `landtek-v8-provenance-p0.timer` (3-min) — promotes any open V8 finding
+> **info→P0** (so `p0_pusher` pages) and drops a **PAUSE-THE-PILOT** note into `notifications/pending.txt`,
+> naming the doc (parsed from the finding text, since `ontology_reject` leaves `holes_findings.doc_id` null).
+> Proven end-to-end with a synthetic finding; **dormant now (0 V8 findings)**. **It does NOT touch the V8 trigger
+> or `ontology_reject`** — governance owns *escalation*, the ontology desk owns the *validator*.
+> **Ownership, reaffirmed:** the ontology desk still owns the **V8 `log`→`block` flip** (`ontology_validator_config`
+> `SET mode='block' WHERE check_code='V8'`) — execute **only** on the ingestion agent's clean-pilot request (shadow
+> proves ordering before block enforces). Governance owns the P0 alert — **do not duplicate/alter it**.
+> *FYI (not a request):* because `ontology_reject` writes all findings at `info`, V5/V6/V7 findings are likewise
+> unescalated by `p0_pusher`; the elevator is intentionally scoped to V8/provenance (the pilot tripwire) only — if
+> you want the others escalated, that's a separate ontology-desk decision. *Status:* pilot is Gemini-429-gated,
+> **PILOT-READY=0**; provenance quota-stuck at 86.
+
 **Net:** where a domain needs *governance* (isolation, provenance, exposure), the ontology leads. Where a
 domain is *product roadmap not yet built* (finance/tenants/forensic), the ontology is silent — correctly
 (don't model vaporware) but the plan should say so explicitly via a Future-Domains link.
