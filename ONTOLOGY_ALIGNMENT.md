@@ -90,6 +90,12 @@ domain is *product roadmap not yet built* (finance/tenants/forensic), the ontolo
   check the touched pillar has an ontology home.
 - ~~Model the Connectivity domain~~ **DONE (deploy_760: §2.17 / A41–A43; deploy_769: shadow-V8 write-guard on `model_used`).**
 - Land the client-projection **A32 render-audit** guard (G6) — the highest product-impact enforcement.
+- **Extended document/semantic model — DRAFTED, pending ingestion coordination (deploy_784).** `docs/DOCUMENT_MODEL_DRAFT.md`
+  models the layered signal→semantic→projection architecture (DocumentSignal · DocumentClassification · DocumentRole ·
+  DocumentFiling/FilingLocation/DocumentInventory + the already-modeled Entity/Fact/Relationship) with DRAFT invariants
+  **A44–A49**, grounded in existing columns (no schema). **Not yet finalized into §2.17/§4** — graduates only on the
+  ingestion agent's confirmation of the 6 coordination questions (§8). This is modeling of existing reality, so it
+  adds no new *gap* — it formalizes what's built + reserves the agentic/projection locus.
 
 **Medium term (as pillars 3/6 get built):**
 - Add a **Finance** registry row + move `finance_transactions` off drift → a canonical table + a

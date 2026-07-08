@@ -1,12 +1,39 @@
 # Document & Signal Model — DRAFT (extends ONTOLOGY §2.17)
 
 > **STATUS: DRAFT — pending ingestion-agent coordination. NOT yet finalized into `ONTOLOGY.md` §2.17 or §4.**
-> This proposal models an extended document/signal/filing architecture as first-class ontology concepts. It is
-> **modeling of existing reality**, not new schema — every concept below is grounded in columns/tables that
-> already exist (verified live 2026-07-08). No code or DB change is proposed. Once the ingestion agent confirms
-> the models are practical for the remediation flow, the concepts graduate into §2.17 and the DRAFT invariants
-> (A44–A47) into §4. Builds on §2.17 (`ConnectedDocument`, the 5-signal `ConnectivityGate`, `ProvenanceStamp`)
-> and stays strictly aligned with **A41** (all 5 signals) · **A42** (provenance earned) · **A43** (gate fail-closed).
+> This proposal models a **layered** document→signal→semantic→projection architecture (§0) as first-class ontology
+> concepts. It is **modeling of existing reality**, not new schema — every concept below is grounded in
+> columns/tables that already exist (verified live 2026-07-08). No code or DB change is proposed. The semantic
+> layer (Entity/EntityLink/Fact/Relationship, §5) is **already modeled** in §2.2/§2.5/§2.11 — this draft
+> *integrates* it, not re-models it. Once the ingestion agent confirms the models are practical, the new concepts
+> graduate into §2.17 and the DRAFT invariants (**A44–A49**) into §4. Builds on §2.17 (`ConnectedDocument`, the
+> 5-signal `ConnectivityGate`, `ProvenanceStamp`) and stays strictly aligned with **A41** (all 5 signals) ·
+> **A42** (provenance earned) · **A43** (gate fail-closed) · **V8** (write-time provenance shadow guard).
+
+---
+
+## 0. Target architecture — the layered frame
+
+The concepts below fit a **layered, decoupled** model: each layer rises from the one under it, carries its own
+governance, and changes in one ripple minimally into others. Storage (leo primary · Drive secondary · physical)
+is *orthogonal* — a filing concern (§4), not a layer of meaning.
+
+```
+ AGENT INTERACTION      safe boundaries · permissions · contextual queries · contributions        (§2.14 coord / A38, future)
+        ▲
+ GOVERNED PROJECTION    purpose-built safe views per agent/client/task                            (§2.15 ClientProjection / A32–A34)
+        ▲
+ SEMANTIC / KNOWLEDGE   Entity · EntityLink · Fact · Relationship · DocumentRole                  (§2.2 · §2.5 · §2.11 · §3/§5 below / A1·A2·A19·A20)
+        ▲               verified knowledge units, each CITED back to a source signal
+ SIGNAL                 DocumentSignal · DocumentClassification · ProvenanceRecord                (§1–§2 below / A41·A42·A43·V8)
+        ▲               text · quality · type · embedding · model(earned) · confidence · source
+ RAW / SOURCE           original files · scans · messages · images                                (§4 FilingLocation)
+```
+**Reading it:** the RAW binary lives in a `FilingLocation` (Drive/vault); the **Signal layer** turns it into a
+`ConnectedDocument` (5 A41 signals); the **Semantic layer** extracts `Fact`s/`Relationship`s from that connected
+text, each **cited back** to the source (so knowledge is never ungrounded — A2/A20); the **Projection layer**
+renders only client-safe values (A32); the **Agent layer** queries through governed boundaries. Governance is not
+bolted on top — A41–A43 govern the signal layer, A1/A2/A19/A20 the semantic layer, A32–A34 the projection.
 
 ---
 
@@ -97,6 +124,8 @@ Correspondence, Permit, Fraud Indicator…) are a controlled vocabulary on `rela
 | **FilingLocation — physical vault** | 🟡 `documents.vault_section`/`vault_number`/`vault_location` | partial | the paper original's shelf location |
 | **FilingLocation — digital scan** | 🟡 `documents.digital_scan_id` / `canonical_filename` | partial | the master scan identity |
 | **DocumentInventory** | ○ *(derivable from the columns; no unified view yet)* | **NET-NEW (view only)** | per doc: in-corpus? Drive-backed? vault-located? — the routine-inventory readout |
+| **FilingRule** | ○ *(policy — not a table)* | **NET-NEW** | where a doc SHOULD live, by kind: every *received* exhibit → Drive binary + corpus + (court-critical) vault; drafts → corpus only. Turns "organized" into a checkable target |
+| **SyncRule** | ○ *(policy)* | **NET-NEW** | how fronts stay aligned: corpus-text ↔ Drive-binary (via `drive_md5_checksum`), Drive ↔ physical (offload policy). A divergence from a `FilingRule`/`SyncRule` is a `DocumentInventory` gap — surfaced, never silent (A46) |
 
 **Governance ties (respect existing invariants).** (a) *Canonical split:* the **corpus** holds canonical
 *knowledge* (extracted_text — the citable source, offline-sovereign); **Drive** holds the canonical *binary*
@@ -107,7 +136,43 @@ diverges is a flagged inventory gap. (c) *No new exposure:* filing/inventory is 
 
 ---
 
-## 5. DRAFT invariants (propose as A44–A47 — NOT yet added to §4)
+## 5. Semantic / Knowledge Layer — Entity · EntityLink · Fact · Relationship
+
+> **These are ALREADY first-class concepts in ONTOLOGY (§2.2 Actors, §2.5/§2.11 Facts).** This section does NOT
+> re-model them — it places them in the layered architecture and clarifies how they **rise from the signal layer
+> and stay cited**, so the corpus is agent-ready. Governance is the existing provenance discipline (A1/A2/A19/A20),
+> not new rules.
+
+| Concept | Canonical home (live) | State | Role in the layered model |
+|---|---|---|---|
+| **Entity** | 🟢 `entities` (4820; `canonical_id` merge graph, `provenance_level`, A15 DAG) | active | the real-world actor/org/ref — one canonical node per real thing |
+| **EntityLink** | 🟢 `doc_entities` (8928; `doc_id`+`role`+`provenance_level`) | active | a document *mentions* an entity in a performative `role` — the edge from **signal layer → semantic layer** |
+| **Fact** | 🟢 `matter_facts` (13,543; `source_id`+`excerpt`+`provenance_level`+`confidence`) | active | a citable claim EXTRACTED from a `ConnectedDocument`'s text, tiered + quoted (A2/A20) |
+| **Relationship** | 🟢 `title_chain` (107) · `knowledge_graph_triples` (74) · `cross_matter_links` (3) · 🌱 `entity_relationships` (0) | active/partial | typed edges between entities/titles/facts — the signature title subgraph is 🟢; the generic KG-triple + entity_relationships layers are underused |
+
+**How the semantic layer stays governed and agent-ready:**
+1. **Rise-from-signals + cited-down.** A `Fact` exists only because a `ConnectedDocument` had a usable `text`
+   signal; it carries `source_id` (the document) + a verbatim `excerpt`, so it is never ungrounded (A2/A20, the
+   `enforce_provenance_facts` trigger). **The signal layer's A41 is what makes the semantic layer trustworthy** —
+   a fact from a half-connected doc would be un-citable. This is the through-line the architecture makes explicit.
+2. **Provenance tier is the retrieval contract.** Every semantic unit has a `provenance_level`; agentic retrieval
+   reads `verified`/`operator` as fact and inference tiers as candidate (A19: `proposed_facts` is an inbox, never
+   quoted). Contextual retrieval = "give me the *verified* facts + their source docs for matter X."
+3. **Client-scoped by construction.** Entities merged across clients need the cross-client allowlist (A16);
+   facts can't cite a cross-client doc (A5/V4). So agentic reasoning inherits isolation for free.
+4. **DocumentRole (§3) is the semantic layer's view of a document** — not what a doc *is* (classification) but
+   what it *proves* in a matter's theory; it's the bridge from a `ConnectedDocument` to a `Fact`/keystone.
+
+**Agentic reasoning & retrieval (the top two layers, ○ future).** The **Governed Projection** layer (§2.15
+ClientProjection, A32–A34) already exists for the *client* surface; an **agent-facing** projection is its analogue
+— purpose-built safe views (e.g. `v_agent_matter_context`: verified facts + roles + source docs for a matter,
+provenance-labelled, client-scoped). The **Agent Interaction** layer (permissions/boundaries/contributions) is
+planned — an agent *contributing* a fact must route it through the same write-gate (proposed → adjudicated →
+verified), never write `verified` directly. These stay ○ until built; naming them reserves the governed locus.
+
+---
+
+## 6. DRAFT invariants (propose as A44–A49 — NOT yet added to §4)
 
 - **A44 (signal extensibility)** — The A41 `ConnectivityGate` is exactly the **5 mandatory** `DocumentSignal`s;
   a new signal type is additive metadata and never enters the gate except by an explicit governance promotion
@@ -120,10 +185,17 @@ diverges is a flagged inventory gap. (c) *No new exposure:* filing/inventory is 
   missing checksum is an inventory gap, never silent. *Rides offline-sovereignty.*
 - **A47 (role is client-scoped)** — A contextual `DocumentRole` (`relation_kind`) is per doc-matter link and
   therefore inherits client separation; a role never crosses a document into another client's theory. *Extends A5.*
+- **A48 (semantic rises from connected + cited)** — A `Fact`/`Relationship` may be extracted only from a
+  `ConnectedDocument` (A41) and must carry a `source_id`/`source_doc_id` (+ verbatim `excerpt` for `verified`);
+  knowledge from a half-connected doc is un-citable. *Reaffirms A2/A20 at the signal→semantic boundary — the
+  architecture's load-bearing link.*
+- **A49 (agentic contribution is gated)** — An agent (or any projection) may CONTRIBUTE to the semantic layer only
+  through the propose→adjudicate→verified write-gate; none writes a `verified` `Fact`/`Relationship` directly, and
+  none reads a sub-`verified` tier out as settled fact. *Extends A19 to the future Agent Interaction layer.*
 
 ---
 
-## 6. Current-issue recommendations (Task 3)
+## 7. Current-issue recommendations (Task 3)
 
 - **Embedding divergence (W3).** ONTOLOGY §2.17 already declares `corpus_backfill_state.embedded` the ONE
   canonical `embedded` signal (not `rag_local`). The 1489 vs 1492 gap = 3 docs with `rag_local` chunks whose
@@ -135,16 +207,20 @@ diverges is a flagged inventory gap. (c) *No new exposure:* filing/inventory is 
   source + adjudication layer, `documents.document_type` as the committed canonical. Already how Paracale was
   done — the model formalizes it and A45 governs it.
 
-## 7. Coordination handoff → ingestion agent (before finalization)
+## 8. Coordination handoff → ingestion agent (before finalization)
 
 **Requested confirmation (so these graduate into §2.17 accurately):**
-1. Is `document_type_proposals.status` the actual proposed→committed adjudication field, and does the classify
-   pass always route through it (never writing `documents.document_type` directly)? (Confirms A45.)
-2. For `DocumentRole`: is `document_matter_links.relation_kind` the right per-matter role slot, or is role
-   carried elsewhere in the remediation flow?
-3. For `DocumentInventory`: do you want a derived **view** (`v_document_inventory`) as the routine-inventory
-   readout, and which layers must it cover (corpus/Drive/vault/scan)? (View-only, no new table — your call to build.)
-4. Any signal beyond the 5 you already treat as connection-relevant (so we register it as optional, per A44)?
+1. **Classification (A45):** is `document_type_proposals.status` the proposed→committed adjudication field, and
+   does the classify pass always route through it (never writing `documents.document_type` directly)?
+2. **Role (A47):** is `document_matter_links.relation_kind` the right per-matter role slot, or is role carried
+   elsewhere in the remediation flow?
+3. **Inventory (A46):** want a derived **view** (`v_document_inventory`) as the routine-inventory readout, covering
+   which layers (corpus/Drive/vault/scan)? View-only, no new table — your call to build.
+4. **Signals (A44):** any signal beyond the 5 you already treat as connection-relevant (register as optional)?
+5. **Semantic rise (A48):** does the fact/entity extraction step already require a `ConnectedDocument` (all 5
+   signals) before harvesting, or can it run on partially-connected docs? (Confirms the signal→semantic gate.)
+6. **Relationship home:** `entity_relationships` is empty (0) — is it the intended generic relationship store, or
+   is `knowledge_graph_triples` the canonical one? (Avoids modeling a dead table as canonical.)
 
 **What does NOT change for you:** the A41 5-signal gate, `_connect_verify`, and the earned-provenance rule are
 untouched — this model *names* what you built, it doesn't alter the flow. **Nothing here is code; nothing is
