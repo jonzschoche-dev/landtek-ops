@@ -28,8 +28,8 @@ domains**:
   not MASTER_PLAN pillars/waves. The two are maintained in parallel, not in lockstep.
 - **Connectivity domain — now modeled (deploy_760, was G4):** the §6B *Corpus Connectivity* work is modeled
   as ONTOLOGY **§2.17** with invariants **A41–A43** (all-5-signals · `model_used` earned · gate fail-closed).
-  The one remaining follow-on is a code item (candidate shadow **V8** guarding `model_used` writes) — flagged,
-  not built (meta-layer only).
+  The last follow-on — the shadow **V8** DB write-guard on `model_used` — is now **BUILT (deploy_769, `log` mode)**,
+  so this domain is fully modeled AND enforced (gate + batch + write-guard). Connectivity has no remaining ontology gap.
 
 **Net:** where a domain needs *governance* (isolation, provenance, exposure), the ontology leads. Where a
 domain is *product roadmap not yet built* (finance/tenants/forensic), the ontology is silent — correctly
@@ -44,7 +44,7 @@ domain is *product roadmap not yet built* (finance/tenants/forensic), the ontolo
 | G1 | **Finance domain unmodeled** | Pillar 3 (v1.5); `finance_transactions`, `v_matter_pnl/roi`, QuickBooks MCP | `finance_transactions` is 🔴 **drift** (§3); no Finance domain model, no invariant | 🟠 med — roadmap, but on a drift table |
 | G2 | **Property/Tenant domain unmodeled** | Pillar 4 (v2.0); tenants/rent/leases | `property_assets` (83) only; no Tenant domain, no invariant | 🟡 low — genuinely future |
 | G3 | **Forensic domain unmodeled** | Pillar 6; `fraud_indicators`, `forensic_hash`, OpenTimestamps | tables exist but no domain model / invariant (integrity, chain-of-custody) | 🟠 med — evidence-grade needs governance |
-| G4 | ~~Connectivity domain not in ontology~~ **RESOLVED (deploy_760)** | §6B live plan; 5-signal connect-verify (86/1579) | **modeled §2.17 + A41–A43**; only the shadow-V8 code follow-on remains (flagged) | ✅ closed |
+| G4 | ~~Connectivity domain not in ontology~~ **RESOLVED (deploy_760)** | §6B live plan; 5-signal connect-verify (86/1579) | **modeled §2.17 + A41–A43**; shadow-V8 write-guard BUILT (deploy_769) | ✅ closed |
 | G5 | **No task→invariant linkage** | roadmap items, Wave 1/2 agents | invariants exist but plan never cites them | 🔴 high — the core alignment gap this file starts to close (§5) |
 | G6 | **Client-projection enforcement** | pillar 7 "per-client Leo / product surface" | A32 🟡 (portal not fully rendering through projection) | 🟠 med — highest product-impact enforcement gap |
 | G7 | **Structural debt in the ontology itself** | — | §2.6 duplicated; §2.8–2.16 authored as H2 (should be H3/§3.x) | 🟡 low — staged for the v1.0 migration (`ontology_migrate.py`) |
@@ -70,7 +70,7 @@ domain is *product roadmap not yet built* (finance/tenants/forensic), the ontolo
 **Short term (now → next few sessions, meta-layer only):**
 - Keep this file current: on every ontology change, update §5 mapping; on every MASTER_PLAN roadmap change,
   check the touched pillar has an ontology home.
-- ~~Model the Connectivity domain~~ **DONE (deploy_760: §2.17 / A41–A43).** Remaining: the shadow-V8 code guard (flagged).
+- ~~Model the Connectivity domain~~ **DONE (deploy_760: §2.17 / A41–A43; deploy_769: shadow-V8 write-guard on `model_used`).**
 - Land the client-projection **A32 render-audit** guard (G6) — the highest product-impact enforcement.
 
 **Medium term (as pillars 3/6 get built):**
@@ -100,7 +100,7 @@ domain is *product roadmap not yet built* (finance/tenants/forensic), the ontolo
 | Mapping (client parcel map, "locate me") | +Geo | §2.4 Geometry | **A9, A10, A11** |
 | Ombudsman offense (RA 3019/6713) | 2/offense | §2.16 Offensive Leverage | **A35, A36, A37** |
 | Supervision / Wave-1 agent wiring to Leo | 5 Proactive | §2.12 Supervision | **A21, A22** (outward chokepoint / governed step) |
-| Corpus connectivity (§6B live plan) | 1 Evidence | §2.17 Document Connectivity | **A41, A42, A43** (defined; shadow V8 is a code follow-on) |
+| Corpus connectivity (§6B live plan) | 1 Evidence | §2.17 Document Connectivity | **A41, A42, A43** (defined; A42 shadow-V8 write-guard built deploy_769) |
 | Truth invariants checked mechanically | all | — (doctrine) | **A24** |
 | Finance & accounting / per-matter ROI | 3 Finance | *(none — G1)* | **—** *(gap: needs a cost/ledger invariant)* |
 | Property / tenant management | 4 Property | *(none — G2)* | **—** *(gap)* |
