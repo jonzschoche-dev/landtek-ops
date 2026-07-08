@@ -14,7 +14,15 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.22 (2026-07-08).** **Extended document/semantic model GRADUATED** (converged design of
+> **Ontology version: v0.23 (2026-07-08).** **Hybrid-retrieval governance — Postgres SoR + Qdrant projection.**
+> §2.17 clarified (A41 is store-agnostic: the `embedded` signal is the Postgres flag `corpus_backfill_state.embedded`,
+> NOT presence in any vector store — so Qdrant is invisible to the gate, A43 stays fail-closed) + **invariants
+> A50** (RetrievalProjection is derived/rebuildable, never authoritative) · **A51** (every Qdrant payload traces to
+> a `documents.id` + carries SoR-projected client/matter) · **A52** (retrieval isolation holds in BOTH tiers +
+> reconciles to SoR — a mis-scoped filter = cross-client leak, the top risk). **Boundary: V8 is Postgres-resident
+> and does NOT reach Qdrant; the projection enforcement is a cross-tier audit the ingestion/ops side builds.** All
+> ○ forward-governance (Qdrant not yet the live store; `RAG_RETRIEVAL_ARCHITECTURE_DIRECTIVE` pending commit).
+> **v0.22:** **Extended document/semantic model GRADUATED** (converged design of
 > the ontology desk + ingestion agent, deploy_785/787). §2.17 extended (DocumentSignal · DocumentClassification ·
 > DocumentRole · DocumentFiling/Inventory + the Semantic layer Entity/Fact/Relationship) + **invariants A44–A49**.
 > **A48 was GROUNDED-corrected before graduating:** the draft "a Fact ⇐ a ConnectedDocument" was falsified (971
@@ -545,11 +553,23 @@ FilingLocation / DocumentInventory / FilingRule / SyncRule** (leo primary + Driv
 which **rises from a document's `text` signal and stays cited** (A48), and to which agents contribute only through
 the write-gate (A49). All additive/shadow-first; A41–A43 + `_connect_verify` + earned-provenance are untouched.
 
+**Hybrid retrieval — SoR vs RetrievalProjection (governs `RAG_RETRIEVAL_ARCHITECTURE_DIRECTIVE`, deploy_790).**
+The connectivity model is **store-agnostic and stays that way** under the proposed Postgres-SoR + Qdrant-projection
+split. **A41 does NOT change:** the `embedded` signal is the Postgres flag `corpus_backfill_state.embedded` (not
+presence in *any* vector store, deploy_789), so a `ConnectedDocument` is defined entirely by SoR signals — moving
+vectors from `rag_local` to Qdrant is invisible to the gate, and A43 stays fail-closed (the gate never depends on
+an external cache). Qdrant is a **`RetrievalProjection`** — derived, rebuildable, never authoritative (A50);
+every payload traces to a `documents.id` + carries SoR-projected `client_code`/`matter_code` (A51); retrieval
+isolation holds in *both* tiers and the projection reconciles to the SoR (A52). **The projection layer's
+enforcement is a cross-tier audit (ingestion/ops builds it), NOT V8** — V8 is a Postgres write-trigger and does
+not reach Qdrant. *(Directive file pending commit; these invariants guide the build and reconcile on its landing.)*
+
 *Components: `supervisor.py` (`_connect_verify` + the `ocr_remediation` work-order kind that gates remediation
 output) · `corpus_backfill_state` (embedded flag) · `ocr_quality` · `extraction_runs` (provenance source) ·
 `rag_embed_local` · `document_type_proposals` · `truth_tests/test_fact_requires_text.py` (A48) ·
-`docs/INGESTION_DIRECTIVE.md` (6-signal runbook) + `DOCUMENT_MODEL_DRAFT.md` (the extended model).
-**Invariants: A41–A49.***
+`docs/INGESTION_DIRECTIVE.md` (6-signal runbook) + `DOCUMENT_MODEL_DRAFT.md` (extended model) +
+`RAG_RETRIEVAL_ARCHITECTURE_DIRECTIVE.md` (○ hybrid retrieval, A50–A52).
+**Invariants: A41–A52.***
 
 ---
 
@@ -633,6 +653,9 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A47 | A contextual `DocumentRole` (`document_matter_links.relation_kind`) is per doc-matter link and inherits client separation (A5); intrinsic role (`documents.doc_role`) is global. A role never crosses a document into another client's theory. | 🟡 **asserted** — `relation_kind` + `doc_role` exist; rides A5. Intrinsic-vs-contextual role split endorsed by the ingestion sign-off (deploy_787). |
 | A48 | A `Fact`/`Relationship` must cite a **source document with a usable `text` signal** (`text_length ≥ 50`) — knowledge is never extracted from a textless doc; `verified` additionally requires a verbatim `excerpt` (A2/A20). **The full 5-signal `ConnectivityGate` is NOT a fact prerequisite** — connectivity governs a doc's *completeness* (A41), not whether its text yields a cited fact. | 🟢 **asserted** — `truth_tests/test_fact_requires_text.py` (deploy gate + nightly). **Grounded correction (2026-07-08):** the draft "fact ⇐ ConnectedDocument" was FALSIFIED — all 971 fact-source docs have text (0 violations) while only 84 are fully connected; even the "scope to `verified`" fallback was too strong (only 13/484 verified-fact docs are connected). Text is the true signal→semantic dependency. Negative-tested to bite. |
 | A49 | An agent (or any projection) contributes to the semantic layer only through the propose→adjudicate→`verified` write-gate; none writes a `verified` `Fact`/`Relationship` directly, nor reads a sub-`verified` tier out as settled fact. | 🟡 **asserted / ○** — the `matter_facts` write-gate (`enforce_provenance_facts`) + `_safe` views enforce it today; the Agent Interaction layer that will inherit it is ○ planned. Extends A19. |
+| A50 | Postgres is the **System of Record** (documents · metadata · provenance · entities · matter links); a vector store (`rag_local` today · **Qdrant** as the proposed high-performance projection) is a **REBUILDABLE `RetrievalProjection`, never authoritative.** The A41 `ConnectivityGate` and every provenance/isolation truth read ONLY SoR signals — the `embedded` signal is the Postgres flag `corpus_backfill_state.embedded`, NOT presence in any vector store — so no gate/invariant depends on a projection's liveness. A projection can be dropped and rebuilt from the SoR with zero loss of truth. | 🟡 **asserted-in-principle / ○** — A41 is already store-agnostic (reads the SoR flag, deploy_789); preserves A43 fail-closed + offline-sovereignty. Qdrant is ○ proposed (`RAG_RETRIEVAL_ARCHITECTURE_DIRECTIVE`, pending commit) — this guides the build; reconcile when it lands. |
+| A51 | Every point in a `RetrievalProjection` (a Qdrant payload/vector) **traces to a `documents.id`** and carries the `client_code`/`matter_code` **projected FROM the SoR at write time** (never inferred at query time). A payload with no resolving source doc, or whose client scope ≠ its source doc's, is invalid. | 🟡 **asserted / ○** — extends A42 (provenance) + A5 (isolation) to the projection. Enforcement is a **projection-audit** the ingestion/ops side builds — **V8 is Postgres-resident and does NOT reach Qdrant** (explicit boundary). ○ until Qdrant is the live store. |
+| A52 | (a) **Retrieval isolation holds in BOTH tiers** — every projection query is client/matter-scoped by a payload filter derived from the SoR; a query for client X never returns client Y's point (the fast path must NOT bypass A5/V4). (b) The projection is **reconcilable to the SoR** — a point whose source doc was deleted, re-tiered, or un-embedded is STALE; the SoR wins on conflict and drift is surfaced, never silently trusted. | 🟡 **asserted / ○** — the highest-risk invariant: a mis-scoped Qdrant filter = **cross-client leak via retrieval, bypassing the Postgres V4 write-trigger.** Enforcement = a **cross-tier projection-audit** (shadow), NOT V8. ○ until Qdrant live. |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
