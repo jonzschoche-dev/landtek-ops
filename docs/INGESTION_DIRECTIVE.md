@@ -278,5 +278,17 @@ untouched (gate reads the same canonical sources); rollback = DROP the new table
 until a separate, approval-gated flip). **Explicitly NOT proposed:** migrating the 5 gate signals into an EAV
 table (query cost + migration risk, no near-term payoff). Least-moves; the Aug-12/provenance path stays primary.
 
+### INGESTION SIGN-OFF → ontology desk (answers to `docs/DOCUMENT_MODEL_DRAFT.md §8`; grounded 2026-07-08)
+
+Convergence confirmed; endorse the reconciled model (deploy_785/786). Answers to graduate §1–§5 → §2.17, A44–A49 → §4:
+- **Q1 (A45 classification):** ✅ the LLM classifier always routes through `document_type_proposals`; `--commit` is the only writer of `documents.document_type` (NULL-only, `status='ok'`+conf≥threshold). **Caveat:** the *deterministic* map (deploy_710 + §3.5) writes `document_type` directly — so **A45 should govern INFERRED (LLM) classification only**; rule-derived types are the A19 deterministic tier, not inference. (Nit: add a `committed` status on `--commit` for the audit trail.)
+- **Q2 (A47 role):** ✅ two axes — intrinsic = `documents.doc_role`; contextual/per-matter = `document_matter_links.relation_kind` (client-scoped, A47). Endorse the split.
+- **Q3 (A46 inventory):** ✅ a **view** `v_document_inventory` (no new table), over digital `extracted_text` · Drive `drive_file_id`/`drive_md5_checksum` · vault `drive_offload` · scan `file_path`; divergence = a surfaced gap. I'll build the read-model on approval (my lane).
+- **Q4 (A44 optional signals):** register five, from the `IngestionComplete` superset: `entity-resolved` (`doc_entities`) · `fact-harvested` (`matter_facts`) · `matter-linked` (`document_matter_links`) · `tracker-baselined` (corpus watch) · `remediation-eligible` (`ocr_quality.flagged`, negative). None enters the gate without a governance promotion (A44).
+- **Q5 (A48 semantic rise): ⚠ A48 AS DRAFTED IS FALSE FOR THE CURRENT CORPUS — do NOT graduate as-is.** Fact extraction runs on **grounded text**, not on a ConnectedDocument. **Grounded:** matter_facts come from **972 distinct source docs — only 84 are fully connected; 888 (91%) are NOT.** Enforcing "a Fact may be extracted only from a ConnectedDocument" would invalidate facts from those 888. **Split A48:** (a) KEEP the citation rule (every Fact carries `source_doc_id` + verbatim `excerpt` for `verified`) — already enforced (A2/A20), reality-matching; (b) scope the **all-5-connected** prerequisite to the **`verified` tier only** (`inferred_strong/weak` may rise from text). "Connected-before-extract" is a shadow/target quality tier, not a hard invariant.
+- **Q6 (relationship home):** canonical = **`knowledge_graph_triples`** (74 rows); **`entity_relationships` is empty (0) → drift (§3)**. (Data confirmed; the modeling call is the semantic desk's.)
+
+**Unchanged for ingestion:** the A41 5-signal gate, `_connect_verify`, earned-provenance (A42/A43), V8 — this model *names* the flow, doesn't alter it. On graduation, the one quick-win I'll ship (my lane, additive): **W3 embed unification** (embedder sets `corpus_backfill_state.embedded` when writing `rag_local`).
+
 ---
 *Prepared 2026-07-06. Companion: `case_work/Paracale-001/CORPUS_TRACKER.md`, `case_work/OCR_WORKLIST.md`. This is a technical pipeline runbook — not a strategic plan (see MASTER_PLAN.md for direction).*
