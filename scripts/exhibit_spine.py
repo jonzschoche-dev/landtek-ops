@@ -27,8 +27,10 @@ import psycopg2, psycopg2.extras
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 
-LABEL_RE = re.compile(r"^\s*(Exhibit|Annex)\s+([A-Z]{1,2}|\d{1,3})(?:\s+to\s+[A-Za-z0-9-]+)?\s*[-–—]\s*(.*)$",
-                      re.IGNORECASE)
+# Label = letter/number with optional compound suffix ('A-1', '1-A', 'B to B-4'); trailing '- <parent>' optional
+# ('ANNEX A-1.jpg' has no parent segment). Matched against the extension-stripped stem.
+LABEL_RE = re.compile(r"^\s*(Exhibit|Annex)\s+([A-Z]{1,2}(?:-\d{1,3})?|\d{1,3}(?:-[A-Z])?)"
+                      r"(?:\s+to\s+[A-Za-z0-9-]+)?\s*(?:[-–—]\s*(.*))?$", re.IGNORECASE)
 FILING_KW = re.compile(r"\b(complaint|answer|motion|manifestation|reply|petition|counter[- ]?affidavit"
                        r"|position paper|comment|opposition|memorandum|request)\b", re.IGNORECASE)
 DRAFT_RE = re.compile(r"\[\s*draft\s*\]", re.IGNORECASE)
@@ -43,7 +45,15 @@ def _normkey(s):
 
 
 def _label_sort(label):
-    return (0, int(label)) if label.isdigit() else (1, label.upper())
+    """Natural exhibit order: numeric series (1, 1-A, 2 …) before letter series (A, A-1, B …),
+    compound suffixes ordered within their parent label."""
+    m = re.match(r"^(\d+)(?:-([A-Z]))?$", label)
+    if m:
+        return (0, int(m.group(1)), m.group(2) or "")
+    m = re.match(r"^([A-Z]+)(?:-(\d+))?$", label)
+    if m:
+        return (1, m.group(1), int(m.group(2) or 0))
+    return (2, label, 0)
 
 
 def main():
@@ -74,17 +84,17 @@ def main():
     unplaced = []
 
     for d in docs:
-        m = LABEL_RE.match(d["fn"] or "")
+        m = LABEL_RE.match(_stem(d["fn"]))
         if not m or DRAFT_RE.search(d["fn"]):
             continue
-        label, rest = m.group(2).upper(), _stem(m.group(3))
+        label, rest = m.group(2).upper(), (m.group(3) or "").strip()
         key = title = main = None
-        if FILING_KW.search(rest):                      # Pass A: the filename names its parent filing
+        if rest and FILING_KW.search(rest):             # Pass A: the filename names its parent filing
             key, title = (d["case_file"], _normkey(rest)), rest
         else:                                           # Pass B: co-traveling filing doc in the same email
             for eid in d["email_ids"]:
                 for sib in by_email.get(eid, []):
-                    if sib["id"] == d["id"] or DRAFT_RE.search(sib["fn"]) or LABEL_RE.match(sib["fn"]):
+                    if sib["id"] == d["id"] or DRAFT_RE.search(sib["fn"]) or LABEL_RE.match(_stem(sib["fn"])):
                         continue
                     if FILING_KW.search(sib["fn"]):
                         key, title, main = (sib["case_file"], _normkey(_stem(sib["fn"]))), _stem(sib["fn"]), sib
@@ -104,7 +114,7 @@ def main():
         if f["main"]:
             continue
         for d in docs:
-            if LABEL_RE.match(d["fn"]) or DRAFT_RE.search(d["fn"]) or d["case_file"] != f["case_file"]:
+            if LABEL_RE.match(_stem(d["fn"])) or DRAFT_RE.search(d["fn"]) or d["case_file"] != f["case_file"]:
                 continue
             stem = _normkey(_stem(d["fn"]))
             if stem and (key[1].startswith(stem) or stem.startswith(key[1])) and len(stem) >= 6:
