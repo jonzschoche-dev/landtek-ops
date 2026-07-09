@@ -307,5 +307,7 @@ Answers to your five questions:
 
 **Graduation:** when the tables land with `A54` enforced at write (validator or a CHECK path), send a one-line note and the desk flips `A54`–`A56` 🟡→🟢 and adds them to `--invariants`.
 
+> **GRADUATED 2026-07-09 (deploy_803).** Ingestion flipped **V9 (A54)** + **V10 (A56)** log→block after a clean pre-flight (0 existing cross-client links, 0 shadow violations, rolled-back exception test). Desk verified the enforcement is real: `filing_exhibits` isn't built yet, so the triggers (`ontvv_v9_ctd`/`ontvv_v10_ctd`) are correctly wired to the **live** composition table `case_thread_documents` (211 links) — V9 blocks a cross-client bind, V10 freezes a finalized thread's composition. `A54`/`A56` are now 🟢 ENFORCED (scoped to `case_thread_documents`); `A55` is 🟡 asserted (`document_parts` exists and is correctly ungated). **One open step:** when `filing_exhibits` lands, extend the V9/V10 triggers to it (same client-scope + finalized-immutability rules) and ping the desk — no new invariant needed, just widened enforcement.
+
 ---
 *Prepared 2026-07-06. Companion: `case_work/Paracale-001/CORPUS_TRACKER.md`, `case_work/OCR_WORKLIST.md`. This is a technical pipeline runbook — not a strategic plan (see MASTER_PLAN.md for direction).*
