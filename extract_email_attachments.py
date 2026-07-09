@@ -53,7 +53,8 @@ UPLOADS = "/root/landtek/uploads"          # legacy landing zone (pre-2026-07-09
 FILES_ROOT = "/root/landtek/files"         # canonical: files/{case_file}/{year}/general/original/
 MAX_WARN_BYTES = 25 * 1024 * 1024  # log (don't skip) attachments larger than this
 URGENT_WINDOW_DAYS = 45            # a matched matter with a deadline inside this window is flagged urgent
-SIGNALS_VERSION = 2  # v2: docket aliases (deploy_810)
+SIGNALS_VERSION = 3  # v2: docket aliases (deploy_810) · v3: post-OCR text pool + unknown-ref leads + text_hash (deploy_812)
+TEXT_POOL_CAP = 250_000  # chars of extracted_text scanned per doc (guards degenerate mega-docs)
 
 
 def _is_pdf(a):
@@ -153,12 +154,47 @@ def _norm(s):
     return re.sub(r"\s+", " ", (s or "")).upper().strip()
 
 
+# Post-OCR text extras (v3): patterns that only make sense INSIDE document text. Still deterministic —
+# these produce LEADS (unknown refs = registry-expansion candidates), clearly separated from registry hits.
+TCT_PAT = re.compile(r"\b(?:0?79-\d{10,13}|[TO]-\d{4,6})\b")
+DOCKET_PAT = re.compile(r"\b(?:CTN\s+SL-\d{4}-\d{4}-\d{3,4}|SL-\d{4}-\d{4}-\d{3,4}"
+                        r"|CIVIL CASE NO\.?\s*[\w-]{2,12}|SP(?:EC(?:IAL)?\.?)?\s*PROC(?:EEDING)?\.?\s*(?:NO\.?\s*)?\d{2,6}"
+                        r"|CRIMINAL CASE NO\.?\s*[\w-]{2,12}|G\.?R\.?\s*NO\.?\s*\d{4,7})\b")
+EXHIBIT_SERIES_PAT = re.compile(r"\b(?:ANNEX|EXHIBIT)\s+[\"“']?([A-Z]{1,2}(?:-\d{1,3})?|\d{1,3}(?:-[A-Z])?)[\"”']?\b")
+
+
+def extract_text_extras(sig, text, known_tcts, known_dockets):
+    """v3 depth: scan extracted_text for structured references BEYOND the registries.
+    unknown_titles/unknown_dockets are LEADS for registry expansion (never treated as verified links);
+    references_exhibits = the exhibit/annex series the text itself cites → bundle/composition depth."""
+    t = _norm(text[:TEXT_POOL_CAP])
+    if not t:
+        return sig
+    known_t = {_norm(k) for k in known_tcts}
+    known_d = {_norm(k) for k in known_dockets}
+    unk_t = sorted({m for m in TCT_PAT.findall(t) if _norm(m) not in known_t})[:25]
+    unk_d = sorted({m.strip() for m in DOCKET_PAT.findall(t)
+                    if not any(kd in _norm(m) or _norm(m) in kd for kd in known_d)})[:25]
+    series = []
+    for lab in EXHIBIT_SERIES_PAT.findall(t):
+        if lab not in series:
+            series.append(lab)
+    if unk_t:
+        sig["unknown_titles"] = unk_t          # title-map expansion leads
+    if unk_d:
+        sig["unknown_dockets"] = unk_d         # matter-registry expansion leads
+    if len(series) >= 2:                       # a doc citing an exhibit SERIES is a bundle/filing-main candidate
+        sig["references_exhibits"] = series[:40]
+        sig["flags"]["cites_exhibit_series"] = True
+    return sig
+
+
 def extract_signals(regs, case_file, texts):
     """Match the doc's textual envelope against the registries. `texts` = {'filename':…,'subject':…,'body':…}.
     Returns a signals dict where EVERY entry is a grounded observation (registry value + where it matched).
     Client scope (A5/A54): a hit whose registry row belongs to a DIFFERENT client than the email is recorded
     under cross_client (a possible-mis-file tripwire), never as significance."""
-    pools = {k: _norm(v) for k, v in texts.items() if v}
+    pools = {k: _norm(v[:TEXT_POOL_CAP] if k == "text" else v) for k, v in texts.items() if v}
     sig = {"version": SIGNALS_VERSION, "provenance": "inferred_strong",
            "basis": "deterministic registry match (filename + parent-email envelope)",
            "matter_hits": [], "title_hits": [], "party_hits": [], "flags": {}, "cross_client": []}
@@ -222,8 +258,9 @@ def extract_signals(regs, case_file, texts):
 
 
 def apply_enrichment(cur, doc_id, sig, dry):
-    """Persist signals. reference_numbers/parties are set ONLY when currently NULL (never clobber);
-    analyst_memo.ingest_signals is merged in; matter_code auto-set ONLY on a single same-client docket hit."""
+    """Persist signals. reference_numbers/parties are refreshed when WE own them (the doc already carries
+    ingest_signals) or when NULL — a pre-engine hand-written value is never clobbered. analyst_memo.ingest_signals
+    is replaced with the newest version; matter_code auto-set ONLY on a single same-client docket hit."""
     refs = {}
     if sig["matter_hits"] or sig["title_hits"]:
         refs = {"dockets": [h["docket"] for h in sig["matter_hits"]],
@@ -238,9 +275,11 @@ def apply_enrichment(cur, doc_id, sig, dry):
         return auto_matter
     cur.execute("""
         UPDATE documents SET
-          reference_numbers = CASE WHEN reference_numbers IS NULL AND %s::jsonb <> '{}'::jsonb
+          reference_numbers = CASE WHEN (reference_numbers IS NULL OR analyst_memo ? 'ingest_signals')
+                                    AND %s::jsonb <> '{}'::jsonb
                                    THEN %s::jsonb ELSE reference_numbers END,
-          parties           = CASE WHEN parties IS NULL AND %s::jsonb <> '{}'::jsonb
+          parties           = CASE WHEN (parties IS NULL OR analyst_memo ? 'ingest_signals')
+                                    AND %s::jsonb <> '{}'::jsonb
                                    THEN %s::jsonb ELSE parties END,
           analyst_memo      = coalesce(analyst_memo,'{}'::jsonb) || jsonb_build_object('ingest_signals', %s::jsonb),
           matter_code       = coalesce(matter_code, %s)

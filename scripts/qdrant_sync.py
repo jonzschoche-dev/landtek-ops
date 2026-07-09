@@ -53,10 +53,20 @@ STOP_FILE = os.environ.get("QDRANT_SYNC_STOP", "/tmp/STOP_QDRANT_SYNC")
 _QURL = _QKEY = None
 
 # Build query — same governed payload as PROJECT_SQL + the doc text (base64). Excludes the 184 no-case_file docs.
+# deploy_812: + significance-engine payload fields (matter_code, dockets, tct_numbers, urgent, cover_message,
+# composition_candidate) so Qdrant supports filtered semantic queries like "urgent docs across a client's
+# matters" / "docs referencing TCT-X in active matters" without a Postgres round-trip.
 BUILD_SQL = """SELECT coalesce(json_agg(row_to_json(t)),'[]') FROM (
-  SELECT d.id AS doc_id, d.case_file, d.document_type, d.doc_role,
+  SELECT d.id AS doc_id, d.case_file, d.document_type, d.doc_role, d.matter_code,
     (SELECT array_agg(DISTINCT l.matter_code) FROM document_matter_links l WHERE l.doc_id=d.id) AS matter_codes,
     (d.model_used IS NOT NULL) AS has_provenance, left(coalesce(d.original_filename,''),80) AS filename,
+    (SELECT array_agg(x) FROM jsonb_array_elements_text(coalesce(d.reference_numbers->'dockets','[]')) x) AS dockets,
+    (SELECT array_agg(x) FROM jsonb_array_elements_text(coalesce(d.reference_numbers->'tct_numbers','[]')) x) AS tct_numbers,
+    EXISTS (SELECT 1 FROM jsonb_array_elements(coalesce(d.analyst_memo->'ingest_signals'->'matter_hits','[]')) h
+             WHERE (h->>'urgent')::bool) AS urgent,
+    coalesce((d.analyst_memo->'ingest_signals'->'flags'->>'cover_message')::bool, false) AS cover_message,
+    coalesce((d.analyst_memo->'ingest_signals'->'flags'->>'composition_candidate')::bool, false)
+      OR coalesce((d.analyst_memo->'ingest_signals'->'flags'->>'cites_exhibit_series')::bool, false) AS composition_candidate,
     replace(encode(convert_to(d.extracted_text,'UTF8'),'base64'), chr(10), '') AS text_b64
   FROM documents d
   WHERE length(coalesce(d.extracted_text,'')) >= 50 AND coalesce(d.case_file,'') <> '' AND d.id > {after} AND {casef}
@@ -98,7 +108,10 @@ def ensure_v2():
     # payload indexes ensured every call (idempotent). doc_id_postgres MUST be indexed (integer) — the per-doc
     # delete-then-insert filters on it; the keyword fields power matter/case/type filtering.
     for field, schema in (("doc_id_postgres", "integer"), ("case_file", "keyword"),
-                          ("document_type", "keyword"), ("matter_codes", "keyword")):
+                          ("document_type", "keyword"), ("matter_codes", "keyword"),
+                          # deploy_812 significance fields → filtered semantic queries
+                          ("matter_code", "keyword"), ("dockets", "keyword"), ("tct_numbers", "keyword"),
+                          ("urgent", "bool"), ("cover_message", "bool"), ("composition_candidate", "bool")):
         try:
             _qd("PUT", f"/collections/{COLLECTION_V2}/index", {"field_name": field, "field_schema": schema})
         except Exception:
