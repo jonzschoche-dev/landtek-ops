@@ -35,7 +35,9 @@ MIN_TEXT = 120  # substantive-text floor
 
 
 def _hits(sig, key):
-    return {json.dumps(h, sort_keys=True, default=str) for h in (sig or {}).get(key) or []}
+    """Identity set of a hit list — matter_code/tct/name only, so a pool RENAME (body→text) or metadata
+    refresh (a deadline moving) is not mis-reported as a gained signal."""
+    return {(h.get("matter_code") or h.get("tct") or h.get("name")) for h in (sig or {}).get(key) or []}
 
 
 def _delta(old, new):
@@ -44,9 +46,7 @@ def _delta(old, new):
     for key, name in (("matter_hits", "matters"), ("title_hits", "titles"), ("party_hits", "parties")):
         gained = _hits(new, key) - _hits(old, key)
         if gained:
-            labels = [json.loads(g).get("matter_code") or json.loads(g).get("tct") or json.loads(g).get("name")
-                      for g in gained]
-            bits.append(f"+{name}:" + ",".join(sorted(set(labels))))
+            bits.append(f"+{name}:" + ",".join(sorted(gained)))
     for lead in ("unknown_titles", "unknown_dockets"):
         n_old, n_new = len((old or {}).get(lead) or []), len(new.get(lead) or [])
         if n_new > n_old:
