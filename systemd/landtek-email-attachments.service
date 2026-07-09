@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek email-attachment extractor — turns gmail_messages attachments into documents (per-account fetch; file_path set so OCR picks them up). The link that makes emailed PDFs (e.g. the ARTA Resolution) findable.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+EnvironmentFile=-/root/landtek/.env
+ExecStart=/usr/bin/python3 /root/landtek/extract_email_attachments.py --limit 100
+StandardOutput=append:/var/log/landtek/email-attachments.log
+StandardError=append:/var/log/landtek/email-attachments.log
