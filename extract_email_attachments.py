@@ -55,6 +55,64 @@ def _safe_name(fn, idx):
     return re.sub(r"[^A-Za-z0-9._-]", "_", fn)[:120]
 
 
+def _find_attid(payload, fname_lower):
+    """Walk a fresh message payload for the CURRENT attachmentId of a filename (ids expire/rotate)."""
+    def walk(p):
+        for part in (p.get("parts") or []):
+            yield part
+            yield from walk(part)
+    first_pdf = None
+    for part in walk(payload):
+        aid = (part.get("body") or {}).get("attachmentId")
+        if not aid:
+            continue
+        pf = (part.get("filename") or "").lower()
+        if fname_lower and pf == fname_lower:
+            return aid
+        if pf.endswith(".pdf") and first_pdf is None:
+            first_pdf = aid
+    return first_pdf
+
+
+def fetch_attachment_bytes(client_for, all_accounts, m, a):
+    """Robustly fetch attachment bytes. Handles the two real failure modes found 2026-07-09:
+      (1) MIS-TAGGED account — a message tagged primary that actually lives in the backup mailbox (pre-`account`
+          ingests default to primary); try the tagged account first, then the others.
+      (2) STALE/EXPIRED attachmentId — Gmail rotates ids; on failure, re-resolve the id from a fresh message
+          fetch and retry.
+    Returns (data|None, resolved_account|None, note). None means the message is gone from every mailbox."""
+    fn = (a.get("filename") or "").lower()
+    att_id = a.get("attachmentId")
+    tagged = m["account"]
+    order = [tagged] + [acct for acct in all_accounts if acct != tagged]
+    last = "no attachmentId"
+    for acct in order:
+        try:
+            g = client_for(acct)
+        except Exception as e:
+            last = f"client({acct}): {str(e)[:60]}"; continue
+        if att_id:  # 1) try the stored id on this account
+            try:
+                r = g.users().messages().attachments().get(
+                    userId="me", messageId=m["message_id"], id=att_id).execute()
+                return base64.urlsafe_b64decode(r["data"]), acct, "stored"
+            except Exception as e:
+                last = str(e)[:80]
+        try:  # 2) message not fetchable here → try next account; else re-resolve a fresh id
+            msg = g.users().messages().get(userId="me", id=m["message_id"], format="full").execute()
+        except Exception as e:
+            last = str(e)[:80]; continue
+        fresh = _find_attid(msg.get("payload", {}), fn)
+        if fresh:
+            try:
+                r = g.users().messages().attachments().get(
+                    userId="me", messageId=m["message_id"], id=fresh).execute()
+                return base64.urlsafe_b64decode(r["data"]), acct, "refreshed-id"
+            except Exception as e:
+                last = str(e)[:80]
+    return None, None, last
+
+
 def backfill_linker(cur, dry):
     """Create the missing canonical email_documents rows for existing 1:1 document_id caches."""
     cur.execute("""
@@ -114,6 +172,7 @@ def main():
     # PER-ACCOUNT clients: an attachmentId is only fetchable via the mailbox that holds the message.
     _addr2acct = {v: k for k, v in ACCOUNT_ADDR.items()}
     _clients = {}
+    ALL_ACCOUNTS = list(ACCOUNT_ADDR.values())
 
     def client_for(account_addr):
         acct = _addr2acct.get(account_addr, "primary")
@@ -144,24 +203,22 @@ def main():
     mode = "DRY-RUN (no writes)" if dry else "LIVE"
     print(f"  [{mode}] {len(msgs)} case-relevant email(s) with attachments to scan\n")
 
-    inserted = linked = skipped_nonpdf = skipped_noid = skipped_err = 0
+    inserted = linked = skipped_nonpdf = skipped_gone = 0
     for m in msgs:
         refs = m["attachment_refs"] if isinstance(m["attachment_refs"], list) else json.loads(m["attachment_refs"] or "[]")
         pdfs = [a for a in refs if _is_pdf(a)]
         skipped_nonpdf += len(refs) - len(pdfs)
         for idx, a in enumerate(pdfs):
-            att_id = a.get("attachmentId")
-            if not att_id:
-                skipped_noid += 1; continue
             fn = a.get("filename") or ""
             size = a.get("size", 0) or 0
-            try:
-                resp = client_for(m["account"]).users().messages().attachments().get(
-                    userId="me", messageId=m["message_id"], id=att_id).execute()
-                data = base64.urlsafe_b64decode(resp["data"])
-            except Exception as e:
-                print(f"    ✗ {(fn or 'unnamed')[:40]}: {str(e)[:80]}")
-                skipped_err += 1; continue
+            data, resolved_acct, note = fetch_attachment_bytes(client_for, ALL_ACCOUNTS, m, a)
+            if data is None:
+                print(f"    ✗ GONE {(fn or 'unnamed')[:40]}: not fetchable in any mailbox ({note})")
+                skipped_gone += 1; continue
+            if resolved_acct != m["account"] or note == "refreshed-id":
+                print(f"    ↻ recovered {(fn or 'unnamed')[:40]} via {resolved_acct} ({note})")
+                if not dry and resolved_acct != m["account"]:  # self-heal the mis-tagged account
+                    cur.execute("UPDATE gmail_messages SET account=%s WHERE id=%s", (resolved_acct, m["id"]))
 
             content_hash = hashlib.sha256(data).hexdigest()
             big = " [LARGE]" if len(data) > MAX_WARN_BYTES else ""
@@ -208,8 +265,7 @@ def main():
     print(f"    NEW documents {verb}: {inserted}")
     print(f"    LINKED to existing doc (same hash): {linked}")
     print(f"    skipped non-PDF (v1 scope): {skipped_nonpdf}")
-    print(f"    skipped no attachmentId: {skipped_noid}")
-    print(f"    skipped fetch error: {skipped_err}")
+    print(f"    skipped GONE (not in any mailbox): {skipped_gone}")
     if dry:
         print(f"\n  DRY-RUN — nothing written. Re-run without --dry-run to apply.")
     cur.close(); conn.close()
