@@ -206,6 +206,48 @@ def affirmations(cur, title_no, sources, computed_ha):
     return out
 
 
+def corroboration(cur, title_no):
+    """How strongly the corpus backs the REGISTERED area itself (independent of the ring):
+    (1) count every doc that carries both the title number and the literal area figure —
+        'the 13.9 ha is on multiple maps' made mechanical;
+    (2) subdivision arithmetic — the derivative titles' areas must sum toward (never past)
+        the mother title's area. Returns printable lines."""
+    lines = []
+    cur.execute("SELECT area_sqm FROM titles WHERE tct_number=%s", (title_no,))
+    r = cur.fetchone()
+    parent_sqm = float(r["area_sqm"]) if r and r["area_sqm"] else None
+    digits = re.sub(r"[^0-9]", "", title_no)[-4:]
+    if parent_sqm:
+        sqm = int(round(parent_sqm))
+        pat = re.sub(r"(\d)(?=(\d{3})+$)", r"\1[,.]?", str(sqm))   # 139132 → 139[,.]?132
+        cur.execute("SELECT count(*) AS n, (array_agg(id ORDER BY id))[1:12] AS ids "
+                    "FROM documents WHERE extracted_text ~ %s AND extracted_text ~ %s",
+                    (pat, digits))
+        w = cur.fetchone()
+        if w and w["n"]:
+            lines.append(f"registered area {parent_sqm/10000:.4g} ha is witnessed by "
+                         f"{w['n']} corpus doc(s): {w['ids']}{'…' if w['n'] > 12 else ''}")
+    cur.execute(
+        "SELECT count(*) AS total, count(t.area_sqm) AS with_area, "
+        "coalesce(sum(t.area_sqm),0) AS sum_sqm "
+        "FROM title_chain tc LEFT JOIN titles t ON t.tct_number = tc.child_title "
+        "WHERE tc.parent_title ~ %s", (r"(^|[^0-9])" + digits + r"($|[^0-9])",))
+    s = cur.fetchone()
+    if s and s["total"]:
+        sum_ha = float(s["sum_sqm"]) / 10000.0
+        line = (f"subdivision arithmetic: {s['with_area']}/{s['total']} derivative titles "
+                f"have areas, summing {sum_ha:.3f} ha")
+        if parent_sqm:
+            pct = 100 * float(s["sum_sqm"]) / parent_sqm
+            if float(s["sum_sqm"]) > parent_sqm * 1.05:
+                line += f" = {pct:.0f}% of parent ❌ CHILDREN EXCEED PARENT — review chain/areas"
+            else:
+                line += (f" = {pct:.0f}% of parent ✅ consistent"
+                         + (" (partial — missing child areas)" if s["with_area"] < s["total"] else " (complete)"))
+        lines.append(line)
+    return lines
+
+
 # ---------------------------------------------------------------- commands
 
 def build(title_no, matter, write=False):
@@ -250,6 +292,9 @@ def build(title_no, matter, write=False):
         tag = "—" if ok is None else ("✅ affirms" if ok else "❌ disagrees")
         unit = "corners" if "corner" in name else "ha"
         print(f"  {name:<42} {val:>10} {unit:<8} {tag}")
+    print("stated-area corroboration (how strongly the corpus backs the register):")
+    for line in corroboration(cur, title_no):
+        print(f"  {line}")
 
     doubt = len(conflicts) + len(extras) + sum(1 for s in agree if len(s) < 2)
     closure = a.get("closure_error_m")
