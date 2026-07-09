@@ -87,8 +87,22 @@ def _vec_literal(v):
     return "[" + ",".join(f"{x:.6f}" for x in v) + "]"
 
 
+def _restale():
+    """Close the de-garble → findable loop. A doc re-OCR'd AFTER its rag_local vectors were created still
+    carries the OLD (garbled) embedding — invisible-to-search even though its text is now clean. Delete those
+    stale chunks so the embed loop below re-embeds the fresh text. Idempotent; runs every pass."""
+    out = _psql(
+        "WITH stale AS (SELECT r.doc_id FROM rag_local r JOIN reocr_log l ON l.doc_id=r.doc_id "
+        "  AND l.note LIKE 'ok%' GROUP BY r.doc_id HAVING max(r.created_at) < max(l.ts)), "
+        "del AS (DELETE FROM rag_local WHERE doc_id IN (SELECT doc_id FROM stale) RETURNING doc_id) "
+        "SELECT count(DISTINCT doc_id) FROM del")
+    if out and out.strip() not in ("0", ""):
+        print(f"[restale] evicted {out.strip()} re-OCR'd docs' stale vectors → re-embedding fresh text", flush=True)
+
+
 def embed_all(limit=None):
     model = _model()
+    _restale()   # evict stale (re-OCR'd) vectors first so this pass re-embeds the fresh text
     done = chunks_total = 0
     while True:
         n = min(40, (limit - done) if limit else 40)
