@@ -53,7 +53,7 @@ UPLOADS = "/root/landtek/uploads"          # legacy landing zone (pre-2026-07-09
 FILES_ROOT = "/root/landtek/files"         # canonical: files/{case_file}/{year}/general/original/
 MAX_WARN_BYTES = 25 * 1024 * 1024  # log (don't skip) attachments larger than this
 URGENT_WINDOW_DAYS = 45            # a matched matter with a deadline inside this window is flagged urgent
-SIGNALS_VERSION = 1
+SIGNALS_VERSION = 2  # v2: docket aliases (deploy_810)
 
 
 def _is_pdf(a):
@@ -132,9 +132,15 @@ def fetch_attachment_bytes(client_for, all_accounts, m, a):
 # ────────────────────────────────────────────────────────────────────────────────────────────────
 
 def load_registries(cur):
-    """Load the live registries the significance engine matches against. Once per run."""
-    cur.execute("""SELECT matter_code, case_file, docket_number, status, next_deadline, next_event, title
-                     FROM matters WHERE docket_number IS NOT NULL AND docket_number <> ''""")
+    """Load the live registries the significance engine matches against. Once per run.
+    Each matter expands into docket_number + docket_aliases needles (aliases are CURATED exact strings —
+    court-caption phrasing like 'Civil Case No. 26-360' for registry docket 'CV-2026-360' — so the
+    docket-exact discipline holds; deploy_810)."""
+    cur.execute("""SELECT matter_code, case_file, docket_number, status, next_deadline, next_event, title,
+                          coalesce(docket_aliases, '{}') AS docket_aliases
+                     FROM matters
+                    WHERE (docket_number IS NOT NULL AND docket_number <> '')
+                       OR coalesce(array_length(docket_aliases, 1), 0) > 0""")
     matters = cur.fetchall()
     cur.execute("SELECT tct_number FROM titles WHERE tct_number IS NOT NULL")
     tcts = [r["tct_number"] for r in cur.fetchall()]
@@ -157,15 +163,21 @@ def extract_signals(regs, case_file, texts):
            "basis": "deterministic registry match (filename + parent-email envelope)",
            "matter_hits": [], "title_hits": [], "party_hits": [], "flags": {}, "cross_client": []}
 
-    # 1. Matters — DOCKET-EXACT only (the approved auto-link rule; never fuzzy-title matching).
+    # 1. Matters — DOCKET-EXACT only (docket_number OR a curated alias; never fuzzy-title matching).
     for mt in regs["matters"]:
-        dk = _norm(mt["docket_number"])
-        if len(dk) < 6:            # refuse degenerate dockets (e.g. 'T-4497' handled by title matching)
-            continue
-        where = [k for k, p in pools.items() if dk in p]
+        needles = [mt["docket_number"]] + list(mt.get("docket_aliases") or [])
+        matched_needle, where = None, []
+        for nd in needles:
+            ndn = _norm(nd)
+            if len(ndn) < 6:       # refuse degenerate dockets (e.g. 'T-4497' handled by title matching)
+                continue
+            w = [k for k, p in pools.items() if ndn in p]
+            if w:
+                matched_needle, where = nd, w
+                break
         if not where:
             continue
-        hit = {"matter_code": mt["matter_code"], "docket": mt["docket_number"], "status": mt["status"],
+        hit = {"matter_code": mt["matter_code"], "docket": matched_needle, "status": mt["status"],
                "next_deadline": str(mt["next_deadline"]) if mt["next_deadline"] else None,
                "matched_in": where}
         if mt["case_file"] and case_file and mt["case_file"] != case_file:
@@ -253,10 +265,14 @@ def _sig_summary(sig, auto_matter):
     return "; ".join(bits) if bits else "no registry signals"
 
 
-def enrich_backfill(cur, dry, limit):
-    """Enrich ALREADY-ingested email-attachment docs (all linked emails' envelopes pooled per doc)."""
+def enrich_backfill(cur, dry, limit, refresh=False):
+    """Enrich ALREADY-ingested email-attachment docs (all linked emails' envelopes pooled per doc).
+    refresh=True re-computes signals for docs whose ingest_signals are from an older SIGNALS_VERSION."""
     regs = load_registries(cur)
-    cur.execute("""
+    gate = ("AND coalesce((d.analyst_memo->'ingest_signals'->>'version')::int, 0) < %s" if refresh
+            else "AND (d.analyst_memo IS NULL OR NOT d.analyst_memo ? 'ingest_signals')")
+    params = ([SIGNALS_VERSION, limit] if refresh else [limit])
+    cur.execute(f"""
         SELECT d.id, d.case_file, d.original_filename,
                string_agg(DISTINCT g.subject, ' | ')   AS subjects,
                string_agg(g.body_plain, ' ')           AS bodies
@@ -264,8 +280,8 @@ def enrich_backfill(cur, dry, limit):
           JOIN email_documents e ON e.doc_id = d.id
           JOIN gmail_messages g  ON g.message_id = e.message_id
          WHERE (d.ingest_source = 'gmail_attachment' OR d.status = 'ingested_from_email')
-           AND (d.analyst_memo IS NULL OR NOT d.analyst_memo ? 'ingest_signals')
-         GROUP BY d.id ORDER BY d.id LIMIT %s""", (limit,))
+           {gate}
+         GROUP BY d.id ORDER BY d.id LIMIT %s""", params)
     docs = cur.fetchall()
     mode = "DRY-RUN" if dry else "LIVE"
     print(f"  [enrich-backfill {mode}] {len(docs)} email-attachment doc(s) lacking ingest_signals\n")
@@ -324,6 +340,8 @@ def main():
                     help="one-shot: create missing email_documents rows for existing document_id caches")
     ap.add_argument("--enrich-backfill", action="store_true",
                     help="apply ingest_signals enrichment to already-ingested email-attachment docs")
+    ap.add_argument("--refresh", action="store_true",
+                    help="with --enrich-backfill: re-enrich docs whose signals predate SIGNALS_VERSION")
     args = ap.parse_args()
     dry = args.dry_run
 
@@ -334,7 +352,7 @@ def main():
         backfill_linker(cur, dry)
         cur.close(); conn.close(); return
     if args.enrich_backfill:
-        enrich_backfill(cur, dry, args.limit)
+        enrich_backfill(cur, dry, args.limit, refresh=args.refresh)
         cur.close(); conn.close(); return
 
     sys.path.insert(0, "/root/landtek")
