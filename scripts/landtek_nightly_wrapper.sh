@@ -41,6 +41,14 @@ if ! python3 scripts/incorporation_status.py --check-regression >>/var/log/landt
     OVERALL_RC=1
 fi
 
+# 1.7 offline-sovereignty regression (A53): a NEW hard external dependency, or the local reasoning
+#      substrate (embedded law / local doc text) eroded. Transient Ollama is operational, not gated.
+if ! python3 scripts/offline_audit.py --check >>/var/log/landtek/offline_audit.log 2>&1; then
+    echo "[$TS] nightly: OFFLINE-CAPABILITY REGRESSION (A53) — the stack may no longer reason unplugged; see /var/log/landtek/offline_audit.log" \
+        >> /root/landtek/notifications/pending.txt
+    OVERALL_RC=1
+fi
+
 # 2. n8n execution health
 echo "[$TS] running scripts/monitor_n8n_executions.py"
 if python3 scripts/monitor_n8n_executions.py >>/var/log/landtek/n8n_health.log 2>&1; then

@@ -38,7 +38,40 @@ def _ok(fn):
         return False, f"{type(e).__name__}: {e}"
 
 
+def check():
+    """Terse REGRESSION gate for the nightly (A53). Exit 1 on an offline-capability regression:
+    the local reasoning SUBSTRATE eroded (no embedded law / no local doc text) OR a NEW external became
+    REQUIRED-TO-REASON (a hard dependency). Transient Ollama reachability is OPERATIONAL (monitored by the
+    cron/health sentinels), not an invariant regression — reported, never gated (avoids nightly noise from a
+    Tailscale blip). Postgres must be reachable to verify the substrate; if it isn't, that IS flagged."""
+    problems = []
+    hard = [label for _p, label, required, _f in EXTERNAL if required]
+    if hard:
+        problems.append(f"NEW hard dependency — external now REQUIRED-TO-REASON: {hard} (A53 says every external is an edge)")
+    try:
+        c = psycopg2.connect(DSN); c.autocommit = True; cur = c.cursor()
+        cur.execute("SELECT count(*) FROM legal_chunks"); law = cur.fetchone()[0]
+        cur.execute("SELECT count(*) FROM documents WHERE coalesce(extracted_text,'')<>''"); txt = cur.fetchone()[0]
+        c.close()
+        if law == 0:
+            problems.append("embedded law eroded (legal_chunks = 0) — cannot measure facts against the law offline")
+        if txt == 0:
+            problems.append("no local document text (0 docs with extracted_text) — nothing to reason over offline")
+    except Exception as e:
+        problems.append(f"cannot verify the offline substrate — Postgres unreachable ({type(e).__name__})")
+    ollama_ok, _ = _ok(lambda: urllib.request.urlopen(OLLAMA + "/api/tags", timeout=8).read())
+    note = "" if ollama_ok else "  [note: local Ollama unreachable now — operational, not gated]"
+    if problems:
+        print(f"A53 OFFLINE-CAPABILITY REGRESSION: {'; '.join(problems)}{note}")
+        return 1
+    print(f"A53 offline-capability OK: embedded law + local doc text present, every external is an edge, "
+          f"no hard dependency.{note}")
+    return 0
+
+
 def main():
+    if "--check" in sys.argv:
+        sys.exit(check())
     print("=" * 74)
     print("OFFLINE-READINESS AUDIT — can the stack reason unplugged?")
     print("=" * 74)
