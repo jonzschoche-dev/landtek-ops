@@ -421,21 +421,69 @@ def extract_file_text():
 
 
 
+def _drive_service():
+    """Build a Drive v3 client with OWNER-QUOTA credentials.
+
+    A Google service account has ZERO storage quota, so files.create into the personal-owned LANDTEK
+    folder returns 403 storageQuotaExceeded. We authenticate as the folder owner via the existing
+    DRIVE_REFRESH_TOKEN OAuth token (jonzschoche@gmail.com) → uploads are owner-quota. Falls back to
+    the SA only if the token is missing, with a loud log (SA uploads WILL 403 on new files).
+    Returns (service, auth_mode).
+    """
+    from googleapiclient.discovery import build as _build
+    tok = os.environ.get("DRIVE_REFRESH_TOKEN")
+    if not tok:
+        try:
+            for _l in open("/root/landtek/.env"):
+                _s = _l.strip()
+                if _s.startswith("DRIVE_REFRESH_TOKEN=") and not _s.startswith("#"):
+                    tok = _s.split("=", 1)[1].strip().strip('"').strip("'")
+                    break
+        except Exception:
+            pass
+    if tok:
+        try:
+            from google.oauth2.credentials import Credentials as _OAuthCreds
+            cli = None
+            for _f in ("/root/landtek/gmail_oauth_client.json", "/root/landtek/gemini_oauth_client.json"):
+                try:
+                    _d = json.load(open(_f))
+                    _d = _d.get("installed", _d.get("web", _d))
+                    if _d.get("client_id"):
+                        cli = _d
+                        break
+                except Exception:
+                    pass
+            if cli:
+                creds = _OAuthCreds(None, refresh_token=tok,
+                                    token_uri="https://oauth2.googleapis.com/token",
+                                    client_id=cli["client_id"], client_secret=cli["client_secret"])
+                return _build('drive', 'v3', credentials=creds), "oauth_owner_quota"
+        except Exception as e:
+            app.logger.warning("drive OAuth creds failed (%s); falling back to SA (uploads may 403)", e)
+    from google.oauth2 import service_account as _sa
+    app.logger.warning("upload_to_drive using SERVICE-ACCOUNT creds — new-file uploads will 403 "
+                       "(storageQuotaExceeded); set DRIVE_REFRESH_TOKEN for owner-quota uploads")
+    creds = _sa.Credentials.from_service_account_file(
+        "/root/landtek/landtek-compute-sa.json",
+        scopes=["https://www.googleapis.com/auth/drive.file",
+                "https://www.googleapis.com/auth/drive"])
+    return _build('drive', 'v3', credentials=creds), "service_account"
+
+
 @app.route('/api/upload_to_drive', methods=['POST'])
 def upload_to_drive():
-    """Upload a file to Google Drive using the service account.
+    """Upload a file to Google Drive using OWNER-QUOTA OAuth creds (the SA has no storage quota).
 
     Body:
       - multipart/form-data: file=@... + folder_id + (optional) target_filename
       OR
       - JSON: {base64_data, folder_id, target_filename?, mime_type?}
 
-    Response: {ok, drive_file_id, drive_link, name, status}
+    Response: {ok, drive_file_id, drive_link, name, auth_mode, status}
     """
     import io as _io, base64 as _b64
     try:
-        from google.oauth2 import service_account as _sa
-        from googleapiclient.discovery import build as _build
         from googleapiclient.http import MediaIoBaseUpload as _MIO
     except Exception as e:
         return jsonify({"ok": False, "status": f"sdk_missing: {e}"}), 500
@@ -469,12 +517,7 @@ def upload_to_drive():
         return jsonify({"ok": False, "status": "folder_id required"}), 400
 
     try:
-        creds = _sa.Credentials.from_service_account_file(
-            "/root/landtek/landtek-compute-sa.json",
-            scopes=["https://www.googleapis.com/auth/drive.file",
-                    "https://www.googleapis.com/auth/drive"]
-        )
-        service = _build('drive', 'v3', credentials=creds)
+        service, auth_mode = _drive_service()
         media = _MIO(_io.BytesIO(raw), mimetype=mime_type, resumable=True)
         meta = {"name": target_filename, "parents": [folder_id]}
         result = service.files().create(
@@ -488,6 +531,7 @@ def upload_to_drive():
             "name": result.get('name'),
             "mime_type": result.get('mimeType'),
             "parents": result.get('parents'),
+            "auth_mode": auth_mode,
             "status": "ok",
         }), 200
     except Exception as e:
