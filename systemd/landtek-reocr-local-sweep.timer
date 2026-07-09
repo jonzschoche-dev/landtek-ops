@@ -1,0 +1,10 @@
+[Unit]
+Description=Drain the garbled-OCR backlog via owned local vision every 20 min (steady drip; shares the Mac Ollama with verify_worker)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=20min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

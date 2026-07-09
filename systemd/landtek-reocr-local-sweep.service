@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek local-vision re-OCR sweep — drains the ocr_quality.flagged garble backlog via the OWNED Mac Ollama qwen2.5vl (Tailscale, $0/no-429). The fallback the Gemini path never had. Strict-improvement + re-score so fixed docs leave the queue.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+EnvironmentFile=-/root/landtek/.env
+ExecStart=/usr/bin/python3 /root/landtek/scripts/reocr_local.py --sweep --max 12
+StandardOutput=append:/var/log/landtek/reocr-local.log
+StandardError=append:/var/log/landtek/reocr-local.log
