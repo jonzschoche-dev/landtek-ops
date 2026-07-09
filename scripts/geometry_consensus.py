@@ -217,16 +217,30 @@ def corroboration(cur, title_no):
     r = cur.fetchone()
     parent_sqm = float(r["area_sqm"]) if r and r["area_sqm"] else None
     digits = re.sub(r"[^0-9]", "", title_no)[-4:]
-    if parent_sqm:
-        sqm = int(round(parent_sqm))
-        pat = re.sub(r"(\d)(?=(\d{3})+$)", r"\1[,.]?", str(sqm))   # 139132 → 139[,.]?132
-        cur.execute("SELECT count(*) AS n, (array_agg(id ORDER BY id))[1:12] AS ids "
-                    "FROM documents WHERE extracted_text ~ %s AND extracted_text ~ %s",
-                    (pat, digits))
-        w = cur.fetchone()
-        if w and w["n"]:
-            lines.append(f"registered area {parent_sqm/10000:.4g} ha is witnessed by "
-                         f"{w['n']} corpus doc(s): {w['ids']}{'…' if w['n'] > 12 else ''}")
+    # Consensus of what the DOCUMENTS state (not what the register says): tally every area
+    # figure asserted by docs that mention this title; the mode is the corpus's answer.
+    cur.execute("SELECT id, extracted_text FROM documents WHERE extracted_text ~ %s", (digits,))
+    votes = {}
+    fig = re.compile(r"([0-9][0-9,\.]{2,10})\s*\)?\s*(?:SQ\.?\s*M(?:TS|ETERS)?\b|square\s*met)", re.I)
+    for d in cur.fetchall():
+        seen = set()
+        for m in fig.finditer(d["extracted_text"] or ""):
+            try:
+                v = int(round(float(m.group(1).replace(",", ""))))
+            except ValueError:
+                continue
+            if 100 <= v <= 5_000_000 and v not in seen:
+                seen.add(v)
+                votes.setdefault(v, set()).add(d["id"])
+    if votes:
+        top = sorted(votes.items(), key=lambda kv: -len(kv[1]))[:3]
+        for v, ids in top:
+            mark = ""
+            if parent_sqm:
+                mark = (" ✅ register matches" if abs(v - parent_sqm) / parent_sqm <= 0.005
+                        else f" (register says {parent_sqm:,.0f})")
+            lines.append(f"figure {v:,} sqm ({v/10000:.4f} ha) stated by {len(ids)} doc(s) "
+                         f"{sorted(ids)[:10]}{'…' if len(ids) > 10 else ''}{mark}")
     cur.execute(
         "SELECT count(*) AS total, count(t.area_sqm) AS with_area, "
         "coalesce(sum(t.area_sqm),0) AS sum_sqm "
