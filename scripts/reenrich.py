@@ -65,20 +65,25 @@ def main():
     ap.add_argument("--case-file", default=None)
     ap.add_argument("--matter", default=None)
     ap.add_argument("--quiet", action="store_true", help="only print docs whose signals CHANGED")
+    ap.add_argument("--force", action="store_true",
+                    help="ignore the staleness gate (use after a REGISTRY-only change: new titles/aliases)")
     args = ap.parse_args()
     dry = args.dry_run
 
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     regs = load_registries(cur)
+    known_tcts = [r["tct_number"] for r in regs["tcts"]]   # regs["tcts"] is (tct, case_file) rows since v4
     known_dockets = [m["docket_number"] for m in regs["matters"] if m["docket_number"]] + \
                     [a for m in regs["matters"] for a in (m.get("docket_aliases") or [])]
 
-    where = ["length(coalesce(d.extracted_text,'')) >= %s",
-             """( NOT coalesce(d.analyst_memo ? 'ingest_signals', false)                       -- C1 never
+    where = ["length(coalesce(d.extracted_text,'')) >= %s"]
+    params = [MIN_TEXT]
+    if not args.force:
+        where.append("""( NOT coalesce(d.analyst_memo ? 'ingest_signals', false)                  -- C1 never
                  OR coalesce((d.analyst_memo->'ingest_signals'->>'version')::int, 0) < %s      -- C2 old engine
-                 OR d.analyst_memo->'ingest_signals'->>'text_hash' IS DISTINCT FROM md5(d.extracted_text) )"""]
-    params = [MIN_TEXT, SIGNALS_VERSION]
+                 OR d.analyst_memo->'ingest_signals'->>'text_hash' IS DISTINCT FROM md5(d.extracted_text) )""")
+        params.append(SIGNALS_VERSION)
     if args.doc_id:
         where.append("d.id = ANY(%s)"); params.append(args.doc_id)
     if args.case_file:
@@ -115,7 +120,7 @@ def main():
         # carry forward ingest-only flags the text pass can't re-derive (cover_message needs the email context)
         if (d["old_sig"] or {}).get("flags", {}).get("cover_message"):
             sig["flags"]["cover_message"] = True
-        sig = extract_text_extras(sig, text, regs["tcts"], known_dockets)
+        sig = extract_text_extras(sig, text, known_tcts, known_dockets)
         sig["text_hash"] = hashlib.md5(text.encode()).hexdigest()
 
         delta = _delta(d["old_sig"], sig)

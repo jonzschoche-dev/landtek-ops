@@ -53,7 +53,7 @@ UPLOADS = "/root/landtek/uploads"          # legacy landing zone (pre-2026-07-09
 FILES_ROOT = "/root/landtek/files"         # canonical: files/{case_file}/{year}/general/original/
 MAX_WARN_BYTES = 25 * 1024 * 1024  # log (don't skip) attachments larger than this
 URGENT_WINDOW_DAYS = 45            # a matched matter with a deadline inside this window is flagged urgent
-SIGNALS_VERSION = 3  # v2: docket aliases (deploy_810) · v3: post-OCR text pool + unknown-ref leads + text_hash (deploy_812)
+SIGNALS_VERSION = 4  # v2: aliases (810) · v3: text pool + leads + text_hash (812) · v4: multi-client registry scoping + ...2126 et al added (813)
 TEXT_POOL_CAP = 250_000  # chars of extracted_text scanned per doc (guards degenerate mega-docs)
 
 
@@ -143,10 +143,12 @@ def load_registries(cur):
                     WHERE (docket_number IS NOT NULL AND docket_number <> '')
                        OR coalesce(array_length(docket_aliases, 1), 0) > 0""")
     matters = cur.fetchall()
-    cur.execute("SELECT tct_number FROM titles WHERE tct_number IS NOT NULL")
-    tcts = [r["tct_number"] for r in cur.fetchall()]
-    cur.execute("SELECT canonical_name FROM transferees WHERE canonical_name IS NOT NULL")
-    names = [r["canonical_name"] for r in cur.fetchall()]
+    # titles/transferees carry their OWN case_file (deploy_813: the registry is no longer all-MWK — e.g.
+    # T-1722 is Inocalla/Paracale-001) → matching is scoped per-row, cross-client hits become tripwire flags.
+    cur.execute("SELECT tct_number, coalesce(case_file,'MWK-001') AS case_file FROM titles WHERE tct_number IS NOT NULL")
+    tcts = cur.fetchall()
+    cur.execute("SELECT canonical_name, coalesce(case_file,'MWK-001') AS case_file FROM transferees WHERE canonical_name IS NOT NULL")
+    names = cur.fetchall()
     return {"matters": matters, "tcts": tcts, "transferees": names}
 
 
@@ -223,27 +225,29 @@ def extract_signals(regs, case_file, texts):
                 hit["urgent"] = True
             sig["matter_hits"].append(hit)
 
-    # 2. Known titles (the MWK title map). MWK registry → for a non-MWK email a hit is cross-client signal.
-    for t in regs["tcts"]:
-        tn = _norm(t)
+    # 2. Known titles — matched per the TITLE's own client (registry is multi-client since deploy_813).
+    for tr in regs["tcts"]:
+        tn = _norm(tr["tct_number"])
         if len(tn) < 5:
             continue
         where = [k for k, p in pools.items() if tn in p]
         if where:
-            entry = {"tct": t, "matched_in": where}
-            (sig["title_hits"] if case_file == "MWK-001"
-             else sig["cross_client"]).append(entry if case_file == "MWK-001"
-                                              else {"kind": "title", **entry, "owner_case_file": "MWK-001"})
+            entry = {"tct": tr["tct_number"], "matched_in": where}
+            if case_file == tr["case_file"]:
+                sig["title_hits"].append(entry)
+            else:
+                sig["cross_client"].append({"kind": "title", **entry, "owner_case_file": tr["case_file"]})
 
-    # 3. Transferees (named MWK defendants/parties of interest).
-    for n in regs["transferees"]:
-        nn = _norm(n)
+    # 3. Transferees (named parties of interest) — same per-row client scoping.
+    for nr in regs["transferees"]:
+        nn = _norm(nr["canonical_name"])
         where = [k for k, p in pools.items() if nn in p]
         if where:
-            entry = {"name": n, "matched_in": where}
-            (sig["party_hits"] if case_file == "MWK-001"
-             else sig["cross_client"]).append(entry if case_file == "MWK-001"
-                                              else {"kind": "party", **entry, "owner_case_file": "MWK-001"})
+            entry = {"name": nr["canonical_name"], "matched_in": where}
+            if case_file == nr["case_file"]:
+                sig["party_hits"].append(entry)
+            else:
+                sig["cross_client"].append({"kind": "party", **entry, "owner_case_file": nr["case_file"]})
 
     # 4. Composition + integrity flags.
     fn_subj = (pools.get("filename", "") + " " + pools.get("subject", ""))

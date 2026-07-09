@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly post-OCR re-enrichment (offset from reocr-local so de-garbled text gets re-signaled)
+
+[Timer]
+OnBootSec=20min
+OnUnitActiveSec=1h
+RandomizedDelaySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
