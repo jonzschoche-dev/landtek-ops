@@ -213,3 +213,32 @@ immediately; the future pillars (Finance/Property/Forensic) stay `—` gaps unti
 *Companion files: `MASTER_PLAN.md` (execution) · `ONTOLOGY.md` (concepts + invariants) ·
 `docs/ONTOLOGY_STRUCTURE.md` (how the ontology grows) · `ontology_check.py --invariants/--coverage/--structure`
 (the mechanical guards that keep all three honest).*
+
+## 9. Validator graduation checklist — the standing bar for every log→block flip (2026-07-09)
+
+Codifies the `GovernanceHandoff` discipline (ONTOLOGY §2.12) that ran the V9/V10 composition flip
+(deploys 801–804) — the template the ingestion agent executed and the desk verified. **Every future
+flip (V5–V8 next) clears ALL five, in order:**
+
+1. **Observation window** — ≥7d of shadow over an ACTIVE pipeline (`--shadow-status` 0-findings is
+   necessary, not sufficient; a dormant pipeline or fresh guard is trivially clean — judge from the
+   validator's deploy date + the guarded table's write traffic).
+2. **Pre-flight query** — prove 0 existing rows violate the invariant (the flip must not strand live data).
+3. **Rolled-back exception test** — in a transaction, force a violating write in block mode, confirm the
+   exception RAISES, roll back. Enforcement proven, no state changed.
+4. **Scope note** — the ONTOLOGY §4 row states exactly WHICH table(s) the trigger guards today and what
+   it extends to later (never claim a phantom table is guarded — the A54 `filing_exhibits` lesson).
+5. **Desk verification + record** — the ontology desk independently re-grounds mode+trigger
+   (`ontology_check.py --enforcement` now makes this mechanical) and records the graduation in the
+   invariant row + the handoff doc.
+
+**Post-flip standing check:** `--enforcement` (deploy_806) verifies every §4 mode CLAIM against the live
+config + `ontvv_v*` triggers — phantom enforcement (doc claims block, validator un-flipped/dropped) fails
+the check + writes a `phantom_enforcement` finding via the daily sentinel. First run caught 3 stale
+under-claims (A2/V3 was already block; A9/V6 was already applied) — both rows re-grounded same day.
+
+**Open governance-desk item — blocked-write visibility:** V3/V4/V9/V10 now `block` in production, but a
+rejected write only raises to the writer; nobody else learns it fired. Build: a daily digest line
+("N writes blocked by Vn this week") sourced from the validators' exception path (extend `ontology_reject`
+to log block-mode RAISEs, not just log-mode findings). Passive-tier visibility only — per-event paging
+stays reserved for validators with an active supervised operation (the V8-elevator discipline).

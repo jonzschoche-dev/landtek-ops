@@ -16,6 +16,7 @@ Usage:
   python3 scripts/ontology_check.py --render-audit # A32: projected client output must carry NO internal token
   python3 scripts/ontology_check.py --alignment  # MASTER_PLAN/bridge A# citations must exist in ONTOLOGY §4 (no DB)
   python3 scripts/ontology_check.py --shadow-status [N]  # log-mode validators: findings in last N days (def 7) + flip-readiness
+  python3 scripts/ontology_check.py --enforcement # §4 mode claims (ENFORCED/shadow) vs LIVE config+triggers — no phantom enforcement
   python3 scripts/ontology_check.py --sentinel # daily timer mode: silent when clean; writes a
                                                # holes_findings row on NEW V3/V4 contamination,
                                                # a coverage regression, OR a broken §4 invariant
@@ -380,6 +381,107 @@ def cmd_shadow_status(cur, days=7) -> int:
     return 0
 
 
+# ENFORCEMENT-REALITY — how a §4 enforcement cell CLAIMS a validator's mode. Order matters:
+# block > not-applied > shadow (a cell saying "shadow-DRAFT, not yet applied … ready for a shadow run"
+# is a NOT-APPLIED claim, not a shadow claim). Patterns are deliberately tight so an INSTRUCTION like
+# "Flip to enforce: UPDATE … SET mode='block'" is never read as a block CLAIM.
+_CLAIM_BLOCK = re.compile(r"ENFORCED\s*\(block\)|is now a `?block`?|flipped\s+log→block|BLOCK write-trigger", re.I)
+_CLAIM_NOT_APPLIED = re.compile(r"not (?:yet )?applied|shadow-DRAFT", re.I)
+_CLAIM_SHADOW = re.compile(r"APPLIED IN SHADOW|SHADOW WRITE-GUARD|`log`|\blog mode\b|\bshadow\b", re.I)
+
+
+def enforcement_reality(cur):
+    """For every Vn cited in an ONTOLOGY §4 enforcement cell with a mode CLAIM, compare the claim against
+    the LIVE DB: ontology_validator_config.mode + the presence of its ontvv_v{n}_* trigger(s).
+    Returns (oks, phantoms, stales, orphans) or None on unreadable doc.
+      phantom = doc claims MORE than reality (claims block/shadow, but mode/trigger absent) — dangerous;
+      stale   = doc claims LESS than reality (claims shadow/not-applied, but live is block/applied) — drift;
+      orphan  = a configured validator no §4 row cites with a mode claim — informational."""
+    try:
+        with open(_doc_path()) as f:
+            doc = f.read()
+    except Exception:
+        return None
+    cur.execute("SELECT check_code, mode FROM ontology_validator_config")
+    cfg = {r[0]: r[1] for r in cur.fetchall()}
+    cur.execute("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE 'ontvv\\_v%'")
+    trig = {}
+    for (t,) in cur.fetchall():
+        m = re.match(r"ontvv_v(\d+)_", t)
+        if m:
+            trig.setdefault(f"V{m.group(1)}", []).append(t)
+    oks, phantoms, stales, cited = [], [], [], set()
+    for line in doc.splitlines():
+        if not re.match(r"^\|\s*A\d+\s*\|", line):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        aid, enf = cells[0], cells[-1]
+        vns = sorted(set(re.findall(r"\bV(\d+)\b", enf)), key=int)
+        if not vns:
+            continue
+        claim = ("block" if _CLAIM_BLOCK.search(enf) else
+                 "not_applied" if _CLAIM_NOT_APPLIED.search(enf) else
+                 "shadow" if _CLAIM_SHADOW.search(enf) else None)
+        if claim is None:
+            continue                                    # cited without a mode claim — nothing to verify
+        for n in vns:
+            vn = f"V{n}"
+            cited.add(vn)
+            mode, tg = cfg.get(vn), trig.get(vn, [])
+            if claim == "block":
+                if mode == "block" and tg:
+                    oks.append((aid, vn, f"block · {len(tg)} trigger(s)"))
+                else:
+                    phantoms.append((aid, vn, f"doc claims ENFORCED(block); live mode={mode!r}, triggers={tg or 'NONE'}"))
+            elif claim == "shadow":
+                if not tg:
+                    phantoms.append((aid, vn, f"doc claims a live shadow guard; NO ontvv_v{n}_* trigger installed (mode={mode!r})"))
+                elif mode == "block":
+                    stales.append((aid, vn, "doc claims shadow/log; live mode is BLOCK — under-claim, update the row"))
+                else:
+                    oks.append((aid, vn, f"log · {len(tg)} trigger(s)"))
+            else:                                       # not_applied
+                if tg:
+                    stales.append((aid, vn, f"doc says not-yet-applied; {len(tg)} trigger(s) LIVE (mode={mode!r}) — update the row"))
+                else:
+                    oks.append((aid, vn, "not applied · no trigger (as documented)"))
+    orphans = sorted(set(cfg) - cited, key=lambda v: int(v[1:]))
+    return oks, phantoms, stales, orphans
+
+
+def cmd_enforcement_reality(cur) -> int:
+    """ENFORCEMENT-REALITY check — the rung above --invariants. --invariants proves a 🟢 row's named
+    ARTIFACT exists; this proves the claimed ENFORCEMENT IS LIVE: a §4 row claiming ENFORCED(block) must
+    have its validator in mode='block' WITH its trigger installed, and a shadow claim must have a real
+    log-mode trigger. Catches the one lie --invariants can't see: a validator flipped back to log (or
+    dropped) while the doc still says ENFORCED — phantom enforcement. Under-claims (doc says shadow,
+    live is block) are STALE warnings, not failures. Exit 1 only on phantom."""
+    result = enforcement_reality(cur)
+    if result is None:
+        print("cannot read ONTOLOGY.md"); return 2
+    oks, phantoms, stales, orphans = result
+    print("=== ONTOLOGY §4 enforcement-reality — every claimed validator mode must be LIVE ===")
+    for aid, vn, note in oks:
+        print(f"  ✓ {aid} → {vn}: {note}")
+    if stales:
+        print(f"\n  ⚠ STALE ({len(stales)}) — reality is STRONGER than the doc claims (update the row):")
+        for aid, vn, note in stales:
+            print(f"    - {aid} → {vn}: {note}")
+    if orphans:
+        print(f"  [i] configured but cited by no §4 mode-claim: {', '.join(orphans)}")
+    if phantoms:
+        print(f"\n  ✗ PHANTOM ENFORCEMENT ({len(phantoms)}) — the doc claims protection that is NOT live:")
+        for aid, vn, note in phantoms:
+            print(f"    - {aid} → {vn}: {note}")
+        print("  → re-flip the validator (or fix the §4 row). A claimed-but-dead guard is worse than none.")
+        return 1
+    print(f"\n  ✓ every claimed enforcement is live ({len(oks)} verified"
+          + (f", {len(stales)} stale under-claim(s) to tidy" if stales else "") + ").")
+    return 0
+
+
 def cmd_alignment() -> int:
     """ALIGNMENT check (no DB) — keeps MASTER_PLAN.md, ONTOLOGY_ALIGNMENT.md, and ONTOLOGY.md §4 in sync
     (ONTOLOGY_ALIGNMENT.md §7.4). Two mechanical rules: (1) every invariant `A#` cited in the plan or the
@@ -515,6 +617,11 @@ def main():
             rc = cmd_shadow_status(cur, days)
         conn.close()
         sys.exit(rc)
+    if "--enforcement" in sys.argv:
+        with conn.cursor() as cur:
+            rc = cmd_enforcement_reality(cur)
+        conn.close()
+        sys.exit(rc)
     problems = 0
     v3 = v4 = 0
     drift_counts, bad, unreg, inference = {}, [], [], {}
@@ -627,6 +734,28 @@ def main():
                          %s, jsonb_build_object('v3',%s,'v4',%s), 'open')""",
                     (desc[:200], desc, v3, v4),
                 )
+        except Exception:
+            pass  # sentinel must never crash the timer
+
+    # phantom-enforcement regression: a §4 row claims ENFORCED(block)/shadow but the validator's live
+    # mode/trigger no longer matches — a claimed-but-dead guard. Writes a P0-adjacent finding.
+    if sentinel:
+        try:
+            with conn.cursor() as cur:
+                er = enforcement_reality(cur)
+            if er and er[1]:
+                pdesc = ("ontology_check enforcement-reality: PHANTOM ENFORCEMENT — "
+                         + "; ".join(f"{a}→{v} ({n})" for a, v, n in er[1][:4])
+                         + ". A §4 row claims a validator mode that is NOT live. Re-flip the validator or "
+                           "fix the row; run scripts/ontology_check.py --enforcement.")
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """INSERT INTO holes_findings(routine_name, routine_version, finding_id_hash,
+                             severity, hole_type, description, metadata, status)
+                           VALUES ('ontology_check','v1', md5(%s), 'high', 'phantom_enforcement',
+                             %s, jsonb_build_object('phantoms', %s), 'open')""",
+                        (pdesc[:200], pdesc, len(er[1])),
+                    )
         except Exception:
             pass  # sentinel must never crash the timer
 

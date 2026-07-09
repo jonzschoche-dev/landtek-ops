@@ -144,3 +144,37 @@ place the whole operation's outward moves converge and are governed.
 **Distribution of the fleet:** ~38 T1 (report health) · ~3 T2-write (DB write-gate governs them) ·
 ~10 T2-flow (register a work order) · every outward move → `outward_action`. So "connecting 52 agents"
 is: ~41 just report health, ~10 register flows, and **all outward moves share one held chokepoint.**
+
+## 9. GOVERNANCE HANDOFF — ontology desk → supervision desk (2026-07-09, deploy_806)
+
+*Filed per the `GovernanceHandoff` pattern (ONTOLOGY §2.12): directive → grounded review → invariants →
+recorded sign-off → explicit graduation trigger. The governing invariants are **A59** and **A61**
+(ONTOLOGY v0.27, §2.18) — both 🟡 with the graduation conditions below. The ontology desk defines the
+invariants; the supervision desk owns the build. Reply/sign-off in this section when picked up.*
+
+### D1 — Supervisor Phase 2, scoped by A59 (governed task completion)
+**Directive.** Wire LIVE work through `work_orders` — but only the work A59 actually governs: tasks that
+are **deadline-bound or mutate governed data**. Start with the three that already have shapes:
+`ocr_remediation` (a registered kind), `evidence_gap` (the enforced write-path exists), and deliverable
+production (`dossier_pipeline`/`case_bundle` runs — the future A58 WorkProduct producers). Everything else
+(report-health daemons, ~41 of the fleet) stays OUTSIDE work orders by design — do not wrap the world.
+**Invariant honored:** every wrapped task reaches a terminal state — `done` / `held` / `failed`-with-reason —
+never silently abandoned (A59). **Graduation:** A59 🟡→🟢 when live work runs through orders AND D2 is active.
+
+### D2 — Stalled-order sentinel (the "or surfaces" half of A59)
+**Directive.** A `work_orders` row past its review horizon (suggest: no state change in 72h while
+non-terminal) writes a `holes_findings` row + a `notifications/pending.txt` line — the same surfacing
+pattern as the offline/incorporation nightly steps. Mechanical, creditless, ~30 lines. Without this, Phase 2
+just moves silent abandonment into a table; WITH it, "finishes or surfaces" is real.
+
+### D3 — One enumerable fleet roster (prerequisite for A61's tier registry)
+**Directive.** `scripts/agents.py` catalogs ~50 agents, but a second automation layer (~56 systemd/cron
+scripts: `refresh_*`, sim, sweeps) runs OUTSIDE that roster. **A supervisor cannot supervise what it cannot
+enumerate.** Merge both into ONE registry — one row per agent/script: name · kind (daemon/timer/cron/
+on-demand) · **tier (T0–T3)** · owner · heartbeat source. This is deliberately ALSO the A61 substrate: once
+tier is a column, a tier RAISE becomes a recorded row-change (metric evidence + human sign-off), and A61
+graduates 🟡→🟢. Suggest: extend `agents.py` to emit/reconcile the registry rather than a new framework.
+**Graduation:** A61 🟡→🟢 when the registry exists AND a documented tier-raise procedure references it.
+
+*Sequencing suggestion: D3 → D2 → D1 (enumerate, then surface, then wire) — D3 is cheapest and unblocks the
+other two. Nothing here is Aug-12-blocking; slot behind live-matter work per MASTER_PLAN §1 wartime posture.*
