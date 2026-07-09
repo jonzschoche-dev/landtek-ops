@@ -197,7 +197,7 @@ invariant, it is a hope. When enforcement isn't yet possible, a **`truth_tests/`
 | **Governance / outward** | Every outward action funnels through one fail-closed chokepoint; a governed step only runs on a governed path. | A21/A22 |
 | **Truth is mechanical** | Truth invariants are checked by deterministic tests + triggers, never a standing LLM harness. | A24 (doctrine) |
 | **Inbox ≠ ledger** | Proposed/candidate rows are never authoritative; only gated ledgers are quoted downstream. | A19 |
-| **Offline sovereignty** | Every guard degrades to a safe hardcoded floor if its config/DB is unreachable. | doctrine |
+| **Offline sovereignty** | The stack reasons with no internet — the local core (Postgres+Ollama+embedded law+text) is self-contained; every external is an edge, never required to reason. Guards also degrade to a hardcoded floor if config/DB is unreachable. | **A53** (`offline_audit.py`) + doctrine |
 
 A new domain that touches money, tenants, or construction does **not** get to re-litigate these — it
 inherits them and adds only its domain-specific invariants on top.
