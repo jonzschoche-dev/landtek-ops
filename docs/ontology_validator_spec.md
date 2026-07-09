@@ -145,26 +145,31 @@ V1/V3 when the shadow migration is authored.)*
 - [x] `scripts/ontology_check.py` whole-corpus linter built + running (V3 grounding, V4 isolation, drift-table watch, provenance-vocab audit, unregistered-table review). Closes the loop.
 - [x] **V4 fired on first run** — caught 6 verified facts (Allan Inocalla / OCT P-1616, Paracale) mis-filed under `MWK-TCT4497`; **re-homed to `PAR-TCT1616`**; `v_ontology_client_cross` now returns 0.
 - [x] V3 confirmed 0 false positives at apply time (0 ungrounded verified facts).
-- [ ] 72h shadow run; V1 false-positive rate = 0 confirmed in `holes_findings` (V1 drift-writes should be 0; `chain_of_title`/`cases` hold *pre-existing* rows, not new writes).
-- [ ] V1/V3 flipped to `block` (`UPDATE ontology_validator_config SET mode='block' WHERE check_code IN ('V1','V3');`); one rollback drill (`--rollback`) executed.
+- [x] 72h shadow run; V1 false-positive rate = 0 confirmed in `holes_findings` (V1 drift-writes should be 0; `chain_of_title`/`cases` hold *pre-existing* rows, not new writes).
+- [x] V1/V3 flipped to `block` — **live mode grounded `block` 2026-07-09 via `ontology_check.py --enforcement`** (these boxes had drifted stale; the check caught A2 still claiming V3 shadow). Rollback drill not separately recorded.
 - [x] `knowledge_graph_triples.provenance_level` overload reconciled (deploy_693: split to `extraction_method` col; vocab now clean).
-- [ ] V4 kept as detector; enforce post-Aug-12 once A5 (`case_file`/`matter_code`) is FK-hardened.
+- [x] V4 — SUPERSEDED: enforced as a `block` write-trigger since deploy_716 (the "keep as detector until post-Aug-12" plan was overtaken; verified live: cross-client fact rejected). See ONTOLOGY.md A5.
 
 ---
 
-## 8. V6 — Geometry client isolation (A9) · **SHADOW DRAFT, NOT APPLIED** (deploy_732 prep)
+## 8. V6 — Geometry client isolation (A9) · **APPLIED IN SHADOW** (live ~2026-07-06/07 per operator 7.2 approval; recorded `migrations/deploy_814_v6_geometry_isolation_shadow.sql`)
 
 Extends the §3 family with a sixth check for the Mapping domain (ONTOLOGY.md §2.4, axiom A9): a parcel's
-geometry belongs to exactly one client. The geometry analogue of V4. **Drafted only — no view, no config
-row, no trigger has been created on the DB.** It ships `log` first (like V4).
+geometry belongs to exactly one client. The geometry analogue of V4. **LIVE on the DB in `log` mode** —
+config `V6='log'`, view `v_ontology_geometry_cross` (0 live violations; MWK-BALANE seed clean), triggers
+`ontvv_v6_map_parcels` + `ontvv_v6_parcels` → `ontvv_geometry_isolation()`, logging
+`ONTOLOGY_GEOMETRY_CLIENT_CROSS` → `holes_findings` (severity `info`, shadow). Shadow proven: a deliberate
+cross-client insert succeeded + logged (rolled back) — blocks nothing. Applied live by the mapping/geometry
+session; recorded to the ontology layer 2026-07-09 (handoff directive). **The canonical SQL is the migration
+file — dumped from the live DB, not this draft.** Grounded mechanically: `ontology_check.py --enforcement`
+verifies the A9↔V6 mode-claim against live config+triggers daily.
 
 **Blocker RESOLVED (deploy_733 — operator decision 7.1 = option (a)):** `parcels.client_code` was added
 (nullable, FK→`clients`, forward-filled by `_client_of(matter_code)` at write). **Both** geometry layers
-now carry a declared `client_code`, so V6 covers **both arms uniformly** — the draft below is updated
-accordingly. Applying it (even in `log`) is the separate **7.2** approval and has NOT been done.
+carry a declared `client_code`, so V6 covers **both arms uniformly**.
 
 ```sql
--- ===== V6 (geometry client isolation, A9) — SHADOW DRAFT, DO NOT APPLY =====
+-- ===== V6 (geometry client isolation, A9) — historical draft; LIVE canonical = migrations/deploy_814 =====
 -- Config (mirrors V4; ships 'log' first):
 -- INSERT INTO ontology_validator_config(check_code,mode,note) VALUES
 --   ('V6','log','geometry client-isolation (A9) via v_ontology_geometry_cross')
@@ -217,9 +222,9 @@ END $$;
 
 **Definition of done (V6):**
 - [x] `parcels.client_code` decision made → **option (a), added deploy_733** (writer forward-fills via `_client_of`).
-- [ ] `v_ontology_geometry_cross` created; returns 0 on the live seed (MWK-BALANE) — expected clean. *(7.2)*
-- [ ] V6 config row inserted `mode='log'`; both triggers attached; ≥72h shadow, 0 false positives. *(7.2)*
-- [ ] Flip both arms to `block` after a clean shadow window. *(post-7.2)*
+- [x] `v_ontology_geometry_cross` created; returns 0 on the live seed (MWK-BALANE) — clean. *(7.2, verified 2026-07-09)*
+- [x] V6 config row `mode='log'`; both triggers attached; shadow-proven (cross-client insert logged, rolled back); 0 findings to date. *(7.2)*
+- [ ] Flip both arms to `block` — per the `ONTOLOGY_ALIGNMENT.md` §9 graduation checklist. **Caveat: the geometry pipeline is near-dormant (`map_parcels`=1, `parcels`=0), so a calendar window is trivially clean — the flip should ride the FIRST real geometry-write campaign (strip_plot_info / survey re-OCR) so the shadow observes actual traffic first.**
 
 ---
 
