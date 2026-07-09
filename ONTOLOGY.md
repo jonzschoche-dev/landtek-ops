@@ -14,7 +14,19 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.25 (2026-07-08).** **A53 law-completeness check added** — `truth_tests/test_matter_law_is_embedded.py`
+> **Ontology version: v0.27 (2026-07-09).** **NEW §2.18 Service Delivery & Deliverables + invariants A57–A61 —
+> the AFFIRMATIVE side.** ~50 of 56 prior invariants governed what an agent must NEVER do; §2.18 governs what a
+> premium service provider must ALWAYS do: **A57** deadline totality (Principle 2 as an axiom — surface fresh +
+> complete, gaps reported never fabricated; `truth_tests/test_deadline_totality.py`, 🟢 asserted, negative-tested) ·
+> **A58** deliverable integrity (WorkProduct + machine-listable manifest + immutable-once-delivered, ○) · **A59**
+> governed task completion (a task finishes or surfaces — the Supervisor Phase-2 target, ○) · **A60** metered
+> inference ledgered + budget-gated (Principle 8 as an axiom; pins the n8n blind spot as a tracked violation) ·
+> **A61** the autonomy ladder is governance (tier raises = metric gate + human sign-off, recorded). Also names
+> **GovernanceHandoff** (§2.12) — the directive→review→invariants→sign-off→graduation pattern that ran the
+> composition layer. +3 assertions (suite 105-green at add). **v0.26 (2026-07-09):** composition layer governed + enforced same-day —
+> A54 (client-scoped composition) + A56 (finalized-filing immutability) 🟢 ENFORCED via **V9/V10 block triggers**
+> on `case_thread_documents` (flipped after clean pre-flight; extend to `filing_exhibits` when built); A55 (a part
+> inherits its parent, never separately gated) 🟡 honored-by-absence. **v0.25 (2026-07-08).** **A53 law-completeness check added** — `truth_tests/test_matter_law_is_embedded.py`
 > (deploy-gate + nightly) asserts every legal authority a matter relies on is available OFFLINE (local `full_text`
 > or embedded `legal_chunks`): **59/59, 0 gap** (LGC · PD 1529 · RA 11032 · RA 3019/6713 · Civil Code · RPC · Constitution),
 > negative-tested. A53 is now two-sided + corpus-checked (offline_audit core capability + this law completeness).
@@ -382,6 +394,7 @@ guard). A8 (MMK≠MWK) is an entity-conflation carrier. **Invariants: A15–A16.
 | Fleet health / pulse | 🟢 `system_heartbeat` (16,377) · `sentinel_alerts` (826) · `agent_audit` (7) | active | T0/T1 report-health tier |
 | Comms guardrail log | 🟢 `outbound_blocks` (14,346) | active | S14 — the most-exercised control |
 | Derived work source | 🟢 `v_evidence_gaps` (457) | active | the enforced gap-order write-path |
+| **GovernanceHandoff** | 🟢 directive docs (`INGESTION_DIRECTIVE.md` §sign-offs · `ONTOLOGY_ALIGNMENT.md` · MASTER_PLAN `Respects:` tags) | active (named 2026-07-09) | the inter-desk coordination pattern, now a NAMED concept: **directive → grounded review → invariants → recorded sign-off → explicit graduation trigger**. This ran the composition layer (handoff→A54-56→V9/V10 flip→graduation, deploys 801-804) without a single collision. Durable artifact + named graduation trigger are what make it work — keep both, every handoff |
 
 *Components: `supervisor.py` (KINDS registry), `SUPERVISION_DIRECTIVE.md` (tier model), `outward_guard.py`,
 `holes/` framework + `dispatcher.py`. **Invariants: A21–A22.***
@@ -580,6 +593,27 @@ output) · `corpus_backfill_state` (embedded flag) · `ocr_quality` · `extracti
 `RAG_RETRIEVAL_ARCHITECTURE_DIRECTIVE.md` (○ hybrid retrieval, A50–A52).
 **Invariants: A41–A52.***
 
+## 2.18 Service Delivery & Deliverables — *the affirmative standard: on time, complete, traceable*
+
+> **Definition.** The domain that governs what a premium service provider must ALWAYS do — where §2.10–§2.17
+> govern what an agent must NEVER do. Three concepts: the **DeadlineSurface** (the stack tells the operator
+> what is due, unprompted — Principle 2 as an axiom), the **WorkProduct** (a client deliverable as a
+> first-class, manifest-carrying, immutable-once-delivered object), and the **AutonomyTier** (an agent's
+> privilege rung, raised only through a metric gate + human sign-off). *Companion: §2.15 governs what a
+> deliverable may SHOW; this section governs whether it is complete, on time, and reconstructable.*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| **DeadlineSurface** | 🟢 `surfaced_deadlines` (daily `as_of` snapshots) ← `matters.next_deadline` + `client_goals.target_date` via `scripts/deadlines.py::digest` | active | the proactive layer: fresh (written daily) + complete (no dated active matter dropped) — A57. The dateless classification (`needs_date`/`watch`/`orphan`, `classify_gap`) is an HONEST gap — reported, never fabricated (the deploy_642/644 phantom-date lesson) |
+| **WorkProduct** | ○ *(none — planned; today deliverables are files from `dossier_pipeline.py`/`case_bundle.py` with no DB identity)* | **NET-NEW** | a client deliverable (dossier · bound PDF · memo · portal view) as an object: assembled only through `_safe` views + ClientProjection (A19/A32), carrying a machine-listable **manifest** of every doc/fact it contains, versioned + **immutable once delivered** (the A56 pattern generalized) — A58. Schema is the delivery side's to design; the ontology fixes identity + invariants |
+| **DeliverableManifest** | ○ *(rides WorkProduct)* | **NET-NEW** | the enumerable contents: every `doc_id`/`fact_id` a deliverable contains, so "detailed results" = every detail cited + reconstructable (the traceability gate of the no-hallucination pipeline) |
+| **AutonomyTier** | 🟡 `SUPERVISION_DIRECTIVE.md` tier model (T0–T3) + `work_orders.governance_block()` — doctrine + per-step gate, no per-agent tier registry | partial | the privilege rung (read-only → propose → execute-low-risk); a rung raise is a governed, recorded event, never self-granted — A61. Encodes MASTER_PLAN §6A pillar 4 ("earn autonomy slowly, metric-gated") |
+
+*Components: `scripts/deadlines.py` (surface + classify + escalate) · `landtek-deadline-*` timers ·
+`truth_tests/test_deadline_totality.py` (A57) · `dossier_pipeline.py`/`case_bundle.py` (the deliverable
+producers a future WorkProduct store would receive) · `llm_calls`/`llm_spend` + `cost_governor` (A60).
+**Invariants: A57–A61.***
+
 ---
 
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
@@ -669,6 +703,11 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A54 | **Composition is client-scoped.** A filing and EVERY exhibit/part it binds (`filing_exhibits.filing_doc_id` + each `exhibit_doc_id`, and any `document_parts` parent) resolve to exactly ONE `client_code` — no cross-client exhibit, regardless of the exhibit's source (email attachment · scanned bundle · separate ingest). | 🟢 **ENFORCED (block)** — **V9** (`ontvv_v9_ctd`, BEFORE INSERT/UPDATE on `case_thread_documents`) rejects a cross-client doc→composition bind at the write; flipped log→block 2026-07-09 after a clean pre-flight (0 existing cross-client links, 0 shadow violations) + a rolled-back exception test (the A54 exception fired). **Currently scoped to the live composition table `case_thread_documents`** (211 links); **extends to `filing_exhibits` when that table lands.** Extends A5/A18 — the load-bearing composition invariant (a mis-scoped bind = cross-client leak). |
 | A55 | **A `document_part` inherits its parent; it is never separately gated.** A part is a LOGICAL segment (page range · annex · exhibit · email body/attachment) of a physical document; connectivity (A41) and provenance (A42) are measured at the PHYSICAL document — a part inherits the parent's signals and is never separately gated, stamped, or counted. A `Fact` may cite a part for precision, but the citation resolves to the connected parent (A48). | 🟡 **asserted** — clarifies A41/A42; `document_parts` now exists (2026-07-09) and is correctly **NOT gated** (no per-part connectivity/provenance trigger) — the invariant is honored *by absence*, connectivity stays per-physical-doc. No positive artifact to name; stays asserted. |
 | A56 | **A finalized filing's exhibit composition is immutable.** Once a filing is finalized (`execution_status` ∈ filed/received), its `filing_exhibits` set + `order_seq` + labels are locked — they are evidence of *what was submitted*; edits are barred unless the filing is explicitly re-opened. Before finalization the composition is freely mutable (drafting). | 🟢 **ENFORCED (block)** — **V10** (`ontvv_v10_ctd`, BEFORE UPDATE/DELETE on `case_thread_documents`) freezes a finalized thread's composition (set/order/labels); flipped log→block 2026-07-09. Inert until a thread/filing is finalized (0 finalized today → no live effect yet, correctly). Extends A4 + received-not-draft; ties to `execution_status`. **Extends to `filing_exhibits` when built.** |
+| A57 | **Deadline totality (Principle 2 as an axiom).** The proactive `DeadlineSurface` is (a) **FRESH** — `surfaced_deadlines` written within 2 days (the layer is alive, not silently dead) — and (b) **COMPLETE** — every active matter's structured `next_deadline` ≤90d out appears in the latest surface. A dateless matter is honestly classified (`needs_date`/`watch`/`orphan`) and the gap **reported, never silenced by a fabricated date** (the deploy_642/644 phantom-date trap). | 🟢 **asserted** — `truth_tests/test_deadline_totality.py` (deploy-gate + nightly): surface-fresh + surface-complete raise RED; the dateless classification is a threshold-free report line. Grounded 2026-07-09: surface fresh (11 rows/day), 9 dated ≤90d, 0 dropped; negative-tested to bite. The FIRST affirmative-side invariant — converts the operator's worst recorded failure ("missing every important date", §6A) into a nightly regression detector. |
+| A58 | **Deliverable integrity.** A client `WorkProduct` (dossier · bound PDF · memo · portal view) is assembled ONLY through `_safe` views + the `ClientProjection` (inherits A19/A32), carries a machine-listable **`DeliverableManifest`** (every doc/fact it contains, enumerable + cited), and is **immutable once delivered** (the A56 pattern generalized from filings to deliverables; a revision is a NEW version, never an edit of the delivered one). | 🟡 **○ planned** — today `dossier_pipeline.py`/`case_bundle.py` produce files with no DB identity; the WorkProduct store + manifest is the delivery side's to build (ontology fixes identity + invariants, not schema). Graduates when the store lands with the manifest + immutability enforced. |
+| A59 | **Governed task completion.** Any multi-step task that mutates governed data runs under a `work_orders` record reaching a **terminal state** — `done`, `held`, or `failed`-with-reason — never silently abandoned; an order stalled past its review horizon surfaces to the operator. A22 guarantees a step is SAFE; A59 guarantees the task FINISHES OR SURFACES. | 🟡 **○ planned** — `work_orders` is Phase-1 (4 rows; most fleet work runs outside it). Graduates with Supervisor Phase 2 (wire live work through orders + a stalled-order sentinel). The invariant is the governance target Phase 2 builds toward. |
+| A60 | **Metered inference is ledgered and budget-gated.** Every credit-consuming LLM call lands in the spend ledger (`llm_calls`/`llm_spend`) and passes `cost_governor.can_afford()` while metered; **unledgered spend is a violation** (Principle 8 as an axiom). Local/owned inference (Ollama) is exempt — it is the free tier by design. | 🟡 **asserted / flagged** — ledger + governor + spend-bridge built; bridge timer DISABLED and the n8n LangChain path is a KNOWN unledgered blind spot (moot while credits are depleted + sim dead, but this row keeps it a tracked violation). **Re-instrument before any credit top-up or sim re-enable** (MASTER_PLAN §3). |
+| A61 | **The autonomy ladder is governance.** An agent's privilege tier (read-only → propose → execute-low-risk → …) may only RISE via a metric gate + human sign-off, recorded durably; **no agent raises its own tier**, and a tier grant names its metric evidence. Encodes §6A pillar 4 + the SUPERVISION_DIRECTIVE tier model; the validator mode-flip discipline (shadow `log` → evidence → approved `block`) is the same ladder applied to enforcement itself. | 🟡 **asserted (doctrine + practice)** — lived discipline (V4–V10 flips, `--stamp` supervised-first, proposals human-approved via `leo_proposal_apply.py`), but no per-agent tier REGISTRY exists — grants live in prose/config. Graduates when tiers are registry-recorded (a `work_orders`-adjacent table, supervision side). |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
