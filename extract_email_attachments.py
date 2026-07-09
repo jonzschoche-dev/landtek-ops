@@ -1,24 +1,117 @@
 #!/usr/bin/env python3
-"""Pull email attachments into documents table (deploy 119)."""
+"""extract_email_attachments.py — pull PDF attachments from case-relevant emails into `documents`,
+linked through `email_documents` (the CANONICAL email↔doc spine).
+
+Priority-1 build-out under docs/LEGAL_FINDABILITY_COMPLETENESS_DIRECTIVE.md + docs/COMPOSITION_MODEL_DRAFT.md.
+This EXTENDS the working deploy_799 extractor (it is NOT a rebuild) with: a canonical-linker write, a real
+`--dry-run`, a case-relevant-only gate, PDF-focus, stronger idempotency, provenance/source stamping, and
+targeting flags for testing.
+
+DESIGN DECISIONS (grounded 2026-07-09 against the live schema):
+  • CANONICAL LINKER = `email_documents(message_id, doc_id, role, filename)` (UNIQUE(message_id, doc_id)).
+    `gmail_messages.document_id` is kept ONLY as a denormalised 1:1 cache (legacy). Every extract writes BOTH.
+  • CASE-RELEVANT ONLY — process emails with `case_file IS NOT NULL` (targeted; no personal-inbox flood).
+  • A5 CLIENT SEPARATION — a new document inherits `case_file` (the CLIENT boundary) from its parent email.
+    It DOES NOT inherit `matter_code`: within one client, case_file→matter_code is one-to-many and the fine
+    matter is a property of the document's CONTENT, not the carrier email — so matter_code is left NULL for the
+    standing content-based matter pipeline to assign. `account` is inherited structurally via the
+    email_documents.message_id → gmail_messages.account link (documents has no account column).
+  • IDEMPOTENCY (safe to re-run): a document is deduped by `content_hash`; the same PDF appearing in two emails
+    becomes ONE `documents` row with TWO `email_documents` links (true many-to-many). Link dedup is the
+    UNIQUE(message_id, doc_id). Re-running creates nothing new.
+  • PDF FOCUS (v1) — only application/pdf (or *.pdf) attachments; non-PDF are counted and logged, never
+    silently dropped.
+  • DO NOT OCR/EMBED here — new rows carry ingest_status='ingested' and the standing OCR+embed pipelines pick
+    them up. Fully reversible: rows are content-hashed and linked; rollback = delete the doc + its ED links.
+
+MODES:
+  (default)          extract attachments from case-relevant, not-yet-extracted emails
+  --dry-run          fetch + hash but WRITE NOTHING; report NEW vs LINKED(existing hash) vs SKIPPED per file
+  --backfill-linker  one-shot: create missing email_documents rows for gmail_messages.document_id links
+
+TARGETING (for testing):
+  --message-id ID    (repeatable) only these gmail message_ids
+  --since YYYY-MM-DD / --until YYYY-MM-DD   received_at window
+  --limit N          cap emails scanned (default 200)
+"""
 import argparse, base64, hashlib, json, os, re, sys
-from datetime import datetime
 import psycopg2, psycopg2.extras
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
 UPLOADS = "/root/landtek/uploads"
+MAX_WARN_BYTES = 25 * 1024 * 1024  # log (don't skip) attachments larger than this
+
+
+def _is_pdf(a):
+    mime = (a.get("mime") or "").lower()
+    fn = (a.get("filename") or "").lower()
+    return mime == "application/pdf" or fn.endswith(".pdf")
+
+
+def _safe_name(fn, idx):
+    """Filename fallback for attachments that arrive without one (edge case)."""
+    if not fn:
+        fn = f"attachment_{idx}.pdf"
+    return re.sub(r"[^A-Za-z0-9._-]", "_", fn)[:120]
+
+
+def backfill_linker(cur, dry):
+    """Create the missing canonical email_documents rows for existing 1:1 document_id caches."""
+    cur.execute("""
+        SELECT g.message_id, g.document_id, d.original_filename
+          FROM gmail_messages g JOIN documents d ON d.id = g.document_id
+         WHERE g.document_id IS NOT NULL
+           AND NOT EXISTS (SELECT 1 FROM email_documents e
+                            WHERE e.message_id = g.message_id AND e.doc_id = g.document_id)
+    """)
+    gap = cur.fetchall()
+    print(f"  [backfill-linker] {len(gap)} cache links missing a canonical email_documents row")
+    if dry:
+        for r in gap[:20]:
+            print(f"    would link msg {r['message_id'][:24]} -> doc {r['document_id']} ({(r['original_filename'] or '')[:40]})")
+        return
+    for r in gap:
+        cur.execute("""INSERT INTO email_documents (message_id, doc_id, role, filename)
+                       VALUES (%s, %s, 'attachment', %s)
+                       ON CONFLICT (message_id, doc_id) DO NOTHING""",
+                    (r["message_id"], r["document_id"], r["original_filename"]))
+    print(f"  [backfill-linker] created {len(gap)} canonical link(s)")
+
+
+def link_canonical(cur, message_id, doc_id, filename, dry):
+    """Write BOTH the canonical email_documents row and the legacy gmail_messages.document_id cache."""
+    if dry:
+        return
+    cur.execute("""INSERT INTO email_documents (message_id, doc_id, role, filename)
+                   VALUES (%s, %s, 'attachment', %s)
+                   ON CONFLICT (message_id, doc_id) DO NOTHING""",
+                (message_id, doc_id, filename))
+    cur.execute("UPDATE gmail_messages SET document_id = %s WHERE message_id = %s AND document_id IS NULL",
+                (doc_id, message_id))
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--query", default=None)
     ap.add_argument("--limit", type=int, default=200)
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--message-id", action="append", default=None, help="target specific gmail message_id(s)")
+    ap.add_argument("--since", default=None, help="received_at >= YYYY-MM-DD")
+    ap.add_argument("--until", default=None, help="received_at < YYYY-MM-DD")
+    ap.add_argument("--backfill-linker", action="store_true",
+                    help="one-shot: create missing email_documents rows for existing document_id caches")
     args = ap.parse_args()
+    dry = args.dry_run
+
+    conn = psycopg2.connect(DSN); conn.autocommit = True
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    if args.backfill_linker:
+        backfill_linker(cur, dry)
+        cur.close(); conn.close(); return
 
     sys.path.insert(0, "/root/landtek")
     from gmail_watcher import gmail_client, ACCOUNT_ADDR
-    # PER-ACCOUNT clients: an attachmentId is only fetchable via the mailbox that holds the message. Using the
-    # primary (hayuma) client for a backup (jonzschoche) message fails — that was why backup attachments never
-    # became documents. Map the email's account back to primary|backup and lazily build one client each.
+    # PER-ACCOUNT clients: an attachmentId is only fetchable via the mailbox that holds the message.
     _addr2acct = {v: k for k, v in ACCOUNT_ADDR.items()}
     _clients = {}
 
@@ -28,52 +121,67 @@ def main():
             _clients[acct] = gmail_client(acct)
         return _clients[acct]
 
-    conn = psycopg2.connect(DSN); conn.autocommit = True
-    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    # CASE-RELEVANT ONLY (case_file IS NOT NULL) + not-yet-extracted (document_id IS NULL email-level dedup).
+    where = ["has_attachments = true", "attachment_refs IS NOT NULL",
+             "document_id IS NULL", "case_file IS NOT NULL"]
+    params = []
+    if args.message_id:
+        where.append("message_id = ANY(%s)"); params.append(args.message_id)
+    if args.since:
+        where.append("received_at >= %s"); params.append(args.since)
+    if args.until:
+        where.append("received_at < %s"); params.append(args.until)
+    params.append(args.limit)
 
-    cur.execute("""
+    cur.execute(f"""
         SELECT id, message_id, subject, from_addr, attachment_refs, case_file, received_at,
                coalesce(account, 'jonathan@hayuma.org') AS account
           FROM gmail_messages
-         WHERE has_attachments = true AND attachment_refs IS NOT NULL AND document_id IS NULL
+         WHERE {' AND '.join(where)}
          ORDER BY received_at DESC LIMIT %s
-    """, (args.limit,))
+    """, params)
     msgs = cur.fetchall()
-    print(f"  {len(msgs)} emails with attachments")
+    mode = "DRY-RUN (no writes)" if dry else "LIVE"
+    print(f"  [{mode}] {len(msgs)} case-relevant email(s) with attachments to scan\n")
 
-    inserted = linked = skipped = 0
+    inserted = linked = skipped_nonpdf = skipped_noid = skipped_err = 0
     for m in msgs:
         refs = m["attachment_refs"] if isinstance(m["attachment_refs"], list) else json.loads(m["attachment_refs"] or "[]")
-        for a in refs:
-            fn = a.get("filename") or ""
-            if not fn: continue
-            # Skip embedded images
-            if (a.get("mime") or "").startswith("image/") and a.get("size", 0) < 100_000:
-                skipped += 1; continue
+        pdfs = [a for a in refs if _is_pdf(a)]
+        skipped_nonpdf += len(refs) - len(pdfs)
+        for idx, a in enumerate(pdfs):
             att_id = a.get("attachmentId")
-            if not att_id: skipped += 1; continue
+            if not att_id:
+                skipped_noid += 1; continue
+            fn = a.get("filename") or ""
+            size = a.get("size", 0) or 0
             try:
                 resp = client_for(m["account"]).users().messages().attachments().get(
                     userId="me", messageId=m["message_id"], id=att_id).execute()
                 data = base64.urlsafe_b64decode(resp["data"])
             except Exception as e:
-                print(f"  ✗ {fn[:40]}: {str(e)[:80]}")
-                skipped += 1; continue
+                print(f"    ✗ {(fn or 'unnamed')[:40]}: {str(e)[:80]}")
+                skipped_err += 1; continue
 
             content_hash = hashlib.sha256(data).hexdigest()
-            # Skip if already in DB by hash
+            big = " [LARGE]" if len(data) > MAX_WARN_BYTES else ""
             cur.execute("SELECT id FROM documents WHERE content_hash = %s LIMIT 1", (content_hash,))
             ex = cur.fetchone()
-            if ex:
-                cur.execute("UPDATE gmail_messages SET document_id = %s WHERE id = %s",
-                            (ex["id"], m["id"]))
+
+            if ex:  # dedup: same bytes already a document → just add the canonical link (many-to-many)
+                link_canonical(cur, m["message_id"], ex["id"], fn or None, dry)
                 linked += 1
+                if dry:
+                    print(f"    LINK  {m['case_file']:<12} {(fn or 'unnamed')[:44]}  -> existing doc {ex['id']}{big}")
                 continue
 
-            # Save locally
-            safe_fn = re.sub(r"[^A-Za-z0-9._-]", "_", fn)[:120]
-            case_subdir = (m.get("case_file") or "uncorrelated")
-            target_dir = os.path.join(UPLOADS, case_subdir, "email_attachments")
+            if dry:
+                print(f"    NEW   {m['case_file']:<12} {(fn or 'unnamed')[:44]}  ({size} b){big}")
+                inserted += 1
+                continue
+
+            safe_fn = _safe_name(fn, idx)
+            target_dir = os.path.join(UPLOADS, m["case_file"], "email_attachments")
             os.makedirs(target_dir, exist_ok=True)
             local_path = os.path.join(target_dir, f"em{m['id']}_{safe_fn}")
             with open(local_path, "wb") as f:
@@ -81,24 +189,29 @@ def main():
 
             cur.execute("""
                 INSERT INTO documents
-                  (case_file, original_filename, smart_filename, content_hash,
-                   mime_type, status, file_path, master_form, ingest_status,
-                   drive_file_id, conversation_id, text_length, created_at)
-                VALUES (%s, %s, %s, %s, %s, 'ingested_from_email', %s, 'digital', 'ingested',
-                        NULL, NULL, NULL, now())
+                  (case_file, matter_code, original_filename, smart_filename, content_hash, sha256,
+                   mime_type, status, file_path, master_form, ingest_status, ingest_source,
+                   text_length, created_at)
+                VALUES (%s, NULL, %s, %s, %s, %s, %s, 'ingested_from_email', %s, 'digital', 'ingested',
+                        'gmail_attachment', NULL, now())
                 RETURNING id
-            """, (m.get("case_file"), fn, fn, content_hash, a.get("mime"), local_path))
+            """, (m["case_file"], fn or safe_fn, fn or safe_fn, content_hash, content_hash,
+                  a.get("mime"), local_path))
             new_id = cur.fetchone()["id"]
-            cur.execute("UPDATE gmail_messages SET document_id = %s WHERE id = %s",
-                        (new_id, m["id"]))
+            link_canonical(cur, m["message_id"], new_id, fn or None, dry)
             inserted += 1
             if inserted % 10 == 0:
-                print(f"  ✓ ingested {inserted} attachments...")
+                print(f"    ✓ ingested {inserted} attachments...")
 
-    print(f"\n  Summary:")
-    print(f"    inserted: {inserted}")
-    print(f"    linked (already had hash): {linked}")
-    print(f"    skipped: {skipped}")
+    verb = "would be created" if dry else "inserted"
+    print(f"\n  Summary [{mode}]:")
+    print(f"    NEW documents {verb}: {inserted}")
+    print(f"    LINKED to existing doc (same hash): {linked}")
+    print(f"    skipped non-PDF (v1 scope): {skipped_nonpdf}")
+    print(f"    skipped no attachmentId: {skipped_noid}")
+    print(f"    skipped fetch error: {skipped_err}")
+    if dry:
+        print(f"\n  DRY-RUN — nothing written. Re-run without --dry-run to apply.")
     cur.close(); conn.close()
 
 
