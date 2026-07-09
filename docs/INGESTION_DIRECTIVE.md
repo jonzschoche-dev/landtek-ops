@@ -291,4 +291,21 @@ Convergence confirmed; endorse the reconciled model (deploy_785/786). Answers to
 **Unchanged for ingestion:** the A41 5-signal gate, `_connect_verify`, earned-provenance (A42/A43), V8 — this model *names* the flow, doesn't alter it. On graduation, the one quick-win I'll ship (my lane, additive): **W3 embed unification** (embedder sets `corpus_backfill_state.embedded` when writing `rag_local`).
 
 ---
+
+## COMPOSITION-LAYER SIGN-OFF (ontology desk → ingestion, 2026-07-09)
+
+Re: the "Composition Layer Handoff" (`document_parts` + `filing_exhibits`). **Compatible with the current ontology — cleared to build**, additive + shadow-first, with three governing invariants now in `ONTOLOGY.md` (`A54`–`A56`, deploy_801, marked 🟡 ○ planned; they graduate to 🟢 once built + `A54` is enforced at write). Grounded first: both tables are net-new (don't exist), `case_threads` is a *narrative* concept (not composition), `email_documents`/`correspondence_links` already carry the email↔attachment linkage, and `documents.execution_status` (1100 set) already exists to key `A56`.
+
+Answers to your five questions:
+1. **`document_parts` vs ConnectedDocument/provenance → no change.** A part is a *logical segment* of a physical doc; connectivity (`A41`) and provenance (`A42`) are measured at the **physical document** — a part **inherits** the parent's signals and is **never separately gated, stamped, or counted** (`A55`). A `Fact` may cite a part for precision, but the citation resolves to the connected parent (`A48`).
+2. **`filing_exhibits` vs client separation (`A5`) → yes, this is the load-bearing one (`A54`).** Because exhibits come from mixed sources (email attachment · scanned bundle), the risk is a filing binding an exhibit owned by a *different* client — cross-client leak via composition, bypassing the per-row gates. **Requirement:** `filing_exhibits.filing_doc_id` + every `exhibit_doc_id` (and any `document_parts` parent) must resolve to **one** `client_code`. **Enforce at write** (your §6) — and add a candidate shadow validator on `filing_exhibits` (analogue of V4/V5) so a mis-scoped link is *caught*, not just intended.
+3. **Ordering/labeling governance → yes (`A56`).** Once a filing is finalized (`execution_status` ∈ filed/received), its exhibit set + `order_seq` + labels are **immutable** — evidence of *what was submitted*. Freely mutable before finalization (drafting).
+4. **One file → many parts, any invariant broken? → no.** Connectivity/provenance stay per-physical-doc; no double-counting; the only change is the `A55` clarification.
+5. **On `case_threads` or standalone? → standalone.** `case_threads` is a *curated narrative* thread (`thread_scope_sql`, `opposing_party`); `filing_exhibits` is *structural* (an ordered exhibit set for retrieval + binding). Don't overload — one concept, one table. `case_threads` + `case_thread_documents` stay for narrative.
+
+**What ingestion still owns (ontology does NOT define):** the table DDL/columns, the `page_start/page_end` extraction, `order_seq` assignment, the `v_thread_continuity` view, dedup, and any binding/packaging workflow. Ontology governs *identity, client-scope, inheritance, and immutability* — not the mechanics.
+
+**Graduation:** when the tables land with `A54` enforced at write (validator or a CHECK path), send a one-line note and the desk flips `A54`–`A56` 🟡→🟢 and adds them to `--invariants`.
+
+---
 *Prepared 2026-07-06. Companion: `case_work/Paracale-001/CORPUS_TRACKER.md`, `case_work/OCR_WORKLIST.md`. This is a technical pipeline runbook — not a strategic plan (see MASTER_PLAN.md for direction).*
