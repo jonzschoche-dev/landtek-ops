@@ -50,9 +50,21 @@ class LocalTierDown(Exception):
     """The owned local vision tier (Mac Ollama) is unreachable — degrade, retry later."""
 
 
+def _tier_up(timeout: int = 5) -> bool:
+    """Cheap liveness probe — distinguishes 'Ollama down' from 'this doc is the problem'."""
+    try:
+        with urllib.request.urlopen(OLLAMA_URL + "/api/tags", timeout=timeout):
+            return True
+    except Exception:
+        return False
+
+
 def _ollama_ocr(png_b64: str, timeout: int = 300) -> str:
+    # num_predict caps a runaway generation (temp-0 vision models can repetition-loop on
+    # dense plan drawings and run until the context fills — that's a >300s timeout that
+    # LOOKS like the tier being down). A real page transcription is well under 4096 tokens.
     body = {"model": MODEL, "prompt": PROMPT, "images": [png_b64],
-            "stream": False, "options": {"temperature": 0}}
+            "stream": False, "options": {"temperature": 0, "num_predict": 4096}}
     req = urllib.request.Request(OLLAMA_URL + "/api/generate",
                                  data=json.dumps(body).encode(),
                                  headers={"content-type": "application/json"}, method="POST")
@@ -98,18 +110,30 @@ def reocr(doc_id, go=False):
         cur.close(); c.close(); return {"doc": doc_id, "error": f"open: {e}"}
     pages = min(d.page_count, MAXPAGES)
     chunks = []
-    try:
-        for i in range(pages):
-            png = d[i].get_pixmap(matrix=fitz.Matrix(RENDER_SCALE, RENDER_SCALE)).tobytes("png")
-            chunks.append(_ollama_ocr(base64.b64encode(png).decode()))
-    except LocalTierDown:
-        if tmp:
-            try: os.remove(tmp)
-            except Exception: pass
-        cur.close(); c.close()
-        raise  # let the drip stop cleanly and retry later
-    finally:
-        pass
+    for i in range(pages):
+        png = d[i].get_pixmap(matrix=fitz.Matrix(RENDER_SCALE, RENDER_SCALE)).tobytes("png")
+        b64 = base64.b64encode(png).decode()
+        try:
+            try:
+                chunks.append(_ollama_ocr(b64))
+            except LocalTierDown:
+                if not _tier_up():
+                    raise  # genuinely down — drip stops cleanly and retries later
+                chunks.append(_ollama_ocr(b64))  # tier is up: one retry (transient/contention)
+        except LocalTierDown as e:
+            if tmp:
+                try: os.remove(tmp)
+                except Exception: pass
+            if _tier_up():
+                # Tier is UP but this page failed twice — the DOC is the problem (runaway/
+                # oversized). Log a fail row so it leaves the pending queue instead of
+                # head-of-line-blocking every future run; force-retry later via --docs N.
+                G._log_reocr(cur, doc_id, before, 0, f"fail:local:page{i+1}:{str(e)[:60]}")
+                cur.close(); c.close()
+                return {"doc": doc_id, "error": f"page {i+1} failed twice with tier UP — "
+                        f"logged fail + dequeued (force-retry: --docs {doc_id})"}
+            cur.close(); c.close()
+            raise  # let the drip stop cleanly and retry later
     text = "\n\n".join(chunks).strip()
     from ocr_quality import score_text   # QUALITY-based strict-improvement (a de-garble can be same length!)
     new_score = score_text(text)[0] if len(text) >= 50 else 0.0
