@@ -1,9 +1,9 @@
 [Unit]
-Description=Drip the geometry_priority queue once daily (+8min after boot) — re-OCR a few pages within the Gemini free tier and parse them into parcel shapes, so the corpus's plot geometry gets recovered steadily without a paid quota.
+Description=Drip the geometry_priority queue every 3h (+8min after boot) — the local-vision backend needs the Mac Ollama tier awake, and a run is a ~2s clean no-op when it isn't (LocalTierDown stops at the first doc). 8 cheap attempts/day catch an awake window that a single daily fire kept missing (the 07:18 UTC fire found the Mac asleep for days; queue sat 1/8).
 
 [Timer]
 OnBootSec=8min
-OnUnitActiveSec=24h
+OnUnitActiveSec=3h
 Persistent=true
 
 [Install]
