@@ -244,26 +244,33 @@ def build(title_no, matter, write=False):
 
     print(f"\nring: {a.get('calls')} courses · computed area {computed_ha or 0:.3f} ha · "
           f"closure {a.get('closure_error_m') or 0:.1f} m")
+    affs = affirmations(cur, title_no, sources, computed_ha)
     print("affirmations (computed vs independent sources):")
-    for name, val, ok in affirmations(cur, title_no, sources, computed_ha):
+    for name, val, ok in affs:
         tag = "—" if ok is None else ("✅ affirms" if ok else "❌ disagrees")
         unit = "corners" if "corner" in name else "ha"
         print(f"  {name:<42} {val:>10} {unit:<8} {tag}")
 
     doubt = len(conflicts) + len(extras) + sum(1 for s in agree if len(s) < 2)
     closure = a.get("closure_error_m")
+    area_affirmed = any(ok for _, _, ok in affs if ok is not None)
     if write:
-        if closure is not None and closure <= CLOSURE_WRITE_M:
+        if closure is None or closure > CLOSURE_WRITE_M:
+            print(f"\nNOT WRITTEN: closure {closure}m > {CLOSURE_WRITE_M}m gate — "
+                  f"resolve the {doubt} flagged course(s) first (review/correct).")
+        elif not area_affirmed:
+            print("\nNOT WRITTEN: ring closes but NO independent source affirms the computed "
+                  "area — a well-closed wrong polygon is still wrong. Resolve the review list "
+                  "or record the correct stated area first.")
+        else:
             bdoc = int(backbone_src.split("#")[0])
             cur.execute("DELETE FROM parcels WHERE title_no=%s", (title_no,))
             P.upsert_parcel(matter, title_no, calls_text, bdoc, None)
             prov = "operator" if n_corr else ("inferred_corroborated"
                     if n_corrob >= len(ring) * 0.6 else "inferred_strong")
             cur.execute("UPDATE parcels SET provenance_level=%s WHERE title_no=%s", (prov, title_no))
-            print(f"\nWROTE consensus parcel (provenance={prov}).")
-        else:
-            print(f"\nNOT WRITTEN: closure {closure}m > {CLOSURE_WRITE_M}m gate — "
-                  f"resolve the {doubt} flagged course(s) first (review/correct).")
+            print(f"\nWROTE consensus parcel (provenance={prov}, area-affirmed, "
+                  f"closure {closure:.1f}m).")
     else:
         print(f"\n(dry-run · {doubt} course(s) need review — `review` lists them, "
               f"`correct` fixes them with operator provenance)")
