@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek gmail backup-inbox TARGETED poll — ingests case/filing-relevant mail from jonzschoche@gmail.com (the personal inbox no code polled = the ARTA-Resolution root cause). Through the existing classifier; case terms + has:attachment only, so no personal-email flood. account=jonzschoche@gmail.com tagged.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+EnvironmentFile=-/root/landtek/.env
+ExecStart=/usr/bin/python3 /root/landtek/gmail_watcher.py --account backup --query "(ARTA OR PENRO OR assessor OR ombudsman OR manifestation OR resolution OR docket OR Balane OR Keesey OR Zschoche OR Inocalla OR Paracale OR Barandon OR sanggunian OR DILG OR CTN OR Hoppe OR Worrick) has:attachment" --max 40
+StandardOutput=append:/var/log/landtek/gmail-backup.log
+StandardError=append:/var/log/landtek/gmail-backup.log

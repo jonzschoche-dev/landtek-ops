@@ -1,0 +1,10 @@
+[Unit]
+Description=Poll the backup inbox (targeted, case-relevant only) every 3h — keeps jonzschoche@gmail.com case mail flowing into the corpus
+
+[Timer]
+OnBootSec=8min
+OnUnitActiveSec=3h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
