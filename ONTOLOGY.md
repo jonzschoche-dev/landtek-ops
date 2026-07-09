@@ -14,7 +14,14 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.30 (2026-07-09).** **§9 handoff closed — A61 GRADUATES 🟢, A59 stays 🟡 (trigger
+> **Ontology version: v0.31 (2026-07-09).** §2.4 gains the geometry-consensus concepts (routed by the mapping
+> desk, tables live deploys 818/819): **CourseAssertion** (`parcel_courses`, 83 — per-source course w/ verbatim
+> `raw_call` excerpt; `geometry_consensus.py` aligns copies → corroborated/single-source/CONFLICT, the geometry
+> analogue of `field_consensus`; parcels written only on closure + ≥1 independent area affirmation) and
+> **CourseCorrection** (`parcel_course_corrections` — operator-provenance corrections that outrank OCR, A6-clean).
+> Closes the coverage gap the sentinel flagged (53/54→54/54). Companion: `docs/GEOMETRY_CAMPAIGN_DIRECTIVE.md`
+> (the campaign order + V6 soak/flip plan).
+> **v0.30 (2026-07-09).** **§9 handoff closed — A61 GRADUATES 🟢, A59 stays 🟡 (trigger
 > named).** Grounded desk review of the supervision desk's deploy_810 (D1/D2/D3 executed in one commit):
 > **A61** → 🟢 enforced-by-construction — `agent_registry` (99 rows, ALL provisional, 0 self-raised) +
 > `fleet_registry.py --grant` (refuses without `--evidence` + `--by`); both §9-D3 trigger halves met.
@@ -229,6 +236,8 @@ The client-facing mapping surface ("see my property; stand inside my boundary").
 | **SurveyGeometry** (relative) | 🟢 `parcels` | empty | metes-and-bounds; `geom_wkt`, `closure_error_m`, `calls`; local metres, un-georeferenced |
 | **SurveyGeometry** (absolute) | 🟢 `map_parcels.geom_geojson` | seeded | WGS84; the relative shape placed on the globe |
 | **GeometrySource** | 🟡 `map_parcels.accuracy_tier`+`source_note` · `parcels.provenance_level` · `reocr_log.note` | partial | HOW geometry was produced (local-vision-ocr / gemini-ocr / operator-trace / survey-plan / satellite / ortho); controlled vocab TBD — **tier ≠ source** |
+| **CourseAssertion** | 🟢 `parcel_courses` (83) | active (deploy_818) | a PER-SOURCE metes-and-bounds course assertion — `title_no` · `source_doc_id` · `seg`/`idx` · `azimuth_deg`/`distance_m` · **verbatim `raw_call`** (the excerpt — provenance carried at course level). Aligned across independent title copies by `scripts/geometry_consensus.py` → **corroborated / single-source / CONFLICT** — the geometry analogue of `field_consensus` (§2.1). An assertion is NEVER a truth-claim: `parcels` is written only when the ring closes **AND ≥1 independent area source affirms** (deploy_819 gate — closure alone passed a well-closed WRONG polygon on T-4497) |
+| **CourseCorrection** | 🟢 `parcel_course_corrections` (0) | ready (deploy_818) | operator manual correction of a course (review+correct CLI): `action` · corrected `azimuth_deg`/`distance_m` · `reason` · `provenance_level`='operator' — **outranks OCR assertions** in consensus, never a silent edit (A6: the correction is its own provenance-tagged row, the raw assertion stays) |
 | **AreaAssertion** | 🟢 `titles.area_sqm` (gated) · `map_parcels.stated_area_sqm`/`area_sqm` · `parcels.stated_ha`/`area_matches` | active | stated (title) vs computed (courses) vs operator-asserted; each provenance-tagged (T-4497=13.9 ha set via truth-override is the pattern) |
 | **ExternalMapReference** | ○ `map_parcels.ortho_tiles_url` only | **NET-NEW** | Google Earth/Maps deep-links, KML/KMZ, embedded/tile URLs. Publishing **exports client geometry to a third party** → outward-guarded; **do not build without sign-off** |
 | **MapVisibility** | 🟡 `map_parcels.status` (awaiting_plot/plotted/published) + `client_access_tokens` | partial | who sees it via which surface (internal / token-client / earth / app / public); `published` = the held switch (`no-external-exposure-until-ready`) |
