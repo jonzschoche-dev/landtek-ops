@@ -138,8 +138,8 @@ def load_registries(cur):
     matters = cur.fetchall()
     cur.execute("SELECT tct_number FROM titles WHERE tct_number IS NOT NULL")
     tcts = [r["tct_number"] for r in cur.fetchall()]
-    cur.execute("SELECT full_name FROM transferees WHERE full_name IS NOT NULL")
-    names = [r["full_name"] for r in cur.fetchall()]
+    cur.execute("SELECT canonical_name FROM transferees WHERE canonical_name IS NOT NULL")
+    names = [r["canonical_name"] for r in cur.fetchall()]
     return {"matters": matters, "tcts": tcts, "transferees": names}
 
 
