@@ -46,8 +46,36 @@ def _count(cur):
     return cur.fetchone()["n"]
 
 
+def no_overbroad_keywords(cur):
+    """DYNAMIC over-broad guard: a keyword that appears in far MORE other-matters' emails than its own is
+    over-broad (an operator name like "Jonathan Zschoche" = 294 cross / 0 own; a generic agency "NCIP" = 64/4)
+    and will cross-file on a weak signal. Catches names/agencies/places the static denylist above can't
+    enumerate. Threshold: >10 cross-matter appearances AND cross > 5× in-matter."""
+    cur.execute("""
+        SELECT k.case_file, k.keyword,
+          count(*) FILTER (WHERE g.case_file = k.case_file)                                AS in_m,
+          count(*) FILTER (WHERE g.case_file <> k.case_file AND coalesce(g.case_file,'') <> '') AS cross_m
+        FROM case_keywords k
+        JOIN gmail_messages g
+          ON position(lower(k.keyword) in lower(coalesce(g.subject,'')||' '||coalesce(g.body_plain,''))) > 0
+        GROUP BY k.case_file, k.keyword
+        HAVING count(*) FILTER (WHERE g.case_file <> k.case_file AND coalesce(g.case_file,'') <> '') > 10
+           AND count(*) FILTER (WHERE g.case_file <> k.case_file AND coalesce(g.case_file,'') <> '')
+               > 5 * greatest(count(*) FILTER (WHERE g.case_file = k.case_file), 1)
+        ORDER BY cross_m DESC""")
+    bad = cur.fetchall()
+    if bad:
+        raise TruthFailure(
+            f"{len(bad)} over-broad keyword(s) in case_keywords — they appear in far more OTHER matters' emails "
+            f"than their own (operator names / generic agencies / places), so they cross-file on a weak signal: "
+            + "; ".join(f"'{r['keyword']}'→{r['case_file']} ({r['in_m']} own / {r['cross_m']} cross)" for r in bad)
+            + ". Replace with a DISTINCTIVE term (specific name / docket / title-no) or remove.")
+    print("      [case_keywords] no over-broad keywords (each appears mainly in its own matter)")
+
+
 TESTS = [
     ("client_separation.case_keywords_no_bare_geo", no_bare_geographic_keywords),
+    ("client_separation.case_keywords_not_overbroad", no_overbroad_keywords),
 ]
 
 
