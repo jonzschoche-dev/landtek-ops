@@ -64,11 +64,18 @@ def load_env_credentials():
     return env
 
 
-def gmail_client():
+ACCOUNT_ADDR = {"primary": "jonathan@hayuma.org", "backup": "jonzschoche@gmail.com"}
+
+
+def gmail_client(account="primary"):
     from googleapiclient.discovery import build
     from google.oauth2.credentials import Credentials
     env = load_env_credentials()
-    refresh_token = env["GMAIL_REFRESH_TOKEN"]
+    # primary = GMAIL_REFRESH_TOKEN (hayuma); backup = GMAIL_REFRESH_TOKEN_BACKUP (jonzschoche personal inbox)
+    token_key = "GMAIL_REFRESH_TOKEN" if account == "primary" else "GMAIL_REFRESH_TOKEN_BACKUP"
+    refresh_token = env.get(token_key)
+    if not refresh_token:
+        raise RuntimeError(f"no refresh token for account={account} (env {token_key})")
     with open("/root/landtek/gmail_oauth_client.json") as f:
         oauth = json.load(f)
     web = oauth.get("web") or oauth.get("installed")
@@ -190,9 +197,12 @@ def main():
         action="store_true",
         help="legacy mirror-all mode (not recommended — pollutes KB)",
     )
+    ap.add_argument("--account", default="primary", choices=["primary", "backup"],
+                    help="inbox: primary=hayuma (default); backup=jonzschoche personal (TARGETED --query use only)")
     args = ap.parse_args()
 
-    svc = gmail_client()
+    acct_addr = ACCOUNT_ADDR.get(args.account, args.account)
+    svc = gmail_client(args.account)
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -316,9 +326,9 @@ def main():
             INSERT INTO gmail_messages
               (message_id, thread_id, from_addr, to_addrs, cc_addrs, subject,
                body_plain, body_html, sent_at, received_at, labels,
-               has_attachments, attachment_refs, case_file, client_code,
+               has_attachments, attachment_refs, case_file, client_code, account,
                relevance_score, relevance_reasons, raw_payload)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s::jsonb)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s,%s::jsonb)
             ON CONFLICT (message_id) DO UPDATE SET
               case_file = COALESCE(EXCLUDED.case_file, gmail_messages.case_file),
               client_code = COALESCE(EXCLUDED.client_code, gmail_messages.client_code),
@@ -328,7 +338,7 @@ def main():
         """, (m["id"], thread_id, from_addr, to_addrs, cc_addrs, subject,
               plain[:50000], html[:50000] if html else None, received_at, received_at,
               labels, bool(attachments), json.dumps(attachments) if attachments else None,
-              case_file, client_code, conf, [category],
+              case_file, client_code, acct_addr, conf, [category],
               json.dumps({"category": category, "bill_metadata": bill_meta})))
         is_new = cur.fetchone()["is_new"]
         if is_new:
