@@ -178,3 +178,23 @@ graduates 🟡→🟢. Suggest: extend `agents.py` to emit/reconcile the registr
 
 *Sequencing suggestion: D3 → D2 → D1 (enumerate, then surface, then wire) — D3 is cheapest and unblocks the
 other two. Nothing here is Aug-12-blocking; slot behind live-matter work per MASTER_PLAN §1 wartime posture.*
+
+### §9 sign-off record (2026-07-09)
+
+- **Build:** deploy_810 `45d9d4e` (supervision desk) — all three directives in one additive commit:
+  D3 `agent_registry` + `fleet_registry.py` (`--sync`/`--health`/`--grant`) · D2 `supervisor_sentinel.py`
+  (nightly-wired, fail-soft) · D1 `deliverable` kind (produce→verify→certify[T3 human]; outward delivery
+  stays `outward_action`). *Note: the builder omitted this reply — recorded here by the reviewing desk;
+  future handoffs: the builder signs on pickup (the durable-artifact rule, ONTOLOGY §2.12).*
+- **Grounded desk verification (ontology desk, deploy_812):** registry live, 99 rows, **100% `provisional`**
+  (42 T1 · 10 T2 · 5 T3 · 42 honest `unset`), 0 granted, 0 self-raised; `--grant` refuses without
+  `--evidence` + `--by` and survives re-sync. Sentinel horizons per non-terminal status (72h incl.
+  `blocked_governance`), writes `holes_findings` + `pending.txt`, auto-closes on terminal. D1 scope honored —
+  no report-health daemon wrapped, no running-agent behavior changed. **No scope deviations found.**
+- **Graduation recorded:** **A61 🟡→🟢** (both D3 trigger halves met: registry exists + the documented
+  tier-raise procedure references it; enforcement by construction at the registry). **A59 REMAINS 🟡** —
+  trigger half-met (D2 active ✓; live work through orders = 0) — graduates on the **first LIVE order cycle
+  reaching a terminal state through a Phase-2 lane.**
+- **Open items → supervision desk:** (1) classify the 42 `unset` tiers (or cover them in the first `--grant`
+  wave); (2) run the first live Phase-2 order (A59's remaining half); (3) any registry schema change comes
+  back through a handoff, not a self-edit.
