@@ -70,7 +70,11 @@ def main():
     where = ["g.case_file IS NOT NULL",
              "length(trim(coalesce(g.body_plain,''))) >= %s",
              """NOT EXISTS (SELECT 1 FROM email_documents e
-                             WHERE e.message_id = g.message_id AND e.role = 'body')"""]
+                             WHERE e.message_id = g.message_id AND e.role = 'body')""",
+             # signal-to-noise: our OWN automated system notifications (digests/calendars) are operational
+             # chatter, not evidence. Narrow on purpose: real sent-mail to agencies (delivery proof) stays in.
+             """NOT (g.from_addr IN ('jonathan@hayuma.org','jonzschoche@gmail.com')
+                     AND g.subject ~* '^landtek\\s*[—–-]')"""]
     params = [MIN_BODY]
     if args.message_id:
         where.append("g.message_id = ANY(%s)"); params.append(args.message_id)
