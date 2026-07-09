@@ -60,4 +60,11 @@ else
     OVERALL_RC=$rc
 fi
 
+# 3. supervision (A59/A61): keep the enumerable fleet roster current, then surface any stalled work
+#    order past its review horizon (A59 "finishes-or-surfaces"). Both idempotent + fail-soft.
+echo "[$TS] running scripts/fleet_registry.py --sync"
+python3 scripts/fleet_registry.py --sync >>/var/log/landtek/supervision.log 2>&1 || true
+echo "[$TS] running scripts/supervisor_sentinel.py"
+python3 scripts/supervisor_sentinel.py >>/var/log/landtek/supervision.log 2>&1 || true
+
 exit $OVERALL_RC

@@ -67,6 +67,19 @@ KINDS = {
             {"name": "certify",        "agent": "human",        "mode": "handoff", "tier": "T3"},
         ],
     },
+    # Deliverable production (A58/A59) — the Phase-2 scope's third lane. A client deliverable (bound
+    # PDF / dossier / memo) is PRODUCED, VERIFIED by the pre-client adversarial QA gate, then CERTIFIED
+    # complete by a human (A58: WorkProduct + manifest, immutable-once-delivered). The actual outward
+    # DELIVERY is a SEPARATE outward_action (the chokepoint) — this kind builds + gates the WorkProduct
+    # so it FINISHES OR SURFACES (A59); it never sends. Deadline-bound + governed-data-touching → routes.
+    "deliverable": {
+        "title": "Deliverable production (produce -> verify -> certify)",
+        "steps": [
+            {"name": "produce", "agent": "ship-packager", "mode": "handoff", "tier": "T2"},
+            {"name": "verify",  "agent": "truth-qa-gate", "mode": "handoff", "tier": "T2"},
+            {"name": "certify", "agent": "human",         "mode": "handoff", "tier": "T3"},
+        ],
+    },
 }
 
 # Verbs that mean an outward/irreversible action — fail-closed even if mis-tagged (GOVERNED_ACTIONS §0).
