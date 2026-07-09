@@ -101,6 +101,29 @@ def _quality(a):
     return "needs_reocr"
 
 
+def _segments(text):
+    """Split a doc into per-lot technical-description segments. A TCT certified copy often
+    carries SEVERAL parcels ('a parcel of land … beginning at a point …' × N); concatenating
+    their calls into one ring is the false-closure failure mode (550m+ on clean text).
+    Returns [(seg_no|None, seg_text)]; None seg_no = no marker found (whole doc, legacy)."""
+    starts = [m.start() for m in re.finditer(r"(?i)beginning\s+at\s+a\s+point", text or "")]
+    if not starts:
+        return [(None, text or "")]
+    return [(i + 1, text[s:(starts[i + 1] if i + 1 < len(starts) else len(text))])
+            for i, s in enumerate(starts)]
+
+
+def _strip_tie(seg):
+    """Remove the tie line from a segment's ring. The FIRST bearing call in 'beginning at a
+    point … being <bearing>, <dist> from <monument>' is the tie to a control monument — it
+    locates point 1 on the earth but is NOT a boundary course; including it corrupts the
+    polygon. Returns (ring_text, tie_snippet|None)."""
+    m = sg._CALL.search(seg or "")
+    if m and re.match(r"\s*(?:fro?m|frm)\b", seg[m.end():m.end() + 14], re.I):
+        return seg[m.end():], seg[max(0, m.start() - 40):m.end() + 90].strip()
+    return seg, None
+
+
 def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=False):
     conn = _conn(); cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     if doc_id:
@@ -127,22 +150,43 @@ def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=Fa
         fname = d["original_filename"] or d["document_title"] or ""
         title_no = _title_no(cur, d["id"], text, fname)
         stated_ha, area_src = _stated_ha(cur, d["id"], text)
-        a = sg.cross_check(text, stated_ha) if stated_ha else sg.analyze(text)
-        q = _quality(a)
-        tally[q] += 1
         tm = _TIE.search(text)
         if tm:
             ties.append((d["id"], title_no, tm.group(0).strip()))
-        rows.append(dict(doc=d["id"], matter=d["case_file"], title=title_no,
-                         calls=a.get("calls"), ok=a.get("ok"),
-                         area_ha=a.get("area_ha"), stated_ha=stated_ha, area_src=area_src,
-                         area_matches=a.get("area_matches"),
-                         closure_m=a.get("closure_error_m"), quality=q,
-                         reason=a.get("reason")))
-        if write and q in (("good", "weak") if write_weak else ("good",)):
-            # idempotent: this sweeper owns the row for this source_doc_id
-            cur.execute("DELETE FROM parcels WHERE source_doc_id=%s", (d["id"],))
-            P.upsert_parcel(d["case_file"] or matter, title_no, text, d["id"], stated_ha)
+        segs = _segments(text)
+        doc_deleted = False
+        for seg_no, seg in segs:
+            ring, tie = _strip_tie(seg)
+            if tie:
+                ties.append((d["id"], title_no, tie))
+            # stated area: this segment's own "containing an area of (N) sq m" first;
+            # doc-level (titles/documents) only when the doc is a single description.
+            seg_stated, seg_src = None, None
+            am = _AREA_TXT.search(seg)
+            if am:
+                try:
+                    seg_stated, seg_src = float(am.group(1).replace(",", "")) / 10000.0, "text:segment"
+                except ValueError:
+                    pass
+            if seg_stated is None and len(segs) == 1:
+                seg_stated, seg_src = stated_ha, area_src
+            a = sg.cross_check(ring, seg_stated) if seg_stated else sg.analyze(ring)
+            if seg_no is not None and len(segs) > 1 and (a.get("calls") or 0) < 3:
+                continue  # boilerplate slice of a multi-lot doc — not a description
+            q = _quality(a)
+            tally[q] += 1
+            rows.append(dict(doc=d["id"], seg=seg_no, matter=d["case_file"], title=title_no,
+                             calls=a.get("calls"), ok=a.get("ok"),
+                             area_ha=a.get("area_ha"), stated_ha=seg_stated, area_src=seg_src,
+                             area_matches=a.get("area_matches"),
+                             closure_m=a.get("closure_error_m"), quality=q,
+                             reason=a.get("reason")))
+            if write and q in (("good", "weak") if write_weak else ("good",)):
+                if not doc_deleted:
+                    # idempotent: this sweeper owns the rows for this source_doc_id
+                    cur.execute("DELETE FROM parcels WHERE source_doc_id=%s", (d["id"],))
+                    doc_deleted = True
+                P.upsert_parcel(d["case_file"] or matter, title_no, ring, d["id"], seg_stated)
 
     # ---- report ----
     print(f"\n{'doc':>5} {'title':<16} {'calls':>5} {'area_ha':>9} {'stated':>8} "
@@ -153,10 +197,11 @@ def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=Fa
         st = f"{r['stated_ha']:.3f}" if r["stated_ha"] else "—"
         cm = f"{r['closure_m']:.1f}" if r["closure_m"] is not None else "—"
         mark = "" if r["area_matches"] is None else ("✓" if r["area_matches"] else "✗area")
-        print(f"{r['doc']:>5} {str(r['title'] or '?'):<16} {str(r['calls'] or 0):>5} "
+        label = f"{r['doc']}#{r['seg']}" if r.get("seg") else str(r["doc"])
+        print(f"{label:>8} {str(r['title'] or '?'):<16} {str(r['calls'] or 0):>5} "
               f"{ah:>9} {st:>8} {cm:>7}  {r['quality']} {mark}")
 
-    print(f"\nSummary: {len(rows)} docs with calls · "
+    print(f"\nSummary: {len(rows)} description segment(s) across docs · "
           f"good={tally['good']} weak={tally['weak']} "
           f"needs_reocr={tally['needs_reocr']} reject={tally['reject']}")
     if ties:
