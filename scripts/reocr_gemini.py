@@ -203,7 +203,12 @@ def _call_gemini(png_b64, key, model):
                                  headers={"content-type": "application/json"}, method="POST")
     with urllib.request.urlopen(req, timeout=120) as r:
         out = json.loads(r.read())
-    return "".join(p.get("text", "") for p in out["candidates"][0]["content"]["parts"])
+    # GUARD: Gemini can return 200 with NO candidates (safety block / recitation / empty) — do not index [0]
+    # unguarded (was reocr_gemini.py:206, IndexError → page-fail cascade → doc-reject → circuit-breaker trip).
+    cands = out.get("candidates") or []
+    if not cands:
+        return ""
+    return "".join(p.get("text", "") for p in cands[0].get("content", {}).get("parts", []))
 
 
 def _key_label(k):

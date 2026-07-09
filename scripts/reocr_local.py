@@ -111,17 +111,29 @@ def reocr(doc_id, go=False):
     finally:
         pass
     text = "\n\n".join(chunks).strip()
-    res = {"doc": doc_id, "pages": pages, "chars_before": before,
-           "chars_after": len(text), "sample": text[:300]}
-    if go and len(text) >= 50:
+    from ocr_quality import score_text   # QUALITY-based strict-improvement (a de-garble can be same length!)
+    new_score = score_text(text)[0] if len(text) >= 50 else 0.0
+    cur.execute("SELECT score FROM ocr_quality WHERE doc_id=%s", (doc_id,))
+    _r = cur.fetchone(); old_score = _r[0] if _r and _r[0] is not None else None
+    improved = len(text) >= 50 and (before < 50 or old_score is None or new_score > old_score)
+    res = {"doc": doc_id, "pages": pages, "chars_before": before, "chars_after": len(text),
+           "old_score": old_score, "new_score": round(new_score, 4), "improved": improved, "sample": text[:300]}
+    if go and improved:
         cur.execute("CREATE TABLE IF NOT EXISTS reocr_backup "
                     "(doc_id int, old_text text, ts timestamptz DEFAULT now())")
         cur.execute("INSERT INTO reocr_backup (doc_id, old_text) "
                     "SELECT id, extracted_text FROM documents WHERE id=%s", (doc_id,))
         cur.execute("UPDATE documents SET extracted_text=%s, text_length=%s, ocr_used=true "
                     "WHERE id=%s", (text[:300000], len(text), doc_id))
+        # re-score ocr_quality so the de-garbled doc LEAVES the flagged queue (else it re-sweeps forever)
+        cur.execute("""INSERT INTO ocr_quality (doc_id, score, chars, word_quality, flagged, scored_at)
+                       VALUES (%s,%s,%s,0,%s, now()) ON CONFLICT (doc_id) DO UPDATE SET
+                       score=EXCLUDED.score, chars=EXCLUDED.chars, flagged=EXCLUDED.flagged, scored_at=now()""",
+                    (doc_id, new_score, len(text), new_score < 0.30))
         G._log_reocr(cur, doc_id, before, len(text), f"ok:local:{MODEL}")
         res["written"] = True
+    elif go:
+        res["error"] = f"no_improvement (old={old_score} new={round(new_score, 4)})"
     if tmp:
         try: os.remove(tmp)
         except Exception: pass
@@ -129,8 +141,44 @@ def reocr(doc_id, go=False):
     return res
 
 
+def sweep(max_docs=40):
+    """Drain the ocr_quality.flagged backlog with the OWNED local vision model (no quota, no 429). Worst-first,
+    resumable (skips reocr_log), strict-improvement + re-score (docs leave the queue), LocalTierDown stops clean.
+    Timer-safe. This is the fallback the Gemini path never had — the 485-doc garble backlog drains on owned compute."""
+    c = G._conn(); cur = c.cursor()
+    cur.execute("""SELECT q.doc_id FROM ocr_quality q JOIN documents d ON d.id=q.doc_id
+        WHERE q.flagged AND (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL)
+          AND lower(coalesce(d.original_filename,'')) !~ '\\.(zip|docx|xlsx|doc|eml|csv|txt|pptx|json)$'
+          AND q.doc_id NOT IN (SELECT doc_id FROM reocr_log)
+        ORDER BY (q.chars >= 200) DESC, q.score ASC""")
+    ids = [r[0] for r in cur.fetchall()]
+    print(f"[local-sweep] flagged-remaining={len(ids)} · processing up to {min(len(ids), max_docs)} · model={MODEL}", flush=True)
+    done = ok = rej = 0
+    for did in ids[:max_docs]:
+        try:
+            r = reocr(did, go=True)
+        except LocalTierDown as e:
+            print(f"[local-sweep] LOCAL TIER DOWN ({str(e)[:80]}) after {done} docs — stopping clean, resume later", flush=True)
+            break
+        except Exception as e:
+            r = {"error": str(e)[:120]}
+        if r.get("written"):
+            ok += 1
+            print(f"  doc {did}: {r.get('chars_before')}->{r.get('chars_after')} score {r.get('old_score')}->{r.get('new_score')} OK", flush=True)
+        else:
+            rej += 1
+            G._log_reocr(cur, did, 0, -1, (r.get("error") or "no_text")[:160])
+            print(f"  doc {did}: skip [{r.get('error', 'no_text')}]", flush=True)
+        done += 1
+    print(f"[local-sweep] processed={done} rewritten={ok} skipped={rej}", flush=True)
+    cur.close(); c.close()
+
+
 def main():
     a = sys.argv
+    if "--sweep" in a:
+        mx = int(a[a.index("--max") + 1]) if "--max" in a else 40
+        sweep(max_docs=mx); sys.exit(0)
     go = "--go" in a
     ids = []
     if "--doc" in a:
