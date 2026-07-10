@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek Messenger channel bridge — drain queued replies every 5 min (idle until token provisioned)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

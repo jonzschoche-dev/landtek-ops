@@ -278,6 +278,88 @@ def _viber_send(receiver_id, text):
 
 
 # ════════════════════════════════════════════════════════════════
+# Facebook Messenger — inbound webhook + outbound send
+# (clones the WhatsApp pattern: same Meta platform, same GET verify-
+#  challenge, graph.facebook.com send. ARMED TOKENLESS by design —
+#  provisioning MESSENGER_PAGE_TOKEN is the external switch, A26.)
+# ════════════════════════════════════════════════════════════════
+
+@bp.route("/api/channel/messenger", methods=["GET", "POST"])
+def messenger_webhook():
+    # Meta verification (GET) — return the challenge (same handshake as WhatsApp)
+    if request.method == "GET":
+        verify_token = _env("MESSENGER_VERIFY_TOKEN", "")
+        if request.args.get("hub.verify_token") == verify_token and verify_token:
+            return request.args.get("hub.challenge", ""), 200
+        return "verification_failed", 403
+
+    payload = request.get_json(silent=True) or {}
+    # Meta payload structure: entry[].messaging[] with sender.id (PSID) + message.text
+    try:
+        results = []
+        for entry in payload.get("entry", []):
+            for ev in entry.get("messaging", []):
+                msg = ev.get("message") or {}
+                if msg.get("is_echo"):
+                    continue  # our own sends echoed back — never route
+                psid = (ev.get("sender") or {}).get("id", "")
+                text = (msg.get("text") or "").strip()
+                if not text or not psid:
+                    continue
+                _log_inbound("messenger", psid, text, raw_payload=ev)
+                reply, state, passthrough = _route_to_onboard_or_agent(
+                    "messenger", psid, psid, None, text)
+                forwarded = False
+                if reply:
+                    _messenger_send(psid, reply)
+                elif passthrough:
+                    forwarded = _forward_to_agent("messenger", psid, psid, None, text)
+                    if not forwarded:
+                        _messenger_send(psid, "Thank you — Jonathan has been notified.")
+                results.append({"psid": psid, "state": state,
+                                "replied": bool(reply), "forwarded": forwarded})
+        return jsonify({"ok": True, "processed": results}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def _messenger_send(psid, text):
+    """Send a Messenger message via the Meta Graph Send API; queue as pending_no_credentials if no token."""
+    import requests
+    token = _env("MESSENGER_PAGE_TOKEN")
+    if not token:
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name='messenger'), %s, 'outbound', %s, now(),
+                    'pending_no_credentials', '{"reason":"MESSENGER_PAGE_TOKEN not configured"}'::jsonb)
+        """, (psid, text))
+        cur.close(); conn.close()
+        return False
+    try:
+        r = requests.post(
+            "https://graph.facebook.com/v18.0/me/messages",
+            params={"access_token": token},
+            json={"recipient": {"id": psid}, "messaging_type": "RESPONSE",
+                  "message": {"text": text}},
+            timeout=15,
+        )
+        ok = r.status_code in (200, 201)
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, external_msg_id)
+            VALUES ((SELECT id FROM channels WHERE name='messenger'), %s, 'outbound', %s, now(), %s, %s)
+        """, (psid, text, "sent" if ok else "failed",
+              (r.json().get("message_id") if ok else None)))
+        cur.close(); conn.close()
+        return ok
+    except Exception:
+        return False
+
+
+# ════════════════════════════════════════════════════════════════
 # Web chat widget — inbound + outbound (HTTP polling or SSE)
 # ════════════════════════════════════════════════════════════════
 
