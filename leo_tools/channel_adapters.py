@@ -50,6 +50,20 @@ def _env(key, default=None):
     return os.getenv(key, default)
 
 
+def _plain_text(text):
+    """Flatten HTML tags/entities to plain text for channels that do not render
+    markup (Messenger, WhatsApp, Viber). Telegram keeps its own HTML via tg_send.
+    Leo's onboarding copy is authored with Telegram <b> tags; this strips them so
+    a Messenger user sees 'Leo', not '<b>Leo</b>'."""
+    if not text:
+        return text
+    import re, html
+    t = re.sub(r'(?i)<br\s*/?>', '\n', text)
+    t = re.sub(r'(?i)</p\s*>', '\n\n', t)
+    t = re.sub(r'<[^>]+>', '', t)
+    return html.unescape(t).strip()
+
+
 def _log_inbound(channel, channel_user_id, text, raw_payload=None):
     conn = _db(); conn.autocommit = True; cur = conn.cursor()
     try:
@@ -152,7 +166,7 @@ def whatsapp_webhook():
                     elif passthrough:
                         forwarded = _forward_to_agent("whatsapp", wa_id, display, None, text)
                         if not forwarded:
-                            _whatsapp_send(wa_id, "Thank you — Atty. Jonathan has been notified.")
+                            _whatsapp_send(wa_id, "Thank you — Jonathan has been notified.")
                     results.append({"wa_id": wa_id, "state": state,
                                     "replied": bool(reply), "forwarded": forwarded})
         return jsonify({"ok": True, "processed": results}), 200
@@ -219,7 +233,7 @@ def viber_webhook():
     if event == "conversation_started":
         return jsonify({"sender": {"name": _env("VIBER_SENDER_NAME", "Leo · LandTek")},
                         "type": "text",
-                        "text": "Hello — this is Leo, assistant to Atty. Jonathan Zschoche. How can I help?"}), 200
+                        "text": "Hello — this is Leo, assistant to Jonathan Zschoche. How can I help?"}), 200
     if event != "message":
         return jsonify({"status": 0}), 200                       # delivered/seen/subscribed/unsubscribed/failed — ack
     try:
@@ -236,7 +250,7 @@ def viber_webhook():
             _viber_send(uid, reply)
         elif passthrough:
             if not _forward_to_agent("viber", uid, name, None, text):
-                _viber_send(uid, "Thank you — Atty. Jonathan has been notified.")
+                _viber_send(uid, "Thank you — Jonathan has been notified.")
         return jsonify({"status": 0}), 200
     except Exception as e:
         return jsonify({"status": 3, "status_message": str(e)}), 200
@@ -326,6 +340,7 @@ def messenger_webhook():
 def _messenger_send(psid, text):
     """Send a Messenger message via the Meta Graph Send API; queue as pending_no_credentials if no token."""
     import requests
+    text = _plain_text(text)  # Messenger renders raw text — strip Telegram-style HTML
     token = _env("MESSENGER_PAGE_TOKEN")
     if not token:
         conn = _db(); conn.autocommit = True; cur = conn.cursor()
@@ -376,7 +391,7 @@ def web_widget_inbound():
     chuid = f"web:{session_id}"
     _log_inbound("web", chuid, text, raw_payload={"name": display, "email": email})
     reply, state, passthrough = _route_to_onboard_or_agent("web", chuid, display, email, text)
-    return jsonify({"reply": reply or "Thank you — Atty. Jonathan has been notified.",
+    return jsonify({"reply": reply or "Thank you — Jonathan has been notified.",
                     "state": state, "session_id": session_id})
 
 

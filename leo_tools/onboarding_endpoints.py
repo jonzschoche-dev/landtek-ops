@@ -216,7 +216,7 @@ def api_onboard():
         if (responses.get("self_classified_intent") or "").startswith("prospect"):
             reply = LIMITED_REPLY_PROSPECT
         else:
-            reply = "Atty. Jonathan is still reviewing — I'll relay any documents you send. He'll respond directly."
+            reply = "Jonathan is still reviewing — I'll relay any documents you send. He'll respond directly."
 
     # Persist state + responses
     cur.execute("""
@@ -315,7 +315,7 @@ def api_approve_user():
 
     # Notify both Jonathan and the user
     user_msg = (
-        f"✅ Atty. Jonathan has approved your access as <b>{role}</b>"
+        f"✅ Jonathan has approved your access as <b>{role}</b>"
         + (f" (scoped to case {scope_case})" if scope_case else "") + ".\n\n"
         "You can now message me freely. I'll cite source documents on every "
         "substantive claim and surface anything needing his attention."
