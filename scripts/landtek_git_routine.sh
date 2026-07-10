@@ -9,8 +9,9 @@
 #   landtek_git_routine.sh start       # session-start: sync + report state
 #   landtek_git_routine.sh end         # session-end: surface unpushed work
 #   landtek_git_routine.sh check       # one-shot health snapshot (no changes)
-#   landtek_git_routine.sh deploy <NN> "short description" path1 path2 ...
+#   landtek_git_routine.sh deploy <NN|auto> "short description" path1 path2 ...
 #                                       # commit specific files with deploy_NN tag + push
+#                                       # NN is collision-checked against history; 'auto' = max+1
 
 set -euo pipefail
 
@@ -144,16 +145,11 @@ EOF
     ;;
 
   deploy)
-    [ $# -lt 4 ] && { err "Usage: deploy <NN> \"description\" path1 [path2 ...]"; exit 2; }
+    [ $# -lt 4 ] && { err "Usage: deploy <NN|auto> \"description\" path1 [path2 ...]"; exit 2; }
     nn="$2"; desc="$3"; shift 3
     paths=("$@")
 
-    hdr "deploy_${nn}: $desc"
-    echo "  Side:  $SIDE"
-    echo "  Files: ${paths[*]}"
-    echo ""
-
-    # Pull-rebase first (per protocol)
+    # Pull-rebase first (per protocol) — also a prerequisite for an honest deploy-number check
     hdr "Pre-flight pull"
     git fetch origin main 2>&1 | tail -1
     if [ -n "$(git log --oneline HEAD..origin/main 2>/dev/null)" ]; then
@@ -161,6 +157,55 @@ EOF
     else
       ok "Already at tip"
     fi
+    echo ""
+
+    # ── Deploy-number guard. Two desks race the counter (deploy_806 and deploy_810 were each
+    #    used twice); ground truth is the commit subjects on the freshly-fetched origin/main + HEAD
+    #    PLUS migration filenames (a migrations/deploy_NNN_*.sql in the shared tree — tracked or
+    #    still untracked — is an earmarked number), not DEPLOY_LOG.csv (stale) or either agent's
+    #    memory. Claims are anchored (^deploy_NN[: ] / ^deploy_NN_) so a number merely MENTIONED
+    #    mid-subject never counts.
+    max_used=$( { git log --format=%s origin/main HEAD 2>/dev/null; ls migrations 2>/dev/null; } \
+                  | grep -oE 'deploy_[0-9]+' | grep -oE '[0-9]+' | sort -n | tail -1 || true)
+    max_used=${max_used:-0}
+    if [ "$nn" = "auto" ]; then
+      nn=$((max_used + 1))
+      ok "Deploy number auto-assigned: deploy_${nn} (max claimed in history+migrations: deploy_${max_used})"
+    else
+      case "$nn" in
+        *[!0-9]*|'') err "Deploy number must be numeric or 'auto' (got: '$nn')"; exit 2 ;;
+      esac
+      dup=$(git log --format='%h %s' origin/main HEAD 2>/dev/null \
+              | { grep -E "^[0-9a-f]+ deploy_${nn}[: ]" || true; } | head -3)
+      if [ -n "$dup" ]; then
+        err "deploy_${nn} is already claimed in history:"
+        echo "$dup" | sed 's/^/    /'
+        err "Next free number: $((max_used + 1)) — or use: $0 deploy auto \"desc\" paths..."
+        exit 4
+      fi
+      # A migration file earmarks its number for the desk that authored it — unless it is one of
+      # THIS deploy's own paths (deploying your own migration is the legitimate case).
+      mig_hit=$(ls migrations 2>/dev/null | { grep -E "^deploy_${nn}_" || true; } | head -1)
+      if [ -n "$mig_hit" ]; then
+        own_mig=false
+        for p in "${paths[@]}"; do
+          case "$p" in migrations/deploy_${nn}_*) own_mig=true ;; esac
+        done
+        if [ "$own_mig" = false ]; then
+          err "deploy_${nn} is earmarked by migrations/${mig_hit} (another desk's in-flight work)."
+          err "Next free number: $((max_used + 1)) — or use: $0 deploy auto \"desc\" paths..."
+          exit 4
+        fi
+      fi
+      if [ "$nn" -le "$max_used" ]; then
+        warn "deploy_${nn} is at/below the max claimed (deploy_${max_used}) but unused — proceeding"
+      fi
+    fi
+    echo ""
+
+    hdr "deploy_${nn}: $desc"
+    echo "  Side:  $SIDE"
+    echo "  Files: ${paths[*]}"
     echo ""
 
     # Truth-test gate (deploy_221C onward). Asserts the bulletproof base
@@ -204,6 +249,19 @@ Auto-tagged by landtek_git_routine.sh on ${SIDE}."
     if ! git push origin main 2>&1 | tail -3; then
       warn "Push rejected — re-pulling + retrying"
       git pull --rebase 2>&1 | tail -3
+      # Race re-check: the other desk may have claimed our number between our fetch and push
+      # (this exact path minted the historical duplicates). Our commit is HEAD after the rebase,
+      # so scan everything BELOW it; on a hit, renumber ours before pushing.
+      if git log --format=%s HEAD~1 2>/dev/null | grep -qE "^deploy_${nn}[: ]"; then
+        bumped=$(( $( { git log --format=%s HEAD~1; ls migrations 2>/dev/null; } \
+                       | grep -oE 'deploy_[0-9]+' \
+                       | grep -oE '[0-9]+' | sort -n | tail -1) + 1 ))
+        warn "deploy_${nn} was claimed while we raced — renumbering this commit to deploy_${bumped}"
+        git commit --amend -m "deploy_${bumped}: ${desc}
+
+Auto-tagged by landtek_git_routine.sh on ${SIDE} (renumbered from deploy_${nn} after a push race)."
+        nn="$bumped"
+      fi
       git push origin main 2>&1 | tail -3
     fi
     ok "deploy_${nn} live"
@@ -225,7 +283,7 @@ Auto-tagged by landtek_git_routine.sh on ${SIDE}."
 
   *)
     err "Unknown command: $cmd"
-    echo "Usage: $0 {start|end|check|deploy <NN> \"desc\" paths...}"
+    echo "Usage: $0 {start|end|check|deploy <NN|auto> \"desc\" paths...}"
     exit 2
     ;;
 esac
