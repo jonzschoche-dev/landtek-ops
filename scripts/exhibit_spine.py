@@ -71,7 +71,8 @@ WORD_DRAFT_RE = re.compile(r"\bdraft\b", re.IGNORECASE)   # received-not-draft: 
 
 def suggest(cur, dry, limit):
     cur.execute("""
-        SELECT d.id, d.case_file, d.original_filename AS fn,
+        SELECT d.id, d.case_file, d.matter_code, d.original_filename AS fn,
+               length(coalesce(d.extracted_text,'')) AS text_len,
                d.analyst_memo->'ingest_signals'->'references_exhibits' AS refs
           FROM documents d
          WHERE d.analyst_memo->'ingest_signals'->'flags' ? 'cites_exhibit_series'
@@ -89,6 +90,8 @@ def suggest(cur, dry, limit):
 
     for m in cands:
         stem = _stem(m["fn"] or "")
+        if not stem:
+            continue                                        # nameless doc can't title a filing proposal
         if WORD_DRAFT_RE.search(m["fn"] or ""):
             skipped_draft += 1; continue                    # drafts never become proposed filings
         if LABEL_RE.match(stem):
@@ -96,6 +99,7 @@ def suggest(cur, dry, limit):
         refs = [str(r).upper() for r in (m["refs"] or [])]
         if not refs:
             continue
+        # Pool 1 — same gmail thread (v_thread_continuity), same case_file
         cur.execute("""
             SELECT DISTINCT v.sibling_doc_id AS doc_id, v.sibling_role AS role, d2.original_filename AS fn,
                    coalesce((d2.analyst_memo->'ingest_signals'->'flags' ? 'cover_message'), false) AS is_cover
@@ -103,8 +107,18 @@ def suggest(cur, dry, limit):
              WHERE v.doc_id = %s AND v.sibling_doc_id <> %s AND d2.case_file = %s""",
             (m["id"], m["id"], m["case_file"]))
         sibs = cur.fetchall()
+        # Pool 2 — same MATTER (docket-exact-derived matter_code equality; deterministic, client-safe):
+        # exhibits often travel in a different email than the filing that cites them.
+        if m["matter_code"]:
+            cur.execute("""
+                SELECT d2.id AS doc_id, 'attachment' AS role, d2.original_filename AS fn, false AS is_cover
+                  FROM documents d2
+                 WHERE d2.matter_code = %s AND d2.case_file = %s AND d2.id <> %s
+                   AND d2.original_filename ~* '^\\s*(exhibit|annex)\\s'""",
+                (m["matter_code"], m["case_file"], m["id"]))
+            sibs += cur.fetchall()
         if not sibs:
-            skipped_noctx += 1; continue                    # no email context → nothing groundable to match
+            skipped_noctx += 1; continue                    # no groundable context to match against
 
         matched, covers, seen = [], [], set()
         for s in sibs:
@@ -116,8 +130,12 @@ def suggest(cur, dry, limit):
             elif s["role"] == "body" and s["is_cover"] and s["doc_id"] not in seen:
                 covers.append((s["doc_id"], s["fn"])); seen.add(s["doc_id"])
         gaps = sorted(set(refs) - {l for l, _, _ in matched}, key=_label_sort)
-        for g in gaps:
-            gap_index.setdefault(g, []).append(m["id"])
+        # BUNDLE HINT: a long main whose cited labels are unmatched likely BINDS its annexes internally →
+        # the right home is document_parts (page ranges), and its "gaps" are NOT missing evidence.
+        bundle_hint = bool(gaps) and (m["text_len"] or 0) > 30_000
+        if not bundle_hint:                                 # bundle-internal labels are not missing evidence
+            for g in gaps:
+                gap_index.setdefault(g, []).append(m["id"])
 
         members = [{"doc_id": m["id"], "role": "filing_main", "label": None, "order_seq": 0,
                     "fn": (m["fn"] or "")[:80]}]
@@ -126,12 +144,15 @@ def suggest(cur, dry, limit):
         for j, (did, fn) in enumerate(covers, start=len(members)):
             members.append({"doc_id": did, "role": "cover", "label": None, "order_seq": j, "fn": fn[:80]})
 
-        basis = (f"doc {m['id']} text cites {len(refs)} exhibit label(s); matched {len(matched)} from "
-                 f"email-thread siblings (v_thread_continuity, same case_file); {len(covers)} cover "
-                 f"message(s); {len(gaps)} cited-but-absent (missing-evidence leads)")
+        basis = (f"doc {m['id']} text cites {len(refs)} exhibit label(s); matched {len(matched)} "
+                 f"(email-thread siblings + same-matter '{m['matter_code'] or '-'}' labeled docs); "
+                 f"{len(covers)} cover message(s); {len(gaps)} cited-but-absent"
+                 + (" [BUNDLE HINT: long doc, unmatched labels likely bound INSIDE it → document_parts, "
+                    "not missing evidence]" if bundle_hint else " (missing-evidence leads)"))
         tname = f"Filing: {stem[:80]}"
         print(f"  ◆ #{m['id']:<5} {tname[:64]}")
         print(f"      matched {len(matched)}/{len(refs)} labels · {len(covers)} cover(s)"
+              + (" · BUNDLE?" if bundle_hint else "")
               + (f" · GAPS: {','.join(gaps[:12])}{'…' if len(gaps) > 12 else ''}" if gaps else ""))
         if not dry:
             cur.execute("""INSERT INTO exhibit_spine_proposals
