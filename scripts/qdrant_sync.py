@@ -13,6 +13,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 import uuid
@@ -85,15 +86,23 @@ def _creds():
     return _QURL, _QKEY
 
 
-def _qd(method, path, body=None):
+def _qd(method, path, body=None, _tries=4):
     url, key = _creds()
     data = json.dumps(body).encode() if body is not None else None
     h = {"content-type": "application/json"}
     if key:
         h["api-key"] = key
-    req = urllib.request.Request(url + path, data=data, method=method, headers=h)
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.load(r)
+    for attempt in range(_tries):
+        req = urllib.request.Request(url + path, data=data, method=method, headers=h)
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            # transient upstream (Qdrant Cloud 502/503/504): back off and retry — a 35-min build must not
+            # die on one gateway blip (it did on 2026-07-09; this is the fix)
+            if e.code in (502, 503, 504) and attempt < _tries - 1:
+                time.sleep(5 * (attempt + 1)); continue
+            raise
 
 
 def ensure_v2():
@@ -175,7 +184,12 @@ def build(limit, batch=25, case=None):
             chs = _chunks(text); vecs = list(model.embed(chs))
             pbase = {"doc_id_postgres": did, "case_file": r["case_file"], "matter_codes": r["matter_codes"] or [],
                      "document_type": r["document_type"], "doc_role": r["doc_role"],
-                     "has_provenance": r["has_provenance"], "filename": r["filename"], "synced_at": ts}
+                     "has_provenance": r["has_provenance"], "filename": r["filename"], "synced_at": ts,
+                     # deploy_812 significance fields (filtered semantic queries)
+                     "matter_code": r.get("matter_code"), "dockets": r.get("dockets") or [],
+                     "tct_numbers": r.get("tct_numbers") or [], "urgent": bool(r.get("urgent")),
+                     "cover_message": bool(r.get("cover_message")),
+                     "composition_candidate": bool(r.get("composition_candidate"))}
             # idempotent: drop this doc's existing points in v2 before re-inserting (handles chunk-count change)
             _qd("POST", f"/collections/{COLLECTION_V2}/points/delete",
                 {"filter": {"must": [{"key": "doc_id_postgres", "match": {"value": did}}]}})
