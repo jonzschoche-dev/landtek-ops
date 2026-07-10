@@ -120,16 +120,34 @@ def suggest(cur, dry, limit):
         if not sibs:
             skipped_noctx += 1; continue                    # no groundable context to match against
 
-        matched, covers, seen = [], [], set()
+        # Precision rules: (1) a labeled doc whose filename names a DIFFERENT parent-filing keyword than
+        # the main is excluded (an 'Exhibit A - Complaint …' never joins an Affidavit's proposal);
+        # (2) one label → at most ONE doc; multiple survivors = AMBIGUOUS, recorded, never guessed.
+        mkw = FILING_KW.search(stem)
+        main_kw = mkw.group(1).lower() if mkw else None
+        by_label, covers, seen = {}, [], set()
         for s in sibs:
             if DRAFT_RE.search(s["fn"] or ""):
                 continue
-            lm = LABEL_RE.match(_stem(s["fn"] or ""))
-            if s["role"] == "attachment" and lm and lm.group(2).upper() in refs and s["doc_id"] not in seen:
-                matched.append((lm.group(2).upper(), s["doc_id"], s["fn"])); seen.add(s["doc_id"])
+            sstem = _stem(s["fn"] or "")
+            lm = LABEL_RE.match(sstem)
+            if s["role"] == "attachment" and lm and lm.group(2).upper() in refs:
+                hint = lm.group(3) or ""
+                hkw = FILING_KW.search(hint)
+                if hkw and (not main_kw or hkw.group(1).lower() != main_kw):
+                    continue                     # names a different parent filing → not ours
+                if s["doc_id"] not in seen:
+                    by_label.setdefault(lm.group(2).upper(), []).append((s["doc_id"], s["fn"]))
+                    seen.add(s["doc_id"])
             elif s["role"] == "body" and s["is_cover"] and s["doc_id"] not in seen:
                 covers.append((s["doc_id"], s["fn"])); seen.add(s["doc_id"])
-        gaps = sorted(set(refs) - {l for l, _, _ in matched}, key=_label_sort)
+        matched, ambiguous = [], []
+        for lab, cands_l in by_label.items():
+            if len(cands_l) == 1:
+                matched.append((lab, cands_l[0][0], cands_l[0][1]))
+            else:
+                ambiguous.append((lab, [c[0] for c in cands_l]))
+        gaps = sorted(set(refs) - {l for l, _, _ in matched} - {l for l, _ in ambiguous}, key=_label_sort)
         # BUNDLE HINT: a long main whose cited labels are unmatched likely BINDS its annexes internally →
         # the right home is document_parts (page ranges), and its "gaps" are NOT missing evidence.
         bundle_hint = bool(gaps) and (m["text_len"] or 0) > 30_000
@@ -145,14 +163,18 @@ def suggest(cur, dry, limit):
             members.append({"doc_id": did, "role": "cover", "label": None, "order_seq": j, "fn": fn[:80]})
 
         basis = (f"doc {m['id']} text cites {len(refs)} exhibit label(s); matched {len(matched)} "
-                 f"(email-thread siblings + same-matter '{m['matter_code'] or '-'}' labeled docs); "
-                 f"{len(covers)} cover message(s); {len(gaps)} cited-but-absent"
+                 f"(email-thread siblings + same-matter '{m['matter_code'] or '-'}' labeled docs, "
+                 f"different-filing-keyword excluded); {len(covers)} cover message(s); "
+                 + (f"{len(ambiguous)} AMBIGUOUS label(s) {[a[0] for a in ambiguous]} (multiple candidates, "
+                    f"never guessed — operator picks); " if ambiguous else "")
+                 + f"{len(gaps)} cited-but-absent"
                  + (" [BUNDLE HINT: long doc, unmatched labels likely bound INSIDE it → document_parts, "
                     "not missing evidence]" if bundle_hint else " (missing-evidence leads)"))
         tname = f"Filing: {stem[:80]}"
         print(f"  ◆ #{m['id']:<5} {tname[:64]}")
         print(f"      matched {len(matched)}/{len(refs)} labels · {len(covers)} cover(s)"
               + (" · BUNDLE?" if bundle_hint else "")
+              + (f" · AMBIG: {','.join(a[0] for a in ambiguous)}" if ambiguous else "")
               + (f" · GAPS: {','.join(gaps[:12])}{'…' if len(gaps) > 12 else ''}" if gaps else ""))
         if not dry:
             cur.execute("""INSERT INTO exhibit_spine_proposals
