@@ -169,7 +169,7 @@ def whatsapp_webhook():
                     elif passthrough:
                         forwarded = _forward_to_agent("whatsapp", wa_id, display, None, text)
                         if not forwarded:
-                            _whatsapp_send(wa_id, "Thank you — Jonathan has been notified.")
+                            _whatsapp_send(wa_id, "Thank you — our team has been notified.")
                     results.append({"wa_id": wa_id, "state": state,
                                     "replied": bool(reply), "forwarded": forwarded})
         return jsonify({"ok": True, "processed": results}), 200
@@ -236,7 +236,7 @@ def viber_webhook():
     if event == "conversation_started":
         return jsonify({"sender": {"name": _env("VIBER_SENDER_NAME", "Leo · LandTek")},
                         "type": "text",
-                        "text": "Hello — this is Leo, assistant to Jonathan Zschoche. How can I help?"}), 200
+                        "text": "Hello — this is Leo, the assistant for LandTek. How can I help?"}), 200
     if event != "message":
         return jsonify({"status": 0}), 200                       # delivered/seen/subscribed/unsubscribed/failed — ack
     try:
@@ -253,7 +253,7 @@ def viber_webhook():
             _viber_send(uid, reply)
         elif passthrough:
             if not _forward_to_agent("viber", uid, name, None, text):
-                _viber_send(uid, "Thank you — Jonathan has been notified.")
+                _viber_send(uid, "Thank you — our team has been notified.")
         return jsonify({"status": 0}), 200
     except Exception as e:
         return jsonify({"status": 3, "status_message": str(e)}), 200
@@ -332,7 +332,7 @@ def messenger_webhook():
                 elif passthrough:
                     forwarded = _forward_to_agent("messenger", psid, psid, None, text)
                     if not forwarded:
-                        _messenger_send(psid, "Thank you — Jonathan has been notified.")
+                        _messenger_send(psid, "Thank you — our team has been notified.")
                 results.append({"psid": psid, "state": state,
                                 "replied": bool(reply), "forwarded": forwarded})
         return jsonify({"ok": True, "processed": results}), 200
@@ -394,7 +394,7 @@ def web_widget_inbound():
     chuid = f"web:{session_id}"
     _log_inbound("web", chuid, text, raw_payload={"name": display, "email": email})
     reply, state, passthrough = _route_to_onboard_or_agent("web", chuid, display, email, text)
-    return jsonify({"reply": reply or "Thank you — Jonathan has been notified.",
+    return jsonify({"reply": reply or "Thank you — our team has been notified.",
                     "state": state, "session_id": session_id})
 
 
