@@ -198,3 +198,14 @@ other two. Nothing here is Aug-12-blocking; slot behind live-matter work per MAS
 - **Open items → supervision desk:** (1) classify the 42 `unset` tiers (or cover them in the first `--grant`
   wave); (2) run the first live Phase-2 order (A59's remaining half); (3) any registry schema change comes
   back through a handoff, not a self-edit.
+
+### D4 — Authenticated sign-off (A63): the operator principal registry (filed 2026-07-10, deploy_828)
+**Directive.** The governance ladder's terminal act — `fleet_registry.py --grant --by`, T3 `approve`,
+validator log→block flips — records a human as FREE TEXT (grounded: `--by` is a plain string; any process
+can type `--by jonathan`). Leo has an identity-integrity rule (S2); the governance layer itself has none.
+Build: (1) a small **operator principal registry** (name · auth surfaces: ops-auth login / Telegram id
+`6513067717` / allowlisted SSH key · active flag); (2) `--by` and the T3 `approve` path **refuse an
+unregistered principal** and record WHICH surface authenticated the act; (3) grants/approvals carry the
+principal id, not a name string. Deliberately small — one table + two refusal checks, no auth framework.
+**Invariant honored:** A63 (ONTOLOGY §4). **Graduation:** A63 🟡→🟢 when an unregistered `--by` is refused
+(negative-tested) and the first real grant/approval records an authenticated principal.
