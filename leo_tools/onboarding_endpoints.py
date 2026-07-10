@@ -123,6 +123,10 @@ def api_onboard():
     display_name = payload.get("display_name")
     username = payload.get("username")
     message = (payload.get("message") or "").strip()
+    # adapter_logged: the channel adapter already wrote the inbound row (_log_inbound with raw
+    # payload) and will send + log the reply inline itself. Skip this endpoint's ledger writes to
+    # avoid double rows. Telegram/n8n posts WITHOUT this flag and keeps them (its only ledger).
+    adapter_logged = bool(payload.get("adapter_logged"))
     if not channel_user_id:
         return jsonify({"error": "channel_user_id required"}), 400
 
@@ -132,12 +136,13 @@ def api_onboard():
     state = user["onboarding_state"]
     responses = user["onboarding_responses"] or {}
 
-    cur.execute("""
-        INSERT INTO channel_messages
-          (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
-        VALUES ((SELECT id FROM channels WHERE name=%s), %s, 'inbound', %s, now(), 'received',
-                jsonb_build_object('onboarding_state_at_receipt', %s))
-    """, (channel, channel_user_id, message, state))
+    if not adapter_logged:
+        cur.execute("""
+            INSERT INTO channel_messages
+              (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
+            VALUES ((SELECT id FROM channels WHERE name=%s), %s, 'inbound', %s, now(), 'received',
+                    jsonb_build_object('onboarding_state_at_receipt', %s))
+        """, (channel, channel_user_id, message, state))
 
     reply = None
     next_state = state
@@ -169,7 +174,7 @@ def api_onboard():
             responses["intro_text"] = message
             # Try to detect name from message
             import re
-            m = re.search(r"(?:I'?m|my name is|ako (?:po )?si|ako ay|si)\s+([A-Z][a-zA-Z'\-]+(?:\s+[A-Z][a-zA-Z'\-]+){0,3})",
+            m = re.search(r"(?:I['’]?m|my name is|ako (?:po )?si|ako ay|si)\s+([A-Z][a-zA-Z'\-]+(?:\s+[A-Z][a-zA-Z'\-]+){0,3})",
                           message, re.IGNORECASE)
             inferred_name = m.group(1).strip() if m else (display_name or "")
             if inferred_name and inferred_name.lower() != "leo":
@@ -227,8 +232,8 @@ def api_onboard():
          WHERE id = %s
     """, (next_state, json.dumps(responses), user["id"]))
 
-    # Log outbound reply
-    if reply:
+    # Log outbound reply (skip when the adapter sends inline and writes its own 'sent' row)
+    if reply and not adapter_logged:
         cur.execute("""
             INSERT INTO channel_messages
               (channel_id, channel_user_id, direction, text_content, sent_at, status)

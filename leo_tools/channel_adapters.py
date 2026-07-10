@@ -86,6 +86,9 @@ def _route_to_onboard_or_agent(channel, channel_user_id, display_name, username,
         "channel": channel, "channel_user_id": channel_user_id,
         "display_name": display_name, "username": username,
         "message": message,
+        # every caller of this helper has already _log_inbound()ed the message and sends the
+        # reply inline (writing its own 'sent' row) — suppress the endpoint's duplicate writes
+        "adapter_logged": True,
     }, timeout=30)
     if r.status_code != 200:
         return ("⚠ Internal error processing your message. Please try again shortly.", "error", False)
