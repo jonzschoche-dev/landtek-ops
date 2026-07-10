@@ -22,7 +22,7 @@ RULES:
 
 USAGE: python3 scripts/exhibit_spine.py [--dry] [--limit N]
 """
-import argparse, re, sys
+import argparse, json, re, sys
 import psycopg2, psycopg2.extras
 
 DSN = "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"
@@ -56,14 +56,168 @@ def _label_sort(label):
     return (2, label, 0)
 
 
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+# SUGGESTIONS v2 (deploy_826) — operator-gated proposals from the significance engine's
+# composition signals. A filing-main candidate = a doc whose TEXT cites an exhibit-label series
+# (flags.cites_exhibit_series + references_exhibits, deploy_812). Its cited labels are reconciled
+# against labeled sibling docs from the SAME email thread (v_thread_continuity) + same case_file.
+# Output = rows in exhibit_spine_proposals, NEVER direct case_thread_documents writes; --apply <id>
+# inserts through the ENFORCED V9 (A54) gate. Labels cited-but-absent are GAPS = missing-evidence
+# leads (a finding, not a defect). Bodies flagged cover_message join as proposed role='cover'.
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+
+WORD_DRAFT_RE = re.compile(r"\bdraft\b", re.IGNORECASE)   # received-not-draft: word-level for main candidates
+
+
+def suggest(cur, dry, limit):
+    cur.execute("""
+        SELECT d.id, d.case_file, d.original_filename AS fn,
+               d.analyst_memo->'ingest_signals'->'references_exhibits' AS refs
+          FROM documents d
+         WHERE d.analyst_memo->'ingest_signals'->'flags' ? 'cites_exhibit_series'
+           AND coalesce(d.ingest_source,'') <> 'gmail_body'
+           AND NOT EXISTS (SELECT 1 FROM case_thread_documents c
+                            WHERE c.doc_id = d.id AND c.role = 'filing_main')
+           AND NOT EXISTS (SELECT 1 FROM exhibit_spine_proposals p
+                            WHERE p.main_doc_id = d.id AND p.status IN ('pending','applied'))
+         ORDER BY d.id LIMIT %s""", (limit,))
+    cands = cur.fetchall()
+    mode = "DRY-RUN" if dry else "LIVE"
+    made = skipped_draft = skipped_label = skipped_noctx = 0
+    gap_index = {}   # label -> [citing main ids]
+    print(f"  [suggest {mode}] {len(cands)} filing-main candidate(s)\n")
+
+    for m in cands:
+        stem = _stem(m["fn"] or "")
+        if WORD_DRAFT_RE.search(m["fn"] or ""):
+            skipped_draft += 1; continue                    # drafts never become proposed filings
+        if LABEL_RE.match(stem):
+            skipped_label += 1; continue                    # an exhibit citing its sub-parts is not a main
+        refs = [str(r).upper() for r in (m["refs"] or [])]
+        if not refs:
+            continue
+        cur.execute("""
+            SELECT DISTINCT v.sibling_doc_id AS doc_id, v.sibling_role AS role, d2.original_filename AS fn,
+                   coalesce((d2.analyst_memo->'ingest_signals'->'flags' ? 'cover_message'), false) AS is_cover
+              FROM v_thread_continuity v JOIN documents d2 ON d2.id = v.sibling_doc_id
+             WHERE v.doc_id = %s AND v.sibling_doc_id <> %s AND d2.case_file = %s""",
+            (m["id"], m["id"], m["case_file"]))
+        sibs = cur.fetchall()
+        if not sibs:
+            skipped_noctx += 1; continue                    # no email context → nothing groundable to match
+
+        matched, covers, seen = [], [], set()
+        for s in sibs:
+            if DRAFT_RE.search(s["fn"] or ""):
+                continue
+            lm = LABEL_RE.match(_stem(s["fn"] or ""))
+            if s["role"] == "attachment" and lm and lm.group(2).upper() in refs and s["doc_id"] not in seen:
+                matched.append((lm.group(2).upper(), s["doc_id"], s["fn"])); seen.add(s["doc_id"])
+            elif s["role"] == "body" and s["is_cover"] and s["doc_id"] not in seen:
+                covers.append((s["doc_id"], s["fn"])); seen.add(s["doc_id"])
+        gaps = sorted(set(refs) - {l for l, _, _ in matched}, key=_label_sort)
+        for g in gaps:
+            gap_index.setdefault(g, []).append(m["id"])
+
+        members = [{"doc_id": m["id"], "role": "filing_main", "label": None, "order_seq": 0,
+                    "fn": (m["fn"] or "")[:80]}]
+        for i, (lab, did, fn) in enumerate(sorted(matched, key=lambda x: _label_sort(x[0])), start=1):
+            members.append({"doc_id": did, "role": "exhibit", "label": lab, "order_seq": i, "fn": fn[:80]})
+        for j, (did, fn) in enumerate(covers, start=len(members)):
+            members.append({"doc_id": did, "role": "cover", "label": None, "order_seq": j, "fn": fn[:80]})
+
+        basis = (f"doc {m['id']} text cites {len(refs)} exhibit label(s); matched {len(matched)} from "
+                 f"email-thread siblings (v_thread_continuity, same case_file); {len(covers)} cover "
+                 f"message(s); {len(gaps)} cited-but-absent (missing-evidence leads)")
+        tname = f"Filing: {stem[:80]}"
+        print(f"  ◆ #{m['id']:<5} {tname[:64]}")
+        print(f"      matched {len(matched)}/{len(refs)} labels · {len(covers)} cover(s)"
+              + (f" · GAPS: {','.join(gaps[:12])}{'…' if len(gaps) > 12 else ''}" if gaps else ""))
+        if not dry:
+            cur.execute("""INSERT INTO exhibit_spine_proposals
+                             (main_doc_id, case_file, thread_name, proposed_members, gaps, basis)
+                           VALUES (%s, %s, %s, %s, %s, %s)
+                           ON CONFLICT (main_doc_id) DO NOTHING""",
+                        (m["id"], m["case_file"], tname, json.dumps(members),
+                         json.dumps(gaps), basis))
+            made += cur.rowcount
+
+    print(f"\n  Summary [{mode}]: proposals {'previewed' if dry else 'created'}: "
+          f"{made if not dry else len(cands) - skipped_draft - skipped_label - skipped_noctx}")
+    print(f"    skipped: {skipped_draft} draft-named · {skipped_label} label-docs · {skipped_noctx} no email context")
+    if gap_index:
+        top = sorted(gap_index.items(), key=lambda kv: -len(kv[1]))[:10]
+        print("    top missing-exhibit leads (label ← citing filings):")
+        for lab, mains in top:
+            print(f"      {lab:<7} cited by doc(s) {', '.join(map(str, mains[:6]))}")
+
+
+def list_pending(cur):
+    cur.execute("""SELECT id, main_doc_id, case_file, thread_name,
+                          jsonb_array_length(proposed_members) AS members,
+                          coalesce(jsonb_array_length(gaps),0) AS gaps, status
+                     FROM exhibit_spine_proposals ORDER BY status, id""")
+    for r in cur.fetchall():
+        print(f"  [{r['status']:<8}] #{r['id']:<4} main={r['main_doc_id']:<5} {r['members']} member(s), "
+              f"{r['gaps']} gap(s)  {r['thread_name'][:58]}  [{r['case_file']}]")
+
+
+def apply_proposal(cur, pid):
+    cur.execute("SELECT * FROM exhibit_spine_proposals WHERE id=%s AND status='pending'", (pid,))
+    p = cur.fetchone()
+    if not p:
+        print(f"  no PENDING proposal #{pid}"); return
+    cur.execute("SELECT id FROM case_threads WHERE parent_case_file=%s AND thread_name=%s",
+                (p["case_file"], p["thread_name"]))
+    row = cur.fetchone()
+    if row:
+        tid = row["id"]
+    else:
+        cur.execute("""INSERT INTO case_threads (parent_case_file, thread_name, thread_type, status, summary)
+                       VALUES (%s, %s, 'filing', 'open', %s) RETURNING id""",
+                    (p["case_file"], p["thread_name"],
+                     f"Applied from exhibit_spine_proposals #{pid} (operator-approved). {p['basis']}"))
+        tid = cur.fetchone()["id"]
+    n = 0
+    for mem in p["proposed_members"]:      # inserts pass THROUGH the enforced V9 (A54) gate
+        cur.execute("""INSERT INTO case_thread_documents
+                         (thread_id, doc_id, role, linked_by, exhibit_label, order_seq)
+                       VALUES (%s, %s, %s, %s, %s, %s)
+                       ON CONFLICT (thread_id, doc_id, role) DO NOTHING""",
+                    (tid, mem["doc_id"], mem["role"], f"exhibit_spine.py --apply {pid}",
+                     mem.get("label"), mem.get("order_seq")))
+        n += cur.rowcount
+    cur.execute("""UPDATE exhibit_spine_proposals
+                      SET status='applied', decided_at=now(), applied_thread_id=%s WHERE id=%s""", (tid, pid))
+    print(f"  ✓ proposal #{pid} applied → thread {tid} ({n} new row(s)). Gaps remain leads: {p['gaps']}")
+
+
+def reject_proposal(cur, pid):
+    cur.execute("""UPDATE exhibit_spine_proposals SET status='rejected', decided_at=now()
+                    WHERE id=%s AND status='pending'""", (pid,))
+    print(f"  {'✓ rejected' if cur.rowcount else 'no pending proposal'} #{pid}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--limit", type=int, default=500)
+    ap.add_argument("--suggest", action="store_true", help="v2: generate operator-gated proposals")
+    ap.add_argument("--list", action="store_true", help="v2: list proposals")
+    ap.add_argument("--apply", type=int, default=None, metavar="ID", help="v2: apply proposal ID (via V9 gate)")
+    ap.add_argument("--reject", type=int, default=None, metavar="ID", help="v2: reject proposal ID")
     args = ap.parse_args()
 
     conn = psycopg2.connect(DSN); conn.autocommit = True
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    if args.suggest:
+        suggest(cur, args.dry, args.limit); cur.close(); conn.close(); return
+    if args.list:
+        list_pending(cur); cur.close(); conn.close(); return
+    if args.apply is not None:
+        apply_proposal(cur, args.apply); cur.close(); conn.close(); return
+    if args.reject is not None:
+        reject_proposal(cur, args.reject); cur.close(); conn.close(); return
 
     # All email-linked docs (labels + potential mains travel by email), with their email ids.
     cur.execute("""
