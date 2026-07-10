@@ -444,18 +444,16 @@ def _compile_signals():
 
 
 def _fetch_facts(cur, scope=None):
-    """Every in-scope matter_fact we can scan. Scoped to the client's matters (client separation)."""
+    """Every in-scope matter_fact we can scan — taken through the `ombudsman-hunter` RecipientProfile
+    (A75, deploy_844): MACHINE form, provenance handles intact, client scope enforced in the query,
+    PULL_COMPLETE (a work-slice is never truncated). First agent-facing projection proof."""
     scope = scope or _scope()
     if not _table_exists(cur, "matter_facts"):
         return []
-    cur.execute("""
-        SELECT id, matter_code,
-               COALESCE(statement, '') AS statement,
-               COALESCE(source_id::text, '') AS source_id,
-               COALESCE(provenance_level, '') AS prov
-        FROM matter_facts WHERE matter_code LIKE %s
-    """, (scope,))
-    return cur.fetchall()
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
+    from recipient_projection import project_fact_slice
+    return [(d["fact_id"], d["matter_code"], d["statement"], d["source_id"], d["provenance_level"])
+            for d in project_fact_slice(cur, "ombudsman-hunter", scope)]
 
 
 def _fetch_docmap(cur):
