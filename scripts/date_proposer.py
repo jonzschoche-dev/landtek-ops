@@ -135,6 +135,16 @@ def recurrence_date(text, today):
     return None, None
 
 
+def strict_goal_match(gtext, dm):
+    """Return the single matter whose FULL code or docket (>=5 chars) appears verbatim in
+    the goal text, else None. STRICT full-substring match — never loose numeric tokens,
+    which false-matched YEARS ("1979 deed") to dockets. Locked by truth_test."""
+    gt = (gtext or "").lower()
+    hits = [mc for mc, (dl, dk) in dm.items()
+            if mc.lower() in gt or (len(dk) >= 5 and dk.lower() in gt)]
+    return hits[0] if len(hits) == 1 else None
+
+
 def dated_matters(cur):
     """matter_code → (next_deadline, docket) for matters with a FUTURE date only.
     Future-only: inheriting a matter's OVERDUE deadline would attach a stale date — a
@@ -201,14 +211,10 @@ def scan(cur, apply):
     cur.execute("""SELECT id, COALESCE(goal_text,'') FROM client_goals
         WHERE target_date IS NULL AND COALESCE(status,'open') NOT IN ('done','achieved','closed')""")
     for gid, gtext in cur.fetchall():
-        # STRICT: the full matter_code or full docket_number must appear in the goal text.
-        # (Loose numeric tokens false-matched YEARS like "1979" to dockets — never again.)
-        gt = gtext.lower()
-        hits = [mc for mc, (dl, dk) in dm.items()
-                if mc.lower() in gt or (len(dk) >= 5 and dk.lower() in gt)]
-        if len(hits) == 1:
-            upsert(cur, apply, "client_goals", gid, "target_date", gtext[:60], dm[hits[0]][0],
-                   "LINKED_MATTER", f"docket/code match → {hits[0]}", proposals)
+        hit = strict_goal_match(gtext, dm)  # full-substring only; year-as-docket can't match
+        if hit:
+            upsert(cur, apply, "client_goals", gid, "target_date", gtext[:60], dm[hit][0],
+                   "LINKED_MATTER", f"docket/code match → {hit}", proposals)
         else:
             upsert(cur, apply, "client_goals", gid, "target_date", gtext[:60], None, "OPERATOR_INPUT",
                    "no unambiguous dated matter link", proposals)

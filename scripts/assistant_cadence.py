@@ -145,6 +145,31 @@ def compose_upcoming(items, today, n=5):
     return "Coming up: " + "; ".join(bits) + "."
 
 
+def dark_worklist_line(cur, cap=3):
+    """One gentle line (A71/S14) surfacing the dark items that need a date — the top few,
+    NOT the full list. Pulls the date_proposer 'needs_operator' class. For a DATELESS item
+    'urgency' can't be a real lead-time, so we order by a stage proxy (litigation-active
+    first) then code — a metabolizable, deterministic dose. Full list: date_proposer --review."""
+    try:
+        cur.execute("""
+            SELECT dp.target_ref, dp.label, dp.target_kind, COALESCE(m.current_stage,'')
+            FROM date_proposals dp
+            LEFT JOIN matters m ON dp.target_kind='matters' AND m.matter_code=dp.target_ref
+            WHERE dp.status='needs_operator'
+            ORDER BY
+              CASE WHEN COALESCE(m.current_stage,'') ~*
+                   'filed|petition|pre_filing|halted|investigation|reconvey|active' THEN 0 ELSE 1 END,
+              dp.target_ref
+        """)
+        rows = cur.fetchall()
+    except Exception:  # date_proposals not present yet → no nudge, don't crash the brief
+        return None
+    if not rows:
+        return None
+    names = [str(r[0] if r[2] == "matters" else (r[1] or r[0]))[:22] for r in rows[:cap]]
+    return f"{len(rows)} items still need a target date — most urgent: " + ", ".join(names) + "."
+
+
 MODES = {
     "morning": ("morning_brief", compose_morning),
     "evening": ("day_before", compose_evening),
@@ -185,6 +210,9 @@ def email_send(subject, body_text, to=JONATHAN_EMAIL):
 def run_mode(cur, mode_key, items, today, dry, channel="telegram", chat_id=JONATHAN_CHAT_ID):
     kind, composer = MODES[mode_key]
     text = composer(items, today)
+    if mode_key == "morning":  # append the gentle dark-item nudge (one line, laddered)
+        dline = dark_worklist_line(cur)
+        text = " · ".join(x for x in (text, dline) if x) or None
     if not text:
         print(f"[{mode_key}/{channel}] nothing to say — staying quiet.")
         return
