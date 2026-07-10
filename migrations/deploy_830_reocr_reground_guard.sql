@@ -14,11 +14,10 @@
 CREATE OR REPLACE FUNCTION reocr_reground_guard() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE demoted int;
 BEGIN
+  -- (matter_facts has no notes column — the demotion audit lives in holes_findings via ontology_reject)
   UPDATE matter_facts mf
      SET provenance_level = 'inferred_strong',
-         notes = coalesce(mf.notes,'') ||
-                 ' [auto-demoted ' || now()::date || ': cited doc ' || NEW.id ||
-                 ' re-OCRed and excerpt no longer grounds — deploy_830 guard]'
+         updated_at = now()
    WHERE mf.source_id = NEW.id::text
      AND mf.provenance_level = 'verified'
      AND NOT excerpt_grounded(mf.excerpt, mf.source_id);
@@ -43,8 +42,7 @@ CREATE TRIGGER trg_reocr_reground_guard
 
 -- Safety sweep (no-op when clean): demote anything currently ungrounded-verified.
 UPDATE matter_facts
-   SET provenance_level='inferred_strong',
-       notes = coalesce(notes,'') || ' [auto-demoted '||now()::date||': ungrounded at deploy_830 sweep]'
+   SET provenance_level='inferred_strong', updated_at=now()
  WHERE provenance_level='verified' AND NOT excerpt_grounded(excerpt, source_id);
 
 SELECT 'guard installed; currently ungrounded verified: '||count(*)
