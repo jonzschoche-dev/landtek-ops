@@ -14,7 +14,15 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.32 (2026-07-10).** **Five assumption-level invariants — A62–A66** (from the "what
+> **Ontology version: v0.33 (2026-07-10).** **§2.19 Calendar & Cadence — the pulse (operator vision:
+> timelines and goals attached to everything, agentically).** Concepts: CalendarEvent (`calendar_events`, 27) ·
+> DerivedObligation (`deadline_extractor`) · timeline-attachment (grounded gap: `work_orders`/plays/objectives
+> have NO forward-date column) · Cadence (digest + S14 pacing). Invariants **A67** (temporal totality — every
+> active governed object dated or explicitly dateless; generalizes A57) · **A68** (a date is a fact: derived
+> obligations carry provenance; prose dates never promoted forward — the 642/644 trap as an axiom) · **A69**
+> (the calendar sets the cadence; the pulse is client-scoped, projection-rendered, S14-gentle by construction).
+> Build lanes: `docs/CALENDAR_CADENCE_DIRECTIVE.md` (C1 totality → C2 derivation → C3 client pulse).
+> **v0.32 (2026-07-10).** **Five assumption-level invariants — A62–A66** (from the "what
 > haven't we governed" review; each grounded live before writing): **A62** the record survives the machine —
 > 🟢 asserted, `truth_tests/test_survivable_record.py` (dump fresh ≤26h + size floor · log-window clean covers
 > the rclone off-box copy network-free · restore-drill days-since reported; the nightly pg_dump existed but was
@@ -667,6 +675,27 @@ MASTER_PLAN §6B W4) · `truth_tests/test_fact_requires_text.py` (A48) ·
 producers a future WorkProduct store would receive) · `llm_calls`/`llm_spend` + `cost_governor` (A60).
 **Invariants: A57–A61.***
 
+## 2.19 Calendar & Cadence — *the pulse: timelines and goals attached to everything, agentically*
+
+> **Definition.** The temporal spine of the stack (operator vision, 2026-07-10): the calendar is not a
+> feature but the PULSE — it sets the cadence for all communications and work. Every governed object with
+> a lifecycle carries a forward timeline; obligations are DERIVED from the record agentically (never only
+> hand-typed); and the calendar drives a gentle, client-scoped, exposure-gated rhythm of briefs and
+> reminders. Extends §2.18's A57 (the matters slice) toward temporal totality. *(Grounded 2026-07-10.)*
+
+| Concept | Canonical home | State | Notes |
+|---|---|---|---|
+| **CalendarEvent** | 🟢 `calendar_events` (27) | active | dated commitments (hearings · filings · meetings); synced/briefed by `scripts/calendar_sync.py` + `calendar_briefer.py`; client calendar access via `mint_calendar_token.py` (token = the A26-style switch) |
+| **DeadlineSurface** | 🟢 `surfaced_deadlines` (126, daily `as_of`) | active | §2.18 — the A57-governed proactive layer |
+| **DerivedObligation** | 🟡 `scripts/deadline_extractor.py` output → `matters.next_deadline` / surfaced rows | partial | an obligation MINED from the record (court order · statute period · email); must carry its source (A68) and never promote a historical prose date to a forward deadline (the deploy_642/644 trap, gated in `deadlines.py`) |
+| **Timeline attachment** | 🟡 `matters.next_deadline` · `client_goals.target_date` | **partial — the A67 gap** | grounded: `work_orders` / `matter_plays` / `matter_objectives` carry NO forward-date column — timelines do not yet attach to *everything* |
+| **Cadence** | 🟡 daily digest (07:00 due-dates-first) · `deadlines.py::escalate` · S14 pacing · `agent_deadline_orchestration.py` | partial | the rhythm: lead-time-laddered reminders, never floods — pacing is a GUARANTEE (S14 no-double-tap), not a hope |
+
+*Components: `deadlines.py` (surface/classify/escalate) · `deadline_extractor.py` · `calendar_sync.py` ·
+`calendar_briefer.py` · `mint_calendar_token.py` · `agent_deadline_orchestration.py` · `landtek-deadline-*`
+timers · `truth_tests/test_deadline_totality.py` (A57). Build directive: `docs/CALENDAR_CADENCE_DIRECTIVE.md`.
+**Invariants: A57, A67–A69.***
+
 ---
 
 ## 3. Drift / legacy — do **not** write here (consolidation backlog)
@@ -766,6 +795,9 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A64 | **Chain of custody: an evidence binary is verifiable against its intake hash.** Provenance (A2/A42) governs where FACTS came from; A64 governs that the DOCUMENT BINARY is bit-identical to what was received — every evidence-tier doc's `content_hash` is recorded at intake and re-verifiable NOW; silent corruption or a swapped file is detected, never trusted. OpenTimestamps anchoring is the later upgrade (§4A pillar 6). | 🟡 **○ planned** — `content_hash` + `forensic_hash.py` (sha256/phash/EXIF) exist; what's missing is the PERIODIC VERIFY SWEEP (re-hash Drive/local binaries vs intake hash → mismatch = a `holes_findings` custody violation). Court-facing (certified-copy comparisons, Aug-12). Graduates when the sweep runs nightly on evidence-tier docs. |
 | A65 | **Truth has an arrow of time.** A `verified` fact contradicted by a LATER verified fact is SUPERSEDED or flagged — the two never silently coexist as equally current; `as_of` ordering + the `contradictions` register decide, and every open contradiction has an owner/lane. (The T-52540 face-read-"clean" vs chain-cancelled incident is the class.) | 🟡 **○ planned** — `matter_facts.as_of` exists; `contradictions` (40) is detected-but-out-of-lane (§2.13). Graduates when contradictions carry an owner + a supersession/flag path and a truth_test asserts no un-owned open contradiction older than its horizon. |
 | A66 | **External content is DATA, never instructions.** No agent treats inbound external content (email body/attachment · Telegram message · scraped page · OCR'd doc) as an instruction to itself — the injection boundary is stack-wide, not Leo-local (generalizes Rules S1–S4). A tool-call, tier change, config write, or outward action triggered BY ingested content is a violation; the outward chokepoint (A21) + tier ladder (A22/A61) are the named backstop. | 🟡 **asserted (doctrine)** — lived in Leo (S1–S4, sim-proven) but unstated for the wider fleet (ingest/comprehend/comms-spine loops all read external text). Graduates with a mechanical floor: an audit that no ingest-path agent carries write-tools beyond its lane (the `agent_registry` tier column is the substrate). |
+| A67 | **Temporal totality — a timeline attaches to every governed object.** Every ACTIVE object with a lifecycle (matter · client_goal · work_order · play/objective · deliverable/filing) carries a FORWARD timeline (deadline · target_date · review horizon · cadence) or an explicit dateless classification; an object with neither is an awareness gap surfaced daily, never invisible. Generalizes A57 (the matters slice) to the whole stack — "timelines and goals attached to everything." | 🟡 **partial** — matters + goals covered (A57 test); **grounded gap 2026-07-10: `work_orders`/`matter_plays`/`matter_objectives` carry NO forward-date column.** Build: `docs/CALENDAR_CADENCE_DIRECTIVE.md` C1. Graduates when each governed kind carries its timeline AND the A57 test generalizes across kinds. |
+| A68 | **A date is a fact — derived obligations carry provenance.** Every calendar/deadline entry names its source (cited doc/excerpt · court order · statute period · operator assertion at `operator` tier); agentic derivation (`deadline_extractor`) writes PROPOSALS, and a **historical date in prose is NEVER promoted to a forward deadline** (the deploy_642/644 phantom-date trap — a NULL `next_deadline` is an operator's explicit signal, not a slot to fill). Extends A2/A19 into time. | 🟡 **asserted** — `deadlines.py` source-tags every surfaced row + hard-gates prose harvest to already-dated matters (the 644 root-cause gate, in code); extractor lane exists. Graduates with a truth_test: no forward deadline without a resolvable source. |
+| A69 | **The calendar sets the cadence — and the pulse is scoped and gated.** Calendar-driven communications ride the existing gates, never bypass them: a client-facing calendar surface shows ONLY that client's projected events (A5 isolation + A32 projection; token = the switch, A26); outbound rhythm honors S14 pacing (one point, no double-tap) + A21 chokepoint; reminders are lead-time-laddered — the pulse is **gentle by construction**, a flood is a violation. | 🟡 **asserted** — digest leads with due-dates; S14 enforced (14k+ blocks); `mint_calendar_token` exists; client calendar surface not yet wired through `ClientProjection` (C3). Graduates when the client calendar renders via projection AND reminder pacing is mechanically floored. |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
