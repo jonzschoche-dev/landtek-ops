@@ -74,12 +74,12 @@ def _send_tg(text, chat_id=None):
 # ── State machine ─────────────────────────────────────────────────────────
 
 INTRO_REPLY = (
-    "Magandang araw! I'm <b>Leo</b>, the assistant for <b>Landtek Law</b>, a Philippine "
-    "property-law practice based in Camarines Norte.\n\n"
+    "Magandang araw! I'm <b>Leo</b>, the assistant for <b>LandTek</b>, a Philippine "
+    "land and property services company based in Camarines Norte.\n\n"
     "I don't recognize you yet. To help you properly, could you tell me:\n"
     "• Your full name\n"
-    "• Are you (a) an existing Landtek client, (b) opposing counsel/party, "
-    "(c) seeking representation, or (d) something else?"
+    "• Are you (a) an existing LandTek client, (b) counsel or a party in a matter we support, "
+    "(c) seeking assistance with a property matter, or (d) something else?"
 )
 
 CLASSIFY_REPLY = (
@@ -90,24 +90,25 @@ CLASSIFY_REPLY = (
 )
 
 ESCALATE_REPLY = (
-    "Thanks, {name}. I've forwarded your message to <b>Atty. Jonathan Zschoche</b> "
+    "Thanks, {name}. I've forwarded your message to <b>Jonathan Zschoche</b> "
     "for review. He'll reach out shortly to confirm next steps.\n\n"
     "In the meantime, feel free to send any documents or context you'd like him to see — "
     "I'll capture them but won't act on them until he approves engagement."
 )
 
 DECLINED_REPLY = (
-    "Thank you for reaching out. Atty. Jonathan has reviewed your message and determined "
-    "Landtek is unable to assist at this time. If circumstances change, please contact us through "
+    "Thank you for reaching out. Jonathan has reviewed your message and determined "
+    "LandTek is unable to assist at this time. If circumstances change, please contact us through "
     "our office directly."
 )
 
 LIMITED_REPLY_PROSPECT = (
-    "While we await Atty. Jonathan's confirmation, here's what I can share:\n"
-    "• <b>Landtek Law</b> handles Philippine property matters — accion reinvindicatoria, "
-    "title verification, estate administration, agrarian disputes.\n"
-    "• Office: Daet, Camarines Norte. Atty. Bonifacio T. Barandon Jr. is lead counsel for litigation.\n"
-    "• Atty. Jonathan handles intake. He'll be in touch within 1-2 business days.\n\n"
+    "While we await Jonathan's confirmation, here's what I can share:\n"
+    "• <b>LandTek</b> is a Philippine land and property services company — title verification, "
+    "property records and documentation, estate/property support.\n"
+    "• LandTek is not a law firm; litigation is handled by engaged counsel — "
+    "Atty. Bonifacio T. Barandon Jr. (Daet, Camarines Norte) leads litigation matters we support.\n"
+    "• Jonathan Zschoche handles intake. He'll be in touch within 1-2 business days.\n\n"
     "If you'd like, send any property documents (TCT, tax dec, deed) — I'll log them safely "
     "for his review."
 )
