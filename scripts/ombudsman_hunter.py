@@ -1204,6 +1204,26 @@ def cmd_playbook(cid):
         if r["status"] not in ("ripe", "held_for_filing"):
             print(f"Candidate #{cid} is '{r['status']}', not ripe. Close its gaps first (--candidate {cid}).")
             return
+        # A70 — incorporation precedes decision: every matter this candidate's theory cites must have an
+        # incorporated (grounded, gap-aware) base BEFORE a stakeholder-facing draft emits. Fail-closed:
+        # one thin/blind matter holds the whole playbook (the 1891-at-0-verified lesson).
+        from incorporation_gate import require_incorporation
+        holds = []
+        for mc in sorted(set(r["matters"] or [])):
+            iv = require_incorporation(cur, mc, stakeholder="ombudsman",
+                                       purpose=f"playbook candidate #{cid} {r['violation_code']}")
+            mark = "✓" if iv["verdict"] == "READY" else "✗"
+            print(f"  {mark} incorporation {mc}: {iv['verdict']}"
+                  + (f" ({iv['verified_count']} verified)" if iv["verified_count"] is not None else ""))
+            if iv["verdict"] != "READY":
+                holds.append((mc, iv))
+        if holds:
+            print(f"\nA70 HOLD — {len(holds)} cited matter(s) un-incorporated; no draft emitted.")
+            for mc, iv in holds:
+                for reason in iv["reasons"][:3]:
+                    print(f"    {mc}: {reason}")
+            print("  → close the readiness blockers (scripts/matter_fix.py <MATTER>), then re-run --playbook.")
+            return
         slug = re.sub(r"[^a-z0-9]+", "_", r["official"].lower()).strip("_")
         vtmpl = VIOLATIONS[r["violation_code"]]
         pb = {
