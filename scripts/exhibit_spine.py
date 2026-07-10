@@ -67,6 +67,11 @@ def _label_sort(label):
 # ─────────────────────────────────────────────────────────────────────────────────────────────
 
 WORD_DRAFT_RE = re.compile(r"\bdraft\b", re.IGNORECASE)   # received-not-draft: word-level for main candidates
+# Responsive pleadings cite the OPPONENT's exhibits ("submitted by the defendants as Exhibit 5", "common
+# exhibit", "attached to the Answer as Exhibit 1") — so their cited labels are REBUTTAL TARGETS, not this
+# filing's own evidence. Proven live: the CV-26360 Reply mis-claimed the Answer's Exhibits 3/5/6 (deploy_826).
+RESPONSIVE_RE = re.compile(r"\b(reply|rejoinder|sur-?reply|opposition|comment|counter-?manifestation)\b",
+                           re.IGNORECASE)
 
 
 def suggest(cur, dry, limit):
@@ -99,6 +104,9 @@ def suggest(cur, dry, limit):
         refs = [str(r).upper() for r in (m["refs"] or [])]
         if not refs:
             continue
+        # RESPONSIVE PLEADING: cited labels are the OPPONENT's exhibits it rebuts, not its own. Do not
+        # match/claim them; record as rebuts_exhibits and propose main + covers only. (deploy_826 fix)
+        responsive = bool(RESPONSIVE_RE.search(stem))
         # Pool 1 — same gmail thread (v_thread_continuity), same case_file
         cur.execute("""
             SELECT DISTINCT v.sibling_doc_id AS doc_id, v.sibling_role AS role, d2.original_filename AS fn,
@@ -142,16 +150,20 @@ def suggest(cur, dry, limit):
             elif s["role"] == "body" and s["is_cover"] and s["doc_id"] not in seen:
                 covers.append((s["doc_id"], s["fn"])); seen.add(s["doc_id"])
         matched, ambiguous = [], []
+        if responsive:
+            by_label = {}                    # opponent's exhibits — never claimed as this filing's own
         for lab, cands_l in by_label.items():
             if len(cands_l) == 1:
                 matched.append((lab, cands_l[0][0], cands_l[0][1]))
             else:
                 ambiguous.append((lab, [c[0] for c in cands_l]))
-        gaps = sorted(set(refs) - {l for l, _, _ in matched} - {l for l, _ in ambiguous}, key=_label_sort)
+        rebuts = sorted(set(refs), key=_label_sort) if responsive else []
+        gaps = ([] if responsive
+                else sorted(set(refs) - {l for l, _, _ in matched} - {l for l, _ in ambiguous}, key=_label_sort))
         # BUNDLE HINT: a long main whose cited labels are unmatched likely BINDS its annexes internally →
         # the right home is document_parts (page ranges), and its "gaps" are NOT missing evidence.
         bundle_hint = bool(gaps) and (m["text_len"] or 0) > 30_000
-        if not bundle_hint:                                 # bundle-internal labels are not missing evidence
+        if not bundle_hint and not responsive:              # bundle-internal / rebutted labels aren't missing evidence
             for g in gaps:
                 gap_index.setdefault(g, []).append(m["id"])
 
@@ -162,18 +174,26 @@ def suggest(cur, dry, limit):
         for j, (did, fn) in enumerate(covers, start=len(members)):
             members.append({"doc_id": did, "role": "cover", "label": None, "order_seq": j, "fn": fn[:80]})
 
-        basis = (f"doc {m['id']} text cites {len(refs)} exhibit label(s); matched {len(matched)} "
-                 f"(email-thread siblings + same-matter '{m['matter_code'] or '-'}' labeled docs, "
-                 f"different-filing-keyword excluded); {len(covers)} cover message(s); "
-                 + (f"{len(ambiguous)} AMBIGUOUS label(s) {[a[0] for a in ambiguous]} (multiple candidates, "
-                    f"never guessed — operator picks); " if ambiguous else "")
-                 + f"{len(gaps)} cited-but-absent"
-                 + (" [BUNDLE HINT: long doc, unmatched labels likely bound INSIDE it → document_parts, "
-                    "not missing evidence]" if bundle_hint else " (missing-evidence leads)"))
+        if responsive:
+            basis = (f"doc {m['id']} is a RESPONSIVE pleading (reply/rejoinder/opposition); the {len(refs)} "
+                     f"exhibit label(s) it cites are the OPPONENT's exhibits it rebuts (rebuts_exhibits), "
+                     f"NOT its own — proposed with main + {len(covers)} cover(s) only.")
+        else:
+            basis = (f"doc {m['id']} text cites {len(refs)} exhibit label(s); matched {len(matched)} "
+                     f"(email-thread siblings + same-matter '{m['matter_code'] or '-'}' labeled docs, "
+                     f"different-filing-keyword excluded); {len(covers)} cover message(s); "
+                     + (f"{len(ambiguous)} AMBIGUOUS label(s) {[a[0] for a in ambiguous]} (multiple candidates, "
+                        f"never guessed — operator picks); " if ambiguous else "")
+                     + f"{len(gaps)} cited-but-absent"
+                     + (" [BUNDLE HINT: long doc, unmatched labels likely bound INSIDE it → document_parts, "
+                        "not missing evidence]" if bundle_hint else " (missing-evidence leads)"))
+        gaps_json = {"gaps": gaps, "rebuts_exhibits": rebuts, "ambiguous": dict(ambiguous)} if (rebuts or ambiguous) \
+                    else gaps  # back-compat: plain array when only gaps
         tname = f"Filing: {stem[:80]}"
-        print(f"  ◆ #{m['id']:<5} {tname[:64]}")
+        print(f"  ◆ #{m['id']:<5} {tname[:64]}" + ("  [RESPONSIVE]" if responsive else ""))
         print(f"      matched {len(matched)}/{len(refs)} labels · {len(covers)} cover(s)"
               + (" · BUNDLE?" if bundle_hint else "")
+              + (f" · REBUTS: {','.join(rebuts[:12])}" if rebuts else "")
               + (f" · AMBIG: {','.join(a[0] for a in ambiguous)}" if ambiguous else "")
               + (f" · GAPS: {','.join(gaps[:12])}{'…' if len(gaps) > 12 else ''}" if gaps else ""))
         if not dry:
@@ -182,7 +202,7 @@ def suggest(cur, dry, limit):
                            VALUES (%s, %s, %s, %s, %s, %s)
                            ON CONFLICT (main_doc_id) DO NOTHING""",
                         (m["id"], m["case_file"], tname, json.dumps(members),
-                         json.dumps(gaps), basis))
+                         json.dumps(gaps_json), basis))
             made += cur.rowcount
 
     print(f"\n  Summary [{mode}]: proposals {'previewed' if dry else 'created'}: "
