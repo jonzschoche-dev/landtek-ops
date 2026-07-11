@@ -45,11 +45,20 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 # Loose candidate finder (the real parser is survey_geometry._CALL). Tolerant of OCR:
 # a bearing letter, degrees, deg/dog/°, a second letter, then a distance.
 _CAND = re.compile(r"[NSns][.\s]?\s*\d{1,3}\s*(?:deg|dog|°|d)\b", re.I)
-# "... containing an area of ... ( 8,706 ) square met..."  → stated sqm from text
-_AREA_TXT = re.compile(r"area\s+of\b[^()]{0,80}?\(?\s*([0-9][0-9,\.]{2,})\s*\)?\s*"
+# stated sqm from text — matches BOTH the prose ("containing an area of … (8,706) square
+# met…") and the LRA electronic-title ("AREA: … (2,587) SQUARE METERS") forms.
+_AREA_TXT = re.compile(r"area\b\s*(?:of|:)?[^()]{0,80}?\(\s*([0-9][0-9,\.]{2,})\s*\)\s*"
                        r"(?:square|sq\.?)\s*met", re.I)
 # tie line to a control monument: "... 2952.29 m. from BLLM No. 1, Mp. of Mercedes"
 _TIE = re.compile(r"([0-9][0-9,\.]{2,})\s*m\.?\s*from\s+(BL[LB]M[^.;\n]{0,40})", re.I)
+# LRA electronic-title tie point: "TIE POINT: BLLM NO. 2, MUNICIPALITY OF MERCEDES ..."
+_TIE_LRA = re.compile(r"TIE\s*POINT\s*[:=]?\s*(BL[LB]M[^.;\n]{0,60})", re.I)
+# LRA tie line lead — "TO CORNER 1  N. 07° 52' W 251.99 M." locates corner 1 (the georeference
+# vector from the monument); it is NOT a boundary edge and must be stripped from the ring.
+_LRA_TIE_LEAD = re.compile(r"TO\s+CORNER\s+\d+\b", re.I)
+# One lot's technical description starts at "beginning at a point" (older prose) OR at the
+# "TIE POINT:" header (modern LRA electronic title). Either marker delimits a segment.
+_SEG_MARK = re.compile(r"(?i)(?:beginning\s+at\s+a\s+point|tie\s*point\s*[:=])")
 
 CLOSURE_GOOD_M = 2.0     # <= this: trustworthy closure
 CLOSURE_WEAK_M = 8.0     # in (good, weak]: usable but shaky; > weak: needs re-OCR
@@ -86,7 +95,12 @@ def _title_no(cur, doc_id, text, fname):
     r = cur.fetchone()
     if r and r["tct_number"]:
         return r["tct_number"]
-    m = re.search(r"T-?\s?0?7?9?-?\d{3,}", fname or "") or re.search(r"\bT-\s?\d{3,}", text or "")
+    # Prefer the LRA electronic-title number (079-2021002126: district-year-serial) — it's
+    # the canonical RD form and unambiguous; then the older "T-NNNN" forms.
+    m = (re.search(r"\b0\d{2}-\d{9,}\b", text or "")
+         or re.search(r"\b0\d{2}-\d{9,}\b", fname or "")
+         or re.search(r"\bT-\s?\d{3,}", text or "")
+         or re.search(r"T-?\s?0?7?9?-?\d{3,}", fname or ""))
     return (m.group(0).replace(" ", "") if m else None)
 
 
@@ -105,8 +119,9 @@ def _segments(text):
     """Split a doc into per-lot technical-description segments. A TCT certified copy often
     carries SEVERAL parcels ('a parcel of land … beginning at a point …' × N); concatenating
     their calls into one ring is the false-closure failure mode (550m+ on clean text).
-    Returns [(seg_no|None, seg_text)]; None seg_no = no marker found (whole doc, legacy)."""
-    starts = [m.start() for m in re.finditer(r"(?i)beginning\s+at\s+a\s+point", text or "")]
+    Returns [(seg_no|None, seg_text)]; None seg_no = no marker found (whole doc, legacy).
+    Handles BOTH the older prose form and the modern LRA electronic-title 'TIE POINT:' form."""
+    starts = [m.start() for m in _SEG_MARK.finditer(text or "")]
     if not starts:
         return [(None, text or "")]
     return [(i + 1, text[s:(starts[i + 1] if i + 1 < len(starts) else len(text))])
@@ -114,10 +129,24 @@ def _segments(text):
 
 
 def _strip_tie(seg):
-    """Remove the tie line from a segment's ring. The FIRST bearing call in 'beginning at a
-    point … being <bearing>, <dist> from <monument>' is the tie to a control monument — it
-    locates point 1 on the earth but is NOT a boundary course; including it corrupts the
-    polygon. Returns (ring_text, tie_snippet|None)."""
+    """Remove the tie line from a segment's ring — it locates corner 1 on the earth (the
+    georeference vector), it is NOT a boundary edge, and including it corrupts the polygon.
+    Handles both formats. Returns (ring_text, tie_snippet|None).
+
+      LRA e-title:  'TIE POINT: BLLM NO. 2 … / TO CORNER 1  N. 07° 52' W 251.99 M. / 1-2 …'
+                    → strip the 'TO CORNER n <call>' vector; ring = the numbered courses.
+      prose:        'beginning at a point … being <bearing>, <dist> from <monument> …'
+                    → strip the leading '<call> from <monument>'.
+    """
+    lead = _LRA_TIE_LEAD.search(seg or "")
+    if lead:
+        cm = sg._CALL.search(seg, lead.end())
+        if cm and cm.start() - lead.end() <= 6:   # the call immediately follows "TO CORNER n"
+            ring = seg[:lead.start()] + "\n" + seg[cm.end():]
+            tp = _TIE_LRA.search(seg)
+            tie = ((f"tie point {tp.group(1).strip()}; " if tp else "")
+                   + seg[lead.start():cm.end()].strip())
+            return ring, tie
     m = sg._CALL.search(seg or "")
     if m and re.match(r"\s*(?:fro?m|frm)\b", seg[m.end():m.end() + 14], re.I):
         return seg[m.end():], seg[max(0, m.start() - 40):m.end() + 90].strip()
