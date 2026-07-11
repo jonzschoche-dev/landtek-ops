@@ -3,15 +3,16 @@
 
 **What A62 requires.** Every invariant assumes the System of Record exists — A50 rebuilds projections
 "from the SoR", A53 reasons from local Postgres. A62 governs the assumption itself: the SoR must survive
-the droplet. The mechanism exists (nightly 02:00 `pg_dump` → `/root/backups/` + `rclone` off-box to Drive,
-14-day retention) but was UNGOVERNED — a silently-dead cron or failing rclone would alarm nothing (the
-installed-wrapper-drift failure class). This makes it mechanical:
-  (a) FRESH   — a local dump newer than 26h and above a sanity size floor (a 0-byte gz "succeeds" silently);
-  (b) CLEAN   — the backup log's recent window shows completion and no errors (rclone failures land here,
-                so the OFF-BOX copy is covered without making the deploy gate depend on Drive connectivity —
-                an A53-clean design: the gate never needs the internet to verify);
-  (c) DRILLED — report-only: days since the last RECORDED restore drill (an unrestored backup is a hope,
-                not a backup). Threshold-free until the first drill is recorded, then it ratchets.
+the droplet. v2 (2026-07-11 redesign): nightly 02:00 DOMAIN dump (excludes workflow-snapshot/plumbing/dead-sim bulk —
+the old full dump was 2.6GB of non-record around a ~400MB record) + Sunday FULL dump local-only; the
+off-box leg is THE MAC (always-on second node, tailnet pull + checksum + receipt — B2/rclone retired
+after dying twice on third-party knobs). Mechanical assertions:
+  (a) FRESH    — a local dump newer than 26h and above a sanity size floor (a 0-byte gz "succeeds" silently);
+  (b) CLEAN    — the backup log's LAST RUN block shows completion and no errors (dump-side failures);
+  (b') RECEIPT — the Mac's checksummed off-box receipt is <30h old and matches a local dump (local reads
+                 only — the gate never needs the network, A53-clean);
+  (c) DRILLED  — report-only: days since the last RECORDED restore drill (an unrestored backup is a hope,
+                 not a backup). Threshold-free until the first drill is recorded, then it ratchets.
 
 Env overrides (for negative-testing): LANDTEK_BACKUP_DIR, LANDTEK_BACKUP_LOG.
 Grounded 2026-07-10: dump 1.3 GB at 02:08 today, log clean, drill NEVER RECORDED (the honest gap).
@@ -29,7 +30,8 @@ BACKUP_DIR = os.environ.get("LANDTEK_BACKUP_DIR", "/root/backups")
 BACKUP_LOG = os.environ.get("LANDTEK_BACKUP_LOG", os.path.join(BACKUP_DIR, "backup.log"))
 DRILL_MARKER = os.path.join(BACKUP_DIR, "RESTORE_DRILL.log")   # operator appends one line per drill
 MAX_AGE_H = 26          # nightly at 02:00 → 26h tolerates clock/queue slop, catches a missed night
-MIN_BYTES = 100 * 1024 * 1024   # DB ≈3 GB → dump ≈1.3 GB gz; 100 MB floor catches a truncated/empty dump
+MIN_BYTES = 40 * 1024 * 1024    # v2 DOMAIN dump ≈86 MB gz (record only; snapshots/plumbing excluded);
+                                # 40 MB floor catches a truncated/empty dump while leaving growth headroom
 
 
 def _newest_dump():
@@ -88,6 +90,44 @@ def backup_log_clean(cur):
             f"copy is failing (A62): {last_run[:3]}")
 
 
+def offbox_receipt_fresh(cur):
+    """A62(b'): the OFF-BOX leg, v2 (2026-07-11 redesign — the Mac pulls the domain dump over the tailnet;
+    B2/rclone retired: the old design shipped 2.6GB/night of NON-record — workflow snapshots, n8n plumbing,
+    dead-sim QA — and died twice on third-party knobs). The Mac writes a RECEIPT to offbox_receipts.log ONLY
+    after a checksum-verified copy exists off-box; this asserts the newest receipt is <30h old AND its sha
+    matches a dump that exists locally. Local file reads only — the gate never touches the network (A53)."""
+    receipts = os.path.join(BACKUP_DIR, "offbox_receipts.log")
+    if not os.path.exists(receipts):
+        raise TruthFailure(
+            f"NO off-box receipt log ({receipts}) — the Mac puller (com.landtek.offbox-backup) has never "
+            f"completed a verified copy; the record does not survive the machine (A62). Check the Mac's "
+            f"~/landtek-backups/pull.log.")
+    with open(receipts, errors="ignore") as f:
+        lines = [ln.split() for ln in f if ln.strip()]
+    if not lines:
+        raise TruthFailure(f"off-box receipt log is EMPTY — no verified copy has ever landed (A62).")
+    age_h = (time.time() - os.path.getmtime(receipts)) / 3600
+    if age_h > 30:
+        raise TruthFailure(
+            f"off-box receipt is STALE — last verified Mac copy {age_h:.0f}h ago (>30h). The Mac puller "
+            f"died silently (Mac off? tailnet down? checksum failing?); the newest record exists ONLY on "
+            f"the droplet (A62). Check the Mac's pull.log + launchctl list | grep offbox.")
+    last = lines[-1]                     # "<iso-ts> <sha256> <filename> mac:<host>"
+    if len(last) >= 3:
+        sha, fname = last[1], last[2]
+        local = os.path.join(BACKUP_DIR, fname)
+        if os.path.exists(local):
+            import hashlib
+            h = hashlib.sha256()
+            with open(local, "rb") as f:
+                for chunk in iter(lambda: f.read(1 << 20), b""):
+                    h.update(chunk)
+            if h.hexdigest() != sha:
+                raise TruthFailure(
+                    f"off-box receipt sha MISMATCH for {fname} — the receipt does not describe the local "
+                    f"dump (corruption or a lying receipt); treat the off-box copy as unverified (A62).")
+
+
 def restore_drill_reported(cur):
     """A62(c) — report-only: an unrestored backup is a hope. Surfaces days-since-drill on every run;
     never RED (the drill is an operator act to schedule, not a pipeline defect to alarm on nightly)."""
@@ -104,6 +144,7 @@ def restore_drill_reported(cur):
 TESTS = [
     ("survivable.backup_fresh", backup_fresh),
     ("survivable.backup_log_clean", backup_log_clean),
+    ("survivable.offbox_receipt_fresh", offbox_receipt_fresh),
     ("survivable.restore_drill_reported", restore_drill_reported),
 ]
 
