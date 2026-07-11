@@ -124,13 +124,17 @@ def _send_decision(cur, channel, recipient, reply):
     chash = hashlib.sha256((reply or "").encode("utf-8")).hexdigest()[:16]
     if og.classify(channel, recipient) == "internal":
         return ("send", "internal", None)
-    approved = og._find_approval(cur, target, chash)
-    if approved:
-        cur.execute("UPDATE work_orders SET audit = audit || %s::jsonb WHERE id=%s",
-                    (json.dumps([{"note": "consumed", "by": "leo_service"}]), approved))
-        return ("send", "outward_approved", approved)
-    oid = og._auto_enqueue(cur, target, chash, "leo_service", reply)
-    return ("hold", "outward_unapproved", oid)
+    pc = cur.connection.cursor()  # outward_guard helpers use positional row[0] — give them a plain cursor
+    try:
+        approved = og._find_approval(pc, target, chash)
+        if approved:
+            pc.execute("UPDATE work_orders SET audit = audit || %s::jsonb WHERE id=%s",
+                       (json.dumps([{"note": "consumed", "by": "leo_service"}]), approved))
+            return ("send", "outward_approved", approved)
+        oid = og._auto_enqueue(pc, target, chash, "leo_service", reply)
+        return ("hold", "outward_unapproved", oid)
+    finally:
+        pc.close()
 
 
 def deliver_approved(cur):
@@ -205,8 +209,12 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
             _log(cur, **{**logkw, "action": "sent", "reason": kind})
             return {"action": "sent", "via": kind, "client": client}
         # send failed -> degrade: enqueue + hold, never a silent loss
-        hoid = og._auto_enqueue(cur, f"{channel}:{channel_user_id}",
-                                hashlib.sha256(human.encode("utf-8")).hexdigest()[:16], "leo_service", human)
+        _pc = cur.connection.cursor()
+        try:
+            hoid = og._auto_enqueue(_pc, f"{channel}:{channel_user_id}",
+                                    hashlib.sha256(human.encode("utf-8")).hexdigest()[:16], "leo_service", human)
+        finally:
+            _pc.close()
         _log(cur, **{**logkw, "action": "send_error", "order": hoid, "reason": kind})
         return {"action": "send_error", "reason": kind, "order": hoid, "client": client}
     except Exception as e:
