@@ -32,6 +32,33 @@ PROFILES = {
         "dose": PULL_COMPLETE,          # a pulled work-slice: completeness wins (agents starve on too-little)
         "channel": "cli",               # internal; outward moves stay behind A21
     },
+    # The second agent-facing projection (A75 rollout T1): the verify-worker's doc work-slice — the
+    # reader that grows the verified corpus. Breadth-fair across ALL governed matters BY DESIGN; the
+    # WHO wall is declared explicitly ('%') and still enforced IN THE QUERY (verify_loop.doc_worklist's
+    # SQL takes the scope as a bound parameter), so narrowing it is a one-line profile change, never
+    # a post-filter.
+    "verify-worker": {
+        "kind": "agent",
+        "who": {"matter_scope": "%", "role": "autonomous corpus reader — breadth-fair across all governed "
+                                             "matters (internal; writes only through the hardened provenance gate)"},
+        "purpose": "read the next legible source docs and grow the verified corpus (verified = verbatim-grounded quote only)",
+        "form": "MACHINE",
+        "dose": PULL_COMPLETE,          # pulled work-slice arrives COMPLETE; --limit paces WORK, never truncates the slice
+        "channel": "cli",               # systemd oneshot (landtek-verify-worker.timer, 15 min); nothing outward
+    },
+    # The push-side projection (A75 rollout T2): the pulse orchestrator's work-order payloads
+    # (calendar_orchestrator.py, deploy_840). PUSH path — the dose ceiling is REAL here:
+    # dose.push_max_per_window IS the orchestrator's per-tick cap (its DEFAULT_CAP reads this value;
+    # over-cap items are DEFERRED WITH A LOG LINE, never silently dropped).
+    "pulse-orchestrator": {
+        "kind": "agent",
+        "who": {"matter_scope": "%", "role": "the pulse — fires deliverable-prep work orders from dated agenda "
+                                             "items (enqueue-only; every order ends in a human T3 hold)"},
+        "purpose": "start preparation on the next dated increment (T-14 prep) as a supervised, fail-closed work order",
+        "form": "MACHINE",
+        "dose": {"push_max_per_window": 10, "window": "pulse tick (daily 05:30 Asia/Manila, landtek-pulse-orchestrator.timer)"},
+        "channel": "db",                # work_orders rows via the supervisor state machine; never sends anything
+    },
     # Worked-example human profile (design §4) — NOT wired; the tenant surface arrives with Property v2.0.
     "tenant-example": {
         "kind": "human",
@@ -69,6 +96,49 @@ def project_fact_slice(cur, profile_key, matter_scope):
              "source_id": r[3], "provenance_level": r[4]} for r in cur.fetchall()]
 
 
+def project_doc_slice(cur, profile_key, matter_scope=None):
+    """MACHINE-form DOC work-slice for a reader agent (A75 T1): the ranked next-reads worklist,
+    handles intact (doc id · matter_code · ranking signals), scope enforced IN THE QUERY (the WHO
+    wall — verify_loop.doc_worklist binds it as a SQL parameter, never a post-filter), and
+    complete-in-one-payload (PULL_COMPLETE: the slice is never paginated/truncated here; a caller's
+    --limit paces how much WORK it takes per tick, not how much slice it may see)."""
+    p = profile(profile_key)
+    if p["form"] != "MACHINE":
+        raise ValueError(f"{profile_key!r} is a {p['form']} profile — project_doc_slice serves MACHINE only")
+    if p["dose"] != PULL_COMPLETE:
+        raise ValueError(f"{profile_key!r} is not a PULL_COMPLETE profile — a doc work-slice is pulled, "
+                         f"complete-in-one-payload (dose ceilings govern push, never pull)")
+    scope = matter_scope or p["who"].get("matter_scope")
+    if not scope:
+        raise ValueError(f"{profile_key!r} declares no matter_scope — the WHO wall must be explicit (A5)")
+    scripts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts")
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    from verify_loop import doc_worklist  # the ONE worklist query (reused, never forked); scope goes into its SQL
+    return doc_worklist(cur, matter_scope=scope)
+
+
+def project_pulse_payload(profile_key, item, due_date, rule):
+    """MACHINE-form PUSH payload for a pulse-fired work order (A75 T2): typed dict, handles intact
+    (agenda uid · matter/client codes · due date · firing rule) so the downstream agent can trace the
+    order back to the dated item that fired it. PUSH path: the CALLER enforces this profile's
+    dose.push_max_per_window per tick (deferrals logged, never silent) — this function shapes one
+    payload; it does not dose."""
+    p = profile(profile_key)
+    if p["form"] != "MACHINE":
+        raise ValueError(f"{profile_key!r} is a {p['form']} profile — project_pulse_payload serves MACHINE only")
+    return {
+        "profile": p["key"],
+        "rule": rule,
+        "item_uid": item.uid,                       # the agenda handle — load-bearing, never stripped
+        "title": (item.title or "")[:200],
+        "matter_code": item.matter or None,
+        "client_code": item.client or None,
+        "owner": item.owner or None,
+        "due_date": due_date.isoformat(),
+    }
+
+
 def render_human_fact(statement, provenance_level):
     """HUMAN-form rendering of one fact: plain statement + translated (never upgraded) confidence.
     Reuses client_ontology (A32/A33/A34) — the one vocabulary, not a fork."""
@@ -90,6 +160,9 @@ def render_human_reply(text):
     if not text:
         return text
     t = _HANDLE_RE.sub("", text)
+    # a stripped handle can leave a dangling connective ("...as mentioned in ." / "...see ,") — drop it
+    t = _re.sub(r"\b(?:as mentioned in|as noted in|as stated in|as per|per|see|refer to)\s*(?=[.,;:!?]|$)",
+                "", t, flags=_re.IGNORECASE)
     t = _re.sub(r"\s{2,}", " ", t)
     t = _re.sub(r"\s+([.,;:!?])", r"\1", t)
     return t.strip()
