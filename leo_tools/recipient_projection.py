@@ -35,6 +35,18 @@ PROFILES = {
         "dose": PULL_COMPLETE,
         "channel": "cli",
     },
+    # Deliverable-emitter projection (A75 graduation, deploy_870): case_memo's verified fact slice
+    # (statement + excerpt + source handle) for the counsel-ready action memo. PULL_COMPLETE — the
+    # memo cites the whole verified base; the A70 gate decides IF a memo may build at all.
+    "case-memo": {
+        "kind": "agent",
+        "who": {"matter_scope": "per-invocation argv[1]", "role": "counsel-ready memo renderer — "
+                "verified-only, cites the source; output is a DRAFT memo, never filed"},
+        "purpose": "render a counsel-grade action memo grounded strictly in this matter's verified facts",
+        "form": "MACHINE",
+        "dose": PULL_COMPLETE,
+        "channel": "cli",
+    },
     # The first agent-facing projection (deploy_844 proof): the ombudsman hunter's fact work-slice.
     "ombudsman-hunter": {
         "kind": "agent",
@@ -101,10 +113,12 @@ def project_fact_slice(cur, profile_key, matter_scope):
         SELECT id, matter_code,
                COALESCE(statement, '')         AS statement,
                COALESCE(source_id::text, '')   AS source_id,
-               COALESCE(provenance_level, '')  AS provenance_level
+               COALESCE(provenance_level, '')  AS provenance_level,
+               COALESCE(excerpt, '')           AS excerpt
         FROM matter_facts WHERE matter_code LIKE %s
     """, (matter_scope,))
     return [{"fact_id": r[0], "matter_code": r[1], "statement": r[2],
+             "excerpt": r[5],
              "source_id": r[3], "provenance_level": r[4]} for r in cur.fetchall()]
 
 

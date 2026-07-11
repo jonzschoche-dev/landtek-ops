@@ -59,6 +59,7 @@ def gate_fails_closed(cur):
 GATED_EMITTERS = [
     ("scripts/ombudsman_hunter.py", "cmd_playbook"),
     ("scripts/brief_drafter.py", "main"),   # A70 graduation, deploy_858
+    ("scripts/case_memo.py", "main"),       # A70 graduation, deploy_870
 ]
 
 

@@ -84,6 +84,23 @@ def _ollama(prompt):
         return json.loads(r.read()).get("response", "").strip()
 
 
+def _projected_facts(cur, mc, off):
+    """A75: verified fact slice (statement, excerpt, source handle) through the case-memo
+    RecipientProfile (WHO=A5 wall in-query · handles intact). Off-profile source docs are
+    dropped (annex hygiene, preserved from the prior raw read)."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
+    from recipient_projection import project_fact_slice
+    out = []
+    for f in project_fact_slice(cur, "case-memo", mc):
+        if f["provenance_level"] != "verified":
+            continue
+        src = f["source_id"]
+        if src and src.isdigit() and int(src) in off:
+            continue
+        out.append((f["statement"], f["excerpt"], src))
+    return out
+
+
 def build(mc, path):
     c = psycopg2.connect(DSN); c.autocommit = True; cur = c.cursor()
     cur.execute("SELECT title, coalesce(forum,court_or_agency,''), coalesce(docket_number,'') FROM matters WHERE matter_code=%s", (mc,))
@@ -91,9 +108,7 @@ def build(mc, path):
     cur.execute("SELECT doc_id, tier FROM matter_relevance WHERE focal_matter=%s", (mc,))
     rel = dict(cur.fetchall())
     off = {d for d, t in rel.items() if t == "OFF-PROFILE"}
-    cur.execute("""SELECT statement, excerpt, source_id FROM matter_facts WHERE matter_code=%s
-                   AND provenance_level='verified' ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
-    facts = [(s, e, src) for s, e, src in cur.fetchall() if not (src and src.isdigit() and int(src) in off)]
+    facts = _projected_facts(cur, mc, off)   # A75: verified slice through the case-memo profile
     factstr = "\n".join(f"- {s} [doc:{src}]" for s, e, src in facts)[:11000]
     laws = []
     for lf in _forums(forum):
@@ -314,6 +329,16 @@ def build(mc, path):
 def main():
     mc = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "MWK-ARTA-1891"
     path = f"/tmp/memo_{mc}.pdf"
+    # A70 incorporation gate — fail-closed BEFORE building: no memo on a thin / gap-blind base
+    # (harder than the soft readiness banner below — a HOLD produces NO memo at all).
+    from incorporation_gate import require_incorporation
+    _gc = psycopg2.connect(DSN); _gcur = _gc.cursor()
+    v = require_incorporation(_gcur, mc, stakeholder="counsel", purpose="case_memo")
+    _gc.close()
+    if v["verdict"] != "READY":
+        print(f"[case-memo] {mc}: incorporation gate → {v['verdict']} (verified={v.get('verified_count')}) "
+              f"— NOT building a memo on a base that can't ground it. reasons: {v.get('reasons')}")
+        return
     nf, nd, nm, ready = build(mc, path)
     print(f"[case-memo] {mc}: {nf} verified facts, {nd} annexes, {nm} unavailable, "
           f"data-layer {'READY' if ready else 'NOT READY'} → {path}")
