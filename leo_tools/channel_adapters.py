@@ -65,6 +65,7 @@ def _plain_text(text):
 
 
 def _log_inbound(channel, channel_user_id, text, raw_payload=None):
+    """Log an inbound message; returns the channel_messages.id (for artifact linking)."""
     conn = _db(); conn.autocommit = True; cur = conn.cursor()
     try:
         cur.execute("""
@@ -72,10 +73,52 @@ def _log_inbound(channel, channel_user_id, text, raw_payload=None):
               (channel_id, channel_user_id, direction, text_content, sent_at, status, metadata)
             VALUES ((SELECT id FROM channels WHERE name=%s), %s, 'inbound', %s, now(), 'received',
                     COALESCE(%s::jsonb, '{}'::jsonb))
+            RETURNING id
         """, (channel, str(channel_user_id), text,
               json.dumps(raw_payload) if raw_payload else None))
+        row = cur.fetchone()
+        return row[0] if row else None
     finally:
         cur.close(); conn.close()
+
+
+def _ingest_channel_media(channel, channel_user_id, channel_message_id, attachments):
+    """Fetch each attachment's bytes and hand to the universal sink. Every attachment yields a
+    comms_artifacts ledger row (landed/deduped/held/quarantined) — lossless, degrade-don't-crash.
+    `attachments`: list of {url, mime, filename, ref}."""
+    if not attachments:
+        return []
+    import requests as _rq
+    sys.path.insert(0, "/root/landtek/scripts")
+    try:
+        from comms_artifact_sink import land_artifact
+    except Exception as e:
+        return [{"status": "quarantined", "reason": f"sink_import:{type(e).__name__}"}]
+    out = []
+    for a in attachments:
+        data = b""
+        try:
+            if a.get("url"):
+                data = _rq.get(a["url"], timeout=45).content
+        except Exception:
+            data = b""
+        out.append(land_artifact(channel, channel_user_id, channel_message_id,
+                                 a.get("filename") or f"{channel}_media", data, a.get("mime"),
+                                 media_ref=a.get("url") or a.get("ref")))
+    return out
+
+
+def _messenger_attachments(msg):
+    """Meta Messenger message.attachments[] → normalized artifact refs (image/audio/video/file)."""
+    mime_of = {"image": "image/jpeg", "audio": "audio/mpeg", "video": "video/mp4",
+               "file": "application/octet-stream"}
+    out = []
+    for a in (msg.get("attachments") or []):
+        t = a.get("type"); url = (a.get("payload") or {}).get("url")
+        if t in mime_of and url:
+            fn = (url.split("?")[0].rsplit("/", 1)[-1]) or f"messenger_{t}"
+            out.append({"url": url, "mime": mime_of[t], "filename": fn, "ref": url})
+    return out
 
 
 def _route_to_onboard_or_agent(channel, channel_user_id, display_name, username, message):
@@ -321,20 +364,26 @@ def messenger_webhook():
                     continue  # our own sends echoed back — never route
                 psid = (ev.get("sender") or {}).get("id", "")
                 text = (msg.get("text") or "").strip()
-                if not text or not psid:
+                atts = _messenger_attachments(msg)
+                if (not text and not atts) or not psid:
                     continue
-                _log_inbound("messenger", psid, text, raw_payload=ev)
-                reply, state, passthrough = _route_to_onboard_or_agent(
-                    "messenger", psid, psid, None, text)
-                forwarded = False
-                if reply:
-                    _messenger_send(psid, reply)
-                elif passthrough:
-                    forwarded = _forward_to_agent("messenger", psid, psid, None, text)
-                    if not forwarded:
-                        _messenger_send(psid, "Thank you — our team has been notified.")
-                results.append({"psid": psid, "state": state,
-                                "replied": bool(reply), "forwarded": forwarded})
+                cmid = _log_inbound("messenger", psid, text or "[media]", raw_payload=ev)
+                # media-lossless: fetch every attachment into the universal sink (never dropped)
+                media = _ingest_channel_media("messenger", psid, cmid, atts)
+                reply = state = None; passthrough = forwarded = False
+                if text:
+                    reply, state, passthrough = _route_to_onboard_or_agent(
+                        "messenger", psid, psid, None, text)
+                    if reply:
+                        _messenger_send(psid, reply)
+                    elif passthrough:
+                        forwarded = _forward_to_agent("messenger", psid, psid, None, text)
+                        if not forwarded:
+                            _messenger_send(psid, "Thank you — our team has been notified.")
+                elif media and any(m.get("status") in ("landed", "deduped") for m in media):
+                    _messenger_send(psid, "Got it — I've saved your file for our team. Thank you.")
+                results.append({"psid": psid, "state": state, "replied": bool(reply),
+                                "forwarded": forwarded, "media": [m.get("status") for m in media]})
         return jsonify({"ok": True, "processed": results}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

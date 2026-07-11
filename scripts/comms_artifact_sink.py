@@ -99,6 +99,11 @@ def land_artifact(channel, channel_user_id, channel_message_id, filename, data, 
                     "reason": "unresolved_client"}
 
         raw = data if isinstance(data, (bytes, bytearray)) else (data or "").encode("utf-8", "ignore")
+        if not raw:  # download failed / empty — visible quarantine, never a silent drop or empty doc
+            _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
+                    client=client, ref=media_ref, fn=fn, mime=mime, mtype=None, hash=None, doc=None,
+                    pstate=None, status="quarantined", reason="empty artifact / fetch failed")
+            return {"status": "quarantined", "doc_id": None, "client_code": client, "reason": "empty_fetch"}
         chash = hashlib.sha256(raw).hexdigest()
         existing, _how = B.find_existing(cur, chash)
         if existing:
