@@ -92,7 +92,7 @@ def extract_sources(cur, title_no, matter):
     tnorm = _norm_title(title_no)
     cur.execute(
         "SELECT id, case_file, extracted_text, original_filename, document_title FROM documents "
-        "WHERE extracted_text ~* '[NSns][.[:space:]]?[0-9]{1,3} ?(deg|dog|d)' "
+        "WHERE extracted_text ~* '[NSns][.[:space:]]?[0-9]{1,3} ?(deg|dog|d|°)' "
         "AND (case_file ILIKE %s OR matter_code ILIKE %s)", (f"%{matter}%", f"%{matter}%"))
     sources = {}
     for d in cur.fetchall():

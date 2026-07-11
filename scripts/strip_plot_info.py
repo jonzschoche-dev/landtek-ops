@@ -161,7 +161,7 @@ def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=Fa
     else:
         q = ("SELECT id, case_file, matter_code, extracted_text, original_filename, "
              "document_title FROM documents WHERE extracted_text ~* "
-             "'[NSns][.[:space:]]?[0-9]{1,3} ?(deg|dog|d)'")
+             "'[NSns][.[:space:]]?[0-9]{1,3} ?(deg|dog|d|°)'")
         args = []
         if matter and not all_corpus:
             q += " AND (case_file ILIKE %s OR matter_code ILIKE %s)"
