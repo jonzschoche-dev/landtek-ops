@@ -56,21 +56,32 @@ def _media_state(mime, text):
 
 
 def _resolve_client(cur, channel, channel_user_id):
-    """A5: the client_code this identity is bound to (channel_users.mapped_client_code). None => HOLD."""
-    cur.execute("""SELECT cu.mapped_client_code
+    """A5 + A77(1): (client_code, bind_confidence, matched_identity) for this identity, or
+    (None, None, None) => HOLD. Confidence is GRADED, not binary: channel_users.bind_confidence
+    (NULL = an explicit operator bind = 1.0; a future fuzzy auto-binder must record its real
+    confidence there). The caller holds anything below COMMS_BIND_MIN_CONF — never guesses."""
+    cur.execute("""SELECT cu.mapped_client_code AS client,
+                          coalesce(cu.bind_confidence, 1.0) AS conf,
+                          'channel_users.id=' || cu.id || ' ' ||
+                          coalesce(cu.display_name, cu.channel_user_id) AS ident
                      FROM channel_users cu JOIN channels c ON c.id = cu.channel_id
                     WHERE c.name = %s AND cu.channel_user_id = %s""",
                 (channel, str(channel_user_id)))
     r = cur.fetchone()
-    return (r["mapped_client_code"] if r else None) or None
+    if not r or not r["client"]:
+        return None, None, None
+    return r["client"], float(r["conf"]), r["ident"]
 
 
 def _ledger(cur, **kw):
+    kw.setdefault("bconf", None)
+    kw.setdefault("ident", None)
     cur.execute("""INSERT INTO comms_artifacts
         (channel, channel_user_id, channel_message_id, client_code, media_ref, original_filename,
-         mime_type, media_type, content_hash, doc_id, processing_state, status, reason)
+         mime_type, media_type, content_hash, doc_id, processing_state, status, reason,
+         bind_confidence, matched_identity)
         VALUES (%(channel)s,%(uid)s,%(msg_id)s,%(client)s,%(ref)s,%(fn)s,%(mime)s,%(mtype)s,
-                %(hash)s,%(doc)s,%(pstate)s,%(status)s,%(reason)s)
+                %(hash)s,%(doc)s,%(pstate)s,%(status)s,%(reason)s,%(bconf)s,%(ident)s)
         ON CONFLICT (channel_message_id, content_hash)
           WHERE channel_message_id IS NOT NULL AND content_hash IS NOT NULL
         DO NOTHING RETURNING id""", kw)
@@ -89,7 +100,7 @@ def land_artifact(channel, channel_user_id, channel_message_id, filename, data, 
     fn = filename or "artifact"
     mime = mime or mimetypes.guess_type(fn)[0] or "application/octet-stream"
     try:
-        client = _resolve_client(cur, channel, channel_user_id)
+        client, bconf, ident = _resolve_client(cur, channel, channel_user_id)
         if not client:
             # A5: resolve-or-HOLD. Visible, never dropped, never guessed.
             _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
@@ -97,12 +108,25 @@ def land_artifact(channel, channel_user_id, channel_message_id, filename, data, 
                     pstate=None, status="held", reason="unresolved_client (A5): identity not bound to a client_code")
             return {"status": "held", "doc_id": None, "client_code": None,
                     "reason": "unresolved_client"}
+        min_conf = float(os.environ.get("COMMS_BIND_MIN_CONF", "0.80"))
+        if bconf < min_conf:
+            # A77(1): a bind BELOW the confidence threshold is held, never guessed. The candidate
+            # bind + its confidence are recorded so the held artifact is auditable (client_code is
+            # left NULL — a held artifact is bound to nobody).
+            _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
+                    client=None, ref=media_ref, fn=fn, mime=mime, mtype=None, hash=None, doc=None,
+                    pstate=None, status="held", bconf=bconf, ident=ident,
+                    reason=f"low_confidence_bind (A77): candidate {client} at confidence "
+                           f"{bconf:.2f} < {min_conf:.2f} — held, never guessed")
+            return {"status": "held", "doc_id": None, "client_code": None,
+                    "reason": "low_confidence_bind", "bind_confidence": bconf}
 
         raw = data if isinstance(data, (bytes, bytearray)) else (data or "").encode("utf-8", "ignore")
         if not raw:  # download failed / empty — visible quarantine, never a silent drop or empty doc
             _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
                     client=client, ref=media_ref, fn=fn, mime=mime, mtype=None, hash=None, doc=None,
-                    pstate=None, status="quarantined", reason="empty artifact / fetch failed")
+                    pstate=None, status="quarantined", reason="empty artifact / fetch failed",
+                    bconf=bconf, ident=ident)
             return {"status": "quarantined", "doc_id": None, "client_code": client, "reason": "empty_fetch"}
         chash = hashlib.sha256(raw).hexdigest()
         existing, _how = B.find_existing(cur, chash)
@@ -111,7 +135,8 @@ def land_artifact(channel, channel_user_id, channel_message_id, filename, data, 
                            ON CONFLICT DO NOTHING""", (existing, client))
             _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
                     client=client, ref=media_ref, fn=fn, mime=mime, mtype=None, hash=chash,
-                    doc=existing, pstate=None, status="deduped", reason="content_hash match")
+                    doc=existing, pstate=None, status="deduped", reason="content_hash match",
+                    bconf=bconf, ident=ident)
             return {"status": "deduped", "doc_id": existing, "client_code": client}
 
         os.makedirs(STORE, exist_ok=True)
@@ -138,7 +163,7 @@ def land_artifact(channel, channel_user_id, channel_message_id, filename, data, 
                        ON CONFLICT DO NOTHING""", (did, client))
         _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
                 client=client, ref=media_ref, fn=fn, mime=mime, mtype=media_type, hash=chash,
-                doc=did, pstate=pstate, status="landed", reason=None)
+                doc=did, pstate=pstate, status="landed", reason=None, bconf=bconf, ident=ident)
         return {"status": "landed", "doc_id": did, "client_code": client, "processing_state": pstate}
     except Exception as e:
         # degrade-don't-crash: quarantine (visible), never a silent drop

@@ -17,6 +17,10 @@ import os
 import psycopg2
 import psycopg2.extras
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ingest_gate  # noqa: E402 — A77 writer-side owner gate (unresolved doc never forms an edge)
+import contradiction as CONTRA  # noqa: E402 — A78 ingest gate (conflict with verified => HOLD)
+
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 
 RE_TITLE = re.compile(r"\b(?:TCT|OCT)?[\s-]?(?:T|P|OCT)-\d{3,6}(?:-\d+)*\b", re.I)
@@ -69,17 +73,38 @@ def harvest_matter(cur, matter_code, go):
                    JOIN documents d ON d.id=l.doc_id
                    WHERE l.matter_code=%s AND length(coalesce(d.extracted_text,''))>80""", (matter_code,))
     docs = cur.fetchall()
-    n = 0
-    if go:
-        cur.execute("DELETE FROM matter_facts WHERE matter_code=%s AND created_by='harvest'", (matter_code,))
+    n = held_conflicts = 0
+    # A77(1): a doc whose client owner cannot be resolved never forms an edge — HELD, not guessed.
+    # Held docs are EXCLUDED from the delete-rewrite: their existing facts stay frozen exactly as
+    # they are (open holes_findings route them to the operator's disposition — never auto-deleted).
+    ok, held = [], []
     for d in docs:
+        (ok if ingest_gate.owner_gate(cur, matter_code, d["doc_id"], "harvest_facts", record=go)
+         else held).append(d)
+    if go:
+        cur.execute("""DELETE FROM matter_facts WHERE matter_code=%s AND created_by='harvest'
+                       AND NOT (source_id = ANY(%s))""",
+                    (matter_code, [str(d["doc_id"]) for d in held]))
+    vmap = CONTRA.verified_event_dates(cur, matter_code)  # A78: loaded once per matter
+    for d in ok:
         for kind, stmt, excerpt in _harvest_doc(d["extracted_text"]):
+            # A78: an incoming fact contradicting a VERIFIED fact is held at ingest, never written.
+            conflicts = CONTRA.conflicts_with_verified(cur, matter_code, stmt + " " + excerpt,
+                                                       verified_map=vmap)
+            if conflicts:
+                held_conflicts += 1
+                ingest_gate.hold_contradiction(cur, "harvest_facts", matter_code, d["doc_id"],
+                                               stmt, conflicts, record=go)
+                continue
             n += 1
             if go:
                 cur.execute("""INSERT INTO matter_facts
                     (matter_code, statement, fact_kind, source_kind, source_id, excerpt, provenance_level, created_by, created_at)
                     VALUES (%s,%s,%s,'doc',%s,%s,'inferred_strong','harvest', now())""",
                     (matter_code, stmt[:500], kind, str(d["doc_id"]), excerpt[:400]))
+    if held or held_conflicts:
+        print(f"  {matter_code:<26} HELD: {len(held)} unresolved-owner doc(s), "
+              f"{held_conflicts} contradicting fact(s) (A77/A78 gate — visible in holes_findings)")
     return n, len(docs)
 
 

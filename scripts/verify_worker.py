@@ -28,6 +28,9 @@ import psycopg2.extras
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import ingest_gate  # noqa: E402 — A77 writer-side owner gate (unresolved doc never forms an edge)
+import contradiction as CONTRA  # noqa: E402 — A78 ingest gate (conflict with verified => HOLD)
+
 PROJECTION_PROFILE = "verify-worker"   # A75: this reader's work-slice comes through its RecipientProfile
 
 
@@ -192,10 +195,19 @@ def process_doc(cur, w, go):
     text = (cur.fetchone() or {}).get("extracted_text") or ""
     if len(text) < 200:
         return {"doc": w["id"], "skip": "too short"}
+    # A77(1): a doc whose client owner cannot be resolved never forms an edge — HELD before any
+    # inference is spent, visible in holes_findings (V4 passes on a NULL owner; the writer refuses).
+    if not ingest_gate.owner_gate(cur, w["matter_code"], w["id"], "verify_worker", record=go):
+        if go:
+            cur.execute("INSERT INTO verify_worker_log (doc_id,n_verified,n_proposed,status) "
+                        "VALUES (%s,0,0,'held_unresolved_owner')", (w["id"],))
+        return {"doc": w["id"], "matter": w["matter_code"],
+                "skip": "HELD: doc owner unresolvable (A77 — no edge, see holes_findings)"}
     facts, tier = _extract_facts(cur, text, w)
     if facts is None:
         raise RuntimeError("all inference tiers unavailable (ollama down + gemini quota)")
     nv = npr = 0; shown = []
+    vmap = CONTRA.verified_event_dates(cur, w["matter_code"])  # A78: loaded once per doc-read
     for f in (facts or []):
         if not isinstance(f, dict):
             continue  # local model sometimes emits a bare string instead of {statement,excerpt,...};
@@ -208,8 +220,23 @@ def process_doc(cur, w, go):
         cur.execute("SELECT excerpt_grounded(%s,%s)", (exc, str(w["id"])))
         grounded = cur.fetchone()["excerpt_grounded"]
         verdict = "verified" if (grounded and conf >= MIN_CONF) else ("proposed" if conf >= MIN_CONF else "drop")
+        # A78 contradiction-at-ingest: a claim carrying an event-date that CONFLICTS with a VERIFIED
+        # fact is HELD for explicit resolution — never written verified, never silently dropped.
+        conflicts = [] if verdict == "drop" else CONTRA.conflicts_with_verified(
+            cur, w["matter_code"], stmt + " " + exc, verified_map=vmap)
+        if conflicts:
+            verdict = "conflict"
         shown.append((verdict, "G" if grounded else "-", round(conf, 2), stmt[:70]))
         if not go or verdict == "drop":
+            continue
+        if verdict == "conflict":
+            ingest_gate.hold_contradiction(cur, "verify_worker", w["matter_code"], w["id"],
+                                           stmt, conflicts)
+            cur.execute("""INSERT INTO proposed_facts (matter_code,statement,excerpt,source_doc_id,
+                             confidence,status)
+                           VALUES (%s,%s,%s,%s,%s,'contradiction_hold')
+                           ON CONFLICT (matter_code,statement) DO UPDATE SET status='contradiction_hold'""",
+                        (w["matter_code"], stmt, exc, w["id"], conf)); npr += 1
             continue
         if verdict == "verified":
             cur.execute("SELECT 1 FROM matter_facts WHERE matter_code=%s AND statement=%s", (w["matter_code"], stmt))
