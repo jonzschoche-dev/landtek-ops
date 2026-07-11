@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek headless Leo reply loop — SHADOW pass (generate + answer-gate + project + classify, LOG only, sends nothing). Test surface (operator + JJ) only. $0 local Ollama. Runs alongside the live n8n path until per-channel cutover.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/leo_service.py --once
+StandardOutput=append:/var/log/landtek_leo_service.log
+StandardError=append:/var/log/landtek_leo_service.log
