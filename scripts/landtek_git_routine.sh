@@ -234,6 +234,22 @@ EOF
       echo ""
     fi
 
+    # ── Cross-desk index guard. On the shared Mac tree, another desk may have `git add`ed files
+    #    that are NOT part of this deploy. `git commit` commits the WHOLE index, so those get swept
+    #    into this deploy (the index-sweep gotcha — it now bites BETWEEN desks, e.g. the comms desk's
+    #    auto-commit swept an executor's +70 in-progress lines into deploy_857). At this point the
+    #    routine has staged nothing yet, so ANY already-staged file is foreign → refuse, don't sweep.
+    hdr "Cross-desk index guard"
+    preexisting_staged="$(git diff --cached --name-only)"
+    if [ -n "$preexisting_staged" ]; then
+      err "Index already holds staged files NOT part of this deploy — refusing to avoid a cross-desk sweep:"
+      echo "$preexisting_staged" | sed 's/^/    /'
+      err "Another desk likely staged these. Unstage (git reset -- <files>) or let that desk commit first, then retry."
+      exit 4
+    fi
+    ok "Index clean — only this deploy's paths will be committed"
+    echo ""
+
     hdr "Stage specific paths"
     git add "${paths[@]}"
     git status --short | head -10
