@@ -78,4 +78,85 @@ isolation check) · the truth-floor result · the graduation line for the ontolo
 - [ ] Close-out block below + one-line graduation directive per path for the ontology desk.
 
 ## Close-out
-*(executor appends here)*
+
+### 2026-07-11 — T1+T2+T3+T4 executed (deploy_858; module additions rode deploy_857's index sweep)
+
+**What was wired**
+
+- **T1 — verify-worker slice.** `verify-worker` profile registered (MACHINE · PULL_COMPLETE ·
+  WHO = `%` declared explicitly, breadth-fair by design). New `project_doc_slice` in
+  `leo_tools/recipient_projection.py` reuses `verify_loop.doc_worklist` (never forks it); the scope
+  is a bound `LIKE %s` parameter INSIDE doc_worklist's SQL (A5 in the query). `verify_worker.py`
+  now pulls its worklist only via `_projected_worklist` → `project_doc_slice`; a projection error
+  HOLDS the tick (empty worklist, loud log line) — no raw fallback, no crash. Grounding: the worker
+  is a VPS systemd **oneshot on a 15-min timer** (`landtek-verify-worker.timer`), not a Mac daemon —
+  no restart needed; the next tick picked up the code (01:45:47Z, exit 0, `systemctl --failed` = 0).
+- **T2 — pulse-orchestrator payloads.** `pulse-orchestrator` profile registered (MACHINE · push
+  dose `{push_max_per_window: 10, window: daily pulse tick 05:30 Manila}` — the mapping is
+  executable: `calendar_orchestrator.DEFAULT_CAP` now READS the profile's dose value). New
+  `project_pulse_payload` shapes the work-order payload (typed, handles intact: item_uid ·
+  matter_code · client_code · owner · due_date · rule), stored in the order's audit entry alongside
+  `profile`. Enqueue semantics, consolidation, cap-deferral logging, and the `pulse_work_log`
+  idempotency ledger unchanged. Projection unavailable → the pulse HOLDS its fires for the tick.
+- **T3 — truth-floor.** `truth_tests/test_recipient_projection.py` (auto-picked-up by `run_all.py`'s
+  glob): per-path wiring grep-floors (hunter · verify_worker · calendar_orchestrator), profile
+  totality across kind/who/purpose/form/dose/channel, fail-closed unknown-profile refusal,
+  A5-in-the-SQL floor, and the report-only un-wired inventory. `render_human_reply`/`render_human_fact`
+  are functions, not profiles — the totality check iterates `PROFILES` only.
+- **T4 — supervised.** work_orders **#30** (T1) and **#31** (T2), kind `deliverable`, both driven
+  produce→verify→**certify T3 hold**: terminal state `blocked_governance` — held for the operator's
+  certify, the fail-closed terminal this lane is built to reach. Full audit trails on both.
+
+**Verification output**
+
+- Shape check (VPS, live DB, pre-deploy from a /tmp tree): projected slice vs raw path
+  **content-identical, 121/121 rows, every field including rank `p`** (canonical (id, matter_code)
+  sort; residual raw-vs-raw ordering jitter is pre-existing SQL tie-nondeterminism on multi-matter
+  docs, e.g. doc 597 in MWK-CV26360 + MWK-TCT4497).
+- Sample slice row (MACHINE, handles intact): `{'id': 438, 'matter_code': 'MWK-CV26360',
+  'from_email': True, 'ocr': 0.45, 'tlen': 1116, 'has_deadline': True, 'has_value': False,
+  'fn': 'Verified Declaration - Complaint - Civil Case No. 26', 'p': 9.4779}`
+- Isolation: scope `MWK%` → 119 rows, **0 outside scope**, 2 correctly excluded vs full slice.
+- Degrade: broken profile → worker worklist `[]` + HOLD line (no crash); unknown profile refused
+  (KeyError); orchestrator with projection unavailable → "HOLDING all fires this tick".
+- T2 idempotency re-proof (production repo, two consecutive `--apply` ticks):
+  `fired: 0 · already-fired (idempotent): 7` **both ticks** — ledger intact across the payload change.
+- T2 payload live proof (rolled-back txn, 0 rows persisted): audit[0].payload =
+  `{"rule":"T14_prep","owner":"jonathan","title":…,"profile":"pulse-orchestrator",
+  "due_date":"2026-07-20","item_uid":…,"client_code":"MWK-001","matter_code":"MWK-CV26360"}`.
+- Truth-floor: **5/5 green on the VPS** (`projection.wired_paths` · `profiles_total` (4 profiles) ·
+  `unknown_profile_refuses` · `scope_in_query` · `unwired_inventory` report line). Negative-tested
+  state-free (`--negative`): axis-strip bit ("verify-worker: missing ['dose']") and unwired-path bit
+  (doctored source failed the floor). Full suite post-deploy: 138 passed; standing A62
+  `survivable.backup_log_clean` red (operator B2 storage-cap billing action, gate-noted);
+  `leo_spine.uncited_legal_rule_caught` flickered red once then passed on re-run — LLM-driven,
+  comms-desk-owned (their uncommitted edits to that gate+test are in flight), untouched here.
+
+**Graduation lines for the ontology desk** *(desk edits ONTOLOGY.md; executor does not)*
+
+> A75 graduation — **verify-worker path**: verify_worker's doc work-slice now flows only through the
+> `verify-worker` RecipientProfile via `project_doc_slice` (scope in doc_worklist's SQL,
+> PULL_COMPLETE, degrade=hold); floor `projection.wired_paths` in
+> truth_tests/test_recipient_projection.py; proven identical-output vs raw + isolation 0-leak
+> (deploy_858, wo#30 held for operator certify).
+
+> A75 graduation — **pulse-orchestrator path**: calendar_orchestrator's work-order payloads are
+> MACHINE-form `project_pulse_payload` projections under the `pulse-orchestrator` profile, with the
+> per-tick cap formally mapped to dose.push_max_per_window (read FROM the profile); idempotency
+> re-proven (2nd tick = 0); floor in the same test (deploy_858, wo#31 held for operator certify).
+
+**Notes / held items**
+
+- deploy_857 (comms desk, Mac index sweep) carried this desk's in-progress
+  `leo_tools/recipient_projection.py` additions (+70 lines: both profiles + both project functions)
+  under its own message — content is exactly what was subsequently verified; deploy_858 lands the
+  consumers and says so. The deploy-routine index-sweep gotcha struck cross-desk; flagged for the
+  operator.
+- No restart was performed or needed (timer-fired oneshot); the live loop was never stopped.
+- `ontology_check --structure` exits 1 on pre-existing §2.16–2.19 heading-depth items (v1.0
+  renumber backlog) — present at HEAD before this work, not addressable here (ONTOLOGY.md is
+  desk-only). `--alignment` / `--invariants` / `--enforcement` green.
+- Un-wired inventory (report-only, shrinking list): scripts reading `matter_facts` directly remain
+  (34 raw fact-readers per deploy_856's `universalize_report.py`, which is the fuller census —
+  complementary to the truth test's line). Next A75 candidates per the design: the tenant/rent pair
+  (Property v2.0).
