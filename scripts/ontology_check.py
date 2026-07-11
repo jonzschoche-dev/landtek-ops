@@ -332,6 +332,7 @@ SHADOW_REGISTRY = {
     "V6": ("geometry client-isolation",   "ONTOLOGY_GEOMETRY_CLIENT_CROSS", None),
     "V7": ("comms channel-identity",      "ONTOLOGY_CHANNEL_BAD_CLIENT",    None),
     "V8": ("provenance earned-from-run",  "ONTOLOGY_PROVENANCE_UNEARNED",   None),
+    "V11": ("null-owner edge (A77)",      "ONTOLOGY_NULL_OWNER_EDGE",       None),
 }
 
 
