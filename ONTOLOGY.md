@@ -20,7 +20,11 @@
 > REFUSED (A5 hard constraint). Accuracy internal / gentleness external (the A75 boundary generalized to the
 > whole web). Design: `docs/RELATIONSHIP_EQUILIBRIUM.md` — grounded (corrected the draft: no `obligations`
 > table exists; `fact_edges` is an empty seed; `contradictions` 44 sit out-of-lane awaiting P3, which
-> graduates A65 too). Phased P1–P4 shadow-first; floors only on a negative-tested propagation function.
+> graduates A65 too). Phased P1–P4 shadow-first; floors only on a negative-tested propagation function. *(v0.36 also RECORDS
+> the peer-authored **A77** — ingestion fidelity: resolution + media→fact gates before an artifact seeds the
+> fact graph — and **A78** — verified is EARNED, never promoted; a record contradicting a verified fact is
+> refused/held AT THE GATE, the gate-side complement of A76's contradiction-at-propagation. Both landed from
+> the answer-gate window without a history entry; desk-validated, correctly 🟡.)*
 > **v0.35 (2026-07-11).** **A75 — universal recipient projection (one truth, N
 > recipient-shaped projections, never N sources).** Generalizes ClientProjection (A32/A33) to every
 > recipient: a RecipientProfile fixes WHO (A5 wall in the query) · PURPOSE (next increment) · FORM (HUMAN
