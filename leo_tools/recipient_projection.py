@@ -47,6 +47,18 @@ PROFILES = {
         "dose": PULL_COMPLETE,
         "channel": "cli",
     },
+    # Deliverable-emitter projection (A75 graduation, deploy_874): case_bundle's verified fact slice
+    # (statement + source handle) captioning the bound exhibit PDF. PULL_COMPLETE — the bundle cites
+    # the whole verified base; the A70 gate decides IF a bundle may bind at all.
+    "case-bundle": {
+        "kind": "agent",
+        "who": {"matter_scope": "per-invocation argv[1]", "role": "exhibit-bundle binder — verified-only "
+                "fact captions; output is a bound PDF DRAFT for counsel, never filed"},
+        "purpose": "caption a bound exhibit PDF from this matter's verified facts",
+        "form": "MACHINE",
+        "dose": PULL_COMPLETE,
+        "channel": "cli",
+    },
     # The first agent-facing projection (deploy_844 proof): the ombudsman hunter's fact work-slice.
     "ombudsman-hunter": {
         "kind": "agent",

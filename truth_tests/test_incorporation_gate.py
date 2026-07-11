@@ -58,8 +58,10 @@ def gate_fails_closed(cur):
 # (universalize_report.py --strict enumerates the not-yet-gated remainder).
 GATED_EMITTERS = [
     ("scripts/ombudsman_hunter.py", "cmd_playbook"),
-    ("scripts/brief_drafter.py", "main"),   # A70 graduation, deploy_858
-    ("scripts/case_memo.py", "main"),       # A70 graduation, deploy_870
+    ("scripts/brief_drafter.py", "main"),      # A70 graduation, deploy_858
+    ("scripts/case_memo.py", "main"),          # A70 graduation, deploy_870
+    ("scripts/dossier_pipeline.py", "main"),   # A70 graduation, deploy_874 (closes the emitter axis)
+    ("scripts/case_bundle.py", "main"),        # A70 graduation, deploy_874
 ]
 
 

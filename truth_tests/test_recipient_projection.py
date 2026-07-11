@@ -46,6 +46,8 @@ WIRED_PATHS = [
      "_projected_facts", "project_fact_slice"),
     ("case_memo._projected_facts", os.path.join("scripts", "case_memo.py"),
      "_projected_facts", "project_fact_slice"),
+    ("case_bundle._projected_facts", os.path.join("scripts", "case_bundle.py"),
+     "_projected_facts", "project_fact_slice"),
 ]
 
 

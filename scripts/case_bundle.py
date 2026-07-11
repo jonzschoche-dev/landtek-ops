@@ -118,9 +118,7 @@ def _gather(mc, exclude=frozenset(), core=False):
     bound.sort(key=_chrono)                    # bind chronologically (initial letters → complaint → orders)
     supporting.sort(key=_chrono)
     exmap = {bound[i][0]: chr(65 + i) for i in range(len(bound))}
-    cur.execute("""SELECT statement, source_id FROM matter_facts WHERE matter_code=%s AND provenance_level='verified'
-                   ORDER BY (source_id ~ '^[0-9]+$') DESC, source_id, id""", (mc,))
-    facts = [(st, sid) for st, sid in cur.fetchall() if not (sid and sid.isdigit() and int(sid) in off)]
+    facts = _projected_facts(cur, mc, off)   # A75: verified slice through the case-bundle profile
     tmap = {}
     if bound:
         cur.execute("SELECT id, left(coalesce(extracted_text,''),60000) FROM documents WHERE id = ANY(%s)",
@@ -263,6 +261,16 @@ def _stamp_pagenums(out):
             pass
 
 
+def _projected_facts(cur, mc, off):
+    """A75: verified (statement, source handle) slice via the case-bundle RecipientProfile
+    (WHO=A5 wall in-query); off-profile source docs dropped (preserved from the prior raw read)."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
+    from recipient_projection import project_fact_slice
+    return [(f["statement"], f["source_id"]) for f in project_fact_slice(cur, "case-bundle", mc)
+            if f["provenance_level"] == "verified"
+            and not (f["source_id"] and f["source_id"].isdigit() and int(f["source_id"]) in off)]
+
+
 def build(mc, dpi=110, quality=45, brief_md=None, exclude=frozenset(), core=False):
     title, docket, forum, docs, supporting, exmap, facts, DT, MN, tmap = _gather(mc, exclude, core)
     if not docs:
@@ -316,6 +324,15 @@ def main():
     exclude = frozenset(int(x) for x in sys.argv[sys.argv.index("--exclude") + 1].split(",")) \
         if "--exclude" in sys.argv else frozenset()
     core = "--core" in sys.argv
+    # A70 incorporation gate — fail-closed: no bundle on a thin / gap-blind base.
+    from incorporation_gate import require_incorporation
+    _gc = psycopg2.connect(DSN)
+    _v = require_incorporation(_gc.cursor(), mc, stakeholder="counsel", purpose="bundle")
+    _gc.close()
+    if _v["verdict"] != "READY":
+        print(f"[bundle] {mc}: incorporation gate → {_v['verdict']} (verified={_v.get('verified_count')}) "
+              f"— NOT binding a bundle on a base that can't ground it. reasons: {_v.get('reasons')}")
+        return
     path, nex = build(mc, dpi, q, brief_md=brief, exclude=exclude, core=core)
     kb = os.path.getsize(path) // 1024
     kind = "Core packet" if core else "Full bundle"

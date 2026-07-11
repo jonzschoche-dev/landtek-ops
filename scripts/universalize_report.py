@@ -37,6 +37,11 @@ A75_EXCLUDE = re.compile(
 # Known stakeholder-facing deliverable emitters (A70 lane). Extend as new emitters land.
 EMITTERS = ["brief_drafter", "case_memo", "dossier_pipeline", "case_bundle",
             "ombudsman_hunter", "affidavit", "demand_letter", "case_forward"]
+# Disposition: name-matches an emitter token but is NOT a per-matter stakeholder deliverable, so the
+# A70 gate (require_incorporation(matter, stakeholder)) is a CATEGORY ERROR — never force it.
+A70_NON_EMITTER = {
+    "case_forward_digest": "internal cross-matter daily digest to the operator (no single matter base)",
+}
 
 FACT_READ = re.compile(r"\bFROM\s+matter_facts\b", re.I)
 WIRED_A75 = re.compile(r"recipient_projection|project_fact_slice", re.I)
@@ -64,8 +69,8 @@ def scan():
         # A75 lane
         if FACT_READ.search(src) and not A75_EXCLUDE.search(name):
             (a75_wired if WIRED_A75.search(src) else a75_raw).append(name)
-        # A70 lane
-        if any(e in name for e in EMITTERS):
+        # A70 lane (skip dispositioned non-emitters — category error to gate them)
+        if any(e in name for e in EMITTERS) and name not in A70_NON_EMITTER:
             (a70_gated if WIRED_A70.search(src) else a70_ungated).append(name)
     return {
         "a75_wired": sorted(set(a75_wired)), "a75_raw": sorted(set(a75_raw)),
@@ -93,6 +98,9 @@ def main():
               + (", ".join(r["a70_gated"]) or "—"))
         print(f"  🟡 emitters NOT gated — GRADUATE per-path ({len(r['a70_ungated'])}): "
               + (", ".join(r["a70_ungated"]) or "— none, universal!"))
+        if A70_NON_EMITTER:
+            print("  ⚪ dispositioned (NOT a stakeholder emitter — gating would be a category error): "
+                  + ", ".join(f"{k} ({v})" for k, v in A70_NON_EMITTER.items()))
         print()
         total_open = len(r["a75_raw"]) + len(r["a70_ungated"])
         print(f"open universalization debt: {total_open} path(s). "

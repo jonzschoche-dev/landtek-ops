@@ -242,6 +242,18 @@ def main():
     ap.add_argument("--no-recover", action="store_true")
     ap.add_argument("--frontier", action="store_true")
     a = ap.parse_args()
+    # A70 incorporation gate — fail-closed BEFORE the pipeline builds/sends anything: no dossier
+    # on a thin / gap-blind base. Verdict recorded (incorporation_verdicts) for the A70 truth-floor.
+    import psycopg2
+    from incorporation_gate import require_incorporation
+    _gc = psycopg2.connect(os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n"))
+    _v = require_incorporation(_gc.cursor(), a.matter, stakeholder="counsel", purpose="dossier")
+    _gc.close()
+    if _v["verdict"] != "READY":
+        print(f"[dossier] {a.matter}: incorporation gate → {_v['verdict']} "
+              f"(verified={_v.get('verified_count')}) — NOT building a dossier on a base that can't "
+              f"ground it. reasons: {_v.get('reasons')}")
+        sys.exit(1)
     pb = _pb(a.matter)
     if not pb:
         sys.exit(f"no playbook for {a.matter} (add one to PLAYBOOKS)")
