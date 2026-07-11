@@ -11,6 +11,11 @@
 -- Run on the VPS:
 --   docker exec -i n8n-postgres-1 psql -U n8n -d n8n < migrations/deploy_830_reocr_reground_guard.sql
 
+-- The guard and the sweep below annotate matter_facts.notes — make sure it exists
+-- (column was added live 2026-07-10 by the Mac truth desk; without it the trigger
+-- aborts every re-OCR write with column-notes-does-not-exist).
+ALTER TABLE matter_facts ADD COLUMN IF NOT EXISTS notes text;
+
 CREATE OR REPLACE FUNCTION reocr_reground_guard() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE demoted int;
 BEGIN
