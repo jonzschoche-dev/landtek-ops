@@ -61,8 +61,12 @@ def scour(cur):
     return added
 
 
-def doc_worklist(cur):
-    """Legible, matter-linked docs not yet source-read, ranked by value — the next reads."""
+def doc_worklist(cur, matter_scope="%"):
+    """Legible, matter-linked docs not yet source-read, ranked by value — the next reads.
+    matter_scope is the A75 WHO wall (a LIKE pattern, e.g. 'MWK%'), enforced HERE in the SQL as a
+    bound parameter — never post-filtered. Default '%' = all governed matters (the verify-worker
+    profile's declared breadth-fair scope). This is the ONE worklist query; recipient_projection's
+    project_doc_slice reuses it (A75: reuse, never fork)."""
     cur.execute("""
         WITH dm AS (   -- a doc belongs to a matter via its matter_code OR a document_matter_links row
             SELECT id AS doc_id, matter_code FROM documents WHERE matter_code IS NOT NULL
@@ -92,7 +96,8 @@ def doc_worklist(cur):
           AND NOT EXISTS (SELECT 1 FROM matter_facts f   -- not yet read FOR THIS matter (per-matter)
                           WHERE f.provenance_level='verified' AND f.source_kind='doc'
                             AND f.source_id=d.id::text AND f.matter_code=dm.matter_code)
-    """)
+          AND dm.matter_code LIKE %s                     -- the WHO wall (A5/A75), in the query
+    """, (matter_scope,))
     rows = cur.fetchall()
     for r in rows:
         r["p"] = (3 if r["from_email"] else 0) + (3 if r["has_value"] else 0) \

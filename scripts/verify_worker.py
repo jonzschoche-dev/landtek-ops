@@ -27,7 +27,26 @@ import psycopg2
 import psycopg2.extras
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from verify_loop import doc_worklist
+
+PROJECTION_PROFILE = "verify-worker"   # A75: this reader's work-slice comes through its RecipientProfile
+
+
+def _projected_worklist(cur):
+    """A75 (deploy_844 rollout T1): the doc work-slice arrives through the `verify-worker`
+    RecipientProfile — MACHINE form, handles intact, WHO scope enforced in the SQL, PULL_COMPLETE
+    (never truncated; --limit paces work, not the slice). DEGRADE, don't crash: a projection error
+    HOLDS this tick (empty worklist, loud line) — there is NO raw-table fallback (no recipient reads
+    raw un-projected data) and the live 15-min timer loop must never die on it."""
+    try:
+        leo_tools = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools")
+        if leo_tools not in sys.path:
+            sys.path.insert(0, leo_tools)
+        from recipient_projection import project_doc_slice
+        return project_doc_slice(cur, PROJECTION_PROFILE)
+    except Exception as e:  # noqa: BLE001 — any projection fault degrades to a held tick
+        print(f"[worker] A75 projection unavailable ({type(e).__name__}: {e}) — HOLDING this tick "
+              f"(no raw fallback; fix the profile/module, the timer retries in 15 min)", flush=True)
+        return []
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 GEMINI_KEYS = [k for k in (os.environ.get("GEMINI_API_KEY", ""), os.environ.get("GEMINI_API_KEY_FALLBACK", "")) if k]
@@ -143,7 +162,7 @@ def _next_docs(cur, limit, matter=None):
     per matter per round, matters ordered by current verified-fact count ASC (most-neglected first),
     each matter's docs in priority order. So a 0-fact matter gets read before CV-26360's 80th fact.
     matter=<code> narrows the worklist to a single matter (used by matter_fix's targeted source-read)."""
-    work = doc_worklist(cur)
+    work = _projected_worklist(cur)
     if matter:
         work = [w for w in work if w["matter_code"] == matter]
     cur.execute(f"SELECT DISTINCT doc_id FROM verify_worker_log WHERE attempted_at > now() - interval '{COOLDOWN_DAYS} days'")

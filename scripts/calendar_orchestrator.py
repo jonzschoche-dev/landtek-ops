@@ -29,17 +29,33 @@ Usage:
 """
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, "/root/landtek/scripts")
+sys.path.insert(0, "/root/landtek/leo_tools")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
 
 from calendar_sync import db  # noqa: E402
 from assistant_cadence import get_agenda, item_date, manila_today  # noqa: E402
 
 RULE = "T14_prep"
 DEFAULT_HORIZON = 14
-DEFAULT_CAP = 10
+
+# A75 (rollout T2): the pulse pushes MACHINE-form projected payloads through the `pulse-orchestrator`
+# RecipientProfile, and the per-tick cap IS the profile's dose ceiling (dose.push_max_per_window —
+# the mapping is recorded in the profile; deferrals stay logged, never silent). DEGRADE, don't crash:
+# if the projection module is unavailable the pulse HOLDS its fires for the tick (loud line, no
+# un-projected payload, no crash) — the timer retries next tick.
+try:
+    from recipient_projection import profile as _rp_profile, project_pulse_payload  # noqa: E402
+    PROFILE_KEY = "pulse-orchestrator"
+    DEFAULT_CAP = _rp_profile(PROFILE_KEY)["dose"]["push_max_per_window"]
+except Exception as _e:  # noqa: BLE001 — any projection fault degrades to a held tick
+    _rp_profile = project_pulse_payload = None
+    PROFILE_KEY = "pulse-orchestrator (UNAVAILABLE)"
+    DEFAULT_CAP = 10  # conservative fallback for --help/dry display; fires are HELD anyway
 
 
 def ensure_ledger(cur):
@@ -62,16 +78,19 @@ def already_fired(cur, uid, rule):
 
 def enqueue_deliverable(cur, item, by="calendar_orchestrator"):
     """Mirror supervisor.cmd_enqueue for kind='deliverable' (same shape, same audit),
-    without shelling out. The kind's steps end in a human T3 certify — fail-closed."""
+    without shelling out. The kind's steps end in a human T3 certify — fail-closed.
+    The order's PAYLOAD is a MACHINE-form A75 projection (typed, handles intact) through the
+    `pulse-orchestrator` profile — payload shape only; enqueue semantics unchanged."""
     from supervisor import KINDS  # the registry is the single source of step shape
     spec = KINDS["deliverable"]
     steps = [dict(s, status="pending", result=None) for s in spec["steps"]]
     d = item_date(item)
     title = f"[pulse T-14] Prepare: {item.title[:120]} (due {d.isoformat()})"
+    payload = project_pulse_payload(PROFILE_KEY, item, d, RULE)  # A75: typed push payload, handles intact
     note = (f"enqueued by the pulse (calendar_orchestrator {RULE}) · uid={item.uid} "
-            f"· due={d.isoformat()} · owner={item.owner or '-'}")
+            f"· due={d.isoformat()} · owner={item.owner or '-'} · profile={PROFILE_KEY}")
     audit = [{"at": datetime.now(timezone.utc).isoformat(), "from": None,
-              "to": "queued", "note": note}]
+              "to": "queued", "note": note, "profile": PROFILE_KEY, "payload": payload}]
     cur.execute(
         """INSERT INTO work_orders (kind, matter_code, title, status, steps, current_step,
              created_by, target_ref, audit)
@@ -116,6 +135,11 @@ def main():
     items = unique
 
     print(f"[pulse] {today} — {len(items)} dated item(s) inside T-{args.horizon}")
+    if project_pulse_payload is None:  # A75 degrade: hold the fires, never crash, never push un-projected
+        print("[pulse] A75 projection unavailable — HOLDING all fires this tick "
+              "(no un-projected payload leaves the pulse; the timer retries next tick)")
+        conn.close()
+        return
     fired = skipped = 0
     deferred = []
     for it in items:
