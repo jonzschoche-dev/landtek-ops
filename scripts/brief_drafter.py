@@ -47,6 +47,16 @@ def _ollama(prompt):
         return None
 
 
+def _projected_facts(cur, mc):
+    """A75: pull this matter's verified fact work-slice through the brief-drafter RecipientProfile
+    (WHO=A5 wall in-query · MACHINE handles intact · PULL_COMPLETE) — no raw un-projected fact read."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
+    from recipient_projection import project_fact_slice
+    return [(f["fact_id"], f["statement"])
+            for f in project_fact_slice(cur, "brief-drafter", mc)
+            if f["provenance_level"] == "verified"]
+
+
 def main():
     a = sys.argv
     if "--matter" not in a:
@@ -56,8 +66,15 @@ def main():
     if kind not in KINDS:
         print(f"--type must be one of {list(KINDS)}"); return
     c = psycopg2.connect(DSN); c.autocommit = True; cur = c.cursor()
-    cur.execute("SELECT id, statement FROM matter_facts WHERE matter_code=%s AND provenance_level='verified' ORDER BY id", (mc,))
-    facts = cur.fetchall()
+    # A70 incorporation gate (fail-closed): never draft on a thin / gap-blind base. The verdict is
+    # recorded (incorporation_verdicts) so the truth-floor can assert no emitter ships un-gated.
+    from incorporation_gate import require_incorporation
+    v = require_incorporation(cur, mc, stakeholder="counsel", purpose=f"brief:{kind}")
+    if v["verdict"] != "READY":
+        print(f"[drafter] {mc}: incorporation gate → {v['verdict']} "
+              f"(verified={v.get('verified_count')}) — NOT drafting on a base that can't ground it. "
+              f"reasons: {v.get('reasons')}"); return
+    facts = _projected_facts(cur, mc)   # A75: verified slice through the brief-drafter profile
     if not facts:
         print(f"[drafter] {mc}: no verified facts — nothing to draft from."); return
     corpus = "\n".join(f"[{i}] {s}" for i, s in facts)

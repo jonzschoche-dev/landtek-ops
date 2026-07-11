@@ -53,14 +53,25 @@ def gate_fails_closed(cur):
             f"(fail-closed, A70c). A gate that passes the unknown passes anything.")
 
 
+# (file, function) for every GRADUATED deliverable emitter — its body must call require_incorporation
+# so no governed emitter ships without a recorded verdict. Add a row when an emitter graduates
+# (universalize_report.py --strict enumerates the not-yet-gated remainder).
+GATED_EMITTERS = [
+    ("scripts/ombudsman_hunter.py", "cmd_playbook"),
+    ("scripts/brief_drafter.py", "main"),   # A70 graduation, deploy_858
+]
+
+
 def gate_is_wired(cur):
-    """A70 wiring floor: the Ombudsman playbook path calls the gate (it cannot be silently unwired)."""
-    src = open(os.path.join(REPO, "scripts", "ombudsman_hunter.py"), errors="ignore").read()
-    body = re.search(r"def cmd_playbook.*?\ndef ", src, re.S)
-    if not body or "require_incorporation" not in body.group(0):
-        raise TruthFailure(
-            "scripts/ombudsman_hunter.py::cmd_playbook no longer calls require_incorporation — the A70 "
-            "gate has been unwired from the Ombudsman/affidavit path. Re-wire before any draft emits.")
+    """A70 wiring floor: every graduated emitter calls the gate (it cannot be silently unwired)."""
+    for relpath, fn in GATED_EMITTERS:
+        src = open(os.path.join(REPO, relpath), errors="ignore").read()
+        body = re.search(rf"def {re.escape(fn)}\b.*?(?=\ndef |\nclass |\Z)", src, re.S)
+        if not body or "require_incorporation" not in body.group(0):
+            raise TruthFailure(
+                f"{relpath}::{fn} no longer calls require_incorporation — the A70 gate has been "
+                f"unwired from a governed deliverable emitter. Re-wire before any draft emits.")
+    print(f"      [incorporation] {len(GATED_EMITTERS)} emitter(s) hold the A70 gate floor")
 
 
 def verdicts_reported(cur):

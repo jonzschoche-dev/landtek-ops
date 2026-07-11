@@ -42,6 +42,8 @@ WIRED_PATHS = [
      "_projected_worklist", "project_doc_slice"),
     ("calendar_orchestrator.enqueue_deliverable", os.path.join("scripts", "calendar_orchestrator.py"),
      "enqueue_deliverable", "project_pulse_payload"),
+    ("brief_drafter._projected_facts", os.path.join("scripts", "brief_drafter.py"),
+     "_projected_facts", "project_fact_slice"),
 ]
 
 
@@ -120,6 +122,29 @@ def scope_in_query(cur):
                                f"gone) — A5 scope must live IN THE QUERY, never a post-filter.")
 
 
+def scope_isolation_runtime(cur):
+    """A5 RUNTIME floor (not just a grep): project_fact_slice under a PAR scope returns ZERO MWK
+    rows and vice-versa — the WHO wall actually isolates at query time. Negative-tested: if the
+    LIKE binding regressed to a no-op, a foreign-client row would leak and this bites."""
+    import psycopg2
+    import recipient_projection as rp
+    from _harness import DSN
+    c = psycopg2.connect(DSN)          # plain tuple cursor: project_fact_slice indexes r[0]
+    pc = c.cursor()
+    try:
+        for scope, foreign in (("PAR-%", "MWK"), ("MWK-%", "PAR")):
+            rows = rp.project_fact_slice(pc, "brief-drafter", scope)
+            leak = [r for r in rows if (r["matter_code"] or "").startswith(foreign)]
+            if leak:
+                raise TruthFailure(
+                    f"project_fact_slice(scope={scope!r}) leaked {len(leak)} {foreign} row(s) — the A5 "
+                    f"WHO wall failed to isolate (e.g. {leak[0]['matter_code']}). A projection must "
+                    f"NEVER cross the client boundary.")
+    finally:
+        c.close()
+    print("      [projection] runtime scope isolation holds (PAR↮MWK: 0 cross-scope rows)")
+
+
 def unwired_inventory(cur):
     """REPORT-ONLY visibility: repo agent scripts still touching matter_facts raw (candidates for the
     next A75 graduations; wired files may appear too when they retain residual internal raw reads —
@@ -146,6 +171,7 @@ TESTS = [
     ("projection.profiles_total", profiles_total),
     ("projection.unknown_profile_refuses", unknown_profile_refuses),
     ("projection.scope_in_query", scope_in_query),
+    ("projection.scope_isolation_runtime", scope_isolation_runtime),
     ("projection.unwired_inventory", unwired_inventory),
 ]
 

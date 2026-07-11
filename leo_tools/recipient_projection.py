@@ -23,6 +23,18 @@ PULL_COMPLETE = "PULL_COMPLETE"
 
 # key -> RecipientProfile (docs/RECIPIENT_PROJECTION.md §3)
 PROFILES = {
+    # Deliverable-emitter projection (A75 graduation, deploy_858): brief_drafter's verified-fact
+    # work-slice for drafting counsel work-product. PULL_COMPLETE — a draft needs the WHOLE verified
+    # base (starving it yields a thin draft); the A70 incorporation gate decides IF it may draft at all.
+    "brief-drafter": {
+        "kind": "agent",
+        "who": {"matter_scope": "per-invocation --matter", "role": "drafting agent — verified-only; "
+                "output is a DRAFT for counsel review, never filed"},
+        "purpose": "draft counsel work-product grounded strictly in this matter's verified facts",
+        "form": "MACHINE",
+        "dose": PULL_COMPLETE,
+        "channel": "cli",
+    },
     # The first agent-facing projection (deploy_844 proof): the ombudsman hunter's fact work-slice.
     "ombudsman-hunter": {
         "kind": "agent",
