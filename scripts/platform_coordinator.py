@@ -50,6 +50,18 @@ def _conn():
     c = psycopg2.connect(DSN); c.autocommit = True; return c
 
 
+def client_of(cur, channel, channel_user_id):
+    """A25 resolve-or-hold, single identity: the client_code this (channel, user) is bound to, or None.
+    The one resolver every comms consumer (sink, leo_service) shares — never guess a client."""
+    cur.execute("""SELECT cu.mapped_client_code
+                     FROM channel_users cu JOIN channels c ON c.id = cu.channel_id
+                    WHERE c.name = %s AND cu.channel_user_id = %s""",
+                (channel, str(channel_user_id)))
+    r = cur.fetchone()
+    val = r["mapped_client_code"] if (r and isinstance(r, dict)) else (r[0] if r else None)
+    return val or None
+
+
 def _channels(cur):
     cur.execute("""SELECT id, name, active, webhook_url, auth_secret_ref FROM channels ORDER BY id""")
     return cur.fetchall()

@@ -75,3 +75,21 @@ def render_human_fact(statement, provenance_level):
     import client_ontology as co
     badge = co.client_provenance_badge(provenance_level)
     return statement + (f" ({badge})" if badge else "")
+
+
+import re as _re
+
+# internal provenance/grounding handles the GATE uses to verify, but a HUMAN client must never see (A32).
+_HANDLE_RE = _re.compile(r"\(?\b(?:doc|fact)\s*:\s*\d+\)?|§\s*[\d.]+|\bA\d{1,3}\b|\bV\d{1,2}\b", _re.IGNORECASE)
+
+
+def render_human_reply(text):
+    """HUMAN-form projection of a free-text reply (A32/A34): strip internal handles (doc:N / fact:N /
+    §x / A-invariant / V-check tokens) so the client sees plain language, never provenance plumbing.
+    The answer-gate verifies grounding on the handled form FIRST; this projects the passed reply."""
+    if not text:
+        return text
+    t = _HANDLE_RE.sub("", text)
+    t = _re.sub(r"\s{2,}", " ", t)
+    t = _re.sub(r"\s+([.,;:!?])", r"\1", t)
+    return t.strip()
