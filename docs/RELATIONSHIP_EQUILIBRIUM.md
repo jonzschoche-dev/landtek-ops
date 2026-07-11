@@ -50,6 +50,13 @@ The type set is the ontology's existing relation vocabulary — no new semantics
    deadline? → the A68 proposal path, source-cited, never a fabricated forward date), cascade check
    (keystone touched?), **isolation check (an edge crossing a client boundary is refused, not weighted — A5
    is a hard constraint, not a parameter)**.
+   **The document-bridge constraint (proven live, 2026-07-11 P1 exercise):** documents are client-agnostic
+   cut-vertices — the direct cross-client fact→fact edge is refused, but `fact → document → fact` bridged
+   Paracale-001 → doc 1176 → NIBDC-001 at hop 2. Therefore the traversal carries a **per-hop A5 guard**:
+   expanding through a document node may only reach nodes of the SAME resolved client as the perturbation's
+   origin; a document with an UNRESOLVED owner (`case_file` NULL) is **not traversable at all** (the V4
+   null-owner bypass class — A77(1) territory; live instance: docs 1172/1177 bled facts into MWK-OP-PETITION
+   on 2026-07-11). `fact→document` stays in the view for provenance display; the constraint binds PROPAGATION.
 4. **Project per recipient** — the marginal increment via A75 form + A71 dose.
 5. **Queue outputs** — pulse orders, brief lines, outward replies (all still behind their gates: A21/A26/S14).
 
