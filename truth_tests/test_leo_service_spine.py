@@ -9,6 +9,7 @@ Asserts the governed spine holds:
 All read-only (gate/remediate/client_of only SELECT); no live send anywhere (the service is shadow-only).
 """
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -49,6 +50,20 @@ def fabricated_cite_caught_and_remediated(cur):
         raise TruthFailure("remediate() left the fabricated citation in the reply — grounded-only rewrite failed.")
 
 
+def uncited_legal_rule_caught(cur):
+    """Negative test — a named statute/rule cited with no grounding doc must FAIL and be stripped
+    (LandTek is not a law firm; the model must not invent law)."""
+    bad = ("Your claim is governed by Section 4, Rule 74 of the Rules of Court and prescribes "
+           "under Article 1144. You should also cite R.A. 3019 against the officer.")
+    res = gate(cur, bad)
+    if res["verdict"] != "fail":
+        raise TruthFailure("gate did NOT fail an uncited legal-rule citation (Rule 74 / Art. 1144 / "
+                           "R.A. 3019) — the model could assert invented law to a client.")
+    fixed = remediate(cur, bad, res)
+    if re.search(r"rule\s+74|article\s+1144|r\.?a\.?\s*3019", fixed, re.I):
+        raise TruthFailure("remediate left an uncited legal citation in the reply.")
+
+
 def grounded_reply_passes(cur):
     """A safe, non-asserting reply must PASS (no false positives that would block real answers)."""
     good = "Salamat sa mensahe! I'll check with the team and follow up with you shortly."
@@ -79,6 +94,7 @@ TESTS = [
     ("leo_spine.ledger_present", ledger_present),
     ("leo_spine.no_fail_ships_unremediated", no_fail_ships_unremediated),
     ("leo_spine.fabricated_cite_caught_and_remediated", fabricated_cite_caught_and_remediated),
+    ("leo_spine.uncited_legal_rule_caught", uncited_legal_rule_caught),
     ("leo_spine.grounded_reply_passes", grounded_reply_passes),
     ("leo_spine.unresolved_sender_held", unresolved_sender_held),
     ("leo_spine.client_isolation_scope", client_isolation_scope),

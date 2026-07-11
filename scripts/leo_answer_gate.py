@@ -51,6 +51,21 @@ FACT_SIGNAL_RE = re.compile(
 HEDGE_RE = re.compile(
     r"\b(unknown|not in the record|i don't know|cannot confirm|unverified|pending|"
     r"need to (?:check|verify)|no (?:verified )?record|\[unknown\]|\[inferred\])\b", re.I)
+# specific legal-authority citations (statute / rule / article / section / G.R.) — LandTek is NOT a law
+# firm, so a named provision asserted WITHOUT a grounding doc is the model inventing law → FAIL, not warn.
+# (A hedge does NOT excuse it: the model should say "I'll confirm the applicable rules with counsel",
+# never name a specific rule number it can't ground.)
+LEGAL_CITE_RE = re.compile(
+    r"\b("
+    r"rules?\s+\d+"                                              # Rule 74, Rules 45
+    r"|art(?:icle|\.)?\s+\d+"                                    # Article 1144, Art. 1144
+    r"|sec(?:tion|\.)?\s+\d+"                                    # Section 4, Sec. 21
+    r"|(?:R\.?A\.?|republic\s+act)\s*(?:no\.?\s*)?\d+"           # R.A. 3019, Republic Act No. 6713
+    r"|(?:P\.?D\.?|presidential\s+decree)\s*(?:no\.?\s*)?\d+"    # P.D. 1529
+    r"|(?:B\.?P\.?|batas\s+pambansa)\s*(?:blg\.?|no\.?)?\s*\d+"  # B.P. Blg. 129
+    r"|(?:C\.?A\.?|commonwealth\s+act)\s*(?:no\.?\s*)?\d+"       # C.A. 141
+    r"|G\.?R\.?\s*(?:no\.?\s*)?\d+"                              # G.R. No. 12345
+    r")\b", re.I)
 
 
 def _conn():
@@ -58,10 +73,17 @@ def _conn():
     return c
 
 
+# dotted legal-authority prefixes (R.A. 3019, G.R. No. 45) whose INTERNAL periods must not read as
+# sentence enders — else "R.A. 3019" splits and the legal-cite check/remediation misses the fragment.
+_ABBREV_DOT = re.compile(r"\b(R\.A|P\.D|B\.P|C\.A|G\.R|E\.O)\.", re.I)
+
+
 def _split_sentences(text):
-    # keep it simple + deterministic: split on sentence enders + newlines/bullets
-    parts = re.split(r"(?<=[.!?])\s+|\n+|(?:^|\s)[-•]\s+", text.strip())
-    return [p.strip() for p in parts if p and p.strip()]
+    # keep it simple + deterministic: split on sentence enders + newlines/bullets, but first protect
+    # the internal periods of dotted legal abbreviations (restored after the split).
+    t = _ABBREV_DOT.sub(lambda m: m.group(0).replace(".", "\x00"), text.strip())
+    parts = re.split(r"(?<=[.!?])\s+|\n+|(?:^|\s)[-•]\s+", t)
+    return [p.replace("\x00", ".").strip() for p in parts if p and p.strip()]
 
 
 def _c0(row):
@@ -111,6 +133,12 @@ def gate(cur, text):
         if FACT_SIGNAL_RE.search(s) and not CITE_RE.search(s):
             warns.append(f"uncited factual claim: \"{s[:90]}\"")
 
+    # ── 4. uncited legal authority ── a named statute/rule/G.R. with no grounding doc → FAIL
+    for s in _split_sentences(text):
+        if LEGAL_CITE_RE.search(s) and not CITE_RE.search(s):
+            fails.append(f"UNCITED LEGAL AUTHORITY: \"{LEGAL_CITE_RE.search(s).group(0)}\" "
+                         "asserted with no grounding doc")
+
     verdict = "fail" if fails else "pass"
     return {"verdict": verdict, "fails": fails, "warns": warns,
             "cited_docs": cited, "n_warns": len(warns)}
@@ -139,6 +167,8 @@ def remediate(cur, text, res=None):
             dropped += 1; continue
         factual = bool(FACT_SIGNAL_RE.search(s)) and not HEDGE_RE.search(s)
         if CASCADE_RE.search(s) and not cites:          # ungrounded cascade
+            dropped += 1; continue
+        if LEGAL_CITE_RE.search(s) and not cites:       # uncited legal authority (statute/rule/G.R.)
             dropped += 1; continue
         if factual and not cites:                       # uncited factual claim
             dropped += 1; continue
