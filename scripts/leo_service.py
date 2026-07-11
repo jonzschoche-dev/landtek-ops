@@ -85,19 +85,81 @@ def _build_prompt(cur, client_code, message):
 
 
 def _log(cur, **kw):
+    kw.setdefault("order", None)
     cur.execute("""INSERT INTO leo_shadow_replies
         (inbound_msg_id, channel, channel_user_id, client_code, candidate_internal, verdict, fails,
-         warns_n, remediated, would_send_human, guard_class, model, action, reason)
+         warns_n, remediated, would_send_human, guard_class, model, action, reason, order_id)
         VALUES (%(msg)s,%(channel)s,%(uid)s,%(client)s,%(cand)s,%(verdict)s,%(fails)s,%(warns)s,
-                %(remed)s,%(human)s,%(guard)s,%(model)s,%(action)s,%(reason)s)
+                %(remed)s,%(human)s,%(guard)s,%(model)s,%(action)s,%(reason)s,%(order)s)
         ON CONFLICT (inbound_msg_id) WHERE inbound_msg_id IS NOT NULL DO NOTHING""", kw)
+
+
+def _channel_mode(cur, channel):
+    """The per-channel cutover switch: 'headless' (leo_service owns replies) or 'n8n' (shadow only)."""
+    cur.execute("SELECT mode FROM leo_channel_mode WHERE channel=%s", (channel,))
+    r = cur.fetchone()
+    return (r["mode"] if r else "n8n")
+
+
+def _deliver(channel, recipient, text):
+    """Send via the channel's OWN existing sender (reuse the bridges — no forks). Returns bool ok."""
+    sys.path.insert(0, "/root/landtek/leo_tools")
+    import channel_adapters as ca
+    if channel == "messenger":
+        return bool(ca._messenger_send(recipient, text))
+    if channel == "whatsapp":
+        return bool(ca._whatsapp_send(recipient, text))
+    if channel == "viber":
+        return bool(ca._viber_send(recipient, text))
+    # telegram is retired LAST and stays on n8n — this path is never reached for it (mode gate returns
+    # before send). Return False as a belt-and-braces guard so leo_service never double-sends on Telegram.
+    return False
+
+
+def _send_decision(cur, channel, recipient, reply):
+    """FAIL-CLOSED send gate (independent of the global guard mode). Returns (decision, kind, order_id):
+      internal (operator) -> send · outward WITH a consumed human approval -> send ·
+      outward WITHOUT approval -> HOLD + enqueue an outward_action for T3 human certification (A21)."""
+    target = f"{channel}:{recipient}"
+    chash = hashlib.sha256((reply or "").encode("utf-8")).hexdigest()[:16]
+    if og.classify(channel, recipient) == "internal":
+        return ("send", "internal", None)
+    approved = og._find_approval(cur, target, chash)
+    if approved:
+        cur.execute("UPDATE work_orders SET audit = audit || %s::jsonb WHERE id=%s",
+                    (json.dumps([{"note": "consumed", "by": "leo_service"}]), approved))
+        return ("send", "outward_approved", approved)
+    oid = og._auto_enqueue(cur, target, chash, "leo_service", reply)
+    return ("hold", "outward_unapproved", oid)
+
+
+def deliver_approved(cur):
+    """Deliver replies whose outward_action order a human has now certified (status='done', unconsumed).
+    This is where a human approval turns into an actual send — the one human action in the loop."""
+    cur.execute("""SELECT s.id, s.channel, s.channel_user_id, s.would_send_human, s.order_id
+                     FROM leo_shadow_replies s JOIN work_orders w ON w.id = s.order_id
+                    WHERE s.action='held_for_approval' AND w.status='done'
+                      AND NOT (w.audit::text LIKE %s)""", ('%"consumed"%',))
+    done = 0
+    for r in cur.fetchall():
+        try:
+            ok = _deliver(r["channel"], r["channel_user_id"], r["would_send_human"])
+        except Exception:
+            ok = False
+        if ok:
+            cur.execute("UPDATE work_orders SET audit = audit || %s::jsonb WHERE id=%s",
+                        (json.dumps([{"note": "consumed", "by": "leo_service_deliver"}]), r["order_id"]))
+            cur.execute("UPDATE leo_shadow_replies SET action='sent' WHERE id=%s", (r["id"],))
+            done += 1
+    if done:
+        print(f"[leo_service] delivered {done} human-approved reply(ies)")
 
 
 def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
     """Run the full spine for one message. SHADOW: logs, never sends. Returns the ledger dict."""
     base = dict(msg=inbound_msg_id, channel=channel, uid=str(channel_user_id), model=MODEL,
                 cand=None, verdict=None, fails=None, warns=0, remed=False, human=None,
-                guard=None, reason=None)
+                guard=None, reason=None, order=None)
     # A25 resolve-or-HOLD: never answer with a guessed client's context
     client = coord.client_of(cur, channel, channel_user_id)
     if not client:
@@ -119,20 +181,42 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
             to_send = gate_mod.remediate(cur, candidate, res)   # $0 grounded-only rewrite
             remediated = True
         human = proj.render_human_reply(to_send)                # A32 human form (no doc#/§ leak)
-        guard_class = og.classify(channel, str(channel_user_id))  # A21 (recorded; nothing sent in shadow)
-        _log(cur, **{**base, "client": client, "cand": candidate, "verdict": res["verdict"],
-                     "fails": psycopg2.extras.Json(res["fails"]), "warns": res["n_warns"],
-                     "remed": remediated, "human": human, "guard": guard_class,
-                     "action": "shadow_logged"})
-        return {"action": "shadow_logged", "client": client, "verdict": res["verdict"],
-                "remediated": remediated, "would_send_human": human, "guard_class": guard_class}
+        guard_class = og.classify(channel, str(channel_user_id))  # A21 classification
+        logkw = {**base, "client": client, "cand": candidate, "verdict": res["verdict"],
+                 "fails": psycopg2.extras.Json(res["fails"]), "warns": res["n_warns"],
+                 "remed": remediated, "human": human, "guard": guard_class}
+        # per-channel cutover switch: 'n8n' => shadow (log, no send); 'headless' => leo_service delivers
+        if _channel_mode(cur, channel) != "headless":
+            _log(cur, **{**logkw, "action": "shadow_logged"})
+            return {"action": "shadow_logged", "client": client, "verdict": res["verdict"],
+                    "remediated": remediated, "would_send_human": human, "guard_class": guard_class}
+        # LIVE channel — fail-closed send gate
+        decision, kind, oid = _send_decision(cur, channel, str(channel_user_id), human)
+        if decision == "hold":
+            _log(cur, **{**logkw, "action": "held_for_approval", "order": oid,
+                         "reason": "outward reply held for human certification (A21/T3)"})
+            return {"action": "held_for_approval", "order": oid, "client": client,
+                    "would_send_human": human}
+        try:
+            ok = _deliver(channel, str(channel_user_id), human)
+        except Exception as e:
+            ok, kind = False, f"send_error:{type(e).__name__}"
+        if ok:
+            _log(cur, **{**logkw, "action": "sent", "reason": kind})
+            return {"action": "sent", "via": kind, "client": client}
+        # send failed -> degrade: enqueue + hold, never a silent loss
+        hoid = og._auto_enqueue(cur, f"{channel}:{channel_user_id}",
+                                hashlib.sha256(human.encode("utf-8")).hexdigest()[:16], "leo_service", human)
+        _log(cur, **{**logkw, "action": "send_error", "order": hoid, "reason": kind})
+        return {"action": "send_error", "reason": kind, "order": hoid, "client": client}
     except Exception as e:
         _log(cur, **{**base, "client": client, "action": "error", "reason": f"{type(e).__name__}: {str(e)[:160]}"})
         return {"action": "error", "reason": str(e)[:160]}
 
 
 def run_once(cur):
-    """Shadow every new inbound from the test surface that hasn't been processed yet."""
+    """Deliver any human-approved held replies, then process new test-surface inbound."""
+    deliver_approved(cur)   # turn certified outward_action orders into actual sends
     ids = tuple(TEST_IDENTITIES)
     cur.execute("""
         SELECT cm.id, c.name AS channel, cm.channel_user_id, cm.text_content

@@ -64,6 +64,19 @@ def _plain_text(text):
     return html.unescape(t).strip()
 
 
+def _headless(channel):
+    """True if this channel has been cut over to leo_service (headless); then the adapter must NOT
+    send its own reply to an approved user — leo_service owns it (prevents double-reply). Fail-safe: on
+    any error, returns False (adapter keeps replying — never a silent gap)."""
+    try:
+        conn = _db(); conn.autocommit = True; cur = conn.cursor()
+        cur.execute("SELECT mode FROM leo_channel_mode WHERE channel=%s", (channel,))
+        r = cur.fetchone(); cur.close(); conn.close()
+        return bool(r and r[0] == "headless")
+    except Exception:
+        return False
+
+
 def _log_inbound(channel, channel_user_id, text, raw_payload=None):
     """Log an inbound message; returns the channel_messages.id (for artifact linking)."""
     conn = _db(); conn.autocommit = True; cur = conn.cursor()
@@ -375,7 +388,9 @@ def messenger_webhook():
                     reply, state, passthrough = _route_to_onboard_or_agent(
                         "messenger", psid, psid, None, text)
                     if reply:
-                        _messenger_send(psid, reply)
+                        _messenger_send(psid, reply)               # onboarding reply — always the adapter's
+                    elif passthrough and _headless("messenger"):
+                        pass  # cut over: leo_service (headless) drafts + holds this approved user's reply
                     elif passthrough:
                         forwarded = _forward_to_agent("messenger", psid, psid, None, text)
                         if not forwarded:
