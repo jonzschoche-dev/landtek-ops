@@ -40,20 +40,22 @@ def report(cur, client=None):
 def ego(cur, fact_id, hops=2):
     """N-hop neighborhood of a fact node — proves the graph is a real ego-network, not a flat list."""
     cur.execute("""
-        WITH RECURSIVE nbr(node_type, node_id, depth) AS (
+        WITH RECURSIVE
+        edges AS (   -- bidirectional edge set (single recursive term below)
+            SELECT src_type, src_id, tgt_type, tgt_id FROM v_relationship_graph
+            UNION ALL
+            SELECT tgt_type, tgt_id, src_type, src_id FROM v_relationship_graph
+        ),
+        nbr(node_type, node_id, depth) AS (
             SELECT 'fact', %s::text, 0
           UNION
             SELECT e.tgt_type, e.tgt_id, n.depth+1
-              FROM v_relationship_graph e JOIN nbr n ON e.src_type=n.node_type AND e.src_id=n.node_id
-             WHERE n.depth < %s
-          UNION
-            SELECT e.src_type, e.src_id, n.depth+1
-              FROM v_relationship_graph e JOIN nbr n ON e.tgt_type=n.node_type AND e.tgt_id=n.node_id
+              FROM edges e JOIN nbr n ON e.src_type=n.node_type AND e.src_id=n.node_id
              WHERE n.depth < %s
         )
         SELECT node_type, count(DISTINCT node_id) AS n, min(depth) AS nearest
           FROM nbr WHERE NOT (node_type='fact' AND node_id=%s) GROUP BY 1 ORDER BY 2 DESC
-    """, (str(fact_id), hops, hops, str(fact_id)))
+    """, (str(fact_id), hops, str(fact_id)))
     rows = cur.fetchall()
     print(f"[graph] {hops}-hop ego-network of fact {fact_id}:")
     for r in rows:
