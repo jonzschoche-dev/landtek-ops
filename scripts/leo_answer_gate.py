@@ -64,6 +64,14 @@ def _split_sentences(text):
     return [p.strip() for p in parts if p and p.strip()]
 
 
+def _c0(row):
+    """First selected column — works for BOTH tuple and RealDict cursors (real callers use RealDict,
+    so positional r[0] KeyError'd on any cited reply — the exact input the gate exists to check)."""
+    if row is None:
+        return None
+    return row[0] if not hasattr(row, "keys") else next(iter(row.values()))
+
+
 def gate(cur, text):
     fails, warns = [], []
 
@@ -71,11 +79,11 @@ def gate(cur, text):
     cited = sorted({int(m) for m in CITE_RE.findall(text)})
     if cited:
         cur.execute("SELECT id FROM documents WHERE id = ANY(%s)", (cited,))
-        real = {r[0] for r in cur.fetchall()}
+        real = {_c0(r) for r in cur.fetchall()}
         cur.execute("""SELECT DISTINCT source_id FROM matter_facts
                        WHERE provenance_level='verified' AND source_kind='doc'
                          AND source_id = ANY(%s)""", ([str(x) for x in cited],))
-        verified = {int(r[0]) for r in cur.fetchall() if (r[0] or "").isdigit()}
+        verified = {int(_c0(r)) for r in cur.fetchall() if (str(_c0(r) or "")).isdigit()}
         for d in cited:
             if d not in real:
                 fails.append(f"FABRICATED CITATION: doc:{d} does not exist in the corpus")
@@ -85,7 +93,7 @@ def gate(cur, text):
     # ── 2. cascade grounding ──
     if CASCADE_RE.search(text):
         cur.execute("SELECT count(*) FROM keystones WHERE lower(status) IN ('open','verified')")
-        n_keystones = cur.fetchone()[0]
+        n_keystones = _c0(cur.fetchone())
         if n_keystones == 0:
             fails.append("UNGROUNDED CASCADE: reply asserts a cascade but no verified keystone exists")
         elif not cited:
@@ -123,7 +131,7 @@ def remediate(cur, text, res=None):
     real = set()
     if res["cited_docs"]:
         cur.execute("SELECT id FROM documents WHERE id = ANY(%s)", (res["cited_docs"],))
-        real = {r[0] for r in cur.fetchall()}
+        real = {_c0(r) for r in cur.fetchall()}
     kept, dropped = [], 0
     for s in _split_sentences(text):
         cites = {int(m) for m in CITE_RE.findall(s)}

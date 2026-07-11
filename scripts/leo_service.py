@@ -40,7 +40,7 @@ import outward_guard as og                    # classify (A21)
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
-MODEL = os.environ.get("LEO_MODEL", "qwen2.5:14b")
+MODEL = os.environ.get("LEO_MODEL", "qwen2.5:14b-instruct")
 
 # In-house test surface only (operator + JJ). Everyone else is ignored until per-channel cutover.
 TEST_IDENTITIES = {("messenger", "37446980471566856"), ("telegram", "6513067717")}
