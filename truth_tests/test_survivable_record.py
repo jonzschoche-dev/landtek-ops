@@ -128,6 +128,32 @@ def offbox_receipt_fresh(cur):
                     f"dump (corruption or a lying receipt); treat the off-box copy as unverified (A62).")
 
 
+def binary_sources_offbox(cur):
+    """A62(b''): every non-empty binary still resident on the VPS has an off-box Drive identity.
+
+    The database dump preserves metadata and extracted text, not bytes referenced by ``file_path``.
+    A fresh dump receipt therefore cannot make A62 green while unique document bytes remain local-only.
+    Zero-byte placeholders are reported elsewhere and are not recoverable binary records.
+    """
+    cur.execute("""SELECT id, file_path
+                     FROM documents
+                    WHERE coalesce(file_path,'') <> ''
+                      AND coalesce(drive_file_id,'') = ''""")
+    stranded = []
+    for doc_id, path in cur.fetchall():
+        try:
+            if os.path.isfile(path) and os.path.getsize(path) > 0:
+                stranded.append((doc_id, path))
+        except OSError:
+            continue
+    if stranded:
+        sample = ", ".join(f"doc:{doc_id}" for doc_id, _ in stranded[:8])
+        raise TruthFailure(
+            f"{len(stranded)} non-empty document binary/binaries exist only on this machine ({sample}). "
+            "The off-box database dump does not contain file_path bytes; run drive_offload.py so each "
+            "binary earns a Drive ID before A62 can be green.")
+
+
 def restore_drill_reported(cur):
     """A62(c) — report-only: an unrestored backup is a hope. Surfaces days-since-drill on every run;
     never RED (the drill is an operator act to schedule, not a pipeline defect to alarm on nightly)."""
@@ -145,6 +171,7 @@ TESTS = [
     ("survivable.backup_fresh", backup_fresh),
     ("survivable.backup_log_clean", backup_log_clean),
     ("survivable.offbox_receipt_fresh", offbox_receipt_fresh),
+    ("survivable.binary_sources_offbox", binary_sources_offbox),
     ("survivable.restore_drill_reported", restore_drill_reported),
 ]
 

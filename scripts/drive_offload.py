@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""drive_offload.py — Drive-canonical PDF policy: push local PDFs to Drive, then drop the local file.
+"""drive_offload.py — Drive-canonical binary policy: push local document bytes to Drive.
 
 Operator policy: PDFs belong in Google Drive. Once a doc is properly ingested (text in the DB + a copy in
 Drive) we don't waste local storage/compute holding the PDF. For each doc with a local file_path but NO
 drive_file_id, this:
   1. uploads the PDF to the LANDTEK Drive folder (via the proven /api/upload_to_drive endpoint)
   2. records documents.drive_file_id + drive_link
-  3. deletes the local file (so /files/c/<id> then streams from Drive; the extracted text stays in the DB)
+  3. deletes the local file only when extracted text exists (otherwise keeps the local working copy)
 
 OPERATOR-RUN: steps 2–3 mutate the shared DB + filesystem, which the autonomous agent is blocked from.
 Safe + staged: --plan is read-only; --go --keep-local uploads + records but keeps the local file (so you
@@ -43,37 +43,42 @@ def main():
     keep = "--keep-local" in sys.argv
     limit = int(sys.argv[sys.argv.index("--limit") + 1]) if "--limit" in sys.argv else 0
     c = psycopg2.connect(DSN); c.autocommit = True; cur = c.cursor()
-    # OFFLINE SAFETY: only offload a doc whose TEXT is already extracted locally — so dropping the binary
-    # to Drive never makes the doc unreadable offline (the stack reasons over extracted_text in Postgres).
+    # A62 requires every extant local binary to have an off-box copy, including unsupported/unextracted
+    # formats.  Deletion remains separately guarded below: a binary without extracted text is uploaded but
+    # kept locally so the stack does not become less usable offline.
     cur.execute("""SELECT id, file_path, coalesce(original_filename,smart_filename,'document.pdf'),
-                   coalesce(mime_type,'application/pdf')
+                   coalesce(mime_type,'application/octet-stream'),
+                   (coalesce(extracted_text,'')<>'') AS has_text
                    FROM documents WHERE file_path IS NOT NULL AND coalesce(drive_file_id,'')=''
-                     AND coalesce(extracted_text,'')<>''
                    ORDER BY id""")
     rows = [r for r in cur.fetchall() if r[1] and os.path.exists(r[1])]
     mb = sum(os.path.getsize(r[1]) for r in rows) / 1e6
     print(f"local-only PDFs (on disk, no Drive copy): {len(rows)} files, {mb:.0f} MB total")
     if not go:
-        for did, fp, fn, mt in rows[:15]:
+        for did, fp, fn, mt, has_text in rows[:15]:
             print(f"  doc:{did:>5}  {os.path.getsize(fp)/1e6:>6.2f} MB  {fn[:48]}")
         print("\n(PLAN only — --go --keep-local to upload+record (keep file), --go for full offload)")
         return
 
     done = fail = 0
-    for did, fp, fn, mt in (rows[:limit] if limit else rows):
+    for did, fp, fn, mt, has_text in (rows[:limit] if limit else rows):
         res = _upload(fp, fn, mt)
         if not res.get("ok"):
             fail += 1; print(f"  ✗ doc:{did} upload failed: {res.get('status')}"); continue
         cur.execute("UPDATE documents SET drive_file_id=%s, drive_link=coalesce(nullif(drive_link,''),%s) WHERE id=%s",
                     (res["drive_file_id"], res.get("drive_link"), did))
-        if not keep:
+        delete_local = not keep and has_text
+        if delete_local:
             try:
                 os.remove(fp)
                 cur.execute("UPDATE documents SET file_path=NULL WHERE id=%s", (did,))
             except OSError as e:
                 print(f"    (could not delete local {fp}: {e})")
         done += 1
-        print(f"  ✓ doc:{did} → drive:{res['drive_file_id']} {'(local kept)' if keep else '(local dropped)'}")
+        disposition = "local dropped" if delete_local else "local kept"
+        if not has_text:
+            disposition += "; no extracted text"
+        print(f"  ✓ doc:{did} → drive:{res['drive_file_id']} ({disposition})")
     print(f"[drive_offload] {done} offloaded, {fail} failed")
 
 
