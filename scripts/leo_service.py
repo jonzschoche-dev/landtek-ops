@@ -157,7 +157,9 @@ def _deliver(channel, recipient, text):
         # only when leo_channel_mode.telegram='headless' (the metered n8n/Anthropic path retired).
         sys.path.insert(0, "/root/landtek/scripts")
         import tg_send
-        ok, _info = tg_send.send(chat_id=str(recipient), text=text, source="leo_service")
+        # override_pacing: this is a DIRECT conversational reply to the user's message (dedup'd one-per-
+        # inbound), not a background alert — the S14 no-double-tap must not block a reply he asked for.
+        ok, _info = tg_send.send(chat_id=str(recipient), text=text, source="leo_service", override_pacing=True)
         return bool(ok)
     return False
 
