@@ -1,0 +1,16 @@
+[Unit]
+Description=LandTek Leo instant-reply daemon — LISTENs for new inbound (pg_notify) and answers in real time via leo_service (internal/test identities on headless channels only; outward still holds). Persistent.
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/leo_instant.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/landtek_leo_instant.log
+StandardError=append:/var/log/landtek_leo_instant.log
+
+[Install]
+WantedBy=multi-user.target
