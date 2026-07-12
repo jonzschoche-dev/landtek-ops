@@ -1,0 +1,16 @@
+[Unit]
+Description=LandTek sovereign Telegram gateway — owns @LeoLandtekBot via getUpdates long-polling; lands conversation on the channel_messages bus (leo_instant answers, $0 local) + applies doc-triage commands (file/skip/unrelated). Retires n8n from Telegram.
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/telegram_gateway.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/landtek_telegram_gateway.log
+StandardError=append:/var/log/landtek_telegram_gateway.log
+
+[Install]
+WantedBy=multi-user.target
