@@ -154,6 +154,23 @@ def binary_sources_offbox(cur):
             "binary earns a Drive ID before A62 can be green.")
 
 
+def encrypted_cloud_receipt_fresh(cur):
+    """A62(b'''): a checksum-verified encrypted database copy reached LANDTEK Drive recently."""
+    receipts = os.path.join(BACKUP_DIR, "cloud_receipts.log")
+    if not os.path.exists(receipts):
+        raise TruthFailure(
+            "No encrypted-cloud receipt exists. The Mac copy is healthy, but the independent encrypted "
+            "Google Drive leg has not completed (A62). Check ~/landtek-backups/pull.log.")
+    age_h = (time.time() - os.path.getmtime(receipts)) / 3600
+    if age_h > 30:
+        raise TruthFailure(
+            f"Encrypted Google Drive backup receipt is stale ({age_h:.0f}h >30h); cloud redundancy is red (A62).")
+    with open(receipts, errors="ignore") as f:
+        last = ([ln.strip() for ln in f if ln.strip()] or [""])[-1]
+    if ".sql.gz.enc" not in last or "gdrive:LANDTEK/" not in last:
+        raise TruthFailure(f"Malformed encrypted-cloud receipt; cannot prove Drive copy (A62): {last[:120]}")
+
+
 def restore_drill_reported(cur):
     """A62(c) — report-only: an unrestored backup is a hope. Surfaces days-since-drill on every run;
     never RED (the drill is an operator act to schedule, not a pipeline defect to alarm on nightly)."""
@@ -172,6 +189,7 @@ TESTS = [
     ("survivable.backup_log_clean", backup_log_clean),
     ("survivable.offbox_receipt_fresh", offbox_receipt_fresh),
     ("survivable.binary_sources_offbox", binary_sources_offbox),
+    ("survivable.encrypted_cloud_receipt_fresh", encrypted_cloud_receipt_fresh),
     ("survivable.restore_drill_reported", restore_drill_reported),
 ]
 
