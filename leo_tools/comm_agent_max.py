@@ -55,6 +55,50 @@ def _role_policy(cur, role):
     return dict(r) if isinstance(r, dict) else dict(zip(keys, r))
 
 
+def _matter_tokens(matter_code):
+    """Distinctive tokens of a matter_code for text matching, e.g. 'MWK-ARTA-1891' -> {ARTA-1891, ARTA,
+    1891}; 'MWK-CV26360' -> {CV26360, 26360}. Drops the client prefix (MWK/PAR/NIBDC)."""
+    import re
+    parts = [p for p in matter_code.split("-") if p and p.upper() not in ("MWK", "PAR", "NIBDC", "PARACALE")]
+    toks = set(parts)
+    if len(parts) >= 2:
+        toks.add("-".join(parts))          # e.g. ARTA-1891
+    for p in parts:
+        m = re.search(r"\d{3,}", p)
+        if m:
+            toks.add(m.group(0))            # bare docket number
+    return {t for t in toks if len(t) >= 3}
+
+
+def resolve_chat_matter(cur, channel_message_id, client_code):
+    """[STUB — designed + tested, NOT yet the graph anchor] Resolve the SPECIFIC matter a chat is about.
+    Ladder: (1) keyword/entity match of the message text against the client's matter identifiers;
+    (2) [deferred] the sender's most-recent matter context via propagation_log/leo_interactions;
+    (3) fallback = the client's most fact-rich matter (today's heuristic). Returns (matter_code, method).
+
+    Not wired into the chat_context edge yet — the view still anchors to the biggest matter until the
+    post-soak increment replaces it with this resolver's output (avoids touching the live traversal
+    surface mid-soak). Proven by test_matter_disambig."""
+    cur.execute("SELECT text_content FROM channel_messages WHERE id=%s", (channel_message_id,))
+    r = cur.fetchone()
+    txt = ((r["text_content"] if isinstance(r, dict) else (r[0] if r else "")) or "").lower()
+
+    # (1) keyword match against the client's matters
+    cur.execute("SELECT matter_code FROM matters WHERE client_code=%s", (client_code,))
+    for row in cur.fetchall():
+        mc = row["matter_code"] if isinstance(row, dict) else row[0]
+        if any(tok.lower() in txt for tok in _matter_tokens(mc)):
+            return mc, "keyword"
+
+    # (3) fallback: the client's most fact-rich matter (current heuristic)
+    cur.execute("""SELECT matter_code FROM matter_facts
+                    WHERE _client_of(matter_code)=%s AND provenance_level='verified'
+                    GROUP BY matter_code ORDER BY count(*) DESC LIMIT 1""", (client_code,))
+    row = cur.fetchone()
+    mc = (row["matter_code"] if isinstance(row, dict) else (row[0] if row else None))
+    return mc, "fallback_biggest"
+
+
 def _resolve_sender(cur, channel_message_id):
     cur.execute("""SELECT c.name AS channel, cm.channel_user_id, cm.text_content, cm.direction,
                           cu.role AS raw_role, cu.mapped_client_code AS client
