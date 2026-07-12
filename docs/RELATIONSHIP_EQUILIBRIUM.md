@@ -82,9 +82,12 @@ metabolic window is a permitted implementation optimization; skipping propagatio
 
 ## 5. Phased build (shadow-first; each phase graduates separately)
 
-- **P1 — graph schema:** unify the edge carriers into one typed relationship view/store (decide
-  `fact_edges` vs `knowledge_graph_triples` as the canonical spine — a §3-style drift ruling, desk's call).
-- **P2 — reactive propagation:** the ego-network recompute, SHADOW (computes + ledgers, surfaces nothing).
+- **P1 — graph schema: RULED + BUILT (deploy_882, desk-ratified 2026-07-12).** The carrier is the DERIVED
+  VIEW `v_relationship_graph` (34k edges — rebuildable over the SoR, A50-consistent), with persistence ONLY
+  in the `propagation_log` ledger. Neither `fact_edges` (stays drift) nor `knowledge_graph_triples` becomes
+  the spine — no third store. The per-hop A5 guard is the view's `WHERE client_code = seed_client` clause;
+  NULL-client edges are unreachable by construction (LOAD-BEARING — never relax to `OR client_code IS NULL`).
+- **P2 — reactive propagation: SHADOW-LIVE (deploy_882).** `equilibrium_propagate.py` — internal plane only, gate-free (the two-plane law: accuracy inside, A79 clamp + A75 projection at the emission plane only), ledgers to `propagation_log`, emits nothing.
 - **P3 — contradiction detection:** wire step-3 checks to `contradictions` with owners (graduates A65 too).
 - **P4 — tuning ledger + calibration:** the observability surface; only then may outputs go live per path.
 
