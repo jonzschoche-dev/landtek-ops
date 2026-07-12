@@ -57,9 +57,11 @@ def outward_held_without_approval_negative(cur):
     conn = psycopg2.connect(DSN); conn.autocommit = False
     c = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     try:
-        # JJ's messenger identity classifies outward; a fresh reply has no approval
+        # An unregistered messenger PSID classifies OUTWARD (not internal_targets, not sim range); a
+        # fresh reply has no approval. NB: JJ's PSID 37446980471566856 is now an operator internal_target,
+        # so it would classify INTERNAL — use a clearly-external id to test the genuine outward-hold path.
         decision, kind, oid = leo_service._send_decision(
-            c, "messenger", "37446980471566856", "UNIQUE-UNAPPROVED-" + os.urandom(6).hex())
+            c, "messenger", "100000000000001", "UNIQUE-UNAPPROVED-" + os.urandom(6).hex())
         if decision != "hold" or not oid:
             raise TruthFailure(f"an unapproved OUTWARD reply resolved to {decision!r} (order={oid}) — "
                                "it must HOLD and enqueue an outward_action for human certification.")

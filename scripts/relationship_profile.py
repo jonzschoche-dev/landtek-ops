@@ -65,7 +65,9 @@ def observe(cur, channel, channel_user_id, client_code, entity_id, inbound_msg_i
                 "WHERE channel=%s AND channel_user_id=%s", (channel, channel_user_id))
     row = cur.fetchone()
     if row and row["last_inbound_id"] == inbound_msg_id:
-        return row["profile"]                              # already counted this message — no double-count
+        p = dict(row["profile"])                            # already counted this message — no double-count,
+        p["_exchanges"] = row["exchanges"]                  # but still report the live count to the caller
+        return p
     if entity_id is None:
         cur.execute("""SELECT cu.entity_id FROM channel_users cu JOIN channels c ON c.id=cu.channel_id
                         WHERE c.name=%s AND cu.channel_user_id=%s""", (channel, channel_user_id))
@@ -90,6 +92,58 @@ def observe(cur, channel, channel_user_id, client_code, entity_id, inbound_msg_i
           exchanges, inbound_msg_id))
     profile["_exchanges"] = exchanges
     return profile
+
+
+def anticipate(cur, client_code, profile):
+    """0-2 time-sensitive items THIS relationship genuinely cares about — from surfaced_deadlines +
+    matter_plays, gated by the profile's OBSERVED themes (relationship-specific, not a global rule).
+    Empty is valid and common (no data / no recurring theme yet). Deterministic + $0."""
+    themes = set(profile.get("top_themes", []) if profile else [])
+    if not themes or not client_code:
+        return []
+    fam = client_code.split("-")[0]
+    items = []
+    # a soon, time-sensitive item — surfaced only when the record shows time-sensitive concerns
+    if themes & {"deadlines", "titles", "tax", "arta", "survey", "estate", "deed"}:
+        cur.execute("""SELECT label, days_out FROM surfaced_deadlines
+                        WHERE matter_code LIKE %s AND days_out IS NOT NULL AND days_out >= 0
+                        ORDER BY days_out ASC LIMIT 1""", (fam + "%",))
+        d = cur.fetchone()
+        if d and d["days_out"] is not None and d["days_out"] <= 45:
+            items.append({"kind": "deadline", "text": f"{d['label']} — due in {d['days_out']} day(s)"})
+    # the relationship's top open action (their own matter; generation decides whether it fits)
+    cur.execute("""SELECT title, suggested_action FROM matter_plays
+                    WHERE matter_code LIKE %s AND score IS NOT NULL
+                    ORDER BY score DESC LIMIT 1""", (fam + "%",))
+    p = cur.fetchone()
+    if p:
+        act = (p["suggested_action"] or p["title"] or "").strip()
+        if act:
+            items.append({"kind": "action", "text": act[:120]})
+    return items[:2]
+
+
+def tending_block(items):
+    """The optional 'tend the relationship' directive — the profile + anticipation are inputs, not commands."""
+    if not items:
+        return ""
+    lines = "; ".join(f"{i['kind']}: {i['text']}" for i in items)
+    return ("RELATIONSHIP TENDING (OPTIONAL — the record shows recurring concerns; if and only if it flows "
+            "naturally and warmly, you MAY gently surface the single most relevant of these in their learned "
+            "tone. Never force it, never list mechanically, never surface if it doesn't fit the moment): " + lines)
+
+
+def record_anticipation(cur, channel, channel_user_id, inbound_msg_id, items):
+    """Append what was surfaced back into the arc (append-only) so the profile can later learn if it landed."""
+    if not items:
+        return
+    try:
+        cur.execute("""UPDATE relationship_profile
+                          SET signal_log = signal_log || %s::jsonb
+                        WHERE channel=%s AND channel_user_id=%s""",
+                    (json.dumps([{"msg": inbound_msg_id, "anticipated": items}]), channel, str(channel_user_id)))
+    except Exception:
+        pass
 
 
 def to_prompt(profile):

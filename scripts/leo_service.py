@@ -106,7 +106,7 @@ def _recent_turns(cur, channel, channel_user_id, before_id=None, limit=10):
 
 
 def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None, inbound_msg_id=None,
-                  internal_context=None, relationship_profile=None):
+                  internal_context=None, relationship_profile=None, relationship_tending=None):
     facts = _grounded_facts(cur, client_code)
     fblock = "\n".join(f"- (doc:{f['source_id']}) {f['statement']}" for f in facts) or "(none on record yet)"
     c = ctx.recent_context(cur, None, client_code)
@@ -138,19 +138,26 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
             rel = f"\n{block}\n" if block else ""
         except Exception:
             rel = ""
-    return (f"{SYSTEM}\n\n{who}\n{eq}{rel}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
+    tend = ""
+    if relationship_tending and _rpro is not None:
+        try:
+            tblock = _rpro.tending_block(relationship_tending)
+            tend = f"\n{tblock}\n" if tblock else ""
+        except Exception:
+            tend = ""
+    return (f"{SYSTEM}\n\n{who}\n{eq}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
             f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\n"
             f"CONVERSATION SO FAR (most recent last — remember it, don't repeat yourself):\n{convo}\n\n"
             f"CURRENT MESSAGE FROM {label}:\n{message}\n\nLeo's reply:")
 
 
 def generate_reply(cur, channel, channel_user_id, message, client_code, internal_context=None,
-                   relationship_profile=None, inbound_msg_id=None):
-    """PURE generation for the orchestrator (comm_agent_max): grounded, memory-, equilibrium- AND
-    living-relationship-informed reply TEXT — through the answer-gate — with NO role clamp, NO A75
-    projection, NO send. Returns {text, verdict, remediated} or {text:None, error:...}."""
+                   relationship_profile=None, inbound_msg_id=None, relationship_tending=None):
+    """PURE generation for the orchestrator (comm_agent_max): grounded, memory-, equilibrium-, living-
+    relationship- AND anticipation-informed reply TEXT — through the answer-gate — with NO role clamp,
+    NO A75 projection, NO send. Returns {text, verdict, remediated} or {text:None, error:...}."""
     prompt = _build_prompt(cur, client_code, message, channel, channel_user_id, inbound_msg_id,
-                           internal_context, relationship_profile)
+                           internal_context, relationship_profile, relationship_tending)
     try:
         candidate = _llm(prompt)
     except Exception as e:

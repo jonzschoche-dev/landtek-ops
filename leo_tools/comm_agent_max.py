@@ -176,21 +176,33 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
     # ── LIVING PROFILE (Increment 2): after propagate, evolve the per-relationship record from this
     # verified exchange (append-only arc + living summary) — it feeds generation and grows every time. ──
     profile = None
+    tending = []
     if client and RPRO is not None:
         try:
             profile = RPRO.observe(cur, channel, uid, client, s.get("entity_id"),
                                    channel_message_id, message, internal)
         except Exception:
             profile = None
+        # ── ANTICIPATORY TENDING (agentic increment): from the record's OBSERVED themes, surface 0-2
+        # genuinely time-sensitive items THIS relationship cares about — an input to generation, never a
+        # command. Empty is valid + common. Deterministic + $0. The arc records what was surfaced. ──
+        if profile is not None:
+            try:
+                tending = RPRO.anticipate(cur, client, profile)
+                RPRO.record_anticipation(cur, channel, uid, channel_message_id, tending)
+            except Exception:
+                tending = []
 
-    # ── GENERATION (the convergence): grounded reply, informed by the equilibrium state AND the living
-    # relationship profile. NOT the raw inbound echo. candidate_text override wins (tests/soak). ──
+    # ── GENERATION (the convergence): grounded reply, informed by the equilibrium state, the living
+    # relationship profile AND anticipatory tending. NOT the raw inbound echo. candidate_text override
+    # wins (tests/soak). ──
     gen = None
     if candidate_text is not None:
         text = candidate_text
     elif client and LS is not None:
         gen = LS.generate_reply(cur, channel, uid, message, client, internal_context=internal,
-                                relationship_profile=profile, inbound_msg_id=channel_message_id)
+                                relationship_profile=profile, inbound_msg_id=channel_message_id,
+                                relationship_tending=tending)
         text = gen.get("text") or ""
     else:
         text = ""   # unresolved client → A25 hold (no generation)
@@ -237,6 +249,7 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
         "internal_ego_nodes": (internal or {}).get("ego_nodes"),
         "internal_contradictions": (internal or {}).get("contradictions"),
         "internal_cross_client_refused": (internal or {}).get("cross_client_refused"),
+        "tending": tending, "tending_count": len(tending or []),
         "emitted": emitted, "mode": mode,
     }
     try:  # shadow-log the whole hair-split (A39); never break on logging

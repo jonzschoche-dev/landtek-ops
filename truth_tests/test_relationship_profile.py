@@ -64,10 +64,36 @@ def profile_feeds_prompt(cur):
         raise TruthFailure(f"to_prompt did not surface the living profile: {block!r}")
 
 
+def anticipation_is_theme_gated_and_bounded(cur):
+    conn, tc = _rb()
+    try:
+        # no observed themes → the organ stays quiet (empty is valid + the common case)
+        if RPRO.anticipate(tc, "MWK-001", {"top_themes": []}) != []:
+            raise TruthFailure("anticipate surfaced items with no observed themes — must stay quiet.")
+        if RPRO.anticipate(tc, None, {"top_themes": ["titles"]}) != []:
+            raise TruthFailure("anticipate surfaced items with no client — must stay quiet.")
+        # with a real time-sensitive theme, it returns AT MOST 2 well-formed items (0 is still valid)
+        items = RPRO.anticipate(tc, "MWK-001", {"top_themes": ["titles", "deadlines"]})
+        if not isinstance(items, list) or len(items) > 2:
+            raise TruthFailure(f"anticipate must return a bounded (0-2) list; got {items!r}")
+        for it in items:
+            if "kind" not in it or "text" not in it or not it["text"]:
+                raise TruthFailure(f"anticipated item malformed: {it!r}")
+        # the tending block is optional-framed and never mechanical
+        block = RPRO.tending_block([{"kind": "deadline", "text": "X — due in 3 day(s)"}])
+        if "OPTIONAL" not in block or "Never force it" not in block:
+            raise TruthFailure(f"tending_block dropped its optional/never-force framing: {block!r}")
+        if RPRO.tending_block([]) != "":
+            raise TruthFailure("tending_block must be empty when nothing was surfaced.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
     ("relationship_profile.grows_and_is_idempotent", profile_grows_and_is_idempotent),
     ("relationship_profile.signals_extracted_correctly", signals_extracted_correctly),
     ("relationship_profile.feeds_prompt", profile_feeds_prompt),
+    ("relationship_profile.anticipation_theme_gated_and_bounded", anticipation_is_theme_gated_and_bounded),
 ]
 
 if __name__ == "__main__":
