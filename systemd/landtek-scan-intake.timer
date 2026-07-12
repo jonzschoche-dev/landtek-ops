@@ -1,0 +1,10 @@
+[Unit]
+Description=Run LandTek ScannerPro intake every 15 min (anything hitting the folder gets ingested)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
