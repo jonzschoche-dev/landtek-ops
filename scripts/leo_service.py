@@ -101,12 +101,20 @@ def _recent_turns(cur, channel, channel_user_id, before_id=None, limit=10):
                      + (r["text_content"] or "")[:220].replace("\n", " ") for r in rows)
 
 
-def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None, inbound_msg_id=None):
+def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None, inbound_msg_id=None,
+                  internal_context=None):
     facts = _grounded_facts(cur, client_code)
     fblock = "\n".join(f"- (doc:{f['source_id']}) {f['statement']}" for f in facts) or "(none on record yet)"
     c = ctx.recent_context(cur, None, client_code)
     items = "\n".join(f"- {a['description']} (due {a['due_date'] or 'n/a'})"
                       for a in c["open_action_items"]) or "(none)"
+    # A76 equilibrium state — the internal recompute informs the reply (surface conflict, don't assert past it)
+    eq = ""
+    if internal_context and (internal_context.get("contradictions") or internal_context.get("cascades")):
+        eq = (f"\nEQUILIBRIUM ALERT: this matter carries {internal_context.get('contradictions', 0)} known "
+              f"contradiction(s) and touches {internal_context.get('cascades', 0)} keystone cascade(s) in the "
+              "record. If your answer would state a fact that could be contradicted, FLAG the uncertainty "
+              "('let me confirm — our records may conflict on that') rather than asserting it.\n")
     who, convo, label = "WHO YOU'RE TALKING TO: (unidentified).", "(this is the first message)", "them"
     if channel and channel_user_id:
         name, role, is_op = _sender_ident(cur, channel, channel_user_id)
@@ -119,10 +127,31 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
             who = f"WHO YOU'RE TALKING TO: {name or 'a contact'} (role: {role}). Address them by name if known."
             label = name or "them"
         convo = _recent_turns(cur, channel, channel_user_id, before_id=inbound_msg_id)
-    return (f"{SYSTEM}\n\n{who}\n\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
+    return (f"{SYSTEM}\n\n{who}\n{eq}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
             f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\n"
             f"CONVERSATION SO FAR (most recent last — remember it, don't repeat yourself):\n{convo}\n\n"
             f"CURRENT MESSAGE FROM {label}:\n{message}\n\nLeo's reply:")
+
+
+def generate_reply(cur, channel, channel_user_id, message, client_code, internal_context=None,
+                   inbound_msg_id=None):
+    """PURE generation for the orchestrator (comm_agent_max): grounded, memory- and equilibrium-informed
+    reply TEXT — through the answer-gate — with NO role clamp, NO A75 projection, NO send. Those are the
+    orchestrator's emission plane. Returns {text, verdict, remediated} or {text:None, error:...}."""
+    prompt = _build_prompt(cur, client_code, message, channel, channel_user_id, inbound_msg_id, internal_context)
+    try:
+        candidate = _llm(prompt)
+    except Exception as e:
+        return {"text": None, "error": f"ollama_unreachable:{type(e).__name__}"}
+    try:
+        res = gate_mod.gate(cur, candidate)
+        text, remediated = candidate, False
+        if res.get("verdict") == "fail":
+            text = gate_mod.remediate(cur, candidate, res)   # $0 grounded-only rewrite
+            remediated = True
+        return {"text": text, "verdict": res.get("verdict"), "remediated": remediated}
+    except Exception as e:
+        return {"text": candidate, "verdict": "gate_error", "remediated": False, "error": str(e)[:120]}
 
 
 def _log(cur, **kw):

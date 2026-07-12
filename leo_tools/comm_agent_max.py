@@ -25,6 +25,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import outward_guard as OG            # scripts/ — the gate + A79 clamp
 import equilibrium_propagate as EP    # scripts/ — the A76 reactive engine (internal plane)
 try:
+    import leo_service as LS           # scripts/ — the generation + delivery engine (the orchestrator calls it)
+except Exception:
+    LS = None
+try:
     import recipient_projection as RP  # leo_tools/ — A75 projection
 except Exception:
     RP = None
@@ -145,7 +149,11 @@ def _apply_projection(text, profile):
         return text
 
 
-def handle_chat_event(cur, channel_message_id, candidate_text=None, mode="shadow"):
+def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow=True, mode="shadow"):
+    """THE single equilibrium-aligned orchestrator for one inbound event (the convergence):
+      A76 propagate (internal, gate-free) → leo_service.generate_reply (grounded, memory, equilibrium-
+      informed) → A79 clamp → A75 projection → next_action; sends ONLY when force_shadow=False AND the
+      clamp says would_send. Two planes preserved: internal reasoning is unclamped; only emission clamps."""
     s = _resolve_sender(cur, channel_message_id)
     if not s:
         return {"error": "channel_message not found", "id": channel_message_id}
@@ -153,47 +161,73 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, mode="shadow
         return {"skipped": "not an inbound event", "id": channel_message_id}
 
     role, client = s["role"], s["client"]
+    channel, uid, message = s["channel"], str(s["channel_user_id"]), (s["text_content"] or "")
 
-    # ── INTERNAL PLANE (gate-free): perturb from the CHAT NODE itself (deploy_888 — the chat is a
-    # first-class, matter-anchored node in v_relationship_graph). Seeded from real context, not an
-    # arbitrary matter: chat -> its client's matters -> their facts. Hot, accurate, unclamped. ──
+    # ── INTERNAL PLANE (gate-free): A76 ego-network recompute on the chat node (per-hop A5 on the matview) ──
     internal = None
     if client:
         internal = EP.propagate(cur, "chat", channel_message_id,
                                 interaction_ref=f"cm:{channel_message_id}", hops=2)
 
+    # ── GENERATION (the convergence): grounded reply, informed by the equilibrium state. NOT the raw
+    # inbound echo — the engine now feeds the brain. candidate_text override wins (tests/soak). ──
+    gen = None
+    if candidate_text is not None:
+        text = candidate_text
+    elif client and LS is not None:
+        gen = LS.generate_reply(cur, channel, uid, message, client,
+                                internal_context=internal, inbound_msg_id=channel_message_id)
+        text = gen.get("text") or ""
+    else:
+        text = ""   # unresolved client → A25 hold (no generation)
+
     # ── EMISSION PLANE (the only clamped surface) ──
-    text = candidate_text if candidate_text is not None else (s["text_content"] or "")
     disclosure = classify_output_disclosure(text, internal)
     policy = _role_policy(cur, role)
     ctx = {"contains_facts": disclosure["contains_facts"], "disclosure_level": disclosure["tier"],
            "source": "comm_agent_max"}
-    OG.apply_comms_role_clamp(role, {"text": text}, ctx, cur=cur)   # A79 shadow clamp (logs would-clamp)
+    OG.apply_comms_role_clamp(role, {"text": text}, ctx, cur=cur)   # A79 clamp (shadow-logs would-clamp)
     would_clamp, reason = OG._clamp_decision(policy, ctx)
-    projected = _apply_projection(text, policy["projection_profile"])  # A75 per clamp directive
+    projected = _apply_projection(text, policy["projection_profile"])  # A75 per the clamp's profile
 
     gd = policy["gate_default"]
-    if would_clamp or gd in ("refuse", "hold"):
+    guard_class = OG.classify(channel, uid)   # A21: 'internal' (operator) vs 'outward'
+    if client is None:
+        next_action = "held_a25"
+    elif would_clamp or gd in ("refuse", "hold"):
         next_action = "hold_for_operator"
     elif gd == "onboarding":
         next_action = "onboarding_flow"
+    elif guard_class == "outward":
+        # A21 outward chokepoint: A79 shapes WHAT/HOW a role may receive, but the actual outward SEND
+        # still holds for approval until per-role enforce — so the orchestrator is never less strict
+        # than the live internal/outward floor. Internal (operator) is the only auto-send.
+        next_action = "hold_for_operator"
     else:
-        next_action = "would_send"   # SHADOW: never actually sent
+        next_action = "would_send"
+
+    emitted = False
+    if not force_shadow and next_action == "would_send" and projected and LS is not None:
+        try:                                # LIVE cutover path (Step 4) — send via the generation engine
+            emitted = bool(LS._deliver(channel, uid, projected))
+        except Exception:
+            emitted = False
 
     decision = {
         "channel_message_id": channel_message_id, "role": role, "client": client,
         "disclosure_tier": disclosure["tier"], "would_clamp": would_clamp, "clamp_reason": reason,
         "projection_profile": policy["projection_profile"], "dose_ceiling": policy["dose_ceiling"],
         "cadence": policy["cadence"], "next_action": next_action,
-        "projected_len": len(projected or ""),
+        "would_send_human": projected, "projected_len": len(projected or ""),
+        "generated": bool(gen), "gate_verdict": (gen or {}).get("verdict"),
         "internal_ego_nodes": (internal or {}).get("ego_nodes"),
         "internal_contradictions": (internal or {}).get("contradictions"),
         "internal_cross_client_refused": (internal or {}).get("cross_client_refused"),
-        "emitted": False, "mode": mode,
+        "emitted": emitted, "mode": mode,
     }
     try:  # shadow-log the whole hair-split (A39); never break on logging
         cur.execute("INSERT INTO channel_audit (channel_id, event_type, payload, result) "
-                    "VALUES (NULL, 'comm_agent_shadow', %s, %s)", (json.dumps(decision), next_action))
+                    "VALUES (NULL, 'comm_agent_shadow', %s, %s)", (json.dumps(decision, default=str), next_action))
     except Exception:
         pass
     return decision

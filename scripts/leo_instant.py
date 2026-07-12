@@ -43,6 +43,25 @@ def _process(cur, mid):
     res = ls.process(cur, r["channel"], str(r["channel_user_id"]), r["text_content"], inbound_msg_id=mid)
     print(f"[leo_instant] msg {mid} ({r['channel']}): {res.get('action')}", flush=True)
 
+    # ── CONVERGENCE (shadow): run the equilibrium-aligned orchestrator alongside the live path (sends
+    # NOTHING — force_shadow) and record the diff, so we can prove it's at least as strict before cutover. ──
+    try:
+        import comm_agent_max as CAM
+        t1 = time.time()
+        orch = CAM.handle_chat_event(cur, mid, force_shadow=True)
+        orch_ms = int((time.time() - t1) * 1000)
+        live_send = res.get("action") == "sent"
+        orch_send = orch.get("next_action") == "would_send"
+        cur.execute("""INSERT INTO comm_agent_convergence_diff
+            (inbound_msg_id, channel, live_action, orch_next_action, orch_would_clamp, orch_disclosure_tier,
+             orch_contradictions, agree_send_hold, orch_at_least_as_strict, orch_latency_ms)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (mid, r["channel"], res.get("action"), orch.get("next_action"), orch.get("would_clamp"),
+             orch.get("disclosure_tier"), orch.get("internal_contradictions"),
+             live_send == orch_send, (not orch_send) or live_send, orch_ms))
+    except Exception as e:
+        print(f"[leo_instant] convergence-diff err: {str(e)[:100]}", flush=True)
+
 
 def main():
     while True:
