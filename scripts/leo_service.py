@@ -74,14 +74,55 @@ def _grounded_facts(cur, client_code):
     return cur.fetchall()
 
 
-def _build_prompt(cur, client_code, message):
+def _sender_ident(cur, channel, channel_user_id):
+    """Who Leo is talking to — name + role + whether it's the operator (internal). Cognizance, not anonymity."""
+    cur.execute("""SELECT cu.display_name, cu.role FROM channel_users cu JOIN channels c ON c.id=cu.channel_id
+                    WHERE c.name=%s AND cu.channel_user_id=%s""", (channel, str(channel_user_id)))
+    r = cur.fetchone()
+    name = (r["display_name"] if r and r["display_name"] else "").strip()
+    if not name or name == str(channel_user_id):
+        name = ""  # PSID/blank is not a name
+    role = (r["role"] if r else "unknown")
+    is_op = og.classify(channel, str(channel_user_id)) == "internal"
+    return name, role, is_op
+
+
+def _recent_turns(cur, channel, channel_user_id, before_id=None, limit=10):
+    """The last N turns of THIS conversation (memory), sender-scoped, oldest-last, current msg excluded."""
+    cur.execute("""SELECT cm.direction, cm.text_content FROM channel_messages cm JOIN channels c ON c.id=cm.channel_id
+                    WHERE c.name=%s AND cm.channel_user_id=%s AND coalesce(cm.text_content,'')<>''
+                      AND cm.text_content <> '[media]' AND (%s::bigint IS NULL OR cm.id < %s)
+                    ORDER BY cm.id DESC LIMIT %s""",
+                (channel, str(channel_user_id), before_id, before_id, limit))
+    rows = list(reversed(cur.fetchall()))
+    if not rows:
+        return "(this is the first message)"
+    return "\n".join(("Leo: " if r["direction"] == "outbound" else "Them: ")
+                     + (r["text_content"] or "")[:220].replace("\n", " ") for r in rows)
+
+
+def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None, inbound_msg_id=None):
     facts = _grounded_facts(cur, client_code)
     fblock = "\n".join(f"- (doc:{f['source_id']}) {f['statement']}" for f in facts) or "(none on record yet)"
-    c = ctx.recent_context(cur, None, client_code)  # client-level open items; sender thread added by caller
+    c = ctx.recent_context(cur, None, client_code)
     items = "\n".join(f"- {a['description']} (due {a['due_date'] or 'n/a'})"
                       for a in c["open_action_items"]) or "(none)"
-    return (f"{SYSTEM}\n\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
-            f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\nCLIENT MESSAGE:\n{message}\n\nLeo's reply:")
+    who, convo, label = "WHO YOU'RE TALKING TO: (unidentified).", "(this is the first message)", "them"
+    if channel and channel_user_id:
+        name, role, is_op = _sender_ident(cur, channel, channel_user_id)
+        if is_op:
+            who = ("WHO YOU'RE TALKING TO: Jonathan — the LandTek OPERATOR and principal. He is your own "
+                   "boss/teammate, NOT a client. Greet him by name (Jonathan), speak candidly and directly, "
+                   "and you may reference internal specifics.")
+            label = "Jonathan"
+        else:
+            who = f"WHO YOU'RE TALKING TO: {name or 'a contact'} (role: {role}). Address them by name if known."
+            label = name or "them"
+        convo = _recent_turns(cur, channel, channel_user_id, before_id=inbound_msg_id)
+    return (f"{SYSTEM}\n\n{who}\n\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
+            f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\n"
+            f"CONVERSATION SO FAR (most recent last — remember it, don't repeat yourself):\n{convo}\n\n"
+            f"CURRENT MESSAGE FROM {label}:\n{message}\n\nLeo's reply:")
 
 
 def _log(cur, **kw):
@@ -111,8 +152,13 @@ def _deliver(channel, recipient, text):
         return bool(ca._whatsapp_send(recipient, text))
     if channel == "viber":
         return bool(ca._viber_send(recipient, text))
-    # telegram is retired LAST and stays on n8n — this path is never reached for it (mode gate returns
-    # before send). Return False as a belt-and-braces guard so leo_service never double-sends on Telegram.
+    if channel == "telegram":
+        # sovereign Telegram send via the S14-governed sender (sanitize + pace + no-double-tap). Reached
+        # only when leo_channel_mode.telegram='headless' (the metered n8n/Anthropic path retired).
+        sys.path.insert(0, "/root/landtek/scripts")
+        import tg_send
+        ok, _info = tg_send.send(chat_id=str(recipient), text=text, source="leo_service")
+        return bool(ok)
     return False
 
 
@@ -171,7 +217,7 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
                      "reason": "unresolved_client (A25): identity not bound to a client_code"})
         return {"action": "held", "client": None}
     try:
-        prompt = _build_prompt(cur, client, message)
+        prompt = _build_prompt(cur, client, message, channel, channel_user_id, inbound_msg_id)
         candidate = _llm(prompt)
     except Exception as e:
         _log(cur, **{**base, "client": client, "action": "ollama_unreachable",
