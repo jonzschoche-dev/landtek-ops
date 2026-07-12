@@ -29,6 +29,10 @@ try:
 except Exception:
     LS = None
 try:
+    import relationship_profile as RPRO  # scripts/ — the living per-relationship organ (Increment 2)
+except Exception:
+    RPRO = None
+try:
     import recipient_projection as RP  # leo_tools/ — A75 projection
 except Exception:
     RP = None
@@ -169,14 +173,24 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
         internal = EP.propagate(cur, "chat", channel_message_id,
                                 interaction_ref=f"cm:{channel_message_id}", hops=2)
 
-    # ── GENERATION (the convergence): grounded reply, informed by the equilibrium state. NOT the raw
-    # inbound echo — the engine now feeds the brain. candidate_text override wins (tests/soak). ──
+    # ── LIVING PROFILE (Increment 2): after propagate, evolve the per-relationship record from this
+    # verified exchange (append-only arc + living summary) — it feeds generation and grows every time. ──
+    profile = None
+    if client and RPRO is not None:
+        try:
+            profile = RPRO.observe(cur, channel, uid, client, s.get("entity_id"),
+                                   channel_message_id, message, internal)
+        except Exception:
+            profile = None
+
+    # ── GENERATION (the convergence): grounded reply, informed by the equilibrium state AND the living
+    # relationship profile. NOT the raw inbound echo. candidate_text override wins (tests/soak). ──
     gen = None
     if candidate_text is not None:
         text = candidate_text
     elif client and LS is not None:
-        gen = LS.generate_reply(cur, channel, uid, message, client,
-                                internal_context=internal, inbound_msg_id=channel_message_id)
+        gen = LS.generate_reply(cur, channel, uid, message, client, internal_context=internal,
+                                relationship_profile=profile, inbound_msg_id=channel_message_id)
         text = gen.get("text") or ""
     else:
         text = ""   # unresolved client → A25 hold (no generation)
