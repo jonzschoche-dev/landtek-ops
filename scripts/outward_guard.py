@@ -167,6 +167,82 @@ def _log(cur, channel, source, target, content_hash, classification, decision, a
         pass  # logging must never break a send
 
 
+# ── A79 role axis (deploy_879) — the single role-clamp read at this one exit ─────────────────────────
+# Every externalizing path (COMM-AGENT-MAX bot reply, A76/P2 reactive increment, A75 pulse) passes the
+# guard; here it also resolves the recipient's canonical role and logs what its policy WOULD clamp.
+# SHADOW: never alters a send. Flip to enforce = act on would_clamp in guard() (one-line change, post-Aug-12).
+
+# Reconcile the three prior vocabularies (channel_users.role / approve_user set / sim) into the canonical
+# 6. Anything unmapped (partner, prospect, unknown, unauthorized, …) → None → the most-restrictive safe
+# default. Fail-closed by construction: an unrecognised role is treated like a stranger, never like a client.
+ROLE_ALIAS = {
+    "operator": "internal", "owner": "internal", "internal": "internal", "agent": "agent",
+    "client": "client", "counsel": "counsel", "counterparty": "counterparty", "public": "public",
+}
+_SAFE_DEFAULT_POLICY = {"disclosure_ceiling": "none", "gate_default": "hold", "dose_ceiling": 0,
+                        "cadence": "gentle", "projection_profile": "human_safe"}
+
+
+def _resolve_role(cur, channel, recipient, classification):
+    """(channel, recipient) → canonical role. Internal classification wins; else map channel_users.role."""
+    if classification == "internal":
+        return "internal"
+    try:
+        cur.execute("SELECT cu.role FROM channel_users cu JOIN channels c ON c.id = cu.channel_id "
+                    "WHERE c.name = %s AND cu.channel_user_id = %s", (channel, str(recipient)))
+        row = cur.fetchone()
+        raw = ((row[0] if row else "") or "").lower()
+    except Exception:
+        raw = ""
+    return ROLE_ALIAS.get(raw)  # None → safe default in the clamp
+
+
+def _clamp_decision(policy, context):
+    """PURE: given a role policy + output context, would the clamp fire, and why? (Testable in isolation.)"""
+    if policy.get("gate_default") == "refuse":
+        return True, "role gate_default=refuse — never auto-anything"
+    if policy.get("disclosure_ceiling") == "none" and context.get("contains_facts"):
+        return True, "disclosure_ceiling=none forbids facts/content"
+    return False, None
+
+
+def apply_comms_role_clamp(recipient_role, proposed_output, context, cur=None):
+    """Read v_comms_role_policy once, log what would clamp, and (SHADOW) return proposed_output UNCHANGED.
+    The one contract the bot/engine/pulse share. Never raises; never blocks in shadow."""
+    own = cur is None
+    conn = None
+    try:
+        if own:
+            conn = _conn(); cur = conn.cursor()
+        policy = None
+        try:
+            cur.execute("SELECT disclosure_ceiling, gate_default, dose_ceiling, cadence, projection_profile "
+                        "FROM v_comms_role_policy WHERE role = %s", (recipient_role or "",))
+            r = cur.fetchone()
+            if r:
+                policy = dict(zip(("disclosure_ceiling", "gate_default", "dose_ceiling", "cadence",
+                                   "projection_profile"), r))
+        except Exception:
+            policy = None
+        if policy is None:
+            policy = dict(_SAFE_DEFAULT_POLICY)  # unknown/unmapped role → most restrictive
+        would_clamp, reason = _clamp_decision(policy, context)
+        audit = {"role": recipient_role, "policy": {k: policy[k] for k in policy},
+                 "would_clamp": would_clamp, "clamp_reason": reason,
+                 "disclosure_level": context.get("disclosure_level"), "source": context.get("source"),
+                 "at": datetime.now(timezone.utc).isoformat()}
+        try:  # shadow audit → channel_audit (A39); logging must never break a send
+            cur.execute("INSERT INTO channel_audit (channel_id, event_type, payload, result) "
+                        "VALUES (NULL, 'role_clamp_shadow', %s, %s)",
+                        (json.dumps(audit), "would_clamp" if would_clamp else "clear"))
+        except Exception:
+            pass
+        return proposed_output  # SHADOW: the send is never altered
+    finally:
+        if own and conn is not None:
+            conn.close()
+
+
 def guard(channel, recipient, content_hash=None, source="", preview="", **_ignore):
     """Decide whether an outward move may proceed. SHADOW: always ('allow', ...) after logging.
     Returns ('allow'|'hold', info). NEVER raises — a guard failure defaults to allow.
@@ -180,6 +256,16 @@ def guard(channel, recipient, content_hash=None, source="", preview="", **_ignor
         mode = _mode(cur)
         target = f"{channel}:{recipient}"
         cls = _classify_cur(cur, channel, _norm(channel, recipient))
+
+        # A79 role-axis shadow clamp: resolve the recipient's canonical role and log what its policy
+        # WOULD clamp. Shadow — advisory only, never alters the decision below. Fail-safe (own try).
+        try:
+            _role = _resolve_role(cur, channel, _norm(channel, recipient), cls)
+            apply_comms_role_clamp(_role, {"preview": preview},
+                                   {"contains_facts": bool((preview or "").strip()),
+                                    "source": source, "target": target}, cur=cur)
+        except Exception:
+            pass
 
         if cls == "internal":
             _log(cur, channel, source, target, content_hash, cls, "internal_skip", None, preview)
