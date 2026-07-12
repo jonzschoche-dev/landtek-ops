@@ -90,15 +90,13 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, mode="shadow
 
     role, client = s["role"], s["client"]
 
-    # ── INTERNAL PLANE (gate-free): perturb the client's ego-network via A76. Hot, accurate, unclamped. ──
+    # ── INTERNAL PLANE (gate-free): perturb from the CHAT NODE itself (deploy_888 — the chat is a
+    # first-class, matter-anchored node in v_relationship_graph). Seeded from real context, not an
+    # arbitrary matter: chat -> its client's matters -> their facts. Hot, accurate, unclamped. ──
     internal = None
     if client:
-        cur.execute("SELECT matter_code FROM matters WHERE client_code=%s ORDER BY matter_code LIMIT 1",
-                    (client,))
-        m = cur.fetchone()
-        if m:
-            seed = (m["matter_code"] if isinstance(m, dict) else m[0])
-            internal = EP.propagate(cur, "matter", seed, interaction_ref=f"cm:{channel_message_id}", hops=2)
+        internal = EP.propagate(cur, "chat", channel_message_id,
+                                interaction_ref=f"cm:{channel_message_id}", hops=2)
 
     # ── EMISSION PLANE (the only clamped surface) ──
     text = candidate_text if candidate_text is not None else (s["text_content"] or "")

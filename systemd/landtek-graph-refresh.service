@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek relationship-graph refresh — rebuild mv_relationship_graph_structural (the A76 internal-plane traversal surface) so ego queries stay fast + current. Read-only externally; ~20-30s.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/refresh_relationship_graph.py
+StandardOutput=append:/var/log/landtek_graph_refresh.log
+StandardError=append:/var/log/landtek_graph_refresh.log

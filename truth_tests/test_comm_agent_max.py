@@ -86,10 +86,29 @@ def client_projection_human_safe(cur):
         conn.rollback(); conn.close()
 
 
+def chat_seed_nonzero_ego(cur):
+    """deploy_888: seeding from the chat NODE reaches the client's real matters+facts — a meaningful,
+    matter-anchored internal recompute, not the ego=0 the arbitrary-matter seed produced."""
+    conn, tc = _rb()
+    try:
+        mid = _inbound_id_for_role(tc, "client") or _inbound_id_for_role(tc, "counterparty")
+        if not mid:
+            return
+        d = CAM.handle_chat_event(tc, mid, candidate_text="status")
+        if not d.get("client"):
+            return  # sender not client-anchored — nothing to seed
+        if not d.get("internal_ego_nodes"):
+            raise TruthFailure(f"chat seed produced ego={d.get('internal_ego_nodes')} — chat-as-node "
+                               "anchoring failed to reach the client's matters/facts.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
     ("comm_agent_max.counterparty_never_auto", counterparty_never_auto),
     ("comm_agent_max.two_plane_internal_gate_free", two_plane_internal_gate_free),
     ("comm_agent_max.client_projection_human_safe", client_projection_human_safe),
+    ("comm_agent_max.chat_seed_nonzero_ego", chat_seed_nonzero_ego),
 ]
 
 if __name__ == "__main__":

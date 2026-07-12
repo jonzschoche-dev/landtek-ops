@@ -1,0 +1,10 @@
+[Unit]
+Description=LandTek relationship-graph refresh — every 30 min (keeps the A76 materialized graph current)
+
+[Timer]
+OnBootSec=8min
+OnUnitActiveSec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

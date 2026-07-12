@@ -28,6 +28,12 @@ def _seed_client(cur, seed_type, seed_id):
         cur.execute("SELECT _client_of(matter_code) AS c FROM matter_facts WHERE id=%s", (seed_id,))
     elif seed_type == "matter":
         cur.execute("SELECT _client_of(%s) AS c", (seed_id,))
+    elif seed_type == "chat":
+        # a chat node's client = its sender's mapped_client_code (resolve-or-hold if unresolved)
+        cur.execute("""SELECT cu.mapped_client_code AS c FROM channel_messages cm
+                         JOIN channel_users cu ON cu.channel_id = cm.channel_id
+                                              AND cu.channel_user_id = cm.channel_user_id
+                        WHERE cm.id = %s""", (seed_id,))
     else:
         return None
     r = cur.fetchone()
@@ -35,12 +41,16 @@ def _seed_client(cur, seed_type, seed_id):
 
 
 def _ego(cur, seed_type, seed_id, client_code, hops):
-    """Ego-network via bidirectional traversal — CLIENT-FILTERED edges only (the per-hop A5 guard)."""
+    """Ego-network via bidirectional traversal — CLIENT-FILTERED edges only (the per-hop A5 guard).
+    PERF: the STRUCTURAL edges (chat->matter, in_matter, cascade, supports, identity, provenance) carry
+    the relationship shape; the co-citation self-join ('shares_source', ~27k) is excluded from traversal
+    so the ego stays fast + bounded (contradictions are checked separately). Doc-bridge guard is unaffected
+    (that leak was via provenance edges, still client-filtered)."""
     cur.execute("""
         WITH RECURSIVE edges AS (
-            SELECT src_type,src_id,tgt_type,tgt_id FROM v_relationship_graph WHERE client_code=%(cc)s
+            SELECT src_type,src_id,tgt_type,tgt_id FROM mv_relationship_graph_structural WHERE client_code=%(cc)s
             UNION ALL
-            SELECT tgt_type,tgt_id,src_type,src_id FROM v_relationship_graph WHERE client_code=%(cc)s
+            SELECT tgt_type,tgt_id,src_type,src_id FROM mv_relationship_graph_structural WHERE client_code=%(cc)s
         ),
         nbr(t,i,d) AS (
             SELECT %(st)s, %(si)s::text, 0
@@ -59,8 +69,8 @@ def _cross_client_would_reach(cur, seed_type, seed_id, client_code, hops):
     the leak the per-hop guard refuses. Used for the ledger + the negative-bite."""
     cur.execute("""
         WITH RECURSIVE edges AS (
-            SELECT src_type,src_id,tgt_type,tgt_id FROM v_relationship_graph
-            UNION ALL SELECT tgt_type,tgt_id,src_type,src_id FROM v_relationship_graph
+            SELECT src_type,src_id,tgt_type,tgt_id FROM mv_relationship_graph_structural
+            UNION ALL SELECT tgt_type,tgt_id,src_type,src_id FROM mv_relationship_graph_structural
         ),
         nbr(t,i,d) AS (
             SELECT %(st)s,%(si)s::text,0
