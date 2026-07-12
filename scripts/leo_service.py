@@ -159,7 +159,7 @@ def _deliver(channel, recipient, text):
         import tg_send
         # override_pacing: this is a DIRECT conversational reply to the user's message (dedup'd one-per-
         # inbound), not a background alert — the S14 no-double-tap must not block a reply he asked for.
-        ok, _info = tg_send.send(chat_id=str(recipient), text=text, source="leo_service", override_pacing=True)
+        ok, _info = tg_send.send(chat_id=str(recipient), text=text, source="leo", override_pacing=True)
         return bool(ok)
     return False
 
