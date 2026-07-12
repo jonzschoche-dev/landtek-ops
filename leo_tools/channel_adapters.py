@@ -112,7 +112,9 @@ def _ingest_channel_media(channel, channel_user_id, channel_message_id, attachme
         data = b""
         try:
             if a.get("url"):
-                data = _rq.get(a["url"], timeout=45).content
+                # WhatsApp Cloud API media URLs require the Bearer token (Messenger URLs are open) →
+                # optional per-attachment headers; absent for Messenger, so behavior is unchanged there.
+                data = _rq.get(a["url"], timeout=45, headers=a.get("headers") or None).content
         except Exception:
             data = b""
         out.append(land_artifact(channel, channel_user_id, channel_message_id,
@@ -132,6 +134,38 @@ def _messenger_attachments(msg):
             fn = (url.split("?")[0].rsplit("/", 1)[-1]) or f"messenger_{t}"
             out.append({"url": url, "mime": mime_of[t], "filename": fn, "ref": url})
     return out
+
+
+_WA_MEDIA_TYPES = ("image", "document", "audio", "video", "voice", "sticker")
+_WA_EXT = {"image": "jpg", "audio": "ogg", "voice": "ogg", "video": "mp4", "sticker": "webp"}
+
+
+def _whatsapp_media(msg, token):
+    """WhatsApp Cloud API message → normalized artifact refs. Unlike Messenger (open URL), Cloud API gives a
+    media_id: resolve media_id → short-lived download URL via the Graph API ON RECEIPT (URL expires ~15 min),
+    and the URL download itself needs the Bearer token → carried in per-attachment `headers`. If the token is
+    unprovisioned (A26) or resolution fails, still return the ref (url=None) so the sink records a
+    quarantined ledger row — the media is ACCOUNTED, never silently dropped (the Messenger drop-bug class)."""
+    t = msg.get("type")
+    if t not in _WA_MEDIA_TYPES:
+        return []
+    mo = msg.get(t) or {}
+    media_id = mo.get("id")
+    if not media_id:
+        return []
+    mime = mo.get("mime_type") or "application/octet-stream"
+    fn = mo.get("filename") or f"whatsapp_{t}_{media_id}.{_WA_EXT.get(t, 'bin')}"
+    hdrs = {"Authorization": f"Bearer {token}"} if token else None
+    url = None
+    if token:
+        try:
+            import requests as _rq
+            r = _rq.get(f"https://graph.facebook.com/v18.0/{media_id}", headers=hdrs, timeout=30)
+            if r.status_code == 200:
+                url = (r.json() or {}).get("url")
+        except Exception:
+            url = None
+    return [{"url": url, "mime": mime, "filename": fn, "ref": media_id, "headers": hdrs}]
 
 
 def _route_to_onboard_or_agent(channel, channel_user_id, display_name, username, message):
@@ -211,23 +245,30 @@ def whatsapp_webhook():
                 value = change.get("value", {})
                 contacts = {c["wa_id"]: c.get("profile", {}).get("name", "")
                             for c in value.get("contacts", [])}
+                wa_token = _env("WHATSAPP_API_TOKEN")
                 for msg in value.get("messages", []):
                     wa_id = msg.get("from", "")
+                    if not wa_id: continue          # can't attribute (A5) without a sender — the ONLY skip
                     text = (msg.get("text", {}).get("body") or "").strip()
                     display = contacts.get(wa_id, wa_id)
-                    if not text or not wa_id: continue
-                    _log_inbound("whatsapp", wa_id, text, raw_payload=msg)
-                    reply, state, passthrough = _route_to_onboard_or_agent(
-                        "whatsapp", wa_id, display, None, text)
-                    forwarded = False
+                    wa_media = _whatsapp_media(msg, wa_token)   # resolve+download-on-receipt (URL expiry)
+                    # media-only messages (no text) must NOT be dropped — log '[media]' and ingest to the sink
+                    cmid = _log_inbound("whatsapp", wa_id, text or "[media]", raw_payload=msg)
+                    media = _ingest_channel_media("whatsapp", wa_id, cmid, wa_media)
+                    reply = state = None; passthrough = forwarded = False
+                    if text:
+                        reply, state, passthrough = _route_to_onboard_or_agent(
+                            "whatsapp", wa_id, display, None, text)
                     if reply:
                         _whatsapp_send(wa_id, reply)
                     elif passthrough:
                         forwarded = _forward_to_agent("whatsapp", wa_id, display, None, text)
                         if not forwarded:
                             _whatsapp_send(wa_id, "Thank you — our team has been notified.")
-                    results.append({"wa_id": wa_id, "state": state,
-                                    "replied": bool(reply), "forwarded": forwarded})
+                    elif media and any(m.get("status") in ("landed", "deduped", "held") for m in media):
+                        _whatsapp_send(wa_id, "Thank you — received and filed.")
+                    results.append({"wa_id": wa_id, "state": state, "replied": bool(reply),
+                                    "forwarded": forwarded, "media": [m.get("status") for m in media]})
         return jsonify({"ok": True, "processed": results}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
