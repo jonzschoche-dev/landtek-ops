@@ -21,9 +21,31 @@ import comm_agent_max as CAM
 def tokens_extract_docket(cur):
     t = CAM._matter_tokens("MWK-ARTA-1891")
     if "ARTA-1891" not in t or "1891" not in t:
-        raise TruthFailure(f"_matter_tokens('MWK-ARTA-1891')={t} — must yield the docket tokens.")
+        raise TruthFailure(f"_matter_tokens('MWK-ARTA-1891')={t} — must yield the distinctive docket tokens.")
     if "MWK" in t:
         raise TruthFailure("_matter_tokens leaked the client prefix MWK — would false-match every MWK chat.")
+    if "ARTA" in t:
+        raise TruthFailure("_matter_tokens kept the generic 'ARTA' — it false-matches the agency name (soak bug).")
+
+
+def no_false_positive_on_prose(cur):
+    """The soak's 3 proven false positives must now FALL BACK, not keyword-match: VOID∈'avoid',
+    ARTA=agency name, LGU=generic office."""
+    conn = psycopg2.connect(EP.DSN); conn.autocommit = False
+    tc = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    try:
+        for prose in ["Please respond promptly to avoid any further delays.",
+                      "as per the 2023 ARTA rules of procedure for the office",
+                      "kindly coordinate with the LGU Mercedes on the payment"]:
+            tc.execute("""INSERT INTO channel_messages (channel_id, channel_user_id, direction, text_content, status)
+                          VALUES (4, 'fp-test', 'inbound', %s, 'received') RETURNING id""", (prose,))
+            mid = tc.fetchone()["id"]
+            mc, method = CAM.resolve_chat_matter(tc, mid, "MWK-001")
+            if method == "keyword":
+                raise TruthFailure(f"FALSE-POSITIVE keyword match on generic prose {prose!r} -> {mc}. "
+                                   "The resolver must fall back, not anchor to a wrong matter.")
+    finally:
+        conn.rollback(); conn.close()
 
 
 def keyword_beats_biggest(cur):
@@ -71,6 +93,7 @@ TESTS = [
     ("matter_disambig.tokens_extract_docket", tokens_extract_docket),
     ("matter_disambig.keyword_beats_biggest", keyword_beats_biggest),
     ("matter_disambig.fallback_when_generic", fallback_when_generic),
+    ("matter_disambig.no_false_positive_on_prose", no_false_positive_on_prose),
 ]
 
 if __name__ == "__main__":

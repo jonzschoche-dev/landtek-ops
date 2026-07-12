@@ -56,18 +56,34 @@ def _role_policy(cur, role):
 
 
 def _matter_tokens(matter_code):
-    """Distinctive tokens of a matter_code for text matching, e.g. 'MWK-ARTA-1891' -> {ARTA-1891, ARTA,
-    1891}; 'MWK-CV26360' -> {CV26360, 26360}. Drops the client prefix (MWK/PAR/NIBDC)."""
+    """DISTINCTIVE identifier tokens only, e.g. 'MWK-ARTA-1891' -> {ARTA-1891, 1891}; 'MWK-CV26360' ->
+    {CV26360}. Kept: compound-dashed codes, alphanumeric codes (letters+digits), pure-numeric dockets
+    >=4 digits. DROPPED: pure-alpha category words (ARTA, LGU, VOID, ESTATE, DLF) — they false-match
+    generic prose ('VOID' in 'avoid', 'ARTA' the agency, 'LGU' the office) — and client/non-ID prefixes.
+    This is the fix for the soak's 4/4 false positives."""
     import re
-    parts = [p for p in matter_code.split("-") if p and p.upper() not in ("MWK", "PAR", "NIBDC", "PARACALE")]
-    toks = set(parts)
+    GENERIC = {"MWK", "PAR", "NIBDC", "PARACALE", "AUTO"}
+    parts = [p for p in matter_code.split("-") if p and p.upper() not in GENERIC]
+    toks = set()
     if len(parts) >= 2:
-        toks.add("-".join(parts))          # e.g. ARTA-1891
+        toks.add("-".join(parts))                      # full compound e.g. ARTA-1891 (highly distinctive)
     for p in parts:
-        m = re.search(r"\d{3,}", p)
-        if m:
-            toks.add(m.group(0))            # bare docket number
-    return {t for t in toks if len(t) >= 3}
+        has_digit, has_alpha = bool(re.search(r"\d", p)), bool(re.search(r"[A-Za-z]", p))
+        if has_digit and has_alpha:
+            toks.add(p)                                # alphanumeric, e.g. CV26360
+        elif has_digit:
+            m = re.search(r"\d{4,}", p)
+            if m:
+                toks.add(m.group(0))                   # pure-numeric docket, >=4 digits only
+        # pure-alpha part -> DROPPED (generic)
+    return {t for t in toks if len(t) >= 4}
+
+
+def _token_present(token, text):
+    """Word-boundary match (alnum-safe both sides) — 'VOID' must NOT match 'avoid', '1891' must NOT match
+    inside '218915'."""
+    import re
+    return re.search(r"(?<![A-Za-z0-9])" + re.escape(token) + r"(?![A-Za-z0-9])", text, re.I) is not None
 
 
 def resolve_chat_matter(cur, channel_message_id, client_code):
@@ -83,12 +99,16 @@ def resolve_chat_matter(cur, channel_message_id, client_code):
     r = cur.fetchone()
     txt = ((r["text_content"] if isinstance(r, dict) else (r[0] if r else "")) or "").lower()
 
-    # (1) keyword match against the client's matters
+    # (1) keyword match against the client's matters — word-boundary; longest (most distinctive) token wins
     cur.execute("SELECT matter_code FROM matters WHERE client_code=%s", (client_code,))
+    best_mc, best_len = None, 0
     for row in cur.fetchall():
         mc = row["matter_code"] if isinstance(row, dict) else row[0]
-        if any(tok.lower() in txt for tok in _matter_tokens(mc)):
-            return mc, "keyword"
+        for tok in _matter_tokens(mc):
+            if len(tok) > best_len and _token_present(tok, txt):
+                best_mc, best_len = mc, len(tok)
+    if best_mc:
+        return best_mc, "keyword"
 
     # (3) fallback: the client's most fact-rich matter (current heuristic)
     cur.execute("""SELECT matter_code FROM matter_facts
