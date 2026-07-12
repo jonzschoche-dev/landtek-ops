@@ -30,10 +30,18 @@ def _rb():
 
 
 def _inbound_id_for_role(cur, raw_role):
+    """An inbound whose sender GENUINELY resolves to raw_role — excluding identities wired as internal
+    (e.g. the operator's own test personas), which classify as 'internal' regardless of channel_users.role."""
     cur.execute("""SELECT cm.id FROM channel_messages cm
                      JOIN channel_users cu ON cu.channel_id = cm.channel_id
                                           AND cu.channel_user_id = cm.channel_user_id
+                     JOIN channels c ON c.id = cm.channel_id
                     WHERE cm.direction='inbound' AND cu.role = %s
+                      AND NOT EXISTS (
+                        SELECT 1 FROM internal_targets it
+                         WHERE it.active AND it.channel IN (c.name, '*')
+                           AND ((it.match_type='exact'  AND cu.channel_user_id = it.identifier)
+                             OR (it.match_type='prefix' AND cu.channel_user_id LIKE it.identifier || '%%')))
                     ORDER BY cm.id DESC LIMIT 1""", (raw_role,))
     r = cur.fetchone()
     return r["id"] if r else None
