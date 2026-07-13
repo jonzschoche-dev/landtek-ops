@@ -304,10 +304,35 @@ def _scorecard(domain, cohort, n, n_targets, tally, cycle_id):
     print(f">> ledger: fitness_measurement (cycle_id={cycle_id}); no facts written; nothing deployed.\n")
 
 
+def gaps_report(cur, limit=12):
+    """The prioritized weakness queue (v_fitness_gaps) — what the remediation loop acts on. Read-only."""
+    rows = _rows(cur, "SELECT remediation, dimension, count(*) n, sum(regressed::int) regressed "
+                      "FROM v_fitness_gaps GROUP BY remediation, dimension ORDER BY n DESC")
+    total = _one(cur, "SELECT count(*) n, sum(regressed::int) r FROM v_fitness_gaps")
+    print(f"\n{'='*70}\nFITNESS GAP QUEUE — {total['n']} open weaknesses "
+          f"({total['r'] or 0} regressions)\n{'='*70}")
+    print(f"{'remediation':<22}{'dimension':<16}{'count':>7}{'regressed':>11}")
+    for r in rows:
+        print(f"{(r['remediation'] or '?'):<22}{r['dimension']:<16}{r['n']:>7}{r['regressed'] or 0:>11}")
+    print("\ntop objects awaiting the most remediations:")
+    for r in _rows(cur, "SELECT object_type, object_id, count(*) n FROM v_fitness_gaps "
+                        "GROUP BY object_type, object_id ORDER BY n DESC LIMIT %s", (limit,)):
+        print(f"   {r['n']:>3}  {r['object_type']}:{r['object_id']}")
+    print()
+
+
 def main():
     if "--domains" in sys.argv:
         for d, a in ADAPTERS.items():
             print(f"  {d:15s} {a.status}")
+        return
+    if "--gaps" in sys.argv:
+        conn = psycopg2.connect(DSN); cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        try:
+            cur.execute("SET ROLE tlfh_harness")
+            gaps_report(cur)
+        finally:
+            cur.close(); conn.close()
         return
     conn = psycopg2.connect(DSN)
     conn.autocommit = False
