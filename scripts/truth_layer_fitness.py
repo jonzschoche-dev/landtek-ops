@@ -143,7 +143,7 @@ class LegalTitleAdapter(DomainAdapter):
         out.append(_m("consistency", "not_superseded", not superseded,
                       basis={"cancelled_by_title": t["cancelled_by_title"]}))
         # 5. Findability & answerability (NEVER demotes grounding — its own axis)
-        out.append(self._findability(cur, tct, src, f"title {tct} registrant issued status chain", ctx))
+        out.extend(self._findability(cur, tct, src, f"title {tct} registrant issued status chain", ctx))
         return [o for o in out if o]
 
     # ---------------------------------------------------------------- INSTRUMENT
@@ -177,26 +177,41 @@ class LegalTitleAdapter(DomainAdapter):
         holes = _one(cur, "SELECT count(*) n FROM holes_findings WHERE status='open' AND doc_id=%s", (src,)) if src else None
         no_contra = not (holes and holes["n"])
         out.append(_m("consistency", "no_open_contradiction", no_contra))
-        out.append(self._findability(cur, iid, src, f"instrument {r['instrument_type'] or ''} {r['executor_full_name'] or ''}", ctx))
+        out.extend(self._findability(cur, iid, src, f"instrument {r['instrument_type'] or ''} {r['executor_full_name'] or ''}", ctx))
         return [o for o in out if o]
 
-    # ---------------------------------------------------------------- findability (shared)
+    # ---------------------------------------------------------------- findability (shared) — returns a LIST
     def _findability(self, cur, obj_id, src, question, ctx):
+        """Two sub-measures, kept separate: `indexed` (first-order, deterministic, $0 — is the grounding doc
+        embedded at all? a doc absent from rag_local is unretrievable by construction) and `semantic_recall`
+        (second-order — does it rank for a natural query; needs the Mac-side query embedder, deferred here)."""
         if not src:
-            return _m("findability", "semantic_recall", "not_tested", basis={"reason": "no source doc"})
+            return [_m("findability", "indexed", "not_tested", basis={"reason": "no source doc"}),
+                    _m("findability", "semantic_recall", "not_tested", basis={"reason": "no source doc"})]
+        out = []
+        n = _one(cur, "SELECT count(*) n FROM rag_local WHERE doc_id=%s", (src,))["n"]
+        if n:
+            out.append(_m("findability", "indexed", "True", numeric=n, basis={"chunks": n}))
+        else:
+            out.append(_m("findability", "indexed", "False",
+                          target={"action": "embed", "what": f"doc:{src} absent from rag_local — unretrievable"}))
         R = ctx.get("retriever")
         if R is None:
-            return _m("findability", "semantic_recall", "not_tested", basis={"reason": "retriever unavailable"})
+            out.append(_m("findability", "semantic_recall", "not_tested",
+                          basis={"reason": "query embedder unavailable (Mac-side)"}))
+            return out
         try:
             hits = R.retrieve(question, k=8, ids=ctx.get("mwk_doc_ids") or None)
             ids = [str(h["doc_id"]) for h in hits]
             if str(src) in ids:
-                return _m("findability", "semantic_recall", "found", numeric=ids.index(str(src)) + 1,
-                          basis={"rank": ids.index(str(src)) + 1})
-            return _m("findability", "semantic_recall", "missed",
-                      target={"action": "reembed_or_query_fix", "what": f"doc:{src} not in top-8 for its own object"})
+                out.append(_m("findability", "semantic_recall", "found", numeric=ids.index(str(src)) + 1,
+                              basis={"rank": ids.index(str(src)) + 1}))
+            else:
+                out.append(_m("findability", "semantic_recall", "missed",
+                              target={"action": "reembed_or_query_fix", "what": f"doc:{src} not in top-8 for its object"}))
         except Exception as e:
-            return _m("findability", "semantic_recall", "not_tested", basis={"error": type(e).__name__})
+            out.append(_m("findability", "semantic_recall", "not_tested", basis={"error": type(e).__name__}))
+        return out
 
 
 # The seven not-yet-instrumented domains (defined interface, zero objects → zero false gaps).
