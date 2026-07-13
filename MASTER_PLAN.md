@@ -5,7 +5,7 @@
 > and stale "READ FIRST" pointers into it — is what kept dragging every new session back to a
 > May-2026 reality and causing knowledge regression. `CLAUDE.md` points here as READ FIRST.
 >
-> **Last updated:** 2026-06-12 — consolidates 9 prior planning docs (now in `archive/planning-2026-06/`).
+> **Last updated:** 2026-07-12 — current-state block rebaselined from live measurement (VPS Postgres + truth suite). Original consolidation of 9 prior planning docs was 2026-06-12 → `archive/planning-2026-06/`.
 > **Provenance discipline applies to THIS doc too.** Facts are tagged **✅ VERIFIED** (checked against the
 > live system this session) or **⚠️ UNVERIFIED** (carried from May-2026 docs, not re-checked — confirm
 > before relying). Never let an unverified carry-over harden into an asserted fact.
@@ -34,8 +34,8 @@
 ## 3. Current verified state (2026-06-12)
 
 - **✅ Infra:** single DigitalOcean droplet — **1 vCPU / 2 GB / 67 GB NVMe + 2 GB swap** (39% disk), Premium Intel, $16/mo (upgraded 2026-06-13 from 1 GB / 33 GB; load dropped 1.8→0.5 — **freeze risk resolved**, single vCPU adequate). Postgres in docker `n8n-postgres-1` (`172.18.0.3:5432/n8n`). Repo `landtek-ops`, pushed from Mac (`~/landtek`) + VPS (`/root/landtek`). Tailscale SSH (check-mode reauth).
-- **✅ Corpus:** ~**1,056 canonical** docs (1,126 total). All 26-360 court filings are blended in from Barandon's emails, incl. **both sides' judicial affidavits**. **~791 MWK-001 docs sit at `pending_classification`** (text captured, integration layer unfinished); 95 in `error`.
-- **✅ Daemons active:** `leo-simulator`, `landtek-truth-loop`, `landtek-fullstack-loop`, `landtek-corpus-backfill`, `landtek-tg-router/-inbox/-media`. **`truth-qa-loop` INACTIVE.**
+- **✅ Corpus (live 2026-07-12):** **2,042 documents** across **38 matters**; RAG **13,602 chunks / 1,958 docs** embedded (`rag_local`, local bge-small 384-dim). Ingest status: **1,151 `pending_classification`** (text captured, integration layer unfinished), **697 `ingested`**, **150 `error`**, 10 `classified`, ~31 quarantined (nobytes/dup/ghost). All 26-360 court filings are blended in from Barandon's emails, incl. **both sides' judicial affidavits**.
+- **⚠️ Daemons (live 2026-07-12 — corrects a stale "active" claim):** the **simulator stays OFF** (standing rule 2026-06-14) and **`leo-simulator`, `landtek-truth-loop`, `landtek-fullstack-loop` are INACTIVE** — do not describe them as active. Running: `landtek-corpus-backfill`, `landtek-tg-router/-inbox/-media`, `com.landtek.offbox-backup` (Mac launchd). Channels: **messenger `headless`, every other channel `n8n`** (telegram/email/whatsapp/viber/sms/slack/voice/web/api).
 - **✅ Ingestion:** Gemini vision OCR (free tier — exhausted) + **local Tesseract via PyMuPDF** (the cost-driven pivot). Qdrant Cloud embeddings (gemini-embedding-001).
 - **✅ Reasoning:** Claude `sonnet-4-5`; `truth_negotiator` + `truth_judge` + `claim_truth_verdicts`; `_safe` views; provenance grading (verified / inferred_strong / inferred_weak).
 - **🟡 A62 durability (re-audited/remediated 2026-07-12):** the prior green claim covered the database only. Audit found 27 non-empty local-only binaries; remediation copied **all 28 local-only rows (41 MB, including one zero-byte placeholder) to canonical LANDTEK Drive**, recorded Drive IDs, and retained every local working copy. B2 is stale/retired (3.642 GiB; corpus last written May; only DB dump found = 2026-06-21); raising its cap is neither necessary nor sufficient. DB layer: nightly domain dump → checksum-verified Mac copy. Final redundancy leg being activated: Mac encrypts the verified dump locally (AES-256/PBKDF2; key never leaves Mac) → uploads ciphertext to restricted `LANDTEK/08 - Internal/Backups/Database` → reads it back for SHA-256 verification → records a cloud receipt. Strengthened A62 gates fail on any non-empty local-only binary or stale/missing encrypted-cloud receipt.
@@ -81,8 +81,8 @@ MASTER_PLAN is the *execution* truth; that artifact is the *vision* truth — ke
 
 | Pillar / system | NOW | DELIVERY |
 |---|---|---|
-| 1 Evidence & Knowledge | ● 3-tier write-gate (triggers) + excerpt-gate; verify_worker (local Ollama) + verify_loop; **18-act law corpus**; rag_local 1055/9451; knowledge meter; Constitution | answer-gate wired into Leo; ~95% corpus readable |
-| 2 Legal Case Mgmt | ● 33 matters; **Grounded Matter Engine** (fact graph + element→gap matrix + freshness); title-chain root→tip; forum desks + 11-forum mandate + router; deadlines; dossier pipeline | play/strategy/revenue live-feed Leo; per-client status/next-action |
+| 1 Evidence & Knowledge | ● 3-tier write-gate (triggers) + excerpt-gate; verify_worker (local Ollama) + verify_loop; **18-act law corpus**; rag_local 1958/13602; knowledge meter; Constitution | answer-gate wired into Leo; ~95% corpus readable |
+| 2 Legal Case Mgmt | ● 38 matters; **Grounded Matter Engine** (fact graph + element→gap matrix + freshness); title-chain root→tip; forum desks + 11-forum mandate + router; deadlines; dossier pipeline | play/strategy/revenue live-feed Leo; per-client status/next-action |
 | 3 Finance (v1.5) | ◐ finance_transactions, v_matter_pnl/roi, QuickBooks MCP in-env | ledger, bill-extract, P&L, per-matter ROI, retainer billing |
 | 4 Property (v2.0) | ○ property_assets (83 rows) | tenants/rent/leases/maintenance/permits |
 | 5 Proactive Intel | ● daily digest (7AM); deadlines (countdown); filing_monitor (6h); email_briefer (trigger-bug fixed deploy_613) | 8-agent control plane; per-**client** alerts; one-tap daily proposals |
@@ -252,6 +252,15 @@ via `case_corpus_sweep.sh` §3.5 + Mac `com.landtek.embed`, deploy_715/716). Onl
 a degraded doc — is *earned* by a real engine read. Paracale = 0 earned; corpus = 86 (truthful
 `extraction_runs` backfill). So the flagship job is the remediation tier that **earns** provenance; nothing
 else moves Paracale off zero. Fabricating `model_used` to pass the gate is forbidden (ontology A8).
+
+**§6B.1 Truth-Layer Fitness Harness** (deploy_906) — grounded, $0, mechanical; **NOT the dead §6A simulator**.
+Measures the truth layer across five dimensions (availability · parsing · grounding · consistency/freshness ·
+findability/answerability), sub-measurements kept separate so no aggregate hides a critical failure; emits a
+named remediation queue; read-only on facts (role `tlfh_harness`) + append-only ledger, both DB-enforced;
+writes **no** facts, verifies nothing, deploys nothing. First MWK cycle: 10/124 objects grounded, 114 inferred,
+237 targets; findability blocked on VPS `fastembed`. It is the eval foundation the **Improvement Lab** (config-
+versioned Leo A/B, human-gated promotion + rollback) will sit on. Full spec + binding Lab appendix:
+`docs/TRUTH_LAYER_FITNESS_SPEC.md`. Governing doctrine: [[feedback-simulator-anti-trap-doctrine]].
 
 **Workstreams (prioritized):**
 1. **W1 — OCR Remediation Tier (earns provenance + text). BUILT · SHADOW (deploys 763–767).** `reocr_gemini.py`
