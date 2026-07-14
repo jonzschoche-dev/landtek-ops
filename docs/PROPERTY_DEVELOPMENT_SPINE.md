@@ -1,9 +1,9 @@
 # Property Development Spine — Design (reconciled)
 
-> **Status:** APPLIED — `migrations/deploy_911_property_development_spine.sql` live on the n8n DB
+> **Status:** APPLIED — deploy_911 (schema/engine) + deploy_912 (V12 shadow isolation) live on the n8n DB
 > (2026-07-14). Schema + `scripts/development_engine.py` + `truth_tests/test_property_development.py`
-> (10/10 green) are live. STILL PENDING: ontology minting of A81–A84 and the V12 isolation triggers
-> (both refinements below are enforced in code/DB; V12 owner-existence + cross-client guard is not yet built).
+> (12/12 green) + ONTOLOGY v0.42 (A81–A84 minted). V12 is **log** mode (owner-existence + cross-client);
+> flip to `block` only after ALIGNMENT §9 soak. STILL NEXT: converge `revenue_engine` → ledger under V12.
 > **Date:** 2026-07-14 (v2 — operator/engine write split + asset-owned-as-cache refinements)  
 > **Supersedes:** the chat draft’s project-only / develop-only / `primary_project_code` shape.  
 > **Authority:** `MASTER_PLAN.md` decides sequencing; this doc is the technical design for the

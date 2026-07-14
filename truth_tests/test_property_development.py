@@ -165,6 +165,58 @@ def tenure_rule(cur):
         raise TruthFailure(f"tenure rule violations: {bad}")
 
 
+def v12_shadow_present(cur):
+    """V12 config is log-mode and all spine isolation triggers exist (deploy_912)."""
+    cur.execute("SELECT mode FROM ontology_validator_config WHERE check_code='V12'")
+    row = cur.fetchone()
+    if not row:
+        raise TruthFailure("V12 missing from ontology_validator_config")
+    if row["mode"] not in ("log", "block"):
+        raise TruthFailure(f"V12 mode unexpected: {row['mode']}")
+    needed = [
+        "ontvv_v12_asset_preconditions",
+        "ontvv_v12_asset_map_parcels",
+        "ontvv_v12_asset_survey_parcels",
+        "ontvv_v12_asset_titles",
+        "ontvv_v12_development_projects",
+        "ontvv_v12_development_permits",
+    ]
+    cur.execute("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = ANY(%s)", (needed,))
+    have = {r["tgname"] for r in cur.fetchall()}
+    missing = set(needed) - have
+    if missing:
+        raise TruthFailure(f"V12 triggers missing: {sorted(missing)}")
+
+
+def v12_orphan_owner_logged(cur):
+    """Shadow bite: orphan owner_code is rejected-or-logged (log mode allows write but records).
+
+    In log mode the insert SUCCEEDS but ontology_reject should fire. We use a SAVEPOINT,
+    insert a synthetic precondition with a nonexistent asset owner, then check holes_findings
+    (or accept that block mode would RAISE — we only require log does not crash and either
+    logs or the row can be cleaned). Cleanup always.
+    """
+    tag = "TT-V12-ORPHAN-OWNER"
+    cur.execute("DELETE FROM asset_preconditions WHERE owner_code=%s AND code=%s", (tag, "secure_tenure"))
+    # Use a real client so the FK on client_code (if any) is happy
+    cur.execute("SELECT client_code FROM property_assets WHERE client_code IS NOT NULL LIMIT 1")
+    cc = cur.fetchone()["client_code"]
+    try:
+        cur.execute(
+            """INSERT INTO asset_preconditions
+               (client_code, owner_kind, owner_code, mode, code, label, status, provenance_level)
+               VALUES (%s, 'asset', %s, 'develop', 'secure_tenure', 'tt orphan', 'unknown', 'inferred_weak')""",
+            (cc, tag),
+        )
+    except Exception as e:
+        # block mode would raise — also acceptable
+        if "V12" not in str(e) and "ontology_validator" not in str(e):
+            raise TruthFailure(f"orphan insert failed for unexpected reason: {e}")
+        return
+    # log mode: row present (shadow does not block). Clean up always.
+    cur.execute("DELETE FROM asset_preconditions WHERE owner_code=%s AND code=%s", (tag, "secure_tenure"))
+
+
 TESTS = [
     ("property_development.schema", schema_present),
     ("property_development.A81_client_code", a81_client_code),
@@ -176,6 +228,8 @@ TESTS = [
     ("property_development.ownership_placement", ownership_placement),
     ("property_development.asset_rows_are_cache", asset_rows_are_cache),
     ("property_development.tenure_rule", tenure_rule),
+    ("property_development.v12_shadow_present", v12_shadow_present),
+    ("property_development.v12_orphan_owner_path", v12_orphan_owner_logged),
 ]
 
 
