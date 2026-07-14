@@ -114,24 +114,32 @@ def _ensure(cur):
 # ── axis assessment (signals from live tables; honest unknowns) ─────────────────────────────────
 
 def _docs_for_title(cur, title_ref, case_file):
-    """Count documents that look related to this title / case_file."""
-    if not title_ref and not case_file:
-        return 0, 0
-    # related docs: filename/title/text mention of title_no, or same case_file
-    cur.execute("""
-        SELECT count(*) AS n,
-               count(*) FILTER (WHERE coalesce(extracted_text,'') <> '') AS with_text
-          FROM documents d
-         WHERE (%s::text IS NOT NULL AND (
-                 coalesce(d.original_filename,'') ILIKE '%%' || %s || '%%'
-              OR coalesce(d.document_title,'') ILIKE '%%' || %s || '%%'
-              OR coalesce(d.canonical_filename,'') ILIKE '%%' || %s || '%%'
-              OR coalesce(d.extracted_text,'') ILIKE '%%' || %s || '%%'
-               ))
-            OR (%s::text IS NOT NULL AND d.case_file = %s)
-        """, (title_ref, title_ref, title_ref, title_ref, title_ref, case_file, case_file))
-    r = cur.fetchone()
-    return int(r["n"] or 0), int(r["with_text"] or 0)
+    """Count documents related to this title.
+
+    Prefer title-number hits (filename/title). Broad case_file membership alone is a weak signal
+    (MWK-001 has ~1800 docs) and must NOT grade documents=solid.
+    Returns (n_title_hits, n_title_with_text, n_case_file_only).
+    """
+    n_title, n_text, n_case = 0, 0, 0
+    if title_ref:
+        # Avoid matching tiny fragments; require title token length >= 4 when possible
+        cur.execute("""
+            SELECT count(*) AS n,
+                   count(*) FILTER (WHERE coalesce(extracted_text,'') <> '') AS with_text
+              FROM documents d
+             WHERE coalesce(d.original_filename,'') ILIKE '%%' || %s || '%%'
+                OR coalesce(d.document_title,'') ILIKE '%%' || %s || '%%'
+                OR coalesce(d.canonical_filename,'') ILIKE '%%' || %s || '%%'
+                OR coalesce(d.smart_filename,'') ILIKE '%%' || %s || '%%'
+            """, (title_ref, title_ref, title_ref, title_ref))
+        r = cur.fetchone()
+        n_title, n_text = int(r["n"] or 0), int(r["with_text"] or 0)
+    if case_file and n_title == 0:
+        cur.execute("""
+            SELECT count(*) AS n FROM documents d WHERE d.case_file = %s
+            """, (case_file,))
+        n_case = int(cur.fetchone()["n"] or 0)
+    return n_title, n_text, n_case
 
 
 def assess_axes(cur, asset):
@@ -145,25 +153,31 @@ def assess_axes(cur, asset):
     out = {}
 
     # ── 1. DOCUMENTS ──
-    n_docs, n_text = _docs_for_title(cur, title_ref, case_file)
-    # also count title row presence as a doc signal
+    n_docs, n_text, n_case = _docs_for_title(cur, title_ref, case_file)
     has_title_row = False
     if title_ref:
         cur.execute("SELECT 1 FROM titles WHERE tct_number=%s LIMIT 1", (title_ref,))
         has_title_row = bool(cur.fetchone())
-    if n_text >= 3 or (n_docs >= 2 and n_text >= 1):
-        out["documents"] = ("partial" if n_text < 5 else "solid",
-                            f"{n_docs} related docs, {n_text} with text"
-                            + ("; titles row present" if has_title_row else ""),
-                            None if n_text >= 5 else
-                            "PREP documents: secure CTC/owner's duplicate + remaining instruments (deeds/SPA/tax)")
+    if n_text >= 5:
+        out["documents"] = ("solid",
+                            f"{n_docs} title-linked docs, {n_text} with text"
+                            + ("; titles row" if has_title_row else ""),
+                            None)
+    elif n_text >= 1 or n_docs >= 2:
+        out["documents"] = ("partial",
+                            f"{n_docs} title-linked docs, {n_text} with text — pack incomplete",
+                            "PREP documents: secure CTC/owner's duplicate + deeds/SPA/tax for this title")
     elif n_docs >= 1 or has_title_row:
         out["documents"] = ("thin",
-                            f"{n_docs} related docs ({n_text} with text); need secure pack",
-                            "PREP documents: pull CTC from RD; secure deeds, SPA, tax decs, court papers for this title")
+                            f"{n_docs} title-linked ({n_text} text); need secure pack",
+                            "PREP documents: pull CTC from RD; secure deeds, SPA, tax decs, court papers")
+    elif n_case > 0:
+        out["documents"] = ("thin",
+                            f"no title-specific docs; {n_case} docs share case_file only (weak signal)",
+                            "PREP documents: find/link papers that name this title number, not only the case bucket")
     else:
         out["documents"] = ("unknown",
-                            "no related documents found in corpus for this title/case_file",
+                            "no related documents found for this title",
                             "PREP documents: identify and secure source docs (RD CTC, Drive, email attachments)")
 
     # ── 2. STATUS ──
@@ -505,13 +519,95 @@ def report(cur=None, limit=20, asset=None):
         cur.close(); c.close()
 
 
+def write_html(path=None, limit=200):
+    """Standalone visual board (no Flask). Open the HTML file in a browser."""
+    import html as _html
+    path = path or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                "output", "title_readiness.html")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    _ensure(cur)
+    cur.execute("""
+        SELECT r.*, a.label, a.title_ref, a.title_status, a.possession, a.tier
+          FROM property_readiness r
+          JOIN property_assets a ON a.asset_code=r.asset_code
+         ORDER BY r.readiness_score ASC NULLS FIRST, a.asset_code LIMIT %s""", (limit,))
+    rows = cur.fetchall()
+    cur.execute("SELECT finished_at, moves_open, note FROM profitability_prep_cycles ORDER BY id DESC LIMIT 1")
+    cycle = cur.fetchone()
+    cur.close(); c.close()
+
+    def badge(g):
+        colors = {"solid": "#059669", "partial": "#d97706", "thin": "#dc2626", "unknown": "#9ca3af"}
+        col = colors.get((g or "unknown").lower(), "#9ca3af")
+        return f'<span style="background:{col};color:#fff;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600">{_html.escape(g or "?")}</span>'
+
+    def bar(score):
+        try:
+            pct = int(round(float(score or 0) * 100))
+        except (TypeError, ValueError):
+            pct = 0
+        col = "#059669" if pct >= 70 else ("#d97706" if pct >= 40 else "#dc2626")
+        return (f'<div style="display:flex;gap:6px;align-items:center"><div style="width:80px;height:8px;'
+                f'background:#e5e7eb;border-radius:4px;overflow:hidden"><div style="width:{pct}%;'
+                f'height:100%;background:{col}"></div></div><span style="font-size:12px;font-weight:600">{pct}%</span></div>')
+
+    trs = []
+    for r in rows:
+        title = r.get("title_ref") or r["asset_code"]
+        trs.append(
+            f"<tr><td><strong>{_html.escape(title)}</strong><br>"
+            f"<span style='color:#6b7280;font-size:11px'>{_html.escape(r['asset_code'])} · "
+            f"{_html.escape(r.get('client_code') or '')}</span></td>"
+            f"<td>{bar(r.get('readiness_score'))}</td>"
+            f"<td>{badge(r.get('documents'))}</td><td>{badge(r.get('status_axis'))}</td>"
+            f"<td>{badge(r.get('occupants'))}</td><td>{badge(r.get('ownership'))}</td>"
+            f"<td>{badge(r.get('title_issues'))}</td><td>{badge(r.get('mapping'))}</td>"
+            f"<td style='font-size:12px;color:#6b7280'>{_html.escape(r.get('weakest_axis') or '')}<br>"
+            f"{_html.escape((r.get('next_prep_action') or '')[:80])}</td></tr>"
+        )
+    cyc = ""
+    if cycle:
+        cyc = (f"<p style='color:#6b7280'>Last cycle: {cycle.get('finished_at')} · "
+               f"open moves={cycle.get('moves_open')} · {_html.escape((cycle.get('note') or '')[:120])}</p>")
+    html_out = f"""<!doctype html><html><head><meta charset="utf-8">
+<title>Title readiness — LandTek</title>
+<style>
+body{{font:14px/1.45 -apple-system,sans-serif;margin:0;background:#f6f7f9;color:#111}}
+.wrap{{max-width:1200px;margin:0 auto;padding:20px}}
+h1{{margin:0 0 8px}} table{{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}}
+th,td{{padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top;font-size:13px}}
+th{{color:#6b7280;font-size:12px}} tr:hover{{background:#fafafa}}
+.card{{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:16px}}
+</style></head><body><div class="wrap">
+<h1>Title readiness</h1>
+<p>Six axes: documents · status · occupants · ownership · title issues · mapping</p>
+{cyc}
+<div class="card"><table>
+<tr><th>Title</th><th>Score</th><th>Docs</th><th>Status</th><th>Occupants</th>
+<th>Ownership</th><th>Title issues</th><th>Map</th><th>Next focus</th></tr>
+{''.join(trs)}
+</table></div>
+<p style="color:#6b7280;font-size:12px">Generated by profitability_prep_cycle.py --html · refresh after each cycle</p>
+</div></body></html>"""
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html_out)
+    print(f"[prep] wrote visual board → {path} ({len(rows)} titles)")
+    return path
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     def val(flag):
         return args[args.index(flag) + 1] if flag in args and args.index(flag) + 1 < len(args) else None
-    if "--report" in args:
+    if "--html" in args:
+        write_html(path=val("--out"), limit=int(val("--limit") or 200))
+    elif "--report" in args:
         report(limit=int(val("--limit") or 20), asset=val("--asset"))
     else:
         run_cycle(do_recompute=("--no-recompute" not in args),
                   report_limit=int(val("--limit") or 15),
                   only_asset=val("--asset"))
+        if "--html" in args or True:
+            # always refresh HTML after a cycle so the visual stays current
+            write_html(limit=int(val("--limit") or 200))

@@ -76,6 +76,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("awareness", "/awareness", "Awareness"),
         ("dependability", "/dependability", "Dependability"),
         ("parcels", "/parcels", "Parcels"),
+        ("readiness", "/readiness", "Titles"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
@@ -499,6 +500,212 @@ def _polygon_svg(pts, size=480, pad=24):
     return (f'<svg viewBox="0 0 {size} {size}" width="100%" '
             f'style="max-width:520px;background:#fff;border:1px solid var(--line);border-radius:8px">'
             f'<polygon points="{poly}" fill="#2563eb22" stroke="#2563eb" stroke-width="2"/></svg>')
+
+
+def _axis_badge(grade: str) -> str:
+    g = (grade or "unknown").lower()
+    cls = {"solid": "badge-ok", "partial": "badge-warn", "thin": "badge-bad",
+           "unknown": "badge-off"}.get(g, "badge-off")
+    return f'<span class="badge {cls}">{_esc(g)}</span>'
+
+
+def _score_bar(score) -> str:
+    try:
+        s = float(score or 0)
+    except (TypeError, ValueError):
+        s = 0.0
+    pct = max(0, min(100, int(round(s * 100))))
+    color = "#059669" if pct >= 70 else ("#d97706" if pct >= 40 else "#dc2626")
+    return (f'<div style="display:flex;align-items:center;gap:8px;min-width:120px">'
+            f'<div style="flex:1;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">'
+            f'<div style="width:{pct}%;height:100%;background:{color}"></div></div>'
+            f'<span style="font-size:12px;font-weight:600;width:36px">{pct}%</span></div>')
+
+
+@bp.route("/readiness")
+def readiness_board():
+    """Visual: status of each title across the six prep axes."""
+    client = (request.args.get("client") or "").strip() or None
+    weakest = (request.args.get("weakest") or "").strip() or None
+    q = (request.args.get("q") or "").strip() or None
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    try:
+        cur.execute("SELECT count(*) n, round(avg(readiness_score)::numeric,3) avg FROM property_readiness")
+        summary = cur.fetchone() or {}
+        cur.execute("SELECT weakest_axis, count(*) n FROM property_readiness GROUP BY 1 ORDER BY 2 DESC")
+        by_weak = cur.fetchall()
+        cur.execute("""SELECT finished_at, assets_seen, moves_open, note
+                         FROM profitability_prep_cycles ORDER BY id DESC LIMIT 1""")
+        last_cycle = cur.fetchone()
+        sql = """
+            SELECT r.*, a.label, a.title_ref, a.title_status, a.possession, a.tier, a.origin
+              FROM property_readiness r
+              JOIN property_assets a ON a.asset_code = r.asset_code
+             WHERE 1=1
+        """
+        params = []
+        if client:
+            sql += " AND r.client_code = %s"; params.append(client)
+        if weakest:
+            sql += " AND r.weakest_axis = %s"; params.append(weakest)
+        if q:
+            sql += """ AND (a.asset_code ILIKE %s OR coalesce(a.title_ref,'') ILIKE %s
+                            OR coalesce(a.label,'') ILIKE %s)"""
+            params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+        sql += " ORDER BY r.readiness_score ASC NULLS FIRST, a.asset_code LIMIT 200"
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+        cur.execute("SELECT DISTINCT client_code FROM property_readiness WHERE client_code IS NOT NULL ORDER BY 1")
+        clients = [r["client_code"] for r in cur.fetchall()]
+    except Exception as e:
+        cur.close(); conn.close()
+        body = (f"<h1>Title readiness</h1><p class='alert alert-bad'>Readiness data unavailable: "
+                f"{_esc(str(e)[:200])}. Run <code>profitability_prep_cycle.py</code> first.</p>")
+        return _layout("Titles", body, active="readiness")
+    cur.close(); conn.close()
+
+    cards = (
+        f"<div class='card'><div class='muted'>Titles scored</div>"
+        f"<div class='stat'>{summary.get('n') or 0}</div></div>"
+        f"<div class='card'><div class='muted'>Avg readiness</div>"
+        f"<div class='stat'>{int(round(float(summary.get('avg') or 0)*100))}%</div></div>"
+    )
+    for w in by_weak[:4]:
+        cards += (f"<div class='card'><div class='muted'>Weakest: {_esc(w['weakest_axis'])}</div>"
+                  f"<div class='stat'>{w['n']}</div></div>")
+
+    cycle_note = ""
+    if last_cycle:
+        cycle_note = (f"<p class='muted'>Last prep cycle: {_esc(str(last_cycle.get('finished_at') or '')[:19])} · "
+                      f"open moves={last_cycle.get('moves_open')} · {_esc((last_cycle.get('note') or '')[:120])}</p>")
+
+    filt = (
+        f"<form class='searchbar' method='get' action='/ops/readiness' style='margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap'>"
+        f"<input name='q' placeholder='Title / asset…' value='{_esc(q or '')}'>"
+        f"<select name='client'><option value=''>All clients</option>"
+        + "".join(f"<option value='{_esc(c)}'{' selected' if c==client else ''}>{_esc(c)}</option>" for c in clients)
+        + f"</select><select name='weakest'><option value=''>Any weakest axis</option>"
+        + "".join(f"<option value='{a}'{' selected' if a==weakest else ''}>{a}</option>"
+                  for a in ("documents","status","occupants","ownership","title_issues","mapping"))
+        + "</select><button type='submit'>Filter</button></form>"
+    )
+
+    if rows:
+        trs = []
+        for r in rows:
+            title = r.get("title_ref") or r["asset_code"]
+            trs.append(
+                f"<tr>"
+                f"<td><a href='/ops/readiness/{_esc(r['asset_code'])}'><strong>{_esc(title)}</strong></a>"
+                f"<div class='muted' style='font-size:11px'>{_esc(r['asset_code'])} · {_esc(r.get('client_code') or '')}</div></td>"
+                f"<td>{_score_bar(r.get('readiness_score'))}</td>"
+                f"<td>{_axis_badge(r.get('documents'))}</td>"
+                f"<td>{_axis_badge(r.get('status_axis'))}</td>"
+                f"<td>{_axis_badge(r.get('occupants'))}</td>"
+                f"<td>{_axis_badge(r.get('ownership'))}</td>"
+                f"<td>{_axis_badge(r.get('title_issues'))}</td>"
+                f"<td>{_axis_badge(r.get('mapping'))}</td>"
+                f"<td class='muted' style='font-size:12px'>{_esc(r.get('weakest_axis') or '—')}</td>"
+                f"</tr>"
+            )
+        table = (
+            "<table><thead><tr>"
+            "<th>Title</th><th>Score</th><th>Docs</th><th>Status</th><th>Occupants</th>"
+            "<th>Ownership</th><th>Title issues</th><th>Map</th><th>Focus</th>"
+            f"</tr></thead><tbody>{''.join(trs)}</tbody></table>"
+        )
+    else:
+        table = "<p class='empty'>No readiness rows — run the prep cycle.</p>"
+
+    body = (
+        "<h1>Title readiness</h1>"
+        "<p class='lead'>Continuous prep status per title — documents, status, occupants, "
+        "ownership, title issues, mapping. Updated by the profitability prep cycle (every 4h).</p>"
+        f"{cycle_note}"
+        f"<div class='grid grid-4' style='margin-bottom:16px'>{cards}</div>"
+        f"{filt}"
+        f"<div class='card' style='overflow-x:auto'>{table}</div>"
+        "<p class='muted' style='margin-top:12px'>solid=understood · partial=some signal · "
+        "thin=weak · unknown=not yet assessed. Click a title for the prep worklist.</p>"
+    )
+    return _layout("Titles", body, active="readiness")
+
+
+@bp.route("/readiness/<asset_code>")
+def readiness_detail(asset_code: str):
+    """Single title: six-axis status + open prep moves."""
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    try:
+        cur.execute("""
+            SELECT r.*, a.label, a.title_ref, a.title_status, a.possession, a.tier, a.origin,
+                   a.case_file, a.has_authority, a.location, a.modes, a.note
+              FROM property_readiness r
+              JOIN property_assets a ON a.asset_code = r.asset_code
+             WHERE r.asset_code = %s""", (asset_code,))
+        r = cur.fetchone()
+        if not r:
+            cur.execute("SELECT * FROM property_assets WHERE asset_code=%s", (asset_code,))
+            a = cur.fetchone()
+            cur.close(); conn.close()
+            if not a:
+                abort(404)
+            body = (f"<h1>{_esc(asset_code)}</h1><p class='alert alert-warn'>No readiness score yet. "
+                    f"Run <code>python3 scripts/profitability_prep_cycle.py --asset {_esc(asset_code)}</code>.</p>")
+            return _layout(asset_code, body, active="readiness")
+        cur.execute("""
+            SELECT priority, axis, action, why, recheck_condition, last_seen_at
+              FROM profitability_prep_moves
+             WHERE asset_code=%s AND status='open'
+             ORDER BY priority ASC, last_seen_at DESC LIMIT 40""", (asset_code,))
+        moves = cur.fetchall()
+    except Exception as e:
+        cur.close(); conn.close()
+        body = f"<h1>Error</h1><p class='alert alert-bad'>{_esc(str(e)[:200])}</p>"
+        return _layout("Error", body, active="readiness")
+    cur.close(); conn.close()
+
+    title = r.get("title_ref") or asset_code
+    axes = [
+        ("Documents", "documents", r.get("documents"), r.get("documents_note")),
+        ("Status", "status", r.get("status_axis"), r.get("status_note")),
+        ("Occupants", "occupants", r.get("occupants"), r.get("occupants_note")),
+        ("Ownership", "ownership", r.get("ownership"), r.get("ownership_note")),
+        ("Title issues", "title_issues", r.get("title_issues"), r.get("title_issues_note")),
+        ("Mapping", "mapping", r.get("mapping"), r.get("mapping_note")),
+    ]
+    axis_cards = "".join(
+        f"<div class='card'><h2>{_esc(label)}</h2>{_axis_badge(grade)}"
+        f"<p class='muted' style='margin:8px 0 0;font-size:12px'>{_esc(note or '—')}</p></div>"
+        for label, _k, grade, note in axes
+    )
+    move_rows = "".join(
+        f"<tr><td>p{m['priority']}</td><td>{_esc(m.get('axis') or '—')}</td>"
+        f"<td><strong>{_esc(m['action'])}</strong>"
+        f"<div class='muted' style='font-size:12px'>{_esc((m.get('why') or '')[:140])}</div></td>"
+        f"<td class='muted' style='font-size:11px'>{_esc(str(m.get('last_seen_at') or '')[:16])}</td></tr>"
+        for m in moves
+    ) or "<tr><td colspan='4' class='empty'>No open prep moves — axes solid or cycle not run.</td></tr>"
+
+    body = (
+        f"<p class='muted'><a href='/ops/readiness'>← All titles</a></p>"
+        f"<h1>{_esc(title)}</h1>"
+        f"<p class='lead'>{_esc(r.get('label') or '')} · {_esc(r.get('client_code') or '')} · "
+        f"status={_esc(r.get('title_status') or '—')} · possession={_esc(r.get('possession') or '—')}</p>"
+        f"<div class='card' style='margin-bottom:16px'>"
+        f"<div class='muted'>Readiness</div>{_score_bar(r.get('readiness_score'))}"
+        f"<p style='margin:8px 0 0'>Weakest axis: <strong>{_esc(r.get('weakest_axis') or '—')}</strong></p>"
+        f"<p class='muted' style='font-size:13px'>{_esc(r.get('next_prep_action') or '')}</p></div>"
+        f"<div class='grid grid-3' style='margin-bottom:20px'>{axis_cards}</div>"
+        f"<h2 class='section-title'>Open prep work</h2>"
+        f"<div class='card'><table><tr><th>Pri</th><th>Axis</th><th>Action</th><th>Seen</th></tr>"
+        f"{move_rows}</table></div>"
+        f"<p class='muted' style='margin-top:12px'>Asset <code>{_esc(asset_code)}</code> · "
+        f"case_file={_esc(r.get('case_file') or '—')} · tier={_esc(r.get('tier') or '—')} · "
+        f"origin={_esc(r.get('origin') or '—')}</p>"
+    )
+    return _layout(title, body, active="readiness")
 
 
 @bp.route("/parcels")
