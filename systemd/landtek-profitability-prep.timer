@@ -1,0 +1,12 @@
+[Unit]
+Description=LandTek profitability prep cycle every 4 hours (unprompted)
+
+[Timer]
+OnBootSec=12min
+OnUnitActiveSec=4h
+AccuracySec=5min
+Persistent=true
+Unit=landtek-profitability-prep.service
+
+[Install]
+WantedBy=timers.target

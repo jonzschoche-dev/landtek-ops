@@ -69,7 +69,7 @@ NEXT_MOVE = {
     "permits": "obtain zoning/locational + DENR/LGU permits",
     "capital_partner": "raise capital or sign a JV partner",
     "feasibility": "build the feasibility/return case",
-    "marketable_title": "clear/quiet the title (often gated on the controlling litigation)",
+    "marketable_title": "PREP title file (CTC/annotations); quiet-title pack — matter only when schedule requires",
     "seller_authority": "confirm heirs' consent or a valid, unrevoked SPA",
     "buyer_price": "source a buyer + set a price",
     "tax_clearance": "compute + secure CGT/DST/CAR + RPT clearance",
@@ -119,9 +119,12 @@ def assess_asset(asset, code, cur):
                         evidence_ref=None, provenance="inferred_weak", recheck="title status recorded")
         tsl = ts.lower()
         if tsl in ("clouded", "cancelled"):
-            return dict(status="blocked", reason=f"title {tsl} — gated on {ctrl or 'recovery'}",
+            # Matter is optional context — never the only story. Prep continues either way.
+            ctx = f" (context matter {ctrl})" if ctrl else ""
+            return dict(status="blocked", reason=f"title {tsl} — prep CTC/annotations/quiet-title pack{ctx}",
                         evidence_kind="title_status", evidence_ref=f"{basis}={ts}",
-                        provenance="inferred_strong", recheck=f"{ctrl or 'recovery'} resolves title")
+                        provenance="inferred_strong",
+                        recheck="title status improves OR prep pack complete enough for next legal step")
         if tsl == "untitled":
             return dict(status="todo", reason="needs titling", evidence_kind="title_status",
                         evidence_ref=f"{basis}=untitled", provenance="inferred_strong",

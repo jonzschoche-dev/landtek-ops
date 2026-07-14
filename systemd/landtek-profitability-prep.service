@@ -1,0 +1,13 @@
+[Unit]
+Description=LandTek continuous profitability preparation cycle
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment=PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
+ExecStart=/usr/bin/python3 /root/landtek/scripts/profitability_prep_cycle.py --limit 30
+StandardOutput=append:/var/log/landtek-profitability-prep.log
+StandardError=append:/var/log/landtek-profitability-prep.log
+TimeoutStartSec=1800

@@ -1,9 +1,9 @@
 # Property Development Spine — Design (reconciled)
 
-> **Status:** APPLIED — deploy_911 (schema) + deploy_912 (V12 shadow) + **deploy_913 (revenue_engine → ledger)**
-> live (2026-07-14/15). Full portfolio recompute: **83/83 assets in ledger**, 551 asset-owned precond rows,
-> path-to-cash board reads `asset_preconditions` only. Truth tests **14/14**. V12 remains **log**.
-> STILL NEXT: GOLDEN-SAND map link + permit skeleton (demo); V12 flip to block after soak.
+> **Status:** APPLIED — deploy_911–913 + **deploy_914 continuous profitability prep cycle**.
+> Full portfolio ledger + unprompted prep loop (`profitability_prep_cycle` every 4h): every property
+> gets prep moves for profitability **without requiring a controlling_matter**. Matter is optional
+> schedule context only. V12 remains **log**.
 > **Date:** 2026-07-14 (v2 — operator/engine write split + asset-owned-as-cache refinements)  
 > **Supersedes:** the chat draft’s project-only / develop-only / `primary_project_code` shape.  
 > **Authority:** `MASTER_PLAN.md` decides sequencing; this doc is the technical design for the
