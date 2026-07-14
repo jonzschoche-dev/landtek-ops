@@ -1,9 +1,9 @@
 # Property Development Spine — Design (reconciled)
 
-> **Status:** APPLIED — deploy_911 (schema/engine) + deploy_912 (V12 shadow isolation) live on the n8n DB
-> (2026-07-14). Schema + `scripts/development_engine.py` + `truth_tests/test_property_development.py`
-> (12/12 green) + ONTOLOGY v0.42 (A81–A84 minted). V12 is **log** mode (owner-existence + cross-client);
-> flip to `block` only after ALIGNMENT §9 soak. STILL NEXT: converge `revenue_engine` → ledger under V12.
+> **Status:** APPLIED — deploy_911 (schema) + deploy_912 (V12 shadow) + **deploy_913 (revenue_engine → ledger)**
+> live (2026-07-14/15). Full portfolio recompute: **83/83 assets in ledger**, 551 asset-owned precond rows,
+> path-to-cash board reads `asset_preconditions` only. Truth tests **14/14**. V12 remains **log**.
+> STILL NEXT: GOLDEN-SAND map link + permit skeleton (demo); V12 flip to block after soak.
 > **Date:** 2026-07-14 (v2 — operator/engine write split + asset-owned-as-cache refinements)  
 > **Supersedes:** the chat draft’s project-only / develop-only / `primary_project_code` shape.  
 > **Authority:** `MASTER_PLAN.md` decides sequencing; this doc is the technical design for the

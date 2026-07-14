@@ -17,6 +17,7 @@ Design of record: docs/PROPERTY_DEVELOPMENT_SPINE.md. Two contracts it enforces 
      and then left alone — the engine respects an operator edit and never clobbers it.
 
   python3 development_engine.py --recompute [--asset PA-... | --project DEV-...]
+      # default: ALL assets with client_code (stubs + curated) × their modes — lights the money board
   python3 development_engine.py --seed-project DEV-PAR-GOLDEN-SAND --asset PA-GOLDEN-SAND --mode develop \
                                 --label "Golden Sand Beach Resort" --target-use resort
   python3 development_engine.py --board [--curated | --stubs | --all]
@@ -282,9 +283,12 @@ def recompute_project(cur, proj):
 
 
 # ── commands ─────────────────────────────────────────────────────────────────────────────────────
-def recompute(asset_code=None, project_code=None):
+def recompute(asset_code=None, project_code=None, curated_only=False):
+    """Refresh ledger. Default: ALL assets with client_code (title stubs + curated) so revenue_engine
+    has one evidenced board for the full portfolio. Project-owned codes still require a project row
+    (V12); stubs get asset-owned codes only until a deal/project is opened."""
     c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    # 1. asset-owned rows for every curated asset (or the one named), across each of its modes
+    # 1. asset-owned rows for every in-scope asset × each of its modes
     if project_code:
         cur.execute("SELECT * FROM development_projects WHERE project_code=%s", (project_code,))
         projs = cur.fetchall()
@@ -292,21 +296,26 @@ def recompute(asset_code=None, project_code=None):
         cur.execute("SELECT * FROM property_assets WHERE asset_code = ANY(%s)", (asset_codes,))
         assets = cur.fetchall()
     else:
-        q = "SELECT * FROM property_assets WHERE origin IN ('seed','operator')"
-        params = ()
+        q = "SELECT * FROM property_assets WHERE client_code IS NOT NULL"
+        params = []
+        if curated_only:
+            q += " AND origin IN ('seed','operator')"
         if asset_code:
-            q += " AND asset_code=%s"; params = (asset_code,)
+            q += " AND asset_code=%s"; params.append(asset_code)
         cur.execute(q, params)
         assets = cur.fetchall()
     n_asset = 0
+    skipped = 0
     for a in assets:
         if a.get("client_code") is None:
-            print(f"[dev] SKIP {a['asset_code']}: no client_code (isolation dark) — backfill first"); continue
+            print(f"[dev] SKIP {a['asset_code']}: no client_code (isolation dark) — backfill first")
+            skipped += 1
+            continue
         for mode in (a.get("modes") or []):
             if mode in CATALOG:
                 recompute_asset(cur, a, mode); n_asset += 1
     c.commit()
-    # 2. project rollups
+    # 2. project rollups (project-owned codes + gating)
     if project_code:
         projs_iter = projs
     else:
@@ -320,7 +329,8 @@ def recompute(asset_code=None, project_code=None):
         sug = f"  ⇒ SUGGEST stage 'ready' (all {roll['total']} ok)" if roll["suggested_stage"] else ""
         print(f"[dev] {p['project_code']}: {roll['ok']}/{roll['total']} ok "
               f"(ratio {roll['ratio']}), gating={roll['gating']}, stage={roll['current_stage']}{sug}")
-    print(f"[dev] recomputed asset-mode rows={n_asset}, projects={len(projs_iter)}")
+    print(f"[dev] recomputed asset-mode rows={n_asset}, projects={len(projs_iter)}, "
+          f"assets_seen={len(assets)}, skipped_no_client={skipped}")
     cur.close(); c.close()
 
 
@@ -390,7 +400,8 @@ if __name__ == "__main__":
         seed_project(val("--seed-project"), val("--asset"), mode=val("--mode", "develop"),
                      label=val("--label"), target_use=val("--target-use"), objective=val("--objective"))
     elif "--recompute" in a:
-        recompute(asset_code=val("--asset"), project_code=val("--project"))
+        recompute(asset_code=val("--asset"), project_code=val("--project"),
+                  curated_only=("--curated-only" in a))
     elif "--board" in a:
         board(scope=("all" if "--all" in a else "stubs" if "--stubs" in a else "curated"))
     else:

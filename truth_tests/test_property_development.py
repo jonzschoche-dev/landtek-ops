@@ -165,6 +165,40 @@ def tenure_rule(cur):
         raise TruthFailure(f"tenure rule violations: {bad}")
 
 
+def ledger_covers_stubs(cur):
+    """deploy_913: title stubs must carry asset-owned ledger rows after full recompute (not curated-only)."""
+    cur.execute("SELECT count(*) AS n FROM property_assets WHERE origin='title' AND client_code IS NOT NULL")
+    stubs = cur.fetchone()["n"]
+    if stubs < 1:
+        return  # empty portfolio — nothing to assert
+    cur.execute("""SELECT count(DISTINCT owner_code) AS n FROM asset_preconditions
+                   WHERE owner_kind='asset' AND owner_code IN (
+                     SELECT asset_code FROM property_assets WHERE origin='title' AND client_code IS NOT NULL
+                   )""")
+    covered = cur.fetchone()["n"]
+    if covered < stubs * 0.9:  # allow tiny drift; full sync should be ~100%
+        raise TruthFailure(
+            f"ledger covers only {covered}/{stubs} title stubs — run development_engine --recompute "
+            f"(revenue_engine --sync). Curated-only recompute would leave stubs dark.")
+
+
+def revenue_reads_ledger(cur):
+    """revenue_engine.plan_for must not invent ok without a ledger row (grep-floor + live sample)."""
+    # code contract: revenue_engine imports CATALOG from development_engine and loads asset_preconditions
+    import os
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "scripts", "revenue_engine.py")
+    src = open(path, encoding="utf-8").read()
+    if "from development_engine import" not in src and "import development_engine" not in src:
+        raise TruthFailure("revenue_engine must import development_engine (single catalog/writer)")
+    if "asset_preconditions" not in src:
+        raise TruthFailure("revenue_engine must read asset_preconditions (ledger)")
+    if "def _assess(" in src and "_assess(a, code)" in src:
+        # old ephemeral assess path must not remain as the board brain
+        if "Return (status, reason). status: ok | blocked" in src:
+            raise TruthFailure("revenue_engine still has ephemeral _assess board path — remove dual epistemology")
+
+
 def v12_shadow_present(cur):
     """V12 config is log-mode and all spine isolation triggers exist (deploy_912)."""
     cur.execute("SELECT mode FROM ontology_validator_config WHERE check_code='V12'")
@@ -230,6 +264,8 @@ TESTS = [
     ("property_development.tenure_rule", tenure_rule),
     ("property_development.v12_shadow_present", v12_shadow_present),
     ("property_development.v12_orphan_owner_path", v12_orphan_owner_logged),
+    ("property_development.ledger_covers_stubs", ledger_covers_stubs),
+    ("property_development.revenue_reads_ledger", revenue_reads_ledger),
 ]
 
 
