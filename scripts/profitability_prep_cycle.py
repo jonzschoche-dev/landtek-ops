@@ -1,26 +1,30 @@
 #!/usr/bin/env python3
 """profitability_prep_cycle.py — CONTINUOUS preparation of every property for profitability.
 
-Doctrine (operator 2026-07-15):
-  * Prep runs whether or not anyone prompts.
-  * Prep does NOT require a controlling_matter. Matter attaches only when the schedule/obligation
-    calls for it — never as the default gate on the whole portfolio.
-  * Goal: maximum momentum — always a clear next prep move per property, across all tracks
-    (earn-now, develop, agrarian, recovery) in parallel.
+Doctrine:
+  Preparing a property means securing understanding on SIX axes (always, unprompted):
+
+    1. documents    — secure the papers (CTC, deeds, SPA, tax, court, CLOA…)
+    2. status       — understand operative property status
+    3. occupants    — who occupies / possesses
+    4. ownership    — owners, claimants, authority to act
+    5. title_issues — defects, clouds, cancellations, CARP, contest
+    6. mapping      — boundary geometry, plot, area
+
+  Matter is OPTIONAL context when the schedule calls for it — never required to prep.
+  Cycle runs on a timer whether or not anyone prompts.
 
 Each cycle:
-  1. RECOMPUTE the asset_preconditions ledger for all assets with client_code
-     (development_engine — sole writer of asset-owned cache).
-  2. DERIVE prep moves from non-ok preconditions + structural gaps (no map, no deal shell, …).
-  3. UPSERT open moves; CLOSE moves whose precond is now ok.
-  4. LOG the cycle (heartbeat).
+  1. RECOMPUTE asset_preconditions ledger (development_engine)
+  2. SCORE each property on the six axes → property_readiness
+  3. UPSERT axis-keyed prep moves → profitability_prep_moves
+  4. CLOSE moves that are resolved
+  5. LOG the cycle
 
-  python3 profitability_prep_cycle.py              # full cycle
-  python3 profitability_prep_cycle.py --report     # momentum board only (no writes)
-  python3 profitability_prep_cycle.py --no-recompute  # derive from current ledger only
-  python3 profitability_prep_cycle.py --limit 20   # print top N
-
-Timer: landtek-profitability-prep.timer (deploy_914)
+  python3 profitability_prep_cycle.py
+  python3 profitability_prep_cycle.py --report
+  python3 profitability_prep_cycle.py --no-recompute
+  python3 profitability_prep_cycle.py --asset PA-GOLDEN-SAND
 """
 from __future__ import annotations
 
@@ -32,35 +36,13 @@ import psycopg2
 import psycopg2.extras
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from development_engine import CATALOG, NEXT_MOVE, recompute as de_recompute  # noqa: E402
+from development_engine import recompute as de_recompute  # noqa: E402
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 
-# Prep-oriented actions (momentum). Prefer DOING over WAITING on a matter.
-PREP_ACTIONS = {
-    "marketable_title": "PREP title file: CTC + RD annotations + liens; assemble quiet-title / recovery pack",
-    "secure_tenure":    "PREP tenure file: CTC + chain status + who holds possession papers",
-    "survey_geometry":  "PREP geometry: link/plot map_parcel; upgrade rough→survey when possible",
-    "seller_authority": "PREP authority: confirm SPA/heirs consent docs on file and unrevoked",
-    "tax_clearance":    "PREP tax pack: RPT receipts + compute CGT/DST path for a future transfer",
-    "registrable":      "PREP registrability: list blocking annotations; draft lift/cancel requests",
-    "possession":       "PREP possession: who occupies, since when, paper trail, photos if any",
-    "usable":           "PREP unit readiness: inspect/repairs checklist for lease or sale",
-    "buyer_price":      "PREP sale readiness: pricing memo + broker list (open a deal when ready)",
-    "tenant":           "PREP lease readiness: unit sheet + rent comps (open a lease deal when ready)",
-    "lease_instrument": "PREP lease form: draft terms from unit sheet (no outbound without gate)",
-    "collection":       "PREP collection: account path + receipt template for when leased",
-    "permits":          "PREP permits: list required LGU/DENR items; seed permit skeleton rows",
-    "capital_partner":  "PREP capital: one-pager for JV/partner (operator decides outreach)",
-    "feasibility":      "PREP feasibility: area/value/income sheet from title + map facts",
-    "mineral_rights":   "PREP mineral file: MGB papers + dispute chronology (no matter wait)",
-    "permit":           "PREP mineral permit: MGB checklist + gaps",
-    "operator":         "PREP operator shortlist for mineral/lease ops",
-}
-
-# Priority: lower = sooner. Earn-now + blocked title prep still high (prep, not freeze).
+AXES = ("documents", "status", "occupants", "ownership", "title_issues", "mapping")
+SCORE = {"solid": 1.0, "partial": 0.55, "thin": 0.25, "unknown": 0.0}
 TIER_BOOST = {"earn_now": 0, "develop": 10, "recover_then": 20}
-STATUS_BOOST = {"blocked": 0, "todo": 15, "unknown": 25}
 
 
 def _conn(autocommit=True):
@@ -70,7 +52,7 @@ def _conn(autocommit=True):
 
 
 def _ensure(cur):
-    """Idempotent minimal ensure if migration not applied yet."""
+    """Minimal ensure if migrations 914/915 not applied."""
     cur.execute("""
         CREATE TABLE IF NOT EXISTS profitability_prep_moves (
           id bigserial PRIMARY KEY,
@@ -86,13 +68,14 @@ def _ensure(cur):
           priority int NOT NULL DEFAULT 100,
           status text NOT NULL DEFAULT 'open',
           origin text NOT NULL DEFAULT 'prep_cycle',
-          move_key text NOT NULL,
+          move_key text NOT NULL UNIQUE,
+          axis text,
           last_seen_at timestamptz NOT NULL DEFAULT now(),
           closed_at timestamptz,
           created_at timestamptz NOT NULL DEFAULT now(),
-          updated_at timestamptz NOT NULL DEFAULT now(),
-          UNIQUE (move_key)
+          updated_at timestamptz NOT NULL DEFAULT now()
         )""")
+    cur.execute("ALTER TABLE profitability_prep_moves ADD COLUMN IF NOT EXISTS axis text")
     cur.execute("""
         CREATE TABLE IF NOT EXISTS profitability_prep_cycles (
           id bigserial PRIMARY KEY,
@@ -105,138 +88,237 @@ def _ensure(cur):
           note text
         )""")
     cur.execute("""
-        CREATE OR REPLACE VIEW v_profitability_momentum AS
-        SELECT m.priority, m.client_code, m.asset_code, a.label AS asset_label, a.origin, a.tier,
-               a.title_status, m.mode, m.precond_code, m.action, m.why, m.recheck_condition,
-               m.matter_code, m.last_seen_at
-          FROM profitability_prep_moves m
-          JOIN property_assets a ON a.asset_code = m.asset_code
-         WHERE m.status = 'open'
-         ORDER BY m.priority ASC, m.last_seen_at DESC""")
+        CREATE TABLE IF NOT EXISTS property_readiness (
+          asset_code text PRIMARY KEY,
+          client_code text,
+          documents text NOT NULL DEFAULT 'unknown',
+          status_axis text NOT NULL DEFAULT 'unknown',
+          occupants text NOT NULL DEFAULT 'unknown',
+          ownership text NOT NULL DEFAULT 'unknown',
+          title_issues text NOT NULL DEFAULT 'unknown',
+          mapping text NOT NULL DEFAULT 'unknown',
+          documents_note text,
+          status_note text,
+          occupants_note text,
+          ownership_note text,
+          title_issues_note text,
+          mapping_note text,
+          readiness_score numeric(5,4),
+          weakest_axis text,
+          next_prep_action text,
+          assessed_at timestamptz NOT NULL DEFAULT now(),
+          updated_at timestamptz NOT NULL DEFAULT now()
+        )""")
 
 
-def _priority(tier, status, sort_order):
-    return TIER_BOOST.get(tier or "", 30) + STATUS_BOOST.get(status or "unknown", 25) + int(sort_order or 50)
+# ── axis assessment (signals from live tables; honest unknowns) ─────────────────────────────────
 
-
-def _action_for(code, status, reason):
-    base = PREP_ACTIONS.get(code) or NEXT_MOVE.get(code) or f"PREP: resolve {code}"
-    # Never phrase as "wait for controlling matter only"
-    if status == "blocked" and reason and "gated on" in reason.lower():
-        return base  # prep pack, not wait
-    return base
-
-
-def _optional_matter(asset):
-    """Matter is optional context only — never required for the move to exist."""
-    return asset.get("controlling_matter") or None
-
-
-def derive_moves(cur, asset):
-    """Yield dicts of prep moves for one asset from the ledger + structural gaps."""
-    ac = asset["asset_code"]
-    client = asset.get("client_code")
-    tier = asset.get("tier")
-    matter = _optional_matter(asset)
-    modes = list(asset.get("modes") or []) or ["sale"]
-
-    # All non-ok ledger rows for this asset (asset-owned + any project-owned for its projects)
+def _docs_for_title(cur, title_ref, case_file):
+    """Count documents that look related to this title / case_file."""
+    if not title_ref and not case_file:
+        return 0, 0
+    # related docs: filename/title/text mention of title_no, or same case_file
     cur.execute("""
-        SELECT ap.mode, ap.code, ap.label, ap.status, ap.reason, ap.next_move,
-               ap.evidence_ref, ap.recheck_condition, ap.sort_order, ap.owner_kind
-          FROM asset_preconditions ap
-         WHERE (ap.owner_kind='asset' AND ap.owner_code=%s)
-            OR (ap.owner_kind='project' AND ap.owner_code IN (
-                  SELECT project_code FROM development_projects
-                   WHERE asset_code=%s AND status='active'))
-           AND ap.status <> 'ok'
-         ORDER BY ap.mode, ap.sort_order""", (ac, ac))
-    rows = cur.fetchall()
-    seen = set()
-    for r in rows:
-        key = (r["mode"], r["code"])
-        if key in seen:
-            continue
-        seen.add(key)
-        action = _action_for(r["code"], r["status"], r["reason"])
-        why = f"{r['status']}: {r['reason'] or r['label'] or r['code']}"
-        yield dict(
-            client_code=client, asset_code=ac, matter_code=matter,
-            mode=r["mode"], precond_code=r["code"], action=action, why=why,
-            recheck_condition=r["recheck_condition"] or f"{r['code']} becomes ok",
-            evidence_ref=r["evidence_ref"],
-            priority=_priority(tier, r["status"], r["sort_order"]),
-        )
-
-    # Structural gap: no map link at all (geometry prep even before a precond row)
-    cur.execute("SELECT 1 FROM asset_map_parcels WHERE asset_code=%s LIMIT 1", (ac,))
-    if not cur.fetchone():
-        yield dict(
-            client_code=client, asset_code=ac, matter_code=matter,
-            mode=None, precond_code="survey_geometry",
-            action=PREP_ACTIONS["survey_geometry"],
-            why="no map_parcel linked — geometry prep unblocks develop + area checks",
-            recheck_condition="asset_map_parcels row exists with geom",
-            evidence_ref=None,
-            priority=_priority(tier, "unknown", 20),
-        )
-
-    # Structural gap: modes include sale/lease but no active deal project — still prep, don't freeze
-    for mode in modes:
-        if mode not in ("sale", "lease", "develop", "mineral"):
-            continue
-        cur.execute("""SELECT 1 FROM development_projects
-                        WHERE asset_code=%s AND mode=%s AND status='active' LIMIT 1""", (ac, mode))
-        if cur.fetchone():
-            continue
-        # only if asset-owned core for that mode is mostly ok → deal shell is the next momentum
-        cat = CATALOG.get(mode) or []
-        asset_codes = [c for c, _, ok, _, _ in cat if ok == "asset"]
-        if not asset_codes:
-            continue
-        cur.execute("""SELECT count(*) FILTER (WHERE status='ok') AS ok, count(*) AS n
-                         FROM asset_preconditions
-                        WHERE owner_kind='asset' AND owner_code=%s AND mode=%s
-                          AND code = ANY(%s)""", (ac, mode, asset_codes))
-        st = cur.fetchone()
-        if st and st["n"] and st["ok"] >= max(1, st["n"] - 1):
-            yield dict(
-                client_code=client, asset_code=ac, matter_code=matter,
-                mode=mode, precond_code="_deal_shell",
-                action=f"PREP open a {mode} deal project when ready (ledger nearly clear for asset facts)",
-                why=f"asset-owned {mode} facts {st['ok']}/{st['n']} ok — deal shell is optional momentum",
-                recheck_condition=f"development_projects row for {mode} or operator defers",
-                evidence_ref=None,
-                priority=_priority(tier, "todo", 80),
-            )
+        SELECT count(*) AS n,
+               count(*) FILTER (WHERE coalesce(extracted_text,'') <> '') AS with_text
+          FROM documents d
+         WHERE (%s::text IS NOT NULL AND (
+                 coalesce(d.original_filename,'') ILIKE '%%' || %s || '%%'
+              OR coalesce(d.document_title,'') ILIKE '%%' || %s || '%%'
+              OR coalesce(d.canonical_filename,'') ILIKE '%%' || %s || '%%'
+              OR coalesce(d.extracted_text,'') ILIKE '%%' || %s || '%%'
+               ))
+            OR (%s::text IS NOT NULL AND d.case_file = %s)
+        """, (title_ref, title_ref, title_ref, title_ref, title_ref, case_file, case_file))
+    r = cur.fetchone()
+    return int(r["n"] or 0), int(r["with_text"] or 0)
 
 
-def _move_key(m):
-    return "|".join([
-        m["asset_code"],
-        m.get("mode") or "",
-        m.get("precond_code") or "",
-        m["action"][:200],
-    ])
+def assess_axes(cur, asset):
+    """Return {axis: (grade, note, prep_action|None)} for the six axes."""
+    ac = asset["asset_code"]
+    title_ref = asset.get("title_ref")
+    case_file = asset.get("case_file")
+    ts = (asset.get("title_status") or "").lower()
+    pos = (asset.get("possession") or "").lower()
+    has_auth = bool(asset.get("has_authority"))
+    out = {}
+
+    # ── 1. DOCUMENTS ──
+    n_docs, n_text = _docs_for_title(cur, title_ref, case_file)
+    # also count title row presence as a doc signal
+    has_title_row = False
+    if title_ref:
+        cur.execute("SELECT 1 FROM titles WHERE tct_number=%s LIMIT 1", (title_ref,))
+        has_title_row = bool(cur.fetchone())
+    if n_text >= 3 or (n_docs >= 2 and n_text >= 1):
+        out["documents"] = ("partial" if n_text < 5 else "solid",
+                            f"{n_docs} related docs, {n_text} with text"
+                            + ("; titles row present" if has_title_row else ""),
+                            None if n_text >= 5 else
+                            "PREP documents: secure CTC/owner's duplicate + remaining instruments (deeds/SPA/tax)")
+    elif n_docs >= 1 or has_title_row:
+        out["documents"] = ("thin",
+                            f"{n_docs} related docs ({n_text} with text); need secure pack",
+                            "PREP documents: pull CTC from RD; secure deeds, SPA, tax decs, court papers for this title")
+    else:
+        out["documents"] = ("unknown",
+                            "no related documents found in corpus for this title/case_file",
+                            "PREP documents: identify and secure source docs (RD CTC, Drive, email attachments)")
+
+    # ── 2. STATUS ──
+    if ts in ("clean", "active"):
+        out["status"] = ("solid" if ts == "clean" else "partial",
+                         f"title_status={ts or 'unset'}",
+                         None if ts == "clean" else
+                         "PREP status: confirm active vs cancelled at RD (status not clean)")
+    elif ts in ("clouded", "cancelled", "unverified", "untitled"):
+        out["status"] = ("thin" if ts == "unverified" else "partial",
+                         f"title_status={ts} — status understood as problem state; keep monitoring",
+                         f"PREP status: reconfirm {ts} at RD + note any new annotations this cycle")
+    else:
+        out["status"] = ("unknown",
+                         "title_status missing — property status not understood",
+                         "PREP status: establish operative title status (clean/clouded/cancelled) from RD")
+
+    # ── 3. OCCUPANTS ──
+    if pos == "yes":
+        out["occupants"] = ("partial",
+                            "possession=yes on asset — occupant identity may still be thin",
+                            "PREP occupants: name who occupies, since when, contact, any lease/tax evidence")
+    elif pos == "contested":
+        out["occupants"] = ("thin",
+                            "possession contested — occupant map is load-bearing",
+                            "PREP occupants: map who is on the land, adverse claim history, photos/affidavits")
+    elif pos in ("no", "vacant"):
+        out["occupants"] = ("partial",
+                            f"possession={pos}",
+                            "PREP occupants: confirm vacant/no occupant with site check or neighbor statement")
+    else:
+        out["occupants"] = ("unknown",
+                            "possession unknown — occupants not understood",
+                            "PREP occupants: determine who occupies (if anyone) and on what basis")
+
+    # ── 4. OWNERSHIP ──
+    owner_bits = []
+    if title_ref:
+        cur.execute("""SELECT registrant_canonical FROM titles WHERE tct_number=%s LIMIT 1""", (title_ref,))
+        tr = cur.fetchone()
+        if tr and tr.get("registrant_canonical"):
+            owner_bits.append(f"registrant={tr['registrant_canonical'][:80]}")
+    if has_auth:
+        owner_bits.append("has_authority=true on asset")
+    cur.execute("""SELECT count(*) AS n FROM asset_titles WHERE asset_code=%s""", (ac,))
+    n_links = cur.fetchone()["n"]
+    if n_links:
+        owner_bits.append(f"{n_links} title links")
+
+    if owner_bits and has_auth and ts == "clean":
+        out["ownership"] = ("partial",
+                            "; ".join(owner_bits),
+                            "PREP ownership: verify heirs/SPA still valid; list all claimants")
+    elif owner_bits:
+        out["ownership"] = ("thin",
+                            "; ".join(owner_bits) or "partial signals",
+                            "PREP ownership: complete owner/claimant map + authority (SPA/heirs) docs")
+    else:
+        out["ownership"] = ("unknown",
+                            "no registrant/authority signals on file",
+                            "PREP ownership: identify registered owner + claimants + who may act")
+
+    # ── 5. TITLE ISSUES ──
+    issues = []
+    if ts in ("clouded", "cancelled"):
+        issues.append(ts)
+    if pos == "contested":
+        issues.append("possession_contested")
+    ctrl = asset.get("controlling_matter")
+    if ctrl:
+        issues.append(f"context:{ctrl}")
+    # CARP / CLOA hint in title number
+    tr_u = (title_ref or "").upper()
+    if "CLOA" in tr_u or "EP-" in tr_u:
+        issues.append("agrarian/CLOA form")
+
+    if not issues and ts == "clean":
+        out["title_issues"] = ("solid",
+                               "no cloud/cancel/contest signals on asset row",
+                               None)
+    elif issues:
+        grade = "partial" if ts in ("clouded", "cancelled") else "thin"
+        out["title_issues"] = (grade,
+                               "issues: " + ", ".join(issues),
+                               "PREP title issues: list defects/annotations; assemble recovery or curative pack")
+    else:
+        out["title_issues"] = ("unknown",
+                               "title issues not yet assessed",
+                               "PREP title issues: scan RD annotations + corpus for defects/encumbrances")
+
+    # ── 6. MAPPING ──
+    cur.execute("""
+        SELECT count(*) AS links,
+               count(*) FILTER (WHERE mp.geom_geojson IS NOT NULL) AS plotted,
+               count(*) FILTER (WHERE mp.accuracy_tier IN ('survey','ortho')) AS survey_grade
+          FROM asset_map_parcels amp
+          LEFT JOIN map_parcels mp ON mp.parcel_code = amp.parcel_code
+         WHERE amp.asset_code=%s""", (ac,))
+    g = cur.fetchone()
+    cur.execute("""SELECT count(*) AS n FROM asset_survey_parcels WHERE asset_code=%s""", (ac,))
+    survey_n = cur.fetchone()["n"]
+
+    if g["survey_grade"] and g["survey_grade"] > 0:
+        out["mapping"] = ("solid",
+                          f"{g['links']} map links, {g['survey_grade']} survey/ortho",
+                          None)
+    elif g["plotted"] and g["plotted"] > 0:
+        out["mapping"] = ("partial",
+                          f"{g['links']} links, plotted but not survey-grade",
+                          "PREP mapping: upgrade plot to survey/ortho; confirm area vs title")
+    elif g["links"] and g["links"] > 0:
+        out["mapping"] = ("thin",
+                          f"{g['links']} map links but unplotted",
+                          "PREP mapping: plot the linked parcel on satellite / survey")
+    elif survey_n:
+        out["mapping"] = ("thin",
+                          f"{survey_n} survey shapes (relative) — not georeferenced",
+                          "PREP mapping: georeference survey shape → map_parcels")
+    else:
+        out["mapping"] = ("unknown",
+                          "no map or survey geometry linked",
+                          "PREP mapping: attach boundary (map_parcel or survey courses) for this property")
+
+    return out
+
+
+def _priority(tier, grade, axis):
+    # weaker axis = higher priority (lower number)
+    weak = {"unknown": 0, "thin": 10, "partial": 25, "solid": 90}
+    axis_w = {"documents": 0, "title_issues": 2, "ownership": 4, "occupants": 6,
+              "status": 8, "mapping": 10, "deal": 40}
+    return TIER_BOOST.get(tier or "", 30) + weak.get(grade, 15) + axis_w.get(axis, 20)
+
+
+def _move_key(asset_code, axis, action):
+    return f"{asset_code}|{axis}|{action[:180]}"
 
 
 def upsert_move(cur, m):
-    m = dict(m)
-    m["move_key"] = _move_key(m)
     cur.execute("""
         INSERT INTO profitability_prep_moves
           (client_code, asset_code, matter_code, mode, precond_code, action, why,
-           recheck_condition, evidence_ref, priority, status, origin, move_key, last_seen_at, updated_at)
+           recheck_condition, evidence_ref, priority, status, origin, move_key, axis,
+           last_seen_at, updated_at)
         VALUES (%(client_code)s,%(asset_code)s,%(matter_code)s,%(mode)s,%(precond_code)s,%(action)s,%(why)s,
-                %(recheck_condition)s,%(evidence_ref)s,%(priority)s,'open','prep_cycle',%(move_key)s,now(),now())
-        ON CONFLICT (move_key)
-        DO UPDATE SET
+                %(recheck_condition)s,%(evidence_ref)s,%(priority)s,'open','prep_cycle',%(move_key)s,%(axis)s,
+                now(),now())
+        ON CONFLICT (move_key) DO UPDATE SET
           client_code=EXCLUDED.client_code,
           matter_code=EXCLUDED.matter_code,
           why=EXCLUDED.why,
           recheck_condition=EXCLUDED.recheck_condition,
           evidence_ref=EXCLUDED.evidence_ref,
           priority=EXCLUDED.priority,
+          axis=EXCLUDED.axis,
           status='open',
           closed_at=NULL,
           last_seen_at=now(),
@@ -244,129 +326,192 @@ def upsert_move(cur, m):
         """, m)
 
 
+def upsert_readiness(cur, asset, axes, next_action):
+    grades = {ax: axes[ax][0] for ax in AXES}
+    notes = {ax: axes[ax][1] for ax in AXES}
+    score = sum(SCORE[grades[ax]] for ax in AXES) / len(AXES)
+    weakest = min(AXES, key=lambda ax: (SCORE[grades[ax]], ax))
+    cur.execute("""
+        INSERT INTO property_readiness
+          (asset_code, client_code,
+           documents, status_axis, occupants, ownership, title_issues, mapping,
+           documents_note, status_note, occupants_note, ownership_note, title_issues_note, mapping_note,
+           readiness_score, weakest_axis, next_prep_action, assessed_at, updated_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now(),now())
+        ON CONFLICT (asset_code) DO UPDATE SET
+          client_code=EXCLUDED.client_code,
+          documents=EXCLUDED.documents, status_axis=EXCLUDED.status_axis,
+          occupants=EXCLUDED.occupants, ownership=EXCLUDED.ownership,
+          title_issues=EXCLUDED.title_issues, mapping=EXCLUDED.mapping,
+          documents_note=EXCLUDED.documents_note, status_note=EXCLUDED.status_note,
+          occupants_note=EXCLUDED.occupants_note, ownership_note=EXCLUDED.ownership_note,
+          title_issues_note=EXCLUDED.title_issues_note, mapping_note=EXCLUDED.mapping_note,
+          readiness_score=EXCLUDED.readiness_score, weakest_axis=EXCLUDED.weakest_axis,
+          next_prep_action=EXCLUDED.next_prep_action, assessed_at=now(), updated_at=now()
+        """, (
+        asset["asset_code"], asset.get("client_code"),
+        grades["documents"], grades["status"], grades["occupants"],
+        grades["ownership"], grades["title_issues"], grades["mapping"],
+        notes["documents"], notes["status"], notes["occupants"],
+        notes["ownership"], notes["title_issues"], notes["mapping"],
+        round(score, 4), weakest, next_action,
+    ))
+
+
+def process_asset(cur, asset):
+    """Assess axes, write readiness + prep moves. Returns (moves_list, next_action)."""
+    axes = assess_axes(cur, asset)
+    moves = []
+    for axis in AXES:
+        grade, note, action = axes[axis]
+        if not action:
+            continue
+        m = dict(
+            client_code=asset.get("client_code"),
+            asset_code=asset["asset_code"],
+            matter_code=asset.get("controlling_matter"),  # optional context only
+            mode=None,
+            precond_code=axis,
+            action=action,
+            why=f"{axis}={grade}: {note}",
+            recheck_condition=f"{axis} reaches solid or prep pack complete",
+            evidence_ref=note[:200] if note else None,
+            priority=_priority(asset.get("tier"), grade, axis),
+            axis=axis,
+        )
+        m["move_key"] = _move_key(asset["asset_code"], axis, action)
+        moves.append(m)
+    # next action = lowest priority number among moves
+    next_action = None
+    if moves:
+        moves_sorted = sorted(moves, key=lambda x: x["priority"])
+        next_action = moves_sorted[0]["action"]
+    upsert_readiness(cur, asset, axes, next_action)
+    for m in moves:
+        upsert_move(cur, m)
+    return moves, next_action
+
+
 def close_resolved(cur, seen_keys):
-    """Mark open moves not seen this cycle as done when their precond is now ok; else leave open
-    (staleness: if not in seen_keys and precond ok → done; if precond still non-ok, keep open)."""
-    cur.execute("""SELECT id, asset_code, mode, precond_code, action FROM profitability_prep_moves
-                   WHERE status='open'""")
+    cur.execute("SELECT id, move_key, asset_code, axis FROM profitability_prep_moves WHERE status='open'")
     closed = 0
     for row in cur.fetchall():
-        key = "|".join([row["asset_code"], row["mode"] or "", row["precond_code"] or "",
-                        (row["action"] or "")[:200]])
-        if key in seen_keys:
+        if row["move_key"] in seen_keys:
             continue
-        # Structural codes without ledger row
-        if row["precond_code"] in (None, "", "_deal_shell", "survey_geometry"):
-            if row["precond_code"] == "survey_geometry":
-                cur.execute("SELECT 1 FROM asset_map_parcels WHERE asset_code=%s LIMIT 1",
-                            (row["asset_code"],))
-                if cur.fetchone():
-                    cur.execute("""UPDATE profitability_prep_moves SET status='done', closed_at=now(),
-                                   updated_at=now() WHERE id=%s""", (row["id"],))
-                    closed += 1
-            continue
-        cur.execute("""SELECT status FROM asset_preconditions
-                        WHERE owner_kind='asset' AND owner_code=%s AND mode IS NOT DISTINCT FROM %s
-                          AND code=%s
-                       UNION ALL
-                       SELECT ap.status FROM asset_preconditions ap
-                        JOIN development_projects dp ON dp.project_code=ap.owner_code
-                        WHERE ap.owner_kind='project' AND dp.asset_code=%s
-                          AND ap.mode IS NOT DISTINCT FROM %s AND ap.code=%s
-                       LIMIT 1""",
-                    (row["asset_code"], row["mode"], row["precond_code"],
-                     row["asset_code"], row["mode"], row["precond_code"]))
-        st = cur.fetchone()
-        if st and st["status"] == "ok":
-            cur.execute("""UPDATE profitability_prep_moves SET status='done', closed_at=now(),
+        # if readiness axis is solid, close
+        axis = row["axis"]
+        if axis and axis in AXES:
+            col = "status_axis" if axis == "status" else axis
+            cur.execute(f"SELECT {col} AS g FROM property_readiness WHERE asset_code=%s",
+                        (row["asset_code"],))
+            r = cur.fetchone()
+            if r and r["g"] == "solid":
+                cur.execute("""UPDATE profitability_prep_moves SET status='done', closed_at=now(),
+                               updated_at=now() WHERE id=%s""", (row["id"],))
+                closed += 1
+                continue
+        # not seen and not solid — supersede stale axis moves from older action text
+        if row["axis"]:
+            cur.execute("""UPDATE profitability_prep_moves SET status='superseded', closed_at=now(),
                            updated_at=now() WHERE id=%s""", (row["id"],))
             closed += 1
     return closed
 
 
-def run_cycle(do_recompute=True, report_limit=25):
+def run_cycle(do_recompute=True, report_limit=20, only_asset=None):
     started = datetime.now(timezone.utc)
-    if do_recompute:
-        print("[prep] recompute ledger (all assets) …")
+    if do_recompute and not only_asset:
+        print("[prep] recompute ledger …")
         de_recompute()
+    elif do_recompute and only_asset:
+        de_recompute(asset_code=only_asset)
 
     c = _conn(autocommit=False)
     cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     _ensure(cur)
-
-    cur.execute("""INSERT INTO profitability_prep_cycles (started_at) VALUES (%s) RETURNING id""",
-                (started,))
+    cur.execute("INSERT INTO profitability_prep_cycles (started_at) VALUES (%s) RETURNING id", (started,))
     cycle_id = cur.fetchone()["id"]
 
-    cur.execute("SELECT * FROM property_assets WHERE client_code IS NOT NULL ORDER BY asset_code")
+    if only_asset:
+        cur.execute("SELECT * FROM property_assets WHERE asset_code=%s AND client_code IS NOT NULL",
+                    (only_asset,))
+    else:
+        cur.execute("SELECT * FROM property_assets WHERE client_code IS NOT NULL ORDER BY asset_code")
     assets = cur.fetchall()
-    seen_keys = set()
+
+    seen = set()
     upserted = 0
     for a in assets:
-        for m in derive_moves(cur, a):
-            upsert_move(cur, m)
+        moves, _ = process_asset(cur, a)
+        for m in moves:
+            seen.add(m["move_key"])
             upserted += 1
-            seen_keys.add(_move_key(m))
-    closed = close_resolved(cur, seen_keys)
+
+    closed = close_resolved(cur, seen) if not only_asset else 0
     cur.execute("SELECT count(*) AS n FROM profitability_prep_moves WHERE status='open'")
     open_n = cur.fetchone()["n"]
-    note = (f"continuous prep — matter optional; assets={len(assets)} "
-            f"upserted={upserted} closed={closed} open={open_n}")
+    note = (f"6-axis property prep — assets={len(assets)} moves_upserted={upserted} "
+            f"closed={closed} open={open_n}")
     cur.execute("""UPDATE profitability_prep_cycles SET finished_at=now(), assets_seen=%s,
                    moves_open=%s, moves_upserted=%s, moves_closed=%s, note=%s WHERE id=%s""",
                 (len(assets), open_n, upserted, closed, note, cycle_id))
     c.commit()
     print(f"[prep] cycle #{cycle_id}: {note}")
-    report(cur, limit=report_limit)
+    report(cur, limit=report_limit, asset=only_asset)
     cur.close(); c.close()
-    return open_n
 
 
-def report(cur=None, limit=25):
+def report(cur=None, limit=20, asset=None):
     own = cur is None
     if own:
         c = _conn(); cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         _ensure(cur)
-    if _view_exists(cur):
-        cur.execute("""SELECT priority, client_code, asset_code, mode, precond_code, action, why, tier
-                         FROM v_profitability_momentum LIMIT %s""", (limit,))
+
+    print("\n" + "=" * 90)
+    print("PROPERTY READINESS — six axes (documents · status · occupants · ownership · title · map)")
+    print("=" * 90)
+    if asset:
+        cur.execute("""SELECT * FROM property_readiness WHERE asset_code=%s""", (asset,))
+        rows = cur.fetchall()
     else:
-        cur.execute("""SELECT m.priority, m.client_code, m.asset_code, m.mode, m.precond_code,
-                              m.action, m.why, a.tier
-                         FROM profitability_prep_moves m
-                         JOIN property_assets a ON a.asset_code=m.asset_code
-                        WHERE m.status='open'
-                        ORDER BY m.priority, m.last_seen_at DESC LIMIT %s""", (limit,))
-    rows = cur.fetchall()
-    print("\n" + "=" * 88)
-    print(f"PROFITABILITY MOMENTUM — top {len(rows)} prep moves (continuous; not matter-gated)")
-    print("=" * 88)
+        cur.execute("""SELECT * FROM property_readiness ORDER BY readiness_score ASC NULLS FIRST
+                       LIMIT %s""", (limit,))
+        rows = cur.fetchall()
+    if not rows:
+        print("  (no readiness rows yet — run a full cycle)")
     for r in rows:
-        mode = r["mode"] or "-"
-        print(f"  p{r['priority']:<3} {(r['client_code'] or '?'):<12} {r['asset_code']:<18} "
-              f"{mode:<8} {r['precond_code'] or '-':<18}")
-        print(f"       → {r['action']}")
-        if r.get("why"):
-            print(f"         ({r['why'][:100]})")
+        print(f"\n  {r['asset_code']}  score={r['readiness_score']}  weakest={r['weakest_axis']}")
+        print(f"    docs={r['documents']:<8} status={r['status_axis']:<8} occ={r['occupants']:<8} "
+              f"own={r['ownership']:<8} title={r['title_issues']:<8} map={r['mapping']:<8}")
+        if r.get("next_prep_action"):
+            print(f"    → {r['next_prep_action']}")
+
+    print("\n" + "-" * 90)
+    print("TOP PREP MOVES (by axis priority)")
+    print("-" * 90)
+    q = """SELECT priority, axis, client_code, asset_code, action, why
+             FROM profitability_prep_moves WHERE status='open'"""
+    params = []
+    if asset:
+        q += " AND asset_code=%s"
+        params.append(asset)
+    q += " ORDER BY priority ASC, last_seen_at DESC LIMIT %s"
+    params.append(limit)
+    cur.execute(q, params)
+    for r in cur.fetchall():
+        print(f"  p{r['priority']:<3} [{(r['axis'] or '-'):<12}] {r['asset_code']:<18} {r['action'][:70]}")
+
     if own:
-        cur.execute("SELECT id, finished_at, assets_seen, moves_open, note FROM profitability_prep_cycles "
-                    "ORDER BY id DESC LIMIT 1")
-        last = cur.fetchone()
-        if last:
-            print(f"\n  last cycle: #{last['id']} open={last['moves_open']} "
-                  f"assets={last['assets_seen']} @ {last['finished_at']}")
         cur.close(); c.close()
-
-
-def _view_exists(cur):
-    cur.execute("SELECT 1 FROM pg_views WHERE viewname='v_profitability_momentum'")
-    return bool(cur.fetchone())
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    def val(flag):
+        return args[args.index(flag) + 1] if flag in args and args.index(flag) + 1 < len(args) else None
     if "--report" in args:
-        report(limit=int(args[args.index("--limit") + 1]) if "--limit" in args else 25)
+        report(limit=int(val("--limit") or 20), asset=val("--asset"))
     else:
-        lim = int(args[args.index("--limit") + 1]) if "--limit" in args else 25
-        run_cycle(do_recompute=("--no-recompute" not in args), report_limit=lim)
+        run_cycle(do_recompute=("--no-recompute" not in args),
+                  report_limit=int(val("--limit") or 15),
+                  only_asset=val("--asset"))
