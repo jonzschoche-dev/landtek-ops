@@ -42,11 +42,29 @@ def _one(cur, sql, args=None):
     return cur.fetchone()
 
 
-# ── retrieval (findability) — the live sovereign retriever; guarded, $0, read-only ──────────────────
-def _retriever():
+# ── retrieval (findability) — VPS-native: the venv embeds the query, THIS cursor does the pgvector search.
+# rag_embed_local is a Mac-side tool (it ssh's into the VPS); we do not reuse it here. $0, read-only. ──
+import subprocess
+EMBED_VENV = os.environ.get("TLFH_EMBED_VENV", "/root/landtek/.venv-tlfh/bin/python")
+EMBED_HELPER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tlfh_embed.py")
+
+
+def _semantic_hits(cur, query, k=8, ids=None):
+    """Top-k rag_local doc_ids for the query, or None if the embedder isn't provisioned (→ not_tested).
+    The venv subprocess ONLY embeds; the ORDER BY embedding <=> query runs on the restricted harness cursor."""
+    if not (EMBED_VENV and os.path.exists(EMBED_VENV) and os.path.exists(EMBED_HELPER)):
+        return None
     try:
-        import rag_embed_local as R
-        return R
+        r = subprocess.run([EMBED_VENV, EMBED_HELPER, query], capture_output=True, text=True, timeout=120)
+        qv = (r.stdout or "").strip()
+        if not qv.startswith("["):
+            return None
+        if ids:
+            cur.execute("SELECT doc_id FROM rag_local WHERE doc_id = ANY(%s) "
+                        "ORDER BY embedding <=> %s::vector LIMIT %s", (list(ids), qv, k))
+        else:
+            cur.execute("SELECT doc_id FROM rag_local ORDER BY embedding <=> %s::vector LIMIT %s", (qv, k))
+        return [str(row["doc_id"]) for row in cur.fetchall()]
     except Exception:
         return None
 
@@ -195,33 +213,64 @@ class LegalTitleAdapter(DomainAdapter):
         else:
             out.append(_m("findability", "indexed", "False",
                           target={"action": "embed", "what": f"doc:{src} absent from rag_local — unretrievable"}))
-        R = ctx.get("retriever")
-        if R is None:
-            out.append(_m("findability", "semantic_recall", "not_tested",
-                          basis={"reason": "query embedder unavailable (Mac-side)"}))
+        if ctx.get("no_semantic"):        # tests/fast path: skip the second-order probe
+            out.append(_m("findability", "semantic_recall", "not_tested", basis={"reason": "semantic probe disabled"}))
             return out
-        try:
-            hits = R.retrieve(question, k=8, ids=ctx.get("mwk_doc_ids") or None)
-            ids = [str(h["doc_id"]) for h in hits]
-            if str(src) in ids:
-                out.append(_m("findability", "semantic_recall", "found", numeric=ids.index(str(src)) + 1,
-                              basis={"rank": ids.index(str(src)) + 1}))
-            else:
-                out.append(_m("findability", "semantic_recall", "missed",
-                              target={"action": "reembed_or_query_fix", "what": f"doc:{src} not in top-8 for its object"}))
-        except Exception as e:
-            out.append(_m("findability", "semantic_recall", "not_tested", basis={"error": type(e).__name__}))
+        hits = _semantic_hits(cur, question, 8, ctx.get("mwk_doc_ids") or None)
+        if hits is None:
+            out.append(_m("findability", "semantic_recall", "not_tested", basis={"reason": "embedder not provisioned"}))
+        elif str(src) in hits:
+            out.append(_m("findability", "semantic_recall", "found", numeric=hits.index(str(src)) + 1,
+                          basis={"rank": hits.index(str(src)) + 1}))
+        else:
+            out.append(_m("findability", "semantic_recall", "missed",
+                          target={"action": "reembed_or_query_fix", "what": f"doc:{src} not in top-8 for its object"}))
         return out
 
 
-# The seven not-yet-instrumented domains (defined interface, zero objects → zero false gaps).
+class MappingAdapter(DomainAdapter):
+    """Second instrumented adapter (proves domain-agnostic on non-legal data). Grades whatever real parcels
+    exist in map_parcels — currently a nascent corpus (n≈1); it scales automatically as parcels are plotted."""
+    domain = "mapping"
+    status = "instrumented"
+
+    def enumerate_objects(self, cur):
+        return [("parcel", str(r["id"]), r["client_code"]) for r in _rows(cur, "SELECT id, client_code FROM map_parcels")]
+
+    def grade(self, cur, object_type, object_id, ctx):
+        r = _one(cur, "SELECT * FROM map_parcels WHERE id=%s", (object_id,))
+        if not r:
+            return []
+        out = []
+        out.append(_m("availability", "geometry_present", bool(r["geom_geojson"]),
+                      target=None if r["geom_geojson"] else {"action": "plot", "what": f"parcel {object_id} has no geometry"}))
+        out.append(_m("availability", "bound_to_client", bool(r["client_code"])))
+        out.append(_m("availability", "bound_to_title", bool(r["title_no"])))
+        out.append(_m("parsing", "area_computed", bool(r["area_sqm"]),
+                      numeric=float(r["area_sqm"]) if r["area_sqm"] else None))
+        out.append(_m("parsing", "centroid_present", bool(r["centroid_lat"] and r["centroid_lng"])))
+        tier = r["accuracy_tier"]
+        grounded = tier in ("survey", "orthomosaic", "ortho") and bool(r["source_note"])
+        out.append(_m("grounding", "accuracy_tier", tier or "none"))
+        out.append(_m("grounding", "survey_grade", grounded,             # approximate/satellite is NOT truth-grade
+                      target=None if grounded else {"action": "survey_or_source",
+                                                    "what": f"parcel {object_id} tier={tier or 'none'} not survey-grade/cited"}))
+        out.append(_m("consistency", "area_agrees", not bool(r["area_flag"]),
+                      basis={"stated": str(r["stated_area_sqm"]), "computed": str(r["area_sqm"])},
+                      target={"action": "reconcile_area", "what": f"parcel {object_id} plot-vs-title area flagged"}
+                      if r["area_flag"] else None))
+        out.append(_m("findability", "indexed", "not_tested", basis={"reason": "parcel has no direct source-doc link"}))
+        return out
+
+
+# The remaining not-yet-instrumented domains (defined interface, zero objects → zero false gaps).
 class StubAdapter(DomainAdapter):
     def __init__(self, domain):
         self.domain = domain
 
 
-ADAPTERS = {"legal": LegalTitleAdapter()}
-for _d in ("mapping", "tenants", "mining", "accounting", "property", "communications", "business"):
+ADAPTERS = {"legal": LegalTitleAdapter(), "mapping": MappingAdapter()}
+for _d in ("tenants", "mining", "accounting", "property", "communications", "business"):
     ADAPTERS[_d] = StubAdapter(_d)
 
 
@@ -249,8 +298,6 @@ def run_cycle(cur, domain="legal", cohort="mwk_spine", print_card=True):
             print(f"[tlfh] domain '{domain}' is not_instrumented — no objects, no gaps (by design).")
         return {"status": "not_instrumented", "domain": domain}
     ctx = adapter.context(cur) if hasattr(adapter, "context") else {}
-    if "retriever" not in ctx:
-        ctx["retriever"] = _retriever()
     objs = adapter.enumerate_objects(cur)
 
     # Pass 1: grade every object into memory (upsert the registry, gather measurements + the rollup). We
@@ -304,6 +351,65 @@ def _scorecard(domain, cohort, n, n_targets, tally, cycle_id):
     print(f">> ledger: fitness_measurement (cycle_id={cycle_id}); no facts written; nothing deployed.\n")
 
 
+# deterministic weakness → matched remediation (a DESCRIPTION; never executed by the harness)
+_REMEDIATION_ACTION = {
+    "verification_pass": "Queue a human/governed verification of this object's grounding through the A77/A78 "
+                         "path (source doc + verify step). The harness NEVER sets provenance='verified'.",
+    "parse": "Re-run the domain parser to fill the missing structured fields; re-graded next cycle.",
+    "embed": "Embed the source document into rag_local so the object becomes retrievable.",
+    "reocr": "Re-OCR the source document (readability below threshold).",
+    "reembed_or_query_fix": "Re-embed the doc or fix the retrieval query — grounding is unchanged.",
+    "adjudicate": "Route the open contradiction to A78 for human adjudication.",
+    "reconcile_area": "Reconcile plotted geometry against the title's stated area (surveyor/human).",
+    "survey_or_source": "Obtain a survey-grade plot or cite the geometry's source.",
+    "retrieve": "Retrieve the missing source binary.",
+    "plot": "Plot the parcel geometry.",
+}
+
+
+def remediate(cur, only=None, print_report=True):
+    """SHADOW remediation: turn each open weakness into a CANDIDATE (with its matched, human-readable action)
+    in the dedicated candidate lane. Writes NO facts, sets nothing verified, executes nothing. A human/
+    governed step promotes candidates onward. Idempotent (one candidate per weakness)."""
+    q = "SELECT g.*, o.id AS opk FROM v_fitness_gaps g JOIN fitness_object o " \
+        "ON o.domain=g.domain AND o.object_type=g.object_type AND o.object_id=g.object_id"
+    args = ()
+    if only:
+        q += " WHERE g.remediation=%s"; args = (only,)
+    rows = _rows(cur, q, args)
+    n = 0
+    for g in rows:
+        action = _REMEDIATION_ACTION.get(g["remediation"], f"Manual review: {g['remediation']}")
+        cur.execute("""INSERT INTO fitness_remediation_candidate
+            (object_pk, domain, object_type, object_id, client_code, dimension, submeasure, remediation, target, proposed_action)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON CONFLICT (object_pk, dimension, submeasure) DO NOTHING""",
+            (g["opk"], g["domain"], g["object_type"], g["object_id"], g["client_code"], g["dimension"],
+             g["submeasure"], g["remediation"], json.dumps(g["target"]) if g["target"] else None, action))
+        n += cur.rowcount
+    if print_report:
+        print(f"[remediate] {len(rows)} open weaknesses → {n} new candidate(s) queued (shadow; no facts written).")
+        for r in _rows(cur, "SELECT remediation, count(*) n FROM fitness_remediation_candidate "
+                            "WHERE status='candidate' GROUP BY remediation ORDER BY n DESC"):
+            print(f"   {r['n']:>4}  {r['remediation']}")
+    return {"open": len(rows), "queued": n}
+
+
+def trend_report(cur):
+    rows = _rows(cur, "SELECT * FROM v_fitness_trend WHERE domain='legal'")
+    print(f"\n{'='*70}\nFITNESS TREND (legal) — grounding coverage cycle-over-cycle\n{'='*70}")
+    print(f"{'cycle':>6}{'objects':>9}{'grounded':>18}{'coverage':>11}{'Δ':>8}{'targets':>9}")
+    prev = None
+    for r in rows:
+        gt, g = r["grounded_total"] or 0, r["grounded"] or 0
+        pct = 100.0 * g / gt if gt else 0.0
+        delta = "" if prev is None else f"{pct - prev:+.1f}"
+        print(f"{r['cycle_id']:>6}{r['n_objects'] or 0:>9}{f'{g}/{gt}':>18}{f'{pct:.1f}%':>11}{delta:>8}{r['open_targets'] or 0:>9}")
+        prev = pct
+    regr = _one(cur, "SELECT count(*) n FROM v_fitness_gaps WHERE regressed")
+    print(f"\n>> regressions currently open (grounded→worse): {regr['n']}\n")
+
+
 def gaps_report(cur, limit=12):
     """The prioritized weakness queue (v_fitness_gaps) — what the remediation loop acts on. Read-only."""
     rows = _rows(cur, "SELECT remediation, dimension, count(*) n, sum(regressed::int) regressed "
@@ -326,14 +432,18 @@ def main():
         for d, a in ADAPTERS.items():
             print(f"  {d:15s} {a.status}")
         return
-    if "--gaps" in sys.argv:
-        conn = psycopg2.connect(DSN); cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        try:
-            cur.execute("SET ROLE tlfh_harness")
-            gaps_report(cur)
-        finally:
-            cur.close(); conn.close()
-        return
+    for flag, fn in (("--gaps", gaps_report), ("--trend", trend_report), ("--remediate", remediate)):
+        if flag in sys.argv:
+            conn = psycopg2.connect(DSN); conn.autocommit = (flag != "--remediate")
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            try:
+                cur.execute("SET ROLE tlfh_harness")
+                fn(cur)
+                if flag == "--remediate":
+                    conn.commit()
+            finally:
+                cur.close(); conn.close()
+            return
     conn = psycopg2.connect(DSN)
     conn.autocommit = False
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)

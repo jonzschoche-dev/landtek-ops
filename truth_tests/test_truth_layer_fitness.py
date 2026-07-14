@@ -102,10 +102,11 @@ def findability_never_demotes_grounding(cur):
         def grounded_of(ctx):
             return {m["submeasure"]: m["value"] for m in adapter.grade(tc, "title", tct, ctx)
                     if m["dimension"] == "grounding"}.get("grounded")
-        no_retr = grounded_of({"retriever": None})
-        missed = grounded_of({"retriever": _NullRetriever(), "mwk_doc_ids": []})
-        if no_retr != missed:
-            raise TruthFailure(f"grounding changed with retrieval state ({no_retr}->{missed}) — findability "
+        # grounding must be identical whether the semantic probe is off or forced to 'missed'
+        clean = grounded_of({"no_semantic": True})
+        forced_miss = grounded_of({"mwk_doc_ids": [-1]})   # scoped to a nonexistent doc → semantic miss
+        if clean != forced_miss:
+            raise TruthFailure(f"grounding changed with retrieval state ({clean}->{forced_miss}) — findability "
                                "demoted grounding (forbidden).")
     finally:
         conn.rollback(); conn.close()
@@ -148,8 +149,8 @@ def empty_domain_yields_no_gaps(cur):
 def cycle_is_fingerprinted(cur):
     """Every cycle records a reproducibility fingerprint (grader version + source snapshot)."""
     conn, tc = _rb()
-    orig = TLF._retriever
-    TLF._retriever = lambda: None                    # keep the test fast + deterministic (no embedding calls)
+    orig = TLF.EMBED_VENV
+    TLF.EMBED_VENV = None                            # keep the test fast + deterministic (no embedding calls)
     try:
         tc.execute("SET ROLE tlfh_harness")
         res = TLF.run_cycle(tc, domain="legal", print_card=False)
@@ -159,12 +160,60 @@ def cycle_is_fingerprinted(cur):
         if (res.get("n_objects") or 0) < 1:
             raise TruthFailure("legal cycle graded zero objects — the spine did not enumerate.")
     finally:
-        TLF._retriever = orig
+        TLF.EMBED_VENV = orig
+        conn.rollback(); conn.close()
+
+
+def remediation_writes_no_facts(cur):
+    """Shadow remediation may write ONLY the dedicated candidate lane — never matter_facts / proposed_facts."""
+    conn, tc = _rb()
+    try:
+        tc.execute("SET ROLE tlfh_harness")
+        before = (TLF._one(tc, "SELECT count(*) n FROM matter_facts")["n"],
+                  TLF._one(tc, "SELECT count(*) n FROM proposed_facts")["n"])
+        TLF.remediate(tc, print_report=False)
+        after = (TLF._one(tc, "SELECT count(*) n FROM matter_facts")["n"],
+                 TLF._one(tc, "SELECT count(*) n FROM proposed_facts")["n"])
+        if after != before:
+            raise TruthFailure("remediation touched a fact/governed lane (matter_facts/proposed_facts) — forbidden.")
+        if (TLF._one(tc, "SELECT count(*) n FROM fitness_remediation_candidate")["n"] or 0) < 1:
+            raise TruthFailure("remediation produced zero candidates despite an open gap queue.")
+    finally:
+        conn.rollback(); conn.close()
+
+
+def mapping_adapter_instrumented(cur):
+    """The second domain adapter grades real geometry objects across dimensions (domain-agnostic proof)."""
+    conn, tc = _rb()
+    try:
+        a = TLF.ADAPTERS["mapping"]
+        if a.status != "instrumented":
+            raise TruthFailure("mapping adapter should be instrumented.")
+        objs = a.enumerate_objects(tc)
+        if objs:
+            meas = a.grade(tc, objs[0][0], objs[0][1], {})
+            if not {m["dimension"] for m in meas}:
+                raise TruthFailure("mapping grade produced no measurements for a real parcel.")
+    finally:
+        conn.rollback(); conn.close()
+
+
+def trend_view_populated(cur):
+    """The cycle-over-cycle trend view carries real grounding coverage."""
+    conn, tc = _rb()
+    try:
+        r = TLF._one(tc, "SELECT count(*) n, max(grounded_total) g FROM v_fitness_trend")
+        if (r["n"] or 0) < 1 or (r["g"] or 0) < 1:
+            raise TruthFailure("v_fitness_trend has no rows / no grounding measurements.")
+    finally:
         conn.rollback(); conn.close()
 
 
 TESTS = [
     ("tlfh.harness_writes_no_facts", harness_writes_no_facts),
+    ("tlfh.remediation_writes_no_facts", remediation_writes_no_facts),
+    ("tlfh.mapping_adapter_instrumented", mapping_adapter_instrumented),
+    ("tlfh.trend_view_populated", trend_view_populated),
     ("tlfh.ledger_is_append_only", ledger_is_append_only),
     ("tlfh.grounded_matches_provenance_gate", grounded_matches_provenance_gate),
     ("tlfh.findability_never_demotes_grounding", findability_never_demotes_grounding),
