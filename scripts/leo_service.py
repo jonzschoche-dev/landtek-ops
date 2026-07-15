@@ -78,6 +78,76 @@ def _grounded_facts(cur, client_code):
     return cur.fetchall()
 
 
+def _property_context(cur, client_code, message=""):
+    """Inject existing readiness + prep + parties (no new stack). Team/operator path only."""
+    if not client_code:
+        return ""
+    blocks = []
+    try:
+        # Title mention in message?
+        import re
+        title_hit = None
+        m = re.search(r"\b(T-?[0-9][0-9A-Za-z./-]{2,})\b", message or "")
+        if m:
+            title_hit = m.group(1)
+        if title_hit:
+            cur.execute("""SELECT a.title_ref, a.asset_code, a.title_status, a.possession,
+                                  r.documents, r.status_axis, r.occupants, r.ownership,
+                                  r.title_issues, r.mapping, r.readiness_score, r.weakest_axis,
+                                  r.next_prep_action
+                             FROM property_assets a
+                             LEFT JOIN property_readiness r ON r.asset_code=a.asset_code
+                            WHERE a.client_code=%s
+                              AND (a.title_ref ILIKE %s OR a.asset_code ILIKE %s)
+                            LIMIT 3""", (client_code, f"%{title_hit}%", f"%{title_hit}%"))
+        else:
+            cur.execute("""SELECT a.title_ref, a.asset_code, a.title_status, a.possession,
+                                  r.documents, r.status_axis, r.occupants, r.ownership,
+                                  r.title_issues, r.mapping, r.readiness_score, r.weakest_axis,
+                                  r.next_prep_action
+                             FROM property_assets a
+                             LEFT JOIN property_readiness r ON r.asset_code=a.asset_code
+                            WHERE a.client_code=%s
+                            ORDER BY r.readiness_score ASC NULLS LAST
+                            LIMIT 5""", (client_code,))
+        rows = cur.fetchall()
+        if rows:
+            lines = []
+            for r in rows:
+                tr = r.get("title_ref") or r.get("asset_code")
+                sc = r.get("readiness_score")
+                scs = f"{float(sc)*100:.0f}%" if sc is not None else "?"
+                lines.append(
+                    f"- {tr} ({r.get('asset_code')}): score={scs} status={r.get('title_status')} "
+                    f"occ={r.get('occupants') or r.get('possession')} own={r.get('ownership')} "
+                    f"title_issues={r.get('title_issues')} map={r.get('mapping')} "
+                    f"weakest={r.get('weakest_axis')} next={r.get('next_prep_action') or '—'}"
+                )
+            blocks.append("TITLE READINESS (six axes):\n" + "\n".join(lines))
+        cur.execute("""SELECT priority, axis, asset_code, action
+                         FROM profitability_prep_moves
+                        WHERE status='open' AND client_code=%s
+                        ORDER BY priority ASC LIMIT 8""", (client_code,))
+        moves = cur.fetchall()
+        if moves:
+            blocks.append("OPEN PREP MOVES:\n" + "\n".join(
+                f"- p{m['priority']} [{m.get('axis') or '-'}] {m['asset_code']}: {m['action'][:120]}"
+                for m in moves))
+        cur.execute("""SELECT party_name, role, matter_code, side
+                         FROM matter_parties
+                        WHERE matter_code LIKE %s AND coalesce(party_name,'')<>''
+                        ORDER BY matter_code, party_name LIMIT 15""",
+                    ((client_code.split("-")[0] if client_code else "") + "%",))
+        parties = cur.fetchall()
+        if parties:
+            blocks.append("PARTIES (buyers/possessors/counsel/etc):\n" + "\n".join(
+                f"- {p['party_name']} | {p.get('role') or '?'} | {p.get('matter_code')} | {p.get('side') or ''}"
+                for p in parties))
+    except Exception:
+        return ""
+    return ("\n\n" + "\n\n".join(blocks) + "\n") if blocks else ""
+
+
 def _sender_ident(cur, channel, channel_user_id):
     """Who Leo is talking to — name + role + whether it's the operator (internal). Cognizance, not anonymity."""
     cur.execute("""SELECT cu.display_name, cu.role FROM channel_users cu JOIN channels c ON c.id=cu.channel_id
@@ -120,17 +190,20 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
               "record. If your answer would state a fact that could be contradicted, FLAG the uncertainty "
               "('let me confirm — our records may conflict on that') rather than asserting it.\n")
     who, convo, label = "WHO YOU'RE TALKING TO: (unidentified).", "(this is the first message)", "them"
+    is_op = False
     if channel and channel_user_id:
         name, role, is_op = _sender_ident(cur, channel, channel_user_id)
         if is_op:
             who = ("WHO YOU'RE TALKING TO: Jonathan — the LandTek OPERATOR and principal. He is your own "
                    "boss/teammate, NOT a client. Greet him by name (Jonathan), speak candidly and directly, "
-                   "and you may reference internal specifics.")
+                   "and you may reference internal specifics (title readiness, prep moves, parties).")
             label = "Jonathan"
         else:
             who = f"WHO YOU'RE TALKING TO: {name or 'a contact'} (role: {role}). Address them by name if known."
             label = name or "them"
         convo = _recent_turns(cur, channel, channel_user_id, before_id=inbound_msg_id)
+    # Wire existing readiness/prep/parties into operator (and counsel/client) context — no new stack
+    prop_block = _property_context(cur, client_code, message) if (is_op or client_code) else ""
     rel = ""
     if relationship_profile and _rpro is not None:
         try:
@@ -145,7 +218,8 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
             tend = f"\n{tblock}\n" if tblock else ""
         except Exception:
             tend = ""
-    return (f"{SYSTEM}\n\n{who}\n{eq}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n\n"
+    return (f"{SYSTEM}\n\n{who}\n{eq}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n"
+            f"{prop_block}\n"
             f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\n"
             f"CONVERSATION SO FAR (most recent last — remember it, don't repeat yourself):\n{convo}\n\n"
             f"CURRENT MESSAGE FROM {label}:\n{message}\n\nLeo's reply:")

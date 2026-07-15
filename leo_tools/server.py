@@ -211,6 +211,140 @@ def party():
     cur.close(); c.close()
     return jsonify({"party":name,"count":len(items),"documents":items})
 
+
+# ── Property / readiness tools (wire existing tables — no new stack) ─────────
+@app.route('/api/title_readiness')
+def title_readiness():
+    """Six-axis readiness for a title/asset. Params: title (TCT/title_ref), asset_code, client_code, limit."""
+    title = (request.args.get('title') or request.args.get('title_ref') or '').strip()
+    asset = (request.args.get('asset_code') or '').strip()
+    client = (request.args.get('client_code') or request.args.get('case_file') or '').strip()
+    try:
+        limit = max(1, min(int(request.args.get('limit', '20')), 50))
+    except Exception:
+        limit = 20
+    c = db(); cur = c.cursor()
+    try:
+        sql = """
+            SELECT a.asset_code, a.title_ref, a.label, a.client_code, a.title_status, a.possession,
+                   a.tier, a.origin, a.modes::text,
+                   r.documents, r.status_axis, r.occupants, r.ownership, r.title_issues, r.mapping,
+                   r.readiness_score, r.weakest_axis, r.next_prep_action,
+                   r.documents_note, r.status_note, r.occupants_note, r.ownership_note,
+                   r.title_issues_note, r.mapping_note
+              FROM property_assets a
+              LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
+             WHERE a.client_code IS NOT NULL
+        """
+        args = []
+        if asset:
+            sql += " AND a.asset_code = %s"; args.append(asset)
+        if title:
+            sql += " AND (a.title_ref ILIKE %s OR a.asset_code ILIKE %s OR a.label ILIKE %s)"
+            args.extend([f"%{title}%", f"%{title}%", f"%{title}%"])
+        if client:
+            sql += " AND (a.client_code = %s OR a.case_file = %s)"; args.extend([client, client])
+        sql += " ORDER BY r.readiness_score ASC NULLS LAST, a.asset_code LIMIT %s"
+        args.append(limit)
+        cur.execute(sql, args)
+        cols = [d[0] for d in cur.description]
+        items = []
+        for row in cur.fetchall():
+            d = dict(zip(cols, row))
+            if d.get("readiness_score") is not None:
+                d["readiness_score"] = float(d["readiness_score"])
+            items.append(d)
+    except Exception as e:
+        cur.close(); c.close()
+        return jsonify({"error": str(e), "hint": "property_readiness may be empty — run profitability_prep_cycle"}), 500
+    cur.close(); c.close()
+    return jsonify({"count": len(items), "titles": items})
+
+
+@app.route('/api/prep_moves')
+def prep_moves():
+    """Open profitability prep moves. Params: asset_code, title, client_code, axis, limit."""
+    asset = (request.args.get('asset_code') or '').strip()
+    title = (request.args.get('title') or '').strip()
+    client = (request.args.get('client_code') or request.args.get('case_file') or '').strip()
+    axis = (request.args.get('axis') or '').strip()
+    try:
+        limit = max(1, min(int(request.args.get('limit', '25')), 80))
+    except Exception:
+        limit = 25
+    c = db(); cur = c.cursor()
+    try:
+        sql = """
+            SELECT m.priority, m.axis, m.asset_code, a.title_ref, a.client_code, m.mode,
+                   m.precond_code, m.action, m.why, m.recheck_condition, m.last_seen_at::text
+              FROM profitability_prep_moves m
+              JOIN property_assets a ON a.asset_code = m.asset_code
+             WHERE m.status = 'open'
+        """
+        args = []
+        if asset:
+            sql += " AND m.asset_code = %s"; args.append(asset)
+        if title:
+            sql += " AND (a.title_ref ILIKE %s OR m.asset_code ILIKE %s)"
+            args.extend([f"%{title}%", f"%{title}%"])
+        if client:
+            sql += " AND (m.client_code = %s OR a.case_file = %s)"; args.extend([client, client])
+        if axis:
+            sql += " AND m.axis = %s"; args.append(axis)
+        sql += " ORDER BY m.priority ASC, m.last_seen_at DESC LIMIT %s"
+        args.append(limit)
+        cur.execute(sql, args)
+        cols = [d[0] for d in cur.description]
+        items = [dict(zip(cols, row)) for row in cur.fetchall()]
+    except Exception as e:
+        cur.close(); c.close()
+        return jsonify({"error": str(e)}), 500
+    cur.close(); c.close()
+    return jsonify({"count": len(items), "moves": items})
+
+
+@app.route('/api/parties')
+def parties():
+    """Matter parties (buyers, possessors, counsel, etc.). Params: name, matter_code, case_file, role, limit."""
+    name = (request.args.get('name') or '').strip()
+    matter = (request.args.get('matter_code') or '').strip()
+    case = (request.args.get('case_file') or request.args.get('client_code') or '').strip()
+    role = (request.args.get('role') or '').strip()
+    try:
+        limit = max(1, min(int(request.args.get('limit', '40')), 100))
+    except Exception:
+        limit = 40
+    c = db(); cur = c.cursor()
+    try:
+        sql = """
+            SELECT id, matter_code, party_name, side, role, provenance_level,
+                   source_doc_id, left(coalesce(source_excerpt,''), 200) AS source_excerpt
+              FROM matter_parties
+             WHERE coalesce(party_name,'') <> ''
+        """
+        args = []
+        if name:
+            sql += " AND party_name ILIKE %s"; args.append(f"%{name}%")
+        if matter:
+            sql += " AND matter_code = %s"; args.append(matter)
+        if case:
+            # matter_code often MWK-CV26360 under client MWK-001
+            sql += " AND (matter_code = %s OR matter_code LIKE %s)"
+            args.extend([case, case.split("-")[0] + "%"])
+        if role:
+            sql += " AND role ILIKE %s"; args.append(f"%{role}%")
+        sql += " ORDER BY matter_code, party_name LIMIT %s"
+        args.append(limit)
+        cur.execute(sql, args)
+        cols = [d[0] for d in cur.description]
+        items = [dict(zip(cols, row)) for row in cur.fetchall()]
+    except Exception as e:
+        cur.close(); c.close()
+        return jsonify({"error": str(e)}), 500
+    cur.close(); c.close()
+    return jsonify({"count": len(items), "parties": items})
+
+
 @app.route('/api/linked_documents')
 def linked_documents():
     """For a given doc_id, return all linked docs across cases."""
@@ -753,6 +887,18 @@ def eval_question():
          "input_schema": {"type": "object", "properties": {"case_file": {"type": "string"}}}},
         {"name": "get_referenced_but_missing", "description": "Documents cited in our archive but absent from the index.",
          "input_schema": {"type": "object", "properties": {"case_file": {"type": "string"}}}},
+        {"name": "get_title_readiness", "description": "Property/title readiness: docs, status, occupants, ownership, title issues, mapping. Use for title/TCT/property status questions.",
+         "input_schema": {"type": "object", "properties": {
+             "title": {"type": "string"}, "asset_code": {"type": "string"},
+             "client_code": {"type": "string"}, "limit": {"type": "integer"}}}},
+        {"name": "get_prep_moves", "description": "Open prep moves for profitability/recovery (what to do next on a title). Filter by title, asset_code, client, axis.",
+         "input_schema": {"type": "object", "properties": {
+             "title": {"type": "string"}, "asset_code": {"type": "string"},
+             "client_code": {"type": "string"}, "axis": {"type": "string"}, "limit": {"type": "integer"}}}},
+        {"name": "get_parties", "description": "Parties on matters: buyers, renters/lessees, possessors, counsel, transferees, officials. Filter by name, matter_code, role.",
+         "input_schema": {"type": "object", "properties": {
+             "name": {"type": "string"}, "matter_code": {"type": "string"},
+             "case_file": {"type": "string"}, "role": {"type": "string"}, "limit": {"type": "integer"}}}},
     ]
 
     TOOL_URL_MAP = {
@@ -762,6 +908,9 @@ def eval_question():
         "get_deadlines": f"{BASE}/api/deadlines",
         "get_pending_questions": f"{BASE}/api/questions",
         "get_referenced_but_missing": f"{BASE}/api/missing",
+        "get_title_readiness": f"{BASE}/api/title_readiness",
+        "get_prep_moves": f"{BASE}/api/prep_moves",
+        "get_parties": f"{BASE}/api/parties",
     }
 
     def call_tool(name, args):
@@ -1036,6 +1185,9 @@ def eval_question_groq():
         "get_deadlines": f"{BASE}/api/deadlines",
         "get_pending_questions": f"{BASE}/api/questions",
         "get_referenced_but_missing": f"{BASE}/api/missing",
+        "get_title_readiness": f"{BASE}/api/title_readiness",
+        "get_prep_moves": f"{BASE}/api/prep_moves",
+        "get_parties": f"{BASE}/api/parties",
     }
 
     # OpenAI-style tool definitions with PERMISSIVE schemas (additionalProperties: true)
@@ -1075,6 +1227,48 @@ def eval_question_groq():
                 "type": "object",
                 "additionalProperties": True,
                 "properties": {"reference": {"type": "string"}}
+            }
+        }},
+        {"type": "function", "function": {
+            "name": "get_title_readiness",
+            "description": (
+                "Property/title readiness (docs, status, occupants, ownership, title issues, mapping). "
+                "Use for TCT/title/property status. Example: {title: 'T-52540'} or {client_code: 'MWK-001'}."
+            ),
+            "parameters": {
+                "type": "object", "additionalProperties": True,
+                "properties": {
+                    "title": {"type": "string"}, "asset_code": {"type": "string"},
+                    "client_code": {"type": "string"}, "limit": {"type": "integer"}
+                }
+            }
+        }},
+        {"type": "function", "function": {
+            "name": "get_prep_moves",
+            "description": (
+                "Open prep moves (what to do next on a title for recovery/profitability). "
+                "Example: {title: 'T-52540'} or {client_code: 'Paracale-001', axis: 'mapping'}."
+            ),
+            "parameters": {
+                "type": "object", "additionalProperties": True,
+                "properties": {
+                    "title": {"type": "string"}, "asset_code": {"type": "string"},
+                    "client_code": {"type": "string"}, "axis": {"type": "string"}, "limit": {"type": "integer"}
+                }
+            }
+        }},
+        {"type": "function", "function": {
+            "name": "get_parties",
+            "description": (
+                "Parties: buyers, possessors, renters, counsel, transferees, officials. "
+                "Example: {name: 'Balane'} or {matter_code: 'MWK-CV26360'} or {role: 'possessor'}."
+            ),
+            "parameters": {
+                "type": "object", "additionalProperties": True,
+                "properties": {
+                    "name": {"type": "string"}, "matter_code": {"type": "string"},
+                    "case_file": {"type": "string"}, "role": {"type": "string"}, "limit": {"type": "integer"}
+                }
             }
         }},
         {"type": "function", "function": {
