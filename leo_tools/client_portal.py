@@ -429,6 +429,21 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
          ORDER BY d.doc_date DESC NULLS LAST, d.id DESC
     """, (case_file, case_file, client_code), default=[])
 
+    # Property spine (same property_readiness the ops UI + Leo read). Client-facing
+    # projection only — no asset_code / prep-engine jargon in the HTML.
+    title_rows = _safe_fetch(cur, conn, """
+        SELECT a.title_ref, a.label, a.title_status, a.possession,
+               r.readiness_score, r.weakest_axis, r.next_prep_action,
+               r.documents, r.status_axis, r.occupants, r.ownership,
+               r.title_issues, r.mapping
+          FROM property_assets a
+          LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
+         WHERE a.client_code = %s
+            OR (%s <> '' AND a.case_file = %s)
+         ORDER BY r.readiness_score ASC NULLS LAST, a.title_ref
+         LIMIT 25
+    """, (client_code, case_file, case_file), default=[])
+
     cur.close()
     conn.close()
 
@@ -648,12 +663,16 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
         if doc_links else ""
     )
 
+    # --- Titles / property readiness (APP surface of the property spine) ---
+    titles_block = _render_client_titles(title_rows)
+
     body = f"""
 <h1>{_esc(client.get('name') or client_code)}</h1>
 <p class="lead">Your matters and deadlines · Updated {_esc(co.friendly_today())}</p>
 {ns_banner}
 {quiet_banner}
 <div class="grid grid-4" style="margin-bottom:8px">{stat_cards}</div>
+{titles_block}
 {''.join(bucket_blocks)}
 {deliverable_block}
 {docs_block}
@@ -661,10 +680,104 @@ def render_client_portal(client_code: str, link_builder=None) -> tuple[str, str]
   Dates and stages are read from the grounded record. Anything not yet confirmed against
   the source document is shown with a plain "estimated" or "awaiting confirmation" note —
   it is never presented as settled fact. Matters awaiting a confirmed date are listed
-  openly rather than hidden.</p>
+  openly rather than hidden. Title preparation status, when shown, is the same operational
+  record your team and Leo use — projected into plain language for you.</p>
 """
     title = f"{client.get('name') or client_code} — portal"
     return title, body
+
+
+# Axis grades → short plain phrases (never "solid/partial/thin" ops jargon alone).
+_AXIS_PLAIN = {
+    "solid": "in good shape",
+    "partial": "partly known",
+    "thin": "needs work",
+    "unknown": "not yet assessed",
+}
+_WEAK_PLAIN = {
+    "documents": "documents",
+    "status": "legal status",
+    "occupants": "who is on the land",
+    "ownership": "ownership record",
+    "title_issues": "title issues",
+    "mapping": "mapping / boundaries",
+}
+
+
+def _render_client_titles(title_rows: list) -> str:
+    """Client-facing property titles block. Empty → silent (legal-only clients)."""
+    if not title_rows:
+        return ""
+    trs = []
+    for t in title_rows:
+        name = (t.get("title_ref") or t.get("label") or "Property").strip()
+        score = t.get("readiness_score")
+        if score is not None:
+            pct = int(round(float(score) * 100))
+            if pct >= 70:
+                badge = f'<span class="badge badge-ok">{pct}% ready</span>'
+            elif pct >= 40:
+                badge = f'<span class="badge badge-warn">{pct}% ready</span>'
+            else:
+                badge = f'<span class="badge badge-bad">{pct}% ready</span>'
+        else:
+            badge = '<span class="badge badge-off">not yet scored</span>'
+        weak = _WEAK_PLAIN.get((t.get("weakest_axis") or "").strip(), "")
+        focus = ("Focus: " + weak) if weak else "—"
+        # Prefer a gentle next-step line; strip internal codes if projection not applied.
+        nxt = (t.get("next_prep_action") or "").strip()
+        if nxt and len(nxt) > 160:
+            nxt = nxt[:157] + "…"
+        # Hide lines that look like pure operator engine codes
+        if nxt and any(tok in nxt.lower() for tok in ("precond_", "asset_code", "null")):
+            nxt = ""
+        status = (t.get("title_status") or "").replace("_", " ").strip()
+        poss = (t.get("possession") or "").replace("_", " ").strip()
+        meta_bits = [b for b in (status, poss) if b]
+        meta = " · ".join(meta_bits)
+        axes_bits = []
+        for key, label in (
+            ("documents", "Docs"),
+            ("status_axis", "Status"),
+            ("occupants", "Occupants"),
+            ("ownership", "Ownership"),
+            ("title_issues", "Title"),
+            ("mapping", "Map"),
+        ):
+            g = (t.get(key) or "unknown").lower()
+            axes_bits.append(f"{label}: {_AXIS_PLAIN.get(g, g)}")
+        axes_line = " · ".join(axes_bits)
+        meta_html = ""
+        if meta:
+            meta_html = (
+                '<div class="muted" style="font-size:12px">'
+                + _esc(meta) + "</div>"
+            )
+        nxt_html = ""
+        if nxt:
+            nxt_html = (
+                '<div class="muted" style="font-size:12px">'
+                + _esc(nxt) + "</div>"
+            )
+        trs.append(
+            "<tr><td><strong>" + _esc(name) + "</strong>"
+            + meta_html
+            + "</td><td>" + badge + "</td>"
+            + "<td>" + _esc(focus)
+            + nxt_html
+            + '<div class="muted" style="font-size:11px;margin-top:4px">'
+            + _esc(axes_line) + "</div>"
+            + "</td></tr>"
+        )
+    return (
+        f'<div class="section-title">Your titles '
+        f'<span class="muted">({len(title_rows)})</span></div>'
+        f'<div class="card"><p class="muted" style="font-size:13px;margin:0 0 10px">'
+        f'Preparation status for each title we are working — documents, status, occupants, '
+        f'ownership, title issues, and mapping. Updated automatically; ask us (or Leo) for detail.</p>'
+        f'<table><tr><th>Title</th><th>Readiness</th><th>What needs attention</th></tr>'
+        f'{"".join(trs)}</table></div>'
+    )
 
 
 def render_matter_detail(client_code: str, matter_code: str,

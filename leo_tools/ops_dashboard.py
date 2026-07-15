@@ -77,6 +77,7 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("dependability", "/dependability", "Dependability"),
         ("parcels", "/parcels", "Parcels"),
         ("readiness", "/readiness", "Titles"),
+        ("surfaces", "/surfaces", "Surfaces"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
@@ -155,6 +156,13 @@ a:hover { text-decoration:underline; }
 .alert-bad { background:#fee2e2; color:#991b1b; }
 .alert-warn { background:#fef3c7; color:#92400e; }
 .alert-ok { background:#d1fae5; color:#065f46; }
+.surface-strip { border:1px solid #bae6fd; background:linear-gradient(135deg,#f0f9ff,#fff); margin-bottom:20px; }
+.surface-strip h2 { color:#0369a1; text-transform:none; letter-spacing:0; font-size:15px; margin:0 0 6px; }
+.surface-card { border-left:4px solid #0ea5e9; }
+.surface-card.ui { border-left-color:#2563eb; }
+.surface-card.app { border-left-color:#059669; }
+.surface-card.llm { border-left-color:#7c3aed; }
+.surface-card code { font-size:11px; background:#f1f5f9; padding:1px 5px; border-radius:4px; }
 </style>
 """
 
@@ -522,6 +530,118 @@ def _score_bar(score) -> str:
             f'<span style="font-size:12px;font-weight:600;width:36px">{pct}%</span></div>')
 
 
+@bp.route("/surfaces")
+def product_surfaces():
+    """Operator map: same property spine via UI, APP, and LLM — no parallel products."""
+    conn = _db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    pulse = _safe_fetch(cur, conn, """
+        SELECT
+          (SELECT COUNT(*) FROM property_assets WHERE client_code IS NOT NULL) AS assets,
+          (SELECT COUNT(*) FROM property_readiness) AS scored,
+          (SELECT ROUND(AVG(readiness_score)::numeric, 3)
+             FROM property_readiness) AS avg_score,
+          (SELECT COUNT(*) FROM profitability_prep_moves WHERE status = 'open') AS open_moves,
+          (SELECT COUNT(*) FROM matter_parties WHERE coalesce(party_name,'') <> '') AS parties,
+          (SELECT finished_at FROM profitability_prep_cycles ORDER BY id DESC LIMIT 1) AS last_cycle
+    """, default={}, one=True) or {}
+    sample = _safe_fetch(cur, conn, """
+        SELECT a.asset_code, a.title_ref, a.client_code, r.readiness_score, r.weakest_axis
+          FROM property_assets a
+          LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
+         WHERE a.client_code IS NOT NULL
+         ORDER BY r.readiness_score ASC NULLS LAST
+         LIMIT 5
+    """, default=[])
+    cur.close(); conn.close()
+
+    avg_pct = int(round(float(pulse.get("avg_score") or 0) * 100))
+    last_cyc = str(pulse.get("last_cycle") or "")[:19] or "never"
+    sample_rows = "".join(
+        f"<tr><td><a href='/ops/readiness/{_esc(s['asset_code'])}'>"
+        f"{_esc(s.get('title_ref') or s['asset_code'])}</a></td>"
+        f"<td>{_esc(s.get('client_code') or '—')}</td>"
+        f"<td>{_score_bar(s.get('readiness_score'))}</td>"
+        f"<td class='muted'>{_esc(s.get('weakest_axis') or '—')}</td></tr>"
+        for s in sample
+    ) or "<tr><td colspan='4' class='empty'>No assets yet</td></tr>"
+    first_asset = (sample[0]["asset_code"] if sample else "ASSET")
+    first_title = (sample[0].get("title_ref") or first_asset) if sample else "T-52540"
+    first_client = (sample[0].get("client_code") or "MWK-001") if sample else "MWK-001"
+
+    body = f"""
+<h1>Product surfaces</h1>
+<p class="lead">Property development spine · one database · three entry points.
+No redesign — existing /ops, /client, and Leo tools only.</p>
+
+<div class="grid grid-4" style="margin-bottom:16px">
+  {_stat_card("Assets", pulse.get("assets") or 0, "property_assets hub")}
+  {_stat_card("Scored", pulse.get("scored") or 0, f"avg readiness {avg_pct}%")}
+  {_stat_card("Open prep moves", pulse.get("open_moves") or 0, "profitability_prep_moves")}
+  {_stat_card("Parties", pulse.get("parties") or 0, f"last cycle {_esc(last_cyc)}")}
+</div>
+
+<div id="ui" class="card surface-card ui" style="margin-bottom:16px">
+  <h2 style="text-transform:none;letter-spacing:0;color:#1e293b;font-size:16px">1 · UI — operator cockpit</h2>
+  <p>SQL-only views for the team. Continuous prep (docs, status, occupants, ownership,
+  title issues, mapping) without waiting for a controlling matter.</p>
+  <ul style="margin:8px 0 12px;padding-left:18px">
+    <li><a href="/ops/readiness"><strong>Titles board</strong></a> — every title, six axes, filters</li>
+    <li>Title detail — prep worklist + parties (buyers, possessors, counsel, tenants)</li>
+    <li><a href="/ops/parcels">Parcels</a> · <a href="/ops/map">Map</a> when geometry exists</li>
+  </ul>
+  <p class="muted" style="font-size:12px">Gate: nginx basic-auth on /ops · no LLM on these pages.</p>
+</div>
+
+<div id="app" class="card surface-card app" style="margin-bottom:16px">
+  <h2 style="text-transform:none;letter-spacing:0;color:#1e293b;font-size:16px">2 · APP — client portal + mobile</h2>
+  <p>Outward surface. Same spine, projected through client ontology (no ops jargon).</p>
+  <ul style="margin:8px 0 12px;padding-left:18px">
+    <li><strong>Web:</strong> <code>https://leo.hayuma.org/client/&lt;token&gt;</code>
+        — magic-link / access code; token-scoped, ownership-checked</li>
+    <li><strong>Mobile:</strong> <code>mobile/</code> Capacitor shell stores the token in
+        Keychain and loads that portal (scaffold on Mac; see <code>mobile/README.md</code>)</li>
+    <li>Portal shows matters + deadlines always; <strong>title readiness</strong> when the
+        client has <code>property_assets</code> rows</li>
+  </ul>
+  <p class="muted" style="font-size:12px">Mint tokens via existing client access flow —
+  do not invent public title URLs without a token.</p>
+</div>
+
+<div id="llm" class="card surface-card llm" style="margin-bottom:16px">
+  <h2 style="text-transform:none;letter-spacing:0;color:#1e293b;font-size:16px">3 · LLM — Leo (Telegram + tools)</h2>
+  <p>Leo answers title / prep / party questions from the same tables. Human only when
+  outward legal action needs it.</p>
+  <table style="margin:8px 0 12px">
+    <tr><th>Tool</th><th>HTTP</th><th>Ask like…</th></tr>
+    <tr><td><code>get_title_readiness</code></td>
+        <td><code>/api/title_readiness?title={_esc(first_title)}</code></td>
+        <td>“Status of {_esc(first_title)}?”</td></tr>
+    <tr><td><code>get_prep_moves</code></td>
+        <td><code>/api/prep_moves?client_code={_esc(first_client)}</code></td>
+        <td>“What prep is open for {_esc(first_client)}?”</td></tr>
+    <tr><td><code>get_parties</code></td>
+        <td><code>/api/parties?case_file={_esc(first_client)}</code></td>
+        <td>“Who is on the {_esc(first_client)} titles — possessors?”</td></tr>
+  </table>
+  <p class="muted" style="font-size:12px">
+    Context auto-injected in <code>leo_service</code> for operator + client-scoped chats.
+    Role/projection still applies via <code>channel_users</code> + comms policy (A75).
+  </p>
+</div>
+
+<div class="card">
+  <h2 style="text-transform:none;letter-spacing:0;color:#1e293b;font-size:16px">Weakest titles right now</h2>
+  <table><tr><th>Title</th><th>Client</th><th>Score</th><th>Focus</th></tr>
+  {sample_rows}</table>
+  <p style="margin:10px 0 0"><a href="/ops/readiness">Full Titles board →</a>
+     · sample asset API:
+     <code>/api/title_readiness?asset_code={_esc(first_asset)}</code></p>
+</div>
+"""
+    return _layout("Surfaces", body, active="surfaces")
+
+
 @bp.route("/readiness")
 def readiness_board():
     """Visual: status of each title across the six prep axes."""
@@ -627,7 +747,8 @@ def readiness_board():
         f"{filt}"
         f"<div class='card' style='overflow-x:auto'>{table}</div>"
         "<p class='muted' style='margin-top:12px'>solid=understood · partial=some signal · "
-        "thin=weak · unknown=not yet assessed. Click a title for the prep worklist.</p>"
+        "thin=weak · unknown=not yet assessed. Click a title for the prep worklist. "
+        "Same spine via <a href='/ops/surfaces'>UI · APP · LLM</a>.</p>"
     )
     return _layout("Titles", body, active="readiness")
 
@@ -660,6 +781,17 @@ def readiness_detail(asset_code: str):
              WHERE asset_code=%s AND status='open'
              ORDER BY priority ASC, last_seen_at DESC LIMIT 40""", (asset_code,))
         moves = cur.fetchall()
+        # Parties: same client prefix as matter_parties (buyers / possessors / counsel)
+        client = r.get("client_code") or r.get("case_file") or ""
+        prefix = (client.split("-")[0] + "%") if client else "___none___"
+        cur.execute("""
+            SELECT party_name, role, side, matter_code, provenance_level
+              FROM matter_parties
+             WHERE coalesce(party_name,'') <> ''
+               AND (matter_code LIKE %s OR matter_code = %s)
+             ORDER BY matter_code, party_name
+             LIMIT 30""", (prefix, client))
+        parties = cur.fetchall()
     except Exception as e:
         cur.close(); conn.close()
         body = f"<h1>Error</h1><p class='alert alert-bad'>{_esc(str(e)[:200])}</p>"
@@ -688,6 +820,36 @@ def readiness_detail(asset_code: str):
         for m in moves
     ) or "<tr><td colspan='4' class='empty'>No open prep moves — axes solid or cycle not run.</td></tr>"
 
+    party_rows = "".join(
+        f"<tr><td>{_esc(p.get('party_name') or '—')}</td>"
+        f"<td>{_esc(p.get('role') or '—')}</td>"
+        f"<td>{_esc(p.get('side') or '—')}</td>"
+        f"<td class='muted' style='font-size:12px'>{_esc(p.get('matter_code') or '—')}</td>"
+        f"<td class='muted' style='font-size:11px'>{_esc(p.get('provenance_level') or '—')}</td></tr>"
+        for p in parties
+    ) or "<tr><td colspan='5' class='empty'>No parties linked under this client prefix yet.</td></tr>"
+
+    client_code = r.get("client_code") or ""
+    surfaces = (
+        f"<div class='card surface-strip' style='margin-top:20px'>"
+        f"<h2>Same spine on every surface</h2>"
+        f"<p class='muted' style='margin:0 0 10px'>One record — three entry points. No parallel stack.</p>"
+        f"<div class='grid grid-3'>"
+        f"<div class='card surface-card ui'><strong>UI</strong>"
+        f"<p class='muted' style='margin:6px 0;font-size:12px'>This page · "
+        f"<a href='/ops/readiness'>Titles board</a> · <a href='/ops/surfaces'>Surfaces map</a></p></div>"
+        f"<div class='card surface-card app'><strong>APP</strong>"
+        f"<p class='muted' style='margin:6px 0;font-size:12px'>Client portal "
+        f"(token <code>/client/&lt;token&gt;</code>) · mobile Capacitor shell · "
+        f"{('client <code>' + _esc(client_code) + '</code>') if client_code else 'client-scoped'}</p></div>"
+        f"<div class='card surface-card llm'><strong>LLM</strong>"
+        f"<p class='muted' style='margin:6px 0;font-size:12px'>Ask Leo about "
+        f"<code>{_esc(title)}</code> · tools "
+        f"<code>get_title_readiness</code> · <code>get_prep_moves</code> · <code>get_parties</code><br>"
+        f"<code style='word-break:break-all'>/api/title_readiness?asset_code={_esc(asset_code)}</code></p></div>"
+        f"</div></div>"
+    )
+
     body = (
         f"<p class='muted'><a href='/ops/readiness'>← All titles</a></p>"
         f"<h1>{_esc(title)}</h1>"
@@ -701,6 +863,10 @@ def readiness_detail(asset_code: str):
         f"<h2 class='section-title'>Open prep work</h2>"
         f"<div class='card'><table><tr><th>Pri</th><th>Axis</th><th>Action</th><th>Seen</th></tr>"
         f"{move_rows}</table></div>"
+        f"<h2 class='section-title'>Parties (buyers · possessors · counsel · tenants)</h2>"
+        f"<div class='card'><table><tr><th>Name</th><th>Role</th><th>Side</th><th>Matter</th><th>Prov</th></tr>"
+        f"{party_rows}</table></div>"
+        f"{surfaces}"
         f"<p class='muted' style='margin-top:12px'>Asset <code>{_esc(asset_code)}</code> · "
         f"case_file={_esc(r.get('case_file') or '—')} · tier={_esc(r.get('tier') or '—')} · "
         f"origin={_esc(r.get('origin') or '—')}</p>"
@@ -1159,6 +1325,16 @@ def home():
          LIMIT 5
     """, default=[])
 
+    # Property-development spine pulse (same tables UI / APP / LLM read)
+    prop_pulse = _safe_fetch(cur, conn, """
+        SELECT
+          (SELECT COUNT(*) FROM property_assets WHERE client_code IS NOT NULL) AS assets,
+          (SELECT COUNT(*) FROM property_readiness) AS scored,
+          (SELECT COUNT(*) FROM profitability_prep_moves WHERE status = 'open') AS open_moves,
+          (SELECT COUNT(*) FROM matter_parties WHERE coalesce(party_name,'') <> '') AS parties,
+          (SELECT finished_at FROM profitability_prep_cycles ORDER BY id DESC LIMIT 1) AS last_cycle
+    """, default={}, one=True) or {}
+
     cur.close()
     conn.close()
 
@@ -1302,6 +1478,48 @@ def home():
 </div>
 """
 
+    n_assets = prop_pulse.get("assets") or 0
+    n_scored = prop_pulse.get("scored") or 0
+    n_moves = prop_pulse.get("open_moves") or 0
+    n_parties = prop_pulse.get("parties") or 0
+    last_cyc = str(prop_pulse.get("last_cycle") or "")[:19] or "never"
+    product_surfaces = f"""
+<div class="card surface-strip">
+  <h2>Product surfaces — property spine</h2>
+  <p class="muted" style="margin:0 0 12px">
+    One architecture, three doors. Live: <strong>{n_scored}</strong> titles scored ·
+    <strong>{n_moves}</strong> open prep moves · <strong>{n_parties}</strong> parties ·
+    prep cycle {_esc(last_cyc)} · <a href="/ops/surfaces">full map →</a>
+  </p>
+  <div class="grid grid-3">
+    <div class="card surface-card ui">
+      <strong>UI · operator cockpit</strong>
+      <p class="muted" style="margin:6px 0 8px;font-size:12px">
+        Title readiness board, six-axis detail, prep worklist, parties.
+        {n_assets} assets on the hub.
+      </p>
+      <a href="/ops/readiness">Open Titles →</a>
+    </div>
+    <div class="card surface-card app">
+      <strong>APP · client / mobile</strong>
+      <p class="muted" style="margin:6px 0 8px;font-size:12px">
+        Token portal <code>/client/&lt;token&gt;</code> + Capacitor iOS shell.
+        Client sees their titles projected (no ops chrome).
+      </p>
+      <a href="/ops/surfaces#app">How to open APP →</a>
+    </div>
+    <div class="card surface-card llm">
+      <strong>LLM · Leo</strong>
+      <p class="muted" style="margin:6px 0 8px;font-size:12px">
+        Telegram / tools: <code>get_title_readiness</code>,
+        <code>get_prep_moves</code>, <code>get_parties</code>. Context injected on chat.
+      </p>
+      <a href="/ops/surfaces#llm">API + ask patterns →</a>
+    </div>
+  </div>
+</div>
+"""
+
     body = f"""
 <h1>Morning briefing</h1>
 <p class="lead">Portfolio, Leo pulse, deadlines — live SQL, no LLM.</p>
@@ -1310,6 +1528,7 @@ def home():
   <input name="q" placeholder="Search docs, emails, notes, matters…" minlength="2" required>
   <button type="submit">Search</button>
 </form>
+{product_surfaces}
 {quick_nav}
 <div class="section-title">Portfolio</div>
 <div class="grid grid-4" style="margin-bottom:8px">{portfolio_cards}</div>
