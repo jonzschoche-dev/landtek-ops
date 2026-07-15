@@ -144,9 +144,10 @@ def resolve():
         uid = (r["channel_user_id"] or "").lower()
         if "@" not in uid:
             continue  # non-email identity: no confident resolution source yet
-        cur.execute("""SELECT DISTINCT client_code FROM channel_users
+        # channel_users has mapped_client_code (not client_code) — A25 wall column
+        cur.execute("""SELECT DISTINCT mapped_client_code FROM channel_users
                        WHERE lower(channel_user_id)=%s AND mapped_client_code IS NOT NULL""", (uid,))
-        hits = [x["client_code"] for x in cur.fetchall()]
+        hits = [x["mapped_client_code"] for x in cur.fetchall()]
         if len(hits) == 1:  # exactly one known client for this identity -> safe to bind
             cur.execute("UPDATE channel_users SET mapped_client_code=%s WHERE id=%s", (hits[0], r["id"]))
             resolved += 1
