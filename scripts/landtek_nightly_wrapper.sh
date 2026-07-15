@@ -5,6 +5,12 @@
 #
 # Writes any failure to notifications/pending.txt so the session-start hook
 # surfaces it next time Jonathan opens a session.
+#
+# A62 policy (deploy_917/919):
+#   - encrypted-cloud OFFSITE tier is report-only inside test_survivable_record until operational
+#   - required off-box Mac receipt stays a HARD gate (suite fails if stale) — fix the puller, don't skip
+#   - LANDTEK_SKIP_TRUTH_FILES mechanism remains in run_all.py for deliberate ops use; nightly does NOT
+#     default-skip A62 (deploy_918 over-carve-out reverted in 919)
 
 set -u
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -16,17 +22,10 @@ echo "=== landtek nightly run $TS ==="
 
 OVERALL_RC=0
 
-# 1. truth_tests
-# A62 (test_survivable_record) is ENVIRONMENTAL: off-box Mac puller / optional encrypted Drive tier.
-# Leaving it in the hard nightly gate permanently reds landtek-truth-tests.service and masks real
-# crashes in systemctl --failed. Run the main suite without it (exit code is the unit health bar);
-# still EXECUTE A62 after and surface failures to pending.txt only (report, don't fail the unit).
-# Deploy gate does NOT use this skip — landtek_git_routine still runs the full suite unless
-# LANDTEK_SKIP_TRUTH_TESTS=1 is set deliberately.
-echo "[$TS] running truth_tests/run_all.py (skipping test_survivable_record — A62 env, see below)"
-export LANDTEK_SKIP_TRUTH_FILES="${LANDTEK_SKIP_TRUTH_FILES:-test_survivable_record}"
+# 1. truth_tests — full suite; A62 optional cloud is report-only in-test; required legs fail the unit
+echo "[$TS] running truth_tests/run_all.py"
 if python3 truth_tests/run_all.py >>/var/log/landtek/truth_tests.log 2>&1; then
-    echo "[$TS] truth_tests PASSED (A62 file skipped for unit health)" >> /var/log/landtek/truth_tests.log
+    echo "[$TS] truth_tests PASSED" >> /var/log/landtek/truth_tests.log
 else
     rc=$?
     echo "[$TS] truth_tests FAILED rc=$rc" >> /var/log/landtek/truth_tests.log
@@ -34,24 +33,6 @@ else
         echo "[$TS] nightly: truth_tests FAILED — tail /var/log/landtek/truth_tests.log"
     } >> /root/landtek/notifications/pending.txt
     OVERALL_RC=$rc
-fi
-
-# 1.1 A62 survivable record — report-only for the systemd unit. Logs + notifies; never reds the unit.
-echo "[$TS] running A62 test_survivable_record (report-only for unit exit)"
-if python3 -c "
-import sys
-sys.path.insert(0, 'truth_tests')
-from _harness import run
-import test_survivable_record as t
-p, f = run(t.TESTS)
-sys.exit(0 if not f else 1)
-" >>/var/log/landtek/truth_tests.log 2>&1; then
-    echo "[$TS] A62 survivable PASSED" >> /var/log/landtek/truth_tests.log
-else
-    echo "[$TS] A62 survivable FAILED (report-only — unit stays green; fix Mac offbox / cloud separately)" \
-        >> /var/log/landtek/truth_tests.log
-    echo "[$TS] nightly: A62 survivable FAILED (offbox/backup env) — does NOT fail the unit; see truth_tests.log" \
-        >> /root/landtek/notifications/pending.txt
 fi
 
 # 1.5 incorporation status — governed visibility (Phase 3): daily snapshot + trend log.
