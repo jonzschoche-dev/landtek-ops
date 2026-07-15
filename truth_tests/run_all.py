@@ -16,9 +16,18 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def main():
+    # Optional skip list (comma-separated module stems). Used by the nightly systemd unit to
+    # keep environmental A62 legs (backup/offbox/cloud transport) from permanently reding
+    # `systemctl --failed` and masking real crashes. Deploy gate should NOT set this — it uses
+    # LANDTEK_SKIP_TRUTH_TESTS=1 only when deliberately bypassing the whole suite.
+    # Example: LANDTEK_SKIP_TRUTH_FILES=test_survivable_record
+    skip_raw = os.environ.get("LANDTEK_SKIP_TRUTH_FILES", "").strip()
+    skip = {s.strip() for s in skip_raw.split(",") if s.strip()}
+
     test_files = sorted(p.stem for p in TESTS_DIR.glob("test_*.py"))
     print("=" * 60)
-    print(f"truth_tests suite — {len(test_files)} test files")
+    print(f"truth_tests suite — {len(test_files)} test files"
+          + (f" (skipping: {', '.join(sorted(skip))})" if skip else ""))
     print("=" * 60)
 
     total_passed = 0
@@ -26,6 +35,9 @@ def main():
     failed_details = []
 
     for tf in test_files:
+        if tf in skip:
+            print(f"\n[{tf}]\n  ⚠ SKIPPED via LANDTEK_SKIP_TRUTH_FILES (environmental/ops leg)")
+            continue
         print(f"\n[{tf}]")
         try:
             mod = importlib.import_module(tf)
