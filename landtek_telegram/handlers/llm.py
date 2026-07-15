@@ -632,6 +632,80 @@ def _call_anthropic(system_prompt, user_text, context_lines):
             "let me take another run at it.", None)
 
 
+def _resolve_client_code(sender_id: str) -> str | None:
+    """Map Telegram sender → client_code (channel_users / authorized_users)."""
+    if not sender_id:
+        return None
+    try:
+        conn = psycopg2.connect(PG_DSN)
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT cu.mapped_client_code
+              FROM channel_users cu
+              JOIN channels c ON c.id = cu.channel_id
+             WHERE c.name = 'telegram' AND cu.channel_user_id = %s
+               AND coalesce(cu.mapped_client_code, '') <> ''
+             LIMIT 1""", (str(sender_id),))
+        r = cur.fetchone()
+        if r and r[0]:
+            cur.close(); conn.close()
+            return r[0]
+        # authorized_users.role owner/operator → no client scope; leave None
+        # filing_assistant / client rows sometimes carry case hints in name only
+        cur.close(); conn.close()
+    except Exception:
+        pass
+    return None
+
+
+def _sovereign_ollama_reply(sender_id: str, text: str) -> tuple[str | None, str | None]:
+    """$0 local Ollama via leo_service — same corpus/readiness spine as Messenger headless.
+
+    Used when Anthropic is out of credit or unreachable so Telegram never dead-ends
+    on a billing message while the sovereign model is up.
+    """
+    try:
+        sys.path.insert(0, "/root/landtek/scripts")
+        sys.path.insert(0, "/root/landtek")
+        import leo_service as ls
+        import platform_coordinator as coord
+    except Exception as e:
+        return None, f"sovereign_import:{type(e).__name__}:{e}"
+
+    conn = None
+    try:
+        conn = psycopg2.connect(PG_DSN)
+        conn.autocommit = True
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        client = None
+        try:
+            client = coord.client_of(cur, "telegram", str(sender_id))
+        except Exception:
+            client = None
+        if not client:
+            client = _resolve_client_code(str(sender_id))
+        # Operator portfolio default only for Jonathan's Telegram id — never invent
+        # a client_code for unknown senders (would leak another family's corpus).
+        if not client and str(sender_id) == JONATHAN:
+            client = "MWK-001"
+        out = ls.generate_reply(
+            cur, "telegram", str(sender_id), text, client, inbound_msg_id=None)
+        cur.close()
+        text_out = (out or {}).get("text")
+        if text_out and str(text_out).strip():
+            return str(text_out).strip(), None
+        return None, f"sovereign_empty:{(out or {}).get('error') or 'no_text'}"
+    except Exception as e:
+        return None, f"sovereign_fail:{type(e).__name__}:{str(e)[:160]}"
+    finally:
+        try:
+            if conn:
+                conn.close()
+        except Exception:
+            pass
+
+
 def handle(row):
     chat_id = row.get("chat_id")
     sender_id = row.get("sender_id") or ""
@@ -657,17 +731,21 @@ def handle(row):
     context = _recent_context(chat_id)
     reply, err = _call_anthropic(system_prompt, text, context)
     if reply is None:
-        # API failed — fall back to a concise honest message rather than ghost.
-        # Make the credit-balance case explicit so "not working" reads as "out of
-        # credit, top up" instead of a vague glitch (deploy_426).
-        if err and "credit balance" in err.lower():
-            _reply(chat_id, "I'm temporarily out of Anthropic API credit, so I can't "
-                           "answer right now. Top up at console.anthropic.com (Plans & "
-                           "Billing) and I'll be back online immediately.")
-        else:
-            _reply(chat_id, "I'm having trouble thinking right now — give me a moment, "
-                           "or send the message as a vault command if it's a vault action.")
-        return {"handler": "llm", "outcome": f"api_failed:{err[:80]}",
+        # Anthropic down / out of credit → sovereign Ollama corpus path ($0).
+        # Do NOT tell the user to top up Anthropic while local Leo can answer.
+        sov, sov_err = _sovereign_ollama_reply(str(sender_id), text)
+        if sov:
+            _reply(chat_id, sov)
+            tag = "credit" if (err and "credit balance" in err.lower()) else "api"
+            return {"handler": "llm",
+                    "outcome": f"replied_ollama_fallback:{tag}:{(err or '')[:60]}",
+                    "reply_sent": True}
+        # Both paths failed — honest, no billing finger-point if sovereign also died
+        _reply(chat_id,
+               "I'm having trouble thinking right now (local model and cloud both "
+               "failed). Give me a moment, or send a vault command if it's a vault action.")
+        return {"handler": "llm",
+                "outcome": f"api_failed:{err[:60] if err else '?'}|sov:{sov_err or '?'}"[:200],
                 "reply_sent": True}
 
     _reply(chat_id, reply)
