@@ -364,41 +364,40 @@ def render(brief: Dict[str, Any]) -> str:
 
 
 def answer_structured(brief: Dict[str, Any], purpose: str = "") -> Optional[str]:
-    """SQL-grade conclusions only from verified spine — never provisional untagged."""
+    """Distilled conclusion from verified spine only — multi-angle internally, short externally."""
     if not brief or not brief.get("matter_codes"):
         return None
-    # Single-matter status
+    # Single-matter status — human-tolerable (equilibrium emission)
     if len(brief["matter_codes"]) == 1 and purpose in ("", "matter_status", "status"):
         mc = brief["matter_codes"][0]
         ang = (brief.get("angles_by_matter") or {}).get(mc) or {}
         sp = (ang.get("spine") or {}).get("data")
         if not sp:
             return None
-        lines = [
-            f"{mc}",
-            f"status: {_g(sp,'status') or '—'}",
-            f"stage: {_g(sp,'current_stage') or '—'}",
-            f"venue: {(_g(sp,'court_or_agency') or _g(sp,'forum') or '—')[:80]}",
-        ]
-        title = (_g(sp, "title") or "")[:120]
-        if title:
-            lines.append(f"title: {title}")
+        status = _g(sp, "status") or "—"
+        stage = (_g(sp, "current_stage") or "—").replace("_", " ")
+        venue = (_g(sp, "court_or_agency") or _g(sp, "forum") or "—")
+        if isinstance(venue, str) and len(venue) > 50:
+            venue = venue[:50]
+        title = (_g(sp, "title") or "")
+        # One-line identity
+        head = f"{mc} is {status} at {venue} — stage: {stage}."
+        lines = [head]
+        if title and len(title) < 100:
+            lines.append(title)
         vg = ang.get("verified_ground") or {}
         verified = vg.get("verified") or []
         if verified:
-            lines.append("verified ground (sample):")
-            for f in verified[:3]:
-                st = re.sub(r"\s+", " ", str(_g(f, "statement") or ""))[:140]
-                lines.append(f"  • (doc:{_g(f,'source_id')}) {st}")
+            st = re.sub(r"\s+", " ", str(_g(verified[0], "statement") or ""))[:160]
+            sid = _g(verified[0], "source_id")
+            lines.append(f"Key ground (doc:{sid}): {st}")
         else:
-            lines.append("verified ground: empty — do not invent facts for this matter.")
-        pt = ang.get("parties") or {}
-        if pt.get("status") == "not_instrumented":
-            lines.append("parties: not_instrumented (table sparsely populated)")
-        elif pt.get("status") == "empty":
-            lines.append("parties: empty on this matter")
-        lines.append("Basis: matters + matter_facts(verified only). Provisional omitted from asserts.")
-        return "\n".join(lines)
+            lines.append("No verified facts on this matter — do not invent.")
+        try:
+            from distill import distill
+            return distill("\n".join(lines), max_lines=4, max_chars=500)
+        except Exception:
+            return "\n".join(lines[:4])
     return None
 
 

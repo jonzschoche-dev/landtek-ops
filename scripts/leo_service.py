@@ -49,11 +49,13 @@ MODEL = os.environ.get("LEO_MODEL", "qwen2.5:14b-instruct")
 # In-house test surface only (operator + JJ). Everyone else is ignored until per-channel cutover.
 TEST_IDENTITIES = {("messenger", "37446980471566856"), ("telegram", "6513067717")}
 
-SYSTEM = ("You are Leo, the assistant for LandTek, a Philippine land & property services company in "
-          "Camarines Norte. Reply briefly and warmly (Taglish is fine). LandTek is NOT a law firm. "
-          "State a specific fact (a date, docket, title number, amount, name) ONLY if it appears in "
-          "GROUNDED FACTS below, and when you do, cite it inline as doc:<id>. If you lack grounding, "
-          "say you'll check with the team — never invent a fact, document, docket, or legal conclusion.")
+SYSTEM = ("You are Leo for LandTek (Philippine land/property ops, Camarines Norte). NOT a law firm. "
+          "REASONING EQUILIBRIUM — every reply: (1) use only the brief/facts below, "
+          "(2) DISTILL to at most 3 short sentences or 5 lines — never dump lists of facts, "
+          "(3) cold professional for the operator, no greetings/filler, "
+          "(4) one point + one next step max. "
+          "State a date/docket/title/amount/name ONLY if it appears below; cite doc:<id>. "
+          "If ungrounded: say so in one sentence — never invent.")
 
 
 def _llm(prompt, temp=0.2):
@@ -383,24 +385,35 @@ def try_purpose_route(cur, client_code, message):
       {text, via, preformed: True, purpose?}
     preformed=True means clamp/send may apply, but A75 projection MUST NOT rewrite
     (dose-1 packs + /files/c links would be mangled).
+
+    Equilibrium: multi-angle work is *inside* the answerers; emission is always distilled.
     """
     if not client_code or not (message or "").strip():
         return None
+
+    def _emit(text, via, purpose=None):
+        if not text:
+            return None
+        try:
+            from distill import distill
+            text = distill(text)
+        except Exception:
+            pass
+        return {"text": text, "via": via, "preformed": True, "purpose": purpose}
+
     try:
         import title_fetch as tf
         if tf.wants_title_fetch(message):
             pack, _ferr = tf.fetch_title_pack(cur, client_code, message)
             if pack:
-                return {"text": pack, "via": "title_fetch", "preformed": True,
-                        "purpose": "title_fetch"}
+                return _emit(pack, "title_fetch", "title_fetch")
     except Exception as e:
         print(f"[leo_service] title_fetch route: {type(e).__name__}: {e}", flush=True)
     try:
         import corpus_answer as ca
         pack, purpose = ca.try_corpus_answer(cur, client_code, message)
         if pack and purpose and not str(purpose).startswith("error"):
-            return {"text": pack, "via": f"corpus_answer:{purpose}", "preformed": True,
-                    "purpose": purpose}
+            return _emit(pack, f"corpus_answer:{purpose}", purpose)
     except Exception as e:
         print(f"[leo_service] corpus_answer route: {type(e).__name__}: {e}", flush=True)
     # MPRB structured answer (matter multi-angle) — preformed when SQL concludes
@@ -408,8 +421,7 @@ def try_purpose_route(cur, client_code, message):
         import matter_brief as mb
         hit = mb.try_mprb_route(cur, client_code, message)
         if hit and hit.get("text"):
-            hit.setdefault("preformed", True)
-            return hit
+            return _emit(hit["text"], hit.get("via") or "mprb", hit.get("purpose"))
     except Exception as e:
         print(f"[leo_service] mprb route: {type(e).__name__}: {e}", flush=True)
     return None
@@ -497,6 +509,11 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
             to_send = gate_mod.remediate(cur, candidate, res)   # $0 grounded-only rewrite
             remediated = True
         human = proj.render_human_reply(to_send)                # A32 human form (no doc#/§ leak)
+        try:
+            from distill import distill
+            human = distill(human, max_lines=5, max_chars=600)
+        except Exception:
+            pass
         guard_class = og.classify(channel, str(channel_user_id))  # A21 classification
         logkw = {**base, "client": client, "cand": candidate, "verdict": res["verdict"],
                  "fails": psycopg2.extras.Json(res["fails"]), "warns": res["n_warns"],

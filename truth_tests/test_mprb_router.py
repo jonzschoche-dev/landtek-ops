@@ -25,8 +25,8 @@ def op_count_oracle_3(cur):
                                   "how many cases have been referred from ARTA to the OP?")
     if not ans or p != "arta_op_referrals":
         raise TruthFailure(f"expected arta_op_referrals pack, got {p}")
-    if "Count of ARTA matters with verified OP/ES-bound record: 3." not in ans:
-        raise TruthFailure(f"OP count oracle failed:\n{ans[:500]}")
+    if "3 ARTA" not in ans and "3." not in ans[:80]:
+        raise TruthFailure(f"OP count oracle failed (want 3 distilled):\n{ans[:500]}")
     for code in ("MWK-ARTA-0690", "MWK-ARTA-0747", "MWK-ARTA-0792"):
         if code not in ans:
             raise TruthFailure(f"missing {code} in OP brief")
@@ -34,6 +34,9 @@ def op_count_oracle_3(cur):
         raise TruthFailure("soft 1378 must not be counted as OP send")
     if "Hello" in ans:
         raise TruthFailure("cold brief must not greet")
+    # Human-tolerable: no multi-paragraph evidence dump
+    if ans.count("\n") > 8 or len(ans) > 800:
+        raise TruthFailure(f"OP brief too long for equilibrium emission: {len(ans)} chars")
 
 
 def purpose_route_returns_preformed(cur):

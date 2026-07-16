@@ -247,8 +247,8 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
     chosen = pool[:cap]
     withheld = max(0, total_related - len(chosen))
 
+    # DISTILLED: 2–4 lines. Intimate ranking is internal; human gets one primary link.
     lines = []
-    # Status — one line (equilibrium: not a dashboard dump)
     if assets:
         a = assets[0]
         sc = _g(a, "readiness_score", 5)
@@ -256,38 +256,28 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
             scs = f"{float(sc)*100:.0f}%" if sc is not None else "?"
         except Exception:
             scs = "?"
-        lines.append(
-            f"T-{token} ({_g(a, 'client_code', 4) or client_code}): "
-            f"status={_g(a, 'title_status', 3) or '—'} · readiness={scs} · "
-            f"docs={_g(a, 'documents', 6) or '?'}"
-        )
+        status = _g(a, "title_status", 3) or "—"
+        ref = _g(a, "title_ref", 1) or f"T-{token}"
+        lines.append(f"{ref}: {status} · readiness {scs}.")
     else:
-        lines.append(f"T-{token}: no property_assets row yet (documents only).")
+        lines.append(f"T-{token}: no asset row yet.")
 
     if chosen:
-        if wide:
-            lines.append(f"Related corpus files ({len(chosen)} of {total_related}):")
-        else:
-            lines.append("Primary file (narrow fetch — one document):")
-        for d in chosen:
-            name = (_g(d, "name", 1) or "Document")[:90]
-            did = _g(d, "id", 0)
-            lines.append(f"• {name}")
-            lines.append(f"  {PUBLIC_FILE}/{did}")
-        if withheld and not wide:
-            lines.append(
-                f"+ {withheld} more related in corpus. "
-                f"Reply: more TCT {token}   (or: full pack TCT {token})"
-            )
+        d = chosen[0]
+        name = (_g(d, "name", 1) or "Document")[:70]
+        did = _g(d, "id", 0)
+        lines.append(f"{name}")
+        lines.append(f"{PUBLIC_FILE}/{did}")
+        if wide and len(chosen) > 1:
+            for d2 in chosen[1:]:
+                lines.append(f"{PUBLIC_FILE}/{_g(d2, 'id', 0)} — {(_g(d2, 'name', 1) or '')[:50]}")
+        elif withheld and not wide:
+            lines.append(f"+{withheld} more — reply: more TCT {token}")
     else:
-        lines.append(
-            "No downloadable file whose name matches that title number in your scope. "
-            "We may still need a CTC from the Registry of Deeds."
-        )
+        lines.append("No downloadable CTC/TCT file for that number in scope.")
 
-    # Honest security footer (short — operator visibility, not a lecture)
-    lines.append(
-        "Scope: client-bound query only. "
-        "Link is a live corpus stream (/files/c) — treat as confidential."
-    )
-    return "\n".join(lines), None
+    try:
+        from distill import distill
+        return distill("\n".join(lines), max_lines=5, max_chars=420), None
+    except Exception:
+        return "\n".join(lines[:5]), None

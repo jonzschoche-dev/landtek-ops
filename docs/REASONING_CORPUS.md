@@ -257,6 +257,20 @@ That deepens equilibrium **without** a redesign: one assembler, existing tables,
 
 ---
 
+## 13a. Equilibrium = intimate knowledge + distilled emission (non-negotiable)
+
+**Failure mode we will not tolerate:** multi-angle work that is *emitted* as a long inventory.
+Humans must not read MPRB dumps. Reasoning equilibrium means:
+
+| Plane | Content | Length |
+|-------|---------|--------|
+| **Internal** | Full angles, verified/provisional split, ranking | May be long (never shown raw) |
+| **External** | One answer + optional one cite/link + one next step | **≤6 lines / ≤700 chars** (`scripts/distill.py`) |
+
+Every preformed route and every LLM reply passes **distill** before send. Intimate knowledge is used to *choose* the three CTNs or the right CTC — not to print the research notes.
+
+---
+
 ## 13. MPRB execution (Phases A–C — landed design)
 
 Fold-in of the three-phase plan (parity → cutover → MPRB). **One doc, no rival.**

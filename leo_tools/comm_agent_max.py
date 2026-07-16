@@ -247,6 +247,11 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
         projected = text
     else:
         projected = _apply_projection(text, policy["projection_profile"])  # A75
+        try:
+            from distill import distill
+            projected = distill(projected or "", max_lines=5, max_chars=600)
+        except Exception:
+            pass
 
     gd = policy["gate_default"]
     guard_class = OG.classify(channel, uid)   # A21: 'internal' (operator) vs 'outward'

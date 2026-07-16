@@ -174,66 +174,51 @@ def answer_arta_op_referrals(cur, client_code: str) -> str:
         for r in cur.fetchall() or []:
             matter_meta[str(_g(r, "matter_code"))] = dict(r)
 
-    # Professional brief — no greeting, no fluff
+    # DISTILLED emission (equilibrium): answer in ≤6 lines, no evidence essays.
+    # Intimate knowledge is used to *choose* the three codes; humans get the conclusion.
     n = len(arta_sent)
-    lines = [
-        "ARTA → Office of the President — verified ground only",
-        "",
-        f"Count of ARTA matters with verified OP/ES-bound record: {n}.",
-    ]
-
-    if n:
-        lines.append("")
-        lines.append("Matters:")
-        for mc in arta_sent:
-            meta = matter_meta.get(mc) or {}
-            ev = evidence.get(mc) or {}
-            stage = (meta.get("current_stage") or "—")[:48]
-            status = meta.get("status") or "—"
-            sid = ev.get("source_id") or "?"
-            # One tight evidence line (not the whole statement dump)
-            snippet = re.sub(r"\s+", " ", str(ev.get("statement") or ""))[:140]
-            lines.append(f"{mc}  [{status} · {stage}]")
-            lines.append(f"  Evidence (doc:{sid}): {snippet}")
-
-    if op_vehicle:
-        lines.append("")
-        lines.append("Tracking docket (petition vehicle, not an extra ARTA CTN):")
-        for mc in op_vehicle:
-            if mc in arta_sent:
-                continue
-            meta = matter_meta.get(mc) or {}
-            lines.append(
-                f"{mc}  [{meta.get('status') or '—'} · "
-                f"{(meta.get('current_stage') or '—')[:48]}]"
-            )
-            title = (meta.get("title") or "")[:100]
-            if title:
-                lines.append(f"  {title}")
-
-    # Explicit non-counts so we never "spew" soft labels as truth
-    lines.append("")
-    lines.append("Not counted as OP referral without verified OP/ES-bound fact:")
-    lines.append(
-        "• Program labels only (e.g. 'OP Bagong Pilipinas' on an ARTA Southern Luzon filing)"
-    )
-    lines.append("• Referrals to CSC, DILG, CART, Mayor, or Ombudsman")
-    lines.append("• Stage strings that merely contain 'op_' without a verified OP filing fact")
-
     if n == 0:
-        lines.append("")
-        lines.append(
-            "No verified OP/ES-bound fact found in this client family. "
-            "That is a gap in the verified record — not a conversational guess of zero."
-        )
-    else:
-        lines.append("")
-        lines.append(
-            "Basis: matter_facts.provenance_level=verified with OP/ES or "
-            "Petition for Supervisory Review language. Not chat memory."
+        return (
+            "No ARTA matter has a verified OP/ES filing in the record for this client. "
+            "That is a verified-ground gap — not a conversational zero."
         )
 
-    return "\n".join(lines)
+    # Primary sources across the set
+    src_ids = []
+    for mc in arta_sent:
+        sid = (evidence.get(mc) or {}).get("source_id")
+        if sid and str(sid) not in src_ids:
+            src_ids.append(str(sid))
+
+    codes_line = ", ".join(arta_sent)
+    vehicle = next((m for m in op_vehicle if m not in arta_sent), None)
+    # One-line stages only for active items
+    active_bits = []
+    for mc in arta_sent:
+        meta = matter_meta.get(mc) or {}
+        if str(meta.get("status") or "").lower() == "active":
+            st = (meta.get("current_stage") or "")[:40]
+            active_bits.append(f"{mc} ({st})" if st else mc)
+
+    lines = [
+        f"{n} ARTA matters are on the May 2026 Petition for Supervisory Review "
+        f"to the Executive Secretary (Office of the President): {codes_line}.",
+    ]
+    if vehicle:
+        meta = matter_meta.get(vehicle) or {}
+        lines.append(
+            f"Tracking docket {vehicle}: {meta.get('status') or '—'} · "
+            f"{(meta.get('current_stage') or '—')[:42]}."
+        )
+    if active_bits:
+        lines.append("Still active on that path: " + "; ".join(active_bits) + ".")
+    if src_ids:
+        lines.append("Ground: verified facts, doc:" + ", doc:".join(src_ids[:4]) + ".")
+    try:
+        from distill import distill
+        return distill("\n".join(lines), max_lines=5, max_chars=550)
+    except Exception:
+        return "\n".join(lines)
 
 
 def answer_arta_inventory(cur, client_code: str) -> str:
