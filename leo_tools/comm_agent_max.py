@@ -196,14 +196,42 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
     # ── GENERATION (the convergence): grounded reply, informed by the equilibrium state, the living
     # relationship profile AND anticipatory tending. NOT the raw inbound echo. candidate_text override
     # wins (tests/soak). ──
+    # Phase A: purpose router FIRST (A85 — same try_purpose_route as ls.process). Preformed packs
+    # (title / corpus / mprb) must NOT be re-phrased by A75 or links/dose break.
     gen = None
+    preformed = False
+    route_via = None
     if candidate_text is not None:
         text = candidate_text
     elif client and LS is not None:
-        gen = LS.generate_reply(cur, channel, uid, message, client, internal_context=internal,
-                                relationship_profile=profile, inbound_msg_id=channel_message_id,
-                                relationship_tending=tending)
-        text = gen.get("text") or ""
+        try:
+            route = LS.try_purpose_route(cur, client, message)
+        except Exception:
+            route = None
+        if route and route.get("text") and route.get("preformed"):
+            text = route["text"]
+            preformed = True
+            route_via = route.get("via")
+            gen = {"text": text, "verdict": "preformed", "via": route_via, "remediated": False}
+        else:
+            # Inject MPRB into generation when matters resolve (internal plane)
+            mprb_ctx = internal
+            try:
+                import matter_brief as mb
+                brief = mb.assemble_for_message(cur, client, message)
+                if brief and mprb_ctx is not None and isinstance(mprb_ctx, dict):
+                    mprb_ctx = dict(mprb_ctx)
+                    mprb_ctx["mprb_render"] = mb.render(brief)
+                elif brief:
+                    mprb_ctx = {"mprb_render": mb.render(brief),
+                                "contradictions": (internal or {}).get("contradictions"),
+                                "cascades": (internal or {}).get("cascades")}
+            except Exception:
+                mprb_ctx = internal
+            gen = LS.generate_reply(cur, channel, uid, message, client, internal_context=mprb_ctx,
+                                    relationship_profile=profile, inbound_msg_id=channel_message_id,
+                                    relationship_tending=tending)
+            text = gen.get("text") or ""
     else:
         text = ""   # unresolved client → A25 hold (no generation)
 
@@ -214,7 +242,11 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
            "source": "comm_agent_max"}
     OG.apply_comms_role_clamp(role, {"text": text}, ctx, cur=cur)   # A79 clamp (shadow-logs would-clamp)
     would_clamp, reason = OG._clamp_decision(policy, ctx)
-    projected = _apply_projection(text, policy["projection_profile"])  # A75 per the clamp's profile
+    # preformed artifacts: clamp decides whether/to-whom; projection does NOT rewrite
+    if preformed:
+        projected = text
+    else:
+        projected = _apply_projection(text, policy["projection_profile"])  # A75
 
     gd = policy["gate_default"]
     guard_class = OG.classify(channel, uid)   # A21: 'internal' (operator) vs 'outward'
@@ -246,6 +278,7 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
         "cadence": policy["cadence"], "next_action": next_action,
         "would_send_human": projected, "projected_len": len(projected or ""),
         "generated": bool(gen), "gate_verdict": (gen or {}).get("verdict"),
+        "preformed": preformed, "route_via": route_via,
         "internal_ego_nodes": (internal or {}).get("ego_nodes"),
         "internal_contradictions": (internal or {}).get("contradictions"),
         "internal_cross_client_refused": (internal or {}).get("cross_client_refused"),

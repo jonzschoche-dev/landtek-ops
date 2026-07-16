@@ -752,15 +752,32 @@ def handle(row):
     if not text:
         return {"handler": "llm", "outcome": "skip_empty", "reply_sent": False}
 
-    # Deterministic title FETCH before any LLM (Ollama has no tools — never "I'll fetch shortly")
-    if _wants_title_fetch(text):
-        pack, ferr = _fetch_title_docs(str(sender_id), text)
-        if pack:
-            _reply(chat_id, pack)
-            return {"handler": "llm", "outcome": "replied_title_fetch", "reply_sent": True}
-        # fall through to Ollama with error context if DB failed
-        if ferr:
-            print(f"[llm] title_fetch failed: {ferr}", file=sys.stderr)
+    # A85: same purpose router as leo_service / CAM (title, ARTA/OP, mprb, …)
+    try:
+        sys.path.insert(0, "/root/landtek/scripts")
+        import leo_service as _ls
+        import platform_coordinator as _coord
+        conn_r = psycopg2.connect(PG_DSN)
+        conn_r.autocommit = True
+        cur_r = conn_r.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        client_r = None
+        try:
+            client_r = _coord.client_of(cur_r, "telegram", str(sender_id))
+        except Exception:
+            client_r = _resolve_client_code(str(sender_id))
+        if not client_r and str(sender_id) == JONATHAN:
+            client_r = "MWK-001"
+        if client_r:
+            route = _ls.try_purpose_route(cur_r, client_r, text)
+            if route and route.get("text"):
+                _reply(chat_id, route["text"])
+                cur_r.close(); conn_r.close()
+                return {"handler": "llm",
+                        "outcome": f"replied_route:{route.get('via')}",
+                        "reply_sent": True, "preformed": True}
+        cur_r.close(); conn_r.close()
+    except Exception as e:
+        print(f"[llm] purpose_route: {e}", file=sys.stderr)
 
     # Build live blocks at call time so matters and vault state are always fresh
     matters_block = _live_matters_block()

@@ -254,3 +254,19 @@ So:
 **RC1 only:** extract `scripts/reasoning_corpus.py` from current `leo_service._build_prompt` + `_property_context` + role/who + caps; Telegram sovereign path and Messenger `process()` both call it; truth tests for wall + cap. Title fetch stays the deterministic exemplar of purpose-gated dose.
 
 That deepens equilibrium **without** a redesign: one assembler, existing tables, local brain, recipient-shaped emission.
+
+---
+
+## 13. MPRB execution (Phases A–C — landed design)
+
+Fold-in of the three-phase plan (parity → cutover → MPRB). **One doc, no rival.**
+
+| Phase | What shipped |
+|-------|----------------|
+| **A — Parity** | `leo_service.try_purpose_route` — title_fetch + corpus_answer + mprb status. Callers: `process`, `comm_agent_max`, Telegram `llm` handler. `preformed=True` skips A75 rewrite; clamp/A21 still apply. |
+| **B — Cutover** | `LEO_ORCH_LIVE=channel:uid,...` on `leo_instant` — those identities use CAM live (`force_shadow=False`); else process live + CAM shadow. Operator-first. Rollback = unset env. |
+| **C — MPRB v1** | `scripts/matter_brief.py`: resolve_matters, assemble (angles with data/empty/not_instrumented), render, answer_structured (verified-only). Wired into purpose route + LLM prompt injection. |
+
+Truth-tests: `truth_tests/test_mprb_router.py` (OP oracle 3, preformed packs, structured basis).
+
+**preformed contract:** clamp decides whether/to-whom; projection does **not** rewrite packs or `/files/c` links.

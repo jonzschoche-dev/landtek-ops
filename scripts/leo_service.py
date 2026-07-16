@@ -231,6 +231,11 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
               f"contradiction(s) and touches {internal_context.get('cascades', 0)} keystone cascade(s) in the "
               "record. If your answer would state a fact that could be contradicted, FLAG the uncertainty "
               "('let me confirm — our records may conflict on that') rather than asserting it.\n")
+    # MPRB (matter pre-response brief) — multi-angle internal plane when provided
+    mprb = ""
+    if internal_context and internal_context.get("mprb_render"):
+        mprb = ("\nMATTER PRE-RESPONSE BRIEF (prefer this; verified vs provisional are split):\n"
+                f"{internal_context['mprb_render']}\n")
     who, convo, label = "WHO YOU'RE TALKING TO: (unidentified).", "(this is the first message)", "them"
     is_op = False
     if channel and channel_user_id:
@@ -260,7 +265,7 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
             tend = f"\n{tblock}\n" if tblock else ""
         except Exception:
             tend = ""
-    return (f"{SYSTEM}\n\n{who}\n{eq}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n"
+    return (f"{SYSTEM}\n\n{who}\n{eq}{mprb}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n"
             f"{prop_block}\n"
             f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\n"
             f"CONVERSATION SO FAR (most recent last — remember it, don't repeat yourself):\n{convo}\n\n"
@@ -371,6 +376,73 @@ def deliver_approved(cur):
         print(f"[leo_service] delivered {done} human-approved reply(ies)")
 
 
+def try_purpose_route(cur, client_code, message):
+    """A85 one router: deterministic corpus artifacts (title pack, ARTA/OP, inventory).
+
+    Returns None or:
+      {text, via, preformed: True, purpose?}
+    preformed=True means clamp/send may apply, but A75 projection MUST NOT rewrite
+    (dose-1 packs + /files/c links would be mangled).
+    """
+    if not client_code or not (message or "").strip():
+        return None
+    try:
+        import title_fetch as tf
+        if tf.wants_title_fetch(message):
+            pack, _ferr = tf.fetch_title_pack(cur, client_code, message)
+            if pack:
+                return {"text": pack, "via": "title_fetch", "preformed": True,
+                        "purpose": "title_fetch"}
+    except Exception as e:
+        print(f"[leo_service] title_fetch route: {type(e).__name__}: {e}", flush=True)
+    try:
+        import corpus_answer as ca
+        pack, purpose = ca.try_corpus_answer(cur, client_code, message)
+        if pack and purpose and not str(purpose).startswith("error"):
+            return {"text": pack, "via": f"corpus_answer:{purpose}", "preformed": True,
+                    "purpose": purpose}
+    except Exception as e:
+        print(f"[leo_service] corpus_answer route: {type(e).__name__}: {e}", flush=True)
+    # MPRB structured answer (matter multi-angle) — preformed when SQL concludes
+    try:
+        import matter_brief as mb
+        hit = mb.try_mprb_route(cur, client_code, message)
+        if hit and hit.get("text"):
+            hit.setdefault("preformed", True)
+            return hit
+    except Exception as e:
+        print(f"[leo_service] mprb route: {type(e).__name__}: {e}", flush=True)
+    return None
+
+
+def _deliver_preformed(cur, base, channel, channel_user_id, client, pack, via):
+    """Send/hold a preformed pack (same gates as process router branch)."""
+    guard_class = og.classify(channel, str(channel_user_id))
+    logkw = {**base, "client": client, "cand": pack, "verdict": via or "corpus",
+             "fails": None, "warns": 0, "remed": False, "human": pack,
+             "guard": guard_class}
+    if _channel_mode(cur, channel) != "headless":
+        _log(cur, **{**logkw, "action": "shadow_logged"})
+        return {"action": "shadow_logged", "client": client,
+                "would_send_human": pack, "via": via, "preformed": True}
+    decision, kind, oid = _send_decision(cur, channel, str(channel_user_id), pack)
+    if decision == "hold":
+        _log(cur, **{**logkw, "action": "held_for_approval", "order": oid,
+                     "reason": f"outward {via} held (A21)"})
+        return {"action": "held_for_approval", "order": oid, "client": client,
+                "would_send_human": pack, "via": via, "preformed": True}
+    try:
+        ok = _deliver(channel, str(channel_user_id), pack)
+    except Exception as e:
+        ok, kind = False, f"send_error:{type(e).__name__}"
+    if ok:
+        _log(cur, **{**logkw, "action": "sent", "reason": f"{via}:{kind}"})
+        return {"action": "sent", "via": via, "client": client, "preformed": True}
+    _log(cur, **{**logkw, "action": "send_error", "reason": kind})
+    return {"action": "send_error", "reason": kind, "client": client, "via": via,
+            "preformed": True}
+
+
 def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
     """Run the full spine for one message. SHADOW: logs, never sends. Returns the ledger dict."""
     base = dict(msg=inbound_msg_id, channel=channel, uid=str(channel_user_id), model=MODEL,
@@ -383,50 +455,35 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
                      "reason": "unresolved_client (A25): identity not bound to a client_code"})
         return {"action": "held", "client": None}
 
-    # ── Deterministic CORPUS answers (title fetch, matter inventory, ARTA/OP, …) ──
-    # Ollama only sees ~12 latest facts — it will honestly say "none I'm aware of"
-    # while matters rows exist. Purpose-aware SQL answers FIRST (A70 ground, A85 one path).
+    # ── A85 purpose router (shared with CAM / TG) ──
     try:
-        pack = None
-        via = None
-        import title_fetch as tf
-        if tf.wants_title_fetch(message or ""):
-            pack, _ferr = tf.fetch_title_pack(cur, client, message or "")
-            via = "title_fetch"
-        if not pack:
-            import corpus_answer as ca
-            pack, purpose = ca.try_corpus_answer(cur, client, message or "")
-            if pack:
-                via = f"corpus_answer:{purpose}"
-        if pack:
-            guard_class = og.classify(channel, str(channel_user_id))
-            logkw = {**base, "client": client, "cand": pack, "verdict": via or "corpus",
-                     "fails": None, "warns": 0, "remed": False, "human": pack,
-                     "guard": guard_class}
-            if _channel_mode(cur, channel) != "headless":
-                _log(cur, **{**logkw, "action": "shadow_logged"})
-                return {"action": "shadow_logged", "client": client,
-                        "would_send_human": pack, "via": via}
-            decision, kind, oid = _send_decision(cur, channel, str(channel_user_id), pack)
-            if decision == "hold":
-                _log(cur, **{**logkw, "action": "held_for_approval", "order": oid,
-                             "reason": f"outward {via} held (A21)"})
-                return {"action": "held_for_approval", "order": oid, "client": client,
-                        "would_send_human": pack}
-            try:
-                ok = _deliver(channel, str(channel_user_id), pack)
-            except Exception as e:
-                ok, kind = False, f"send_error:{type(e).__name__}"
-            if ok:
-                _log(cur, **{**logkw, "action": "sent", "reason": f"{via}:{kind}"})
-                return {"action": "sent", "via": via, "client": client}
-            _log(cur, **{**logkw, "action": "send_error", "reason": kind})
-            return {"action": "send_error", "reason": kind, "client": client}
+        route = try_purpose_route(cur, client, message or "")
+        if route and route.get("text"):
+            return _deliver_preformed(
+                cur, base, channel, channel_user_id, client,
+                route["text"], route.get("via") or "purpose_route")
     except Exception as e:
-        print(f"[leo_service] corpus_answer skip: {type(e).__name__}: {e}", flush=True)
+        print(f"[leo_service] purpose_route skip: {type(e).__name__}: {e}", flush=True)
+
+    # MPRB prompt block for LLM path (angles selected; not a full dump)
+    mprb_block = ""
+    try:
+        import matter_brief as mb
+        brief = mb.assemble_for_message(cur, client, message or "")
+        if brief:
+            mprb_block = mb.render(brief) or ""
+    except Exception as e:
+        print(f"[leo_service] mprb assemble: {type(e).__name__}: {e}", flush=True)
 
     try:
         prompt = _build_prompt(cur, client, message, channel, channel_user_id, inbound_msg_id)
+        if mprb_block:
+            prompt = prompt.replace(
+                "GROUNDED FACTS (cite as doc:ID):",
+                f"MATTER PRE-RESPONSE BRIEF (internal plane — prefer this over thin fact window):\n"
+                f"{mprb_block}\n\nGROUNDED FACTS (cite as doc:ID):",
+                1,
+            )
         candidate = _llm(prompt)
     except Exception as e:
         _log(cur, **{**base, "client": client, "action": "ollama_unreachable",
