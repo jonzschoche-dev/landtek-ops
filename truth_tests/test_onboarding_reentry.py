@@ -78,7 +78,7 @@ def declined_reentry_archives_history(cur):
     cur.execute("SELECT count(*) AS n FROM channel_users WHERE channel_user_id=%s", (tag,))
     if (cur.fetchone()["n"] or 0) != 1:
         raise TruthFailure("re-entry must not create a second row")
-    cur.rollback()
+    cur.connection.rollback()
 
 
 def operator_identity_locked(cur):
@@ -93,7 +93,7 @@ def operator_identity_locked(cur):
 
 
 def reopen_api_refuses_operator(cur):
-    """Safety: _archive on operator-like role keeps principal flags when keep path used."""
+    """Safety: Jonathan telegram row is identity-locked."""
     cur.execute("""
         SELECT cu.* FROM channel_users cu
           JOIN channels c ON c.id = cu.channel_id
@@ -106,7 +106,7 @@ def reopen_api_refuses_operator(cur):
     u = dict(row)
     if not ob._identity_locked(u):
         raise TruthFailure("Jonathan telegram row must be identity-locked")
-    cur.rollback()
+    # do not leave test rows; harness connection is shared — no writes here
 
 
 TESTS = [
