@@ -171,8 +171,10 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
         return None, f"title_fetch_db:{type(e).__name__}:{e}"
 
     def _rank(d: Any) -> int:
+        # NOTE: rank 0 is valid (best hit). Never use `x or 2` — 0 is falsy in Python.
         if isinstance(d, dict):
-            return int(d.get("rank") or 2)
+            v = d.get("rank")
+            return int(v) if v is not None else 2
         return 2
 
     # Prefer downloadable rows whose FILENAME carries the token (dose + precision)
