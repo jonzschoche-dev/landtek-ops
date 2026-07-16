@@ -773,9 +773,9 @@ document.getElementById('t').textContent=CFG.label+' — georeference';
 document.getElementById('sub').textContent='('+CFG.parcel+' · '+CFG.title_no+
   ' · survey area '+(CFG.area_sqm?Math.round(CFG.area_sqm).toLocaleString()+' m\\u00b2':'—')+')';
 if(CFG.tie) document.getElementById('tie').textContent='tie point: '+CFG.tie.replace(/^tie point /i,'');
-var esri=L.tileLayer(CFG.tiles.esri,{maxZoom:21,attribution:CFG.tiles.esri_attrib});
+var esri=L.tileLayer(CFG.tiles.esri,{maxZoom:21,maxNativeZoom:18,attribution:CFG.tiles.esri_attrib});
 var bases={'Satellite (Esri)':esri};
-if(CFG.tiles.gsat) bases['Satellite (Google)']=L.tileLayer(CFG.tiles.gsat,{maxZoom:21,attribution:'&copy; Google'});
+if(CFG.tiles.gsat) bases['Satellite (Google)']=L.tileLayer(CFG.tiles.gsat,{maxZoom:21,maxNativeZoom:20,attribution:'&copy; Google'});
 var map=L.map('map',{layers:[esri]}).setView([CFG.lat,CFG.lng], CFG.anchor?18:16);
 L.control.layers(bases).addTo(map);
 // corner-1 offset -> [lat,lng] (mirror of geo_math.local_ring_to_geojson; TRUE north = no rotation)
@@ -1011,13 +1011,13 @@ __PANEL_CSS__
 var CFG=__CFG__;
 __PANEL_JS__
 document.getElementById('mf').href='/client/'+CFG.token+'/manifest.json';
-var esri=L.tileLayer(CFG.tiles.esri,{maxZoom:21,attribution:CFG.tiles.esri_attrib});
+var esri=L.tileLayer(CFG.tiles.esri,{maxZoom:21,maxNativeZoom:18,attribution:CFG.tiles.esri_attrib});
 var bases={'Satellite (Esri)':esri};
-if(CFG.tiles.gsat) bases['Satellite (Google)']=L.tileLayer(CFG.tiles.gsat,{maxZoom:21,attribution:'&copy; Google'});
-if(CFG.tiles.ghyb) bases['Hybrid (Google)']=L.tileLayer(CFG.tiles.ghyb,{maxZoom:21,attribution:'&copy; Google'});
+if(CFG.tiles.gsat) bases['Satellite (Google)']=L.tileLayer(CFG.tiles.gsat,{maxZoom:21,maxNativeZoom:20,attribution:'&copy; Google'});
+if(CFG.tiles.ghyb) bases['Hybrid (Google)']=L.tileLayer(CFG.tiles.ghyb,{maxZoom:21,maxNativeZoom:20,attribution:'&copy; Google'});
 var map=L.map('map',{layers:[esri]}).setView([CFG.lat,CFG.lng],17);
 var overlays={};
-CFG.orthos.forEach(function(o){overlays[o.label]=L.tileLayer(o.url,{maxZoom:22,opacity:.95});});
+CFG.orthos.forEach(function(o){overlays[o.label]=L.tileLayer(o.url,{maxZoom:22,maxNativeZoom:22,opacity:.95});});
 var approximate=false, RINGS=[];
 var parcelLayer=L.geoJSON(null,{style:function(){return {color:'#facc15',weight:3,fillOpacity:0.12};},
   onEachFeature:function(f,lyr){var p=f.properties;
