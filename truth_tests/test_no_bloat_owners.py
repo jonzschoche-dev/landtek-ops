@@ -11,12 +11,11 @@ Checks (VPS / host with systemd + bot token when available):
 """
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
-import urllib.parse
 import urllib.request
-import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _harness import run, TruthFailure
@@ -59,10 +58,10 @@ def _webhook_url(token: str) -> str:
         return ""
 
 
-def no_dual_telegram_owner():
+def no_dual_telegram_owner(cur):
     """A85: webhook owner XOR getUpdates gateway — never both active."""
+    del cur  # no DB needed
     gw = _systemctl_active("landtek-telegram-gateway.service")
-    # If we cannot see systemd (dev laptop without units), skip live half.
     try:
         subprocess.run(["systemctl", "--version"], capture_output=True, timeout=3, check=True)
         have_systemd = True
@@ -77,27 +76,22 @@ def no_dual_telegram_owner():
             f"A85 breach: telegram gateway ACTIVE while webhook is set ({wh[:80]}). "
             "Disable landtek-telegram-gateway OR stop webhook_anchor + deleteWebhook — one owner only."
         )
-    return {
-        "gateway_active": gw,
-        "webhook": (wh[:60] + "…") if len(wh) > 60 else (wh or "(none/unknown)"),
-        "have_systemd": have_systemd,
-        "ok": not (gw and wh),
-    }
 
 
-def gateway_code_refuses_dual_owner():
+def gateway_code_refuses_dual_owner(cur):
+    del cur
     path = os.path.join(ROOT, "scripts", "telegram_gateway.py")
     if not os.path.isfile(path):
         raise TruthFailure(f"missing {path}")
     src = open(path).read()
-    if "A85 refuse" not in src and "A85" not in src:
+    if "A85 refuse" not in src:
         raise TruthFailure("telegram_gateway.py missing A85 refuse guard")
     if "getWebhookInfo" not in src and "_webhook_url" not in src:
         raise TruthFailure("telegram_gateway.py must check webhook before polling")
-    return {"guard": "present"}
 
 
-def llm_ollama_first():
+def llm_ollama_first(cur):
+    del cur
     path = os.path.join(ROOT, "landtek_telegram", "handlers", "llm.py")
     if not os.path.isfile(path):
         raise TruthFailure(f"missing {path}")
@@ -106,15 +100,18 @@ def llm_ollama_first():
         raise TruthFailure("llm.py must gate Anthropic behind LANDTEK_ALLOW_ANTHROPIC_CHAT (A85)")
     if "_sovereign_ollama_reply" not in src:
         raise TruthFailure("llm.py must call sovereign Ollama path")
-    # Ollama must be attempted before Anthropic in handle()
-    i_sov = src.find("_sovereign_ollama_reply")
+    i_sov = src.find("sov, sov_err = _sovereign_ollama_reply")
     i_ant = src.find("_call_anthropic(system_prompt")
     if i_sov < 0 or i_ant < 0 or i_sov > i_ant:
         raise TruthFailure("llm.py must try Ollama before Anthropic in handle()")
-    return {"order": "ollama_then_optional_anthropic"}
 
+
+TESTS = [
+    ("A85.no_dual_telegram_owner", no_dual_telegram_owner),
+    ("A85.gateway_code_refuses", gateway_code_refuses_dual_owner),
+    ("A85.llm_ollama_first", llm_ollama_first),
+]
 
 if __name__ == "__main__":
-    run("A85_no_dual_telegram_owner", no_dual_telegram_owner)
-    run("A85_gateway_code_refuses", gateway_code_refuses_dual_owner)
-    run("A85_llm_ollama_first", llm_ollama_first)
+    p, f = run(TESTS)
+    sys.exit(0 if not f else 1)
