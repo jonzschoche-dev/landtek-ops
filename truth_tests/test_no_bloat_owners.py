@@ -98,12 +98,16 @@ def llm_ollama_first(cur):
     src = open(path).read()
     if "LANDTEK_ALLOW_ANTHROPIC_CHAT" not in src:
         raise TruthFailure("llm.py must gate Anthropic behind LANDTEK_ALLOW_ANTHROPIC_CHAT (A85)")
-    if "_sovereign_ollama_reply" not in src:
-        raise TruthFailure("llm.py must call sovereign Ollama path")
-    i_sov = src.find("sov, sov_err = _sovereign_ollama_reply")
-    i_ant = src.find("_call_anthropic(system_prompt")
-    if i_sov < 0 or i_ant < 0 or i_sov > i_ant:
-        raise TruthFailure("llm.py must try Ollama before Anthropic in handle()")
+    if "def handle(row):" not in src:
+        raise TruthFailure("llm.py missing handle()")
+    # Order floor: only inside handle() — not the def of _call_anthropic earlier in the file
+    body = src.split("def handle(row):", 1)[1]
+    i_sov = body.find("_sovereign_ollama_reply(")
+    i_ant = body.find("_call_anthropic(")
+    if i_sov < 0:
+        raise TruthFailure("handle() must call _sovereign_ollama_reply")
+    if i_ant >= 0 and i_sov > i_ant:
+        raise TruthFailure("handle() must try Ollama before Anthropic (A85 single brain order)")
 
 
 TESTS = [
