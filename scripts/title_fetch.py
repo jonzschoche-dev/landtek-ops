@@ -247,8 +247,7 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
     chosen = pool[:cap]
     withheld = max(0, total_related - len(chosen))
 
-    # DISTILLED: 2–4 lines. Intimate ranking is internal; human gets one primary link.
-    lines = []
+    # Short BY CONSTRUCTION (≤280). Ranking is intimate; emission is one link.
     if assets:
         a = assets[0]
         sc = _g(a, "readiness_score", 5)
@@ -258,26 +257,25 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
             scs = "?"
         status = _g(a, "title_status", 3) or "—"
         ref = _g(a, "title_ref", 1) or f"T-{token}"
-        lines.append(f"{ref}: {status} · readiness {scs}.")
+        head = f"{ref}: {status}, readiness {scs}."
     else:
-        lines.append(f"T-{token}: no asset row yet.")
+        head = f"T-{token}: no asset row."
 
-    if chosen:
-        d = chosen[0]
-        name = (_g(d, "name", 1) or "Document")[:70]
-        did = _g(d, "id", 0)
-        lines.append(f"{name}")
-        lines.append(f"{PUBLIC_FILE}/{did}")
-        if wide and len(chosen) > 1:
-            for d2 in chosen[1:]:
-                lines.append(f"{PUBLIC_FILE}/{_g(d2, 'id', 0)} — {(_g(d2, 'name', 1) or '')[:50]}")
-        elif withheld and not wide:
-            lines.append(f"+{withheld} more — reply: more TCT {token}")
+    if not chosen:
+        return f"{head} No downloadable CTC/TCT in scope.", None
+
+    d = chosen[0]
+    did = _g(d, "id", 0)
+    name = (_g(d, "name", 1) or "Document")
+    # Prefer short name if long
+    if len(name) > 45:
+        name = name[:42] + "…"
+    more = f" +{withheld} more (say: more TCT {token})." if (withheld and not wide) else ""
+    if wide and len(chosen) > 1:
+        links = " ".join(f"{PUBLIC_FILE}/{_g(x, 'id', 0)}" for x in chosen[:3])
+        text = f"{head} {links}{more}"
     else:
-        lines.append("No downloadable CTC/TCT file for that number in scope.")
-
-    try:
-        from distill import distill
-        return distill("\n".join(lines), max_lines=5, max_chars=420), None
-    except Exception:
-        return "\n".join(lines[:5]), None
+        text = f"{head} {name} {PUBLIC_FILE}/{did}{more}"
+    if len(text) > 280:
+        text = f"{ref if assets else 'T-'+token}: {PUBLIC_FILE}/{did}{more}"
+    return text.strip(), None

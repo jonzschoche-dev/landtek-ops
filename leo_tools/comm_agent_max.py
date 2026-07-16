@@ -242,16 +242,12 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
            "source": "comm_agent_max"}
     OG.apply_comms_role_clamp(role, {"text": text}, ctx, cur=cur)   # A79 clamp (shadow-logs would-clamp)
     would_clamp, reason = OG._clamp_decision(policy, ctx)
-    # preformed artifacts: clamp decides whether/to-whom; projection does NOT rewrite
+    # preformed: clamp decides whether/to-whom; projection does NOT rewrite (packs/links).
+    # Free prose: A75 project only — no second truncator (S14/EMISSION_CAP at deliver).
     if preformed:
         projected = text
     else:
         projected = _apply_projection(text, policy["projection_profile"])  # A75
-        try:
-            from distill import distill
-            projected = distill(projected or "", max_lines=5, max_chars=600)
-        except Exception:
-            pass
 
     gd = policy["gate_default"]
     guard_class = OG.classify(channel, uid)   # A21: 'internal' (operator) vs 'outward'

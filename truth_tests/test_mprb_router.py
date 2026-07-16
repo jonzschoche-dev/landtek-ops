@@ -34,9 +34,9 @@ def op_count_oracle_3(cur):
         raise TruthFailure("soft 1378 must not be counted as OP send")
     if "Hello" in ans:
         raise TruthFailure("cold brief must not greet")
-    # Human-tolerable: no multi-paragraph evidence dump
-    if ans.count("\n") > 8 or len(ans) > 800:
-        raise TruthFailure(f"OP brief too long for equilibrium emission: {len(ans)} chars")
+    # Short by construction — one dose authority (S14 / EMISSION_CAP = 280)
+    if len(ans) > 280:
+        raise TruthFailure(f"OP brief over emission cap: {len(ans)} chars (want ≤280 by construction)")
 
 
 def purpose_route_returns_preformed(cur):

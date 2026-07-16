@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
-"""distill.py — emission plane of reasoning equilibrium (A71 + A75 dose).
+"""emission dose — ONE authority (A85), short by construction.
 
-Internal MPRB / corpus work may be multi-angle and long.
-What a human receives MUST be short, cold, and one-point.
+Peer correction (2026-07-16): post-hoc line/char truncation is NOT distillation.
+It keeps the ramble and can drop the conclusion. Structured answerers must
+EMIT already-short text. This module only:
 
-Hard caps (operator-tolerable, not a data dump):
-  MAX_LINES  = 6
-  MAX_CHARS  = 700
-  No greetings, no "let me know if", no scope lectures unless essential.
+  1. strip_fluff() — drop greeting/filler lines (no length chop)
+  2. EMISSION_CAP  — must match S14 HUMAN_MESSAGE_CAP (280) for operator-facing
+     free text; preformed packs MUST be built under this cap by the answerer.
+
+If text exceeds the cap, that is an answerer bug — we log and take the LAST
+complete sentence(s) (conclusion-preserving), not the first lines.
 """
 from __future__ import annotations
 
 import re
+import sys
 
-MAX_LINES = 6
-MAX_CHARS = 700
+# Single dose authority — keep in lockstep with scripts/tg_send.HUMAN_MESSAGE_CAP
+EMISSION_CAP = 280
 
-_FLUFF = re.compile(
+_FLUFF_LINE = re.compile(
     r"(?i)^("
     r"hello\b|hi\b|kamusta|salamat|how can i|let me know|if you need|"
     r"anything else|how's everything|i'll check with the team|"
@@ -25,38 +29,59 @@ _FLUFF = re.compile(
 )
 
 
-def distill(text: str, *, max_lines: int = MAX_LINES, max_chars: int = MAX_CHARS) -> str:
-    """Force human-tolerable length. Prefer early lines (already ordered as answer-first)."""
+def strip_fluff(text: str) -> str:
+    """Remove greeting/filler lines only. Does not truncate."""
     if not text:
-        return text
+        return text or ""
     lines = []
-    for raw in (text or "").splitlines():
+    for raw in text.splitlines():
         line = raw.rstrip()
         if not line.strip():
-            if lines and lines[-1] != "":
-                lines.append("")  # keep single blank sparingly
             continue
-        if _FLUFF.match(line.strip()):
+        if _FLUFF_LINE.match(line.strip()):
             continue
-        # Drop long "Not counted" essays — keep one line max later
         lines.append(line)
+    return "\n".join(lines).strip()
 
-    # Collapse multiple blanks
-    out, prev_blank = [], False
-    for line in lines:
-        blank = line.strip() == ""
-        if blank and prev_blank:
-            continue
-        out.append(line)
-        prev_blank = blank
 
-    # Prefer answer lines; if still too many, keep first max_lines non-empty
-    non_empty = [l for l in out if l.strip()]
-    if len(non_empty) > max_lines:
-        non_empty = non_empty[:max_lines]
-    body = "\n".join(non_empty).strip()
-    if len(body) > max_chars:
-        body = body[: max_chars - 1].rsplit("\n", 1)[0].rstrip()
-        if len(body) > max_chars:
-            body = body[: max_chars - 1].rstrip() + "…"
-    return body
+def prefer_conclusion(text: str, cap: int = EMISSION_CAP) -> str:
+    """If over cap, keep the END (conclusion), not the start (ramble).
+
+    Prefer whole sentences. Only for free LLM prose that violated the system
+    prompt — structured packs must never need this.
+    """
+    t = strip_fluff(text or "")
+    if len(t) <= cap:
+        return t
+    # Last sentences that fit
+    parts = re.split(r"(?<=[.!?])\s+", t)
+    out = []
+    for p in reversed(parts):
+        candidate = (p + (" " + " ".join(reversed(out)) if out else "")).strip()
+        if len(candidate) <= cap:
+            out.insert(0, p)
+        else:
+            if not out:
+                # single long sentence — hard cut on word boundary from end
+                return t[-cap:].lstrip()
+                # better from start of last window:
+                chunk = t[-(cap - 1):]
+                sp = chunk.find(" ")
+                return (chunk[sp + 1:] if sp > 0 else chunk) + ""
+            break
+    return " ".join(out).strip()
+
+
+def distill(text: str, *, max_lines: int = 6, max_chars: int = EMISSION_CAP) -> str:
+    """Deprecated name kept for callers. Fluff-strip + conclusion-preserving cap only.
+
+    max_lines is ignored for truncation of body (construction owns line count).
+    """
+    t = strip_fluff(text or "")
+    if max_chars and len(t) > max_chars:
+        print(
+            f"[distill] WARN over cap {len(t)}>{max_chars} — answerer should be short by construction",
+            file=sys.stderr,
+        )
+        t = prefer_conclusion(t, max_chars)
+    return t

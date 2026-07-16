@@ -257,17 +257,19 @@ That deepens equilibrium **without** a redesign: one assembler, existing tables,
 
 ---
 
-## 13a. Equilibrium = intimate knowledge + distilled emission (non-negotiable)
+## 13a. Equilibrium = intimate knowledge + short-by-construction emission
 
-**Failure mode we will not tolerate:** multi-angle work that is *emitted* as a long inventory.
-Humans must not read MPRB dumps. Reasoning equilibrium means:
+**Failure mode:** multi-angle work *emitted* as inventory; or a **truncator** that keeps the
+ramble and drops the conclusion. Post-hoc `distill()` line-caps are not distillation.
 
 | Plane | Content | Length |
 |-------|---------|--------|
-| **Internal** | Full angles, verified/provisional split, ranking | May be long (never shown raw) |
-| **External** | One answer + optional one cite/link + one next step | **≤6 lines / ≤700 chars** (`scripts/distill.py`) |
+| **Internal** | Full angles, ranking, verified/provisional | May be long (never shown raw) |
+| **External** | One answer, already short | **≤280 chars** (`EMISSION_CAP` = S14 `HUMAN_MESSAGE_CAP`) |
 
-Every preformed route and every LLM reply passes **distill** before send. Intimate knowledge is used to *choose* the three CTNs or the right CTC — not to print the research notes.
+**One dose authority (A85):** answerers emit short text by construction. `strip_fluff` only
+removes greetings. If free LLM prose exceeds 280, keep the **last** sentences (conclusion),
+never the first. Messenger and Telegram share the same cap on operator-facing sends.
 
 ---
 

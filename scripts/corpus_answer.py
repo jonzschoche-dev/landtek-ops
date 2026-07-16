@@ -174,51 +174,38 @@ def answer_arta_op_referrals(cur, client_code: str) -> str:
         for r in cur.fetchall() or []:
             matter_meta[str(_g(r, "matter_code"))] = dict(r)
 
-    # DISTILLED emission (equilibrium): answer in ≤6 lines, no evidence essays.
-    # Intimate knowledge is used to *choose* the three codes; humans get the conclusion.
+    # Short BY CONSTRUCTION (≤280 = S14 / EMISSION_CAP). No post-hoc chop.
     n = len(arta_sent)
     if n == 0:
         return (
-            "No ARTA matter has a verified OP/ES filing in the record for this client. "
-            "That is a verified-ground gap — not a conversational zero."
+            "No ARTA matter has a verified OP/ES filing on record for this client."
         )
 
-    # Primary sources across the set
+    # Prefer short codes in the list (0690 not full MWK-ARTA-0690 if clear)
+    short = []
+    for mc in arta_sent:
+        m = re.search(r"(\d{4})$", mc) or re.search(r"ARTA-(\d+)", mc, re.I)
+        short.append(m.group(1) if m else mc)
+    codes = ", ".join(short) if len("".join(short)) < 40 else ", ".join(arta_sent)
+
     src_ids = []
     for mc in arta_sent:
         sid = (evidence.get(mc) or {}).get("source_id")
         if sid and str(sid) not in src_ids:
             src_ids.append(str(sid))
+    cite = f" docs {', '.join(src_ids[:3])}." if src_ids else ""
 
-    codes_line = ", ".join(arta_sent)
     vehicle = next((m for m in op_vehicle if m not in arta_sent), None)
-    # One-line stages only for active items
-    active_bits = []
-    for mc in arta_sent:
-        meta = matter_meta.get(mc) or {}
-        if str(meta.get("status") or "").lower() == "active":
-            st = (meta.get("current_stage") or "")[:40]
-            active_bits.append(f"{mc} ({st})" if st else mc)
+    vehicle_bit = f" Vehicle {vehicle} awaiting OP action." if vehicle else ""
 
-    lines = [
-        f"{n} ARTA matters are on the May 2026 Petition for Supervisory Review "
-        f"to the Executive Secretary (Office of the President): {codes_line}.",
-    ]
-    if vehicle:
-        meta = matter_meta.get(vehicle) or {}
-        lines.append(
-            f"Tracking docket {vehicle}: {meta.get('status') or '—'} · "
-            f"{(meta.get('current_stage') or '—')[:42]}."
-        )
-    if active_bits:
-        lines.append("Still active on that path: " + "; ".join(active_bits) + ".")
-    if src_ids:
-        lines.append("Ground: verified facts, doc:" + ", doc:".join(src_ids[:4]) + ".")
-    try:
-        from distill import distill
-        return distill("\n".join(lines), max_lines=5, max_chars=550)
-    except Exception:
-        return "\n".join(lines)
+    # One sentence + optional second
+    text = (
+        f"{n} ARTA CTNs on the May 2026 OP/ES supervisory petition: {codes}."
+        f"{vehicle_bit}{cite}"
+    )
+    if len(text) > 280:
+        text = f"{n} CTNs on OP/ES petition May 2026: {codes}.{cite}"
+    return text.strip()
 
 
 def answer_arta_inventory(cur, client_code: str) -> str:

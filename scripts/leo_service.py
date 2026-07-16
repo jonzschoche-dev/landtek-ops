@@ -314,9 +314,24 @@ def _channel_mode(cur, channel):
 
 
 def _deliver(channel, recipient, text):
-    """Send via the channel's OWN existing sender (reuse the bridges — no forks). Returns bool ok."""
+    """Send via the channel's OWN existing sender (reuse the bridges — no forks). Returns bool ok.
+
+    A85 emission parity: operator-facing free text uses one dose (S14 280). Preformed
+    packs are already short-by-construction under EMISSION_CAP. Messenger had no S14
+    cap before — that was the verbosity parity break.
+    """
+    sys.path.insert(0, "/root/landtek/scripts")
     sys.path.insert(0, "/root/landtek/leo_tools")
     import channel_adapters as ca
+    # One dose authority for internal operator channels
+    try:
+        if og.classify(channel, str(recipient)) == "internal":
+            from distill import strip_fluff, prefer_conclusion, EMISSION_CAP
+            text = strip_fluff(text or "")
+            if len(text) > EMISSION_CAP:
+                text = prefer_conclusion(text, EMISSION_CAP)
+    except Exception:
+        pass
     if channel == "messenger":
         return bool(ca._messenger_send(recipient, text))
     if channel == "whatsapp":
@@ -324,13 +339,11 @@ def _deliver(channel, recipient, text):
     if channel == "viber":
         return bool(ca._viber_send(recipient, text))
     if channel == "telegram":
-        # sovereign Telegram send via the S14-governed sender (sanitize + pace + no-double-tap). Reached
-        # only when leo_channel_mode.telegram='headless' (the metered n8n/Anthropic path retired).
-        sys.path.insert(0, "/root/landtek/scripts")
         import tg_send
-        # override_pacing: this is a DIRECT conversational reply to the user's message (dedup'd one-per-
-        # inbound), not a background alert — the S14 no-double-tap must not block a reply he asked for.
-        ok, _info = tg_send.send(chat_id=str(recipient), text=text, source="leo", override_pacing=True)
+        # override_pacing: direct conversational reply; S14 sanitize still applies for Jonathan
+        ok, _info = tg_send.send(
+            chat_id=str(recipient), text=text, source="leo",
+            override_pacing=True, human_readable=True)
         return bool(ok)
     return False
 
@@ -394,9 +407,15 @@ def try_purpose_route(cur, client_code, message):
     def _emit(text, via, purpose=None):
         if not text:
             return None
+        # Short by construction only — strip fluff, do not truncate away the answer.
+        # Cap warning if answerer exceeded EMISSION_CAP (280 / S14).
         try:
-            from distill import distill
-            text = distill(text)
+            from distill import strip_fluff, prefer_conclusion, EMISSION_CAP
+            text = strip_fluff(text)
+            if len(text) > EMISSION_CAP:
+                print(f"[leo_service] route over dose {len(text)}>{EMISSION_CAP} via={via}",
+                      flush=True)
+                text = prefer_conclusion(text, EMISSION_CAP)
         except Exception:
             pass
         return {"text": text, "via": via, "preformed": True, "purpose": purpose}
@@ -509,9 +528,13 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
             to_send = gate_mod.remediate(cur, candidate, res)   # $0 grounded-only rewrite
             remediated = True
         human = proj.render_human_reply(to_send)                # A32 human form (no doc#/§ leak)
+        # Do NOT post-truncate LLM prose here (kills conclusions). Brevity is system-prompt
+        # + short-by-construction routers. S14 applies on Telegram send for Jonathan.
         try:
-            from distill import distill
-            human = distill(human, max_lines=5, max_chars=600)
+            from distill import strip_fluff, prefer_conclusion, EMISSION_CAP
+            human = strip_fluff(human)
+            if len(human) > EMISSION_CAP:
+                human = prefer_conclusion(human, EMISSION_CAP)
         except Exception:
             pass
         guard_class = og.classify(channel, str(channel_user_id))  # A21 classification

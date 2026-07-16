@@ -377,27 +377,21 @@ def answer_structured(brief: Dict[str, Any], purpose: str = "") -> Optional[str]
         status = _g(sp, "status") or "—"
         stage = (_g(sp, "current_stage") or "—").replace("_", " ")
         venue = (_g(sp, "court_or_agency") or _g(sp, "forum") or "—")
-        if isinstance(venue, str) and len(venue) > 50:
-            venue = venue[:50]
-        title = (_g(sp, "title") or "")
-        # One-line identity
-        head = f"{mc} is {status} at {venue} — stage: {stage}."
-        lines = [head]
-        if title and len(title) < 100:
-            lines.append(title)
+        if isinstance(venue, str) and len(venue) > 40:
+            venue = venue[:40]
+        # One breath — short by construction (≤280)
+        text = f"{mc}: {status} at {venue}; stage {stage}."
         vg = ang.get("verified_ground") or {}
         verified = vg.get("verified") or []
         if verified:
-            st = re.sub(r"\s+", " ", str(_g(verified[0], "statement") or ""))[:160]
+            st = re.sub(r"\s+", " ", str(_g(verified[0], "statement") or ""))
             sid = _g(verified[0], "source_id")
-            lines.append(f"Key ground (doc:{sid}): {st}")
-        else:
-            lines.append("No verified facts on this matter — do not invent.")
-        try:
-            from distill import distill
-            return distill("\n".join(lines), max_lines=4, max_chars=500)
-        except Exception:
-            return "\n".join(lines[:4])
+            room = 280 - len(text) - 12
+            if room > 40:
+                text = f"{text} Ground (doc:{sid}): {st[:room]}."
+        if len(text) > 280:
+            text = f"{mc}: {status}; stage {stage}."
+        return text
     return None
 
 
