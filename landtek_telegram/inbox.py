@@ -117,13 +117,29 @@ def tg_webhook():
     chat_type = chat.get("type")
     chat_title = chat.get("title") or chat.get("first_name") or chat.get("username")
     sender_id = str(sender.get("id")) if sender.get("id") is not None else None
-    sender_name = (" ".join(filter(None, [sender.get("first_name"),
-                                          sender.get("last_name")])).strip()
-                   or sender.get("username"))
+    # Telegram first_name is user-editable — prefer locked channel_users.display_name
+    # for approved/known identities so re-named accounts don't mislabel the principal.
+    tg_name = (" ".join(filter(None, [sender.get("first_name"),
+                                      sender.get("last_name")])).strip()
+               or sender.get("username"))
+    sender_name = tg_name
 
     try:
         conn = psycopg2.connect(PG_DSN); conn.autocommit = True
         cur = conn.cursor()
+        if sender_id:
+            cur.execute("""
+                SELECT cu.display_name
+                  FROM channel_users cu
+                  JOIN channels c ON c.id = cu.channel_id
+                 WHERE c.name = 'telegram' AND cu.channel_user_id = %s
+                   AND cu.onboarding_state = 'approved'
+                   AND coalesce(cu.display_name, '') <> ''
+                 LIMIT 1
+            """, (sender_id,))
+            row = cur.fetchone()
+            if row and row[0]:
+                sender_name = row[0]
         cur.execute("""
             INSERT INTO telegram_inbox
                 (update_id, update_type, chat_id, chat_type, chat_title,

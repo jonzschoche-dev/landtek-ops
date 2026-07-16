@@ -1,18 +1,26 @@
-"""Onboarding state machine for unknown senders (deploy_116).
+"""Onboarding state machine for unknown senders (deploy_116 + re-entry/A85-adjacent).
 
 Endpoints:
   POST /api/onboard          — process inbound message in onboarding flow
   POST /api/approve_user     — Jonathan approves an awaiting user
   POST /api/deny_user        — Jonathan denies an awaiting user
+  POST /api/reopen_user      — reset declined/blocked/misregistered user for a clean re-entry
+  POST /api/correct_user     — fix display_name / role / case on an existing row (no full reset)
   GET  /api/pending_approvals — list awaiting_jonathan_approval users
 
 When the n8n workflow detects a non-approved sender, it POSTs to /api/onboard
 with {channel='telegram', channel_user_id=..., message=...}. The endpoint
 runs the state machine and returns {reply: <text to send>, state_after, escalate}.
+
+Re-entry (common failure): someone misregisters, is denied, or is deleted and comes
+back on the SAME channel_user_id. We never invent a second row (UNIQUE per channel);
+we archive prior state into metadata.reentry_history and restart cleanly — except
+locked identities (approved operator/owner) which only move via /api/reopen_user.
 """
 import os
 import sys
 import json
+import re
 from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 import psycopg2
@@ -23,9 +31,108 @@ JONATHAN_TG_ID = "6513067717"
 
 bp = Blueprint("onboarding_endpoints", __name__)
 
+# Explicit re-entry / misregister phrases (EN + common Tagalog cues). Not silent.
+REENTRY_PHRASES = (
+    "start over", "start again", "start anew",
+    "re-register", "reregister", "re register", "re-apply", "reapply", "re apply",
+    "wrong name", "wrong identity", "wrong person", "not me", "that's not me",
+    "i misregistered", "misregister", "mis-registered", "registered wrong",
+    "new registration", "bagong register", "mag-register ulit", "register ulit",
+    "please reopen", "reopen my", "try again please", "ulit po ang registration",
+)
+
 
 def _db():
     return psycopg2.connect(PG_DSN)
+
+
+def _wants_reentry(message: str) -> bool:
+    m = (message or "").lower()
+    return any(p in m for p in REENTRY_PHRASES)
+
+
+def _identity_locked(user: dict) -> bool:
+    """Approved operator/owner (and any authorized approved principal) cannot be
+    name-clobbered or auto-reset from chat — only operator API may reopen."""
+    role = (user.get("approved_role") or user.get("role") or "").lower()
+    if role in ("operator", "owner"):
+        return True
+    if user.get("onboarding_state") == "approved" and user.get("authorized"):
+        # clients/counsel: locked against self-serve wipe; operator uses /reopen
+        return True
+    return False
+
+
+def _as_dict(val):
+    if val is None:
+        return {}
+    if isinstance(val, dict):
+        return dict(val)
+    if isinstance(val, str):
+        try:
+            return json.loads(val) or {}
+        except Exception:
+            return {}
+    return {}
+
+
+def _archive_and_reset(cur, user: dict, reason: str, *, keep_authorized: bool = False) -> dict:
+    """Same channel_user_id, clean onboarding slate. Prior attempt → metadata.reentry_history."""
+    responses = _as_dict(user.get("onboarding_responses"))
+    meta = _as_dict(user.get("metadata"))
+    hist = list(meta.get("reentry_history") or [])
+    hist.append({
+        "at": datetime.now(timezone.utc).isoformat(),
+        "reason": reason,
+        "from_state": user.get("onboarding_state"),
+        "prior_display_name": user.get("display_name"),
+        "prior_role": user.get("role"),
+        "prior_approved_role": user.get("approved_role"),
+        "prior_mapped_client_code": user.get("mapped_client_code"),
+        "prior_responses": responses,
+    })
+    meta["reentry_history"] = hist[-20:]
+    meta["last_reentry_at"] = datetime.now(timezone.utc).isoformat()
+    meta["last_reentry_reason"] = reason
+
+    locked_role = (user.get("approved_role") or user.get("role") or "").lower() in (
+        "operator", "owner",
+    )
+    if locked_role or keep_authorized:
+        # should rarely reset operators; if forced via API, keep principal flags
+        cur.execute("""
+            UPDATE channel_users
+               SET onboarding_state = 'awaiting_intro',
+                   onboarding_responses = '{}'::jsonb,
+                   onboarding_started_at = now(),
+                   onboarding_completed_at = NULL,
+                   pending_approval_msg_id = NULL,
+                   metadata = %s::jsonb,
+                   last_seen_at = now()
+             WHERE id = %s
+         RETURNING *""", (json.dumps(meta), user["id"]))
+    else:
+        cur.execute("""
+            UPDATE channel_users
+               SET onboarding_state = 'awaiting_intro',
+                   onboarding_responses = '{}'::jsonb,
+                   onboarding_started_at = now(),
+                   onboarding_completed_at = NULL,
+                   role = 'unknown',
+                   approved_role = NULL,
+                   approved_by = NULL,
+                   approved_scope_case = NULL,
+                   authorized = false,
+                   authorized_at = NULL,
+                   authorized_by = NULL,
+                   mapped_client_code = NULL,
+                   pending_approval_msg_id = NULL,
+                   metadata = %s::jsonb,
+                   last_seen_at = now()
+             WHERE id = %s
+         RETURNING *""", (json.dumps(meta), user["id"]))
+    row = cur.fetchone()
+    return dict(row) if row else user
 
 
 def _get_or_create_user(cur, channel_name, channel_user_id, display_name=None, username=None):
@@ -36,7 +143,21 @@ def _get_or_create_user(cur, channel_name, channel_user_id, display_name=None, u
     """, (channel_name, str(channel_user_id)))
     row = cur.fetchone()
     if row:
-        return dict(row), False
+        user = dict(row)
+        # Soft-refresh username in metadata only — NEVER clobber locked display_name
+        # (Telegram first_name is user-editable and caused "Jj Moreno" on operator id).
+        if username and not _identity_locked(user):
+            meta = _as_dict(user.get("metadata"))
+            if meta.get("username") != username:
+                meta["username"] = username
+                cur.execute(
+                    "UPDATE channel_users SET metadata=%s::jsonb, last_seen_at=now() WHERE id=%s",
+                    (json.dumps(meta), user["id"]))
+        elif not _identity_locked(user):
+            cur.execute("UPDATE channel_users SET last_seen_at=now() WHERE id=%s", (user["id"],))
+        else:
+            cur.execute("UPDATE channel_users SET last_seen_at=now() WHERE id=%s", (user["id"],))
+        return user, False
     cur.execute("""
         INSERT INTO channel_users (channel_id, channel_user_id, display_name,
                                      role, authorized, onboarding_state,
@@ -133,8 +254,11 @@ def api_onboard():
     conn = _db(); conn.autocommit = True
     cur = conn.cursor(cursor_factory=RealDictCursor)
     user, created = _get_or_create_user(cur, channel, channel_user_id, display_name, username)
+    # Re-fetch after last_seen touch
+    cur.execute("SELECT * FROM channel_users WHERE id=%s", (user["id"],))
+    user = dict(cur.fetchone())
     state = user["onboarding_state"]
-    responses = user["onboarding_responses"] or {}
+    responses = _as_dict(user.get("onboarding_responses"))
 
     if not adapter_logged:
         cur.execute("""
@@ -147,41 +271,70 @@ def api_onboard():
     reply = None
     next_state = state
     escalate = False
+    reentered = False
 
-    if state == "approved":
+    # ── Clean re-entry / misregister (same channel_user_id — never a second row) ──
+    # Allowed from in-progress or declined. Not from blocked (operator must /reopen).
+    # Not from locked approved identities (prevents adversarial wipe).
+    if (not created and not _identity_locked(user)
+            and state in ("awaiting_intro", "awaiting_classification",
+                          "awaiting_jonathan_approval", "declined")
+            and _wants_reentry(message)):
+        user = _archive_and_reset(cur, user, reason=f"user_requested:{message[:120]}")
+        state = "awaiting_intro"
+        responses = {}
+        reentered = True
+        reply = (
+            "Understood — we'll start your registration over cleanly. "
+            "Your earlier answers were saved for our team, not lost.\n\n" + INTRO_REPLY
+        )
+        next_state = "awaiting_intro"
+
+    elif state == "approved":
         # Shouldn't reach here, but bail to AI Agent
         cur.close(); conn.close()
         return jsonify({"reply": None, "state_after": "approved", "escalate": False,
                         "passthrough": True, "role": user.get("approved_role")})
 
     elif state == "declined":
-        reply = DECLINED_REPLY
-        next_state = "declined"  # absorbing state
+        # Absorbing until they ask to re-apply (handled above) or operator reopens
+        reply = (
+            DECLINED_REPLY
+            + "\n\nIf you'd like us to reconsider, reply with: <b>re-apply</b>"
+        )
+        next_state = "declined"
 
     elif state == "blocked":
-        # Silent block
+        # Silent block — operator uses POST /api/reopen_user to clear
         cur.close(); conn.close()
         return jsonify({"reply": None, "state_after": "blocked", "passthrough": False})
 
     elif state == "awaiting_intro":
-        if created:
-            # First-ever message; respond with INTRO and stay in awaiting_intro
-            reply = INTRO_REPLY
-            next_state = "awaiting_intro"
-            responses["first_message"] = message
+        if created or reentered:
+            # First-ever message OR clean re-entry: INTRO and stay in awaiting_intro
+            # (reentered already set reply above)
+            if not reentered:
+                reply = INTRO_REPLY
+                next_state = "awaiting_intro"
+                responses["first_message"] = message
+            else:
+                responses["first_message"] = message
+                # already replied INTRO
         else:
             # User replied with their intro
             responses["intro_text"] = message
-            # Try to detect name from message
-            import re
-            m = re.search(r"(?:I['’]?m|my name is|ako (?:po )?si|ako ay|si)\s+([A-Z][a-zA-Z'\-]+(?:\s+[A-Z][a-zA-Z'\-]+){0,3})",
-                          message, re.IGNORECASE)
+            m = re.search(
+                r"(?:I['’]?m|my name is|ako (?:po )?si|ako ay|si)\s+"
+                r"([A-Z][a-zA-Z'\-]+(?:\s+[A-Z][a-zA-Z'\-]+){0,3})",
+                message, re.IGNORECASE)
             inferred_name = m.group(1).strip() if m else (display_name or "")
             if inferred_name and inferred_name.lower() != "leo":
                 responses["inferred_name"] = inferred_name
-                cur.execute("UPDATE channel_users SET display_name = %s WHERE id = %s",
-                            (inferred_name, user["id"]))
-            # Try to detect role intent
+                # Never overwrite locked principal names
+                if not _identity_locked(user):
+                    cur.execute(
+                        "UPDATE channel_users SET display_name = %s WHERE id = %s",
+                        (inferred_name, user["id"]))
             mlow = message.lower()
             intent = None
             if any(k in mlow for k in ("client of landtek", "i'm a client", "existing client", "your client")):
@@ -199,8 +352,6 @@ def api_onboard():
 
     elif state == "awaiting_classification":
         responses["matter_description"] = message
-        # Heuristic: look for docket / TCT / property indicators
-        import re
         m_docket = re.search(r"(civil\s+case\s+no\.?\s*|cv[\-\s]?)([\dA-Z\-]+)", message, re.IGNORECASE)
         m_tct = re.search(r"\b(T(?:CT)?[\-\s]?\d{3,7}(?:[\-\s]\d{3,7})?)\b", message, re.IGNORECASE)
         m_arp = re.search(r"(GR-\d{4}-[A-Z]{2}-\d{2}-\d{3}-\d{5}|ARP-?\d+)", message, re.IGNORECASE)
@@ -214,14 +365,17 @@ def api_onboard():
 
     elif state == "awaiting_jonathan_approval":
         # User keeps sending while waiting — capture but keep them in queue
-        # Concat to responses
         prior = responses.get("messages_while_waiting", [])
         prior.append({"text": message[:1000], "at": datetime.now(timezone.utc).isoformat()})
         responses["messages_while_waiting"] = prior[-10:]  # cap
         if (responses.get("self_classified_intent") or "").startswith("prospect"):
             reply = LIMITED_REPLY_PROSPECT
         else:
-            reply = "Our team is still reviewing — I'll relay any documents you send. They'll respond directly."
+            reply = (
+                "Our team is still reviewing — I'll relay any documents you send. "
+                "They'll respond directly.\n\n"
+                "If you registered under the wrong name or details, reply: <b>start over</b>"
+            )
 
     # Persist state + responses
     cur.execute("""
@@ -275,22 +429,155 @@ def api_onboard():
         "escalate": escalate,
         "passthrough": False,
         "created": created,
+        "reentered": reentered,
         "user_id": user["id"],
     })
 
 
+@bp.route("/api/reopen_user", methods=["POST", "GET"])
+def api_reopen_user():
+    """Operator: reset a user for clean re-entry (declined / blocked / misapproved).
+
+    Args: id (channel_user_id), reason (optional), channel (optional filter).
+    Archives prior state to metadata.reentry_history — does NOT delete the row.
+    """
+    if request.method == "POST":
+        p = request.get_json(silent=True) or {}
+        cid = str(p.get("id") or "")
+        reason = (p.get("reason") or "operator_reopen").strip()
+        channel = (p.get("channel") or "").strip() or None
+    else:
+        cid = (request.args.get("id") or "").strip()
+        reason = (request.args.get("reason") or "operator_reopen").strip()
+        channel = (request.args.get("channel") or "").strip() or None
+    if not cid:
+        return jsonify({"error": "id required"}), 400
+
+    conn = _db(); conn.autocommit = True
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    if channel:
+        cur.execute("""
+            SELECT cu.* FROM channel_users cu
+              JOIN channels c ON c.id = cu.channel_id
+             WHERE cu.channel_user_id = %s AND c.name = %s
+        """, (cid, channel))
+    else:
+        cur.execute("SELECT * FROM channel_users WHERE channel_user_id = %s ORDER BY id DESC LIMIT 1",
+                    (cid,))
+    row = cur.fetchone()
+    if not row:
+        cur.close(); conn.close()
+        return jsonify({"error": f"no user with channel_user_id={cid}"}), 404
+    user = dict(row)
+    if (user.get("approved_role") or user.get("role") or "").lower() in ("operator", "owner"):
+        cur.close(); conn.close()
+        return jsonify({"error": "refuse: cannot reopen operator/owner identity via this API"}), 403
+
+    fresh = _archive_and_reset(cur, user, reason=f"operator:{reason}")
+    _send_tg(
+        f"✓ Reopened <b>{fresh.get('display_name') or cid}</b> "
+        f"(id=<code>{cid}</code>) for clean re-entry — reason: {reason}"
+    )
+    # Notify user if telegram-like numeric id
+    if cid.isdigit():
+        _send_tg(
+            "Your LandTek access was reset so you can register again cleanly. "
+            "Please send any message to begin.",
+            chat_id=cid,
+        )
+    cur.close(); conn.close()
+    return jsonify({"ok": True, "user_id": fresh.get("id"), "state": "awaiting_intro",
+                    "reentry_history_n": len(_as_dict(fresh.get("metadata")).get("reentry_history") or [])})
+
+
+@bp.route("/api/correct_user", methods=["POST", "GET"])
+def api_correct_user():
+    """Operator: fix misregistration without wiping history.
+
+    Args: id, name? (display_name), role?, case? (mapped_client_code / scope).
+    """
+    if request.method == "POST":
+        p = request.get_json(silent=True) or {}
+    else:
+        p = request.args
+    cid = str(p.get("id") or "").strip()
+    name = (p.get("name") or p.get("display_name") or "").strip() or None
+    role = (p.get("role") or "").strip() or None
+    scope_case = (p.get("case") or "").strip() or None
+    if not cid:
+        return jsonify({"error": "id required"}), 400
+    if role and role not in ("client", "prospect", "counsel", "counterparty", "partner",
+                             "operator", "owner", "unknown"):
+        return jsonify({"error": f"invalid role: {role}"}), 400
+
+    conn = _db(); conn.autocommit = True
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT * FROM channel_users WHERE channel_user_id = %s ORDER BY id DESC LIMIT 1",
+                (cid,))
+    row = cur.fetchone()
+    if not row:
+        cur.close(); conn.close()
+        return jsonify({"error": f"no user with channel_user_id={cid}"}), 404
+    user = dict(row)
+    meta = _as_dict(user.get("metadata"))
+    hist = list(meta.get("correction_history") or [])
+    hist.append({
+        "at": datetime.now(timezone.utc).isoformat(),
+        "before": {"display_name": user.get("display_name"), "role": user.get("role"),
+                   "approved_role": user.get("approved_role"),
+                   "mapped_client_code": user.get("mapped_client_code")},
+        "patch": {"name": name, "role": role, "case": scope_case},
+    })
+    meta["correction_history"] = hist[-30:]
+
+    sets = ["metadata = %s::jsonb", "last_seen_at = now()"]
+    args = [json.dumps(meta)]
+    if name:
+        sets.append("display_name = %s")
+        args.append(name)
+    if role:
+        sets.append("role = %s")
+        args.append(role)
+        if role != "unknown":
+            sets.append("approved_role = %s")
+            args.append(role)
+    if scope_case is not None:
+        sets.append("approved_scope_case = %s")
+        args.append(scope_case or None)
+        sets.append("mapped_client_code = %s")
+        args.append(scope_case or None)
+    args.append(user["id"])
+    cur.execute(f"UPDATE channel_users SET {', '.join(sets)} WHERE id = %s RETURNING *", args)
+    fresh = dict(cur.fetchone())
+    _send_tg(
+        f"✓ Corrected <b>{fresh.get('display_name')}</b> (<code>{cid}</code>) "
+        f"role={fresh.get('role')} case={fresh.get('mapped_client_code') or '—'}"
+    )
+    cur.close(); conn.close()
+    return jsonify({"ok": True, "user": {
+        "id": fresh["id"], "display_name": fresh.get("display_name"),
+        "role": fresh.get("role"), "mapped_client_code": fresh.get("mapped_client_code"),
+        "onboarding_state": fresh.get("onboarding_state"),
+    }})
+
+
 @bp.route("/api/approve_user", methods=["POST", "GET"])
 def api_approve_user():
-    """Approve a pending user. Args: id (channel_user_id), role, case (optional)."""
+    """Approve a pending user. Args: id (channel_user_id), role, case (optional).
+
+    Also works as a re-approve after misregistration correction (same id).
+    """
     if request.method == "POST":
         p = request.get_json(silent=True) or {}
         cid = str(p.get("id") or "")
         role = (p.get("role") or "prospect").strip()
         scope_case = (p.get("case") or "").strip() or None
+        name = (p.get("name") or "").strip() or None
     else:
         cid = (request.args.get("id") or "").strip()
         role = (request.args.get("role") or "prospect").strip()
         scope_case = (request.args.get("case") or "").strip() or None
+        name = (request.args.get("name") or "").strip() or None
     if not cid:
         return jsonify({"error": "id required"}), 400
     if role not in ("client", "prospect", "counsel", "counterparty", "partner"):
@@ -298,6 +585,16 @@ def api_approve_user():
 
     conn = _db(); conn.autocommit = True
     cur = conn.cursor(cursor_factory=RealDictCursor)
+    # Refuse overwriting operator/owner via approve
+    cur.execute("""
+        SELECT approved_role, role FROM channel_users WHERE channel_user_id = %s
+         ORDER BY id DESC LIMIT 1
+    """, (cid,))
+    pre = cur.fetchone()
+    if pre and (pre.get("approved_role") or pre.get("role") or "").lower() in ("operator", "owner"):
+        cur.close(); conn.close()
+        return jsonify({"error": "refuse: cannot re-approve operator/owner via this path"}), 403
+
     cur.execute("""
         UPDATE channel_users
            SET onboarding_state = 'approved',
@@ -309,10 +606,11 @@ def api_approve_user():
                authorized = true,
                authorized_at = now(),
                authorized_by = 'jonathan',
-               mapped_client_code = COALESCE(mapped_client_code, %s)
+               mapped_client_code = COALESCE(%s, mapped_client_code),
+               display_name = COALESCE(%s, display_name)
          WHERE channel_user_id = %s
          RETURNING *
-    """, (role, role, scope_case, scope_case, cid))
+    """, (role, role, scope_case, scope_case, name, cid))
     row = cur.fetchone()
     if not row:
         cur.close(); conn.close()
