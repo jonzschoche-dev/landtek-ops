@@ -65,11 +65,53 @@ def _llm(prompt, temp=0.2):
         return json.loads(r.read()).get("response", "").strip()
 
 
-def _grounded_facts(cur, client_code):
-    """A5-safe verified facts for the client FAMILY (never another client), with citable doc source_ids."""
+def _grounded_facts(cur, client_code, message=""):
+    """A5-safe verified facts for the client FAMILY, RELEVANCE-first then recent.
+
+    Old behavior (ORDER BY updated_at LIMIT 12) made Leo 'unaware' of ARTA/OP
+    while 4000+ verified facts existed — the window simply never included them.
+    """
     fam = (client_code or "").split("-")[0]
     if not fam:
         return []
+    import re
+    stop = {"the", "a", "an", "to", "from", "of", "and", "or", "how", "many",
+            "what", "when", "where", "is", "are", "was", "were", "have", "has",
+            "been", "that", "this", "with", "for", "any", "me", "my", "we", "you",
+            "pretty", "good", "cases", "casss"}
+    toks = [t for t in re.findall(r"[A-Za-z0-9\-]{3,}", (message or "").lower())
+            if t not in stop][:8]
+    if toks:
+        clauses = " OR ".join(["statement ILIKE %s"] * len(toks))
+        sql = f"""
+            SELECT statement, source_id, provenance_level FROM (
+              SELECT statement, source_id, provenance_level, updated_at
+                FROM matter_facts
+               WHERE matter_code LIKE %s AND provenance_level='verified'
+                 AND source_id ~ '^[0-9]+$'
+                 AND ({clauses})
+               ORDER BY updated_at DESC LIMIT 12
+            ) hit
+            UNION ALL
+            SELECT statement, source_id, provenance_level FROM (
+              SELECT statement, source_id, provenance_level, updated_at
+                FROM matter_facts
+               WHERE matter_code LIKE %s AND provenance_level='verified'
+                 AND source_id ~ '^[0-9]+$'
+               ORDER BY updated_at DESC LIMIT 8
+            ) rec
+            LIMIT 16
+        """
+        cur.execute(sql, [fam + "%"] + [f"%{t}%" for t in toks] + [fam + "%"])
+        rows = cur.fetchall()
+        seen, out = set(), []
+        for r in rows:
+            k = (r.get("statement") or "")[:80]
+            if k in seen:
+                continue
+            seen.add(k)
+            out.append(r)
+        return out[:16]
     cur.execute("""SELECT statement, source_id, provenance_level
                      FROM matter_facts
                     WHERE matter_code LIKE %s AND provenance_level='verified'
@@ -177,7 +219,7 @@ def _recent_turns(cur, channel, channel_user_id, before_id=None, limit=10):
 
 def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None, inbound_msg_id=None,
                   internal_context=None, relationship_profile=None, relationship_tending=None):
-    facts = _grounded_facts(cur, client_code)
+    facts = _grounded_facts(cur, client_code, message=message or "")
     fblock = "\n".join(f"- (doc:{f['source_id']}) {f['statement']}" for f in facts) or "(none on record yet)"
     c = ctx.recent_context(cur, None, client_code)
     items = "\n".join(f"- {a['description']} (due {a['due_date'] or 'n/a'})"
@@ -341,38 +383,47 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
                      "reason": "unresolved_client (A25): identity not bound to a client_code"})
         return {"action": "held", "client": None}
 
-    # ── Deterministic title FETCH (same ability as Telegram — scripts/title_fetch) ──
-    # Ollama has no tools; never promise "I'll fetch shortly" without links.
+    # ── Deterministic CORPUS answers (title fetch, matter inventory, ARTA/OP, …) ──
+    # Ollama only sees ~12 latest facts — it will honestly say "none I'm aware of"
+    # while matters rows exist. Purpose-aware SQL answers FIRST (A70 ground, A85 one path).
     try:
+        pack = None
+        via = None
         import title_fetch as tf
         if tf.wants_title_fetch(message or ""):
             pack, _ferr = tf.fetch_title_pack(cur, client, message or "")
+            via = "title_fetch"
+        if not pack:
+            import corpus_answer as ca
+            pack, purpose = ca.try_corpus_answer(cur, client, message or "")
             if pack:
-                guard_class = og.classify(channel, str(channel_user_id))
-                logkw = {**base, "client": client, "cand": pack, "verdict": "title_fetch",
-                         "fails": None, "warns": 0, "remed": False, "human": pack,
-                         "guard": guard_class}
-                if _channel_mode(cur, channel) != "headless":
-                    _log(cur, **{**logkw, "action": "shadow_logged"})
-                    return {"action": "shadow_logged", "client": client,
-                            "would_send_human": pack, "via": "title_fetch"}
-                decision, kind, oid = _send_decision(cur, channel, str(channel_user_id), pack)
-                if decision == "hold":
-                    _log(cur, **{**logkw, "action": "held_for_approval", "order": oid,
-                                 "reason": "outward title pack held (A21)"})
-                    return {"action": "held_for_approval", "order": oid, "client": client,
-                            "would_send_human": pack}
-                try:
-                    ok = _deliver(channel, str(channel_user_id), pack)
-                except Exception as e:
-                    ok, kind = False, f"send_error:{type(e).__name__}"
-                if ok:
-                    _log(cur, **{**logkw, "action": "sent", "reason": f"title_fetch:{kind}"})
-                    return {"action": "sent", "via": "title_fetch", "client": client}
-                _log(cur, **{**logkw, "action": "send_error", "reason": kind})
-                return {"action": "send_error", "reason": kind, "client": client}
+                via = f"corpus_answer:{purpose}"
+        if pack:
+            guard_class = og.classify(channel, str(channel_user_id))
+            logkw = {**base, "client": client, "cand": pack, "verdict": via or "corpus",
+                     "fails": None, "warns": 0, "remed": False, "human": pack,
+                     "guard": guard_class}
+            if _channel_mode(cur, channel) != "headless":
+                _log(cur, **{**logkw, "action": "shadow_logged"})
+                return {"action": "shadow_logged", "client": client,
+                        "would_send_human": pack, "via": via}
+            decision, kind, oid = _send_decision(cur, channel, str(channel_user_id), pack)
+            if decision == "hold":
+                _log(cur, **{**logkw, "action": "held_for_approval", "order": oid,
+                             "reason": f"outward {via} held (A21)"})
+                return {"action": "held_for_approval", "order": oid, "client": client,
+                        "would_send_human": pack}
+            try:
+                ok = _deliver(channel, str(channel_user_id), pack)
+            except Exception as e:
+                ok, kind = False, f"send_error:{type(e).__name__}"
+            if ok:
+                _log(cur, **{**logkw, "action": "sent", "reason": f"{via}:{kind}"})
+                return {"action": "sent", "via": via, "client": client}
+            _log(cur, **{**logkw, "action": "send_error", "reason": kind})
+            return {"action": "send_error", "reason": kind, "client": client}
     except Exception as e:
-        print(f"[leo_service] title_fetch skip: {type(e).__name__}: {e}", flush=True)
+        print(f"[leo_service] corpus_answer skip: {type(e).__name__}: {e}", flush=True)
 
     try:
         prompt = _build_prompt(cur, client, message, channel, channel_user_id, inbound_msg_id)
