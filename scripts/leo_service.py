@@ -340,6 +340,40 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
         _log(cur, **{**base, "client": None, "action": "held",
                      "reason": "unresolved_client (A25): identity not bound to a client_code"})
         return {"action": "held", "client": None}
+
+    # ── Deterministic title FETCH (same ability as Telegram — scripts/title_fetch) ──
+    # Ollama has no tools; never promise "I'll fetch shortly" without links.
+    try:
+        import title_fetch as tf
+        if tf.wants_title_fetch(message or ""):
+            pack, _ferr = tf.fetch_title_pack(cur, client, message or "")
+            if pack:
+                guard_class = og.classify(channel, str(channel_user_id))
+                logkw = {**base, "client": client, "cand": pack, "verdict": "title_fetch",
+                         "fails": None, "warns": 0, "remed": False, "human": pack,
+                         "guard": guard_class}
+                if _channel_mode(cur, channel) != "headless":
+                    _log(cur, **{**logkw, "action": "shadow_logged"})
+                    return {"action": "shadow_logged", "client": client,
+                            "would_send_human": pack, "via": "title_fetch"}
+                decision, kind, oid = _send_decision(cur, channel, str(channel_user_id), pack)
+                if decision == "hold":
+                    _log(cur, **{**logkw, "action": "held_for_approval", "order": oid,
+                                 "reason": "outward title pack held (A21)"})
+                    return {"action": "held_for_approval", "order": oid, "client": client,
+                            "would_send_human": pack}
+                try:
+                    ok = _deliver(channel, str(channel_user_id), pack)
+                except Exception as e:
+                    ok, kind = False, f"send_error:{type(e).__name__}"
+                if ok:
+                    _log(cur, **{**logkw, "action": "sent", "reason": f"title_fetch:{kind}"})
+                    return {"action": "sent", "via": "title_fetch", "client": client}
+                _log(cur, **{**logkw, "action": "send_error", "reason": kind})
+                return {"action": "send_error", "reason": kind, "client": client}
+    except Exception as e:
+        print(f"[leo_service] title_fetch skip: {type(e).__name__}: {e}", flush=True)
+
     try:
         prompt = _build_prompt(cur, client, message, channel, channel_user_id, inbound_msg_id)
         candidate = _llm(prompt)

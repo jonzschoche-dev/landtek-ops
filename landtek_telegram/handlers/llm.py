@@ -659,168 +659,42 @@ def _resolve_client_code(sender_id: str) -> str | None:
     return None
 
 
-def _title_token_from_message(text: str) -> str | None:
-    """Extract TCT/title token from a fetch/send request, if present."""
-    import re
-    t = text or ""
-    # T-32911, TCT 32911, tct-32911, title 32911
-    m = re.search(
-        r"\b(?:TCT|T)[\s\-–#]*([0-9]{3,7}(?:[\-/][0-9]{1,7})?)\b",
-        t, re.IGNORECASE,
-    )
-    if m:
-        return m.group(1)
-    m = re.search(r"\btitle\s+(?:no\.?|number|#)?\s*([0-9]{3,7})\b", t, re.IGNORECASE)
-    if m:
-        return m.group(1)
-    return None
-
-
-def _wants_title_fetch(text: str) -> bool:
-    """True when the user is asking us to GET a title file, not just discuss status."""
-    t = (text or "").lower()
-    if not any(k in t for k in (
-        "fetch", "send me", "get me", "give me", "download", "link to",
-        "pull the", "pull me", "hanapin", "ibigay", "padala",
-    )):
-        return False
-    return bool(
-        "title" in t or "tct" in t or "titulo" in t
-        or _title_token_from_message(text)
-    )
-
-
 def _fetch_title_docs(sender_id: str, text: str) -> tuple[str | None, str | None]:
-    """Deterministic corpus title fetch — real /files/c/ links, no LLM promise.
-
-    Ollama cannot call tools; when the user asks to fetch a title we answer from
-    documents + property_assets instead of inventing 'I'll get it shortly'.
-    """
-    token = _title_token_from_message(text)
-    if not token:
-        return (
-            "Which title? Send the TCT number (e.g. fetch me title TCT 32911).",
-            None,
-        )
+    """Shared title pack (scripts/title_fetch) — Telegram + Messenger same ability."""
+    sys.path.insert(0, "/root/landtek/scripts")
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+    try:
+        import title_fetch as tf
+    except Exception as e:
+        return None, f"title_fetch_import:{e}"
     client = _resolve_client_code(str(sender_id))
     if not client and str(sender_id) == JONATHAN:
         client = "MWK-001"
-    # Non-operator without a client scope: do not cross the A5 wall
     if not client and str(sender_id) != JONATHAN:
         return (
             "I can only pull titles for an approved client scope. "
             "Ask Jonathan to map your access, or send the title number again after approval.",
             None,
         )
-
-    like = f"%{token}%"
     try:
         conn = psycopg2.connect(PG_DSN)
         conn.autocommit = True
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        # Asset pulse
-        cur.execute("""
-            SELECT a.asset_code, a.title_ref, a.label, a.title_status, a.client_code,
-                   r.readiness_score, r.documents, r.documents_note, r.next_prep_action
-              FROM property_assets a
-              LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
-             WHERE a.title_ref ILIKE %s OR a.asset_code ILIKE %s OR a.label ILIKE %s
-             ORDER BY a.asset_code LIMIT 3
-        """, (like, like, like))
-        assets = cur.fetchall()
-        # Documents that name this title — prefer downloadable
-        fam = (client or "").split("-")[0] + "%"
-        # Prefer filename / title_ref hits. Full-text only if framed as TCT/T-####
-        # (avoids COA packets that merely mention the number once).
-        tct_like = f"%TCT%{token}%"
-        t_dash = f"%T-{token}%"
-        t_space = f"%T {token}%"
-        cur.execute("""
-            SELECT d.id,
-                   COALESCE(NULLIF(d.smart_filename,''), d.original_filename, 'Document') AS name,
-                   d.matter_code, d.case_file,
-                   (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) AS downloadable,
-                   CASE
-                     WHEN COALESCE(d.smart_filename,'') ILIKE %s
-                       OR COALESCE(d.original_filename,'') ILIKE %s THEN 0
-                     WHEN COALESCE(d.smart_filename,'') ILIKE %s
-                       OR COALESCE(d.original_filename,'') ILIKE %s
-                       OR COALESCE(d.smart_filename,'') ILIKE %s
-                       OR COALESCE(d.original_filename,'') ILIKE %s THEN 1
-                     ELSE 2
-                   END AS rank
-              FROM documents d
-             WHERE (
-                    d.case_file = %s
-                 OR d.case_file LIKE %s
-                 OR d.matter_code LIKE %s
-                 OR (d.case_file IN ('MWK-001', 'Owner') AND %s LIKE 'MWK%%')
-             )
-               AND (
-                    COALESCE(d.smart_filename,'') ILIKE %s
-                 OR COALESCE(d.original_filename,'') ILIKE %s
-                 OR COALESCE(d.smart_filename,'') ILIKE %s
-                 OR COALESCE(d.original_filename,'') ILIKE %s
-                 OR COALESCE(d.smart_filename,'') ILIKE %s
-                 OR COALESCE(d.original_filename,'') ILIKE %s
-                 OR COALESCE(d.extracted_text,'') ILIKE %s
-                 OR COALESCE(d.extracted_text,'') ILIKE %s
-               )
-             ORDER BY rank ASC, downloadable DESC, d.id DESC
-             LIMIT 12
-        """, (
-            like, like, tct_like, tct_like, t_dash, t_dash,
-            client, fam, fam, client or "",
-            like, like, tct_like, tct_like, t_dash, t_dash,
-            tct_like, t_dash,
-        ))
-        docs = cur.fetchall()
-        # Keep rank 0–1 always; rank 2 (body-only) only if nothing better
-        ranked = list(docs or [])
-        strong = [d for d in ranked if (d.get("rank") or 2) <= 1]
-        docs = strong if strong else ranked[:5]
+        pack, err = tf.fetch_title_pack(cur, client, text)
         cur.close(); conn.close()
+        return pack, err
     except Exception as e:
-        return None, f"title_fetch_db:{type(e).__name__}:{e}"
+        return None, f"title_fetch:{type(e).__name__}:{e}"
 
-    lines = [f"Title pack for TCT / T-{token}:"]
-    if assets:
-        for a in assets:
-            sc = a.get("readiness_score")
-            scs = f"{float(sc)*100:.0f}%" if sc is not None else "?"
-            lines.append(
-                f"• {a.get('title_ref') or a.get('asset_code')} "
-                f"({a.get('client_code') or '—'}) status={a.get('title_status') or '—'} "
-                f"readiness={scs} docs={a.get('documents') or '?'}"
-            )
-            note = (a.get("documents_note") or "")[:120]
-            if note:
-                lines.append(f"  note: {note}")
-            nxt = (a.get("next_prep_action") or "")[:140]
-            if nxt:
-                lines.append(f"  next: {nxt}")
-    else:
-        lines.append(f"• No property_assets row matched T-{token} yet (title may still be in documents only).")
 
-    dl_docs = [d for d in docs if d.get("downloadable")]
-    other = [d for d in docs if not d.get("downloadable")]
-    if dl_docs:
-        lines.append("Downloadable from the corpus:")
-        for d in dl_docs[:8]:
-            name = (d.get("name") or "Document")[:90]
-            lines.append(f"• {name}")
-            lines.append(f"  https://leo.hayuma.org/files/c/{d['id']}")
-    if other and not dl_docs:
-        lines.append("Named in the record but no file bytes on disk/Drive yet:")
-        for d in other[:5]:
-            lines.append(f"• {(d.get('name') or 'Document')[:90]} (doc {d['id']})")
-    if not docs:
-        lines.append(
-            "No document filename/text hit for that number in your scope. "
-            "We may still need a CTC from the Registry of Deeds."
-        )
-    lines.append("I am not inventing a file — only linking what is already in the LandTek corpus.")
-    return "\n".join(lines), None
+def _wants_title_fetch(text: str) -> bool:
+    sys.path.insert(0, "/root/landtek/scripts")
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+    try:
+        import title_fetch as tf
+        return tf.wants_title_fetch(text)
+    except Exception:
+        return False
 
 
 def _sovereign_ollama_reply(sender_id: str, text: str) -> tuple[str | None, str | None]:
