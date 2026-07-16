@@ -61,37 +61,46 @@ def _g(row, key):
 
 
 def _is_op_bound_fact(statement: str) -> bool:
-    """True only if the verified statement itself puts the matter at OP/ES.
+    """True only if the verified statement evidences a filing/address to OP/ES.
 
-    Rejects: Ombudsman referrals, DILG/CSC referrals, local CART, 'referred to Mayor'.
-    Accepts: Office of the President, Executive Secretary, Petition for Supervisory
-    Review filed with OP/ES, matter properly before the OP.
+    Rejects soft advocacy ('properly before OP', 'without prejudice… simultaneously
+    filed') and other-agency referrals. Accepts petition addressed to ES/OP or an
+    explicit Petition for Supervisory Review and Corrective Action filing.
     """
     s = (statement or "").lower()
     if not s:
         return False
-    # Hard exclusions first (common false friends)
-    if "ombudsman" in s and "office of the president" not in s and "executive secretary" not in s:
+    # Soft / non-filing language — do not promote to "sent to OP"
+    if "without prejudice" in s:
         return False
-    if re.search(r"\bdilg\b", s) and "office of the president" not in s:
+    if "properly before the office of the president" in s and "filed" not in s:
         return False
-    if re.search(r"\bcsc\b", s) and "office of the president" not in s:
+    if "ombudsman" in s and "executive secretary" not in s and "office of the president" not in s:
         return False
-    if "referred to mayor" in s or "mayor pajarillo" in s and "president" not in s:
+    if re.search(r"\bdilg\b", s) and "executive secretary" not in s:
+        return False
+    if re.search(r"\bcsc\b", s) and "executive secretary" not in s:
+        return False
+    if "referred to mayor" in s or (
+        "mayor pajarillo" in s and "president" not in s and "executive secretary" not in s
+    ):
         return False
 
-    positive = (
-        "office of the president" in s
-        or "executive secretary" in s
-        or "exec. secretary" in s
-        or ("supervisory review" in s and (
-            "president" in s or "executive secretary" in s or "recto" in s
-            or "filed" in s  # petition for supervisory review filings
-        ))
-        or "properly before the office of the president" in s
-        or ("petition for supervisory review" in s and "corrective action" in s)
-    )
-    return bool(positive)
+    # Hard OP/ES address
+    if "executive secretary" in s or "ralph g. recto" in s:
+        return True
+    if "office of the president" in s and any(
+        x in s for x in ("addressed", "filed with", "filed 0", "filed on", "copy furnished")
+    ):
+        return True
+    # Operative petition filing (May 2026 supervisory review package)
+    if (
+        "petition for supervisory review" in s
+        and "corrective action" in s
+        and any(x in s for x in ("filed", "files the petition", "petitioner files"))
+    ):
+        return True
+    return False
 
 
 def answer_arta_op_referrals(cur, client_code: str) -> str:
