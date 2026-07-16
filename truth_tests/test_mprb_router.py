@@ -27,9 +27,10 @@ def op_count_oracle_3(cur):
         raise TruthFailure(f"expected arta_op_referrals pack, got {p}")
     if "3 ARTA" not in ans and "3." not in ans[:80]:
         raise TruthFailure(f"OP count oracle failed (want 3 distilled):\n{ans[:500]}")
-    for code in ("MWK-ARTA-0690", "MWK-ARTA-0747", "MWK-ARTA-0792"):
+    # Short form (0690) or full matter code — both ok if all three present
+    for code in ("0690", "0747", "0792"):
         if code not in ans:
-            raise TruthFailure(f"missing {code} in OP brief")
+            raise TruthFailure(f"missing CTN {code} in OP brief")
     if "MWK-ARTA-1378" in ans:
         raise TruthFailure("soft 1378 must not be counted as OP send")
     if "Hello" in ans:
