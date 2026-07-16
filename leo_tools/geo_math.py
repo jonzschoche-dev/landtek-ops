@@ -19,6 +19,29 @@ from typing import List, Sequence, Tuple
 _R = 6_378_137.0  # WGS84 equatorial radius, meters
 
 
+def local_ring_to_geojson(pts, anchor_lat, anchor_lng, origin=None):
+    """Georeference a LOCAL-METER ring (x=East, y=North; the parcels `geom_wkt` convention)
+    to an absolute WGS84 GeoJSON Polygon, by translating `origin` (default the first vertex,
+    i.e. corner 1) onto (anchor_lat, anchor_lng).
+
+    Survey bearings are TRUE north, so the ring's orientation is already absolute — this is a
+    PURE TRANSLATION, no rotation. Inverse of `_to_local_m`, using the same `_R`, so a ring
+    round-trips through polygon_area_sqm essentially unchanged. `pts` = [(x_east, y_north), …].
+    """
+    if not pts:
+        return None
+    ox, oy = origin if origin is not None else pts[0]
+    cos0 = math.cos(math.radians(anchor_lat)) or 1e-9
+    coords = []
+    for x, y in pts:
+        dlng = math.degrees((x - ox) / (_R * cos0))
+        dlat = math.degrees((y - oy) / _R)
+        coords.append([round(anchor_lng + dlng, 8), round(anchor_lat + dlat, 8)])
+    if coords[0] != coords[-1]:
+        coords.append(coords[0])
+    return {"type": "Polygon", "coordinates": [coords]}
+
+
 def _ring(geojson: dict) -> List[Sequence[float]]:
     """Exterior ring ([lng,lat] pairs) of a GeoJSON Polygon or Feature."""
     if not geojson:

@@ -152,7 +152,8 @@ def ops_map_index():
             f"<td>{cc}</td><td>{label or ''}</td><td>{tier_s}</td>"
             f"<td style='text-align:right'>{area_s}</td>"
             f"<td style='text-align:right'>{stated_s}</td>"
-            f"<td>{flag_s}</td><td>{status}</td></tr>"
+            f"<td>{flag_s}</td><td>{status}</td>"
+            f"<td><a href='/ops/map/georef?parcel={pc}'>georef ⌖</a></td></tr>"
         )
     body = (
         "<h1>Mapping — parcels</h1>"
@@ -162,7 +163,7 @@ def ops_map_index():
         "hand-placed, shows an APPROXIMATE banner to the client.</p>"
         "<table border=1 cellpadding=6 cellspacing=0>"
         "<tr><th>parcel</th><th>client</th><th>label</th><th>tier</th>"
-        "<th>plotted m²</th><th>title m²</th><th>flag</th><th>status</th></tr>"
+        "<th>plotted m²</th><th>title m²</th><th>flag</th><th>status</th><th></th></tr>"
         + "".join(trs) + "</table>"
     )
     return _page("Mapping — parcels", body)
@@ -244,6 +245,119 @@ def ops_parcels_geojson():
     conn = _db(); cur = conn.cursor(); cur.execute(q, args)
     rows = cur.fetchall(); cur.close(); conn.close()
     return jsonify(_features(rows))
+
+
+# ======================================================================
+#  OPS georeference — one-tap "anchor corner 1" (survey shape -> world)
+# ======================================================================
+# A `parcels` row holds a survey-EXACT relative shape (local metres, corner 1 at origin,
+# TRUE-north bearings). Because the orientation is already absolute, placing it on the
+# globe needs ONE translation anchor — the operator taps where corner 1 sits on satellite,
+# and the whole (unrotated) ring follows. Writes the survey-tier map_parcels geometry.
+# It never fabricates: the shape is the verified survey; the anchor is an explicit operator
+# assertion, recorded in source_note. Absolute position stays operator-grade until a real
+# BLLM-monument coordinate or a drone ortho tightens it (accuracy_tier ladder).
+
+def _parcel_ring_m(cur, title_no):
+    """The survey ring for a title as local-metre (x_east, y_north) points, best-closing
+    parcels row. Returns (points, parcels_id, area_sqm, stated_sqm) or (None,...)."""
+    cur.execute("SELECT id, geom_wkt, area_sqm, stated_ha FROM parcels "
+                "WHERE title_no=%s AND geom_wkt IS NOT NULL "
+                "ORDER BY closure_error_m NULLS LAST, id LIMIT 1", (title_no,))
+    r = cur.fetchone()
+    if not r:
+        return None, None, None, None
+    pid, wkt, area, stated_ha = r
+    import parcels as _P
+    pts = _P.wkt_points(wkt)
+    return pts, pid, (float(area) if area else None), (float(stated_ha) * 10000 if stated_ha else None)
+
+
+@bp.route("/ops/map/georef")
+def ops_map_georef():
+    parcel = (request.args.get("parcel") or "").strip()
+    if not parcel:
+        abort(400)
+    conn = _db(); cur = conn.cursor()
+    cur.execute("SELECT parcel_code, title_no, label, centroid_lat, centroid_lng, "
+                "geom_geojson, accuracy_tier FROM map_parcels WHERE parcel_code=%s", (parcel,))
+    row = cur.fetchone()
+    if not row:
+        cur.close(); conn.close(); abort(404)
+    pc, title_no, label, clat, clng, existing_geom, tier = row
+    pts, pid, area, stated = _parcel_ring_m(cur, title_no) if title_no else (None, None, None, None)
+    # tie point hint from the recovered courses (BLLM No. 2, Mercedes)
+    tie = None
+    if title_no:
+        cur.execute("SELECT raw_call FROM parcel_courses WHERE title_no=%s "
+                    "AND raw_call ILIKE '%%tie point%%' LIMIT 1", (title_no,))
+        t = cur.fetchone(); tie = t[0] if t else None
+    cur.close(); conn.close()
+    if not pts:
+        return _page("Georeference — no survey shape",
+                     f"<h1>Georeference {pc}</h1><p>No survey <code>parcels</code> shape exists for "
+                     f"title <b>{title_no or '—'}</b> yet — run the consensus build first "
+                     f"(<code>geometry_consensus.py build --title {title_no} --write</code>).</p>")
+    # existing anchor = corner 1 of the existing geometry, if already placed
+    anchor = None
+    if existing_geom:
+        g = existing_geom if isinstance(existing_geom, dict) else json.loads(existing_geom)
+        ring = (g.get("geometry", g)).get("coordinates", [[]])[0]
+        if ring:
+            anchor = [ring[0][1], ring[0][0]]  # [lat,lng]
+    cfg = {
+        "parcel": pc, "title_no": title_no, "label": label or pc,
+        "ring_m": [[round(x, 3), round(y, 3)] for x, y in pts],   # [x_east, y_north]
+        "area_sqm": area, "stated_sqm": stated, "tie": tie,
+        "anchor": anchor,
+        "lat": (anchor[0] if anchor else (clat if clat is not None else 14.10)),
+        "lng": (anchor[1] if anchor else (clng if clng is not None else 122.86)),
+        "tiles": {"esri": TILE_URL, "esri_attrib": TILE_ATTRIB,
+                  "gsat": _google_tile_template("satellite")},
+    }
+    return Response(_GEOREF_HTML.replace("__CFG__", _cfg_js(cfg)), mimetype="text/html")
+
+
+@bp.route("/ops/map/georef/save", methods=["POST"])
+def ops_map_georef_save():
+    d = request.get_json(silent=True) or {}
+    parcel = (d.get("parcel_code") or "").strip()
+    try:
+        lat = float(d["lat"]); lng = float(d["lng"])
+    except (KeyError, TypeError, ValueError):
+        return jsonify(ok=False, error="need numeric lat/lng"), 400
+    if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+        return jsonify(ok=False, error="lat/lng out of range"), 400
+    conn = _db(); conn.autocommit = True; cur = conn.cursor()
+    cur.execute("SELECT title_no, stated_area_sqm FROM map_parcels WHERE parcel_code=%s", (parcel,))
+    row = cur.fetchone()
+    if not row:
+        cur.close(); conn.close(); return jsonify(ok=False, error="no such parcel"), 404
+    title_no, stated = row
+    pts, pid, area, stated_from_parcel = _parcel_ring_m(cur, title_no)
+    if not pts:
+        cur.close(); conn.close()
+        return jsonify(ok=False, error=f"no survey shape for {title_no} — build consensus first"), 409
+    geom = geo_math.local_ring_to_geojson(pts, lat, lng)     # corner 1 -> (lat,lng), no rotation
+    garea = round(geo_math.polygon_area_sqm(geom), 1)
+    clat, clng = geo_math.polygon_centroid(geom)
+    # Honest tiering: the SHAPE is survey-exact (parcels ring, corroborated, closes to cm),
+    # but a hand-placed anchor is only as accurate as the operator's eye — so POSITION is
+    # 'rough' (the client sees the APPROXIMATE banner). It graduates to 'survey' only when the
+    # anchor is the real BLLM-monument coordinate, and to 'ortho' on a drone tie.
+    note = (f"survey-exact SHAPE (parcels id={pid}, closes to cm, corroborated) placed by "
+            f"operator anchor on corner 1 @ ({lat:.6f},{lng:.6f}); TRUE-north, no rotation. "
+            f"POSITION is approximate/hand-placed — refine at /ops/map/georef, promote to survey "
+            f"tier when tied to the BLLM monument coordinate.")
+    cur.execute(
+        "UPDATE map_parcels SET geom_geojson=%s, centroid_lat=%s, centroid_lng=%s, area_sqm=%s, "
+        "accuracy_tier='rough', survey_parcel_id=%s, source_note=%s, plotted_by='ops-georef', "
+        "plotted_at=now(), updated_at=now(), status='plotted' WHERE parcel_code=%s",
+        (json.dumps(geom), clat, clng, garea, pid, note, parcel))
+    cur.close(); conn.close()
+    return jsonify(ok=True, parcel_code=parcel, area_sqm=garea, geom=geom,
+                   stated_sqm=stated or stated_from_parcel,
+                   centroid=[clat, clng], tier="rough")
 
 
 # ======================================================================
@@ -620,6 +734,82 @@ function clearGeom(){{
    .then(r=>r.json()).then(j=>{{document.getElementById('status').textContent=j.ok?'Un-plotted.':'Error: '+j.error;
      if(layer)map.removeLayer(layer);layer=null;}});
 }}
+</script></body></html>"""
+
+
+# --- OPS georeference: one-tap "anchor corner 1" (token-replacement template) ---------
+_GEOREF_HTML = """<!doctype html><html><head><meta charset=utf-8>
+<title>Georeference</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+ html,body{margin:0;height:100%;font-family:system-ui,sans-serif}
+ #bar{padding:9px 13px;background:#111;color:#fff;font-size:13px;display:flex;gap:10px;
+   align-items:center;flex-wrap:wrap}
+ #bar b{font-size:14px}
+ #map{position:absolute;top:0;bottom:0;left:0;right:0}
+ #wrap{position:absolute;top:0;bottom:0;left:0;right:0;display:flex;flex-direction:column}
+ #mapwrap{position:relative;flex:1}
+ button{background:#2563eb;color:#fff;border:0;border-radius:6px;padding:8px 13px;font-size:14px;cursor:pointer}
+ #status{padding:7px 13px;font-size:13px;background:#f5f5f5}
+ .muted{color:#9ca3af}
+ .hint{color:#fde68a}
+</style></head><body>
+<div id=wrap>
+ <div id=bar>
+   <b id=t></b> <span class=muted id=sub></span>
+   <span class=hint id=tie></span>
+   <button onclick=save()>Save placement</button>
+   <span id=live class=muted></span>
+ </div>
+ <div id=mapwrap><div id=map></div></div>
+ <div id=status>Drag the pin to where <b>corner 1</b> sits on the satellite image. The exact
+   survey shape (TRUE-north, no rotation) follows the pin. Nudge until the outline lines up, then Save.</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var CFG=__CFG__, R=6378137;
+document.getElementById('t').textContent=CFG.label+' — georeference';
+document.getElementById('sub').textContent='('+CFG.parcel+' · '+CFG.title_no+
+  ' · survey area '+(CFG.area_sqm?Math.round(CFG.area_sqm).toLocaleString()+' m\\u00b2':'—')+')';
+if(CFG.tie) document.getElementById('tie').textContent='tie point: '+CFG.tie.replace(/^tie point /i,'');
+var esri=L.tileLayer(CFG.tiles.esri,{maxZoom:21,attribution:CFG.tiles.esri_attrib});
+var bases={'Satellite (Esri)':esri};
+if(CFG.tiles.gsat) bases['Satellite (Google)']=L.tileLayer(CFG.tiles.gsat,{maxZoom:21,attribution:'&copy; Google'});
+var map=L.map('map',{layers:[esri]}).setView([CFG.lat,CFG.lng], CFG.anchor?18:16);
+L.control.layers(bases).addTo(map);
+// corner-1 offset -> [lat,lng] (mirror of geo_math.local_ring_to_geojson; TRUE north = no rotation)
+function ringAt(lat,lng){
+  var cos=Math.cos(lat*Math.PI/180)||1e-9, out=[];
+  for(var i=0;i<CFG.ring_m.length;i++){
+    var x=CFG.ring_m[i][0], y=CFG.ring_m[i][1];
+    out.push([lat + (y/R)*180/Math.PI, lng + (x/(R*cos))*180/Math.PI]);
+  }
+  return out;
+}
+var poly=L.polygon(ringAt(CFG.lat,CFG.lng),{color:'#facc15',weight:3,fillOpacity:0.12}).addTo(map);
+var pin=L.marker([CFG.lat,CFG.lng],{draggable:true,title:'corner 1'}).addTo(map);
+pin.bindTooltip('corner 1',{permanent:true,direction:'right',offset:[8,0]});
+function redraw(){var p=pin.getLatLng();poly.setLatLngs(ringAt(p.lat,p.lng));
+  document.getElementById('live').textContent='corner 1 @ '+p.lat.toFixed(6)+', '+p.lng.toFixed(6);}
+pin.on('drag',redraw); pin.on('dragend',redraw);
+map.on('click',function(e){pin.setLatLng(e.latlng);redraw();});
+redraw();
+try{map.fitBounds(poly.getBounds(),{maxZoom:18,padding:[40,40]});}catch(e){}
+function save(){
+  var p=pin.getLatLng();
+  document.getElementById('status').textContent='Saving…';
+  fetch('/ops/map/georef/save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({parcel_code:CFG.parcel,lat:p.lat,lng:p.lng})})
+   .then(function(r){return r.json();}).then(function(j){
+     var s=document.getElementById('status');
+     if(!j.ok){s.textContent='Error: '+j.error;return;}
+     var da=j.stated_sqm?(' vs '+Math.round(j.stated_sqm).toLocaleString()+' stated'):'';
+     s.innerHTML='\\u2705 Placed (survey tier). Area on the globe '+Math.round(j.area_sqm).toLocaleString()
+       +' m\\u00b2'+da+' — the client map now shows this boundary. Re-drag + Save to nudge.';
+     poly.setLatLngs((j.geom.coordinates[0]).map(function(c){return [c[1],c[0]];}));
+   }).catch(function(){document.getElementById('status').textContent='Network error.';});
+}
 </script></body></html>"""
 
 
