@@ -72,13 +72,13 @@ def _g(row, key, idx=None):
 
 
 def _name_has_token(name: str, token: str) -> bool:
-    n = (name or "").lower()
-    t = token.lower()
-    return t in n and (
-        f"tct" in n or f"t-{t}" in n or f"t {t}" in n
-        or f"tct-{t}" in n or f"tct {t}" in n
-        or f"_{t}" in n or f"-{t}" in n or n.startswith(t)
-    )
+    """Filename actually carries the title number (not body-text coincidence)."""
+    n = (name or "").lower().replace("–", "-")
+    t = (token or "").lower()
+    if not t or t not in n:
+        return False
+    # Prefer titled form; still accept bare number in filename (survey/receipt patterns)
+    return True
 
 
 def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Optional[str], Optional[str]]:
@@ -175,18 +175,23 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
             return int(d.get("rank") or 2)
         return 2
 
-    # Prefer filename that actually carries the title number (not mere "TCT" noise)
-    primary_pool = [
+    # Prefer downloadable rows whose FILENAME carries the token (dose + precision)
+    def _dl(d) -> bool:
+        v = _g(d, "downloadable", 4)
+        return bool(v) is True or v == 1 or str(v).lower() in ("t", "true", "1")
+
+    token_named = [
         d for d in ranked
-        if _rank(d) <= 1 and _g(d, "downloadable", 4)
+        if _rank(d) <= 1 and _dl(d)
         and _name_has_token(str(_g(d, "name", 1) or ""), token)
     ]
-    secondary_pool = [
+    other_named = [
         d for d in ranked
-        if _rank(d) <= 1 and _g(d, "downloadable", 4) and d not in primary_pool
+        if _rank(d) <= 1 and _dl(d)
+        and d not in token_named
     ]
-    # Body-only (rank 2) never auto-released on narrow request
-    pool = primary_pool or secondary_pool
+    # Body/rank-2 never auto-released on narrow request
+    pool = token_named or other_named
     total_related = len(pool)
     chosen = pool[:cap]
     withheld = max(0, total_related - len(chosen))
