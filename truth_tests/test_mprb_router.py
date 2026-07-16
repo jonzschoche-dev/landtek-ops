@@ -62,11 +62,11 @@ def mprb_status_structured(cur):
     text = mb.answer_structured(brief, "matter_status")
     if not text or "MWK-ARTA-0747" not in text:
         raise TruthFailure(f"mprb status failed: {text}")
-    if "verified ground" not in text.lower() and "VERIFIED" not in text:
-        # answer_structured uses 'verified ground'
-        if "verified ground" not in text:
-            raise TruthFailure("status brief must declare verified ground section")
-    # parties angle declared
+    if "active" not in text.lower():
+        raise TruthFailure("status brief must state active/closed")
+    # distilled: human-tolerable
+    if len(text) > 600 or text.count("\n") > 6:
+        raise TruthFailure(f"status brief too long: {len(text)} chars")
     ang = brief["angles_by_matter"]["MWK-ARTA-0747"]["parties"]
     if ang.get("status") not in ("data", "empty", "not_instrumented"):
         raise TruthFailure(f"parties status missing: {ang}")
@@ -77,15 +77,15 @@ def mprb_never_launder_provisional_in_structured(cur):
     brief = mb.assemble(cur, client_code="MWK-001", matter_codes=["MWK-OP-PETITION"],
                         message="status MWK-OP-PETITION")
     text = mb.answer_structured(brief, "matter_status") or ""
-    # structured path must not print provisional untagged
     if "inferred_strong" in text and "unconfirmed" not in text.lower():
-        # answer_structured shouldn't include provisional at all
-        pass
+        raise TruthFailure("provisional must not appear untagged")
     if "PROVISIONAL" in text and "unconfirmed" not in text.lower():
         raise TruthFailure("provisional must be tagged if present")
-    # answer_structured only uses verified sample — OK if no provisional section
-    if "Basis: matters + matter_facts(verified only)" not in text:
-        raise TruthFailure("structured must declare verified-only basis")
+    # distilled structured answer is short; full basis lives internal
+    if len(text) > 600:
+        raise TruthFailure("structured emission too long")
+    if "MWK-OP-PETITION" not in text:
+        raise TruthFailure("must name the matter")
 
 
 TESTS = [
