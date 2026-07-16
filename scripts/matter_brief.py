@@ -107,15 +107,66 @@ def _angle_spine(cur, matter_code: str) -> Dict[str, Any]:
     return {"status": "data", "data": dict(r) if isinstance(r, dict) else r}
 
 
-def _angle_facts(cur, matter_code: str) -> Dict[str, Any]:
+def _matter_keywords(matter_code: str, title: str = "") -> List[str]:
+    """Tokens that make a verified fact *about* this matter, not freeloading noise."""
+    keys = []
+    mc = (matter_code or "").upper()
+    for part in re.split(r"[-_]", mc):
+        if len(part) >= 3 and part not in ("MWK", "AUTO", "THE"):
+            keys.append(part.lower())
+    # CTN / SL fragments from title
+    blob = f"{matter_code} {title}".lower()
+    keys.extend(re.findall(r"\b(?:sl-?)?\d{4}-\d{4}-\d{3,4}\b", blob))
+    keys.extend(re.findall(r"\b(?:arta|cart|ombudsman|op|resolution|appeal|petition)\b", blob))
+    # unique preserve
+    out, seen = [], set()
+    for k in keys:
+        if k and k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out[:12]
+
+
+def _fact_relevance(statement: str, keys: List[str]) -> int:
+    s = (statement or "").lower()
+    if not s:
+        return -1
+    score = 0
+    for k in keys:
+        if k in s:
+            score += 3 if len(k) >= 4 else 1
+    # procedural substance
+    for w in ("resolution", "complaint", "appeal", "petition", "filed", "referred",
+              "arta", "ctn", "order", "hearing", "respondent", "complainant"):
+        if w in s:
+            score += 1
+    # deprioritize bulk tax/RPT noise when matter is ARTA (unless ARTA mentioned)
+    if "arta" in (keys or []) or any("arta" in k for k in keys):
+        if any(w in s for w in ("treasurer", "dbp account", "assessment", "php ", "remitted")):
+            if "arta" not in s and "resolution" not in s and "ctn" not in s:
+                score -= 5
+    return score
+
+
+def _angle_facts(cur, matter_code: str, matter_title: str = "") -> Dict[str, Any]:
+    keys = _matter_keywords(matter_code, matter_title)
     cur.execute("""
         SELECT statement, source_id, provenance_level
           FROM matter_facts
          WHERE matter_code=%s AND provenance_level='verified'
            AND coalesce(statement,'')<>''
-         ORDER BY updated_at DESC LIMIT %s
-    """, (matter_code, MAX_VERIFIED_LINES))
-    verified = list(cur.fetchall() or [])
+         ORDER BY updated_at DESC LIMIT 40
+    """, (matter_code,))
+    raw = list(cur.fetchall() or [])
+    scored = []
+    for r in raw:
+        sc = _fact_relevance(str(_g(r, "statement") or ""), keys)
+        scored.append((sc, r))
+    scored.sort(key=lambda x: -x[0])
+    # Keep only non-negative relevance when we have better hits
+    positive = [r for sc, r in scored if sc > 0]
+    verified = (positive or [r for sc, r in scored])[:MAX_VERIFIED_LINES]
+
     cur.execute("""
         SELECT statement, source_id, provenance_level
           FROM matter_facts
@@ -206,9 +257,13 @@ def assemble(cur, *, client_code: str, matter_codes: List[str], message: str = "
     """Build MatterBrief dict for matter_codes (client-walled)."""
     angles = {}
     for mc in matter_codes:
+        spine = _angle_spine(cur, mc)
+        title = ""
+        if spine.get("status") == "data" and spine.get("data"):
+            title = str(_g(spine["data"], "title") or "")
         angles[mc] = {
-            "spine": _angle_spine(cur, mc),
-            "verified_ground": _angle_facts(cur, mc),
+            "spine": spine,
+            "verified_ground": _angle_facts(cur, mc, title),
             "parties": _angle_parties(cur, mc),
             "deadlines": _angle_deadlines(cur, mc),
             "documents": _angle_documents(cur, mc),

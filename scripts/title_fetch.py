@@ -77,8 +77,45 @@ def _name_has_token(name: str, token: str) -> bool:
     t = (token or "").lower()
     if not t or t not in n:
         return False
-    # Prefer titled form; still accept bare number in filename (survey/receipt patterns)
     return True
+
+
+def _doc_precision_score(name: str, token: str, matter_code: str | None = None) -> int:
+    """Higher = better primary for a narrow title fetch. Prefer CTC/TCT over dual surveys."""
+    n = (name or "").lower().replace("–", "-").replace("_", " ")
+    t = (token or "").lower()
+    if not t or t not in n:
+        return -100
+    score = 10
+    # Strong title identity
+    if f"t-{t}" in n or f"t {t}" in n or f"tct t-{t}" in n or f"tct_{t}" in n.replace(" ", "_"):
+        score += 40
+    if f"tct {t}" in n or f"tct-{t}" in n or f"tct_{t}" in n:
+        score += 35
+    # Certified true copy of THIS title
+    if "certified" in n or " ctc" in n or n.startswith("ctc"):
+        score += 50
+    if "true copy" in n:
+        score += 40
+    # Explicit TCT instrument vs survey/receipt of multiple titles
+    if re.search(rf"\btct\b.*\b{re.escape(t)}\b", n) or re.search(rf"\b{re.escape(t)}\b.*\btct\b", n):
+        score += 15
+    if "survey" in n:
+        score -= 25
+    if "receipt" in n and "tct" not in n:
+        score -= 10
+    # Dual-title surveys (e.g. 32911 and 4497) are secondary when asking one number
+    other_tcts = re.findall(r"\b(?:tct|t)[\s\-]*([0-9]{3,7})\b", n)
+    distinct = {x for x in other_tcts if x != t}
+    if len(distinct) >= 1 and "survey" in n:
+        score -= 30
+    # Matter spine link
+    mc = (matter_code or "").upper()
+    if mc and t in mc.replace("-", ""):
+        score += 20
+    if mc and "TCT" in mc and t in mc:
+        score += 15
+    return score
 
 
 def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Optional[str], Optional[str]]:
@@ -111,8 +148,13 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
               LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
              WHERE (a.client_code = %s OR a.client_code LIKE %s OR a.case_file = %s)
                AND (a.title_ref ILIKE %s OR a.asset_code ILIKE %s OR a.label ILIKE %s)
-             ORDER BY a.asset_code LIMIT 1
-        """, (client_code, fam, client_code, like, like, like))
+             ORDER BY
+               CASE WHEN a.title_ref ILIKE %s OR a.title_ref ILIKE %s THEN 0 ELSE 1 END,
+               CASE WHEN coalesce(a.origin,'') = 'title' THEN 0 ELSE 1 END,
+               coalesce(r.readiness_score, 0) DESC
+             LIMIT 1
+        """, (client_code, fam, client_code, like, like, like,
+              f"T-{token}", f"%T-{token}%"))
         assets = cur.fetchall()
         # Fallback without client filter only if exact title_ref match in family already empty
         if not assets:
@@ -122,8 +164,10 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
                   FROM property_assets a
                   LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
                  WHERE a.title_ref ILIKE %s OR a.asset_code ILIKE %s
-                 ORDER BY a.asset_code LIMIT 1
-            """, (like, like))
+                 ORDER BY CASE WHEN a.title_ref ILIKE %s THEN 0 ELSE 1 END,
+                          coalesce(r.readiness_score, 0) DESC
+                 LIMIT 1
+            """, (like, like, f"%T-{token}%"))
             assets = cur.fetchall()
             # A5: refuse foreign client assets
             assets = [
@@ -187,6 +231,11 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
         if _rank(d) <= 1 and _dl(d)
         and _name_has_token(str(_g(d, "name", 1) or ""), token)
     ]
+    # Precision sort: CTC / T-#### first; dual surveys last
+    token_named.sort(
+        key=lambda d: -_doc_precision_score(
+            str(_g(d, "name", 1) or ""), token, str(_g(d, "matter_code", 2) or "")),
+    )
     other_named = [
         d for d in ranked
         if _rank(d) <= 1 and _dl(d)
