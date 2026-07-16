@@ -1,14 +1,17 @@
 [Unit]
-Description=LandTek sovereign Telegram gateway — owns @LeoLandtekBot via getUpdates long-polling; lands conversation on the channel_messages bus (leo_instant answers, $0 local) + applies doc-triage commands (file/skip/unrelated). Retires n8n from Telegram.
+Description=LandTek sovereign Telegram gateway (getUpdates) — A85: only when no webhook owner
 After=network-online.target docker.service
+# Do NOT enable while landtek-tg-anchor / webhook at leo.hayuma.org/landtek/tg is live.
+# Cutover: stop tg-anchor → set TELEGRAM_FORCE_GATEWAY=1 or deleteWebhook → enable this unit.
 
 [Service]
 Type=simple
 EnvironmentFile=-/root/landtek/.env
 WorkingDirectory=/root/landtek
 ExecStart=/usr/bin/python3 /root/landtek/scripts/telegram_gateway.py
-Restart=always
-RestartSec=5
+# A85: clean exit (webhook still set) must NOT thrash — never Restart=always on this unit
+Restart=on-failure
+RestartSec=10
 StandardOutput=append:/var/log/landtek_telegram_gateway.log
 StandardError=append:/var/log/landtek_telegram_gateway.log
 

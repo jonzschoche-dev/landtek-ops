@@ -729,24 +729,29 @@ def handle(row):
             matters_block=matters_block, vault_state_block=vault_block)
 
     context = _recent_context(chat_id)
-    reply, err = _call_anthropic(system_prompt, text, context)
-    if reply is None:
-        # Anthropic down / out of credit → sovereign Ollama corpus path ($0).
-        # Do NOT tell the user to top up Anthropic while local Leo can answer.
-        sov, sov_err = _sovereign_ollama_reply(str(sender_id), text)
-        if sov:
-            _reply(chat_id, sov)
-            tag = "credit" if (err and "credit balance" in err.lower()) else "api"
-            return {"handler": "llm",
-                    "outcome": f"replied_ollama_fallback:{tag}:{(err or '')[:60]}",
-                    "reply_sent": True}
-        # Both paths failed — honest, no billing finger-point if sovereign also died
-        _reply(chat_id,
-               "I'm having trouble thinking right now (local model and cloud both "
-               "failed). Give me a moment, or send a vault command if it's a vault action.")
-        return {"handler": "llm",
-                "outcome": f"api_failed:{err[:60] if err else '?'}|sov:{sov_err or '?'}"[:200],
-                "reply_sent": True}
 
-    _reply(chat_id, reply)
-    return {"handler": "llm", "outcome": "replied", "reply_sent": True}
+    # ── A85 single chat brain: Ollama corpus first ($0). Anthropic is optional
+    # secondary only when LANDTEK_ALLOW_ANTHROPIC_CHAT=1 — never dual-primary.
+    allow_anthropic = os.environ.get("LANDTEK_ALLOW_ANTHROPIC_CHAT", "").strip().lower() in (
+        "1", "true", "yes",
+    )
+
+    sov, sov_err = _sovereign_ollama_reply(str(sender_id), text)
+    if sov:
+        _reply(chat_id, sov)
+        return {"handler": "llm", "outcome": "replied_ollama", "reply_sent": True}
+
+    reply, err = (None, "anthropic_disabled")
+    if allow_anthropic:
+        reply, err = _call_anthropic(system_prompt, text, context)
+        if reply is not None:
+            _reply(chat_id, reply)
+            return {"handler": "llm", "outcome": "replied_anthropic", "reply_sent": True}
+
+    # Both paths failed — no billing finger-point (A85: cloud is not the product)
+    _reply(chat_id,
+           "I'm having trouble thinking right now. Give me a moment, "
+           "or send a vault command if it's a vault action.")
+    return {"handler": "llm",
+            "outcome": f"api_failed:sov:{sov_err or '?'}|cloud:{(err or '')[:60]}"[:200],
+            "reply_sent": True}

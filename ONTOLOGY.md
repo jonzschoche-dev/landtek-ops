@@ -14,19 +14,21 @@
 > new-domain template, invariant conventions, and the maintenance protocol) is defined in
 > `docs/ONTOLOGY_STRUCTURE.md`. Add domains by *appending* (§2.N + new A-numbers), never by renumbering.
 >
-> **Ontology version: v0.42 (2026-07-14).** **Property Development + Revenue precondition spine LANDS
-> (deploy_911 schema/engine; deploy_912 V12 shadow).** Graduates two Future Domains in one spine
-> (Revenue/Valuation/Portfolio + Construction/Project Delivery — design `docs/PROPERTY_DEVELOPMENT_SPINE.md`).
-> Hub-on-`property_assets` (origin=title stubs vs seed/operator curated); generalized ledger
-> `asset_preconditions` (all four modes; asset-owned = engine-derived cache; project-owned sourcing);
-> `development_projects` / `development_permits` / link tables (`asset_titles` · `asset_map_parcels` ·
-> `asset_survey_parcels`); views `v_development_board` · `v_asset_inventory`. **A81–A84 MINTED.**
-> **V12 SHADOW (log):** owner-existence + cross-client isolation on the spine tables (polymorphic
-> `asset_preconditions.owner_code` has no FK — V12 is the floor). A80 remains highest *prior* mint;
-> A81–A84 continue the series. Live proof: 83/83 client_code · 1 project · 38 preconds · 10/10
-> truth_tests. **v0.41 (2026-07-12).** **A62 re-audited + scope-corrected** (required legs green;
-> encrypted offsite optional / transport-blocked on gdrive-sa 403). **v0.40 (2026-07-12).** **The
-> comms buildout brought up to law (L4 unblocked).**
+> **Ontology version: v0.43 (2026-07-16).** **A85 MINTED — no parallel owners / no bloat.** One capability
+> surface → one process owner → one reply brain. Dual stacks that compete (e.g. Telegram webhook +
+> getUpdates gateway both active) are a violation; unused owners must be **disabled**, not retry-looping.
+> Floored by `truth_tests/test_no_bloat_owners.py` + gateway self-refuse. **v0.42 (2026-07-14).** **Property
+> Development + Revenue precondition spine LANDS (deploy_911 schema/engine; deploy_912 V12 shadow).**
+> Graduates two Future Domains in one spine (Revenue/Valuation/Portfolio + Construction/Project Delivery —
+> design `docs/PROPERTY_DEVELOPMENT_SPINE.md`). Hub-on-`property_assets` (origin=title stubs vs seed/operator
+> curated); generalized ledger `asset_preconditions` (all four modes; asset-owned = engine-derived cache;
+> project-owned sourcing); `development_projects` / `development_permits` / link tables (`asset_titles` ·
+> `asset_map_parcels` · `asset_survey_parcels`); views `v_development_board` · `v_asset_inventory`.
+> **A81–A84 MINTED.** **V12 SHADOW (log):** owner-existence + cross-client isolation on the spine tables
+> (polymorphic `asset_preconditions.owner_code` has no FK — V12 is the floor). Live proof: 83/83 client_code ·
+> 1 project · 38 preconds · 10/10 truth_tests. **v0.41 (2026-07-12).** **A62 re-audited + scope-corrected**
+> (required legs green; encrypted offsite optional / transport-blocked on gdrive-sa 403). **v0.40
+> (2026-07-12).** **The comms buildout brought up to law (L4 unblocked).**
 > **A79 MINTED** (role clamp at the single gate — deploy_880 built it citing an invariant that didn't exist;
 > law now matches build): role from `comms_role_policy`, counterparty ⇒ facts/strategy refused, clamp emits
 > `{disclosure_ceiling, projection_profile}` for A75 — clamp decides, projection shapes. **A80 MINTED ○**
@@ -878,6 +880,7 @@ ontology fix — a strategy call. Surface via `agent_concept_map.py --review`.
 | A82 | **A precondition may only be `ok` with evidence — fail-closed.** `asset_preconditions.status='ok'` requires `source_doc_id` OR non-empty `evidence_ref` OR `provenance_level='operator'`. **Write-path law (Refinement 1):** the engine/reconciler may never self-assign `provenance_level IN ('operator','verified')`; engine `ok` only via doc or **deterministic** `evidence_ref` + `inferred_*`. `operator` is reserved for an operator-authenticated write path. **Asset-owned codes are a derived cache (Refinement 2):** `secure_tenure` / `survey_geometry` / `possession` / `marketable_title` / … are engine-sole-writer projections of title/geometry facts — never hand-set, never operator-`ok`. Operator `ok` is legal only on project-owned sourcing codes (`capital_partner`, `feasibility`, `buyer_price`, `tenant`, …). | 🟢 **DB CHECK + engine + truth-floored (deploy_911)** — constraint `asset_preconditions_ok_requires_evidence` rejects silent `ok`; `test_property_development` proves bite + operator-attested accept + engine rows never `operator`/`verified`. Graduates further when operator-set path is principal-authenticated (A63). |
 | A83 | **Geometry for an asset only via link tables — no free-text coordinates on the project.** An asset's spatial claim rides `asset_map_parcels` → `map_parcels` and/or `asset_survey_parcels` → `parcels` (hard FK); optional soft `map_parcels.asset_code`. Projects do not store lat/lng/WKT/GeoJSON columns. Extends A9/A11: plotting stays on the geometry spine; money board *reads* survey readiness via precondition `survey_geometry` (tier-aware: ortho/survey → ok; rough → todo; none → unknown). | 🟢 **asserted + schema-floored (deploy_911)** — no free-coord columns on `development_projects`; link tables only; truth_test `A83_no_free_coords`. |
 | A84 | **Project stage `ready` requires all mode preconditions `ok` (asset-owned ∪ project-owned).** Engine may *suggest* ready; operator commits stage (Sprint-1). A project cannot honestly claim shovel-ready while tenure, geometry, permits, capital, or feasibility is non-ok for its mode. | 🟡 **engine + truth_test (deploy_911)** — no live project at `ready` with a non-ok precond; stage owner = engine-suggests. DB trigger optional later. |
+| A85 | **No parallel owners — no bloat.** For any external capability surface (Telegram bot · Messenger page · email bridge · channel chat brain), **exactly one process tree owns ingress** and **exactly one brain owns replies**. A second owner that competes (webhook **and** getUpdates; n8n **and** headless for the same channel without a cutover flip; two LLM paths both “primary”) is a violation. New work **wires into the existing owner** — it does not add a peer “for safety.” An superseded path must be **systemd-disabled or code-retired**, not left active retry-looping (409 Conflict spam is evidence of A85 breach). Fallbacks are ordered single-path (try A then B), never two simultaneous owners. | 🟡 **first floor LIVE (deploy_923)** — Telegram: webhook stack is sole live owner; `landtek-telegram-gateway` disabled while webhook is set; gateway **refuses** to poll if webhook URL non-empty (clean exit); chat LLM is Ollama-first (Anthropic optional via env). Truth-floor `test_no_bloat_owners`. Graduates 🟢 when every channel has a single declared owner in `leo_channel_mode` + matching active unit inventory (no zombie peers). |
 
 **A5 is now enforced (was the load-bearing gap).** It is the extension point for the `ontology_validator`
 (see `docs/ontology_validator_spec.md`).
@@ -1123,6 +1126,9 @@ cleanly instead of inventing a parallel structure. **○ = planned; do not build
   mapped onto the real series: proposed A20 → existing **A25**, proposed A21 → new **A28**, proposed A22 →
   existing **A27** (coordinator = its concrete enforcement), proposed A23 → existing **A26** (token-as-switch
   + `channel_audit` activation audit). **Doc-only — no schema, no code, no enforcement change.**
+- v0.43 (2026-07-16) — **A85 no parallel owners / no bloat.** One surface → one ingress owner → one reply
+  brain. Telegram dual-stack (webhook_anchor + getUpdates gateway) banned while both active; gateway
+  self-refuses; chat LLM Ollama-first. Floor: `test_no_bloat_owners`.
 - v0.42 (2026-07-14) — **Property Development + Revenue spine.** Registered `property_assets` (promoted hub) ·
   `development_projects` · `development_permits` · `asset_preconditions` · `asset_titles` ·
   `asset_map_parcels` · `asset_survey_parcels` · `v_development_board` · `v_asset_inventory`. Minted

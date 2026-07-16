@@ -112,16 +112,46 @@ def _process_update(cur, token, upd):
     print(f"[tg_gw] conversation from {frm} → bus", flush=True)
 
 
+def _webhook_url(token):
+    """Return current Telegram webhook URL or ''."""
+    try:
+        info = _api(token, "getWebhookInfo")
+        return ((info.get("result") or {}).get("url") or "").strip()
+    except Exception:
+        return ""
+
+
 def main():
     token = _token()
     if not token:
         sys.exit("[tg_gw] TELEGRAM_BOT_TOKEN not set")
-    # take the bot from n8n so getUpdates works (the deliberate cut)
+
+    # ── A85 (no parallel owners): refuse to compete with an active webhook owner ──
+    # webhook_anchor re-pins https://leo.hayuma.org/landtek/tg every 30s. Polling
+    # getUpdates against that is pure 409 spam (~300/hr). One owner only.
+    # Full cutover = stop landtek-tg-anchor, deleteWebhook, then enable THIS unit.
+    if os.environ.get("TELEGRAM_FORCE_GATEWAY", "").strip() not in ("1", "true", "yes"):
+        url = _webhook_url(token)
+        if url:
+            print(
+                f"[tg_gw] A85 refuse: webhook owner active ({url[:80]}). "
+                "Disable landtek-tg-anchor + deleteWebhook before enabling gateway. "
+                "Exiting cleanly (no poll loop).",
+                flush=True,
+            )
+            sys.exit(0)
+
+    # take the bot so getUpdates works (only when no webhook / force flag)
     try:
         _api(token, "deleteWebhook", drop_pending_updates="false")
         print("[tg_gw] webhook deleted — gateway now owns the bot via getUpdates", flush=True)
     except Exception as e:
         print(f"[tg_gw] deleteWebhook warn: {str(e)[:80]}", flush=True)
+    # re-check: if something re-set the webhook, still refuse the loop
+    url = _webhook_url(token)
+    if url and os.environ.get("TELEGRAM_FORCE_GATEWAY", "").strip() not in ("1", "true", "yes"):
+        print(f"[tg_gw] A85 refuse after deleteWebhook: webhook still {url[:80]}", flush=True)
+        sys.exit(0)
     while True:
         conn = None
         try:
