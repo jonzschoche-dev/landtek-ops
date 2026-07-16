@@ -730,11 +730,25 @@ def _fetch_title_docs(sender_id: str, text: str) -> tuple[str | None, str | None
         assets = cur.fetchall()
         # Documents that name this title — prefer downloadable
         fam = (client or "").split("-")[0] + "%"
+        # Prefer filename / title_ref hits. Full-text only if framed as TCT/T-####
+        # (avoids COA packets that merely mention the number once).
+        tct_like = f"%TCT%{token}%"
+        t_dash = f"%T-{token}%"
+        t_space = f"%T {token}%"
         cur.execute("""
             SELECT d.id,
                    COALESCE(NULLIF(d.smart_filename,''), d.original_filename, 'Document') AS name,
                    d.matter_code, d.case_file,
-                   (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) AS downloadable
+                   (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) AS downloadable,
+                   CASE
+                     WHEN COALESCE(d.smart_filename,'') ILIKE %s
+                       OR COALESCE(d.original_filename,'') ILIKE %s THEN 0
+                     WHEN COALESCE(d.smart_filename,'') ILIKE %s
+                       OR COALESCE(d.original_filename,'') ILIKE %s
+                       OR COALESCE(d.smart_filename,'') ILIKE %s
+                       OR COALESCE(d.original_filename,'') ILIKE %s THEN 1
+                     ELSE 2
+                   END AS rank
               FROM documents d
              WHERE (
                     d.case_file = %s
@@ -745,12 +759,26 @@ def _fetch_title_docs(sender_id: str, text: str) -> tuple[str | None, str | None
                AND (
                     COALESCE(d.smart_filename,'') ILIKE %s
                  OR COALESCE(d.original_filename,'') ILIKE %s
+                 OR COALESCE(d.smart_filename,'') ILIKE %s
+                 OR COALESCE(d.original_filename,'') ILIKE %s
+                 OR COALESCE(d.smart_filename,'') ILIKE %s
+                 OR COALESCE(d.original_filename,'') ILIKE %s
+                 OR COALESCE(d.extracted_text,'') ILIKE %s
                  OR COALESCE(d.extracted_text,'') ILIKE %s
                )
-             ORDER BY downloadable DESC, d.id DESC
+             ORDER BY rank ASC, downloadable DESC, d.id DESC
              LIMIT 12
-        """, (client, fam, fam, client or "", like, like, like))
+        """, (
+            like, like, tct_like, tct_like, t_dash, t_dash,
+            client, fam, fam, client or "",
+            like, like, tct_like, tct_like, t_dash, t_dash,
+            tct_like, t_dash,
+        ))
         docs = cur.fetchall()
+        # Keep rank 0–1 always; rank 2 (body-only) only if nothing better
+        ranked = list(docs or [])
+        strong = [d for d in ranked if (d.get("rank") or 2) <= 1]
+        docs = strong if strong else ranked[:5]
         cur.close(); conn.close()
     except Exception as e:
         return None, f"title_fetch_db:{type(e).__name__}:{e}"
