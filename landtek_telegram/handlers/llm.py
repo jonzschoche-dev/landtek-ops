@@ -659,6 +659,142 @@ def _resolve_client_code(sender_id: str) -> str | None:
     return None
 
 
+def _title_token_from_message(text: str) -> str | None:
+    """Extract TCT/title token from a fetch/send request, if present."""
+    import re
+    t = text or ""
+    # T-32911, TCT 32911, tct-32911, title 32911
+    m = re.search(
+        r"\b(?:TCT|T)[\s\-–#]*([0-9]{3,7}(?:[\-/][0-9]{1,7})?)\b",
+        t, re.IGNORECASE,
+    )
+    if m:
+        return m.group(1)
+    m = re.search(r"\btitle\s+(?:no\.?|number|#)?\s*([0-9]{3,7})\b", t, re.IGNORECASE)
+    if m:
+        return m.group(1)
+    return None
+
+
+def _wants_title_fetch(text: str) -> bool:
+    """True when the user is asking us to GET a title file, not just discuss status."""
+    t = (text or "").lower()
+    if not any(k in t for k in (
+        "fetch", "send me", "get me", "give me", "download", "link to",
+        "pull the", "pull me", "hanapin", "ibigay", "padala",
+    )):
+        return False
+    return bool(
+        "title" in t or "tct" in t or "titulo" in t
+        or _title_token_from_message(text)
+    )
+
+
+def _fetch_title_docs(sender_id: str, text: str) -> tuple[str | None, str | None]:
+    """Deterministic corpus title fetch — real /files/c/ links, no LLM promise.
+
+    Ollama cannot call tools; when the user asks to fetch a title we answer from
+    documents + property_assets instead of inventing 'I'll get it shortly'.
+    """
+    token = _title_token_from_message(text)
+    if not token:
+        return (
+            "Which title? Send the TCT number (e.g. fetch me title TCT 32911).",
+            None,
+        )
+    client = _resolve_client_code(str(sender_id))
+    if not client and str(sender_id) == JONATHAN:
+        client = "MWK-001"
+    # Non-operator without a client scope: do not cross the A5 wall
+    if not client and str(sender_id) != JONATHAN:
+        return (
+            "I can only pull titles for an approved client scope. "
+            "Ask Jonathan to map your access, or send the title number again after approval.",
+            None,
+        )
+
+    like = f"%{token}%"
+    try:
+        conn = psycopg2.connect(PG_DSN)
+        conn.autocommit = True
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # Asset pulse
+        cur.execute("""
+            SELECT a.asset_code, a.title_ref, a.label, a.title_status, a.client_code,
+                   r.readiness_score, r.documents, r.documents_note, r.next_prep_action
+              FROM property_assets a
+              LEFT JOIN property_readiness r ON r.asset_code = a.asset_code
+             WHERE a.title_ref ILIKE %s OR a.asset_code ILIKE %s OR a.label ILIKE %s
+             ORDER BY a.asset_code LIMIT 3
+        """, (like, like, like))
+        assets = cur.fetchall()
+        # Documents that name this title — prefer downloadable
+        fam = (client or "").split("-")[0] + "%"
+        cur.execute("""
+            SELECT d.id,
+                   COALESCE(NULLIF(d.smart_filename,''), d.original_filename, 'Document') AS name,
+                   d.matter_code, d.case_file,
+                   (d.file_path IS NOT NULL OR d.drive_file_id IS NOT NULL) AS downloadable
+              FROM documents d
+             WHERE (
+                    d.case_file = %s
+                 OR d.case_file LIKE %s
+                 OR d.matter_code LIKE %s
+                 OR (d.case_file IN ('MWK-001', 'Owner') AND %s LIKE 'MWK%%')
+             )
+               AND (
+                    COALESCE(d.smart_filename,'') ILIKE %s
+                 OR COALESCE(d.original_filename,'') ILIKE %s
+                 OR COALESCE(d.extracted_text,'') ILIKE %s
+               )
+             ORDER BY downloadable DESC, d.id DESC
+             LIMIT 12
+        """, (client, fam, fam, client or "", like, like, like))
+        docs = cur.fetchall()
+        cur.close(); conn.close()
+    except Exception as e:
+        return None, f"title_fetch_db:{type(e).__name__}:{e}"
+
+    lines = [f"Title pack for TCT / T-{token}:"]
+    if assets:
+        for a in assets:
+            sc = a.get("readiness_score")
+            scs = f"{float(sc)*100:.0f}%" if sc is not None else "?"
+            lines.append(
+                f"• {a.get('title_ref') or a.get('asset_code')} "
+                f"({a.get('client_code') or '—'}) status={a.get('title_status') or '—'} "
+                f"readiness={scs} docs={a.get('documents') or '?'}"
+            )
+            note = (a.get("documents_note") or "")[:120]
+            if note:
+                lines.append(f"  note: {note}")
+            nxt = (a.get("next_prep_action") or "")[:140]
+            if nxt:
+                lines.append(f"  next: {nxt}")
+    else:
+        lines.append(f"• No property_assets row matched T-{token} yet (title may still be in documents only).")
+
+    dl_docs = [d for d in docs if d.get("downloadable")]
+    other = [d for d in docs if not d.get("downloadable")]
+    if dl_docs:
+        lines.append("Downloadable from the corpus:")
+        for d in dl_docs[:8]:
+            name = (d.get("name") or "Document")[:90]
+            lines.append(f"• {name}")
+            lines.append(f"  https://leo.hayuma.org/files/c/{d['id']}")
+    if other and not dl_docs:
+        lines.append("Named in the record but no file bytes on disk/Drive yet:")
+        for d in other[:5]:
+            lines.append(f"• {(d.get('name') or 'Document')[:90]} (doc {d['id']})")
+    if not docs:
+        lines.append(
+            "No document filename/text hit for that number in your scope. "
+            "We may still need a CTC from the Registry of Deeds."
+        )
+    lines.append("I am not inventing a file — only linking what is already in the LandTek corpus.")
+    return "\n".join(lines), None
+
+
 def _sovereign_ollama_reply(sender_id: str, text: str) -> tuple[str | None, str | None]:
     """$0 local Ollama via leo_service — same corpus/readiness spine as Messenger headless.
 
@@ -713,6 +849,16 @@ def handle(row):
 
     if not text:
         return {"handler": "llm", "outcome": "skip_empty", "reply_sent": False}
+
+    # Deterministic title FETCH before any LLM (Ollama has no tools — never "I'll fetch shortly")
+    if _wants_title_fetch(text):
+        pack, ferr = _fetch_title_docs(str(sender_id), text)
+        if pack:
+            _reply(chat_id, pack)
+            return {"handler": "llm", "outcome": "replied_title_fetch", "reply_sent": True}
+        # fall through to Ollama with error context if DB failed
+        if ferr:
+            print(f"[llm] title_fetch failed: {ferr}", file=sys.stderr)
 
     # Build live blocks at call time so matters and vault state are always fresh
     matters_block = _live_matters_block()
