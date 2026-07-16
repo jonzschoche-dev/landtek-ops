@@ -273,6 +273,37 @@ def _parcel_ring_m(cur, title_no):
     return pts, pid, (float(area) if area else None), (float(stated_ha) * 10000 if stated_ha else None)
 
 
+def _tie_vector(cur, title_no):
+    """The monument tie vector for a title: (azimuth_cw_from_N, distance_m, text). This is the
+    'TO CORNER 1  <bearing>  <dist>' line the consensus strips from the ring — it points FROM the
+    control monument (BLLM) TO corner 1. Re-derived from the source doc text (it isn't persisted
+    as a boundary course). Returns (None, None, None) if the title carries no LRA tie line."""
+    cur.execute("SELECT DISTINCT source_doc_id FROM parcel_courses WHERE title_no=%s "
+                "ORDER BY source_doc_id", (title_no,))
+    for (doc_id,) in cur.fetchall():
+        cur.execute("SELECT extracted_text FROM documents WHERE id=%s", (doc_id,))
+        rr = cur.fetchone()
+        for _sno, seg in GC.SP._segments((rr[0] if rr else "") or ""):
+            _ring, tie = GC.SP._strip_tie(seg)
+            if tie:
+                calls = list(GC.sg.parse_calls(tie))
+                if calls:
+                    return calls[0][0], calls[0][1], " ".join(tie.split())
+    return None, None, None
+
+
+def _corner1_from_monument(mon_lat, mon_lng, az, dist):
+    """Corner 1's WGS84 lat/lng = the monument offset by the tie vector (az cw from N, metres).
+    Same _R and projection as geo_math so it round-trips with the ring placement."""
+    import math
+    R = 6_378_137.0
+    dx = dist * math.sin(math.radians(az))   # East metres
+    dy = dist * math.cos(math.radians(az))   # North metres
+    lat = mon_lat + math.degrees(dy / R)
+    lng = mon_lng + math.degrees(dx / (R * math.cos(math.radians(mon_lat)) or 1e-9))
+    return lat, lng
+
+
 @bp.route("/ops/map/georef")
 def ops_map_georef():
     parcel = (request.args.get("parcel") or "").strip()
@@ -286,12 +317,8 @@ def ops_map_georef():
         cur.close(); conn.close(); abort(404)
     pc, title_no, label, clat, clng, existing_geom, tier = row
     pts, pid, area, stated = _parcel_ring_m(cur, title_no) if title_no else (None, None, None, None)
-    # tie point hint from the recovered courses (BLLM No. 2, Mercedes)
-    tie = None
-    if title_no:
-        cur.execute("SELECT raw_call FROM parcel_courses WHERE title_no=%s "
-                    "AND raw_call ILIKE '%%tie point%%' LIMIT 1", (title_no,))
-        t = cur.fetchone(); tie = t[0] if t else None
+    # the monument tie vector (BLLM -> corner 1), re-derived from the source doc
+    tie_az, tie_dist, tie_txt = _tie_vector(cur, title_no) if title_no else (None, None, None)
     cur.close(); conn.close()
     if not pts:
         return _page("Georeference — no survey shape",
@@ -308,8 +335,11 @@ def ops_map_georef():
     cfg = {
         "parcel": pc, "title_no": title_no, "label": label or pc,
         "ring_m": [[round(x, 3), round(y, 3)] for x, y in pts],   # [x_east, y_north]
-        "area_sqm": area, "stated_sqm": stated, "tie": tie,
-        "anchor": anchor,
+        "area_sqm": area, "stated_sqm": stated,
+        "tie": tie_txt,
+        "tie_az": (round(tie_az, 4) if tie_az is not None else None),
+        "tie_dist": (round(tie_dist, 2) if tie_dist is not None else None),
+        "anchor": anchor, "tier": tier,
         "lat": (anchor[0] if anchor else (clat if clat is not None else 14.10)),
         "lng": (anchor[1] if anchor else (clng if clng is not None else 122.86)),
         "tiles": {"esri": TILE_URL, "esri_attrib": TILE_ATTRIB,
@@ -320,14 +350,16 @@ def ops_map_georef():
 
 @bp.route("/ops/map/georef/save", methods=["POST"])
 def ops_map_georef_save():
+    """Place a parcel's survey-exact shape on the globe. Two modes:
+      mode='drag'     — operator taps corner 1 on satellite → tier 'rough' (POSITION is eyeball).
+      mode='monument' — operator supplies the BLLM/control-monument coordinate; the stored tie
+                        vector computes corner 1 exactly → tier 'survey' (POSITION is survey-grade).
+    Both are honest: the SHAPE is always the corroborated parcels ring; only POSITION accuracy —
+    hence the tier and the client APPROXIMATE banner (shown for anything below 'ortho') — differs.
+    """
     d = request.get_json(silent=True) or {}
     parcel = (d.get("parcel_code") or "").strip()
-    try:
-        lat = float(d["lat"]); lng = float(d["lng"])
-    except (KeyError, TypeError, ValueError):
-        return jsonify(ok=False, error="need numeric lat/lng"), 400
-    if not (-90 <= lat <= 90 and -180 <= lng <= 180):
-        return jsonify(ok=False, error="lat/lng out of range"), 400
+    mode = (d.get("mode") or "drag").strip()
     conn = _db(); conn.autocommit = True; cur = conn.cursor()
     cur.execute("SELECT title_no, stated_area_sqm FROM map_parcels WHERE parcel_code=%s", (parcel,))
     row = cur.fetchone()
@@ -338,26 +370,49 @@ def ops_map_georef_save():
     if not pts:
         cur.close(); conn.close()
         return jsonify(ok=False, error=f"no survey shape for {title_no} — build consensus first"), 409
+
+    if mode == "monument":
+        try:
+            mlat = float(d["mon_lat"]); mlng = float(d["mon_lng"])
+        except (KeyError, TypeError, ValueError):
+            cur.close(); conn.close()
+            return jsonify(ok=False, error="need numeric monument mon_lat/mon_lng"), 400
+        az, dist, tietxt = _tie_vector(cur, title_no)
+        if az is None:
+            cur.close(); conn.close()
+            return jsonify(ok=False, error=f"no tie line on file for {title_no} — cannot compute "
+                           f"corner 1 from a monument; use drag mode or enter corner 1 directly"), 409
+        lat, lng = _corner1_from_monument(mlat, mlng, az, dist)
+        tier = "survey"
+        note = (f"SURVEY placement: corner 1 computed from the tie line [{tietxt}] anchored at the "
+                f"control monument ({mlat:.6f},{mlng:.6f}); shape = parcels id={pid} (corroborated, "
+                f"closes to cm), TRUE-north. Position is survey-grade to the monument's accuracy.")
+        placed_at = [round(lat, 8), round(lng, 8)]
+    else:
+        try:
+            lat = float(d["lat"]); lng = float(d["lng"])
+        except (KeyError, TypeError, ValueError):
+            cur.close(); conn.close(); return jsonify(ok=False, error="need numeric lat/lng"), 400
+        tier = "rough"
+        note = (f"survey-exact SHAPE (parcels id={pid}, closes to cm, corroborated) placed by "
+                f"operator anchor on corner 1 @ ({lat:.6f},{lng:.6f}); TRUE-north, no rotation. "
+                f"POSITION is approximate/hand-placed — promote to survey tier via monument mode.")
+        placed_at = None
+    if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+        cur.close(); conn.close(); return jsonify(ok=False, error="computed lat/lng out of range"), 400
+
     geom = geo_math.local_ring_to_geojson(pts, lat, lng)     # corner 1 -> (lat,lng), no rotation
     garea = round(geo_math.polygon_area_sqm(geom), 1)
     clat, clng = geo_math.polygon_centroid(geom)
-    # Honest tiering: the SHAPE is survey-exact (parcels ring, corroborated, closes to cm),
-    # but a hand-placed anchor is only as accurate as the operator's eye — so POSITION is
-    # 'rough' (the client sees the APPROXIMATE banner). It graduates to 'survey' only when the
-    # anchor is the real BLLM-monument coordinate, and to 'ortho' on a drone tie.
-    note = (f"survey-exact SHAPE (parcels id={pid}, closes to cm, corroborated) placed by "
-            f"operator anchor on corner 1 @ ({lat:.6f},{lng:.6f}); TRUE-north, no rotation. "
-            f"POSITION is approximate/hand-placed — refine at /ops/map/georef, promote to survey "
-            f"tier when tied to the BLLM monument coordinate.")
     cur.execute(
         "UPDATE map_parcels SET geom_geojson=%s, centroid_lat=%s, centroid_lng=%s, area_sqm=%s, "
-        "accuracy_tier='rough', survey_parcel_id=%s, source_note=%s, plotted_by='ops-georef', "
+        "accuracy_tier=%s, survey_parcel_id=%s, source_note=%s, plotted_by='ops-georef', "
         "plotted_at=now(), updated_at=now(), status='plotted' WHERE parcel_code=%s",
-        (json.dumps(geom), clat, clng, garea, pid, note, parcel))
+        (json.dumps(geom), clat, clng, garea, tier, pid, note, parcel))
     cur.close(); conn.close()
     return jsonify(ok=True, parcel_code=parcel, area_sqm=garea, geom=geom,
-                   stated_sqm=stated or stated_from_parcel,
-                   centroid=[clat, clng], tier="rough")
+                   stated_sqm=stated or stated_from_parcel, corner1=placed_at,
+                   centroid=[clat, clng], tier=tier)
 
 
 # ======================================================================
@@ -754,17 +809,29 @@ _GEOREF_HTML = """<!doctype html><html><head><meta charset=utf-8>
  #status{padding:7px 13px;font-size:13px;background:#f5f5f5}
  .muted{color:#9ca3af}
  .hint{color:#fde68a}
+ #mon{padding:7px 13px;font-size:13px;background:#0b3b3a;color:#d1fae5;display:none;
+   align-items:center;gap:7px;flex-wrap:wrap}
+ #mon input{width:120px;padding:5px;border-radius:5px;border:0}
+ #mon button{background:#0f766e}
 </style></head><body>
 <div id=wrap>
  <div id=bar>
    <b id=t></b> <span class=muted id=sub></span>
    <span class=hint id=tie></span>
-   <button onclick=save()>Save placement</button>
+   <button onclick=save()>Save (rough — drag)</button>
    <span id=live class=muted></span>
  </div>
+ <div id=mon>
+   <b>Survey-grade:</b> enter the control monument (BLLM) coordinate —
+   lat <input id=mlat placeholder="14.1055" inputmode=decimal>
+   lng <input id=mlng placeholder="122.9630" inputmode=decimal>
+   <button onclick=monSave()>Place from monument (survey)</button>
+   <span class=muted id=montie></span>
+ </div>
  <div id=mapwrap><div id=map></div></div>
- <div id=status>Drag the pin to where <b>corner 1</b> sits on the satellite image. The exact
-   survey shape (TRUE-north, no rotation) follows the pin. Nudge until the outline lines up, then Save.</div>
+ <div id=status>Drag the pin to where <b>corner 1</b> sits on the satellite image (rough placement).
+   The exact survey shape (TRUE-north, no rotation) follows the pin. For survey-grade, enter the
+   BLLM monument coordinate above and the tie line places corner 1 exactly.</div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -772,7 +839,11 @@ var CFG=__CFG__, R=6378137;
 document.getElementById('t').textContent=CFG.label+' — georeference';
 document.getElementById('sub').textContent='('+CFG.parcel+' · '+CFG.title_no+
   ' · survey area '+(CFG.area_sqm?Math.round(CFG.area_sqm).toLocaleString()+' m\\u00b2':'—')+')';
-if(CFG.tie) document.getElementById('tie').textContent='tie point: '+CFG.tie.replace(/^tie point /i,'');
+if(CFG.tie) document.getElementById('tie').textContent='tie: '+CFG.tie.replace(/^tie point /i,'');
+if(CFG.tie_az!=null && CFG.tie_dist!=null){
+  document.getElementById('mon').style.display='flex';
+  document.getElementById('montie').textContent='(applies '+CFG.tie_dist+' m @ az '+CFG.tie_az.toFixed(2)+'\\u00b0 to reach corner 1)';
+}
 var esri=L.tileLayer(CFG.tiles.esri,{maxZoom:21,maxNativeZoom:18,attribution:CFG.tiles.esri_attrib});
 var bases={'Satellite (Esri)':esri};
 if(CFG.tiles.gsat) bases['Satellite (Google)']=L.tileLayer(CFG.tiles.gsat,{maxZoom:21,maxNativeZoom:20,attribution:'&copy; Google'});
@@ -796,19 +867,27 @@ pin.on('drag',redraw); pin.on('dragend',redraw);
 map.on('click',function(e){pin.setLatLng(e.latlng);redraw();});
 redraw();
 try{map.fitBounds(poly.getBounds(),{maxZoom:18,padding:[40,40]});}catch(e){}
-function save(){
-  var p=pin.getLatLng();
+function post(body){
   document.getElementById('status').textContent='Saving…';
-  fetch('/ops/map/georef/save',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({parcel_code:CFG.parcel,lat:p.lat,lng:p.lng})})
-   .then(function(r){return r.json();}).then(function(j){
+  return fetch('/ops/map/georef/save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(j){
      var s=document.getElementById('status');
      if(!j.ok){s.textContent='Error: '+j.error;return;}
      var da=j.stated_sqm?(' vs '+Math.round(j.stated_sqm).toLocaleString()+' stated'):'';
-     s.innerHTML='\\u2705 Placed (survey tier). Area on the globe '+Math.round(j.area_sqm).toLocaleString()
-       +' m\\u00b2'+da+' — the client map now shows this boundary. Re-drag + Save to nudge.';
-     poly.setLatLngs((j.geom.coordinates[0]).map(function(c){return [c[1],c[0]];}));
+     s.innerHTML='\\u2705 Placed ('+j.tier+' tier). Area on the globe '+Math.round(j.area_sqm).toLocaleString()
+       +' m\\u00b2'+da+(j.tier==='survey'?' \\u2014 SURVEY-GRADE via the monument.':' \\u2014 approximate.')
+       +' The client map now shows this boundary.';
+     var ll=(j.geom.coordinates[0]).map(function(c){return [c[1],c[0]];});
+     poly.setLatLngs(ll); pin.setLatLng(ll[0]);
+     try{map.fitBounds(poly.getBounds(),{maxZoom:19,padding:[40,40]});}catch(e){}
    }).catch(function(){document.getElementById('status').textContent='Network error.';});
+}
+function save(){ var p=pin.getLatLng(); post({parcel_code:CFG.parcel,mode:'drag',lat:p.lat,lng:p.lng}); }
+function monSave(){
+  var mlat=parseFloat(document.getElementById('mlat').value),
+      mlng=parseFloat(document.getElementById('mlng').value);
+  if(isNaN(mlat)||isNaN(mlng)){alert('Enter the monument lat and lng');return;}
+  post({parcel_code:CFG.parcel,mode:'monument',mon_lat:mlat,mon_lng:mlng});
 }
 </script></body></html>"""
 
