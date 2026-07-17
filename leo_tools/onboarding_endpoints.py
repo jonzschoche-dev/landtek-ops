@@ -76,6 +76,191 @@ def _as_dict(val):
     return {}
 
 
+# Staff / internal roles that must leave a reachable phone + email after approval.
+STAFF_CONTACT_ROLES = frozenset({
+    "filing_assistant", "partner", "counsel", "operator", "owner",
+})
+
+STAFF_CONTACT_ASK = (
+    "Welcome — your access is approved.\n\n"
+    "One quick step for the team directory: please send your "
+    "<b>mobile number</b> and <b>email address</b> in one message "
+    "(example: 0917 123 4567 / kristyle@example.com)."
+)
+
+STAFF_CONTACT_NEED_PHONE = (
+    "Got your email. Please also send your <b>mobile number</b> "
+    "(example: 0917 123 4567)."
+)
+
+STAFF_CONTACT_NEED_EMAIL = (
+    "Got your number. Please also send your <b>email address</b>."
+)
+
+STAFF_CONTACT_DONE = (
+    "Thank you — phone and email are on file. "
+    "You can message me freely for vault filing and case coordination."
+)
+
+STAFF_CONTACT_RETRY = (
+    "I still need both a mobile number and an email. "
+    "Please reply in one message, e.g. 0917 123 4567 / you@example.com"
+)
+
+
+def _extract_email(text: str) -> str | None:
+    if not text:
+        return None
+    m = re.search(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", text)
+    return m.group(0).strip() if m else None
+
+
+def _extract_phone(text: str) -> str | None:
+    """Best-effort PH / international mobile; keep digits with leading + if present."""
+    if not text:
+        return None
+    # Prefer explicit +63 / 09 patterns before generic digit runs.
+    patterns = (
+        r"\+63[\s\-]?\d{3}[\s\-]?\d{3}[\s\-]?\d{4}",
+        r"\b09\d{2}[\s\-]?\d{3}[\s\-]?\d{4}\b",
+        r"\b63\d{10}\b",
+        r"\+\d{10,15}\b",
+    )
+    for p in patterns:
+        m = re.search(p, text)
+        if m:
+            raw = m.group(0)
+            digits = re.sub(r"[^\d+]", "", raw)
+            if digits.startswith("+"):
+                return "+" + re.sub(r"\D", "", digits[1:])
+            only = re.sub(r"\D", "", digits)
+            if only.startswith("09") and len(only) == 11:
+                return only
+            if only.startswith("63") and len(only) == 12:
+                return "+" + only
+            if len(only) >= 10:
+                return only
+    return None
+
+
+def _client_id_for_user(user: dict) -> int | None:
+    meta = _as_dict(user.get("metadata"))
+    cid = meta.get("linked_client_id")
+    if cid is not None:
+        try:
+            return int(cid)
+        except (TypeError, ValueError):
+            pass
+    return None
+
+
+def _staff_needs_contact(cur, user: dict) -> bool:
+    role = (user.get("approved_role") or user.get("role") or "").lower()
+    if role not in STAFF_CONTACT_ROLES:
+        return False
+    if role in ("operator", "owner"):
+        return False  # principals already known; never nag Jonathan
+    responses = _as_dict(user.get("onboarding_responses"))
+    if (responses.get("phone") or "").strip() and (responses.get("email") or "").strip():
+        return False
+    client_id = _client_id_for_user(user)
+    if client_id:
+        cur.execute("SELECT email, phone FROM clients WHERE id = %s", (client_id,))
+        row = cur.fetchone()
+        if row:
+            email = (row.get("email") if isinstance(row, dict) else row[0]) or ""
+            phone = (row.get("phone") if isinstance(row, dict) else row[1]) or ""
+            if str(email).strip() and str(phone).strip():
+                return False
+    # Also check telegram_id match on clients
+    cuid = str(user.get("channel_user_id") or "")
+    if cuid:
+        cur.execute(
+            "SELECT email, phone FROM clients WHERE telegram_id = %s LIMIT 1",
+            (cuid,),
+        )
+        row = cur.fetchone()
+        if row:
+            email = (row.get("email") if isinstance(row, dict) else row[0]) or ""
+            phone = (row.get("phone") if isinstance(row, dict) else row[1]) or ""
+            if str(email).strip() and str(phone).strip():
+                return False
+    return True
+
+
+def _save_staff_contact(cur, user: dict, email: str | None, phone: str | None) -> dict:
+    """Persist partial/full contact onto channel_users + clients. Returns updated responses."""
+    responses = _as_dict(user.get("onboarding_responses"))
+    meta = _as_dict(user.get("metadata"))
+    if email:
+        responses["email"] = email
+        meta["email"] = email
+    if phone:
+        responses["phone"] = phone
+        meta["phone"] = phone
+    cur.execute(
+        """UPDATE channel_users
+              SET onboarding_responses = %s::jsonb,
+                  metadata = %s::jsonb,
+                  last_seen_at = now()
+            WHERE id = %s""",
+        (json.dumps(responses), json.dumps(meta), user["id"]),
+    )
+    client_id = _client_id_for_user(user)
+    sets, args = [], []
+    if email:
+        sets.append("email = COALESCE(NULLIF(email, ''), %s)")
+        args.append(email)
+    if phone:
+        sets.append("phone = COALESCE(NULLIF(phone, ''), %s)")
+        args.append(phone)
+    if sets and client_id:
+        args.append(client_id)
+        cur.execute(
+            f"UPDATE clients SET {', '.join(sets)}, updated_at = now() WHERE id = %s",
+            args,
+        )
+    elif sets:
+        # Fall back: match by telegram_id if this is a TG identity
+        cuid = str(user.get("channel_user_id") or "")
+        if cuid.isdigit() or cuid:
+            args2 = list(args) + [cuid]
+            cur.execute(
+                f"UPDATE clients SET {', '.join(sets)}, updated_at = now() "
+                f"WHERE telegram_id = %s",
+                args2,
+            )
+    return responses
+
+
+def _handle_staff_contact(cur, user: dict, message: str) -> tuple[str, str, dict]:
+    """Process a message while collecting staff phone+email.
+
+    Returns (reply, next_state, responses).
+    """
+    responses = _as_dict(user.get("onboarding_responses"))
+    email = _extract_email(message) or (responses.get("email") or "").strip() or None
+    phone = _extract_phone(message) or (responses.get("phone") or "").strip() or None
+    if email or phone:
+        responses = _save_staff_contact(cur, user, email, phone)
+        email = (responses.get("email") or "").strip() or None
+        phone = (responses.get("phone") or "").strip() or None
+
+    if email and phone:
+        responses["staff_contact_completed_at"] = datetime.now(timezone.utc).isoformat()
+        return STAFF_CONTACT_DONE, "approved", responses
+    if email and not phone:
+        return STAFF_CONTACT_NEED_PHONE, "awaiting_staff_contact", responses
+    if phone and not email:
+        return STAFF_CONTACT_NEED_EMAIL, "awaiting_staff_contact", responses
+    # First ask or unparseable
+    if not (message or "").strip() or message.strip().lower() in (
+        "ok", "okay", "yes", "sure", "sige", "go",
+    ):
+        return STAFF_CONTACT_ASK, "awaiting_staff_contact", responses
+    return STAFF_CONTACT_RETRY, "awaiting_staff_contact", responses
+
+
 def _archive_and_reset(cur, user: dict, reason: str, *, keep_authorized: bool = False) -> dict:
     """Same channel_user_id, clean onboarding slate. Prior attempt → metadata.reentry_history."""
     responses = _as_dict(user.get("onboarding_responses"))
@@ -290,11 +475,20 @@ def api_onboard():
         )
         next_state = "awaiting_intro"
 
+    elif state == "awaiting_staff_contact":
+        # Authorized staff — still need phone + email for the directory before free chat.
+        reply, next_state, responses = _handle_staff_contact(cur, user, message)
+
     elif state == "approved":
-        # Shouldn't reach here, but bail to AI Agent
-        cur.close(); conn.close()
-        return jsonify({"reply": None, "state_after": "approved", "escalate": False,
-                        "passthrough": True, "role": user.get("approved_role")})
+        # Staff missing directory contact stay gated; everyone else → AI agent / headless.
+        if _staff_needs_contact(cur, user):
+            reply, next_state, responses = _handle_staff_contact(cur, user, message)
+            if next_state == "awaiting_staff_contact" and not (message or "").strip():
+                reply = STAFF_CONTACT_ASK
+        else:
+            cur.close(); conn.close()
+            return jsonify({"reply": None, "state_after": "approved", "escalate": False,
+                            "passthrough": True, "role": user.get("approved_role")})
 
     elif state == "declined":
         # Absorbing until they ask to re-apply (handled above) or operator reopens

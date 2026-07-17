@@ -752,6 +752,38 @@ def handle(row):
     if not text:
         return {"handler": "llm", "outcome": "skip_empty", "reply_sent": False}
 
+    # Staff directory gate (phone + email) — same state machine as Messenger onboarding.
+    # Private chats only; group vault work is not interrupted.
+    if str(chat_id) == str(sender_id) or (
+        str(chat_id).lstrip("-").isdigit() and not str(chat_id).startswith("-")
+    ):
+        try:
+            import requests as _rq
+            r = _rq.post(
+                "http://127.0.0.1:8765/api/onboard",
+                json={
+                    "channel": "telegram",
+                    "channel_user_id": str(sender_id),
+                    "display_name": row.get("sender_name"),
+                    "message": text,
+                    "adapter_logged": True,
+                },
+                timeout=20,
+            )
+            if r.status_code == 200:
+                j = r.json() or {}
+                if j.get("passthrough"):
+                    pass  # free chat — continue to LLM
+                elif j.get("reply"):
+                    _reply(chat_id, j["reply"])
+                    return {
+                        "handler": "llm",
+                        "outcome": f"staff_contact:{j.get('state_after')}",
+                        "reply_sent": True,
+                    }
+        except Exception as e:
+            print(f"[llm] staff_contact_gate: {e}", file=sys.stderr)
+
     # A85: same purpose router as leo_service / CAM (title, ARTA/OP, mprb, …)
     try:
         sys.path.insert(0, "/root/landtek/scripts")
@@ -775,6 +807,13 @@ def handle(row):
                 return {"handler": "llm",
                         "outcome": f"replied_route:{route.get('via')}",
                         "reply_sent": True, "preformed": True}
+            # Hard gate: inquiries never reach free Ollama/Anthropic
+            if _ls.is_inquiry(text):
+                _reply(chat_id, getattr(_ls, "STACK_CLOSED_TEXT",
+                    "I do not have a grounded answer from the corpus stack. I will not invent."))
+                cur_r.close(); conn_r.close()
+                return {"handler": "llm", "outcome": "stack_closed",
+                        "reply_sent": True, "preformed": True}
         cur_r.close(); conn_r.close()
     except Exception as e:
         print(f"[llm] purpose_route: {e}", file=sys.stderr)
@@ -795,8 +834,8 @@ def handle(row):
 
     context = _recent_context(chat_id)
 
-    # ── A85 single chat brain: Ollama corpus first ($0). Anthropic is optional
-    # secondary only when LANDTEK_ALLOW_ANTHROPIC_CHAT=1 — never dual-primary.
+    # ── Free model path is ONLY for non-inquiry (greetings / vault narrative).
+    # generate_reply itself also refuses is_inquiry — belt and suspenders.
     allow_anthropic = os.environ.get("LANDTEK_ALLOW_ANTHROPIC_CHAT", "").strip().lower() in (
         "1", "true", "yes",
     )

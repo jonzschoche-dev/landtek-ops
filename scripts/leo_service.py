@@ -24,6 +24,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import urllib.request
 
@@ -50,11 +51,14 @@ MODEL = os.environ.get("LEO_MODEL", "qwen2.5:14b-instruct")
 TEST_IDENTITIES = {("messenger", "37446980471566856"), ("telegram", "6513067717")}
 
 SYSTEM = ("You are Leo for LandTek (Philippine land/property ops, Camarines Norte). NOT a law firm. "
+          "STYLE: plain natural English (or Filipino only if the user wrote in Filipino). "
+          "No Taglish filler, no 'Kamusta/salamat' unless they did first, no pipe characters, "
+          "no bullet dumps, no HTML, no Chinese or mixed-script noise. "
           "REASONING EQUILIBRIUM — every reply: (1) use only the brief/facts below, "
-          "(2) DISTILL to at most 3 short sentences or 5 lines — never dump lists of facts, "
-          "(3) cold professional for the operator, no greetings/filler, "
-          "(4) one point + one next step max. "
-          "State a date/docket/title/amount/name ONLY if it appears below; cite doc:<id>. "
+          "(2) at most 2 short sentences — never dump lists of facts, "
+          "(3) calm and direct, no fake cheerfulness, "
+          "(4) one point; add a next step only if it is concrete and grounded. "
+          "State a date/docket/title/amount/name ONLY if it appears below. "
           "If ungrounded: say so in one sentence — never invent.")
 
 
@@ -276,9 +280,34 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
 
 def generate_reply(cur, channel, channel_user_id, message, client_code, internal_context=None,
                    relationship_profile=None, inbound_msg_id=None, relationship_tending=None):
-    """PURE generation for the orchestrator (comm_agent_max): grounded, memory-, equilibrium-, living-
-    relationship- AND anticipation-informed reply TEXT — through the answer-gate — with NO role clamp,
-    NO A75 projection, NO send. Returns {text, verdict, remediated} or {text:None, error:...}."""
+    """PURE generation for orchestrators — but inquiries MUST hit corpus first.
+
+    For is_inquiry(message): only try_purpose_route (tables + reasoning). Never free LLM.
+    For non-inquiry (greetings / vault narrative): grounded LLM still allowed.
+    Returns {text, verdict, remediated, via?} or {text:None, error:...}.
+    """
+    # ── HARD GATE: corpus/reasoning before any freestyle model text ──
+    if client_code and is_inquiry(message or ""):
+        try:
+            route = try_purpose_route(cur, client_code, message or "")
+            if route and route.get("text"):
+                return {
+                    "text": route["text"],
+                    "verdict": "stack",
+                    "remediated": False,
+                    "via": route.get("via") or "purpose_route",
+                    "preformed": True,
+                }
+        except Exception as e:
+            print(f"[leo_service] generate_reply stack gate: {e}", flush=True)
+        return {
+            "text": STACK_CLOSED_TEXT,
+            "verdict": "stack_closed",
+            "remediated": False,
+            "via": "stack_closed",
+            "preformed": True,
+        }
+
     prompt = _build_prompt(cur, client_code, message, channel, channel_user_id, inbound_msg_id,
                            internal_context, relationship_profile, relationship_tending)
     try:
@@ -391,43 +420,121 @@ def deliver_approved(cur):
         print(f"[leo_service] delivered {done} human-approved reply(ies)")
 
 
+def is_inquiry(message: str) -> bool:
+    """True when free LLM is FORBIDDEN and corpus/reasoning stack is mandatory.
+
+    Social acknowledgements and vault narrative are False (other handlers may run).
+    Anything that looks like a property/legal/factual question is True.
+    """
+    t = (message or "").strip().lower()
+    if not t or len(t) < 2:
+        return False
+    # Pure social / ack — not inquiries
+    if re.fullmatch(
+        r"(hi|hello|hey|thanks|thank you|salamat|ok|okay|sige|ty|thx|noted|"
+        r"good morning|good afternoon|good evening|magandang\s+\w+|"
+        r"got it|copy|yes|no|yeah|yep|sure)[\s!.?]*",
+        t,
+    ):
+        return False
+    if "?" in (message or ""):
+        return True
+    starters = (
+        "what ", "what's ", "whats ", "when ", "where ", "who ", "why ", "how ",
+        "which ", "is ", "are ", "was ", "were ", "do ", "does ", "did ",
+        "can ", "could ", "should ", "would ", "tell me", "show me", "list ",
+        "find ", "fetch ", "give me", "get me", "pull ", "explain ", "summarize ",
+        "status of", "history of", "history ",
+    )
+    if any(t.startswith(s) for s in starters):
+        return True
+    markers = (
+        "history", "historical", "title chain", "mother title", "parent title",
+        "docket", "case no", "case number", "mro", "ctn", "tct", "oct", "e-title",
+        "e title", "petition", "appeal", "manifest", "deadline", "originally",
+        "came from", "come from", "status of", "who owns", "registered",
+        "cancelled", "transfer", "readiness", "op ", " arta", "balane", "title ",
+    )
+    if any(m in t for m in markers):
+        return True
+    # Bare title / year / ref tokens ⇒ treat as factual lookup
+    if re.search(r"\b(T-?\d{3,7}|\d{5,7}|20\d{2}-\d{3,4}|MRO-\d|\d{6}-MRO-\d+)\b",
+                 message or "", re.I):
+        return True
+    return False
+
+
+STACK_CLOSED_TEXT = (
+    "I do not have a grounded answer from the corpus stack for that yet "
+    "(title / fact / brief / law layers returned no safe hit). "
+    "I will not invent. Needs human review if this is urgent."
+)
+
+
 def try_purpose_route(cur, client_code, message):
-    """A85 one router: deterministic corpus artifacts (title pack, ARTA/OP, inventory).
+    """Corpus + reasoning FIRST. Every inquiry is stack-bound.
 
-    Returns None or:
-      {text, via, preformed: True, purpose?}
-    preformed=True means clamp/send may apply, but A75 projection MUST NOT rewrite
-    (dose-1 packs + /files/c links would be mangled).
-
-    Equilibrium: multi-angle work is *inside* the answerers; emission is always distilled.
+    Returns None only for non-inquiries (chitchat / vault narrative).
+    For inquiries: always returns a pack — either stack hit or fail-closed.
+    Free LLM must never invent property/legal facts (T-52540 PA-T disaster).
     """
     if not client_code or not (message or "").strip():
         return None
+
+    inquiry = is_inquiry(message)
 
     def _emit(text, via, purpose=None):
         if not text:
             return None
         # Short by construction only — strip fluff, do not truncate away the answer.
         # Cap warning if answerer exceeded EMISSION_CAP (280 / S14).
+        # Exception: title_history is table-backed chain evidence — never prefer_conclusion
+        # a dense fact pack into a useless one-liner (that path caused PA-T invent).
         try:
             from distill import strip_fluff, prefer_conclusion, EMISSION_CAP
             text = strip_fluff(text)
-            if len(text) > EMISSION_CAP:
-                print(f"[leo_service] route over dose {len(text)}>{EMISSION_CAP} via={via}",
+            hist_cap = 900 if purpose in ("title_history", "title_fetch", "inquiry_stack",
+                                          "stack_closed", "stack_hit", "pass_to_human") else EMISSION_CAP
+            if len(text) > hist_cap:
+                print(f"[leo_service] route over dose {len(text)}>{hist_cap} via={via}",
                       flush=True)
-                text = prefer_conclusion(text, EMISSION_CAP)
+                if purpose in ("title_history", "inquiry_stack", "stack_hit", "pass_to_human"):
+                    text = text[: hist_cap - 1] + "…"
+                else:
+                    text = prefer_conclusion(text, hist_cap)
         except Exception:
             pass
         return {"text": text, "via": via, "preformed": True, "purpose": purpose}
 
     try:
         import title_fetch as tf
+        # Title CHAIN / origin first — must never fall through to free LLM invent.
+        if tf.wants_title_history(message):
+            hist, _herr = tf.fetch_title_history(cur, client_code, message)
+            if hist:
+                return _emit(hist, "title_history", "title_history")
         if tf.wants_title_fetch(message):
             pack, _ferr = tf.fetch_title_pack(cur, client_code, message)
             if pack:
                 return _emit(pack, "title_fetch", "title_fetch")
     except Exception as e:
         print(f"[leo_service] title_fetch route: {type(e).__name__}: {e}", flush=True)
+
+    # Agentic stack: ALWAYS for inquiries; also try on borderline factual text
+    try:
+        import inquiry_stack as ist
+        pack = ist.try_inquiry_stack(
+            cur, client_code, message, go=True, force=inquiry,
+        )
+        if pack and pack.get("text"):
+            return _emit(
+                pack["text"],
+                pack.get("via") or "inquiry_stack",
+                pack.get("purpose") or "inquiry_stack",
+            )
+    except Exception as e:
+        print(f"[leo_service] inquiry_stack route: {type(e).__name__}: {e}", flush=True)
+
     try:
         import corpus_answer as ca
         pack, purpose = ca.try_corpus_answer(cur, client_code, message)
@@ -435,6 +542,7 @@ def try_purpose_route(cur, client_code, message):
             return _emit(pack, f"corpus_answer:{purpose}", purpose)
     except Exception as e:
         print(f"[leo_service] corpus_answer route: {type(e).__name__}: {e}", flush=True)
+
     # MPRB structured answer (matter multi-angle) — preformed when SQL concludes
     try:
         import matter_brief as mb
@@ -443,6 +551,12 @@ def try_purpose_route(cur, client_code, message):
             return _emit(hit["text"], hit.get("via") or "mprb", hit.get("purpose"))
     except Exception as e:
         print(f"[leo_service] mprb route: {type(e).__name__}: {e}", flush=True)
+
+    # HARD GATE: inquiries never fall through to free LLM
+    if inquiry:
+        print(f"[leo_service] STACK_CLOSED inquiry (no corpus hit): {(message or '')[:80]!r}",
+              flush=True)
+        return _emit(STACK_CLOSED_TEXT, "stack_closed", "stack_closed")
     return None
 
 
@@ -487,6 +601,7 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
         return {"action": "held", "client": None}
 
     # ── A85 purpose router (shared with CAM / TG) ──
+    # Inquiries ALWAYS resolve here (stack hit or STACK_CLOSED). Free LLM never invents facts.
     try:
         route = try_purpose_route(cur, client, message or "")
         if route and route.get("text"):
@@ -496,7 +611,13 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
     except Exception as e:
         print(f"[leo_service] purpose_route skip: {type(e).__name__}: {e}", flush=True)
 
-    # MPRB prompt block for LLM path (angles selected; not a full dump)
+    # Second hard gate (belt+suspenders): never free-LLM an inquiry even if route returned None
+    if is_inquiry(message or ""):
+        return _deliver_preformed(
+            cur, base, channel, channel_user_id, client,
+            STACK_CLOSED_TEXT, "stack_closed")
+
+    # MPRB prompt block for LLM path (angles selected; not a full dump) — chitchat / narrative only
     mprb_block = ""
     try:
         import matter_brief as mb

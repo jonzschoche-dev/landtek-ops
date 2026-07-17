@@ -44,7 +44,33 @@ def title_token_from_message(text: str) -> Optional[str]:
     m = re.search(r"\btitle\s+(?:no\.?|number|#)?\s*([0-9]{3,7})\b", t, re.IGNORECASE)
     if m:
         return m.group(1)
+    # "history of 52540" / "52540 where did it come from" — bare title number
+    m = re.search(
+        r"\b(?:history|chain|origin|of|from|title|tct)\s+(?:of\s+)?(?:TCT|T[\s\-]*)?(\d{3,7})\b",
+        t, re.IGNORECASE,
+    )
+    if m:
+        return m.group(1)
+    m = re.search(r"\b(\d{5,7})\b", t)
+    if m:
+        return m.group(1)
     return None
+
+
+HISTORY_PHRASES = (
+    "history", "historical", "title chain", "chain of title", "mother title",
+    "parent title", "where did", "originally", "origin of", "came from",
+    "derived from", "cancelled by", "source title", "prior title",
+    "originally come", "come from", "ancestry", "derivation",
+)
+
+
+def wants_title_history(text: str) -> bool:
+    """Title chain / origin questions — must NOT fall through to free LLM."""
+    t = (text or "").lower()
+    if not any(p in t for p in HISTORY_PHRASES):
+        return False
+    return bool(title_token_from_message(text))
 
 
 def wants_title_fetch(text: str) -> bool:
@@ -278,4 +304,236 @@ def fetch_title_pack(cur, client_code: Optional[str], text: str) -> tuple[Option
         text = f"{head} {name} {PUBLIC_FILE}/{did}{more}"
     if len(text) > 280:
         text = f"{ref if assets else 'T-'+token}: {PUBLIC_FILE}/{did}{more}"
+    return text.strip(), None
+
+
+def fetch_title_history(
+    cur, client_code: Optional[str], text: str,
+) -> tuple[Optional[str], Optional[str]]:
+    """Table-backed title chain/origin. Never invent mother titles or OCT numbers.
+
+    Reads title_brief + titles + verified matter_facts + source docs.
+    Free LLM must not answer these — PA-asset codes are not title numbers.
+    """
+    token = title_token_from_message(text)
+    if not token:
+        return (
+            "Which title? Send the TCT number (e.g. history of TCT 52540).",
+            None,
+        )
+    if not client_code:
+        return (
+            "I can only pull title history for an approved client scope.",
+            None,
+        )
+
+    key = f"T-{token}"
+    like = f"%{token}%"
+    fam = client_code.split("-")[0] + "%"
+
+    brief = None
+    reg = None
+    try:
+        cur.execute(
+            """
+            SELECT title_key, display_no, title_kind, status, lifecycle_status,
+                   parent_titles, child_titles, n_source_docs, n_facts_verified,
+                   clarity_status, registrant_name, card
+              FROM title_brief
+             WHERE title_key ILIKE %s OR display_no ILIKE %s
+                OR title_key = %s OR display_no = %s
+             ORDER BY n_facts_verified DESC NULLS LAST
+             LIMIT 1
+            """,
+            (like, like, key, key),
+        )
+        brief = cur.fetchone()
+    except Exception as e:
+        return None, f"title_history_brief:{type(e).__name__}:{e}"
+
+    try:
+        cur.execute(
+            """
+            SELECT tct_number, status, lifecycle_status, parent_title,
+                   cancelled_by_title, registrant_name_raw, issued_date,
+                   source_doc_id, notes
+              FROM titles
+             WHERE tct_number ILIKE %s OR tct_number = %s
+             LIMIT 1
+            """,
+            (like, key),
+        )
+        reg = cur.fetchone()
+    except Exception:
+        reg = None
+
+    if not brief and not reg:
+        return (
+            f"No title card or registry row for {key} in scope. "
+            f"I will not invent a mother title. Say fetch TCT {token} to search docs.",
+            None,
+        )
+
+    def _g2(row, k, i=None):
+        if row is None:
+            return None
+        if isinstance(row, dict):
+            return row.get(k)
+        return row[i] if i is not None else None
+
+    display = _g2(brief, "display_no") or _g2(reg, "tct_number") or key
+    kind = _g2(brief, "title_kind") or "tct"
+    status = _g2(brief, "status") or _g2(reg, "status") or "—"
+    life = _g2(brief, "lifecycle_status") or _g2(reg, "lifecycle_status") or "—"
+    parents = _g2(brief, "parent_titles") or []
+    children = _g2(brief, "child_titles") or []
+    if isinstance(parents, str):
+        parents = [parents]
+    if isinstance(children, str):
+        children = [children]
+    parents = [str(p) for p in (parents or []) if p]
+    children = [str(c) for c in (children or []) if c]
+    # Registry single parent / cancel chain
+    p_reg = _g2(reg, "parent_title")
+    if p_reg and str(p_reg) not in parents:
+        parents = [str(p_reg)] + parents
+    cancelled_by = _g2(reg, "cancelled_by_title")
+    if cancelled_by and str(cancelled_by) not in children:
+        children = [str(cancelled_by)] + list(children)
+
+    # Verified facts that actually mention this title (not free invent)
+    facts = []
+    try:
+        cur.execute(
+            """
+            SELECT left(statement, 180) AS statement, source_id
+              FROM matter_facts
+             WHERE provenance_level IN ('verified', 'operator')
+               AND (statement ILIKE %s OR excerpt ILIKE %s)
+               AND (
+                    matter_code LIKE %s OR matter_code IS NULL
+                    OR source_id IN (
+                        SELECT d.id FROM documents d
+                         WHERE d.case_file = %s OR d.case_file LIKE %s
+                            OR d.matter_code LIKE %s
+                    )
+               )
+             ORDER BY
+               CASE WHEN statement ILIKE '%%mother%%' OR statement ILIKE '%%parent%%'
+                          OR statement ILIKE '%%transferred from%%'
+                          OR statement ILIKE '%%acquired%%'
+                          OR statement ILIKE '%%cancelled%%'
+                          OR statement ILIKE '%%intestate%%'
+                          OR statement ILIKE '%%original%%' THEN 0 ELSE 1 END,
+               id DESC
+             LIMIT 5
+            """,
+            (like, like, fam, client_code, fam, fam),
+        )
+        facts = list(cur.fetchall() or [])
+    except Exception:
+        try:
+            cur.execute(
+                """
+                SELECT left(statement, 180) AS statement, source_id
+                  FROM matter_facts
+                 WHERE provenance_level IN ('verified', 'operator')
+                   AND (statement ILIKE %s OR excerpt ILIKE %s)
+                 ORDER BY id DESC
+                 LIMIT 5
+                """,
+                (like, like),
+            )
+            facts = list(cur.fetchall() or [])
+        except Exception:
+            facts = []
+
+    # Primary cancelled-fraud / CTC doc if any
+    primary_doc = _g2(reg, "source_doc_id")
+    primary_name = None
+    if primary_doc:
+        try:
+            cur.execute(
+                """
+                SELECT id, COALESCE(NULLIF(smart_filename,''), original_filename,
+                                    file_name, 'Document') AS name
+                  FROM documents WHERE id = %s
+                """,
+                (int(primary_doc),),
+            )
+            dr = cur.fetchone()
+            if dr:
+                primary_doc = _g2(dr, "id", 0)
+                primary_name = _g2(dr, "name", 1)
+        except Exception:
+            pass
+
+    n_docs = _g2(brief, "n_source_docs") or 0
+    n_ver = _g2(brief, "n_facts_verified") or 0
+    registrant = _g2(brief, "registrant_name") or _g2(reg, "registrant_name_raw")
+
+    # ── Refined clear card (prose, not field dump) ──
+    status_bit = f"{status}"
+    if life and life not in (status, "—", None):
+        status_bit += f" / {life}"
+    if registrant and str(registrant).lower() not in ("—", "none", "null"):
+        status_bit += f" ({registrant})"
+
+    lines = [f"{display} is a {kind.upper()} — {status_bit}."]
+
+    if parents:
+        lines.append("Came from: " + ", ".join(parents[:5]) + ".")
+    else:
+        lines.append(
+            "Mother/parent title is not recorded on the title card or registry "
+            "(I will not invent an OCT)."
+        )
+
+    if children or cancelled_by:
+        succ = []
+        if cancelled_by:
+            succ.append(str(cancelled_by))
+        for c in children:
+            if str(c) not in succ:
+                succ.append(str(c))
+        lines.append("Succeeded by / cancelled toward: " + ", ".join(succ[:5]) + ".")
+
+    # One distilled verified fact (not a dump of three near-duplicates)
+    best = None
+    for f in facts:
+        st = (_g2(f, "statement", 0) or "").strip()
+        if not st:
+            continue
+        low = st.lower()
+        score = 0
+        for kw, pts in (
+            ("cancelled", 40), ("transferred from", 35), ("mother", 30),
+            ("acquired", 25), ("intestate", 25), ("fraud", 20), ("heir", 15),
+        ):
+            if kw in low:
+                score += pts
+        if best is None or score > best[0]:
+            best = (score, st, _g2(f, "source_id", 1))
+    if best and best[0] >= 15:
+        sid = best[2]
+        lines.append(
+            f"On record: {best[1]}"
+            + (f" (doc {sid})" if sid else "")
+            + "."
+        )
+
+    if primary_doc:
+        nm = (primary_name or "source document")[:48]
+        lines.append(f"Primary file: {nm}\n{PUBLIC_FILE}/{primary_doc}")
+
+    if n_docs or n_ver:
+        lines.append(
+            f"({n_docs or 0} source docs · {n_ver or 0} verified facts on the title card)"
+        )
+
+    text = "\n".join(lines)
+    if len(text) > 700:
+        text = "\n".join(lines[:4])
+        if primary_doc:
+            text += f"\n{PUBLIC_FILE}/{primary_doc}"
     return text.strip(), None
