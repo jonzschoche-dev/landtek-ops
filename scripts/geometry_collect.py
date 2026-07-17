@@ -144,8 +144,18 @@ def collect(title_no, matter, dispatch=False):
             print(f"    doc {w['doc']:>4}  {w['name']:<42} {extra}")
 
     # 4. DISPATCH — communicate to the OCR engine: enqueue garbled witnesses for re-OCR.
+    #    ...but only when the shape is NOT already trustworthy. If we already hold a ring that
+    #    closes within the gate, re-OCR of a garbled/incomplete copy can't improve on it (a title
+    #    cert that omits its own closing course will NEVER parse to a closed ring, no matter how
+    #    clean the OCR) — so those become manual corroboration candidates, not OCR jobs. This
+    #    stops the collector churning re-OCR on already-solved parcels.
+    have_good = any((h["closure_error_m"] is not None and float(h["closure_error_m"]) <= 8.0)
+                    for h in have)
     garbled_ids = [w["doc"] for w in witnesses.get("garbled", [])]
-    if garbled_ids:
+    if garbled_ids and have_good:
+        print(f"\nSHAPE ALREADY HELD (closes within gate) — {garbled_ids} are manual corroboration "
+              f"candidates, not re-OCR jobs (re-OCR can't complete an incomplete cert). Not dispatched.")
+    elif garbled_ids:
         print(f"\nCROSS-ENGINE DISPATCH → re-OCR queue (geometry_priority): {garbled_ids}")
         if dispatch:
             n = 0
@@ -164,10 +174,16 @@ def collect(title_no, matter, dispatch=False):
 
     # 5. verdict
     nclean = len(witnesses.get("clean_courses", []))
-    print(f"\nverdict: {nclean} clean course-witness(es), {len(garbled_ids)} recoverable via OCR, "
-          f"{len(witnesses.get('area_only', []))} area affirmations. "
-          + ("Multi-source corroboration available now — run geometry_consensus." if nclean >= 2 else
-             "Need OCR/LDC to unlock a corroborating witness." if nclean < 2 else ""))
+    ngarbled = len(garbled_ids)
+    if have_good and (nclean or ngarbled):
+        tail = ("Shape held & closing; corroborating cert copies on file — reconcile manually / "
+                "via geometry_consensus. Get BLLM No. 2 coordinate for survey-tier anchoring.")
+    elif nclean >= 2:
+        tail = "Multi-source corroboration available now — run geometry_consensus."
+    else:
+        tail = "Need OCR/LDC to unlock a corroborating witness."
+    print(f"\nverdict: {nclean} clean course-witness(es), {ngarbled} garbled/incomplete cert copies, "
+          f"{len(witnesses.get('area_only', []))} area affirmations. " + tail)
     cur.close(); conn.close()
 
 
