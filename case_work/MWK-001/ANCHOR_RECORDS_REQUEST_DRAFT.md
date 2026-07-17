@@ -33,6 +33,20 @@ survey lands precisely on the map.
    **PSD-05-026197**, and any **isolated/relocation survey plan** on file for these lots.
 4. *(If available)* The **cadastral map / projection** covering **Barangay San Roque, Mercedes**,
    showing the monument network (BLLM Nos.) referenced by these titles.
+5. **The PRS92 grid coordinates of Cadastral Lots 401, 403, and 405, Cad 118-D, Mercedes Cadastre.**
+   Per your Office's letter **LMS-25-550 (26 November 2025)**, Lot 2-A, (LRA) Psd-221861 (TCT T-32911,
+   8,706 m²) was *projected in your records* as encompassing these three cadastral lots. Their cadastral
+   coordinates georeference Lot 2-A directly and are the authoritative basis for resolving the technical-
+   record overlap between the Psd-221861 plan and the Cad 118-D cadastre.
+
+**Correlation established from your own records (for reference):**
+
+| LRA plan lot | Title | Area (m²) | DENR cadastral projection (Cad 118-D) |
+|---|---|---|---|
+| Lot 2-A, Psd-221861 | TCT T-32911 | 8,706 | Lots 401 + 403 + 405 |
+
+*This lot -> title -> cadastral-lot correlation is what independently corroborates each MWK parcel; the
+cadastral coordinates above resolve both the mapping and the overlap question in a single step.*
 
 ## What we will do with it (internal note — not part of the request)
 - LDC corner coordinates → convert **PRS92 → WGS84** → exact survey-tier placement on the client map.
