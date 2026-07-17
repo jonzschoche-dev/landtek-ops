@@ -471,6 +471,71 @@ STACK_CLOSED_TEXT = (
 )
 
 
+# field kinds an asked docket/CTN-style identifier may legitimately match (NEVER date/amount —
+# a year like 2026 must not "resolve" against date fields and defeat the gate)
+_IDENT_FIELD_KINDS = ("ctn", "docket", "tct", "oct", "e_title", "tax_dec", "arp", "doc_ref", "mro_ref")
+
+
+def _asked_identifiers(message):
+    """Identifiers the user EXPLICITLY asked about — deterministic, keyword-anchored (a bare number
+    in prose is not an identifier ask; 'docket 99999' / 'TCT T-99999' / a full CTN is)."""
+    t = message or ""
+    ids = set()
+    for m in re.finditer(r"(?i)\b(?:docket|ctn|case(?:\s*no\.?)?|arp)\s*(?:no\.?|number|#)?\s*[:\-]?\s*"
+                         r"((?:[A-Z]{1,4}-)?[0-9][0-9-]{2,18})", t):
+        ids.add(("docket", m.group(1).strip("-")))
+    for m in re.finditer(r"(?i)\b(?:tct|oct|title)\s*(?:no\.?)?\s*[:\-]?\s*(T-?[0-9][0-9A-Za-z./-]{2,})", t):
+        ids.add(("title", m.group(1)))
+    for m in re.finditer(r"\b(T-[0-9]{4,6})\b", t):
+        ids.add(("title", m.group(1)))
+    for m in re.finditer(r"\b(?:SL-)?(\d{4}-\d{4}-\d{4})\b", t):
+        ids.add(("docket", m.group(1)))
+    return ids
+
+
+def _identifier_known(cur, kind, val):
+    """Does this asked identifier exist ANYWHERE in the typed corpus? Cheap EXISTS probes only."""
+    v = (val or "").strip().upper()
+    if not v:
+        return True                                    # nothing checkable → never block on it
+    try:
+        if kind == "title":
+            tnum = v if v.startswith("T-") else ("T-" + v.lstrip("T").lstrip("-"))
+            cur.execute("SELECT 1 FROM titles WHERE upper(tct_number)=%s "
+                        "UNION SELECT 1 FROM document_fields WHERE field_kind IN ('tct','oct','e_title') "
+                        "AND upper(value_norm) LIKE %s LIMIT 1", (tnum, "%" + tnum.lstrip("T-") + "%"))
+            return cur.fetchone() is not None
+        cur.execute("SELECT 1 FROM fact_fields WHERE field_kind = ANY(%s) "
+                    "AND (upper(value_norm)=%s OR upper(value_norm) LIKE %s) "
+                    "UNION SELECT 1 FROM document_fields WHERE field_kind = ANY(%s) "
+                    "AND (upper(value_norm)=%s OR upper(value_norm) LIKE %s) "
+                    "UNION SELECT 1 FROM matters WHERE upper(matter_code) LIKE %s LIMIT 1",
+                    (list(_IDENT_FIELD_KINDS), v, "%" + v, list(_IDENT_FIELD_KINDS), v, "%" + v, "%" + v))
+        return cur.fetchone() is not None
+    except Exception:
+        return True                                    # probe failure must never fabricate "unknown"
+
+
+def _unknown_identifier_gate(cur, message):
+    """FAIL-CLOSED on unmatched identifiers: if the ask names identifier(s) and NONE resolve against
+    the typed corpus, say so — never route to the nearest-match answer (the 'docket 99999 answered
+    with ARTA 0690' failure, 2026-07-18). Mixed known+unknown passes through (the specific answerers
+    handle their own scope)."""
+    asked = _asked_identifiers(message)
+    if not asked:
+        return None
+    known, unknown = [], []
+    for kind, val in asked:
+        (known if _identifier_known(cur, kind, val) else unknown).append(val)
+    if unknown and not known:
+        vals = ", ".join(sorted(set(unknown)))
+        return {"text": f"No record of {vals} in the corpus — that identifier does not match any "
+                        "docket, CTN, or title on file. If it's new, send the document and I'll "
+                        "ingest it.",
+                "via": "unknown_identifier", "preformed": True, "purpose": "unknown_identifier"}
+    return None
+
+
 def try_purpose_route(cur, client_code, message):
     """Corpus + reasoning FIRST. Every inquiry is stack-bound.
 
@@ -480,6 +545,12 @@ def try_purpose_route(cur, client_code, message):
     """
     if not client_code or not (message or "").strip():
         return None
+
+    # Identifier fail-closed gate FIRST: an ask about an identifier the corpus doesn't hold gets an
+    # honest "no record", not the nearest-match answer from any downstream route.
+    gate = _unknown_identifier_gate(cur, message)
+    if gate:
+        return gate
 
     inquiry = is_inquiry(message)
 
