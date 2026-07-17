@@ -321,9 +321,62 @@ def grade_probe(cur, probe: dict, res: dict) -> dict:
     return {"grade": grade, "missing": missing, "leaked": leaked, "via": via}
 
 
+# ── Retention sweep (sim footprint only) ─────────────────────────────────────
+
+def retention_sweep(cur, inq_days: int = 14, log_days: int = 90) -> dict:
+    """Prune the sim's own footprint so quiet cycles don't grow forever.
+
+    NEVER touches real-channel inquiries or the grounded writebacks the sim
+    produced (document_fields / matter_facts rows are the point of the sim).
+    Sim rows are double-keyed (channel='sim' AND 999000* sender) so a real
+    inquiry can never match. inquiry_scrutiny / inquiry_answer_atoms cascade
+    from inquiry_runs; agent_sim_probes cascade from agent_sim_cycles.
+    """
+    out = {}
+    # Queue rows tied to old sim inquiries — the FK is ON DELETE SET NULL, so
+    # delete them first while the join still resolves.
+    cur.execute(
+        """
+        DELETE FROM agent_work_queue q
+        USING inquiry_runs r
+        WHERE q.inquiry_id = r.id
+          AND r.channel = 'sim' AND r.channel_user_id LIKE '999000%%'
+          AND r.created_at < now() - make_interval(days => %s)
+        """,
+        (inq_days,),
+    )
+    out["agent_work_queue"] = cur.rowcount
+    # sim_observer rows are sim-only by construction (suppressed-notify audit)
+    cur.execute(
+        """
+        DELETE FROM agent_work_queue
+        WHERE agent_key = 'sim_observer'
+          AND created_at < now() - make_interval(days => %s)
+        """,
+        (inq_days,),
+    )
+    out["agent_work_queue"] += cur.rowcount
+    cur.execute(
+        """
+        DELETE FROM inquiry_runs
+        WHERE channel = 'sim' AND channel_user_id LIKE '999000%%'
+          AND created_at < now() - make_interval(days => %s)
+        """,
+        (inq_days,),
+    )
+    out["inquiry_runs"] = cur.rowcount
+    cur.execute(
+        "DELETE FROM agent_sim_cycles WHERE started_at < now() - make_interval(days => %s)",
+        (log_days,),
+    )
+    out["agent_sim_cycles"] = cur.rowcount
+    return out
+
+
 # ── Cycle ────────────────────────────────────────────────────────────────────
 
-def run_cycle(n_probes: int, drain: bool, dry: bool) -> dict:
+def run_cycle(n_probes: int, drain: bool, dry: bool,
+              retain_days: int = 14, log_retain_days: int = 90) -> dict:
     c = _conn()
     cur = _cur(c)
     _suppressed["n"] = 0
@@ -398,6 +451,11 @@ def run_cycle(n_probes: int, drain: bool, dry: bool) -> dict:
         for t in tables
     }
 
+    # Self-pruning: sweep AFTER the delta counts so growth numbers stay honest
+    sweep = {}
+    if not dry:
+        sweep = retention_sweep(cur, retain_days, log_retain_days)
+
     cur.execute(
         """
         UPDATE agent_sim_cycles SET
@@ -405,7 +463,8 @@ def run_cycle(n_probes: int, drain: bool, dry: bool) -> dict:
             n_probes = %s, n_hit = %s, n_answered_miss = %s,
             n_held = %s, n_leak = %s, n_error = %s,
             suppressed_notifies = %s,
-            table_deltas = %s::jsonb, drain_notes = %s::jsonb
+            table_deltas = %s::jsonb, drain_notes = %s::jsonb,
+            notes = %s
         WHERE id = %s
         """,
         (
@@ -413,10 +472,13 @@ def run_cycle(n_probes: int, drain: bool, dry: bool) -> dict:
             tally["held_ok"] + tally["held_miss"], tally["leak"], tally["error"],
             _suppressed["n"],
             json.dumps(deltas), json.dumps(drain_notes, default=str),
+            ("sweep: " + json.dumps(sweep)) if sweep else None,
             cycle_id,
         ),
     )
 
+    if sweep and any(sweep.values()):
+        print(f"  [sweep] pruned sim footprint: {sweep}")
     grew = {t: d["delta"] for t, d in deltas.items() if d["delta"]}
     print(f"\ncycle {cycle_id}: {len(probes)} probes — "
           f"{tally['hit']} hit, {tally['answered_miss']} answered-miss, "
@@ -474,17 +536,32 @@ def main():
     ap.add_argument("--no-drain", action="store_true", help="skip agent drains")
     ap.add_argument("--dry", action="store_true", help="no writeback, no drain")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--retain-days", type=int, default=14,
+                    help="sim inquiries older than this are pruned each cycle")
+    ap.add_argument("--log-retain-days", type=int, default=90,
+                    help="agent_sim_cycles/probes retention horizon")
+    ap.add_argument("--sweep", action="store_true",
+                    help="run only the retention sweep, no probes")
     a = ap.parse_args()
 
     if a.report:
         report()
         return
+    if a.sweep:
+        c = _conn()
+        cur = _cur(c)
+        print("sweep:", retention_sweep(cur, a.retain_days, a.log_retain_days))
+        cur.close()
+        c.close()
+        return
     if a.loop:
         while True:
-            run_cycle(a.probes, drain=not a.no_drain, dry=a.dry)
+            run_cycle(a.probes, drain=not a.no_drain, dry=a.dry,
+                      retain_days=a.retain_days, log_retain_days=a.log_retain_days)
             time.sleep(max(a.interval, 300))
     else:
-        run_cycle(a.probes, drain=not a.no_drain, dry=a.dry)
+        run_cycle(a.probes, drain=not a.no_drain, dry=a.dry,
+                  retain_days=a.retain_days, log_retain_days=a.log_retain_days)
 
 
 if __name__ == "__main__":
