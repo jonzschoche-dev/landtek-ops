@@ -67,6 +67,15 @@ LOTS = {
  "2-K": (1866,[('N',76,12,'W',29.50),('N',1,23,'E',22.34),('N',76,30,'W',5.00),('N',13,15,'E',30.22),
                ('S',78,28,'E',8.30),('S',77,58,'E',6.71),('S',77,58,'E',10.29),('S',77,58,'E',12.51),('S',11,52,'W',53.29)]),
  "2-L": (223, [('N',7,46,'E',21.89),('S',76,30,'E',4.00),('S',76,30,'E',5.00),('S',1,23,'W',22.34),('N',76,12,'W',11.50)]),
+ # 2-M from its TITLE — TCT T-32912 (doc 142), back-page technical description.
+ # Settles three things the plan couldn't: course 3-4 is N 74-05 W 37.78 (the plan's hand
+ # "24" is a 7; my closure search had already fingered 74 as the only fit), course 11-12 is
+ # 4.00 (not 9.00), and the area is 1,895 (not the 2,000/2,047 floating in other docs).
+ # Course 6-7 is S 79-35 E — the cert's faint typewriter S reads as N, but N gives closure
+ # 7.16 vs 0.027 for S, and S puts it collinear with 5-6/7-8 as the plan shows.
+ "2-M": (1895, [('N',76,12,'W',4.00),('N',7,46,'E',21.89),('N',74,5,'W',37.78),('N',15,18,'E',36.15),
+                ('S',79,36,'E',15.01),('S',79,35,'E',19.74),('S',79,35,'E',18.00),('S',12,51,'W',10.06),
+                ('N',78,28,'W',8.30),('S',13,15,'W',30.22),('N',76,30,'W',4.00),('S',7,46,'W',21.89)]),
  # 2-N: HELD. The earlier "recovery" of the closing course 6-1 (53.50->57.42) was cosmetic —
  # course 6-1 is the LAST course, so its length changes the closure metric but moves NO vertex.
  # The real ~3.9 m defect is in courses 1-5 and is unidentified. Leaving it in corrupted every
@@ -105,7 +114,6 @@ LOTS = {
 # lots whose bearings (not distances) are still ambiguous on the scan — held, NOT fabricated
 FLAGGED = {
  "2-G": (4148, "return-course bearing ambiguous (closure 70 m); needs frontier re-OCR"),
- "2-M": (1895, "one bearing ambiguous (closure 30 m); needs frontier re-OCR"),
  "2-N": (2000, "closes only by editing the closing course (cosmetic); real ~3.9 m defect in courses 1-5 — corrupts anything assembled through it"),
 }
 
@@ -113,7 +121,7 @@ FLAGGED = {
 TIE_BEARING = {"2-A":('N',86,31,'W',261.63),"2-B":('N',82,11,'W',None),"2-C":('N',83,33,'W',None),
  "2-D":('N',83,33,'W',None),"2-E":('N',82,56,'W',None),"2-F":('N',63,0,'W',None),"2-G":('N',82,11,'W',None),
  "2-H":('N',75,22,'W',None),"2-I":('N',75,22,'W',None),"2-J":('N',73,56,'W',None),"2-K":('N',82,50,'W',None),
- "2-L":('N',82,19,'W',None),"2-M":('N',82,19,'W',None),"2-N":('N',81,39,'W',None),"2-O":('N',81,20,'W',None),
+ "2-L":('N',82,19,'W',None),"2-M":('N',82,19,'W',439.86),"2-N":('N',81,39,'W',None),"2-O":('N',81,20,'W',None),
  "2-P":('N',81,20,'W',None),"2-Q":('N',67,32,'W',None),"2-R":('N',67,32,'W',None),"2-S":('N',71,40,'W',None),
  "2-T":('N',69,6,'W',None),"2-U":('N',69,9,'W',None),"2-V":('N',69,16,'W',None),"2-W":('N',65,39,'W',1202.29),   # tie from title doc 289
  # 2-X tie from title doc 562. Its text reads "N 81 deg 14' E" but the E is an OCR slip for W:
