@@ -289,7 +289,8 @@ def generate_reply(cur, channel, channel_user_id, message, client_code, internal
     # ── HARD GATE: corpus/reasoning before any freestyle model text ──
     if client_code and is_inquiry(message or ""):
         try:
-            route = try_purpose_route(cur, client_code, message or "")
+            route = try_purpose_route(cur, client_code, message or "",
+                                      channel=channel, channel_user_id=channel_user_id)
             if route and route.get("text"):
                 return {
                     "text": route["text"],
@@ -536,8 +537,11 @@ def _unknown_identifier_gate(cur, message):
     return None
 
 
-def try_purpose_route(cur, client_code, message):
+def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=None):
     """Corpus + reasoning FIRST. Every inquiry is stack-bound.
+
+    channel/channel_user_id are OPTIONAL sender identity — identity-gated routes (Drive) fire only
+    when the A21 classifier says the sender is internal; absent identity fails closed (no route).
 
     Returns None only for non-inquiries (chitchat / vault narrative).
     For inquiries: always returns a pack — either stack hit or fail-closed.
@@ -596,7 +600,8 @@ def try_purpose_route(cur, client_code, message):
     # channels, deterministic, read-only, ≤280. Writes stay with the explicit vault command handler.
     try:
         import tool_routes as tr
-        hit = tr.try_tool_route(cur, client_code, message)
+        hit = tr.try_tool_route(cur, client_code, message, channel=channel,
+                                channel_user_id=channel_user_id)
         if hit and hit.get("text"):
             return _emit(hit["text"], hit.get("via") or "tool", hit.get("purpose"))
     except Exception as e:
@@ -698,7 +703,8 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
     # ── A85 purpose router (shared with CAM / TG) ──
     # Inquiries ALWAYS resolve here (stack hit or STACK_CLOSED). Free LLM never invents facts.
     try:
-        route = try_purpose_route(cur, client, message or "")
+        route = try_purpose_route(cur, client, message or "",
+                                  channel=channel, channel_user_id=channel_user_id)
         if route and route.get("text"):
             return _deliver_preformed(
                 cur, base, channel, channel_user_id, client,

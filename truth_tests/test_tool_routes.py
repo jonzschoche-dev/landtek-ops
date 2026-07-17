@@ -90,8 +90,46 @@ def unknown_doc_fails_closed(cur):
         conn.rollback(); conn.close()
 
 
+def drive_route_is_internal_only(cur):
+    """Drive is the UN-WALLED store: the route exists ONLY for A21-internal identities. No identity /
+    unknown identity → the route silently does not exist (never revealed). Deterministic (search
+    monkeypatched — no network)."""
+    conn, tc = _rb()
+    orig = TR._drive_search
+    TR._drive_search = lambda terms: f"Drive: 1 match(es): fake-{terms[:10]}.txt"
+    try:
+        ask = "search drive for petition scans"
+        if TR.try_tool_route(tc, "MWK-001", ask) is not None:
+            raise TruthFailure("drive route fired with NO identity — must fail closed.")
+        if TR.try_tool_route(tc, "MWK-001", ask, channel="telegram", channel_user_id="999999999") is not None:
+            raise TruthFailure("drive route fired for an unknown (non-internal) identity.")
+        hit = TR.try_tool_route(tc, "MWK-001", ask, channel="telegram", channel_user_id="6513067717")
+        if not hit or hit.get("via") != "tool:drive_search":
+            raise TruthFailure(f"drive route did not fire for the operator: {hit!r}")
+    finally:
+        TR._drive_search = orig
+        conn.rollback(); conn.close()
+
+
+def drive_degrades_never_crashes(cur):
+    """The Drive edge failing (no libs / offline) yields None — the spine continues, nothing raises."""
+    conn, tc = _rb()
+    orig = TR._drive_search
+    TR._drive_search = lambda terms: None
+    try:
+        hit = TR.try_tool_route(tc, "MWK-001", "search drive for petition",
+                                channel="telegram", channel_user_id="6513067717")
+        if hit is not None and hit.get("via") == "tool:drive_search":
+            raise TruthFailure("degraded drive search still produced a drive answer.")
+    finally:
+        TR._drive_search = orig
+        conn.rollback(); conn.close()
+
+
 TESTS = [
     ("tool_routes.same_answer_any_channel", same_answer_regardless_of_channel),
+    ("tool_routes.drive_internal_only", drive_route_is_internal_only),
+    ("tool_routes.drive_degrades", drive_degrades_never_crashes),
     ("tool_routes.doc_lookup_client_walled", doc_lookup_is_client_walled),
     ("tool_routes.ordinary_chat_untouched", ordinary_chat_is_untouched),
     ("tool_routes.no_write_from_conversation", no_write_reachable_from_conversation),

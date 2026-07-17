@@ -223,7 +223,8 @@ def handle(row):
         if not client_r and str(sender_id) == JONATHAN:
             client_r = "MWK-001"
         if client_r:
-            route = _ls.try_purpose_route(cur_r, client_r, text)
+            route = _ls.try_purpose_route(cur_r, client_r, text,
+                                          channel="telegram", channel_user_id=str(sender_id))
             if route and route.get("text"):
                 _reply(chat_id, route["text"])
                 cur_r.close(); conn_r.close()

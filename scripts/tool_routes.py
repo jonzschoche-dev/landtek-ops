@@ -57,6 +57,9 @@ def _vault_intent(text):
 _DOC_ID_RE = re.compile(r"(?i)\b(?:doc|document)\s*(?:no\.?|#|id)?\s*(\d{2,5})\b")
 _DOC_SEARCH_RE = re.compile(r"(?i)\b(?:find|search|look\s+for|locate)\b.{0,20}\b(?:doc|document|file)s?\b"
                             r"\s*(?:about|for|on|named|called|re)?\s*(.{3,60})")
+_DRIVE_RE = re.compile(r"\b(?:search|check|look\s+in|scan)\b.{0,15}\bdrive\b\s*(?:for|about|:)?\s*(.{3,60})"
+                       r"|\bdrive\b\s+search\s+(.{3,60})", re.I)
+_SA_CREDS = "/root/landtek/google-creds.json"
 
 
 # ── executors (read-only; A5 wall in the SQL) ───────────────────────────────────────────────────────
@@ -133,12 +136,58 @@ def _doc_search(cur, client_code, terms):
     return f"{len(rows)} match(es): {lines}."
 
 
+def _drive_search(terms):
+    """LIVE Drive search (the 'search the live source, not just the corpus' doctrine edge) via the
+    READ-ONLY service account. Lazy imports; any failure (no libs / no creds / offline) returns None —
+    the sovereign core never depends on this edge. NB the registry's search_drive tool pointed at an
+    /api/search_drive endpoint that never existed — this is the capability's first real implementation."""
+    terms = (terms or "").strip().rstrip("?.!").strip()
+    if len(terms) < 3:
+        return None
+    try:
+        from google.oauth2 import service_account
+        from googleapiclient.discovery import build
+        creds = service_account.Credentials.from_service_account_file(
+            _SA_CREDS, scopes=["https://www.googleapis.com/auth/drive.readonly"])
+        svc = build("drive", "v3", credentials=creds, cache_discovery=False)
+        q = "name contains '{}' and trashed = false".format(terms.replace("'", "\\'"))
+        res = svc.files().list(q=q, pageSize=5, fields="files(id,name)").execute()
+        files = res.get("files") or []
+    except Exception:
+        return None
+    if not files:
+        return f"No Drive files matching “{terms[:40]}”. The corpus may still hold it — ask me to search documents."
+    names = "; ".join(f.get("name", "?")[:45] for f in files[:3])
+    more = f" (+{len(files) - 3} more)" if len(files) > 3 else ""
+    return f"Drive: {len(files)} match(es){more}: {names}. Want any ingested into the corpus?"
+
+
+def _is_internal(channel, channel_user_id):
+    """The A21 classifier decides who counts as internal — reuse it, never a private allowlist."""
+    if not channel or not channel_user_id:
+        return False
+    try:
+        import outward_guard as og
+        return og.classify(channel, str(channel_user_id)) == "internal"
+    except Exception:
+        return False
+
+
 # ── the one entry point the spine calls ─────────────────────────────────────────────────────────────
-def try_tool_route(cur, client_code, message):
+def try_tool_route(cur, client_code, message, channel=None, channel_user_id=None):
     """Deterministic tool routes for every channel — same brain, same answers. Returns None fast when
     no tool intent is present (ordinary conversation is untouched)."""
     if not (message or "").strip():
         return None
+    # DRIVE (identity-gated): Drive is the UN-WALLED canonical store — one folder, every client's
+    # files. A5 cannot be enforced inside a raw name search, so the route exists ONLY for internal
+    # identities (operator/staff via the A21 classifier). For anyone else it silently does not exist.
+    dm = _DRIVE_RE.search(message)
+    if dm and _is_internal(channel, channel_user_id):
+        text = _drive_search(dm.group(1) or dm.group(2))
+        if text:
+            return {"text": text[:280], "via": "tool:drive_search", "preformed": True,
+                    "purpose": "drive_search"}
     intent = _vault_intent(message)
     if intent:
         text = _vault_route(cur, intent, message)
