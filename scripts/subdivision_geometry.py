@@ -96,9 +96,29 @@ TIE_BEARING = {"2-A":('N',86,31,'W',261.63),"2-B":('N',82,11,'W',None),"2-C":('N
  "2-P":('N',81,20,'W',None),"2-Q":('N',67,32,'W',None),"2-R":('N',67,32,'W',None),"2-S":('N',71,40,'W',None),
  "2-T":('N',69,6,'W',None),"2-U":('N',69,9,'W',None),"2-V":('N',69,16,'W',None),"2-W":('N',65,39,'W',None)}
 
+def recovered_lots():
+    """Lots whose courses were later recovered by frontier re-OCR (subdivision_reocr_retry.py)
+    and written to subdivision_recovered_lots. Merged into the validated set so they flow into
+    ingest + assembly automatically once unlocked."""
+    try:
+        import psycopg2
+        c = psycopg2.connect(DSN); cur = c.cursor()
+        cur.execute("SELECT to_regclass('public.subdivision_recovered_lots')")
+        if not cur.fetchone()[0]:
+            cur.close(); c.close(); return {}
+        cur.execute("SELECT lot, stated_area, courses_json FROM subdivision_recovered_lots")
+        out = {}
+        for lot, area, cj in cur.fetchall():
+            cs = cj if isinstance(cj, list) else __import__("json").loads(cj)
+            out[lot] = (area, [tuple(x) for x in cs])
+        cur.close(); c.close(); return out
+    except Exception:
+        return {}
+
 def validate():
     out = {}
-    for name, (stated, courses) in LOTS.items():
+    lots = dict(LOTS); lots.update(recovered_lots())   # DB-recovered lots join the set
+    for name, (stated, courses) in lots.items():
         clo, area, pts = ring(courses)
         out[name] = {"stated": stated, "closure": clo, "area": area, "pts": pts,
                      "ok": clo <= CLOSE_GATE, "courses": courses}
@@ -126,6 +146,8 @@ def main():
         if r["ok"]:
             tot += r["area"]
     for name, (st, why) in FLAGGED.items():
+        if name in res:            # recovered by re-OCR — no longer flagged
+            continue
         print(f"  {name:4s} FLAG  {why}")
     print(f"\n  verified lot area total: {tot:,.0f} m²  (plan aggregate 139,132 m²; "
           f"flagged lots 2-G/2-M/2-X carry the balance incl. the 108,918 m² residual 2-X)")
