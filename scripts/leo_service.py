@@ -591,6 +591,17 @@ def try_purpose_route(cur, client_code, message):
     except Exception as e:
         print(f"[leo_service] title_fetch route: {type(e).__name__}: {e}", flush=True)
 
+    # TOOL ROUTES (deploy_966): the retired per-channel tool-loop's capabilities, as governed spine
+    # routes — vault queries · doc lookup/search — one brain for every communication tool, all
+    # channels, deterministic, read-only, ≤280. Writes stay with the explicit vault command handler.
+    try:
+        import tool_routes as tr
+        hit = tr.try_tool_route(cur, client_code, message)
+        if hit and hit.get("text"):
+            return _emit(hit["text"], hit.get("via") or "tool", hit.get("purpose"))
+    except Exception as e:
+        print(f"[leo_service] tool route: {type(e).__name__}: {e}", flush=True)
+
     # PURPOSE-SPECIFIC first (membership semantics): a classified ask (OP docket · ARTA→OP count ·
     # inventory) is answered by its dedicated answerer BEFORE the generic inquiry_stack aggregate —
     # the aggregate counts MENTIONS across a matter's docs; these answer MEMBERSHIP (what the
