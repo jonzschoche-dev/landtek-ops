@@ -85,7 +85,7 @@ CAN answer a status ask short + no-LLM
 
 CAN answer "how many CTNs / which codes"
   ← needs fact_fields (field_kind='ctn', verified) OR matter_brief.ctns[]
-  → "3 CTNs: 0690, 0747, 0792."   (count(DISTINCT value_norm), no ILIKE, no LLM)
+  → "2 CTNs on the petition: 0690, 0792."   (instrument-membership, no ILIKE, no LLM)
 
 CANNOT re-derive what is materialized
   ← if matter_brief is fresh, USE it; if stale, fall back AND flag re-materialize
@@ -108,8 +108,10 @@ CANNOT assert provisional as fact
 
 ## Truth-tests (the teeth)
 
-- `count_from_typed_fields` — CTN count comes from `fact_fields`/`matter_brief.ctns`, NOT `ILIKE`; oracle:
-  ARTA→OP = **3** with codes **0690, 0747, 0792**.
+- `count_from_typed_fields` — CTN count comes from typed fields, NOT `ILIKE`; oracle **CORRECTED
+  2026-07-18** (mention ≠ membership): CTNs **on the petition instrument** = **2 (0690, 0792)** —
+  '0747' appears nowhere in the petition text and 1210 is mention-only; the old "3" was an
+  unsupported hardcoded belief. See `truth_tests/test_petition_membership.py`.
 - `no_llm_on_factual` — the status/count path makes **zero** Ollama calls (monkeypatch `_llm` to raise).
 - `tier_wall` — only verified facts/fields asserted plainly; `inferred_strong` never rendered untagged.
 - `freshness_guard` — a stale brief triggers fallback + re-materialize flag, is never served as fresh.
@@ -134,7 +136,7 @@ reach it through the same route. No fourth path.
 
 ## Done-when
 
-1. "how many ARTA→OP CTNs?" → **"3 CTNs: 0690, 0747, 0792."** from `fact_fields`/`matter_brief.ctns`, zero LLM, ≤280.
+1. "how many ARTA→OP CTNs?" → **"2 CTNs on the petition: 0690, 0792."** (instrument-membership; any evidence-tied extras reported separately, never counted as "on"), zero LLM, ≤280.
 2. `corpus_answer.py`'s hardcoded `ILIKE`-prose CTN counter is **deleted**.
 3. `matter_brief.py::assemble()` **reads** the materialized `matter_brief` (freshness-guarded), not a parallel re-derive.
 4. A status ask returns the brief's verified ground only; provisional is tagged; the `⚠ UNCLEAR` briefs

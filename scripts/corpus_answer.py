@@ -232,13 +232,24 @@ def answer_arta_op_referrals(cur, client_code: str) -> str:
     vehicle = next((m for m in op_vehicle if m not in arta_sent), None)
     vehicle_bit = f" Vehicle {vehicle} awaiting OP action." if vehicle else ""
 
-    # One sentence + optional second
-    text = (
-        f"{n} ARTA CTNs on the May 2026 OP/ES supervisory petition: {codes}."
-        f"{vehicle_bit}{cite}"
-    )
+    # MEMBERSHIP vs EVIDENCE-TIE (never conflate): "on the petition" is a membership claim and is
+    # sourced from the instrument's own extracted CTNs; a matter tied to the OP filing by a verified
+    # fact but NOT named on the petition face is reported separately, never counted as "on".
+    member = set(_petition_member_ctns(cur))
+    on_pet = [c for c in short if c in member]
+    tied = [c for c in short if c not in member]
+    if on_pet:
+        text = f"{len(on_pet)} ARTA CTNs on the May 2026 OP/ES petition: {', '.join(on_pet)}."
+        if tied:
+            text += f" {', '.join(tied)} tied by verified record but not named on the petition face."
+        text += f"{vehicle_bit}{cite}"
+    else:
+        text = (
+            f"{n} ARTA matter(s) tied to the OP/ES filing by verified record: {codes}."
+            f"{vehicle_bit}{cite}"
+        )
     if len(text) > 280:
-        text = f"{n} CTNs on OP/ES petition May 2026: {codes}.{cite}"
+        text = f"{len(on_pet) or n} CTNs on/tied to OP petition: {codes}.{cite}"
     return text.strip()
 
 
@@ -292,6 +303,45 @@ def answer_matter_inventory(cur, client_code: str) -> str:
         for r in active:
             lines.append(f"  {_g(r, 'matter_code')} · {(_g(r, 'current_stage') or '—')[:40]}")
     return "\n".join(lines)
+
+
+def _petition_member_ctns(cur) -> list[str]:
+    """CTNs the OP petition ITSELF carries — MEMBERSHIP, never matter-aggregate MENTION.
+
+    Membership = extracted from the petition instrument's own text (document_fields rows on docs
+    whose title marks them as the OP petition). A CTN discussed in CART minutes or a dialogue
+    invitation linked to the matter is a MENTION and is NOT on the petition.
+
+    Grounded finding (2026-07-18): the instrument (docs 702/703, 'Petition to the OP', ~110k chars
+    each) carries CTNs SL-2025-1008-0690 and SL-2025-1104-0792 ONLY. The long-standing '3 CTNs
+    incl. 0747' belief is unsupported — '0747' appears NOWHERE in the petition text and zero
+    verified facts tie 0747 to an OP/ES filing. If a supplemental filing later adds CTNs, this
+    query picks them up from that instrument's extracted fields; never hardcode the list again.
+    """
+    short = []
+    try:
+        cur.execute(
+            """
+            SELECT DISTINCT df.value_norm
+              FROM document_fields df
+              JOIN documents d ON d.id = df.doc_id
+             WHERE df.field_kind = 'ctn'
+               AND (coalesce(d.document_title,'') || ' ' || coalesce(d.original_filename,''))
+                   ~* 'petition'
+               AND (coalesce(d.document_title,'') || ' ' || coalesce(d.original_filename,''))
+                   ~* '\\yop\\y|office of the president'
+             ORDER BY 1
+            """
+        )
+        for r in _as_dicts(cur):
+            v = _g(r, "value_norm") or ""
+            m = re.search(r"(\d{4})$", v)
+            c = m.group(1) if m else v
+            if c and c not in short:
+                short.append(c)
+    except Exception:
+        pass
+    return short
 
 
 def answer_op_docket(cur, client_code: str, message: str = "") -> str:
@@ -381,38 +431,11 @@ def answer_op_docket(cur, client_code: str, message: str = "") -> str:
     # Primary petition stamp 050526-… first; second manifestation 060426-… second
     vals.sort(key=lambda x: (0 if x.startswith("050526") else 1 if x.startswith("060426") else 2, x))
 
-    # Core CTNs on the operative petition — short codes only
-    core_ctns = []
-    try:
-        cur.execute(
-            """
-            SELECT DISTINCT value_norm
-            FROM fact_fields
-            WHERE matter_code = 'MWK-OP-PETITION'
-              AND field_kind = 'ctn'
-              AND (
-                value_norm LIKE '%%0690'
-                OR value_norm LIKE '%%0792'
-                OR value_norm LIKE '%%0747'
-                OR value_norm ~ '2025-1008-0690|2025-1104-0792|2025-1021-0747'
-              )
-            ORDER BY 1
-            """
-        )
-        for r in _as_dicts(cur):
-            v = _g(r, "value_norm") or ""
-            m = re.search(r"(\d{4})$", v)
-            core_ctns.append(m.group(1) if m else v)
-    except Exception:
-        pass
-    ctn_short = []
-    for c in core_ctns:
-        if c not in ctn_short:
-            ctn_short.append(c)
-    ctn_short = ctn_short[:3]
+    # Core CTNs on the operative petition — MEMBERSHIP, not mention (see _petition_member_ctns)
+    ctn_short = _petition_member_ctns(cur)
 
     if not vals:
-        ctn_bit = f" ARTA CTNs on record: {', '.join(ctn_short)}." if ctn_short else ""
+        ctn_bit = f" CTNs on the petition: {', '.join(ctn_short)}." if ctn_short else ""
         return (
             "No Malacañang receiving ref (MRO) or O.P. Case No. is typed yet "
             f"for the OP petition.{ctn_bit}"
@@ -442,7 +465,7 @@ def answer_op_docket(cur, client_code: str, message: str = "") -> str:
         f"No separate O.P. Case No. on the petition face."
     )
     if ctn_short:
-        text += f" ARTA CTNs {', '.join(ctn_short)}."
+        text += f" CTNs on the petition: {', '.join(ctn_short)}."
     if len(text) > 280:
         text = f"OP petition: MRO {primary}. No O.P. Case No. on face."
         if ctn_short:

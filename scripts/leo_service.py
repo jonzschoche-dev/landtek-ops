@@ -520,6 +520,19 @@ def try_purpose_route(cur, client_code, message):
     except Exception as e:
         print(f"[leo_service] title_fetch route: {type(e).__name__}: {e}", flush=True)
 
+    # PURPOSE-SPECIFIC first (membership semantics): a classified ask (OP docket · ARTA→OP count ·
+    # inventory) is answered by its dedicated answerer BEFORE the generic inquiry_stack aggregate —
+    # the aggregate counts MENTIONS across a matter's docs; these answer MEMBERSHIP (what the
+    # instrument itself carries). Root cause of the 1210 CTN overcount, fixed 2026-07-18.
+    try:
+        import corpus_answer as ca
+        if ca.classify_purpose(message):
+            pack, purpose = ca.try_corpus_answer(cur, client_code, message)
+            if pack and purpose and not str(purpose).startswith("error"):
+                return _emit(pack, f"corpus_answer:{purpose}", purpose)
+    except Exception as e:
+        print(f"[leo_service] corpus_answer priority route: {type(e).__name__}: {e}", flush=True)
+
     # Agentic stack: ALWAYS for inquiries; also try on borderline factual text
     try:
         import inquiry_stack as ist
