@@ -52,14 +52,25 @@ def _pip(pt, poly):
             inside = not inside
     return inside
 
-def _overlap(qa, others):
-    # true overlap: a vertex of one strictly inside the other (interior, not shared edge)
+def _overlap(qa, others, frac=0.04):
+    """Interior-AREA overlap by sampling — robust for concave (L-shaped) lots AND for lots that
+    merely share an edge or a T-junction (those contribute ~0 interior overlap; a real stacking
+    contributes a large fraction). Centroid/edge-crossing tests both misfire on this subdivision's
+    concave lots (2-N, 2-X); area sampling doesn't."""
+    xs = [p[0] for p in qa]; ys = [p[1] for p in qa]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    n = 22
+    interior = []
+    for i in range(n):
+        for j in range(n):
+            px = x0 + (x1-x0)*(i+0.5)/n; py = y0 + (y1-y0)*(j+0.5)/n
+            if _pip((px, py), qa):
+                interior.append((px, py))
+    if not interior:
+        return False
     for pb in others:
-        cq = centroid(qa)
-        if _pip(cq, pb):
-            return True
-        cp = centroid(pb)
-        if _pip(cp, qa):
+        hit = sum(1 for p in interior if _pip(p, pb))
+        if hit / len(interior) > frac:
             return True
     return False
 
@@ -116,8 +127,9 @@ def main():
     print(f"not connected to 2-A component: {islands}")
     # overlap sanity
     ks = list(placed)
-    ov = [(ks[i], ks[j]) for i in range(len(ks)) for j in range(i+1, len(ks)) if overlaps(placed[ks[i]], placed[ks[j]])]
-    print(f"overlap flags (centroid proximity): {ov if ov else 'none'}")
+    ov = [(ks[i], ks[j]) for i in range(len(ks)) for j in range(i+1, len(ks))
+          if _overlap(placed[ks[i]], [placed[ks[j]]])]
+    print(f"overlap flags (interior-area): {ov if ov else 'none'}")
     xs = [to_lnglat(*v) for verts in placed.values() for v in verts]
     lngs = [p[0] for p in xs]; lats = [p[1] for p in xs]
     print(f"mesh bbox: lng [{min(lngs):.5f},{max(lngs):.5f}] lat [{min(lats):.5f},{max(lats):.5f}]  "

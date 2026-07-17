@@ -76,12 +76,16 @@ LOTS = {
  "2-M": (1895, [('N',76,12,'W',4.00),('N',7,46,'E',21.89),('N',74,5,'W',37.78),('N',15,18,'E',36.15),
                 ('S',79,36,'E',15.01),('S',79,35,'E',19.74),('S',79,35,'E',18.00),('S',12,51,'W',10.06),
                 ('N',78,28,'W',8.30),('S',13,15,'W',30.22),('N',76,30,'W',4.00),('S',7,46,'W',21.89)]),
- # 2-N: HELD. The earlier "recovery" of the closing course 6-1 (53.50->57.42) was cosmetic —
- # course 6-1 is the LAST course, so its length changes the closure metric but moves NO vertex.
- # The real ~3.9 m defect is in courses 1-5 and is unidentified. Leaving it in corrupted every
- # lot assembled through it (2-X and its dependents drifted ~4.1 m off their printed tie
- # distances). Held until its true course is recovered. Lesson: closure alone can be gamed by
- # editing the closing course — the tie table is what caught this.
+ # 2-N — RECONSTRUCTED from its neighbours' titles (2-N was sold to a third party; no own title).
+ # 5 of 6 courses are the shared boundaries described from the other side:
+ #   1-2 = reverse of 2-X (doc 562) course 31-32  (S13-18W 65.61)
+ #   2-3 = reverse of 2-X course 30-31            (N57-49W 19.99; my plan read 19.90 was the ~0.1 slip)
+ #   3-4,4-5,5-6 = reverse of 2-M (T-32912) courses 4-5, 3-4, 2-3
+ # Only the road side 6-1 is undescribed; closure fixes it at N 76-12 W, 57.51 m. This EXPOSES
+ # my original plan read of 6-1 (53.50) as the true ~4 m defect — not a closing-course artifact.
+ # Result: closure 0.004 m, area 2,000.2 vs stated 2,000 (0.01%). Two titles + closure, no title of its own.
+ "2-N": (2000, [('N',13,18,'E',65.61),('S',57,49,'E',19.99),('S',15,18,'W',36.15),('S',74,5,'E',37.78),
+                ('S',7,46,'W',21.89),('N',76,12,'W',57.51)]),
  "2-O": (172, [('N',14,44,'E',16.00),('S',76,12,'E',10.50),('S',12,58,'W',16.00),('N',76,12,'W',11.00)]),
  "2-P": (172, [('N',76,12,'W',11.00),('N',16,31,'E',16.01),('S',76,12,'E',10.50),('S',16,31,'W',16.00)]),
  "2-Q": (1022,[('S',79,43,'E',17.50),('S',2,51,'W',24.54),('S',12,51,'W',30.00),('N',79,35,'W',18.00),('N',9,20,'E',54.30)]),
@@ -113,15 +117,14 @@ LOTS = {
 
 # lots whose bearings (not distances) are still ambiguous on the scan — held, NOT fabricated
 FLAGGED = {
- "2-G": (4148, "return-course bearing ambiguous (closure 70 m); needs frontier re-OCR"),
- "2-N": (2000, "closes only by editing the closing course (cosmetic); real ~3.9 m defect in courses 1-5 — corrupts anything assembled through it"),
+ "2-G": (4148, "sold to Fermin Marquez (third party) — no title in the Keesey corpus; needs Registry of Deeds"),
 }
 
 # tie-line bearings from BLLM No. 2 to each lot's corner 1 (distances fold-damaged on doc 287)
 TIE_BEARING = {"2-A":('N',86,31,'W',261.63),"2-B":('N',82,11,'W',None),"2-C":('N',83,33,'W',None),
  "2-D":('N',83,33,'W',None),"2-E":('N',82,56,'W',None),"2-F":('N',63,0,'W',None),"2-G":('N',82,11,'W',None),
  "2-H":('N',75,22,'W',None),"2-I":('N',75,22,'W',None),"2-J":('N',73,56,'W',None),"2-K":('N',82,50,'W',None),
- "2-L":('N',82,19,'W',None),"2-M":('N',82,19,'W',439.86),"2-N":('N',81,39,'W',None),"2-O":('N',81,20,'W',None),
+ "2-L":('N',82,19,'W',None),"2-M":('N',82,19,'W',439.86),"2-N":('N',81,39,'W',497.0),"2-O":('N',81,20,'W',None),
  "2-P":('N',81,20,'W',None),"2-Q":('N',67,32,'W',None),"2-R":('N',67,32,'W',None),"2-S":('N',71,40,'W',None),
  "2-T":('N',69,6,'W',None),"2-U":('N',69,9,'W',None),"2-V":('N',69,16,'W',None),"2-W":('N',65,39,'W',1202.29),   # tie from title doc 289
  # 2-X tie from title doc 562. Its text reads "N 81 deg 14' E" but the E is an OCR slip for W:
