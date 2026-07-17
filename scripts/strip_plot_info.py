@@ -104,9 +104,36 @@ def _title_no(cur, doc_id, text, fname):
     return (m.group(0).replace(" ", "") if m else None)
 
 
+COMPACT_MIN = 0.12   # Polsby-Popper 4πA/P²: ~1 disc · 0.79 square · →0 sliver
+
+
+def _compactness(a):
+    """Shape-plausibility from an analyze() result (Polsby-Popper 4πA/P²). A garbled ring can
+    CLOSE and hit a plausible AREA yet be a physically-impossible sliver (courses that fold
+    back on themselves) — closure+area alone missed exactly that (T-111 = a 269×27 m sliver,
+    compactness 0.05, placed on the map before this gate existed). Real parcels are > ~0.12."""
+    wkt = a.get("wkt_local", "")
+    m = re.search(r"\(\((.*)\)\)", wkt)
+    pts = []
+    if m:
+        for p in m.group(1).split(","):
+            xy = p.strip().split()
+            if len(xy) == 2:
+                pts.append((float(xy[0]), float(xy[1])))
+    if len(pts) < 4:
+        return 0.0
+    import math
+    per = sum(math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])
+              for i in range(len(pts) - 1))
+    area = a.get("area_sqm") or 0.0
+    return (4 * math.pi * area / (per * per)) if per else 0.0
+
+
 def _quality(a):
     if not a.get("ok"):
         return "reject"
+    if _compactness(a) < COMPACT_MIN:
+        return "degenerate"   # closes + right area, but an impossible sliver shape — never write
     ce = a.get("closure_error_m") or 0.0
     if ce <= CLOSURE_GOOD_M:
         return "good"

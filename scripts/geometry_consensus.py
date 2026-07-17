@@ -501,10 +501,14 @@ def build(title_no, matter, write=False):
         if computed_ha:
             total_ha += computed_ha
         area_affirmed = any(ok for _, _, ok in affs if ok is not None)
+        compact = SP._compactness(a)
         if write:
             if closure is None or closure > CLOSURE_WRITE_M:
                 print(f"  LOT {lot} NOT WRITTEN: closure gate ({closure} m > {CLOSURE_WRITE_M} m) "
                       f"— {doubt} course(s) to review/correct.")
+            elif compact < SP.COMPACT_MIN:
+                print(f"  LOT {lot} NOT WRITTEN: degenerate shape (compactness {compact:.3f} < "
+                      f"{SP.COMPACT_MIN}) — closes + right area but a physically-impossible sliver.")
             elif not area_affirmed:
                 print(f"  LOT {lot} NOT WRITTEN: closes but no independent source affirms the "
                       f"area — a well-closed wrong polygon is still wrong.")
