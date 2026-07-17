@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek agent-stack simulator — scripts/agent_stack_sim.py: grounded probe cycle through the deploy_938 agentic inquiry stack. Seeds probes FROM the DB (no synthetic facts), fires them through run_inquiry(go=True), drains every active agent's work queue so agents populate their owned tables via their real compelled hooks, and grades mechanically (expected-substring / cross-client leak tripwire / held). Operator Telegram pings are suppressed for sim inquiries (counted, never sent — S14 intact). $0, no model calls.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/usr/bin/python3 /root/landtek/scripts/agent_stack_sim.py --once --probes 12
+StandardOutput=append:/var/log/landtek_agent_sim.log
+StandardError=append:/var/log/landtek_agent_sim.log

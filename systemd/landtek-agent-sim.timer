@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the agent-stack simulator every 6 hours (grounded probes + agent drains)
+
+[Timer]
+OnCalendar=*-*-* 00/6:40:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
