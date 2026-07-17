@@ -416,6 +416,102 @@ def ops_map_georef_save():
 
 
 # ======================================================================
+#  OPS plan overlay — align a survey/plan SCAN onto satellite (deploy_947)
+# ======================================================================
+# For plans whose course tables are too damaged/handwritten to transcribe (e.g. the 1975
+# T-4497 subdivision, fold across the boundary distances), the operator drags the plan
+# image's corners onto the satellite so the WHOLE subdivision shape is visible in place.
+# VISUAL REFERENCE ONLY — never becomes survey geometry or an accuracy tier.
+_PLANIMG_CACHE = {}
+
+
+@bp.route("/ops/map/planimg/<int:doc_id>.png")
+def ops_planimg(doc_id):
+    if doc_id not in _PLANIMG_CACHE:
+        import fitz
+        conn = _db(); cur = conn.cursor()
+        cur.execute("SELECT file_path, drive_file_id FROM documents WHERE id=%s", (doc_id,))
+        r = cur.fetchone(); cur.close(); conn.close()
+        if not r:
+            abort(404)
+        fp, drv = r
+        path = fp if (fp and os.path.exists(fp or "")) else _drive_fetch_for(drv)
+        if not path:
+            abort(404)
+        pix = fitz.open(path)[0].get_pixmap(matrix=fitz.Matrix(2.5, 2.5))
+        _PLANIMG_CACHE[doc_id] = (pix.tobytes("png"), pix.width, pix.height)
+    png, w, h = _PLANIMG_CACHE[doc_id]
+    resp = Response(png, mimetype="image/png")
+    resp.headers["X-Img-W"] = str(w); resp.headers["X-Img-H"] = str(h)
+    resp.headers["Cache-Control"] = "private, max-age=3600"
+    return resp
+
+
+def _drive_fetch_for(drv):
+    if not drv:
+        return None
+    try:
+        import reocr_gemini as _G
+        return _G._drive_fetch(drv)
+    except Exception:
+        return None
+
+
+@bp.route("/ops/map/planoverlay")
+def ops_planoverlay():
+    doc = (request.args.get("doc") or "").strip()
+    if not doc.isdigit():
+        abort(400)
+    conn = _db(); cur = conn.cursor()
+    cur.execute("SELECT corners, opacity, img_w, img_h, label FROM plan_overlays WHERE doc_id=%s", (int(doc),))
+    row = cur.fetchone()
+    cur.execute("SELECT coalesce(document_title, original_filename, 'plan') FROM documents WHERE id=%s", (int(doc),))
+    nm = cur.fetchone(); cur.close(); conn.close()
+    cfg = {
+        "doc": int(doc), "label": (row[4] if row else (nm[0] if nm else "plan")),
+        "img_url": f"/ops/map/planimg/{doc}.png",
+        "corners": (row[0] if row else None),
+        "opacity": (row[1] if row else 0.6),
+        "tiles": {"esri": TILE_URL, "esri_attrib": TILE_ATTRIB, "gsat": _google_tile_template("satellite")},
+        "center": [14.106, 122.964],
+    }
+    return Response(_PLANOVERLAY_HTML.replace("__CFG__", _cfg_js(cfg)), mimetype="text/html")
+
+
+@bp.route("/ops/map/planoverlay/save", methods=["POST"])
+def ops_planoverlay_save():
+    d = request.get_json(silent=True) or {}
+    try:
+        doc = int(d["doc"])
+        corners = d["corners"]              # [[lat,lng] x3] : plan TL, TR, BL
+        assert isinstance(corners, list) and len(corners) == 3
+        corners = [[float(c[0]), float(c[1])] for c in corners]
+    except (KeyError, TypeError, ValueError, AssertionError):
+        return jsonify(ok=False, error="need doc + 3 corner [lat,lng] pairs"), 400
+    opacity = float(d.get("opacity") or 0.6)
+    iw = int(d.get("img_w") or 0); ih = int(d.get("img_h") or 0)
+    conn = _db(); conn.autocommit = True; cur = conn.cursor()
+    # client_code from the doc's matter (A5/A9) — visual layer still stays client-scoped
+    cur.execute("SELECT case_file, matter_code FROM documents WHERE id=%s", (doc,))
+    r = cur.fetchone()
+    client = None
+    if r:
+        cur.execute("SELECT _client_of(%s)", (r[1] or r[0],)); cc = cur.fetchone()
+        client = cc[0] if cc else None
+    if not client:
+        cur.close(); conn.close()
+        return jsonify(ok=False, error="cannot resolve client for this doc"), 409
+    cur.execute(
+        "INSERT INTO plan_overlays (doc_id,client_code,matter_code,label,corners,img_w,img_h,opacity,created_by) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'ops') ON CONFLICT (doc_id) DO UPDATE SET "
+        "corners=EXCLUDED.corners, opacity=EXCLUDED.opacity, img_w=EXCLUDED.img_w, img_h=EXCLUDED.img_h, "
+        "updated_at=now()",
+        (doc, client, (r[1] if r else None), d.get("label"), json.dumps(corners), iw, ih, opacity))
+    cur.close(); conn.close()
+    return jsonify(ok=True, doc=doc)
+
+
+# ======================================================================
 #  CLIENT surface (token-gated; NO basic-auth; one token -> one client)
 # ======================================================================
 
@@ -888,6 +984,75 @@ function monSave(){
       mlng=parseFloat(document.getElementById('mlng').value);
   if(isNaN(mlat)||isNaN(mlng)){alert('Enter the monument lat and lng');return;}
   post({parcel_code:CFG.parcel,mode:'monument',mon_lat:mlat,mon_lng:mlng});
+}
+</script></body></html>"""
+
+
+# --- OPS plan overlay: drag a plan SCAN's corners onto satellite (3-corner affine warp) ---
+_PLANOVERLAY_HTML = """<!doctype html><html><head><meta charset=utf-8>
+<title>Plan overlay</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+ html,body{margin:0;height:100%;font-family:system-ui,sans-serif}
+ #bar{padding:9px 13px;background:#111;color:#fff;font-size:13px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+ #bar b{font-size:14px}
+ #map{position:absolute;top:44px;bottom:0;left:0;right:0}
+ #planwrap{position:absolute;top:44px;bottom:0;left:0;right:0;overflow:hidden;pointer-events:none;z-index:400}
+ #planimg{position:absolute;top:0;left:0;transform-origin:0 0}
+ button{background:#0f766e;color:#fff;border:0;border-radius:6px;padding:8px 13px;font-size:14px;cursor:pointer}
+ input[type=range]{vertical-align:middle}
+ .cn{background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;
+   line-height:22px;font-weight:bold;font-size:12px;box-shadow:0 0 0 2px #fff}
+ #status{padding:6px 13px;font-size:12px;background:#f5f5f5;position:absolute;bottom:0;left:0;right:0;z-index:500}
+</style></head><body>
+<div id=bar>
+  <b id=t></b>
+  opacity <input id=op type=range min=0.15 max=1 step=0.05>
+  <button onclick=savePlan()>Save alignment</button>
+  <span id=msg style=color:#9ca3af>Drag the 3 red corners (TL, TR, BL) onto the matching points on the ground.</span>
+</div>
+<div id=map></div>
+<div id=planwrap><img id=planimg></div>
+<div id=status>Tip: line up the coastline and the provincial road first — those are the two unmistakable edges.</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var CFG=__CFG__;
+document.getElementById('t').textContent=CFG.label+' — align on satellite';
+var map=L.map('map').setView(CFG.center,16);
+L.tileLayer(CFG.tiles.esri,{maxZoom:21,maxNativeZoom:18,attribution:CFG.tiles.esri_attrib}).addTo(map);
+if(CFG.tiles.gsat) L.control.layers({'Esri':L.tileLayer(CFG.tiles.esri,{maxZoom:21,maxNativeZoom:18}),
+  'Google':L.tileLayer(CFG.tiles.gsat,{maxZoom:21,maxNativeZoom:20})}).addTo(map);
+var img=document.getElementById('planimg'), IW=0, IH=0;
+var op=document.getElementById('op'); op.value=CFG.opacity; img.style.opacity=CFG.opacity;
+op.oninput=function(){img.style.opacity=op.value;};
+// default corner placement (a rough box around the AO) unless a saved alignment exists
+var c=map.getCenter();
+var def=CFG.corners||[[c.lat+0.004,c.lng-0.006],[c.lat+0.002,c.lng+0.008],[c.lat-0.006,c.lng-0.004]];
+var names=['TL','TR','BL'], marks=[];
+def.forEach(function(ll,i){
+  var m=L.marker(ll,{draggable:true,icon:L.divIcon({className:'',html:'<div class=cn>'+names[i]+'</div>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(map);
+  m.on('drag',warp); m.on('dragend',warp); marks.push(m);
+});
+function affine(){
+  if(!IW||!IH) return;
+  var p0=map.latLngToContainerPoint(marks[0].getLatLng()),
+      p1=map.latLngToContainerPoint(marks[1].getLatLng()),
+      p2=map.latLngToContainerPoint(marks[2].getLatLng());
+  var a=(p1.x-p0.x)/IW, b=(p1.y-p0.y)/IW, cc=(p2.x-p0.x)/IH, d=(p2.y-p0.y)/IH;
+  img.style.transform='matrix('+a+','+b+','+cc+','+d+','+p0.x+','+p0.y+')';
+}
+function warp(){ affine(); }
+map.on('move zoom zoomanim viewreset moveend', warp);
+img.onload=function(){ IW=img.naturalWidth; IH=img.naturalHeight; img.style.width=IW+'px'; img.style.height=IH+'px'; warp(); };
+img.src=CFG.img_url;
+function savePlan(){
+  document.getElementById('msg').textContent='Saving…';
+  fetch('/ops/map/planoverlay/save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({doc:CFG.doc,label:CFG.label,opacity:parseFloat(op.value),img_w:IW,img_h:IH,
+      corners:marks.map(function(m){var l=m.getLatLng();return [l.lat,l.lng];})})})
+   .then(function(r){return r.json();}).then(function(j){
+     document.getElementById('msg').textContent=j.ok?'\\u2705 Alignment saved.':'Error: '+j.error;});
 }
 </script></body></html>"""
 
