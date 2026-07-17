@@ -42,6 +42,51 @@ PLAYBOOKS = {
              ("11032", "Imposition of additional requirements")),
         ],
     },
+    "MWK-DLF": {
+        "forum": "MTC Mercedes (Civil Case 26-360 — the wedge/test case) feeding the broader RTC Camarines Norte "
+                 "estate-recovery action (nullity + reconveyance + accounting; see investigations/MWK-DLF/RTC_COMPLAINT_OUTLINE.md)",
+        "grants": "declaration of nullity of the de la Fuente conveyances, cancellation of the derivative Torrens titles, "
+                  "reinstatement/reconveyance to the MWK heirs, accounting and turnover of sale proceeds, recovery of possession, damages",
+        "cannot_grant": "administrative discipline of public officials, or recovery of the 1995 Mercedes LGU donation",
+        "reserve_to": "the ARTA/Ombudsman cluster (officials) and MWK-LGU-RECOVERY (the donation)",
+        "law": "386", "law_kw": "sale of a piece of land",
+        "elements": [
+            # LEAD THEORY (per the 2026-07-17 war-room audit): NOT "negotiate ≠ sell" (that slogan loses on the
+            # SPA's own text, which authorizes signing/executing + receiving proceeds). The sale power was
+            # CLASS-LIMITED — only to holders of a Llamanzares Contract-to-Sell / prior down-payment holders.
+            ("Void conveyance — the SPA's sale power was CLASS-LIMITED and Balane is admittedly outside the class "
+             "(special powers strictly construed, Arts. 1874/1878/1879; Cosmic Lumber G.R. 114311; Bautista-Spille)",
+             "SPA para 7 (doc:246/329/416, PE-170453): sale only to holders of a Ben-Llamanzares Contract-to-Sell "
+             "or prior down-payment holders; Balane's own JA admits no Llamanzares contract; the defense's own "
+             "receipts (doc:414) start 20-Oct-2003 — none predate the 1992 SPA, none names Llamanzares",
+             ("386", "sale of a piece of land")),
+            ("Agency TERMINATED before the 2016 deed — the 15-Aug-2005 disowning SPA, published 2020, annotated "
+             "2021; extinguished in any event by Cesar's death (Arts. 1919-1921). [Honest caveats: the 2005 clause "
+             "is a generic disowning not naming Cesar; no document proves 2005 notice to him — mooted by the lead "
+             "class-limitation theory]",
+             "the 2005 Buenaventura SPA disowning clause (doc:441 Q28, Exhibit F) + Notice of Revocation (doc:76) "
+             "+ RD confirmation (doc:79/358) vs the 2016 deed (doc:415/233, execution admitted in Answer ¶8)",
+             ("386", "Agency is extinguished")),
+            ("Balane is NOT an innocent purchaser — she dealt with an agent, bore the duty to inquire into his "
+             "authority, and never contacted the owners (PD 1529 §53; Yoshizaki duty of inquiry)",
+             "Answer ¶32 (examined only the SPA + mother title), Balane JA (never contacted owners; sitting public "
+             "official held to higher diligence); the RD Certification (doc:353 — the de la Fuente-era instruments "
+             "on the chain are NOT on file)",
+             ("1529", "innocent purchaser for value")),
+            ("The agent must ACCOUNT for whatever he received (Art. 1891; Domingo v. Domingo L-30573) — pleaded as "
+             "accounting/badge-of-fraud, NOT as an element voiding the sale [do not overclaim 'never a peso': the "
+             "deed recites receipt by the AGENT; application of proceeds is contested (Salvador JA S24)]",
+             "receipts signed by Salvador 'Von' who was never an agent (doc:771/414), the Von letter (doc:1010), "
+             "the 2005 Hoppe email (doc:92 — 'no agreements... didn't consent')",
+             ("386", "bound to render an account")),
+            ("Remedy — a void sale conveys nothing; nullity is imprescriptible; the derivative title falls and the "
+             "land reconveys (Arts. 1409-1410; Heirs of Tulauan G.R. 248974; PD 1529 §107); laches cannot validate "
+             "a void deed",
+             "the 26-360 prayer (doc:446/424 — void the deed, cancel 079-2021002126, reinstate T-52540, accounting) "
+             "+ the estate-wide roster (drafts/branch2_recovery_roster)",
+             ("386", "inexistence of a contract")),
+        ],
+    },
 }
 
 
