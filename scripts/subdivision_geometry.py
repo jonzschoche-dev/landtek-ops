@@ -67,8 +67,12 @@ LOTS = {
  "2-K": (1866,[('N',76,12,'W',29.50),('N',1,23,'E',22.34),('N',76,30,'W',5.00),('N',13,15,'E',30.22),
                ('S',78,28,'E',8.30),('S',77,58,'E',6.71),('S',77,58,'E',10.29),('S',77,58,'E',12.51),('S',11,52,'W',53.29)]),
  "2-L": (223, [('N',7,46,'E',21.89),('S',76,30,'E',4.00),('S',76,30,'E',5.00),('S',1,23,'W',22.34),('N',76,12,'W',11.50)]),
- "2-N": (2000,[('N',13,18,'E',65.61),('S',57,49,'E',19.90),('S',15,18,'W',36.15),('S',74,5,'E',37.78),
-               ('S',7,46,'W',21.89),('N',76,12,'W',57.42)]),  # 6-1 53.50->57.42 rec
+ # 2-N: HELD. The earlier "recovery" of the closing course 6-1 (53.50->57.42) was cosmetic —
+ # course 6-1 is the LAST course, so its length changes the closure metric but moves NO vertex.
+ # The real ~3.9 m defect is in courses 1-5 and is unidentified. Leaving it in corrupted every
+ # lot assembled through it (2-X and its dependents drifted ~4.1 m off their printed tie
+ # distances). Held until its true course is recovered. Lesson: closure alone can be gamed by
+ # editing the closing course — the tie table is what caught this.
  "2-O": (172, [('N',14,44,'E',16.00),('S',76,12,'E',10.50),('S',12,58,'W',16.00),('N',76,12,'W',11.00)]),
  "2-P": (172, [('N',76,12,'W',11.00),('N',16,31,'E',16.01),('S',76,12,'E',10.50),('S',16,31,'W',16.00)]),
  "2-Q": (1022,[('S',79,43,'E',17.50),('S',2,51,'W',24.54),('S',12,51,'W',30.00),('N',79,35,'W',18.00),('N',9,20,'E',54.30)]),
@@ -78,14 +82,31 @@ LOTS = {
  "2-U": (1283,[('S',10,30,'W',16.00),('N',70,9,'W',15.00),('S',20,0,'W',20.00),('N',70,9,'W',30.00),
                ('N',20,36,'E',35.79),('S',70,9,'E',42.00)]),
  "2-V": (635, [('S',20,0,'W',38.50),('N',70,9,'W',16.00),('N',18,31,'E',38.51),('S',70,9,'E',17.00)]),
- "2-W": (1250,[('S',79,0,'E',50.00),('S',11,0,'W',25.00),('N',79,0,'W',50.00),('N',11,0,'E',25.00)]),
+ # 2-W from its TITLE (doc 289, Agcaoili, Lot 2-W) — clean typed technical description.
+ # NB: the plan's hand-lettering reads 49/41 which I had wrongly "corrected" to 79/11; the title
+ # settles it. Closure+area are rotation-invariant, so the gate could NOT catch that error —
+ # the title (and the tie-bearing cross-check) is what catches a rotated ring.
+ "2-W": (1250, [('S',49,0,'E',50.00),('S',41,0,'W',25.00),('N',49,0,'W',50.00),('N',41,0,'E',25.00)]),
+ # 2-X — the residual, from its TITLE technical description (doc 562). Course 7-8 reads 39.09
+ # in that doc's OCR but MUST be 50.00: points 6..9 are the notch Lot 2-W occupies, and 2-W's
+ # own title gives that side as 50.00. With it, the 36-course ring closes 0.047 m and encloses
+ # 106,901.7 vs the stated 106,918 (0.015%) — two documents corroborating each other.
+ "2-X": (106918, [('N',76,12,'W',89.97),('N',72,54,'W',453.46),('N',72,8,'W',145.05),('N',18,19,'E',240.99),
+                  ('S',49,0,'E',21.10),('S',41,0,'W',25.00),('S',49,0,'E',50.00),('N',41,0,'E',25.00),
+                  ('S',49,0,'E',45.90),('S',60,11,'E',285.36),('S',70,9,'E',142.62),('S',18,31,'W',38.51),
+                  ('S',70,9,'E',16.00),('N',20,0,'E',38.50),('S',70,9,'E',33.50),('S',20,36,'W',35.79),
+                  ('S',70,9,'E',30.00),('N',20,0,'E',20.00),('S',70,9,'E',15.00),('N',10,30,'E',16.00),
+                  ('S',70,9,'E',24.50),('S',20,9,'W',29.01),('S',70,9,'E',18.00),('N',20,9,'E',4.00),
+                  ('S',71,43,'E',37.59),('N',11,41,'E',24.21),('S',79,47,'E',45.10),('S',11,42,'W',54.24),
+                  ('N',79,36,'W',15.01),('N',57,49,'W',19.99),('S',13,18,'W',65.61),('N',76,12,'W',11.50),
+                  ('N',12,58,'E',16.00),('N',76,12,'W',10.50),('N',76,12,'W',10.50),('S',16,31,'W',16.01)]),
 }
 
 # lots whose bearings (not distances) are still ambiguous on the scan — held, NOT fabricated
 FLAGGED = {
  "2-G": (4148, "return-course bearing ambiguous (closure 70 m); needs frontier re-OCR"),
  "2-M": (1895, "one bearing ambiguous (closure 30 m); needs frontier re-OCR"),
- "2-X": (108918, "36-course residual, distance column garbled (1/9, 4/7); needs frontier re-OCR"),
+ "2-N": (2000, "closes only by editing the closing course (cosmetic); real ~3.9 m defect in courses 1-5 — corrupts anything assembled through it"),
 }
 
 # tie-line bearings from BLLM No. 2 to each lot's corner 1 (distances fold-damaged on doc 287)
@@ -94,7 +115,11 @@ TIE_BEARING = {"2-A":('N',86,31,'W',261.63),"2-B":('N',82,11,'W',None),"2-C":('N
  "2-H":('N',75,22,'W',None),"2-I":('N',75,22,'W',None),"2-J":('N',73,56,'W',None),"2-K":('N',82,50,'W',None),
  "2-L":('N',82,19,'W',None),"2-M":('N',82,19,'W',None),"2-N":('N',81,39,'W',None),"2-O":('N',81,20,'W',None),
  "2-P":('N',81,20,'W',None),"2-Q":('N',67,32,'W',None),"2-R":('N',67,32,'W',None),"2-S":('N',71,40,'W',None),
- "2-T":('N',69,6,'W',None),"2-U":('N',69,9,'W',None),"2-V":('N',69,16,'W',None),"2-W":('N',65,39,'W',None)}
+ "2-T":('N',69,6,'W',None),"2-U":('N',69,9,'W',None),"2-V":('N',69,16,'W',None),"2-W":('N',65,39,'W',1202.29),   # tie from title doc 289
+ # 2-X tie from title doc 562. Its text reads "N 81 deg 14' E" but the E is an OCR slip for W:
+ # the assembled mesh puts 2-X's corner 1 at N 81-14 W, 534.4 m — degrees, minutes AND distance
+ # match the title exactly, only the quadrant letter differs. Geometry settles it.
+ "2-X":('N',81,14,'W',534.40)}
 
 def recovered_lots():
     """Lots whose courses were later recovered by frontier re-OCR (subdivision_reocr_retry.py)
@@ -149,8 +174,9 @@ def main():
         if name in res:            # recovered by re-OCR — no longer flagged
             continue
         print(f"  {name:4s} FLAG  {why}")
-    print(f"\n  verified lot area total: {tot:,.0f} m²  (plan aggregate 139,132 m²; "
-          f"flagged lots 2-G/2-M/2-X carry the balance incl. the 108,918 m² residual 2-X)")
+    held = sum(st for st, _ in FLAGGED.values())
+    print(f"\n  verified lot area total: {tot:,.0f} m² + held {held:,.0f} m² = {tot+held:,.0f} m² "
+          f"vs the plan's stated aggregate 139,132 m² (delta {abs(tot+held-139132):,.0f} m²)")
 
     if a.ingest:
         import psycopg2
