@@ -96,18 +96,15 @@ def llm_ollama_first(cur):
     if not os.path.isfile(path):
         raise TruthFailure(f"missing {path}")
     src = open(path).read()
-    if "LANDTEK_ALLOW_ANTHROPIC_CHAT" not in src:
-        raise TruthFailure("llm.py must gate Anthropic behind LANDTEK_ALLOW_ANTHROPIC_CHAT (A85)")
+    # FLOOR RAISED 2026-07-18 (deploy_965): the Anthropic loop is RETIRED, not gated — the handler
+    # is sovereign-spine-only. Gating-behind-a-flag was the transitional floor; absence is the final one.
+    if "_call_anthropic" in src or "ANTHROPIC_API_KEY" in src:
+        raise TruthFailure("llm.py carries an Anthropic path — the loop was retired (deploy_965, A85); "
+                           "model choice lives in the spine's config, never in a channel handler.")
     if "def handle(row):" not in src:
         raise TruthFailure("llm.py missing handle()")
-    # Order floor: only inside handle() — not the def of _call_anthropic earlier in the file
-    body = src.split("def handle(row):", 1)[1]
-    i_sov = body.find("_sovereign_ollama_reply(")
-    i_ant = body.find("_call_anthropic(")
-    if i_sov < 0:
-        raise TruthFailure("handle() must call _sovereign_ollama_reply")
-    if i_ant >= 0 and i_sov > i_ant:
-        raise TruthFailure("handle() must try Ollama before Anthropic (A85 single brain order)")
+    if "_sovereign_ollama_reply(" not in src.split("def handle(row):", 1)[1]:
+        raise TruthFailure("handle() must call _sovereign_ollama_reply (the one governed spine)")
 
 
 TESTS = [

@@ -165,9 +165,13 @@ def cycle_is_fingerprinted(cur):
 
 
 def remediation_writes_no_facts(cur):
-    """Shadow remediation may write ONLY the dedicated candidate lane — never matter_facts / proposed_facts."""
+    """Shadow remediation may write ONLY the dedicated candidate lane — never matter_facts / proposed_facts.
+    REPEATABLE READ pins both count reads to ONE snapshot: live daemons (verify_worker/harvest) write
+    matter_facts continuously, and under READ COMMITTED their commits landed between the two reads and
+    false-failed this test (seen in the 2026-07-18 full-suite run). Our own txn's writes still show."""
     conn, tc = _rb()
     try:
+        tc.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
         tc.execute("SET ROLE tlfh_harness")
         before = (TLF._one(tc, "SELECT count(*) n FROM matter_facts")["n"],
                   TLF._one(tc, "SELECT count(*) n FROM proposed_facts")["n"])

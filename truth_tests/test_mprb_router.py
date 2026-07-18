@@ -19,18 +19,23 @@ def try_purpose_route_exists(cur):
     assert hasattr(ls, "_deliver_preformed")
 
 
-def op_count_oracle_3(cur):
+def op_count_oracle_membership(cur):
+    """ORACLE CORRECTED 2026-07-18 (mention ≠ membership, deploy_963): the petition instrument
+    (docs 702/703) carries CTNs 0690 + 0792 ONLY — '0747' appears nowhere in its text; the old
+    'want 3 incl. 0747' was an unsupported hardcoded belief. The answer must state membership (2)
+    and may report 0747 ONLY with its tied-not-named label."""
     import corpus_answer as ca
     ans, p = ca.try_corpus_answer(cur, "MWK-001",
                                   "how many cases have been referred from ARTA to the OP?")
     if not ans or p != "arta_op_referrals":
         raise TruthFailure(f"expected arta_op_referrals pack, got {p}")
-    if "3 ARTA" not in ans and "3." not in ans[:80]:
-        raise TruthFailure(f"OP count oracle failed (want 3 distilled):\n{ans[:500]}")
-    # Short form (0690) or full matter code — both ok if all three present
-    for code in ("0690", "0747", "0792"):
-        if code not in ans:
-            raise TruthFailure(f"missing CTN {code} in OP brief")
+    head = ans.split(".")[0]                      # the membership CLAIM sentence
+    if "2" not in head or "0690" not in head or "0792" not in head:
+        raise TruthFailure(f"membership claim must be 2 CTNs (0690, 0792):\n{ans[:300]}")
+    if "0747" in head:
+        raise TruthFailure(f"0747 asserted as ON the petition (membership breach):\n{ans[:300]}")
+    if "0747" in ans and "not named on the petition" not in ans:
+        raise TruthFailure(f"0747 present without its tied-not-named label:\n{ans[:300]}")
     if "MWK-ARTA-1378" in ans:
         raise TruthFailure("soft 1378 must not be counted as OP send")
     if "Hello" in ans:
@@ -91,7 +96,7 @@ def mprb_never_launder_provisional_in_structured(cur):
 
 TESTS = [
     ("mprb.try_purpose_route_exists", try_purpose_route_exists),
-    ("mprb.op_count_oracle_3", op_count_oracle_3),
+    ("mprb.op_count_oracle_membership", op_count_oracle_membership),
     ("mprb.purpose_route_preformed", purpose_route_returns_preformed),
     ("mprb.status_structured", mprb_status_structured),
     ("mprb.provenance_structured_basis", mprb_never_launder_provisional_in_structured),

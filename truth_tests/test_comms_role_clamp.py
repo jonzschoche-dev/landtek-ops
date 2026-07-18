@@ -27,10 +27,15 @@ def _policy(cur, role):
 
 
 def policy_seeded_six(cur):
-    cur.execute("SELECT count(*) AS n FROM v_comms_role_policy")
-    n = cur.fetchone()["n"]
-    if n != 6:
-        raise TruthFailure(f"expected 6 canonical roles in comms_role_policy, got {n}.")
+    # 2026-07-16 the role-axis desk seeded 'operator' + 'unknown' as EXPLICIT policy rows (fail-closed
+    # unknown; operator distinct from internal) — canonical set is now EIGHT. Exact-set assertion so
+    # any further drift still bites.
+    cur.execute("SELECT role FROM v_comms_role_policy ORDER BY role")
+    roles = {r["role"] for r in cur.fetchall()}
+    expect = {"agent", "client", "counsel", "counterparty", "internal", "operator", "public", "unknown"}
+    if roles != expect:
+        raise TruthFailure(f"comms_role_policy role set drifted: got {sorted(roles)}, "
+                           f"expected exactly {sorted(expect)}.")
     cur.execute("SELECT role FROM v_comms_role_policy WHERE gate_default='refuse' AND dose_ceiling<>0")
     bad = cur.fetchall()
     if bad:

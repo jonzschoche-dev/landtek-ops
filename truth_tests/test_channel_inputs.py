@@ -114,8 +114,16 @@ def operator_reply_auto_sends_without_touching_the_wire(cur):
             if res.get("action") != "sent":
                 raise TruthFailure(f"[{ch}] operator reply did not auto-send (got {res.get('action')!r}) — "
                                    "the internal auto-send lane is broken.")
-            if res.get("via") != "internal":
-                raise TruthFailure(f"[{ch}] operator send routed via {res.get('via')!r}, not the internal lane.")
+            # Post-convergence (deploy_962): an operator INQUIRY is legitimately claimed by the
+            # purpose router (stack/preformed via) and still auto-sends on the internal lane. What
+            # matters is WHO may auto-send (internal only) — the via label may be the stack's.
+            via = res.get("via") or ""
+            if via != "internal" and not any(
+                    via.startswith(p) for p in ("inquiry_stack", "corpus_answer", "title_",
+                                                "tool:", "mprb", "stack", "purpose_route",
+                                                "unknown_identifier")):
+                raise TruthFailure(f"[{ch}] operator send routed via {via!r} — neither the internal "
+                                   "lane nor a recognized governed stack route.")
         if captured and any(not (c[2] or "").strip() for c in captured):
             raise TruthFailure(f"[{ch}] auto-sent an EMPTY reply to the operator: {captured}")
     finally:
