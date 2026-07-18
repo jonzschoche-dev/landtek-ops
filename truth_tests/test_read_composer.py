@@ -141,6 +141,29 @@ def same_frame_both_channels(cur):
     print(f"      [A86] same frame both channels ({len(a['text'])} chars): {a['text'][:70]!r}…")
 
 
+def one_reader_inventory(cur):
+    """P3 tracker (report-only, the A75-inventory pattern): count reply-path modules that still
+    read the fact stores raw instead of through the composer. The SHRINKING list is the A86
+    graduation metric — this line makes it a nightly printed number, not an anecdote. Flips to
+    a hard gate at P3 close (directive §10.7), not before."""
+    import re as _re
+    scripts_dir = os.path.join(_REPO, "scripts")
+    reply_path = ("inquiry_stack.py", "corpus_answer.py", "title_fetch.py", "tool_routes.py",
+                  "matter_brief.py", "leo_service.py")
+    raw = []
+    for name in reply_path:
+        path = os.path.join(scripts_dir, name)
+        if not os.path.exists(path):
+            continue
+        with open(path) as f:
+            src = f.read()
+        if _re.search(r"FROM\s+(matter_facts|fact_fields|document_fields|titles)\b", src) \
+                and "composer" not in name:
+            raw.append(name)
+    print(f"      [A86-P3] reply-path raw readers remaining: {len(raw)} {raw} — the shrinking "
+          f"list is the graduation tracker (composer_route + consensus are the sanctioned readers)")
+
+
 TESTS = [
     ("composer.registry_seeded", registry_seeded),
     ("composer.always_answer", always_answer),
@@ -149,6 +172,7 @@ TESTS = [
     ("composer.audit_written", audit_written),
     ("composer.route_wired", route_wired),
     ("composer.same_frame_both_channels", same_frame_both_channels),
+    ("composer.one_reader_inventory", one_reader_inventory),
 ]
 
 
