@@ -185,18 +185,13 @@ def process_doc(cur, doc_id: int, text: str, matter_codes: list[str], go: bool) 
             except psycopg2.Error:
                 pass
 
-    # 3) Matter-linked: write atomic matter_facts (inferred_strong) so tables fill
+    # 3) Matter-linked: write atomic matter_facts (inferred_strong) so tables fill.
+    # Idempotent IN PLACE: upsert on uq_mf_writer_key so an unchanged fact keeps its
+    # id — fact_fields (ON DELETE CASCADE) survives; only genuinely stale facts are
+    # swept afterwards. The old delete-then-reinsert here recreated ~26k rows per
+    # awareness cycle and cascaded the typed fields away every run.
     if matter_codes and go:
-        # wipe prior doc_populate facts for this doc+matters (idempotent rewrite)
-        for mc in matter_codes:
-            cur.execute(
-                """
-                DELETE FROM matter_facts
-                WHERE matter_code=%s AND source_kind='doc' AND source_id=%s
-                  AND created_by='doc_populate'
-                """,
-                (mc, str(doc_id)),
-            )
+        kept_fact_ids = []
         for f in kept:
             if f["field_kind"] in ("forum",):  # low value as fact statement alone
                 continue
@@ -209,6 +204,15 @@ def process_doc(cur, doc_id: int, text: str, matter_codes: list[str], go: bool) 
                             (matter_code, statement, fact_kind, source_kind, source_id,
                              excerpt, provenance_level, created_by, created_at)
                         VALUES (%s,%s,%s,'doc',%s,%s,'inferred_strong','doc_populate', now())
+                        ON CONFLICT (matter_code, created_by, source_id, md5(statement))
+                          WHERE created_by IN ('harvest', 'doc_populate')
+                        DO UPDATE SET
+                            fact_kind = EXCLUDED.fact_kind,
+                            excerpt = EXCLUDED.excerpt,
+                            updated_at = CASE WHEN (matter_facts.fact_kind, matter_facts.excerpt)
+                                                  IS DISTINCT FROM (EXCLUDED.fact_kind, EXCLUDED.excerpt)
+                                              THEN now() ELSE matter_facts.updated_at END
+                        RETURNING id
                         """,
                         (
                             mc,
@@ -218,10 +222,23 @@ def process_doc(cur, doc_id: int, text: str, matter_codes: list[str], go: bool) 
                             f["source_span"][:400],
                         ),
                     )
+                    row = cur.fetchone()
+                    if row:
+                        kept_fact_ids.append(row["id"])
                     stats["facts"] += 1
                 except psycopg2.Error:
-                    # provenance/unique/gate — skip, do not invent
+                    # provenance/gate — skip, do not invent
                     pass
+        # stale-sweep: only facts this doc no longer yields (field gone, text changed)
+        for mc in matter_codes:
+            cur.execute(
+                """
+                DELETE FROM matter_facts
+                WHERE matter_code=%s AND source_kind='doc' AND source_id=%s
+                  AND created_by='doc_populate' AND NOT (id = ANY(%s))
+                """,
+                (mc, str(doc_id), kept_fact_ids or [-1]),
+            )
 
     # 4) Parties (labeled only) → matter_parties when linked
     parties = _parties_from_text(text)
