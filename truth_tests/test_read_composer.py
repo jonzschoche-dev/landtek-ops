@@ -19,7 +19,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _REPO)
+sys.path.insert(0, os.path.join(_REPO, "scripts"))
 from _harness import run, TruthFailure
 
 from leo_tools.consensus import compose_answer, INTENTS
@@ -105,12 +107,48 @@ def audit_written(cur):
     print(f"      [A86] audit: composer_audit {before} -> {after}")
 
 
+def route_wired(cur):
+    """P1 floor: the composer is wired into the ONE brain's route chain (leo_service), and it
+    sits BEFORE the generic inquiry_stack aggregate — a composer-owned ask never falls through
+    to a bespoke reader first (directive §5)."""
+    src_path = os.path.join(_REPO, "scripts", "leo_service.py")
+    with open(src_path) as f:
+        src = f.read()
+    if "composer_route" not in src:
+        raise TruthFailure("leo_service.py does not call composer_route — the composer is not wired "
+                           "into the reply brain (A86 P1)")
+    if src.index("composer_route") > src.index("import inquiry_stack"):
+        raise TruthFailure("composer_route fires AFTER inquiry_stack in try_purpose_route — the one "
+                           "reader must claim its ask-shapes before the generic aggregate")
+    print("      [A86] composer_route wired in leo_service, upstream of inquiry_stack")
+
+
+def same_frame_both_channels(cur):
+    """The directive §5 done-test, mechanical: the same composer-owned ask on telegram and
+    messenger yields the IDENTICAL emission — channel only changes transport, never content."""
+    import composer_route as cr
+    ask = "What deadlines are coming up?"
+    a = cr.try_composer_route(cur, "MWK-001", ask, channel="telegram", channel_user_id="t1")
+    b = cr.try_composer_route(cur, "MWK-001", ask, channel="messenger", channel_user_id="m1")
+    if not a or not b:
+        raise TruthFailure(f"composer did not claim the deadlines ask on both channels "
+                           f"(telegram={bool(a)}, messenger={bool(b)})")
+    if a["text"] != b["text"]:
+        raise TruthFailure("SAME ask, DIFFERENT frames across channels — the one-mind contract is "
+                           f"broken:\n  tg: {a['text']!r}\n  ms: {b['text']!r}")
+    if len(a["text"]) > 280:
+        raise TruthFailure(f"composer emission exceeds the S14 cap ({len(a['text'])} > 280)")
+    print(f"      [A86] same frame both channels ({len(a['text'])} chars): {a['text'][:70]!r}…")
+
+
 TESTS = [
     ("composer.registry_seeded", registry_seeded),
     ("composer.always_answer", always_answer),
     ("composer.scope_hold", scope_hold),
     ("composer.mention_never_answers", mention_never_answers),
     ("composer.audit_written", audit_written),
+    ("composer.route_wired", route_wired),
+    ("composer.same_frame_both_channels", same_frame_both_channels),
 ]
 
 

@@ -416,26 +416,51 @@ def _compose_facts(cur, matter, topic, client_code, role, params):
     if reg_gap:
         gaps.append(reg_gap)
 
-    owner = _matter_client(cur, matter)
-    if owner is None:
+    # Scope: an explicit matter is owner-checked; no matter + a client_code = CLIENT-WIDE search
+    # (the A5 wall moves up one level but stays IN THE QUERY — never a guessed single matter).
+    if matter:
+        owner = _matter_client(cur, matter)
+        if owner is None:
+            return _envelope("facts", params, client_code, role, "miss", [], [],
+                             gaps + [_gap("unknown_matter", detail=matter)],
+                             {"headline": f"no matter {matter}"})
+        if client_code and owner != client_code:
+            return _scope_hold("facts", params, client_code, role, owner)
+        scope_sql, scope_params = "f.matter_code = %s", [matter]
+        scope_label = matter
+    elif client_code:
+        scope_sql = "f.matter_code IN (SELECT matter_code FROM matters WHERE client_code = %s)"
+        scope_params = [client_code]
+        scope_label = client_code
+    else:
         return _envelope("facts", params, client_code, role, "miss", [], [],
-                         gaps + [_gap("unknown_matter", detail=matter)],
-                         {"headline": f"no matter {matter}"})
-    if client_code and owner != client_code:
-        return _scope_hold("facts", params, client_code, role, owner)
+                         gaps + [_gap("unscoped_ask", detail="facts needs a matter or client scope",
+                                      unblocks="pass matter= or client_code=")],
+                         {"headline": "facts ask without a scope"})
 
-    like = f"%{topic}%" if topic else "%"
-    # Answer grade: tier-ranked matter_facts (verified first; inferred only labeled)
-    cur.execute("""SELECT id, statement, excerpt, source_id, provenance_level, as_of
-                   FROM matter_facts
-                   WHERE matter_code=%s AND statement ILIKE %s
-                   ORDER BY CASE provenance_level
-                              WHEN 'verified' THEN 0 WHEN 'operator' THEN 1
-                              WHEN 'inferred_corroborated' THEN 2 WHEN 'inferred_strong' THEN 3
-                              ELSE 4 END,
-                            as_of DESC NULLS LAST, id DESC
-                   LIMIT 12""", (matter, like))
+    _TIER_ORDER = """CASE provenance_level
+                       WHEN 'verified' THEN 0 WHEN 'operator' THEN 1
+                       WHEN 'inferred_corroborated' THEN 2 WHEN 'inferred_strong' THEN 3
+                       ELSE 4 END, as_of DESC NULLS LAST, id DESC"""
+    # Answer grade: tier-ranked matter_facts (verified first; inferred only labeled).
+    # Phrase match first; a multi-word topic that misses degrades to token-AND
+    # (every token present, any order) — deterministic, never fuzzy.
+    cur.execute(f"""SELECT f.id, f.matter_code, f.statement, f.excerpt, f.source_id,
+                           f.provenance_level, f.as_of
+                    FROM matter_facts f WHERE {scope_sql} AND f.statement ILIKE %s
+                    ORDER BY {_TIER_ORDER} LIMIT 12""",
+                (*scope_params, f"%{topic}%" if topic else "%"))
     rows = cur.fetchall()
+    if not rows and topic and " " in topic.strip():
+        toks = [t for t in topic.split() if len(t) > 2][:4]
+        if toks:
+            cond = " AND ".join(["f.statement ILIKE %s"] * len(toks))
+            cur.execute(f"""SELECT f.id, f.matter_code, f.statement, f.excerpt, f.source_id,
+                                   f.provenance_level, f.as_of
+                            FROM matter_facts f WHERE {scope_sql} AND {cond}
+                            ORDER BY {_TIER_ORDER} LIMIT 12""",
+                        (*scope_params, *[f"%{t}%" for t in toks]))
+            rows = cur.fetchall()
     for r in rows:
         label = r["statement"]
         if r["provenance_level"] not in ("verified", "operator"):
@@ -446,13 +471,13 @@ def _compose_facts(cur, matter, topic, client_code, role, params):
 
     n_verified = sum(1 for r in rows if r["provenance_level"] == "verified")
     if topic and n_verified == 0:
-        gaps.append(_gap("no_verified_fact", detail=f"no verified fact matches {topic!r} in {matter}",
+        gaps.append(_gap("no_verified_fact", detail=f"no verified fact matches {topic!r} in {scope_label}",
                          unblocks="verify_worker pass over the matching source docs"))
 
     # mention_only — pending proposals are a gap, never claims
-    cur.execute("""SELECT count(*) AS n FROM proposed_facts
-                   WHERE matter_code=%s AND status NOT IN ('accepted','rejected','promoted')
-                     AND statement ILIKE %s""", (matter, like))
+    cur.execute(f"""SELECT count(*) AS n FROM proposed_facts f
+                    WHERE {scope_sql} AND status NOT IN ('accepted','rejected','promoted')
+                      AND statement ILIKE %s""", (*scope_params, f"%{topic}%" if topic else "%"))
     npend = (cur.fetchone() or {}).get("n") or 0
     if npend:
         gaps.append(_gap("pending_adjudication", n=npend,
@@ -462,7 +487,7 @@ def _compose_facts(cur, matter, topic, client_code, role, params):
     status = "hit" if answer_grade else ("partial" if claims else "miss")
     if status == "hit" and gaps:
         status = "partial" if any(g["kind"] != "pending_adjudication" for g in gaps) else "hit"
-    frame = {"headline": f"{matter}: {n_verified} verified / {len(rows)} matched" + (f" for {topic!r}" if topic else ""),
+    frame = {"headline": f"{scope_label}: {n_verified} verified / {len(rows)} matched" + (f" for {topic!r}" if topic else ""),
              "lines": [c["text"] for c in claims[:8]]}
     return _envelope("facts", params, client_code, role, status, claims, dissent, gaps, frame)
 

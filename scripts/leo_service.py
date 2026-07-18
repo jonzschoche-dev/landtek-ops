@@ -620,6 +620,18 @@ def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=N
     except Exception as e:
         print(f"[leo_service] corpus_answer priority route: {type(e).__name__}: {e}", flush=True)
 
+    # READ COMPOSER (A86 P1, deploy_940): the one reader, as a route — claims the ask-shapes with
+    # no tuned dedicated owner (deadlines · topical facts). Same frame on EVERY channel by
+    # construction (docs/READ_CONSENSUS_DIRECTIVE.md §5 done-test); envelope logged to composer_audit.
+    try:
+        import composer_route as cr
+        hit = cr.try_composer_route(cur, client_code, message, channel=channel,
+                                    channel_user_id=channel_user_id)
+        if hit and hit.get("text"):
+            return _emit(hit["text"], hit.get("via") or "composer", hit.get("purpose"))
+    except Exception as e:
+        print(f"[leo_service] composer route: {type(e).__name__}: {e}", flush=True)
+
     # Agentic stack: ALWAYS for inquiries; also try on borderline factual text
     try:
         import inquiry_stack as ist
