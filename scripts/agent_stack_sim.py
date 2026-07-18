@@ -222,15 +222,54 @@ def probe_title_inventory(cur):
         inv = IQ._fetch_title_inventory(cur, SIM_CLIENT, status_filter="living")
     except Exception:
         return None
-    ids = inv.get("ids") or []
-    if not ids:
+    # The dose-aware render names the ACTIVE slice in the primary emission —
+    # expect those (other slices are follow-up words, probed separately).
+    active = [
+        r["tct_number"] for r in (inv.get("rows") or [])
+        if (r.get("status") or "").lower() == "active" and r.get("tct_number")
+    ]
+    if not active:
         return None
-    expected = random.sample(ids, min(3, len(ids)))
+    expected = random.sample(active, min(2, len(active)))
     return _probe(
         "title_inventory",
         "List the titles for MWK",
         expected=expected,
         seed={"living_count": inv.get("count"), "from": "titles registry (living)"},
+    ) | {"max_len": 340}
+
+
+def probe_list_followup(cur):
+    cur.execute(
+        r"""
+        SELECT tct_number FROM titles
+        WHERE case_file LIKE 'MWK%%' AND coalesce(status,'') ILIKE 'active'
+          AND tct_number ~ '^T-\d{3,7}$'
+        ORDER BY random() LIMIT 1
+        """
+    )
+    r = cur.fetchone()
+    if not r:
+        return None
+    return _probe(
+        "list_followup",
+        "Where is the list?",
+        expected=[r["tct_number"]],
+        forbidden=FORBIDDEN_DEFAULT + ["MRO", "Malacañang"],
+        seed={"from": "titles (active); guards the 2026-07-17 follow-up failure"},
+    ) | {"max_len": 340}
+
+
+def probe_tagalog_update(cur):
+    # Grounded expectation: matter_brief headlines exist → answer must come
+    # from them (or hold honestly) — NEVER the Malacañang-ref spam this ask
+    # produced on 2026-07-17.
+    return _probe(
+        "tagalog_update",
+        "Ano po ang pinakabagong update sa titulo natin?",
+        expected=[],
+        forbidden=FORBIDDEN_DEFAULT + ["MRO", "Malacañang"],
+        seed={"from": "invariant: no ref-dump on unmatched phrasing"},
     )
 
 
@@ -273,6 +312,8 @@ BUILDERS = (
     probe_title_inventory,
     probe_who_is,
     probe_separation_guard,
+    probe_list_followup,
+    probe_tagalog_update,
 )
 
 
@@ -318,6 +359,12 @@ def grade_probe(cur, probe: dict, res: dict) -> dict:
                 pass
     else:
         grade = "hit"
+    # Dose check: an answer that exceeds the channel cap gets truncated on the
+    # phone — the user never sees the tail. Correct-but-oversized is a miss.
+    max_len = probe.get("max_len")
+    if grade == "hit" and max_len and len(text) > max_len:
+        grade = "answered_miss"
+        missing = missing + [f"dose<={max_len} (got {len(text)})"]
     return {"grade": grade, "missing": missing, "leaked": leaked, "via": via}
 
 

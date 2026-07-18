@@ -864,6 +864,9 @@ def _fetch_title_inventory(
         status_sql = "coalesce(status,'') ILIKE '%%cancel%%'"
     elif sf == "clouded":
         status_sql = "coalesce(status,'') ILIKE '%%cloud%%'"
+    elif sf in ("unverified", "unknown", "contested"):
+        # closed set from our own slice parser — never user-interpolated
+        status_sql = f"coalesce(status,'') ILIKE '{sf}'"
     else:
         status_sql = f"coalesce(status,'') NOT IN ('{non}')"
 
@@ -967,72 +970,45 @@ def _fetch_title_inventory(
 
 
 def _render_title_inventory(inv: dict, *, list_mode: bool) -> str:
-    """Count and list from the SAME inv dict — count is always len(ids)."""
+    """Dose-aware render: the primary emission must SURVIVE the ~280-char
+    channel cap (S14), so it leads with count + split + the ACTIVE ids, and
+    every other slice is one follow-up word away. A 1,000-char answer that
+    gets truncated to its header reads as 'clueless' on the phone — the
+    2026-07-17 'where the list?' failure. Count == len(list) by construction.
+    """
     ids = inv.get("ids") or []
     n = len(ids)
     client = inv.get("client") or "client"
-    bd = inv.get("breakdown") or {}
     sf = (inv.get("status_filter") or "active").lower()
-    label = {
-        "active": "strict-active (status=active only)",
-        "living": "living / in-force portfolio (not cancelled)",
-        "cancelled": "cancelled",
-        "clouded": "clouded",
-    }.get(sf, "registered (non-invalid)")
-
-    # Lead: count == list length by construction
-    lines = [
-        f"{client} titles — {label}: {n}."
-    ]
-    if bd:
-        parts = [f"{k} {v}" for k, v in bd.items()]
-        lines.append("Full registry split: " + ", ".join(parts) + ".")
-
-    # Per-status list when living (so T-4497/T-32911 are visible with why)
     rows = inv.get("rows") or []
-    if sf == "living" and rows:
-        by_st: dict[str, list[str]] = {}
-        for r in rows:
-            st = (r.get("status") or "unknown").lower()
-            tid = r.get("tct_number")
-            if tid:
-                by_st.setdefault(st, []).append(tid)
-        for st in sorted(by_st.keys()):
-            lines.append(f"{st} ({len(by_st[st])}): " + ", ".join(by_st[st]) + ".")
-    elif n == 0:
-        lines.append("List: (none).")
-    elif list_mode or n <= 40:
-        chunk = ", ".join(ids)
-        lines.append("List (" + str(n) + "): " + chunk + ".")
-    else:
-        lines.append(
-            "List (" + str(n) + "): " + ", ".join(ids[:25])
-            + f" … +{n - 25} more (ask for full list)."
-        )
 
-    # Cross-check assets (different status vocabulary: clean/clouded/cancelled)
-    assets = inv.get("assets") or {}
-    clean_n = len(assets.get("clean") or [])
-    cloud_n = len(assets.get("clouded") or [])
-    can_n = len(assets.get("cancelled") or [])
-    if clean_n or cloud_n or can_n:
-        lines.append(
-            f"Property-assets cross-check (same client): "
-            f"{clean_n} clean, {cloud_n} clouded, {can_n} cancelled "
-            f"— not the same enum as titles.status=active."
-        )
+    by_st: dict[str, list[str]] = {}
+    for r in rows:
+        st = (r.get("status") or "unknown").lower()
+        tid = r.get("tct_number")
+        if tid:
+            by_st.setdefault(st, []).append(tid)
 
-    rejected = inv.get("rejected") or []
-    if rejected:
+    # A single requested slice: name every id (each slice fits one message)
+    if sf not in ("living", "all"):
+        lines = [f"{client} {sf} titles: {n}."]
+        if ids:
+            lines.append(", ".join(ids) + ".")
+        else:
+            lines.append("(none on the registry)")
+        return "\n".join(lines)
+
+    # living/all: count + per-status split + active ids; slices on request
+    split = ", ".join(f"{k} {len(v)}" for k, v in sorted(by_st.items()))
+    lines = [f"{client} living titles: {n} ({split})."]
+    act = by_st.get("active") or []
+    if act:
+        lines.append(f"Active ({len(act)}): " + ", ".join(act) + ".")
+    others = [k for k in sorted(by_st) if k != "active" and by_st[k]]
+    if others:
         lines.append(
-            f"Excluded {len(rejected)} non-title id(s) "
-            f"(form serials / garbage — e.g. judicial form numbers)."
+            "Say " + " or ".join(f"'{k}'" for k in others[:4]) + " for that list."
         )
-    lines.append(
-        "Definition: count = len(list) of well-formed title ids for "
-        f"{client}, status={label}; aliases collapsed; other clients excluded. "
-        "Ask cancelled/clouded/all for other status slices."
-    )
     return "\n".join(lines)
 
 
@@ -1051,10 +1027,26 @@ def _answer_title_inventory(cur, message: str, client_code: str) -> Optional[dic
         r"|\blist of\b",
         t,
     ))
-    if not (wants_count or wants_list or re.search(r"\bactive titles?\b", t)):
+    # Follow-ups after a truncated/compact inventory answer ("Where the list?")
+    # and bare slice words ("clouded") — the conversational pagination the
+    # compact render advertises. 2026-07-17: these fell to the generic route
+    # and answered with MRO refs.
+    followup = bool(re.search(
+        r"\bwhere\b.*\blist\b|\bfull list\b|\bthe rest\b|\brest of\b"
+        r"|\bsend (me )?the list\b|\bcomplete list\b|\blistahan\b|\blista\b",
+        t,
+    ))
+    slice_word = re.fullmatch(
+        r"\W*(clouded|cancelled|active|unverified|unknown|contested)\W*", t
+    )
+    if not (wants_count or wants_list or followup or slice_word
+            or re.search(r"\bactive titles?\b", t)):
         return None
 
-    if re.search(r"\bcancelled\b", t):
+    if slice_word:
+        status_filter = slice_word.group(1)
+        want_active = status_filter == "active"
+    elif re.search(r"\bcancelled\b", t):
         status_filter = "cancelled"
         want_active = False
     elif re.search(r"\bclouded\b", t) and not re.search(r"\bactive\b", t):
@@ -1120,6 +1112,65 @@ def _answer_title_count(cur, message: str, client_code: str) -> Optional[dict]:
     return _answer_title_inventory(cur, message, client_code)
 
 
+def _answer_status_update(cur, client_code: str) -> Optional[dict]:
+    """'Any update?' / 'pinakabagong update?' — answer from matter_brief
+    headlines (grounded, freshest digested state), never a ref dump."""
+    fam = (client_code or "MWK-001").split("-")[0] + "%"
+    try:
+        cur.execute(
+            """
+            SELECT matter_code, headline, n_facts_verified
+            FROM matter_brief
+            WHERE matter_code LIKE %s AND coalesce(headline, '') <> ''
+            ORDER BY n_facts_verified DESC NULLS LAST
+            LIMIT 2
+            """,
+            (fam,),
+        )
+        rows = _as_dicts(cur)
+    except Exception:
+        rows = []
+    if not rows:
+        return {
+            "text": (
+                "No digested update on record yet for this portfolio. "
+                "I won't invent one — flagging for human review."
+            ),
+            "via": "held_unclear",
+            "atoms_used": [],
+            "pass_to_human": True,
+            "human_pass": {"mode": "hold_no_facts", "score": 55},
+            "mode": "hold_no_facts",
+        }
+    parts = []
+    for r in rows:
+        mc = r["matter_code"]
+        # headline is a machine digest ("MWK-X · active/stage_slug · forum ·
+        # 7 CTNs (...)") — speak it plainly (S14): stage + forum, no slugs,
+        # no CTN tails, no repeated matter code.
+        segs = [s.strip() for s in (r.get("headline") or "").split("·")]
+        keep = []
+        for s in segs:
+            if not s or s == mc or re.match(r"^\d+\s+CTNs?", s, re.I):
+                continue
+            s = s.split("/")[-1].replace("_", " ").strip()
+            if s and s not in keep:
+                keep.append(s)
+        desc = ", ".join(keep[:2]) if keep else "on record, no stage change"
+        parts.append(f"{mc.replace('MWK-', '')}: {desc[:100]}")
+    text = "Latest on record — " + ". ".join(parts) + "."
+    if len(text) > 278:
+        text = text[:275].rsplit(" ", 1)[0] + "…"
+    return {
+        "text": text,
+        "via": "stack_hit",
+        "atoms_used": [],
+        "pass_to_human": False,
+        "human_pass": {"mode": "facts_only", "score": 0},
+        "mode": "facts_only",
+    }
+
+
 def _intent(tmsg: str) -> str:
     t = tmsg or ""
     if re.search(r"\bwho\b", t):
@@ -1128,10 +1179,22 @@ def _intent(tmsg: str) -> str:
         r"\b(how many|count|number of)\b.*\b(title|tct|titles)\b"
         r"|\bactive titles?\b"
         r"|\b(list|show|see|which|enumerate)\b.*\b(title|tct|titles)\b"
-        r"|\b(title|tct|titles)\b.*\b(list|show|all)\b",
+        r"|\b(title|tct|titles)\b.*\b(list|show|all)\b"
+        r"|\bwhere\b.*\blist\b|\bfull list\b|\bthe rest\b|\blistahan\b|\blista\b",
         t,
     ):
         return "title_count"
+    if re.fullmatch(
+        r"\W*(clouded|cancelled|active|unverified|unknown|contested)\W*", t
+    ):
+        return "title_count"
+    # Status/update asks (incl. Tagalog: 'Ano ang pinakabagong update sa
+    # titulo natin?', 'may update ba?') — 2026-07-17 these fell to the
+    # generic route and answered with unrelated MRO refs.
+    if re.search(
+        r"\b(update|updates|pinakabagong|balita|latest|progress|any news)\b", t
+    ):
+        return "status_update"
     if re.search(r"\b(history|parent title|mother title|came from|originally)\b", t):
         return "title_history"
     if re.search(
@@ -1198,12 +1261,13 @@ def _atoms_for_intent(intent: str, atoms: list, tmsg: str) -> list:
         return pool[:6]
     if intent == "person":
         return []  # handled elsewhere
-    # general: refuse pure CTN dump unless user asked about ARTA/CTN/docket
-    if by["mro_ref"] or by["docket"]:
-        return (by["mro_ref"] + by["docket"] + by["tct"])[:4]
+    # general: NEVER volunteer refs the user didn't ask about. The old
+    # mro_ref/docket branch here made every unmatched ask (greetings, Tagalog
+    # phrasings, follow-ups) answer with Malacañang refs — the 2026-07-17
+    # 'clueless' failure. Title atoms only if the ask was title-shaped;
+    # otherwise empty → caller fail-closes honestly.
     if by["tct"] or by["oct"]:
         return (by["tct"] + by["oct"] + by["e_title"])[:4]
-    # No relevant typed atoms — empty (caller fail-closes). Do NOT return random CTNs.
     return []
 
 
@@ -1230,6 +1294,10 @@ def synthesize(message: str, scrutiny: dict, cur=None, client_code: str = "") ->
         tc = _answer_title_inventory(cur, message, cc)
         if tc:
             return tc
+    if cur is not None and intent == "status_update":
+        su = _answer_status_update(cur, cc)
+        if su:
+            return su
 
     want_second = bool(re.search(r"\bsecond\b.*\bmanifest|\bmanifest\w*\b.*\bsecond\b", tmsg))
     want_docket = intent in ("docket", "op")
@@ -1611,6 +1679,40 @@ def run_inquiry(
     t0 = time.time()
     c = _conn()
     cur = _cur(c)
+    norm = re.sub(r"\s+", " ", (message or "").lower()).strip()
+
+    # Double-fire guard: channel handlers invoke the stack twice per inbound
+    # (instant + convergence pass) — every 2026-07-17 real ask has twin rows
+    # 1–2s apart. Same normalized ask, same principal, already answered within
+    # 30s → return the cached answer; no new row, no duplicate writeback.
+    cur.execute(
+        """
+        SELECT id, answer_text, answer_via, status FROM inquiry_runs
+        WHERE client_code IS NOT DISTINCT FROM %s
+          AND message_norm = %s
+          AND channel_user_id IS NOT DISTINCT FROM %s
+          AND status <> 'open'
+          AND created_at > now() - interval '30 seconds'
+        ORDER BY id DESC LIMIT 1
+        """,
+        (client_code, norm, channel_user_id),
+    )
+    dup = cur.fetchone()
+    if dup:
+        cur.close()
+        c.close()
+        return {
+            "inquiry_id": dup["id"],
+            "text": dup["answer_text"] or "",
+            "via": f"inquiry_stack:{dup['answer_via'] or 'stack_hit'}",
+            "preformed": True,
+            "pass_to_human": dup["status"] == "held",
+            "human_pass": {},
+            "scrutiny_layers": [],
+            "writeback": {"dedup": True},
+            "triggers": 0,
+            "duration_ms": 0,
+        }
 
     cur.execute(
         """
@@ -1619,10 +1721,7 @@ def run_inquiry(
         VALUES (%s,%s,%s,%s,%s,%s,'open')
         RETURNING id
         """,
-        (
-            channel, channel_user_id, client_code, role, message,
-            re.sub(r"\s+", " ", (message or "").lower()).strip(),
-        ),
+        (channel, channel_user_id, client_code, role, message, norm),
     )
     inquiry_id = cur.fetchone()["id"]
 
