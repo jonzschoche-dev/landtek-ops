@@ -111,6 +111,12 @@ deploy_972 title inventory refactor ONTO the composer — their bespoke readers 
 - **Step 1 (one day):** run `adjudicate_sweep.py` ONCE — mechanical classes only, through the existing
   gated write path: verbatim-substring proposals conflicting with nothing → promote (A2-satisfying by
   construction); exact dupes → merge; quarantined-source → reject. Record the closure rate.
+  **→ MEASURED 2026-07-18 (sweep built + run, --go):** 261 examined · **mechanical closure 19/261 = 7%**
+  (19 duplicates rejected+ledgered · 0 promotable — the DB gate still refuses every re-offered verified
+  insert, so the residue is genuinely not-groundable, not stale-blocked · 12 contradiction_holds persist,
+  0 released · 1 owner-unresolvable). **Residue for the A/B decision: 242.** Option A's premise
+  ("mechanical closure is high") is FALSE — the residue needs either the dose-capped operator queue
+  (A, ~242 items at ≤10/day ≈ 5 weeks) or the funeral (B). Operator decision, now evidence-backed.
 - **Option A (drain is real):** if mechanical closure is high, keep the sweep on a timer + a
   dose-capped operator batch queue (≤10 one-tap items/day in the digest, A71) with an SLA; unactioned
   items past horizon expire to labeled `inferred_*`, never linger.
