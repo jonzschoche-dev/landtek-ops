@@ -222,6 +222,23 @@ def _compose_matter_status(cur, matter, client_code, role, params):
                     "FROM matter_facts WHERE matter_code=%s", (matter,))
         n_v = (cur.fetchone() or {}).get("nv") or 0
 
+    # Rank 3 support — CORRESPONDENCE (added 2026-07-19 after the Botor/CV6839 miss: counsel
+    # questions are correspondence questions; the one reader must see the comms layer).
+    # gmail_messages is matter-tagged at ingest; content stays support-grade (a mention in an
+    # email is not a verified fact), but its existence/recency/subjects surface in the frame.
+    try:
+        cur.execute("""SELECT count(*) AS n, max(received_at)::date AS latest,
+                              (array_agg(subject ORDER BY received_at DESC))[1] AS last_subject
+                       FROM gmail_messages WHERE matter_codes @> ARRAY[%s]::text[]""", (matter,))
+        gm = cur.fetchone()
+        if gm and gm["n"]:
+            claims.append(_claim({"emails": gm["n"], "latest": str(gm["latest"])},
+                                 f"correspondence: {gm['n']} email(s), latest {gm['latest']} "
+                                 f"({(gm['last_subject'] or '')[:60]})",
+                                 "gmail_messages", matter, None, 3))
+    except Exception:  # noqa: BLE001 — comms store absent/mistyped must never break the answer
+        pass
+
     # mention_only — proposed_facts contributes ONLY the gap, never a claim
     cur.execute("SELECT count(*) AS n FROM proposed_facts WHERE matter_code=%s "
                 "AND status NOT IN ('accepted','rejected','promoted','expired')", (matter,))
