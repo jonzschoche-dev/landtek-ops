@@ -120,3 +120,4 @@ juris_targets*.json
 # Misplaced migration duplicates — canonical migrations live in migrations/. Copies that
 # land in scripts/ are exact dupes that only dirty the tree; never track them here.
 scripts/deploy_*.sql
+.venv-tlfh/
