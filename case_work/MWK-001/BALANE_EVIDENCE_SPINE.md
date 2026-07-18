@@ -113,11 +113,13 @@ Our SJ prayer asks the court to **cancel …2126 and REINSTATE T-52540** in the 
 | ~1995 | de la Fuente's authorized period referenced as ending | doc 1132 (handwritten) | INFERRED (garbled OCR) |
 | **19 Feb 1999** | Gerry Hoppe writes de la Fuente: heirs transferring POA to Ida Buenaventura | **doc 1134** | VERIFIED (read) |
 | **15 Aug 2005** | de la Fuente's SPA **REVOKED** | doc 76 (2020 publication) + doc 79 (RD letter "since 2005") | VERIFIED (2 sources) |
-| **Sept 2016** | Deed of Absolute Sale, de la Fuente → Balane | title_transfers id 36; doc 1088; demand letter 388 | VERIFIED event / **GAP: deed not in hand** |
+| **Sept 2016** | Deed of Absolute Sale, de la Fuente → Balane | **doc 415** (LRA-certified Exhibit 6) + doc 233 (bundle copy) — per §6 item 6 | VERIFIED (deed in corpus) |
+| **28 Mar 2017** | **Deed of Confirmation executed by Cesar** (ratifying the Balane sale; parcel "registered in the name of Geraldine K. Hoppe") — notarized Asis, Daet; witnessed "Romel E. Jacinto" ⚠️ same name as RD registrar — verify on image | doc 233 (notary block: "28th day of March, 2017") | VERIFIED (read) |
+| **21 Jun 2017** | **CESAR DELA FUENTE DIES.** Stated to RTC Br. 40 by his own counsel Atty. Gay Belen (Motion, recited in the court's Order, CV 6839 MWK v. DAR): "Cesar Dela Fuente, the administrator of the estate of the plaintiff has already died last June 21, 2017" | **doc 673** (RTC Order) | VERIFIED (court record; PSA cert to obtain) |
 | 25 Sep–9 Oct 2020 | Revocation **published** (Bicol Post ×3) — 4 yrs after the sale | doc 76 (Affidavit of Publication) | VERIFIED (read) |
-| 2021 | T-52540 cancelled; **T-079-2021002126** issued to Gloria Balane | title_chain | VERIFIED |
+| **23 Nov 2021** | T-52540 cancelled; **T-079-2021002126** issued to Gloria Balane; …2127 issued to the heirs. Registration cascade ran **4+ years after the agent's death** — necessarily processed by others (Salvador side) | title_chain; Entry 2021003235/36 | VERIFIED |
 
-Revocation (2005) precedes sale (2016) by 11 years. Publication (2020) post-dates the sale — relevant only to Prong B / good faith, neutralized as in §2a.
+Revocation (2005) precedes sale (2016) by 11 years. Publication (2020) post-dates the sale — relevant only to Prong B / good faith, neutralized as in §2a. **Death (21 Jun 2017) post-dates both the 2016 deed and the Mar-2017 confirmation — so it does NOT void the Balane deed; its force is (a) Art. 1919(3) hard stop for any later "Cesar" act (estate-wide case), (b) fixing the accounting defendant as Cesar's ESTATE, (c) explaining the 2021 cascade as Salvador's doing.**
 
 ---
 
