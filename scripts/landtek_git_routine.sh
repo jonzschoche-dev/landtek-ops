@@ -282,17 +282,26 @@ Auto-tagged by landtek_git_routine.sh on ${SIDE} (renumbered from deploy_${nn} a
     fi
     ok "deploy_${nn} live"
 
-    # Post-deploy: sync the VPS clone's CODE dirs to origin so manual scp is unnecessary and the
-    # running code never drifts from what was just deployed. Surgical (only code paths), so the
-    # tracked-but-regenerated dirs (case_dossiers/) and data dirs are left untouched; safe on a
-    # dirty tree because `checkout <ref> -- <paths>` overwrites only the named code files.
+    # Post-deploy: sync the VPS clone to origin. LINEAGE-FIRST (fixed 2026-07-18 — the old
+    # unconditional `checkout origin/main -- <paths>` STAGED the files into the VPS index on
+    # every Mac deploy, permanently blocking `pull --rebase`; that is exactly how the VPS went
+    # 42 commits behind while runtime files stayed current). Now: clean tracked tree → true
+    # fast-forward (HEAD advances, one lineage); dirty tracked tree → old surgical file-sync
+    # + reset (runtime current, lineage diverging — WARN LOUDLY so it gets reconciled).
     if [ "$SIDE" != "VPS" ]; then
       hdr "Sync VPS code"
       if ssh -o ConnectTimeout=20 root@100.85.203.58 \
-           "cd /root/landtek && git fetch origin main -q && git checkout origin/main -- scripts migrations leo_tools truth_tests landtek_telegram 2>/dev/null"; then
-        ok "VPS code synced to deploy_${nn} (no scp needed)"
+           "cd /root/landtek && git fetch origin main -q && \
+            if [ -z \"\$(git status --porcelain | grep -v '^??')\" ]; then \
+              git merge --ff-only origin/main -q && echo FF_SYNCED; \
+            else \
+              git checkout origin/main -- scripts migrations leo_tools truth_tests landtek_telegram 2>/dev/null && \
+              git reset -q scripts migrations leo_tools truth_tests landtek_telegram 2>/dev/null; \
+              echo FILE_SYNCED_DIRTY; \
+            fi" | grep -q FF_SYNCED; then
+        ok "VPS lineage fast-forwarded to deploy_${nn} (HEAD advanced, tree clean)"
       else
-        warn "VPS code sync skipped (ssh/git issue) — verify manually"
+        warn "VPS tree DIRTY — file-synced only; git lineage is DIVERGING. Reconcile the VPS tree (stash/commit) before it goes N-behind again."
       fi
     fi
     ;;
