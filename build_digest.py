@@ -174,6 +174,21 @@ def build_digest_sections():
             lines.append(f"  • [{it['priority'] or '?'}] {due} ({it['case_file'] or '?'}): {it['description'][:70]}")
         sections["action_items"] = f"📋 <b>Open action items ({len(items)})</b>\n" + "\n".join(lines)
 
+    # 4b. Fact adjudication queue (§6 Option A, deploy_977) — today's dose-capped batch; the line
+    # only appears when a batch exists (one point per message, no filler)
+    try:
+        cur.execute("SELECT count(*) AS n FROM v_adjudication_queue")
+        _q_today = (cur.fetchone() or {}).get("n") or 0
+        if _q_today:
+            cur.execute("""SELECT count(*) AS n FROM proposed_facts
+                           WHERE status IN ('pending','contradiction_hold')""")
+            _q_open = (cur.fetchone() or {}).get("n") or 0
+            sections["adjudication"] = (
+                f"⚖️ <b>Fact queue</b>\n  • {_q_today} item(s) ready for your yes/no today "
+                f"({_q_open} open overall) — scripts/adjudicate_queue.py --list")
+    except Exception as _e:
+        pass  # queue substrate absent → no section, never a broken digest
+
     # 5. Today's calendar
     try:
         cur.execute("""
@@ -286,7 +301,7 @@ def render_digest_messages():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     header = f"📊 <b>LandTek Daily Digest — {today}</b>\n\n"
 
-    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "calendar", "cases", "health", "inference", "governance"]
+    order = ["deadlines", "agent_activity", "corpus_stats", "activity", "uploads", "inquiries", "action_items", "adjudication", "calendar", "cases", "health", "inference", "governance"]
     msgs = []
     buf = header
     for k in order:

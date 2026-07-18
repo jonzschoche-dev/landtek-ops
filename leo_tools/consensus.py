@@ -206,7 +206,7 @@ def _compose_matter_status(cur, matter, client_code, role, params):
 
     # mention_only — proposed_facts contributes ONLY the gap, never a claim
     cur.execute("SELECT count(*) AS n FROM proposed_facts WHERE matter_code=%s "
-                "AND status NOT IN ('accepted','rejected','promoted')", (matter,))
+                "AND status NOT IN ('accepted','rejected','promoted','expired')", (matter,))
     npend = (cur.fetchone() or {}).get("n") or 0
     if npend:
         gaps.append(_gap("pending_adjudication", n=npend,
@@ -476,7 +476,7 @@ def _compose_facts(cur, matter, topic, client_code, role, params):
 
     # mention_only — pending proposals are a gap, never claims
     cur.execute(f"""SELECT count(*) AS n FROM proposed_facts f
-                    WHERE {scope_sql} AND status NOT IN ('accepted','rejected','promoted')
+                    WHERE {scope_sql} AND status NOT IN ('accepted','rejected','promoted','expired')
                       AND statement ILIKE %s""", (*scope_params, f"%{topic}%" if topic else "%"))
     npend = (cur.fetchone() or {}).get("n") or 0
     if npend:

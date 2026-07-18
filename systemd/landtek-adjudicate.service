@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek adjudication drain (§6 Option A) — daily mechanical re-check sweep (adjudicate_sweep --go: duplicates close, re-OCR'd excerpts re-offered to the DB gate, A74) then offer the operator's dose-capped batch (adjudicate_queue --offer: <=10/day, 3-offer expiry to labeled inferred). $0, deterministic, all writes through the A77/A78/DB gates.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/bin/sh -c '/usr/bin/python3 /root/landtek/scripts/adjudicate_sweep.py --go && /usr/bin/python3 /root/landtek/scripts/adjudicate_queue.py --offer'
+StandardOutput=append:/var/log/landtek_adjudicate.log
+StandardError=append:/var/log/landtek_adjudicate.log

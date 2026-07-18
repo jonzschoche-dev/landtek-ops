@@ -117,6 +117,14 @@ deploy_972 title inventory refactor ONTO the composer — their bespoke readers 
   0 released · 1 owner-unresolvable). **Residue for the A/B decision: 242.** Option A's premise
   ("mechanical closure is high") is FALSE — the residue needs either the dose-capped operator queue
   (A, ~242 items at ≤10/day ≈ 5 weeks) or the funeral (B). Operator decision, now evidence-backed.
+  **→ DECIDED 2026-07-18: OPTION A (operator).** Built same day (deploy_977): `adjudicate_queue.py`
+  (--offer/--list/--accept/--reject/--status/--digest-line) — daily dose ≤10 (env `ADJ_DOSE`),
+  breadth-fair rotation MWK-first, **3-offer expiry to LABELED `inferred_strong`** (never lingers,
+  never upgrades; status `expired` added to the vocabulary + all filters). Accept lands at
+  **`operator` tier** — verified stays DB-gate-earned. All queue writes ride the same A77/A78/DB
+  gates as every writer. Daily timer `landtek-adjudicate.timer` (05:30 UTC: sweep --go → offer);
+  digest carries the batch line (build_digest §4b). Floors: tier ceilings + dose ceiling
+  (test_adjudication_ledger, 6 green).
 - **Option A (drain is real):** if mechanical closure is high, keep the sweep on a timer + a
   dose-capped operator batch queue (≤10 one-tap items/day in the digest, A71) with an SLA; unactioned
   items past horizon expire to labeled `inferred_*`, never linger.
