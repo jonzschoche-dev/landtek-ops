@@ -53,7 +53,25 @@ CACHE_CONF = 0.80  # fresh derived card (rank 2)
 # Degrade-don't-crash fallback if the registry table is unreachable; flags itself as a gap.
 _FALLBACK_STALENESS_H = 26
 
-INTENTS = ("matter_status", "title", "deadlines", "facts")
+INTENTS = ("matter_status", "title", "deadlines", "facts", "title_inventory", "client_status")
+
+
+def _normalize_client(cur, client_code):
+    """Alias landmine fix (Grok review 2026-07-18): 'MWK' must resolve to 'MWK-001', not A5-hold.
+    Deterministic ladder: exact (case-insensitive) → unique prefix match → as-given (scope then
+    holds honestly). Never guesses across multiple matches."""
+    if not client_code:
+        return client_code
+    cur.execute("SELECT client_code FROM clients WHERE upper(client_code) = upper(%s)", (client_code,))
+    r = cur.fetchone()
+    if r:
+        return r["client_code"]
+    cur.execute("SELECT client_code FROM clients WHERE upper(client_code) LIKE upper(%s) || '-%%'",
+                (client_code,))
+    rows = cur.fetchall()
+    if len(rows) == 1:
+        return rows[0]["client_code"]
+    return client_code
 
 
 # ---------------------------------------------------------------- plumbing
@@ -492,6 +510,81 @@ def _compose_facts(cur, matter, topic, client_code, role, params):
     return _envelope("facts", params, client_code, role, status, claims, dissent, gaps, frame)
 
 
+def _compose_title_inventory(cur, client_code, role, params):
+    """The deploy_972 'clueless' ask-shape, composer-owned: count + status split + the requested
+    slice's ids, dosed for S14 (the other slices are one follow-up away). Reads the title_brief
+    cache (rank 2) — 455 cards, client-scoped in SQL."""
+    claims, gaps = [], []
+    _, reg_gap = _load_registry(cur, "title_inventory")
+    if reg_gap:
+        gaps.append(reg_gap)
+    if not client_code:
+        return _envelope("title_inventory", params, client_code, role, "miss", [], [],
+                         gaps + [_gap("unscoped_ask", detail="title inventory needs a client scope")],
+                         {"headline": "title inventory without a client"})
+    want = (params.get("slice") or "active").lower()
+
+    cur.execute("""SELECT coalesce(nullif(lower(coalesce(lifecycle_status, status)), ''), 'unknown') AS st,
+                          count(*) AS n, array_agg(display_no ORDER BY display_no) AS ids
+                   FROM title_brief WHERE client_code = %s GROUP BY 1 ORDER BY n DESC""",
+                (client_code,))
+    rows = cur.fetchall()
+    if not rows:
+        return _envelope("title_inventory", params, client_code, role, "miss", [], [],
+                         gaps + [_gap("no_title_cards", detail=f"no title_brief rows for {client_code}",
+                                      unblocks="materialize_title_brief run")],
+                         {"headline": f"{client_code}: no title cards"})
+    total = sum(r["n"] for r in rows)
+    split = " · ".join(f"{r['st']} {r['n']}" for r in rows)
+    claims.append(_claim({"total": total, "split": {r["st"]: r["n"] for r in rows}},
+                         f"{client_code}: {total} titles — {split}", "title_brief", client_code, None, 2))
+    slice_row = next((r for r in rows if r["st"] == want), None)
+    if slice_row:
+        ids = slice_row["ids"][:23]
+        claims.append(_claim(slice_row["ids"], f"{want}: {', '.join(ids)}",
+                             "title_brief", client_code, None, 2))
+    frame = {"headline": claims[0]["text"],
+             "lines": [c["text"] for c in claims[1:]],
+             "followups": [r["st"] for r in rows if r["st"] != want]}
+    return _envelope("title_inventory", params, client_code, role, "hit", claims, [], gaps, frame)
+
+
+def _compose_client_status(cur, client_code, role, params):
+    """Client-wide status rollup (the bare 'any update?' ask): active matters' brief headlines,
+    next-dated first, dosed. Rank-2 cache read; the undated count is reported, never hidden."""
+    claims, gaps = [], []
+    _, reg_gap = _load_registry(cur, "client_status")
+    if reg_gap:
+        gaps.append(reg_gap)
+    if not client_code:
+        return _envelope("client_status", params, client_code, role, "miss", [], [],
+                         gaps + [_gap("unscoped_ask", detail="client status needs a client scope")],
+                         {"headline": "status without a client"})
+    cur.execute("""SELECT b.matter_code, b.headline, m.next_deadline
+                   FROM matter_brief b JOIN matters m ON m.matter_code = b.matter_code
+                   WHERE m.client_code = %s AND m.status = 'active'
+                   ORDER BY m.next_deadline ASC NULLS LAST, b.n_facts_verified DESC LIMIT 6""",
+                (client_code,))
+    rows = cur.fetchall()
+    if not rows:
+        return _envelope("client_status", params, client_code, role, "miss", [], [],
+                         gaps + [_gap("no_matter_cards", detail=f"no active matter briefs for {client_code}",
+                                      unblocks="materialize_matter_brief run")],
+                         {"headline": f"{client_code}: no active matter cards"})
+    for r in rows:
+        claims.append(_claim(r["headline"], r["headline"], "matter_brief", r["matter_code"], None, 2))
+    cur.execute("""SELECT count(*) AS n FROM matters
+                   WHERE client_code = %s AND status='active' AND next_deadline IS NULL""",
+                (client_code,))
+    undated = (cur.fetchone() or {}).get("n") or 0
+    if undated:
+        gaps.append(_gap("needs_date", n=undated))
+    frame = {"headline": f"{client_code}: {len(rows)} active matter(s), next dated first",
+             "lines": [c["text"] for c in claims[:4]]}
+    status = "partial" if gaps else "hit"
+    return _envelope("client_status", params, client_code, role, status, claims, [], gaps, frame)
+
+
 # ---------------------------------------------------------------- public API
 
 def compose_answer(intent, client_code=None, role="operator", caller=None, **params):
@@ -508,12 +601,17 @@ def compose_answer(intent, client_code=None, role="operator", caller=None, **par
                          {"headline": f"unknown intent {intent}"})
     conn, cur = _cur()
     try:
+        client_code = _normalize_client(cur, client_code)
         if intent == "matter_status":
             env = _compose_matter_status(cur, params.get("matter"), client_code, role, params)
         elif intent == "title":
             env = _compose_title(cur, params.get("title"), client_code, role, params)
         elif intent == "deadlines":
             env = _compose_deadlines(cur, params.get("matter"), client_code, role, params)
+        elif intent == "title_inventory":
+            env = _compose_title_inventory(cur, client_code, role, params)
+        elif intent == "client_status":
+            env = _compose_client_status(cur, client_code, role, params)
         else:
             env = _compose_facts(cur, params.get("matter"), params.get("topic"), client_code, role, params)
         _audit(cur, env, caller=caller)

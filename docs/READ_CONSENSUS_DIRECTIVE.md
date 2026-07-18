@@ -1,6 +1,14 @@
 # Read-Side Consensus Layer — "the Answer Plane / Read Composer" (design directive, v2)
 
-> **Status: DESIGN — not built.** v1 authored 2026-07-18 (Mac desk) from the read-side gap analysis;
+> **Status: P0–P2 LIVE (deploys 939 · 975 · 976 · 977, 2026-07-18) — title_inventory/status not yet
+> composer-owned.** Live: registry + 4 intents + audit (P0) · both reply brains routed, same-frame
+> floor (P1) · sweep measured 7% + Option A dose queue + daily timer (P2). NOT yet owned: title
+> inventory · status_update · OP/docket membership (tuned bespoke readers remain — the A86
+> inventory tracker holds the shrinking list, baseline 5). Emission plane clamp (A79/A80) still
+> upstream work. This header is kept honest per the #4 lesson: the source of truth must not lie
+> about itself.
+>
+> **Status: DESIGN — not built** *(original v1/v2 header, superseded above).* v1 authored 2026-07-18 (Mac desk) from the read-side gap analysis;
 > **v2 same day: converged with the peer desk's composer brief** (adopting the hit/partial/miss/hold
 > envelope, the one-reply-brain-first wiring, the drain-or-funeral decision gate, the scoped temporal
 > cut, and the fleet self-inventory lane; retaining the registry-table authority source over

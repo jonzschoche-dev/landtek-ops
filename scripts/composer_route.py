@@ -46,6 +46,19 @@ _FACTS_RE = re.compile(
 
 _TOPIC_STRIP_RE = re.compile(r"^(the|our|my|ang|si|kay)\s+", re.I)
 
+# deploy_972's failure shapes, now composer-owned (Grok review item 2). inquiry_stack remains
+# the fallback when the composer misses; the dual path is FORBIDDEN once these soak green.
+_TITLE_LIST_RE = re.compile(
+    r"\b(list( of| all)?( the| our| my)? titles?|titles? (list|inventory)|how many titles|"
+    r"listahan|all( the| of)? titles|(active|clouded|cancelled|contested|unverified) titles|"
+    r"which titles|titles? do (we|i) (have|own|hold)|where('?s| is) the list)\b", re.I)
+_SLICE_RE = re.compile(r"\b(active|clouded|cancelled|contested|unverified|unknown)\b", re.I)
+_STATUS_RE = re.compile(
+    r"\b(any updates?|status update|latest (news|status|update)|balita|pinakabagong|"
+    r"what('?s| is) (new|happening|the status)|update (sa|naman))\b", re.I)
+_MATTER_HINT_RE = re.compile(r"\b(MWK|PARACALE|NIBDC|AUTO)-[A-Z0-9-]{2,}\b"
+                             r"|\b(guardianship|estate|arta|26-?360|op petition)\b", re.I)
+
 
 def _clip(text: str, cap: int = S14_CAP) -> str:
     if len(text) <= cap:
@@ -87,6 +100,21 @@ def try_composer_route(cur, client_code, message, channel=None, channel_user_id=
         return None
 
     caller = f"composer_route:{channel or 'unknown'}"
+
+    if _TITLE_LIST_RE.search(msg):
+        sl = _SLICE_RE.search(msg)
+        env = compose_answer("title_inventory", client_code=client_code, caller=caller,
+                             slice=sl.group(1).lower() if sl else None)
+        if env["status"] == "hit":
+            return {"text": _render(env, max_lines=2), "via": f"composer:title_inventory:{env['status']}",
+                    "purpose": "composer_title_inventory"}
+        # miss/hold → fall through to the tuned inquiry_stack path (dual path until soak green)
+
+    if _STATUS_RE.search(msg) and not _MATTER_HINT_RE.search(msg):
+        env = compose_answer("client_status", client_code=client_code, caller=caller)
+        if env["status"] in ("hit", "partial"):
+            return {"text": _render(env, max_lines=3), "via": f"composer:client_status:{env['status']}",
+                    "purpose": "composer_client_status"}
 
     if _DEADLINE_RE.search(msg):
         env = compose_answer("deadlines", client_code=client_code, caller=caller)
