@@ -198,7 +198,7 @@ def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=Fa
     docs = cur.fetchall()
 
     rows, ties = [], []
-    tally = {"good": 0, "weak": 0, "needs_reocr": 0, "reject": 0}
+    tally = {"good": 0, "weak": 0, "needs_reocr": 0, "reject": 0, "degenerate": 0}
     for d in docs:
         text = d["extracted_text"] or ""
         if not _CAND.search(text):
@@ -259,7 +259,7 @@ def sweep(matter=None, doc_id=None, all_corpus=False, write=False, write_weak=Fa
 
     print(f"\nSummary: {len(rows)} description segment(s) across docs · "
           f"good={tally['good']} weak={tally['weak']} "
-          f"needs_reocr={tally['needs_reocr']} reject={tally['reject']}")
+          f"needs_reocr={tally['needs_reocr']} reject={tally['reject']} degenerate={tally['degenerate']}")
     if ties:
         print(f"\nTIE LINES found ({len(ties)}) — georeferencing anchors for the map_parcels bridge:")
         for did, tno, snip in ties:
