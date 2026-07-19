@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek MWK expense harvester — sync the reimbursement ledger (legal_cost_actuals) from the latest Statement of Expenses; reconcile-gated, idempotent
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/landtek
+Environment=PG_DSN=postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
+ExecStart=/usr/bin/python3 /root/landtek/scripts/expense_harvester.py
+StandardOutput=append:/root/landtek/logs/expense_harvester.log
+StandardError=append:/root/landtek/logs/expense_harvester.log
