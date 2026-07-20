@@ -21,7 +21,11 @@ REGISTERED = {c["case_file"] for c in CLIENTS.values() if c.get("case_file")}
 # 'Archive' is the system bucket for documents/matters demoted out of active
 # triage (deploy_293 Fortunato-out-of-triage + AUTO-ARCHIVE matter). It's a real
 # domain value, not corruption — tolerated but unowned by any CLIENTS row.
-TOLERATED = {"unknown", "Unknown", "", "Archive"}
+TOLERATED = {"unknown", "Unknown", "", "Archive",
+             # 'PENDING_TRIAGE' — the scanner's deliberate "unreadable/unidentifiable by content →
+             # flag, NEVER guess onto a client" bucket (migration 2026-07-19_scanner_folder_filing.sql).
+             # This is client-separation (A5) working correctly, not corruption — recognized, still tracked.
+             "PENDING_TRIAGE"}
 
 
 def case_file_domain_invariant(cur):
