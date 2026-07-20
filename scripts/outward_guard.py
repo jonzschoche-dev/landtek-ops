@@ -110,7 +110,25 @@ def _mode(cur) -> str:
     try:
         cur.execute("SELECT mode FROM outward_guard_config WHERE id = 1")
         row = cur.fetchone()
-        return (row[0] if row else "shadow")
+        if not row:
+            return "shadow"
+        return (row["mode"] if isinstance(row, dict) else row[0])  # cursor-parity
+    except Exception:
+        return "shadow"
+
+
+def _safe_mode() -> str:
+    """Read the guard mode on its OWN short-lived connection — used by the fail-closed error path only.
+    Returns 'shadow' on any failure: a mode we cannot positively confirm as enforcing must NOT block a
+    real send (offline-sovereignty). The realistic enforce-mode fail-open — a logic bug in guard()'s body
+    while the DB is up and mode='block' — is caught here because this fresh read succeeds and returns
+    'block'. (deploy_989 / R5-T1)"""
+    try:
+        c = _conn()
+        try:
+            return _mode(c.cursor())
+        finally:
+            c.close()
     except Exception:
         return "shadow"
 
@@ -198,7 +216,15 @@ def _resolve_role(cur, channel, recipient, classification):
 
 
 def _clamp_decision(policy, context):
-    """PURE: given a role policy + output context, would the clamp fire, and why? (Testable in isolation.)"""
+    """PURE: given a role policy + output context, would the clamp fire, and why? (Testable in isolation.)
+
+    A80 tier NOT YET COMPARED (R5-T3, held): the output-disclosure tier that comm_agent_max computes
+    (context['disclosure_level'] ∈ {contradiction, cross_matter_cascade, verified_fact, general}) is
+    logged but NOT compared here against the role's disclosure_ceiling ∈ {none, machine_typed,
+    facts_plus_strategy, full}. The two are different axes with NO shared vocabulary; wiring the
+    comparison requires the ontology desk to reconcile them (see docs/DIRECTIVE_A80_disclosure_vocab.md).
+    This executor does NOT self-mint that mapping. Until the directive lands, the tier stays advisory and
+    the clamp fires only on the two ceiling/gate signals below (fail-closed for none/refuse)."""
     if policy.get("gate_default") == "refuse":
         return True, "role gate_default=refuse — never auto-anything"
     if policy.get("disclosure_ceiling") == "none" and context.get("contains_facts"):
@@ -220,8 +246,12 @@ def apply_comms_role_clamp(recipient_role, proposed_output, context, cur=None):
                         "FROM v_comms_role_policy WHERE role = %s", (recipient_role or "",))
             r = cur.fetchone()
             if r:
-                policy = dict(zip(("disclosure_ceiling", "gate_default", "dose_ceiling", "cadence",
-                                   "projection_profile"), r))
+                # cursor-parity: a RealDictCursor caller (leo_instant, comm_agent_soak, comm_agent_max)
+                # returns a dict row; zip(keys, dict) would iterate the row's KEYS → self-referential
+                # garbage, so would_clamp read False for every counterparty. Guard on isinstance (mirrors
+                # comm_agent_max._role_policy) so the shadow audit tells the truth. (deploy_989 / R5-T2)
+                _keys = ("disclosure_ceiling", "gate_default", "dose_ceiling", "cadence", "projection_profile")
+                policy = dict(r) if isinstance(r, dict) else dict(zip(_keys, r))
         except Exception:
             policy = None
         if policy is None:
@@ -290,7 +320,21 @@ def guard(channel, recipient, content_hash=None, source="", preview="", **_ignor
                              "reason": "no approved outward_action; held at T3"})
         return ("allow", {"classification": cls, "mode": mode, "shadow": True})
     except Exception as e:
-        return ("allow", {"error": str(e)})  # fail-safe: never block a real send on a guard error
+        # FAIL-CLOSED for an outward send in enforce (block) mode (A21/A43): a guard error must never let
+        # unapproved raw text reach a party. OFFLINE-SOVEREIGN for internal: the operator/sim (floor-
+        # classified without the DB) are never held — their own alerts must always flow. SHADOW-SAFE: in
+        # shadow the guard is structurally non-blocking, so it still allows (never blocks a real send).
+        # This changes behaviour ONLY on the block-mode error path — which is not active today — so it
+        # makes the future enforce switch trustworthy without altering current shadow behaviour. (R5-T1)
+        try:
+            is_internal = _floor_is_internal(channel, _norm(channel, recipient))
+        except Exception:
+            is_internal = True   # cannot even classify → treat as internal-safe (never block on a bug)
+        eff_mode = _safe_mode()
+        if eff_mode == "block" and not is_internal:
+            return ("hold", {"classification": "outward", "mode": eff_mode,
+                             "reason": "guard error — fail-closed hold (A21/A43)", "error": str(e)})
+        return ("allow", {"error": str(e), "mode": eff_mode})  # shadow / internal / unknown-mode: allow
     finally:
         if conn is not None:
             conn.close()

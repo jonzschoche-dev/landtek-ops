@@ -238,6 +238,9 @@ def handle_chat_event(cur, channel_message_id, candidate_text=None, force_shadow
     # ── EMISSION PLANE (the only clamped surface) ──
     disclosure = classify_output_disclosure(text, internal)
     policy = _role_policy(cur, role)
+    # NB (R5-T3): disclosure_level (the A80 output tier) is carried into ctx and shadow-logged but is NOT
+    # yet compared against the role's disclosure_ceiling — the two vocabularies are unreconciled. Wiring
+    # is held on docs/DIRECTIVE_A80_disclosure_vocab.md (ontology desk). Advisory until then.
     ctx = {"contains_facts": disclosure["contains_facts"], "disclosure_level": disclosure["tier"],
            "source": "comm_agent_max"}
     OG.apply_comms_role_clamp(role, {"text": text}, ctx, cur=cur)   # A79 clamp (shadow-logs would-clamp)
