@@ -110,7 +110,8 @@ Our SJ prayer asks the court to **cancel …2126 and REINSTATE T-52540** in the 
 | Date | Event | Source | Grade |
 |---|---|---|---|
 | **16 Mar 1992** | SPA to de la Fuente — **limited-object** power: sell only to Llamanzares CTS holders | **doc 246** (clean LRA CTC); doc 416 corroborative; doc 329 (19 Mar 1992) | VERIFIED (read clean 2026-07-05) |
-| ~1995 | de la Fuente's authorized period referenced as ending | doc 1132 (handwritten) | INFERRED (garbled OCR) |
+| ~15 Aug 1995 | **DRAFT (unexecuted) in co-owner Gerry Hoppe's hand:** "Cesar represented the heirs from 1991 to August 15, 1995, only for a limited number of transactions"; POA given to Ida Buenaventura as of 15-Aug-1995; disowns Von de la Fuente + Glenn Ordoveza Jr. and any post-1995 Cesar act | doc 1132 (handwritten); confirmed by Jonathan 2026-07-20 as **Gerry's DRAFT, not executed/published** (image pending upload) | **DRAFT only — NOT court-grade.** Corroborates class limit; the "1995" end-date is aspirational, collides with the 2005 published revocation. Do NOT testify a 1995 revocation on this. |
+| **1999** | **Cesar REPLACED as the heirs' representative in the Agrarian Reform case (CV 6839, MWK v. DAR, RTC Br. 40)** — the documentable pivot | Jonathan attestation; **pull CV 6839 order**; aligns w/ doc 1134 | **DOCUMENTABLE** (obtain CV 6839 record) |
 | **19 Feb 1999** | Gerry Hoppe writes de la Fuente: heirs transferring POA to Ida Buenaventura | **doc 1134** | VERIFIED (read) |
 | **15 Aug 2005** | de la Fuente's SPA **REVOKED** | doc 76 (2020 publication) + doc 79 (RD letter "since 2005") | VERIFIED (2 sources) |
 | **Sept 2016** | Deed of Absolute Sale, de la Fuente → Balane | **doc 415** (LRA-certified Exhibit 6) + doc 233 (bundle copy) — per §6 item 6 | VERIFIED (deed in corpus) |
