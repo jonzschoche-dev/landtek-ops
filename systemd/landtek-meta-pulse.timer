@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the LandTek meta-pulse daily at 03:30 UTC (11:30 AM Manila) — off-peak, after the nightly truth_tests + ontology sentinel have settled — so NEW self-improvement gaps are recorded and self-healing ones auto-closed within 24h, deterministically and at $0.
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 UTC
+AccuracySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

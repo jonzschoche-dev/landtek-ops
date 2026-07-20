@@ -1,0 +1,15 @@
+[Unit]
+Description=LandTek meta-pulse — scripts/meta_pulse.py: the $0 deterministic self-improving loop. Wraps truth_tests/run_all.py + ontology_check.py (--invariants/--enforcement/--alignment), diffs their output against the last run's state (meta_pulse_state), and records ONLY NEW gaps to system_evolution_log. Auto-closes gaps whose machine-checkable recheck_condition now passes (mirrors A74 recheck / reOCR rearm / V-shadow soak). Sends nothing, decides nothing, calls NO model. The only queue needing a human is: status='open' AND auto_resolvable=false.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+# A new gap is DATA, not a daemon failure — meta_pulse exits 0 on a normal cycle and 2
+# only on an internal error (DB unreachable). Treat 2 as success for systemd hygiene
+# (keep `systemctl --failed` at zero); state is durable, the next daily tick retries.
+SuccessExitStatus=0 2
+ExecStart=/usr/bin/python3 /root/landtek/scripts/meta_pulse.py
+StandardOutput=append:/var/log/landtek_meta_pulse.log
+StandardError=append:/var/log/landtek_meta_pulse.log
