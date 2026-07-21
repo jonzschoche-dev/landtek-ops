@@ -152,10 +152,15 @@ def job_b_index_unseen_drive(service):
         if not page_token: break
     print(f"  Drive PDFs total: {len(drive_pdfs)}")
 
-    # Filter: skip Drive IDs already indexed AND skip IDs already proven duplicates.
+    # Filter: skip Drive IDs already indexed AND skip IDs already proven duplicates AND skip the ScannerPro
+    # onboarding folder — that folder is OWNED by scan_intake.py (which tags ingest_source='scannerpro' and
+    # runs the land→OCR→classify handoff). Without this skip, drive_backfill races and lands those files first
+    # with a NULL source, shadowing the dedicated onboarding lane (the Jul 13/19 scans landed source-NULL).
+    SCANNERPRO_FOLDER = os.environ.get("SCANNERPRO_FOLDER_ID", "1TAksYrG-BzoOfc3UEIEZgJ6lBzu3IzmY")
     candidates = [f for f in drive_pdfs
                   if f["id"] not in known_drive_ids
-                  and f["id"] not in known_dupe_ids]
+                  and f["id"] not in known_dupe_ids
+                  and SCANNERPRO_FOLDER not in (f.get("parents") or [])]
     print(f"  candidates needing examination: {len(candidates)}")
     if not candidates:
         cur.close(); conn.close()
