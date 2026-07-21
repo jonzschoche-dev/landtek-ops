@@ -56,22 +56,30 @@ def classify_text(kw, text):
 
 
 def _record(cur, doc_id, assigned, hits, reason, dry):
-    payload = {"version": CLASSIFIER_VERSION, "assigned": assigned, "reason": reason,
-               "matched": hits}
+    """Three dispositions:
+      single_client → set case_file (filed).
+      multi_client  → stamp PENDING_TRIAGE — genuinely ambiguous, needs a human, will NOT self-resolve.
+      no_signal     → LEAVE case_file NULL (record the attempt only) so a later keyword improvement can still
+                      auto-file it; it stays visible in v_scan_triage as an unfiled row meanwhile."""
+    payload = {"version": CLASSIFIER_VERSION, "assigned": assigned, "reason": reason, "matched": hits}
     if dry:
         return
     if assigned:
-        cur.execute("""UPDATE documents
-                          SET case_file = %s,
-                              analyst_memo = coalesce(analyst_memo,'{}'::jsonb)
-                                             || jsonb_build_object('client_classification', %s::jsonb)
+        cur.execute("""UPDATE documents SET case_file = %s,
+                          analyst_memo = coalesce(analyst_memo,'{}'::jsonb)
+                                         || jsonb_build_object('client_classification', %s::jsonb)
                         WHERE id = %s AND case_file IS NULL""",
                     (assigned, json.dumps(payload), doc_id))
-    else:  # flag → PENDING_TRIAGE (only from NULL; don't re-stamp an already-triaged row)
-        cur.execute("""UPDATE documents
-                          SET case_file = 'PENDING_TRIAGE',
-                              analyst_memo = coalesce(analyst_memo,'{}'::jsonb)
-                                             || jsonb_build_object('client_classification', %s::jsonb)
+    elif reason.startswith("multi_client"):
+        cur.execute("""UPDATE documents SET case_file = 'PENDING_TRIAGE',
+                          analyst_memo = coalesce(analyst_memo,'{}'::jsonb)
+                                         || jsonb_build_object('client_classification', %s::jsonb)
+                        WHERE id = %s AND case_file IS NULL""",
+                    (json.dumps(payload), doc_id))
+    else:  # no_client_signal → keep NULL (reprocessable), just record the attempt
+        cur.execute("""UPDATE documents SET
+                          analyst_memo = coalesce(analyst_memo,'{}'::jsonb)
+                                         || jsonb_build_object('client_classification', %s::jsonb)
                         WHERE id = %s AND case_file IS NULL""",
                     (json.dumps(payload), doc_id))
 
