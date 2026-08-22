@@ -3,7 +3,8 @@
 
 Grinds the corpus toward bullet-proof on the Gemini FREE tier: a rate-limited,
 idempotent, resumable loop that makes every canonical doc
-  READ       — OCR the ones with no extracted_text (gemini-2.5-flash vision)
+  READ       — extract the ones with no extracted_text: PDF text layer per page, Tesseract OCR
+               for image-only pages; ALL pages, partials recorded (deploy_994)
   SEARCHABLE — embed the ones with text but no vector (gemini-embedding-001 -> Qdrant)
 
 Self-adapts to the real rate limit: on HTTP 429 it backs off and retries, so it
@@ -78,6 +79,48 @@ def local_path(row):
     return None, False
 
 
+NATIVE_MIN_CHARS = 40   # a page whose PDF text layer yields fewer chars than this is treated as image-only -> OCR it
+OCR_DPI = 120           # memory-careful for the tiny box (was the deploy_405 setting)
+MAX_PAGES = int(os.environ.get("BACKFILL_MAX_PAGES", "0") or 0)  # 0 = no cap. Any cap is RECORDED as partial, never silent.
+
+
+def extract_pages(path, max_pages=0):
+    """Page-by-page extraction, every page accounted for.
+
+    Per page: use the PDF's own text layer when it carries real text, else Tesseract OCR via
+    PyMuPDF (dpi OCR_DPI). A page that raises is recorded (NOT swallowed silently) and the
+    loop continues. Returns dict(text, page_count, pages_done, pages_native, pages_ocr, errors).
+    pages_done < page_count  <=>  PARTIAL — the caller must record it (deploy_994 fix: the old
+    15-page cap silently reported a 19-page memo as complete; see doc 1163)."""
+    d = fitz.open(path)
+    pc = d.page_count
+    limit = pc if not max_pages else min(pc, max_pages)
+    parts, errors, n_native, n_ocr, done = [], [], 0, 0, 0
+    for i in range(limit):
+        try:
+            page = d[i]
+            t = (page.get_text("text") or "")
+            if len(t.strip()) >= NATIVE_MIN_CHARS:
+                n_native += 1
+            else:
+                tp = page.get_textpage_ocr(dpi=OCR_DPI, full=True)
+                t = page.get_text("text", textpage=tp) or ""
+                del tp
+                n_ocr += 1
+            parts.append(t)
+            done += 1
+            del page
+        except Exception as e:
+            errors.append(f"p{i+1}:{type(e).__name__}:{str(e)[:60]}")
+            parts.append("")
+        gc.collect()
+    d.close()
+    if limit < pc:
+        errors.append(f"cap:{limit}/{pc}")
+    return {"text": "\n".join(parts).strip(), "page_count": pc, "pages_done": done,
+            "pages_native": n_native, "pages_ocr": n_ocr, "errors": errors}
+
+
 def do_ocr(cur, row):
     path, tmp = local_path(row)
     if not path:
@@ -92,19 +135,11 @@ def do_ocr(cur, row):
             VALUES (%s,1,true,%s) ON CONFLICT (doc_id) DO UPDATE SET ocr_done=true,
             last_error=excluded.last_error, updated_at=now()""", (row["id"], f"unsupported mime {mime}"))
         return "skip"
-    # LOCAL OCR via PyMuPDF+Tesseract — no quota. Memory-careful (this box is tiny):
-    # one page at a time at modest DPI, gc between pages, cap pages per doc.
+    # LOCAL extraction via PyMuPDF (+Tesseract for image-only pages) — no quota. Memory-careful:
+    # one page at a time, gc between pages. ALL pages (deploy_994): a cap, if ever set via
+    # BACKFILL_MAX_PAGES, is recorded as a partial extraction — never reported as complete.
     try:
-        d = fitz.open(path)
-        parts = []
-        for i in range(min(d.page_count, 15)):
-            page = d[i]
-            tp = page.get_textpage_ocr(dpi=120, full=True)
-            parts.append(page.get_text("text", textpage=tp))
-            del tp, page
-            gc.collect()
-        d.close()
-        text = "\n".join(parts).strip()
+        r = extract_pages(path, MAX_PAGES)
     except Exception as e:
         # un-openable (HEIC, corrupt, etc.) — count the attempt so we move on
         # instead of looping forever on one bad file.
@@ -116,30 +151,35 @@ def do_ocr(cur, row):
     finally:
         if tmp and os.path.exists(path):
             os.remove(path)
+    text = r["text"]
     if len(text) < 20:
         cur.execute("""INSERT INTO corpus_backfill_state (doc_id, ocr_attempts, last_error)
             VALUES (%s,1,'empty ocr') ON CONFLICT (doc_id) DO UPDATE SET
             ocr_attempts=corpus_backfill_state.ocr_attempts+1, last_error='empty ocr', updated_at=now()""",
             (row["id"],))
+        cur.execute("UPDATE documents SET page_count=%s WHERE id=%s AND page_count IS NULL",
+                    (r["page_count"], row["id"]))
         return "empty"
-    cur.execute("UPDATE documents SET extracted_text=%s WHERE id=%s", (text, row["id"]))
-    cur.execute("""INSERT INTO corpus_backfill_state (doc_id, ocr_done) VALUES (%s,true)
-        ON CONFLICT (doc_id) DO UPDATE SET ocr_done=true, updated_at=now()""", (row["id"],))
-    return f"ocr {len(text)}c"
-
-
-def do_embed(cur, row):
-    text = (row["extracted_text"] or "")[:8000]
-    emb = genai.embed_content(model="models/gemini-embedding-001", content=text,
-                              task_type="RETRIEVAL_DOCUMENT", output_dimensionality=768)
-    vec = emb["embedding"]
-    pid = str(uuid.uuid5(NS, f"doc-{row['id']}"))
-    QC.upsert(collection_name=COLL, points=[{
-        "id": pid, "vector": vec,
-        "payload": {"doc_id_postgres": row["id"], "text": text[:500], "source": "backfill"}}])
-    cur.execute("""INSERT INTO corpus_backfill_state (doc_id, embedded) VALUES (%s,true)
-        ON CONFLICT (doc_id) DO UPDATE SET embedded=true, updated_at=now()""", (row["id"],))
-    return "embedded"
+    partial = r["pages_done"] < r["page_count"]
+    err = (f"partial extraction: {r['pages_done']}/{r['page_count']} pages "
+           f"({'; '.join(r['errors'])[:160]})") if partial else None
+    # text is written even when partial (findability), but the shortfall is RECORDED on the row
+    # and in the state table, and ocr_done stays false so the daemon retries (<3 attempts).
+    cur.execute("""UPDATE documents SET extracted_text=%s, text_length=%s, page_count=%s,
+                   ocr_used=%s, processed_at=now(),
+                   error=CASE WHEN %s IS NOT NULL THEN %s
+                              WHEN error LIKE 'partial extraction%%' THEN NULL ELSE error END
+                   WHERE id=%s""",
+                (text, len(text), r["page_count"], r["pages_ocr"] > 0, err, err, row["id"]))
+    if partial:
+        cur.execute("""INSERT INTO corpus_backfill_state (doc_id, ocr_attempts, ocr_done, last_error)
+            VALUES (%s,1,false,%s) ON CONFLICT (doc_id) DO UPDATE SET
+            ocr_attempts=corpus_backfill_state.ocr_attempts+1, ocr_done=false,
+            last_error=excluded.last_error, updated_at=now()""", (row["id"], err[:200]))
+        return f"PARTIAL {r['pages_done']}/{r['page_count']}p {len(text)}c"
+    cur.execute("""INSERT INTO corpus_backfill_state (doc_id, ocr_done, last_error) VALUES (%s,true,NULL)
+        ON CONFLICT (doc_id) DO UPDATE SET ocr_done=true, last_error=NULL, updated_at=now()""", (row["id"],))
+    return f"ocr {len(text)}c {r['page_count']}p (native {r['pages_native']}, ocr {r['pages_ocr']})"
 
 
 def quarantine_unfetchable(cur):
@@ -158,7 +198,9 @@ def quarantine_unfetchable(cur):
 def next_ocr(cur):
     cur.execute(f"""SELECT d.id, d.file_path, d.drive_file_id, d.mime_type FROM documents d
         LEFT JOIN corpus_backfill_state s ON s.doc_id=d.id
-        WHERE {CANON} AND coalesce(length(d.extracted_text),0) < 50
+        WHERE {CANON}
+          AND (coalesce(length(d.extracted_text),0) < 50
+               OR coalesce(s.last_error,'') LIKE 'partial extraction%')  -- deploy_994: retry recorded partials
           AND (coalesce(d.file_path,'')<>'' OR coalesce(d.drive_file_id,'')<>'')
           AND coalesce(s.ocr_attempts,0) < 3 AND coalesce(s.ocr_done,false)=false
         ORDER BY d.id LIMIT 1""")
@@ -204,7 +246,7 @@ def main():
             row = next_ocr(cur)
             if row:
                 r = do_ocr(cur, row)
-                if r.startswith("ocr") or r == "empty":
+                if r.startswith("ocr") or r.startswith("PARTIAL") or r == "empty":
                     done_ocr += 1 if r.startswith("ocr") else 0
                     log(f"OCR doc#{row['id']}: {r}  (ocr done={done_ocr})")
                     time.sleep(OCR_PACE)
