@@ -182,6 +182,20 @@ def do_ocr(cur, row):
     return f"ocr {len(text)}c {r['page_count']}p (native {r['pages_native']}, ocr {r['pages_ocr']})"
 
 
+def do_embed(cur, row):
+    text = (row["extracted_text"] or "")[:8000]
+    emb = genai.embed_content(model="models/gemini-embedding-001", content=text,
+                              task_type="RETRIEVAL_DOCUMENT", output_dimensionality=768)
+    vec = emb["embedding"]
+    pid = str(uuid.uuid5(NS, f"doc-{row['id']}"))
+    QC.upsert(collection_name=COLL, points=[{
+        "id": pid, "vector": vec,
+        "payload": {"doc_id_postgres": row["id"], "text": text[:500], "source": "backfill"}}])
+    cur.execute("""INSERT INTO corpus_backfill_state (doc_id, embedded) VALUES (%s,true)
+        ON CONFLICT (doc_id) DO UPDATE SET embedded=true, updated_at=now()""", (row["id"],))
+    return "embedded"
+
+
 def quarantine_unfetchable(cur):
     """Self-healing finish line: a doc whose bytes can't be fetched after 3 tries
     (dead file_path + invalid Drive id) can never be OCR'd — quarantine it so READ
