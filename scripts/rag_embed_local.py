@@ -18,10 +18,14 @@ vector space is internally consistent.
   python3 scripts/rag_embed_local.py --status
 """
 import base64
+import os
 import subprocess
 import sys
 
-SSH = ["ssh", "-o", "ConnectTimeout=60", "root@100.85.203.58"]
+# Host: env-overridable; default the ~/.ssh/config alias (public IP). The old hardcoded Tailscale IP
+# (100.85.203.58) started black-holing on 2026-08-24 — TCP connects, session hangs — which killed every
+# _psql call at the 120s subprocess timeout and silently broke the 6h embed sweep (deploy_996).
+SSH = ["ssh", "-o", "ConnectTimeout=60", os.environ.get("LANDTEK_SSH_HOST", "landtek")]
 DOCKER_PSQL = "docker exec -i n8n-postgres-1 psql -U n8n -d n8n"
 CHUNK, OVERLAP = 1500, 200
 _MODEL = None
