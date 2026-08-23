@@ -1,9 +1,11 @@
-# Inocalla Farm Shaker Table — Prototype Engineering Brief
+# LAB X Shaker Table — Prototype Engineering Brief (SMBC Mercury-Free Processing System, Casalugan)
 
-**Project:** LandTek project (LandTek is a principal, not just service provider) at the Inocalla farm, Paracale, Camarines Norte — filed under Paracale-001; keep strictly separated from MWK and NIBDC per the client-separation invariant. Registered in `MASTER_PLAN.md` §7 / §8 (2026-08-23).
-**Design authority:** Stephen Lloyd, head mechanical engineer and designer. This brief consolidates the starting point; every decision marked **D-n** is his to make or overrule.
-**Status:** DRAFT v0.1 — 2026-08-23. Consolidated from the 2026-08-22 design chat (which drew on ~100 web sources, none vendor-quoted). Nothing here is a measured quote or a test result; cost figures are marked **ESTIMATE / UNQUOTED** throughout.
-**Goal:** 10 tonnes/day of gravity feed at the farm, mercury-free, built with local fabricators wherever possible. Build **one** full-size prototype first, tune it, then decide on table 2.
+**Project:** LAB X — a LandTek project (LandTek is a principal, not just service provider) under **Golden Inocalla Management Services** (Allan Inocalla, Principal). **Site (rev. 2026-08-23):** the **SMBC Mercury-Free Processing System (MFPS), Barangay Casalugan, Paracale** — the ₱29M planetGOLD facility owned and managed by the Samahan ng mga Minero sa Barangay Casalugan, where **Stephen Lloyd is Investor and Operational Partner under SMBC Board Resolution No. 2026-009** (SMBC owns the plant; Stephen holds no equity; net profits 50/50). Site facts per `case_work/NIBDC-001/DEAL_MEMO_PLANET_GOLD_PROCESSING_NIBDC.md` (a draft for negotiation — executed agreement copy still to be obtained). Filed under Paracale-001; keep strictly separated from MWK per the client-separation invariant. Registered in `MASTER_PLAN.md` §7 / §8. Presentation: `LAB_X_SHAKER_TABLE_DESIGN.pdf` (generator `lab_x_deck.py`).
+**Design authority:** Stephen Lloyd, head mechanical engineer and designer. **Manpower:** Allan Inocalla supplies the site crew (installation, pad works, riffle fitting) and the table operators. This brief consolidates the starting point; every decision marked **D-n** is his to make or overrule.
+**Status:** DRAFT v0.2 — 2026-08-23 (site moved from the Inocalla farm to the SMBC MFPS; Stephen Lloyd as design lead and plant operator). Consolidated from the 2026-08-22 design chat (which drew on ~100 web sources, none vendor-quoted). Nothing here is a measured quote or a test result; cost figures are marked **ESTIMATE / UNQUOTED** throughout.
+**Goal:** 10 tonnes/day of gravity feed at the SMBC MFPS plant, mercury-free, built with local fabricators wherever possible. Build **one** full-size prototype first, tune it, then decide on table 2.
+
+**Programme positioning (2026-08-23):** LAB X is part of the UN-backed **planetGOLD** sustainable Minahang Bayan agenda (the MFPS was established under planetGOLD Philippines — UNEP-led, GEF-funded); the partnership's alignment note names the MFPS as the model to replicate regionally. Stephen's and the project's accolades are to spearhead further funding and involvement — **documents-only accolade file (C-21) and funding-line map (C-22) still to compile; nothing asserted without a document.**
 
 **One-sentence position:** A Wilfley/6-S-style table is buildable in Camarines Norte from local mild steel, a locally machined eccentric shaft, and a rubber-lined deck; the three things that decide whether it actually recovers gold are (1) a rigid foundation — **not** spring isolation, (2) an accurately machined asymmetric head motion, and (3) riffle/slope geometry copied from a proven deck and then tuned in the field — and the one thing that decides whether two tables are the right machine at all is an ore test that nobody has run yet.
 
@@ -70,7 +72,7 @@ Deck geometry, the eccentric-shaft spec, the materials list, the local-sourcing 
 |---|---|---|
 | D-1 | Circuit A (table roughs) or B (rougher upstream, table cleans) | Build prototype either way; decide before table 2 |
 | D-2 | Deck size: full 4.5 m or a 3–3.5 m "half" unit for the prototype | Full size — the head motion is the hard part and is the same cost either way |
-| D-3 | Motor: 3-phase 1.1 kW + VFD (needs 3-phase supply or 1-ph-in VFD) vs single-phase 1.5 HP fixed speed | 3-phase motor + single-phase-input VFD; confirm what CANORECO actually delivers at the farm |
+| D-3 | Motor: 3-phase 1.1 kW + VFD (needs 3-phase supply or 1-ph-in VFD) vs single-phase 1.5 HP fixed speed | 3-phase motor + single-phase-input VFD; confirm the MFPS plant supply phase and spare capacity (C-8) |
 | D-4 | Head motion: copy a 6-S toggle/spring mechanism vs simpler eccentric + pitman + rubber return | Copy 6-S geometry — measure a reference unit (§12) |
 | D-5 | Deck support: leaf-spring flexures vs rocker/pivot stands | Flexures (fewer wear parts) |
 | D-6 | Deck lining: local conveyor-grade rubber vs imported Linatex-class | Local rubber for the prototype; note wear rate |
@@ -163,7 +165,7 @@ Realistic mid-point with local labour: **₱160,000–190,000** per the design c
 
 The taper is what makes the table selective: each riffle is a successively lower barrier, lights wash over and off, heavies keep crawling. Riffles of uniform height concentrate poorly.
 
-**Strong recommendation before finalising any of this:** photograph and measure the riffle layout of an operating 6-S deck (the planetGOLD Paracale plant is the obvious reference, minutes from the farm) and copy it. The numbers above are textbook-class; the reference deck is proven on local ore.
+**Strong recommendation before finalising any of this:** photograph and measure the riffle layout of an operating 6-S deck and copy it — if the MFPS gravity circuit carries one, Stephen measures it in-house (C-17). The numbers above are textbook-class; the reference deck is proven on local ore.
 
 ### 7b. Fabricating tapered riffles — Method A, hardwood (prototype default, D-7)
 
@@ -231,7 +233,7 @@ Three slopes/motions are adjustable. Start values below are published 6-S / Wilf
 5. Fabricator: base frame → deck skeleton → supports and jacks → head-motion housing → motor mount → launders.
 6. Bond rubber lining; cut, seal and fit riffles (§7).
 7. Dry-run and balance on the shop floor; fix pulley/belt/guard.
-8. Cast the pad at the farm (cure ≥ 7 days before loading).
+8. SMBC written consent; cast the pad inside/beside the MFPS (cure ≥ 7 days before loading).
 9. Set the table, anchor, plumb water, wire motor + VFD + emergency stop.
 10. Wet commissioning per §8a; record the setup sheet.
 11. Decide table 2 (D-1) from measured capacity and recovery.
@@ -256,12 +258,17 @@ Imported 6-S units were cited in the chat at roughly USD 1,500–3,500 FOB befor
 | # | Item | Owner |
 |---|---|---|
 | 1 | Ore sample and gravity test — size distribution, free vs locked gold | Allan / Stephen |
-| 2 | Power at the farm: CANORECO supply single- or three-phase? (The farm has a customer-funded line extension — see `CANORECO_LINE_TAPPING_INTAKE.md`.) | Allan |
-| 3 | Reference unit: confirm a 6-S table is operating at the planetGOLD Paracale plant and arrange a visit to measure it | Jonathan / Allan |
+| 2 | Power at the MFPS: phase, voltage, spare capacity for two 1.5 kW drives (the plant already has supply) | Stephen |
+| 3 | Reference unit: does the MFPS gravity circuit carry a shaking table (reported centrifuge + helix + table)? If so Stephen measures it in-house; else arrange a visit elsewhere | Stephen |
 | 4 | Three fabrication quotes (steel + labour), one lathe-shop quote for the shaft, one rubber quote | Stephen |
-| 5 | Water source and tailings/settling arrangement at the site | Allan |
-| 6 | Permitting: confirm the processing activity is covered by the farm's existing mining/processing status — legal item, tracked separately in the Paracale-001 spine | Jonathan |
+| 5 | MFPS water and tailings/settling capacity for the added tables | Stephen |
+| 6 | Consents: executed Operational Partnership Agreement copy; SMBC written consent to install; added tables inside the MFPS permits/ECC (PMRB / MGB-V) | Stephen / Jonathan |
+| 7 | Role of the tables (main-circuit cleaner vs the deal memo §5 toll-basis secondary station) and title to them (GIMS / SMBC / investor group) | Allan / Stephen |
+| 8 | Marlon Malaluan's operating role (named operator in the draft memo; not in Res. 2026-009) | Stephen |
+| 9 | Allan-supplied manpower: headcount, skills (welder / fitter / mason / operators), cost basis (in-kind vs paid), availability date | Allan |
+| 10 | Accolade file — Stephen's and the project's credentials/recognitions, verified documents only | Stephen / Allan |
+| 11 | Funding and involvement lines (planetGOLD / UN-GEF follow-on, DENR-MGB / PMRB / LGU, investors, TSX-V path, NGOs): programme name/phase, who leads each | Allan / Stephen / Jonathan |
 
 ---
 
-*Document history:* v0.1 2026-08-23 — consolidated from the design chat, isolation track retired, circuit/ore-test gates added, riffle fabrication and slope settings written up. Next revision after Stephen's D-1…D-8 calls.
+*Document history:* v0.1 2026-08-23 — consolidated from the design chat, isolation track retired, circuit/ore-test gates added, riffle fabrication and slope settings written up. v0.2 2026-08-23 — site moved to the SMBC MFPS (Casalugan), Stephen Lloyd spotlighted as design lead + operating partner, consent/title/inventory open items added; LAB X deck generated. Next revision after Stephen's D-1…D-8 calls.
