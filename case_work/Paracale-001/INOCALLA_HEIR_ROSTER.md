@@ -27,7 +27,7 @@
 
 ### DECEASED SIBLINGS — their CHILDREN must all be named (fill in)
 
-**CASPER V. Inocalla** (deceased) — *"Resolutions BACK TO FAMILY (PAID)"* = the DBP lots repurchased/paid (1985 Undertaking). ⚠ This branch **runs the Front-2 mining** and **owes the DBP conveyance** — cooperation uncertain. **Update 2026-08-23 [O]:** Allan had a long, warm conversation with Lita — she says she and her children are committed to preserving Casper's legacy; goodwill letter drafted (`LETTER_ATE_LITA_2026-08.md`). Door opening; consent no longer presumed hostile.
+**CASPER V. Inocalla** (deceased) — *"Resolutions BACK TO FAMILY (PAID)"* = the DBP lots repurchased/paid (1985 Undertaking). ⚠ This branch **runs the Front-2 mining** and **owes the DBP conveyance** — cooperation uncertain. **Update 2026-08-23 [O]:** Allan had a long, warm conversation with Lita — she says she and her children are committed to preserving Casper's legacy; goodwill letter drafted (`LETTER_ATE_LITA_2026-08.md`). Door opening; consent no longer presumed hostile. **⚠ Update 2026-08-24 [O — Jonathan, UNVERIFIED]:** Lita **has started selling Casper's properties** (which parcels/buyers/stage unknown — identify). Undertaking-notice letter + protection plan: `UNDERTAKING_NOTICE_ATE_LITA.md`. RD CTCs for T-20754/55/56/57 now URGENT.
 | Heir | Age | Address | Consent | Notes |
 |---|---|---|---|---|
 | **Carmelita "Lita" Inocalla** (widow) [O] | ( ? ) | ( ? ) | ⚠ likely resistant → **warming (2026-08-23 conversation w/ Allan [O])** | runs the mining; goodwill letter sent/pending — get the 4 children's names/ages/addresses if door stays open |

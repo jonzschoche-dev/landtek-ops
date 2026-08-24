@@ -5,6 +5,10 @@
 > the properties. This is a significant opening — the roster had this branch flagged **"likely
 > resistant"** (runs the Front-2 mining; owes the DBP conveyance under the 1985 Undertaking).
 > Allan drafted a short letter; polished version below. **[O] — Allan's draft relayed by Jonathan.**
+>
+> **⚠ Update 2026-08-24:** Jonathan reports Lita **has started selling Casper's properties** [O,
+> unverified] and wants to send her Casper's signed 1985 Undertaking. Follow-up letter + protection
+> plan: `UNDERTAKING_NOTICE_ATE_LITA.md`. If a sale is imminent, the two letters can go together.
 
 ---
 
