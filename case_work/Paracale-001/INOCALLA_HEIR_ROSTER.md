@@ -27,10 +27,10 @@
 
 ### DECEASED SIBLINGS — their CHILDREN must all be named (fill in)
 
-**CASPER V. Inocalla** (deceased) — *"Resolutions BACK TO FAMILY (PAID)"* = the DBP lots repurchased/paid (1985 Undertaking). ⚠ This branch **runs the Front-2 mining** and **owes the DBP conveyance** — cooperation uncertain.
+**CASPER V. Inocalla** (deceased) — *"Resolutions BACK TO FAMILY (PAID)"* = the DBP lots repurchased/paid (1985 Undertaking). ⚠ This branch **runs the Front-2 mining** and **owes the DBP conveyance** — cooperation uncertain. **Update 2026-08-23 [O]:** Allan had a long, warm conversation with Lita — she says she and her children are committed to preserving Casper's legacy; goodwill letter drafted (`LETTER_ATE_LITA_2026-08.md`). Door opening; consent no longer presumed hostile.
 | Heir | Age | Address | Consent | Notes |
 |---|---|---|---|---|
-| **Carmelita "Lita" Inocalla** (widow) [O] | ( ? ) | ( ? ) | ⚠ likely resistant | runs the mining |
+| **Carmelita "Lita" Inocalla** (widow) [O] | ( ? ) | ( ? ) | ⚠ likely resistant → **warming (2026-08-23 conversation w/ Allan [O])** | runs the mining; goodwill letter sent/pending — get the 4 children's names/ages/addresses if door stays open |
 | Casper child 1 ( ? ) | | | | |
 | Casper child 2 ( ? ) | | | | |
 | Casper child 3 ( ? ) | | | | |
