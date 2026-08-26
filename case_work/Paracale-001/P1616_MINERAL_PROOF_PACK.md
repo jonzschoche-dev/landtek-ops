@@ -49,13 +49,31 @@ What it certifies:
   veins. The properties known to be traversed by any of the four quartz vein system are lots #3,
   #4, #5, #6, #7, #9, #12, #13, #14, and #15 … The properties that are not possibly traversed by
   any of the four veins are lots #1, #2 and #10."**
-- ⚠ **P-1616 status inside the cert — CONFIRM BEFORE QUOTING:** P-1616 is **row #11** of the
-  schedule. The "not traversed" sentence names ONLY #1, #2, #10 — implying **#11 IS in the
-  mineralized set** — but the OCR of the enumerated "traversed" list does not clearly show "#11"
-  (both photo copies garble that stretch). **Heightened OCR / manual read of the original photo is
-  required to fix whether row #11 appears in the traversed enumeration.** Until then: cite the
-  cert as "area mineralized with gold; only rows 1, 2 and 10 excluded from vein traversal"
-  [V-as-OCR'd] and mark the #11 inclusion **PENDING VERIFICATION**.
+- **Deciphered by vision read 2026-08-26** (both Drive photos are the same 576×1024
+  Telegram-compressed scan; page-level read + pixel zooms). Full narrative, verbatim as legible:
+  > *"Per Report of Verification the area is mineralized with gold. Gold is concentrated only
+  > along veins. The properties known to be traversed by any of the four quartz vein system are
+  > lots #3, #4, #5, #6, #7, #9, #12, #13, #14, and #15. There is a probability however that lot
+  > #1[1?] may be traversed by split veins of the Manila vein system. Also the Vallejo vein system
+  > probably extends into lot #8. The properties that are not possibly traversed by any of the
+  > four veins are lots #1, #2 and #10. Lots #1 and #2, however are transected by fractures
+  > (inferred from air photos) which may possibly host quartz veins. For lot #10, it may be
+  > possible that a split vein of the Vallejo or the Manila vein system exist."*
+- Field verification dates read **August 5–7, 1996** (matches NI 43-101 Table 7 "MGB V August
+  1996 Verification Samples"). Signature block: **REY[NULFO A.?] JUAN, OIC Regional Director**;
+  documentary stamps DS/1999 ser. 5534422/5534423/0005534451.
+- ⚠ **P-1616 (row #11) status — the one remaining ambiguity:** the "probability… split veins of
+  the Manila vein system" sentence names a lot number that **visually reads "#1" but is almost
+  certainly "#11"**: (a) at 576-px width the second digit of an "11" is unresolvable against a
+  single "1"; (b) internal consistency — with "#11" every one of the 15 rows is accounted for
+  exactly once (traversed: 3–7, 9, 12–15; probable: 11 Manila split veins, 8 Vallejo extension;
+  not traversed: 1, 2, 10 with their own fracture/split-vein caveats), whereas with "#1" the
+  paragraph contradicts itself about #1 and says nothing at all about #11; (c) geometry — Lot 4
+  is bounded by lots 3, 5 and 7 of the same survey, all in the traversed list. **Pixel analysis
+  cannot go further on this compressed photo — the fix is a proper scan of Allan's paper original
+  or the MGB CTC (gap item B-7), NOT more OCR of these jpgs.** Until then cite: "P-1616 is
+  surrounded by traversed lots on three sides; the cert's probability clause (Manila split veins)
+  most plausibly refers to it — PENDING VERIFICATION on the original."
 - This is the single strongest "mineral property" document in hand: a **government certification,
   on a schedule that names P-1616 by lot, survey number, owner and title number**. Get the
   physical original from Allan and a **certified re-issue/CTC from MGB R-V** (the 2000 original
@@ -177,12 +195,54 @@ speaks of "the Inocalla land" collectively. To close it:
 | 4 | **AWO / occupation-fee compliance history** for the claims | the "make-or-break" vested-rights fact (§6-B) | MGB R-V |
 | 5 | NI 43-101 **figures/maps at full resolution** (Figs. 1–3 property/tenement maps) | the report's own maps may already draw the Inocalla lots — extract before commissioning new work | already in `ParacaleGold_JZafra 2.pdf`; needs image-grade extraction |
 
-| 6 | **Heightened OCR of the MGB 2000 Certification photos** (A0) — settle whether row #11 (Lot 4 / P-1616) is in the "traversed" enumeration + fix the verification dates | unlocks the strongest parcel-level claim | LandTek (heightened_ocr runner, VPS) |
+| 6 | ~~Heightened OCR of the MGB 2000 Certification photos~~ → **✅ DONE 2026-08-26 (vision read, full narrative transcribed into A0).** Residual: the "#1 vs #11" token is beyond the photo's resolution — closes only via item 7 (original/CTC) | unlocks the strongest parcel-level claim | ✅ read; token → item 7 |
 | 7 | **Certified re-issue / CTC of the April 2000 MGB Certification** from MGB R-V records (cite OR #2895597, 12 Apr 2000, requested by Casper Inocalla) | court-grade original of A0 | Allan (field) — family's own paper, NDA wall does not apply |
 | 8 | **Certified copy of survey plan Psu-143364** (and Psu-143363, plus the consolidated plan of record) | the official survey map of the parcel | see "Where to get the Psu plan" below |
 
 **Recommended order:** 6 (in-house, immediate) → 5 (free, in hand) → 3 (in-house) → 7–8 (field) →
 1–2 (MGB pull, mind the NDA wall on channel #1) → 4.
+
+### ✅ Lot 4 polygon — RECONSTRUCTED AND VERIFIED (2026-08-26)
+
+The parcel polygon is now solved from the OCT's own technical description (page 16-A of the 4b
+Drive scan, read at 300–600 dpi). **Proof of transcription accuracy: traverse closure misfit
+0.07 m over the 2,230.18 m perimeter, and shoelace area = 152,068.9 sqm vs the title's 152,069 —
+an exact match.** Artifacts in this folder:
+- `p1616_lot4_polygon.geojson` — the 15-corner polygon in LOCAL survey meters (x=East, y=North,
+  origin = corner 1) with full provenance properties. Ready to load into `map_parcels` once
+  georeferenced.
+- `p1616_lot4_polygon.png` — rendered plot with corner numbers, course distances, and adjoining
+  owners per the title.
+
+The 15 courses (bearing, distance): 1→2 N03°47'E 153.49; 2→3 S14°26'E 242.18; 3→4 S68°13'E
+223.82; 4→5 S47°46'W 299.34; 5→6 N78°45'W 162.92; 6→7 S61°07'W 174.37; 7→8 N07°00'W 195.16;
+8→9 N27°00'W 88.11; 9→10 N77°05'W 40.16; 10→11 S71°58'W 57.41; 11→12 N05°22'W 75.67; 12→13
+S89°51'E 205.30; 13→14 N56°35'E 104.62; 14→15 S69°27'E 137.16; 15→1 N00°33'W 70.47 (POB).
+
+Adjoiners per the title: NW line 1-2 Leonardo Lamadrid (H-54763); NE line 2-3 Hrs. of Serapia
+Banal (H-47686); line 3-4 (H-47774); SE line 4-5 Filomena L. Madrid (Lot 1, Psu-143365); S lines
+5-6-7 Pastor Dasco (H-128572); W lines 7-8-9-10-11 Lot 5, Psu-143364; line 11-12 Creek and Lot 1;
+N lines 12-13-14-15-1 Leonardo Lamadrid (H-54763). *(Matches the 2024 Tax Dec boundary recitals.)*
+Distinctive shape: a narrow ~150 m spike at corner 2 (wedge between the Lamadrid and Banal
+hacienda lots). Surveyed **June 2–5, 1954**, approved **April 28, 1955**; **"This lot is covered
+by FPA No. V-43979"** (the free-patent application number — useful key for DENR/LMB records).
+Points 8, 9, 10, 11 marked by PLS cylindrical concrete monuments, the rest old points.
+
+**Georeferencing (still open):** the tie line reads **"N.60-⟨minutes obscured by fold crease⟩'W.,
+3508.83 m from BLBM No. 1, Bo. of Batobalani, Mp. of Paracale"** — candidates 01'/31'/51'. To
+place the polygon on the map: (a) read the minutes off the LRA CTC print (4a, page "16-A" —
+higher quality than the 4b duplicate scan), and (b) obtain BLBM No. 1 Batobalani coordinates
+(PRS92/PPCS) from DENR R-V LMS — or shortcut: fit the polygon onto the family's consolidated plan
+(A4-b) / satellite imagery via the mapping-agent.
+
+**Bonus from page 16-B (Memorandum of Incumbrances), same read:** a sibling patent title
+**P-1618** exists (mortgaged together with P-1516/P-1615/P-1617 — Philippine Veterans Bank 1966,
+₱10,000, guardian Vicente Inocalla for the minors; cancelled 1967; then PNB 1967 ₱7,000) — **a
+16th family title NOT in the 15-row inventory. Chase P-1618's identity.** Also: the RD's July 14,
+1964 certification on this very copy says it is the **second owner's duplicate**, issued by CFI
+order (Judge Melquiades G. Ilao) after the first duplicate was declared null and void — i.e., the
+2024 affidavit-of-loss episode is the SECOND loss of this title's owner's copy (1964 precedent
+on file).
 
 ### Where to get the official Psu-143364 plan (survey plan sourcing)
 

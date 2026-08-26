@@ -1,0 +1,92 @@
+{
+ "type": "FeatureCollection",
+ "crs_note": "LOCAL survey coordinates (meters), x=East y=North, origin=corner 1 of Lot 4 Psu-143364. NOT georeferenced: tie line N.60-??'W (minutes illegible) 3508.83m from BLBM No.1 Batobalani, Paracale. Georeference pending BLBM coordinates.",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "title": "OCT P-1616",
+    "lot": "Lot 4, Psu-143364",
+    "owner": "Allan V. Inocalla",
+    "area_sqm_title": 152069,
+    "area_sqm_computed": 152068.9,
+    "perimeter_m": 2230.18,
+    "closure_misfit_m": 0.07,
+    "source": "OCT P-1616 technical description p.16-A (4b Drive scan), transcribed+verified 2026-08-26",
+    "surveyed": "June 2-5, 1954 (approved April 28, 1955)",
+    "fpa": "FPA No. V-43979"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       0.0,
+       0.0
+      ],
+      [
+       10.13,
+       153.16
+      ],
+      [
+       70.49,
+       -81.38
+      ],
+      [
+       278.33,
+       -164.44
+      ],
+      [
+       56.69,
+       -365.64
+      ],
+      [
+       -103.1,
+       -333.86
+      ],
+      [
+       -255.77,
+       -418.08
+      ],
+      [
+       -279.56,
+       -224.38
+      ],
+      [
+       -319.56,
+       -145.87
+      ],
+      [
+       -358.7,
+       -136.89
+      ],
+      [
+       -413.29,
+       -154.67
+      ],
+      [
+       -420.37,
+       -79.33
+      ],
+      [
+       -215.07,
+       -79.87
+      ],
+      [
+       -127.75,
+       -22.25
+      ],
+      [
+       0.69,
+       -70.4
+      ],
+      [
+       0.0,
+       0.0
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
