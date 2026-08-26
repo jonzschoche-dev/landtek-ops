@@ -31,6 +31,36 @@
 
 ## A. What we HOLD — the proof chain, strongest first
 
+### A0. ⭐ MGB Region V CERTIFICATION (April 13, 2000) — the parcel-level government proof **[V — read 2026-08-26; needs heightened OCR]**
+Photos of an original **DENR Mines and Geosciences Bureau, Region V (Banag, Daraga, Albay)
+Certification issued 13 April 2000** on the request of **Casper Inocalla** (OR #2895597, 12 Apr
+2000; signed by the OIC Regional Director). Two copies, in Drive folder
+`Direct - Shishir Inocalla/photos`:
+- https://drive.google.com/file/d/1abYnRrDYxo7DIWL7T_N5t4ATtoh9IjhO/view
+- https://drive.google.com/file/d/1kG6tk99ufZDYflblq49zKyxcnomR0la8/view
+
+What it certifies:
+- The Inocalla/Villafria properties underwent **geological verification by MGB** (OCR reads the
+  field dates ambiguously — "August 5–7, 199?"; the NI 43-101's Table 7 "MGB V August 1996
+  Verification Samples" suggests **1996** — confirm on the original).
+- It reproduces the **same 15-row property schedule** as the family inventory (row 11 = **Lot 4,
+  Psu-143364, Allan Inocalla, P-1616, 15.2069 ha**).
+- **"Per Report of Verification the area is mineralized with gold. Gold is concentrated only along
+  veins. The properties known to be traversed by any of the four quartz vein system are lots #3,
+  #4, #5, #6, #7, #9, #12, #13, #14, and #15 … The properties that are not possibly traversed by
+  any of the four veins are lots #1, #2 and #10."**
+- ⚠ **P-1616 status inside the cert — CONFIRM BEFORE QUOTING:** P-1616 is **row #11** of the
+  schedule. The "not traversed" sentence names ONLY #1, #2, #10 — implying **#11 IS in the
+  mineralized set** — but the OCR of the enumerated "traversed" list does not clearly show "#11"
+  (both photo copies garble that stretch). **Heightened OCR / manual read of the original photo is
+  required to fix whether row #11 appears in the traversed enumeration.** Until then: cite the
+  cert as "area mineralized with gold; only rows 1, 2 and 10 excluded from vein traversal"
+  [V-as-OCR'd] and mark the #11 inclusion **PENDING VERIFICATION**.
+- This is the single strongest "mineral property" document in hand: a **government certification,
+  on a schedule that names P-1616 by lot, survey number, owner and title number**. Get the
+  physical original from Allan and a **certified re-issue/CTC from MGB R-V** (the 2000 original
+  should be retrievable from MGB records with the OR reference).
+
 ### A1. NI 43-101 Technical Report — the technical keystone **[V — read 2026-08-26]**
 *"NI 43-101 Report on Mineral Resource Exploration Target — Bicol Gold Project (APSA-000322-V)",
 Jaime C. Zafra, P.Geo FAusIMM, for Paracale Gold Corporation, eff. 1 Jan 2022.*
@@ -94,6 +124,29 @@ The application's own sketch maps "indicat[e] the respective names of the mining
   photos — same scope (loan-packet items 3a/3b/3d, packet folder cover: `00 - COVER - Documents
   Submitted.txt`, 2026-07-02).
 
+### A4-b. Consolidated survey plan (map) plotting Lot 4, Psu-143364 **[V — sighted 2026-08-26]**
+Photo of a **"CONSOLIDATED PLAN OF LAND AS PREPARED [for] HEIRS OF VICENTE INOCALLA, SR. AND
+BEATRIZ VILLAFRIA — situated in Capacuan & San Rafael, Paracale & Jose Panganiban, Camarines
+Norte"** — a surveyor's consolidated plan drawing that **plots the Psu-143364 lots including
+LOT 4 (P-1616)** alongside T-3424, T-20754/55/56/57, H-128572, P-1516, P-1615, T-2194, T-4185.
+Drive: `Direct - Shishir Inocalla/photos/1478433353969575.jpg`
+(https://drive.google.com/file/d/1f_DMgsaZ-LAygpK9VXL2W7CPvhaR6yRm/view).
+This is the family-held **map that points to the parcel** — pair it with the OCT's technical
+description for the demonstrative overlay (gap-list item B-3). Surveyor's name/plan number/date
+are on the sheet but OCR-illegible — read off the original photo.
+
+### A4-c. Final SPA property schedule — "Coco/Mineral" land classification **[V photos; O = Final SPA gdoc]**
+A schedule page of the family's **Final SPA (July 2024; principals Marilou, Cipriana, Herbert,
+Jesus, Remedios → Allan as Attorney-in-Fact)** lists the San Rafael / Jose Panganiban parcels
+(incl. Psu-143364 / Psu-143363 lots, T-5656, T-20754/56/57, H-128572, T-2194, T-4185) with
+**"Kind of land: Coco/Mineral"**
+(https://drive.google.com/file/d/1yE2KIEXu9KVSa18-nrF71A7PjwHLfTX8/view). This mirrors assessor
+kind-of-land designations — family/assessor-side corroboration that the San Rafael block is
+treated as part-mineral. (⚠ The 2024 Tax Dec for P-1616 itself reads Coconut/Bulas — the
+"Coco/Mineral" designations visible on this page attach to the neighboring rows 17–24; whether
+P-1616's own row (earlier page) reads Coco/Mineral must be checked on the preceding schedule
+page.)
+
 ### A5. Historical / corroborating
 - **MPSA Application, Alakor Corp., July 4, 2000** (doc 1269;
   https://drive.google.com/file/d/1VDM-FMCkRtua4KEiW82kUcIhlmNpohuF/view) — earlier third-party
@@ -124,8 +177,31 @@ speaks of "the Inocalla land" collectively. To close it:
 | 4 | **AWO / occupation-fee compliance history** for the claims | the "make-or-break" vested-rights fact (§6-B) | MGB R-V |
 | 5 | NI 43-101 **figures/maps at full resolution** (Figs. 1–3 property/tenement maps) | the report's own maps may already draw the Inocalla lots — extract before commissioning new work | already in `ParacaleGold_JZafra 2.pdf`; needs image-grade extraction |
 
-**Recommended order:** 5 (free, in hand) → 3 (in-house) → 1–2 (one MGB records pull, mind the NDA
-wall on channel #1) → 4.
+| 6 | **Heightened OCR of the MGB 2000 Certification photos** (A0) — settle whether row #11 (Lot 4 / P-1616) is in the "traversed" enumeration + fix the verification dates | unlocks the strongest parcel-level claim | LandTek (heightened_ocr runner, VPS) |
+| 7 | **Certified re-issue / CTC of the April 2000 MGB Certification** from MGB R-V records (cite OR #2895597, 12 Apr 2000, requested by Casper Inocalla) | court-grade original of A0 | Allan (field) — family's own paper, NDA wall does not apply |
+| 8 | **Certified copy of survey plan Psu-143364** (and Psu-143363, plus the consolidated plan of record) | the official survey map of the parcel | see "Where to get the Psu plan" below |
+
+**Recommended order:** 6 (in-house, immediate) → 5 (free, in hand) → 3 (in-house) → 7–8 (field) →
+1–2 (MGB pull, mind the NDA wall on channel #1) → 4.
+
+### Where to get the official Psu-143364 plan (survey plan sourcing)
+
+**Psu = a private-land survey plan** (pre-consolidation series, approved by the Bureau of Lands).
+It is NOT a subdivision plan (Psd) — Psu-143364 is the mother survey whose Lots 1–10 became the
+individual heir titles; Lot 4 = P-1616. Certified copies of the **plan sheet, lot data
+computation, and technical descriptions** are obtainable from:
+
+1. **DENR Region V — Lands Management Service (LMS), Legazpi City**, or **CENRO Daet / PENRO
+   Camarines Norte** — regional custodian of approved survey plan records for the province.
+   Request "certified electronic/blueprint copy of Plan Psu-143364 (and Psu-143363), with lot
+   data computation and technical description of Lot 4."
+2. **NAMRIA (Taguig)** — holds microfilm of old Bureau-of-Lands Psu plans; the fallback if the
+   regional record is lost (this is a 1950s-era survey — pre-1963 patent).
+3. **LRA / RD Camarines Norte** — the registration copy: the plan accompanying the OCT P-1616
+   issuance; ask for the plan on file with the patent transcription (Sept 3, 1963 entry).
+4. **Already in hand (unofficial):** the family's consolidated plan photo (A4-b) and the OCT's own
+   technical description (metes and bounds of Lot 4, tie line to BLLM No. 1, Batobalani) — enough
+   to plot the parcel now; the certified plan is for filings.
 
 ---
 
