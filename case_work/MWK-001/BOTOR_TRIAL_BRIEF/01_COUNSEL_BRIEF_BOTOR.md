@@ -71,13 +71,29 @@ Balane. Defense counsel: Atty. Ronald A. Ramos.
 | ~1 Jun 2026 | Our Comment/Opposition to re-admission | doc 1087 |
 | ~2 Jun 2026 | Mediation held | spine §2c |
 | 27 Jul 2026 | Guardianship initial hearing, RTC Br. 41 Daet (your matter) | MASTER_PLAN §1; outcome not yet in corpus |
-| **9 Sep 2026** | **TRIAL — Jonathan testifies as Patricia's witness** | **[OPERATOR-REPORTED 2026-08-30]** — verify the order/notice; corpus's prior fixed point was 12 Aug |
+| **28 Aug 2026** | **MTC ORDER (Judge Lourdes Clarissa Donnatilla K. Cu): mediation/JDR failed; trial calendar set.** Plaintiff's witnesses: **9 Sep · 7 Oct · 14 Oct · 4 Nov · 11 Nov 2026**; defendants' witnesses: **2 Dec · 9 Dec 2026 · 13 Jan · 3 Feb · 10 Feb 2027** — all 1:30 PM. Counsel had **3 days to manifest non-availability**, else dates final and non-transferable. Order is **silent** on the SJ and JA-admission motions. | **VERIFIED** — scan + transcription: `case_work/MWK-001/court_orders/ORDER_2026-08-28_trial_setting.md` |
+| **9 Sep 2026, 1:30 PM** | **TRIAL DAY 1 — Jonathan testifies as Patricia's witness** | VERIFIED (28-Aug Order) |
 
-**Unknowns to close with Barandon's file before 9 Sep (no ruling is in corpus on any of these):**
-1. Has the court ruled on the **SJ motion**? (See §3a — the silence is itself an issue.)
-2. Has the court ruled on **admission of Balane's Judicial Affidavit**? If exclusion stands, the
-   defense has no principal direct testimony — this changes trial shape entirely.
-3. What exactly is set for 9 Sep — plaintiff's presentation of evidence? Whose witnesses?
+**⏰ IMMEDIATE (expires ~31 Aug / 1 Sep):** confirm TODAY with Atty. Barandon whether he has any
+conflict on any of the ten dates and whether a non-availability manifestation was filed within the
+3-day window. After it lapses the calendar is final and non-transferable — including the December
+dates the defense needs for its Gloria-in-Canada problem.
+
+**Trial-shape read-offs from the calendar:** plaintiff has **five** hearing dates — enough for
+Jonathan's direct + cross plus supporting witnesses and the formal offer; counsel should now plan
+the witness order and which documentary exhibits (including the pattern bundle, §6) land on which
+date. The defense's first date is **2 Dec** — their excluded-JA / remote-testimony problem for
+Gloria must surface as motion practice before then; watch for it and oppose on the record already
+built (doc 1087).
+
+**Unknowns still to close with Barandon's file before 9 Sep:**
+1. Has the court ruled on the **SJ motion**? The 28-Aug trial-setting order is **silent** on it
+   (see §3a).
+2. Has the court ruled on **admission of Balane's Judicial Affidavit**? Also silent in the 28-Aug
+   order. If exclusion stands, the defense has no principal direct testimony — and their first
+   presentation date (2 Dec) forces the issue into motion practice this fall.
+3. ~~What is set for 9 Sep~~ **ANSWERED by the 28-Aug Order:** plaintiff's presentation of
+   witnesses, five dates, 1:30 PM.
 4. What did the pre-trial order stipulate/mark? (Stipulations bind the trial; we have never read
    the pre-trial order itself.)
 
@@ -89,8 +105,9 @@ resolution by roughly May–June. Lower courts must resolve pending matters with
 submission** (Const. Art. VIII §15(1)); on that clock a written resolution was due around
 July–August. Three explanations, in descending likelihood — each with its own move:
 
-1. **An order exists that we have not seen** (resolved in the trial-setting order itself, or served
-   on counsel only, or in the mail). → *Move: a records check at the MTC docket — certified copies
+1. **A separate order exists that we have not seen** (served on counsel only, or in the mail). The
+   28-Aug trial-setting order — now in hand — does **not** resolve the SJ, so if a resolution
+   exists it is a separate issuance. → *Move: a records check at the MTC docket — certified copies
    of every order issued since April. Cheap, fast, and it also captures the pre-trial order and the
    JA-admission ruling. Do this first; nothing else in this section matters until it's done.*
 2. **The court is deferring to trial** — treating the SPA's interpretation as a triable issue

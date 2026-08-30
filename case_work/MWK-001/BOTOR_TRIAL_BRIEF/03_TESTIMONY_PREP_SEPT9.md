@@ -1,10 +1,12 @@
-# Testimony prep — Jonathan on the stand, 9 Sep 2026 (CV 26-360, MTC Mercedes)
+# Testimony prep — Jonathan on the stand, 9 Sep 2026, 1:30 PM (CV 26-360, MTC Mercedes)
 
-> Rebaselined 2026-08-30 from the Aug-12 cards (`AUG12_CROSS_CARD.md`, `AUG12_CROSS_REHEARSAL.md`)
-> after the trial moved to **9 September** `[OPERATOR-REPORTED]`. Substance unchanged — the record
-> did not move; only the date did. If any part of the testimony was already given on/around Aug 12,
-> tell counsel so this pack can be trimmed to what remains. Rehearse aloud with counsel
-> (Barandon; Botor if agreed). Approved answers ≤2 sentences.
+> Rebaselined 2026-08-30 from the Aug-12 cards (`AUG12_CROSS_CARD.md`, `AUG12_CROSS_REHEARSAL.md`).
+> **Date VERIFIED by the MTC Order of 28 Aug 2026** (Judge Cu; transcription:
+> `../court_orders/ORDER_2026-08-28_trial_setting.md`): mediation/JDR failed; **plaintiff's
+> presentation runs 9 Sep · 7 Oct · 14 Oct · 4 Nov · 11 Nov 2026, all 1:30 PM** — so direct and
+> cross may span multiple settings; pace accordingly, and the golden rules apply on EVERY date.
+> Substance unchanged from the Aug-12 prep — the record did not move; the calendar did. Rehearse
+> aloud with counsel (Barandon; Botor if agreed). Approved answers ≤2 sentences.
 
 ## The one line that wins everything
 

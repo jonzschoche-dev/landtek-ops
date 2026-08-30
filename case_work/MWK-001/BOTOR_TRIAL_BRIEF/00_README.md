@@ -39,11 +39,13 @@ counsel relies on it.**
 
 ## Hard gates (do not skip)
 
-1. **Trial date 9 Sep 2026 is `[OPERATOR-REPORTED 2026-08-30]`** — no court order in corpus yet
-   records it (the prior north star was Aug-12 testimony). Counsel must verify date, time, and what
-   the setting covers (SJ hearing? presentation of plaintiff's evidence?) against the latest order
-   or notice from MTC Mercedes / Atty. Barandon's file. Same for the status of the SJ motion and
-   the Balane-affidavit admission motion — **no ruling on either is in corpus.**
+1. **Trial date 9 Sep 2026 is DOCUMENT-VERIFIED** — MTC Order of 28 Aug 2026 (scan + transcription:
+   `case_work/MWK-001/court_orders/ORDER_2026-08-28_trial_setting.md`): mediation/JDR failed;
+   plaintiff presents 9 Sep, 7 Oct, 14 Oct, 4 Nov, 11 Nov 2026; defendants 2 Dec, 9 Dec 2026,
+   13 Jan, 3 Feb, 10 Feb 2027 — all 1:30 PM. **⏰ URGENT: counsel had 3 days from 28 Aug to
+   manifest non-availability (expires ~31 Aug), else the dates are final and non-transferable.**
+   The order is SILENT on the SJ motion and the Balane-affidavit admission motion — **no ruling on
+   either is in corpus**; the MTC records check (brief §3a) remains the first move.
 2. **Barandon is counsel of record in 26-360.** Botor consulting ≠ Botor appearing. Any appearance,
    substitution, or collaboration structure is for Jonathan and both counsel to settle — ten days
    before trial, an uncoordinated second voice is a risk, not a remedy. The brief flags this.
