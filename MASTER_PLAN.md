@@ -14,12 +14,12 @@
 
 ## 1. North star & live legal posture
 
-**✅ Aug 12, 2026 — Jonathan Zschoche testifies as Patricia Keesey Zschoche's witness** in **Civil Case 26-360 (Zschoche v. Balane)** (2,587 sqm parcel recovery, MTC Mercedes).
+**⚠️➜ REBASELINED 2026-08-30 (operator-reported): Sept 9, 2026 — TRIAL of Civil Case 26-360; Jonathan Zschoche testifies as Patricia Keesey Zschoche's witness** (2,587 sqm parcel recovery, MTC Mercedes). The prior Aug-12 fixed point is superseded. **No court order in corpus yet records the 9-Sep setting, the SJ ruling, or the JA-admission ruling — confirm all three against Barandon's file/the court order and upgrade to ✅.** Trial-prep package for consulting Atty. Botor (estate counsel taking over estate responsibilities): `case_work/MWK-001/BOTOR_TRIAL_BRIEF/` (counsel brief · document index · Sept-9 testimony pack · campaign-pattern memo).
 
 - **✅ Court: MTC Mercedes, Camarines Norte; governed by Summary Procedure.** NOT the RTC. NOT an "Aug 1 pre-trial." Pre-trial was **May 13, 2026 (passed)** — the case advanced into motion practice.
 - **✅ Live now:** our **Motion for Summary Judgment** pending a ruling; defendants moving to admit **Gloria Balane's Judicial Affidavit** (excluded at pre-trial); **mediation** held ~June 2.
 - **✅ Parallel: MWK-GUARDIANSHIP** (special proceeding, RTC Daet) — **✅ Atty. Adan Botor is counsel of record** (ENGAGED); **✅ petition FILED as Spec. Proc. No. 2680, RTC Br. 41 Daet — hearing SET 2026-07-27 8:30am** (in-court; per RTC Order doc#1199 / gmail#91604 from Botor, recv 2026-06-22; supersedes the older "pending filing" language). Guardianship-first sequencing (Jonathan as guardian) gates CV-26360 authority.
-- **Posture: wartime, not peacetime.** Everything the stack does serves the Aug 12 deadline / the SJ motion / the guardianship grant, or it is deferred. No from-scratch rebuilds during the live window.
+- **Posture: wartime, not peacetime.** Everything the stack does serves the **Sept 9 trial** / the SJ motion / the guardianship grant, or it is deferred. No from-scratch rebuilds during the live window. *(Older "Aug 12" references throughout this doc read as the trial-prep deadline; they are superseded by Sept 9.)*
 
 **✅ Verified case corrections (override older docs / CLAUDE.md):**
 - Balane's title = **T-079-2021002126** (not …2127).
