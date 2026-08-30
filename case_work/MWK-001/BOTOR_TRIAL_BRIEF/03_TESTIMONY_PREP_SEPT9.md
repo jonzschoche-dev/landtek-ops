@@ -20,9 +20,12 @@ It needs no date, no chain, no revocation. Whenever cornered, come home to it.
 
 ## Golden rules
 
-1. **Never argue "he couldn't sell at all."** The SPA authorized a sale — to Llamanzares
-   Contract-to-Sell holders only. Concede the clause; stand on the class. (If shown your own JA
-   Q53, concede the wording and restate the class limitation.)
+1. **On the stand, never argue "he couldn't sell at all."** Counsel WILL argue on paper that the
+   SPA granted no sale power (the strict-construction prong — brief §4b), and the jurisprudence
+   supports it. But a witness can't plead in the alternative, and the "sign and execute … receive
+   the proceeds" clause will be read to you on cross. Your unlosable ground is the class: concede
+   the clause; stand on the class. (If shown your own JA Q53, concede the wording and restate the
+   class limitation. Legal argument → "that's for counsel.")
 2. **Never claim personal knowledge you don't have** (the 1992 signing; any 2005 notice to Cesar).
    You testify as Patricia's attorney-in-fact on the documents and family records — plus the
    personal knowledge you do have (you were in the Philippines in 1996 and met Cesar).

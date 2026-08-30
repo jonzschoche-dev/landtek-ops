@@ -160,23 +160,66 @@ the owners. Honest limits (do not overstate): the 2005 disowning clause does not
 document proves 2005 notice *to him* (Salvador denies it, doc 407 S32); publication came 2020,
 annotation 2021. Under the lead frame none of that matters.
 
-### 4b. THE CRACK — our filed papers still lead with a retired theory
+### 4b. The "negotiate" argument — not retired, LAYERED (revised 2026-08-30 per Jonathan's flag)
 
-- The filed SJ motion argues the SPA "does not contain any express grant of authority to sell …
-  but only to 'negotiate'" (doc 393 ¶5–6). Jonathan's own JA swears the same (doc 441 Q53).
-- But the SPA also empowers the agent "to sign and execute the necessary documents … as well as to
-  receive the proceeds of the aforementioned sale" — text Jonathan himself reads into the record
-  (doc 441 Q23) and the deed recites (doc 415).
-- The defense has already loaded the counter: Answer ¶39 — the SPA "read as a whole" allowed a sale
-  (doc 405).
+**The internal history, honestly:** the filed SJ motion argues the SPA "does not contain any
+express grant of authority to sell … but only to 'negotiate'" (doc 393 ¶5–6); Jonathan's JA swears
+the same (doc 441 Q53). A July war-room audit flagged this as dangerous *as a sole lead*, because
+the SPA also empowers the agent "to sign and execute the necessary documents … as well as to
+receive the proceeds of the aforementioned sale" — text our own witness reads into the record
+(doc 441 Q23) — and the defense has loaded exactly that counter (Answer ¶39: the SPA "read as a
+whole" allowed a sale). **Jonathan's response (2026-08-30) is doctrinally right: the
+strict-construction jurisprudence keeps the negotiate argument alive.** The correct posture is
+neither "lead only with negotiate-only" nor "retire it" — it is **argument in the alternative,
+each prong independently voiding the sale:**
 
-**The fix is argument-framing, not new evidence: at trial, concede the SPA authorized *a* sale and
-stand on the class limitation + revocation.** Jonathan's testimony pack is already built on the
-concede-and-pivot (see `03_TESTIMONY_PREP_SEPT9.md`). What lead counsel must do: align the trial
-memorandum / formal offer / any argument to the class-limitation lead, and handle the JA Q53
-wording (plus the known typos, §5) before the defense uses our own affidavit against us.
-**This is the concrete substance behind Jonathan's "not proactive enough" concern — raise it
-directly and get an answer on how the trial will be framed.**
+**Prong 1 — No power to sell at all (strict construction).** The SPA's operative grant is "to
+negotiate for the sale." **Nowhere in the instrument do the dispositive words appear — sell,
+convey, transfer, alienate, dispose, hypothecate, encumber.** The law requires them:
+- Art. 1874 — sale of land through an agent requires *written* authority, else void;
+- Art. 1878(5) — an SPA is required for any contract transmitting ownership of an immovable;
+- **Art. 1879 — "A special power to sell excludes the power to mortgage; and a special power to
+  mortgage does not include the power to sell"** — the Code's own declaration that dispositive
+  powers are never implied one from another; a fortiori, none is implied from "negotiate";
+- *Cosmic Lumber v. CA* (G.R. 114311, 1996) — sale authority must appear in "clear and
+  unmistakable language"; *Woodchild Holdings v. Roxas Electric* (G.R. 140667, 2004) — powers of
+  attorney are strictly construed and never extended by implication; *Bautista-Spille v. Nicorp*
+  (G.R. 214057, 2015; **in the firm's verified law library**) — general/administrative authority
+  or mere authority to negotiate does not include the power to sell, and the agent's sale is void;
+  *MCIAA v. Unchuan* (G.R. 182537, 2016; in library) — void for want of written sale authority,
+  and the nullity action never prescribes. The negotiate-line cases (*AF Realty v. Dieselman*;
+  *Litonjua v. Eternit*) hold authority to negotiate/find a buyer is not authority to conclude the
+  sale — **counsel to verify these two citations before briefing** (not yet in the verified
+  library).
+- The defense's "sign and execute … receive the proceeds" clause is answerable on strict
+  construction: it is **ancillary machinery for "the aforementioned sale"** — the class-limited,
+  consultation-gated sale the instrument describes — not an independent, at-large dispositive
+  grant. Under *Woodchild*, ancillary words cannot extend the power by implication.
+
+**Prong 2 — Even assuming a sale power, Balane is outside it.** The trap in the defense's own
+argument: **"read as a whole" is self-defeating.** If reading the instrument as a whole yields a
+sale power, the same whole reading carries, in the same sentence, the Llamanzares-CTS class limit
+and the prior-consultation condition. They cannot keep the empowering clause and drop the limiting
+one. Balane concedes she held no Llamanzares contract and never contacted the owners (doc 1089
+T13/T18–19/T43; receipts doc 414). A sale beyond the SPA's limits is void — *Tumibay v. Lopez*
+(G.R. 171692, 2013; in library: agent exceeding the SPA's limits, buyer chargeable with knowledge
+→ void, reconveyance). This prong is proven by the defendants' own exhibits and is immune to ¶39.
+
+**Prong 3 — In any event, revoked 2005** + the buyer's duty of inquiry (*Yoshizaki*; *Sarili v.
+Lagrosa*, *Bucton v. Go*, *Manalese v. Ferreras* — all in library on buyer-through-agent
+diligence), with the honest limits already noted (§4a).
+
+**The division of labor that resolves the July-vs-now tension:** *counsel argues all three prongs
+in the alternative on paper* — that is what lawyers do, and each prong is independently
+dispositive. **Jonathan the witness argues none of them** — a witness cannot plead in the
+alternative; on cross he concedes the clause exists and pivots to the class limitation, exactly as
+his prep pack drills. The July guidance protects the witness; Jonathan's point restores the full
+arsenal to the briefs. Both are right, at different altitudes.
+
+**What lead counsel must still do:** align the trial memorandum / formal offer to this layered
+frame; handle the JA Q53 wording and the known typos (§4c) before the defense uses our own
+affidavit against us. **This is the concrete substance behind Jonathan's "not proactive enough"
+concern — raise it directly and get an answer on how the trial will be framed.**
 
 ### 4c. Also banked in our papers (clean up before the stand)
 
