@@ -29,7 +29,9 @@
 | Document | Doc-id | Grade | What it shows |
 |---|---|---|---|
 | **RD-certified multi-deed bundle** — de la Fuente serial conveyances: Nacasa (Lot 2-X-6-S/T-52354), Victa (2-X-6-T/T-47657, + his 2007 confirmation), Vela (2-X-6-I-4-D, + 2000 confirmation), Pascual Jr. (Poblacion, OCR-thin), a "Cesar" buyer (121 sqm off T-32917) | **590** | VERIFIED (Pascual + "Cesar" identity **[HV]**) | The campaign in one certified document — identical 1992-Munda-SPA recital across buyers. |
-| Deed to **Rosalina M. Hansol** (Balane's sister; Lot 2-X-6-I-4-B, ₱74,100) — **requested from RD by Erwin Balane himself**, Ref. 2026002049 | 413 | VERIFIED | A defense-procured exhibit proving another de la Fuente sale — to Gloria's sister. **Caution: recites the 1991 Agcaoili SPA (doc 369?, unread) — a different instrument; do not argue it under the 1992 SPA's limits.** |
+| Deed to **Rosalina M. Hansol** (Balane's sister; Lot 2-X-6-I-4(-B), 494 sqm, ₱74,100) — **requested from RD by Erwin Balane himself**, Ref. 2026002049 | 413 | VERIFIED | A defense-procured exhibit proving another de la Fuente sale — to Gloria's sister — **resting on the 1991 Agcaoili SPA, which grants NO power to sell** (row below). Void under Art. 1874 on its face; argue it under the 1991 instrument, never the 1992 SPA's class limits. |
+| **1991 Agcaoili SPA** (Doc 260/Pg 53/Ser 1991, 22 Aug 1991; NP Carmen Agcaoili) — the instrument the Hansol deed cites | **72** (cleanest, w/ notarial page), 82, 35; CTC at 369 pp 1–4 | VERIFIED (vision-OCR; **eyeball the image before offering**) | **Administration only** — control/supervision, pay taxes, sue trespass/waste, collect debts, represent before BIR/RD/DAR. **No clause selling, conveying, or mortgaging.** With doc 246: *neither* instrument de la Fuente cited authorized the sale made under it. |
+| **Jacinto cross-flag** — "Romel C. Jacinto" as instrumental witness on the Balane deed + 2017 Confirmation AND as OIC Register of Deeds issuing Balane's title 23 Nov 2021 | 369 pp 10/16/22 | VERIFIED (names on document faces; same-person identity **[HV]**) | Counsel's call whether to probe on cross. Never assert complicity. |
 | Balane JA naming fellow buyers (Ramirez; sister Hansol T-50192) | 1089 T39–T42 | corpus full text (EXCLUDED at pre-trial) | Her own corroboration of the campaign — usable on cross if admitted. |
 | 2012 delegation SPA, Cesar → Salvador O. dela Fuente | 38 | VERIFIED | Unauthorized sub-agency (Art. 1892); also recites his caretaker mandate. |
 | RTC Order, CV 6839 (MWK v. DAR) — counsel states **Cesar died 21 Jun 2017** | 673 | VERIFIED (court record; PSA cert to obtain) | Death; fixes accounting defendant as his estate; explains the post-death 2021 cascade. |
@@ -58,11 +60,11 @@
 
 ## E. Known gaps (evidence to obtain — owners per brief §7)
 
-1. **Rulings + pre-trial order + the 9-Sep setting order** — from Barandon's file. *(Blocking everything else.)*
+1. **Rulings + pre-trial order + the 9-Sep setting order** — MTC docket records check (certified copies of every order since April). *(Blocking everything else — includes resolving the silent-SJ question, brief §3a.)*
 2. **Cesar's PSA death certificate** (doc 673 is the court-record substitute).
 3. **CV 6839 order (1999)** — Cesar replaced as the heirs' representative (documentable pivot).
-4. **Doc 369 (1991 Agcaoili SPA) read clean** — fixes the Hansol vector before any pattern use of doc 413.
-5. **2005 revocation primary instrument** — the disowning clause is quoted in doc 441 Q28 (Exhibit F, the 2005 Buenaventura SPA); the standalone instrument is not separately in corpus.
+4. ~~Doc 369 (1991 Agcaoili SPA) read clean~~ **RESOLVED — read via vision-OCR (docs 72/82/35 + 369 pp 1–4): administration only, no sale power** (`T4497_AUTHORITY_OCR_FINDINGS.md`). Residual: counsel eyeballs the instrument image before court use.
+5. **2005 revocation primary instrument** — the disowning clause is quoted in doc 441 Q28 (Exhibit F, the 2005 Buenaventura SPA); the standalone instrument is not separately in corpus. NB the 2005 draft + Agcaoili-firm email trail (docs 85/91) verify the *intent*; the executed/consularized instrument stays PENDING VERIFICATION.
 6. **Llamanzares CTS roster** — none exists in corpus (consistent with our theory, but confirm from estate records that none ever existed; a produced CTS would weaken V1 for that buyer).
 7. **Mary Worrick Keesey 1988 death certificate** — succession proof currently rides affidavits (docs 187/284/445).
 

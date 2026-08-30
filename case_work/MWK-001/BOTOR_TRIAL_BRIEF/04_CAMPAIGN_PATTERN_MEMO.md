@@ -18,6 +18,13 @@
 2. **Family web:** Rosalina Hansol is Gloria Balane's sister — admitted in Balane's own JA
    (doc 1089 T39–T42), now corroborated by the actual Hansol deed (doc 413, procured from RD by
    defendant Erwin Balane himself).
+2a. **Neither instrument authorized the sale made under it (upgraded 2026-08-30).** The Hansol
+   deed rests on the **1991 Agcaoili SPA** — vision-OCR-verified as **administration only, with no
+   clause selling, conveying, or mortgaging anything** (docs 72/82/35; CTC doc 369 pp 1–4). So the
+   sister's purchase is void under **Art. 1874** without any class analysis, while Balane's rests
+   on the 1992 SPA's class she was outside of. One agent, two defective papers, sales under both —
+   that *is* the scheme/system, provable from the instruments themselves. *(Gate: OCR-grade —
+   eyeball the 1991 SPA image before offering it.)*
 3. **Below-value pricing across the campaign:** ~₱43–₱150/sqm against an assessor market value of
    ~₱970+/sqm on the same estate (Balane: ₱96.6/sqm ≈ 10% of the ₱2.5M ARP MV, ledger docs
    238/411).
@@ -32,11 +39,16 @@
 **INFERENCE — PENDING VERIFICATION (never assert in court):**
 
 - Any **coordinated criminal "syndicate"** — i.e., knowing collusion among buyers, the de la
-  Fuentes, notaries, and/or registry or assessor personnel. Suggestive threads exist (the "Romel
-  E. Jacinto" witness-name on the 2017 Confirmation matching an RD registrar's name — unverified
-  on image; the ARTA dockets against Mercedes officials; the NBI referral), but **no document in
+  Fuentes, notaries, and/or registry or assessor personnel. The strongest verified thread: the
+  name **"Romel C. Jacinto" appears on the document faces as instrumental witness on the Balane
+  deed and the 2017 Deed of Confirmation AND as the OIC Register of Deeds who issued Balane's
+  title on 23 Nov 2021** (doc 369 pp 10/16/22, per `T4497_AUTHORITY_OCR_FINDINGS.md`). The names
+  are verified; the *same-person identity* and any inference of complicity are not. That thread,
+  the ARTA dockets against Mercedes officials, and the NBI referral remain leads: **no document in
   corpus establishes agreement or knowledge across the actors.** The word "syndicate" is a
-  conclusion; the record currently proves a *pattern*.
+  conclusion; the record currently proves a *pattern*. (If counsel confirms the Jacinto identity,
+  the dual role is a legitimate cross question for any RD-side witness — asked as a fact, never as
+  an accusation.)
 
 **The discipline is the strategy:** a judge who watches you prove a pattern with certified
 registry documents will draw the inference personally, and it will stick. A witness or lawyer who
@@ -99,8 +111,8 @@ the meal.
 - **Most campaign sales predate the 2005 revocation** — so the estate-wide theory must lead on the
   SPA's **object + purpose limits (V1)**, not revocation timing. Balane's 2016 sale is the outlier
   that also enjoys the revocation prong.
-- **Pre-filing diligence still open:** read doc 369 (the 1991 Agcaoili SPA — Hansol's instrument;
-  until read, her void-vector is unproven and she must not be tarred with the 1992 SPA's limits);
+- **Pre-filing diligence still open:** eyeball the 1991 Agcaoili SPA image (the no-sale-power
+  reading is OCR-verified — docs 72/82/35 — but exhibit use wants a human read of the instrument);
   heightened-OCR the doc 590 Pascual/"Cesar" portions; pull the four unread root deeds (Valledor,
   Santiago, Tychingco, Vergara); confirm no Llamanzares CTS roster ever existed (we cannot prove
   the negative from our own corpus alone).
@@ -114,8 +126,9 @@ the meal.
 ## 4. One-paragraph summary for the two counsel
 
 The record proves — with certified registry documents already in our hands — that one fiduciary,
-holding one limited-object SPA, serially conveyed the Keesey estate to tenants, relatives, and
-strangers at ~10% of assessed value, never applied the proceeds to the taxes the SPA existed to
+holding two authority instruments **neither of which authorized the sales he made under them**
+(the 1991 SPA: no sale power at all; the 1992 SPA: a closed buyer class), serially conveyed the
+Keesey estate to tenants, relatives, and strangers at ~10% of assessed value, never applied the proceeds to the taxes the SPA existed to
 pay, papered the flagship sale five times, purported to hand his agency to his brother without
 authority, and died four years before the titles issued. That pattern belongs inside 26-360
 through formal offer of docs 590/413, the good-faith rebuttal, and cross — argued as scheme and

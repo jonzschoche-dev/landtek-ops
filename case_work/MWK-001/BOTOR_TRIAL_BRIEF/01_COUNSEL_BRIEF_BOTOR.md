@@ -74,13 +74,40 @@ Balane. Defense counsel: Atty. Ronald A. Ramos.
 | **9 Sep 2026** | **TRIAL — Jonathan testifies as Patricia's witness** | **[OPERATOR-REPORTED 2026-08-30]** — verify the order/notice; corpus's prior fixed point was 12 Aug |
 
 **Unknowns to close with Barandon's file before 9 Sep (no ruling is in corpus on any of these):**
-1. Has the court ruled on the **SJ motion**? (A trial setting suggests denial or deferral — get the
-   order and its reasoning; it tells us what the judge considers the triable issues.)
+1. Has the court ruled on the **SJ motion**? (See §3a — the silence is itself an issue.)
 2. Has the court ruled on **admission of Balane's Judicial Affidavit**? If exclusion stands, the
    defense has no principal direct testimony — this changes trial shape entirely.
 3. What exactly is set for 9 Sep — plaintiff's presentation of evidence? Whose witnesses?
 4. What did the pre-trial order stipulate/mark? (Stipulations bind the trial; we have never read
    the pre-trial order itself.)
+
+### 3a. The silent Summary-Judgment motion — Jonathan's flag (2026-08-30), and the counsel moves
+
+Jonathan finds it strange that no written resolution of the SJ motion has issued. He is right to:
+the motion was filed **24 Apr 2026** (doc 393) and, on what the corpus shows, was submitted for
+resolution by roughly May–June. Lower courts must resolve pending matters within **three months of
+submission** (Const. Art. VIII §15(1)); on that clock a written resolution was due around
+July–August. Three explanations, in descending likelihood — each with its own move:
+
+1. **An order exists that we have not seen** (resolved in the trial-setting order itself, or served
+   on counsel only, or in the mail). → *Move: a records check at the MTC docket — certified copies
+   of every order issued since April. Cheap, fast, and it also captures the pre-trial order and the
+   JA-admission ruling. Do this first; nothing else in this section matters until it's done.*
+2. **The court is deferring to trial** — treating the SPA's interpretation as a triable issue
+   (exactly the defense's manufactured-issue play, dossier §"Weaknesses"). A trial setting with the
+   motion unresolved functions as a denial without saying so. → *Move: proceed fully trial-ready
+   (this package's posture anyway), and note that under Rule 35 as amended (2019) the court must
+   state its reasons on the record when granting or denying — a one-line or silent denial is a
+   preserved point, for counsel's judgment whether to press it.*
+3. **The motion is genuinely unresolved and forgotten.** → *Move: a respectful Motion for
+   Resolution (or manifestation) reciting the filing and submission dates. Filed before trial, it
+   either surfaces the ruling or puts the delay on record; either way we stop flying blind.*
+
+**What NOT to do:** do not treat the silence as leverage for a certiorari detour or an
+inhibition fight on the eve of trial — that trades a strong record for a procedural war. The
+silence is a records problem first, a preserved-error point second, and a grievance never.
+And whatever the SJ's fate, **the JA-admission ruling matters more for 9 Sep**: whether Gloria's
+affidavit is in or out defines the entire cross plan.
 
 ---
 
@@ -181,10 +208,27 @@ it must be used with discipline (full treatment: `04_CAMPAIGN_PATTERN_MEMO.md`).
 
 **Seven de la Fuente sales are read and quotable in corpus**, each signed by him "as
 Attorney-in-Fact of the Heirs of Mary W. Keesey": Balane (docs 233/239/366/415/432 — five versions
-of one deed), **Rosalina Hansol — Gloria Balane's sister** (doc 413, resting on a *different* 1991
-SPA — scope unread, do not conflate), Delia Nacasa, Alberto Victa, Dolores Vela, Jose Pascual Jr.,
-and a probable Cesar Ramirez (all in the RD-certified multi-deed bundle **doc 590**). Balane's own
-JA corroborates the campaign by naming Ramirez and her sister as fellow buyers (doc 1089 T39–T42).
+of one deed), **Rosalina Hansol — Gloria Balane's sister** (doc 413), Delia Nacasa, Alberto Victa,
+Dolores Vela, Jose Pascual Jr., and a probable Cesar Ramirez (all in the RD-certified multi-deed
+bundle **doc 590**). Balane's own JA corroborates the campaign by naming Ramirez and her sister as
+fellow buyers (doc 1089 T39–T42).
+
+**The two-instrument kill-shot (upgraded 2026-08-30 — Jonathan's flag, confirmed against
+`T4497_AUTHORITY_OCR_FINDINGS.md`):** de la Fuente cited two different authority instruments across
+the campaign, and **neither authorized the sale made under it**:
+- **1991 Agcaoili SPA** (Doc 260/Pg 53/Ser 1991, 22 Aug 1991) — **administration only: no clause
+  selling, conveying, or mortgaging anything** (vision-OCR verified from the instrument itself,
+  docs 72 [cleanest, with notarial page] / 82 / 35; CTC in doc 369 pp 1–4). **The Hansol deed
+  (doc 413) rests on this instrument** — a sale of land by an agent with no written authority to
+  sell is **void under Art. 1874**, full stop; no class analysis even needed. *(Court-use gate:
+  the reading is OCR-grade — have counsel eyeball the instrument image before offering; then it is
+  exhibit-ready.)*
+- **1992 Munda SPA** (doc 246) — a sale power, but class-limited to Llamanzares CTS /
+  down-payment holders (§4a). The Balane and doc-590 deeds rest on this one.
+
+And the deed proving the 1991-SPA void sale — to Gloria's own sister — was **procured from the RD
+by defendant Erwin Balane himself** (doc 413, Ref. 2026002049). Their own exhibit documents a void
+family purchase; handled correctly at trial, it backfires on them entirely.
 
 **The verified fraud signals across the campaign:**
 - **Below-value pricing:** Balane paid ₱96.6/sqm against the estate's own assessor market value of
@@ -202,9 +246,13 @@ JA corroborates the campaign by naming Ramirez and her sister as fellow buyers (
 
 **What "syndicate" is and is not, on the record:** a coordinated *campaign by one fiduciary*, with
 family links among buyers and an unauthorized successor, is VERIFIED. A criminal syndicate
-involving officials (RD/Assessor complicity, e.g. the "Romel E. Jacinto" witness-name overlap on
-the 2017 Confirmation, doc 233) is **INFERENCE — PENDING VERIFICATION** and must never be asserted
-as fact in court. The ARTA dockets against Mercedes officials and the NBI referral exist as
+involving officials is **INFERENCE — PENDING VERIFICATION** and must never be asserted as fact in
+court. The strongest verified thread in that direction: **the name "Romel C. Jacinto" appears as
+instrumental witness on the Balane deed and the 2017 Deed of Confirmation AND as the OIC Register
+of Deeds who issued Balane's title on 23 Nov 2021** (document faces read: doc 369 pp 10/16/22, per
+`T4497_AUTHORITY_OCR_FINDINGS.md`). The *names on the documents* are verified; that it is the
+*same person*, and any inference of complicity, is not — counsel decides whether to probe it on
+cross, never to assert it. The ARTA dockets against Mercedes officials and the NBI referral remain
 separate, human-gated tracks.
 
 **Strategic sequencing (the estate-wide stakes of this trial):**
