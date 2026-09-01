@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<name>OCT P-1616 - Lot 4 Psu-143364 (APPROXIMATE)</name>
+<name>OCT P-1616 - Lot 4 Psu-143364 (APPROXIMATE v2)</name>
 <description>Allan V. Inocalla - 152,069 sqm - Brgy. San Rafael, Jose Panganiban, Camarines Norte.
-Polygon SHAPE is exact (from title technical description; closure 0.07 m).
-POSITION is approximate (+/- 1-2 km): anchored on the assumed location of BLBM No.1 Batobalani
-(barangay reference point 14.2348, 122.7453) via tie line N.60-30'W (minutes digit unverified) 3,508.83 m.
-Do NOT use for boundary decisions. Fix: BLBM No.1 coordinates from DENR, or a GPS pin taken standing
-on a monumented corner (corners 8-11 have concrete monuments).</description>
-<Style id="lot"><LineStyle><color>ff2d7a2d</color><width>3</width></LineStyle>
-<PolyStyle><color>552d7a2d</color></PolyStyle></Style>
+SHAPE exact (title technical description; closure 0.07 m). POSITION approximate (+/- ~1 km),
+triangulated 2026-09-01 from three independent signals that converge: (1) tie line N.60-30'W
+(minutes digit unverified) 3,508.83 m from BLBM No.1 Batobalani using two published Batobalani
+reference points (PhilAtlas 14.2348,122.7453; GeoNames 14.2330,122.7500); (2) the APSA-000322-V
+tenement map in the NI 43-101 (claims cluster read against the map graticule at ~14 15.3N
+122 42E); (3) barangay geometry (parcel lies between Batobalani and San Rafael centers).
+NOT for boundary decisions. Exact fix: BLBM No.1 coordinates + tie minutes from DENR (driver
+errand), or GPS pins taken standing on monumented corners 8-11.</description>
+<Style id="lot"><LineStyle><color>ff2d7a2d</color><width>3</width></LineStyle><PolyStyle><color>552d7a2d</color></PolyStyle></Style>
 <Style id="tie"><LineStyle><color>ff3030b0</color><width>2</width></LineStyle></Style>
-<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - approx position</name><styleUrl>#lot</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.716995,14.250387,0 122.717089,14.251768,0 122.717649,14.249653,0 122.719575,14.248903,0 122.717521,14.247088,0 122.716040,14.247375,0 122.714625,14.246615,0 122.714404,14.248363,0 122.714034,14.249071,0 122.713671,14.249152,0 122.713165,14.248992,0 122.713099,14.249671,0 122.715002,14.249666,0 122.715811,14.250186,0 122.717002,14.249752,0 122.716995,14.250387,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Corner 1 (POB, approx)</name><Point><coordinates>122.716995,14.250387,0</coordinates></Point></Placemark>
-<Placemark><name>Assumed BLBM No.1, Batobalani (anchor)</name><Point><coordinates>122.745300,14.234800,0</coordinates></Point></Placemark>
-<Placemark><name>Tie line N.60-30'W 3,508.83 m (assumed)</name><styleUrl>#tie</styleUrl>
-<LineString><coordinates>122.745300,14.234800,0 122.716995,14.250387,0</coordinates></LineString></Placemark>
+<Style id="ref"><IconStyle><scale>0.8</scale></IconStyle></Style>
+<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - approx position v2</name><styleUrl>#lot</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.719345,14.249487,0 122.719439,14.250868,0 122.719999,14.248753,0 122.721925,14.248003,0 122.719871,14.246188,0 122.718390,14.246475,0 122.716975,14.245715,0 122.716754,14.247463,0 122.716384,14.248171,0 122.716021,14.248252,0 122.715515,14.248092,0 122.715449,14.248771,0 122.717352,14.248766,0 122.718161,14.249286,0 122.719352,14.248852,0 122.719345,14.249487,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Corner 1 (POB, approx)</name><Point><coordinates>122.719345,14.249487,0</coordinates></Point></Placemark>
+<Placemark><name>Tie line N.60-30'W 3,508.83 m (assumed minutes)</name><styleUrl>#tie</styleUrl>
+<LineString><coordinates>122.747650,14.233900,0 122.719345,14.249487,0</coordinates></LineString></Placemark>
+<Placemark><name>Assumed BLBM No.1 (PhilAtlas Batobalani pt)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.745300,14.234800,0</coordinates></Point></Placemark><Placemark><name>Assumed BLBM No.1 (GeoNames Batobalane pt)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.750000,14.233000,0</coordinates></Point></Placemark><Placemark><name>Capacuan brgy center (Inocalla compound area)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.737900,14.249800,0</coordinates></Point></Placemark><Placemark><name>San Rafael brgy center (Jose Panganiban)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.692800,14.257200,0</coordinates></Point></Placemark><Placemark><name>APSA-000322-V claims cluster (graticule read, NI 43-101 map)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.702000,14.255000,0</coordinates></Point></Placemark>
 </Document></kml>
