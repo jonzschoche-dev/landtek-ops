@@ -94,3 +94,15 @@ do not commission a relocation survey unless the bank asks.
 Send Jonathan: (1) photos of everything obtained, (2) the tie-line minutes digit, (3) BLBM No. 1
 coordinates if released, (4) ORs. LandTek then: georeferences the polygon, loads it into
 `map_parcels`, and slots the Lot Plan + Vicinity Map into the loan packet as items 4c/4d.
+
+---
+
+## OUTREACH LOG
+
+- **2026-09-01 — Email sent** from Jonathan (jonathan@hayuma.org) to **Surveys and Mapping
+  Division, DENR Region V** (smd.r5@denr.gov.ph, cc smddenr5@gmail.com; Gmail thread
+  `1a05f76a181e92a8`): requested (1) certified Psu-143364 plan + Lot 4 lot data computation
+  + technical description, (2) the tie-line's full bearing (missing minutes digit),
+  (3) BLBM No. 1 Batobalani coordinates, (4) whether Psu-143364 Amd. affected Lot 4,
+  (5) FPA V-43979 survey records; asked fees, email-initiated processing with in-person
+  claiming (Division or CENRO Daet), and turnaround. **Follow up if no reply by 2026-09-08.**
