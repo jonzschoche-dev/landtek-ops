@@ -47,7 +47,7 @@ resolution of the Summary-Judgment motion; any ruling on the Balane-affidavit ad
 | D3 | Defense Exhibit 1 — TCT No. 079-2021002126 (Balane) | The title to cancel; face recites "T-52540 (TOTALLY CANCELLED)" |
 | D4 | Defense Exhibit 2 — Tax Declaration ARP No. GR-2023-II-07-001-00256 | The tax declaration named in the case caption/prayer |
 | D5 | Defense Exhibit 3 — TCT No. T-50192 (Rosalina Hansol — Gloria's sister) | Defense-procured pattern evidence (Part 4) |
-| D6 | SPA to Ida Buenaventura, 15 Aug 2005 | The 2005 revocation/disowning instrument ("revoked 2005 · published 2020 · annotated 2021") |
+| D6 | SPA to Ida Buenaventura, 15 Aug 2005 | The 2005 revocation/disowning instrument ("revoked 2005 · published 2020 · annotated 2021"). **⚠ The corpus copy of this instrument (doc 85) is graded an unsigned DRAFT — verify this folder copy is the executed/consularized final before any court use; the 2005 date itself is separately documented (docs 76, 79).** |
 | D7 | 2012 SPA, Cesar → Salvador ("Von") de la Fuente | The unauthorized sub-delegation (Art. 1892) |
 
 ## E — Complaint exhibit set (as filed with the Complaint)

@@ -172,7 +172,7 @@ T-32917, not on T-4497, but complete the chain to the live dispute):
 | T-52354 | doc:325 | cancelled |
 | T-33350 | doc:312 (Elena Vergara) | |
 | **T-52540** | doc:48, doc:96, doc:272 | ★ cancelled; the Balane predecessor |
-| → **T-079-2021002127** | doc:368, doc:20, doc:427 | **Gloria Balane** — the flagship contested title (2021, from cancelled T-52540 via 2016 deed by de la Fuente under the SPA revoked 2005) |
+| → **T-079-2021002126** *(corrected 2026-09-03 — this row previously said …2127, the exact error the spine banked as correction #2; …2127 = the retained heirs' parcel Lot 2-X-6-I-4-C-2, doc:20)* | doc:368, doc:427; …2126 face = doc:410 | **Gloria Balane** — the flagship contested title (2021, from cancelled T-52540 via 2016 deed by de la Fuente under the SPA revoked 2005) |
 
 Supporting the void-chain theory: **`doc:76`** (2020 Notice of Revocation of de la Fuente) and
 **`doc:79`** (revocation reply) — the SPA at D6/D7 was *negotiate-only* and was revoked 2005, yet
