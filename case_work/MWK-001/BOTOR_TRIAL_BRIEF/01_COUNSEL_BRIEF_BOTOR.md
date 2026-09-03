@@ -266,8 +266,10 @@ most a necessary party for the accounting. Confirm with Barandon this opposition
 This is the context Jonathan fears will be lost at trial. **It is documentary, not theory** — but
 it must be used with discipline (full treatment: `04_CAMPAIGN_PATTERN_MEMO.md`).
 
-**Seven de la Fuente sales are read and quotable in corpus**, each signed by him "as
-Attorney-in-Fact of the Heirs of Mary W. Keesey": Balane (docs 233/239/366/415/432 — five versions
+**The campaign's full scale is 20+ named transferees and roughly 35–40 derivative titles carved
+out of mother title T-4497** (41 transfer events in the title map; Complaint and transferee
+matrix). Within that, **seven de la Fuente sales are read and quotable in corpus** — the deeds
+themselves, each signed by him "as Attorney-in-Fact of the Heirs of Mary W. Keesey": Balane (docs 233/239/366/415/432 — five versions
 of one deed), **Rosalina Hansol — Gloria Balane's sister** (doc 413), Delia Nacasa, Alberto Victa,
 Dolores Vela, Jose Pascual Jr., and a probable Cesar Ramirez (all in the RD-certified multi-deed
 bundle **doc 590**). Balane's own JA corroborates the campaign by naming Ramirez and her sister as

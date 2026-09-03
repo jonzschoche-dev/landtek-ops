@@ -11,6 +11,9 @@
 
 **VERIFIED (read, doc-ids cited) — "a serial conveyance campaign by one fiduciary":**
 
+0. **Scale:** 20+ named transferees and ~35–40 derivative titles carved out of T-4497 (41 transfer
+   events in the title map; Complaint + transferee matrix). The seven deeds below are the subset
+   already in hand — the mechanism proof — not the campaign's extent.
 1. **Seven documented sales** signed by Cesar M. de la Fuente "as Attorney-in-Fact of the Heirs of
    Mary W. Keesey": Balane (docs 233/239/366/415/432), Hansol (doc 413), Nacasa, Victa, Vela,
    Pascual Jr., a probable Ramirez (all doc 590, an RD-certified multi-deed bundle). Identity of
