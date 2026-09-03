@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<name>OCT P-1616 - Lot 4 Psu-143364 (APPROXIMATE v2)</name>
+<name>OCT P-1616 - Lot 4 Psu-143364 (APPROXIMATE v3)</name>
 <description>Allan V. Inocalla - 152,069 sqm - Brgy. San Rafael, Jose Panganiban, Camarines Norte.
-SHAPE exact (title technical description; closure 0.07 m). POSITION approximate (+/- ~1 km),
-triangulated 2026-09-01 from three independent signals that converge: (1) tie line N.60-30'W
-(minutes digit unverified) 3,508.83 m from BLBM No.1 Batobalani using two published Batobalani
-reference points (PhilAtlas 14.2348,122.7453; GeoNames 14.2330,122.7500); (2) the APSA-000322-V
-tenement map in the NI 43-101 (claims cluster read against the map graticule at ~14 15.3N
-122 42E); (3) barangay geometry (parcel lies between Batobalani and San Rafael centers).
-NOT for boundary decisions. Exact fix: BLBM No.1 coordinates + tie minutes from DENR (driver
-errand), or GPS pins taken standing on monumented corners 8-11.</description>
+SHAPE exact (title technical description; closure 0.07 m). POSITION v3 (2026-09-02, +/- ~0.8 km):
+constraint-solved - the parcel must lie wholly inside the official Brgy. San Rafael boundary
+(NAMRIA/PSGC 2023 polygon) while its tie line (3,508.83 m at S60E back from corner 1) must land
+inside Brgy. Batobalani (BLBM No.1's barangay). Feasible corner-1 zone: 14.240-14.254 N,
+122.685-122.701 E; centroid used here. Corroborated by the APSA-000322-V claims cluster
+(graticule read ~14.255, 122.702) at the zone's NE edge. Supersedes v2 (which assumed BLBM at
+the modern barangay center - shown wrong by ~3 km; implied true BLBM zone is western Batobalani
+near the Batobalane River). NOT for boundary decisions. Exact fix: BLBM No.1 coordinates + tie
+minutes (DENR R-V SMD + PENRO CamNorte requests sent 2026-09-01), or GPS pins on monumented
+corners 8-11.</description>
 <Style id="lot"><LineStyle><color>ff2d7a2d</color><width>3</width></LineStyle><PolyStyle><color>552d7a2d</color></PolyStyle></Style>
-<Style id="tie"><LineStyle><color>ff3030b0</color><width>2</width></LineStyle></Style>
+<Style id="zone"><LineStyle><color>ff2080d0</color><width>2</width></LineStyle><PolyStyle><color>202080d0</color></PolyStyle></Style>
+<Style id="bzone"><LineStyle><color>ff3030b0</color><width>2</width></LineStyle><PolyStyle><color>203030b0</color></PolyStyle></Style>
 <Style id="ref"><IconStyle><scale>0.8</scale></IconStyle></Style>
-<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - approx position v2</name><styleUrl>#lot</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.719345,14.249487,0 122.719439,14.250868,0 122.719999,14.248753,0 122.721925,14.248003,0 122.719871,14.246188,0 122.718390,14.246475,0 122.716975,14.245715,0 122.716754,14.247463,0 122.716384,14.248171,0 122.716021,14.248252,0 122.715515,14.248092,0 122.715449,14.248771,0 122.717352,14.248766,0 122.718161,14.249286,0 122.719352,14.248852,0 122.719345,14.249487,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Corner 1 (POB, approx)</name><Point><coordinates>122.719345,14.249487,0</coordinates></Point></Placemark>
-<Placemark><name>Tie line N.60-30'W 3,508.83 m (assumed minutes)</name><styleUrl>#tie</styleUrl>
-<LineString><coordinates>122.747650,14.233900,0 122.719345,14.249487,0</coordinates></LineString></Placemark>
-<Placemark><name>Assumed BLBM No.1 (PhilAtlas Batobalani pt)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.745300,14.234800,0</coordinates></Point></Placemark><Placemark><name>Assumed BLBM No.1 (GeoNames Batobalane pt)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.750000,14.233000,0</coordinates></Point></Placemark><Placemark><name>Capacuan brgy center (Inocalla compound area)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.737900,14.249800,0</coordinates></Point></Placemark><Placemark><name>San Rafael brgy center (Jose Panganiban)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.692800,14.257200,0</coordinates></Point></Placemark><Placemark><name>APSA-000322-V claims cluster (graticule read, NI 43-101 map)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.702000,14.255000,0</coordinates></Point></Placemark>
+<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - approx position v3</name><styleUrl>#lot</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.692220,14.248480,0 122.692314,14.249862,0 122.692873,14.247746,0 122.694800,14.246997,0 122.692745,14.245182,0 122.691264,14.245468,0 122.689849,14.244708,0 122.689629,14.246456,0 122.689258,14.247164,0 122.688895,14.247245,0 122.688389,14.247085,0 122.688324,14.247764,0 122.690227,14.247760,0 122.691036,14.248279,0 122.692226,14.247845,0 122.692220,14.248480,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Feasible corner-1 zone (+/-0.8 km)</name><styleUrl>#zone</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.685200,14.240000,0 122.700800,14.240000,0 122.700800,14.253900,0 122.685200,14.253900,0 122.685200,14.240000,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Implied BLBM No.1 zone (western Batobalani)</name><styleUrl>#bzone</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.713400,14.224100,0 122.729100,14.224100,0 122.729100,14.238300,0 122.713400,14.238300,0 122.713400,14.224100,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Corner 1 (POB, v3 estimate)</name><Point><coordinates>122.692220,14.248480,0</coordinates></Point></Placemark>
+<Placemark><name>APSA-000322-V claims cluster (graticule read)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.702000,14.255000,0</coordinates></Point></Placemark>
+<Placemark><name>San Rafael brgy center</name><styleUrl>#ref</styleUrl><Point><coordinates>122.692800,14.257200,0</coordinates></Point></Placemark>
+<Placemark><name>Batobalane River (mindat)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.732900,14.231300,0</coordinates></Point></Placemark>
 </Document></kml>

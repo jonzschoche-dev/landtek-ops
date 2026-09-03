@@ -106,3 +106,45 @@ coordinates if released, (4) ORs. LandTek then: georeferences the polygon, loads
   (3) BLBM No. 1 Batobalani coordinates, (4) whether Psu-143364 Amd. affected Lot 4,
   (5) FPA V-43979 survey records; asked fees, email-initiated processing with in-person
   claiming (Division or CENRO Daet), and turnaround. **Follow up if no reply by 2026-09-08.**
+
+- **2026-09-01 — Same request emailed to PENRO Camarines Norte (Daet)**
+  (penrocamarinesnorte@denr.gov.ph, cc penro.camnorte@yahoo.com; Gmail thread
+  `1a05f92542f6fdd1`), attn. Survey/Records Section with a routing note to the CENRO
+  concerned; letter notes the parallel SMD R-V request. Same 5 asks + fees/process questions.
+
+---
+
+## PUBLIC-RECORD SEARCH RESULTS (2026-09-01/02 — do NOT re-search the dead ends)
+
+An open-web sweep (external AI + our own) established:
+
+**Confirmed unavailable online (dead ends — official request is the only route):**
+- BLBM/BLLM monument coordinates are held at LMB/LMS and are NOT queryable online
+  (Geoportal thread confirms). No Camarines Norte values in any open source.
+- No online image/index of Psu-143364, Psu-143365, OCT P-1616, FPA V-43979, or the
+  adjoining homestead plans H-54763 / H-47686 / H-47774 / H-128572.
+- No MGB-published corner list for APSA-000322-V; no geocoded coordinates anywhere for the
+  five named veins (San Rafael/Virginia/Vallejo/Manila/Pasacao) in this district.
+- No free georeferenced 1:50,000 GeoTIFF of the two covering NAMRIA sheets.
+
+**Useful finds (actioned or actionable):**
+- NAMRIA 1:50,000 sheets covering the parcel: **3562-4 (Jose Panganiban)** + **3562-1
+  (Paracale)** — purchasable at NAMRIA eMapa/Map Sales.
+- **Official barangay polygons** (NAMRIA 2023-11-06 / PSA PSGC via
+  github.com/bendlikeabamboo/barangay-boundaries-repository) — DOWNLOADED and used, see below.
+- LiPAD (Phil-LiDAR) holds DTM for the area — account/request needed; flood maps open.
+- Mindat district points: Batobalane River 14.2313,122.7329; Santa Rosa Mine 14.2606,122.7267;
+  Matanlang 14.2333,122.7333; Paracale Intrusion 14.2968,122.7147.
+
+**⭐ v3 GEOREFERENCE (2026-09-02) — constraint solve using the official barangay polygons:**
+The tie-line-from-barangay-center estimate (v2, ~122.717-122.722 E) is REFUTED: the official
+Brgy. San Rafael polygon ends at 122.7125 E, so v2 placed the parcel outside its own barangay.
+Solving jointly — (a) whole parcel inside the San Rafael polygon, (b) tie-line endpoint (S60°E,
+3,508.83 m from corner 1) inside the Batobalani polygon — gives a feasible corner-1 zone of
+**14.240–14.254 N, 122.685–122.701 E** (centroid **14.2485, 122.6922**; insensitive to the
+unknown tie minutes 01'/31'/51'), corroborated by the APSA claims-cluster graticule read
+(14.255, 122.702) at the zone's NE edge. Implication: **BLBM No. 1 sits in WESTERN Batobalani
+(~14.224–14.238 N, 122.713–122.729 E, near the Batobalane River), ~2–3.5 km west of the modern
+barangay reference point.** KML v3 (`P1616_Lot4_approx.kml`, here and in the Drive loan folder,
+file id `1jwppEyRnarJs46aMVffOQVtTkAJyT3LR`) carries the parcel at the v3 centroid plus the
+feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 km.
