@@ -148,3 +148,16 @@ unknown tie minutes 01'/31'/51'), corroborated by the APSA claims-cluster gratic
 barangay reference point.** KML v3 (`P1616_Lot4_approx.kml`, here and in the Drive loan folder,
 file id `1jwppEyRnarJs46aMVffOQVtTkAJyT3LR`) carries the parcel at the v3 centroid plus the
 feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 km.
+
+- **2026-09-03 — Surveyor's lead (Joemar Andrew, via Messenger): the CADASTRAL EQUIVALENT
+  is the fast path to grid coordinates.** A Psu plan predates the coordinate-system era and
+  "di ma-plot sa Google Maps" directly; but Jose Panganiban's 1970s public-land subdivision
+  **PLS-1047-D** carries a grid coordinate system that plots straight into Google Earth. The
+  research task at LMS Legazpi is therefore: *find Lot 4, Psu-143364's equivalent cadastral
+  lot number under PLS-1047-D, then pull that lot's grid coordinates.* He also confirmed the
+  tie point is "BLLM No. 1 of Batobalani, that is in 1963" — matching our title read.
+  **Supplemental emails sent same day into both DENR threads** adding asks #6 (cadastral lot
+  number under PLS-1047-D) and #7 (its grid coordinates, PRS92/PPCS-TM).
+  Second local avenue: the **Municipal Assessor of Jose Panganiban** (Tax Dec
+  GR-2023-I-05-021-00306, PIN 025-05-021-20-004) can usually map an ARP to its cadastral lot
+  number over the counter — add to the runner's errand.
