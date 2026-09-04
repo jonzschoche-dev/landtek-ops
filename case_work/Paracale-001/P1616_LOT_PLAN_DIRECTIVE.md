@@ -219,3 +219,15 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   (translation).** Final refinement: Google-Earth drag-fit by someone who knows the
   tunnels/quarry, a GPS pin on a monumented corner, or the DENR/LMS data. Renders saved in
   session (`sat_candidates.png`, `sat_zoom2.png`) and sent to Jonathan.
+
+- **2026-09-06 — ✅ FITTED POSITION v5 (operator drag-fit, Google Earth Pro).** Jonathan/team
+  dragged the 1:2,000 Progress Map overlay to terrain; fitted **corner 1 = 14°15'14.37"N,
+  122°42'49.27"E (14.253992, 122.713686)** — 790 m NW of the v4 seed. **Validation:** running
+  the title's tie line backward (S.60°30'E, 3,508.83 m) puts the implied BLBM No. 1 **inside
+  Brgy. Batobalani, 536 m from its published reference point** — the drag-fit and the title's
+  tie line independently agree. Parcel confirmed in modern Brgy. Santa Rosa Sur. Orientation:
+  true-north per title bearings, no rotation applied (max theoretical rotation error <1° ≈
+  <12 m if the 1954 survey were magnetic-referenced). Est. accuracy now **~100–200 m**.
+  Repo KML + GeoJSON updated to v5; Drive KML replaced; `P1616_MapFit_v5.kmz` (overlay
+  re-seeded at v5) delivered. Remaining to survey-grade: DENR/LMS lot data (email threads +
+  Joemar's LMS pull, lots 905/906 PLS-…-D) or GPS pins on monumented corners 8–11.

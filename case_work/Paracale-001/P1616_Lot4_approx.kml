@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<name>P-1616 Map-Fit v4 (Santa Rosa Sur reconciliation)</name>
-<description>ROUGH MATCH v4 (2026-09-05): parcel corner 1 at 14.24949, 122.71935 - the straight
-tie-line solution (3,508.83 m N60-30'W of the published Batobalani reference points), which
-falls in modern Brgy. SANTA ROSA SUR, Jose Panganiban. Reconciliation: the title's 1963
-"Brgy. San Rafael" most plausibly included today's Santa Rosa strip (later carved out), which
-is also the Progress Map's own locality ("Sta. Rosa Norte/Sur"). The Manila Vein workings sit
-~400 m west of the parcel per the 1:2,000 Progress Map (drawn as the overlay). Estimated
-accuracy +/-800 m. FINE-TUNE: in Google Earth Pro drag the overlay until creeks/tunnels/quarry
-match the terrain; the green lot rides at the same offset. Verify with DENR reply or a GPS pin
-on a monumented corner (8-11).</description>
-<!-- overlay in KMZ only <name>Progress Map of Paracale Nacional (1:2,000, v4 seed)</name>
-<color>b0ffffff</color><Icon><href>files/progress_map.png</href></Icon>
-<LatLonBox><north>14.252039</north><south>14.241320</south><east>122.724499</east><west>122.708906</west><rotation>0</rotation></LatLonBox> -->
+<name>P-1616 Lot 4 - FITTED v5 (operator drag-fit)</name>
+<description>FITTED POSITION v5 (2026-09-06): corner 1 at 14.253992 N, 122.713686 E
+(14d15'14.37"N 122d42'49.27"E) - OPERATOR DRAG-FIT in Google Earth Pro (Jonathan/team,
+matching the 1:2,000 Progress Map overlay to terrain). Independently validated: running the
+title's tie line back (S60-30'E, 3,508.83 m) lands the implied BLBM No.1 INSIDE Brgy.
+Batobalani, 536 m from its published reference point - the fit and the title agree. Parcel is
+in modern Brgy. Santa Rosa Sur (1963 "San Rafael"). Shape exact from OCT technical description
+(closure 0.07 m). Est. accuracy: the drag-fit's, ~100-200 m. Final survey-grade fix: DENR/LMS
+data or GPS on monumented corners 8-11. Orientation is true-north per the title bearings - do
+not rotate.</description>
 <Style id="lot"><LineStyle><color>ff2dd42d</color><width>3</width></LineStyle><PolyStyle><color>402dd42d</color></PolyStyle></Style>
-<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - v4 position</name><styleUrl>#lot</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.719350,14.249490,0 122.719444,14.250872,0 122.720003,14.248756,0 122.721930,14.248007,0 122.719875,14.246192,0 122.718394,14.246478,0 122.716979,14.245718,0 122.716759,14.247466,0 122.716388,14.248174,0 122.716025,14.248255,0 122.715519,14.248095,0 122.715454,14.248774,0 122.717357,14.248770,0 122.718166,14.249289,0 122.719356,14.248855,0 122.719350,14.249490,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Corner 1 (POB) v4</name><Point><coordinates>122.719350,14.249490,0</coordinates></Point></Placemark>
-<Placemark><name>San Rafael boundary</name><Style><LineStyle><color>ff2020c0</color><width>2</width></LineStyle></Style><LineString><coordinates>122.701590,14.270679,0 122.712506,14.265583,0 122.690292,14.233031,0 122.673465,14.263203,0 122.701590,14.270679,0</coordinates></LineString></Placemark><Placemark><name>Santa Rosa Sur boundary</name><Style><LineStyle><color>ffc07020</color><width>2</width></LineStyle></Style><LineString><coordinates>122.728032,14.275150,0 122.734324,14.257138,0 122.715931,14.233304,0 122.690292,14.233031,0 122.707648,14.251128,0 122.715096,14.273086,0 122.718478,14.268493,0 122.728032,14.275150,0</coordinates></LineString></Placemark><Placemark><name>Batobalani boundary</name><Style><LineStyle><color>ff804020</color><width>2</width></LineStyle></Style><LineString><coordinates>122.745112,14.240679,0 122.747489,14.232930,0 122.719744,14.205796,0 122.677809,14.188864,0 122.690292,14.233031,0 122.745112,14.240679,0</coordinates></LineString></Placemark>
-<Placemark><name>Santa Rosa Mine (mindat)</name><Point><coordinates>122.726700,14.260600,0</coordinates></Point></Placemark>
-<Placemark><name>APSA claims cluster (graticule read)</name><Point><coordinates>122.702000,14.255000,0</coordinates></Point></Placemark>
+<Style id="tie"><LineStyle><color>ff3030b0</color><width>2</width></LineStyle></Style>
+<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - v5 FITTED</name><styleUrl>#lot</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.713686,14.253992,0 122.713780,14.255374,0 122.714339,14.253258,0 122.716266,14.252509,0 122.714211,14.250694,0 122.712730,14.250980,0 122.711315,14.250220,0 122.711095,14.251968,0 122.710724,14.252676,0 122.710361,14.252757,0 122.709855,14.252597,0 122.709790,14.253276,0 122.711693,14.253272,0 122.712502,14.253791,0 122.713692,14.253357,0 122.713686,14.253992,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Corner 1 (POB) v5 - 14d15'14.37"N 122d42'49.27"E</name><Point><coordinates>122.713686,14.253992,0</coordinates></Point></Placemark>
+<Placemark><name>Implied BLBM No.1 (from tie line; in Batobalani, 536 m from brgy point)</name><styleUrl>#tie</styleUrl><Point><coordinates>122.741990,14.238400,0</coordinates></Point></Placemark>
+<Placemark><name>Tie line N.60-30'W 3,508.83 m</name><styleUrl>#tie</styleUrl>
+<LineString><coordinates>122.741990,14.238400,0 122.713686,14.253992,0</coordinates></LineString></Placemark>
 </Document></kml>

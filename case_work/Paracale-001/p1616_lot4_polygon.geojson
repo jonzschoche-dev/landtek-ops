@@ -1,6 +1,5 @@
 {
  "type": "FeatureCollection",
- "crs_note": "LOCAL survey coordinates (meters), x=East y=North, origin=corner 1 of Lot 4 Psu-143364. NOT georeferenced: tie line N.60-??'W (minutes illegible) 3508.83m from BLBM No.1 Batobalani, Paracale. Georeference pending BLBM coordinates.",
  "features": [
   {
    "type": "Feature",
@@ -9,80 +8,78 @@
     "lot": "Lot 4, Psu-143364",
     "owner": "Allan V. Inocalla",
     "area_sqm_title": 152069,
-    "area_sqm_computed": 152068.9,
-    "perimeter_m": 2230.18,
-    "closure_misfit_m": 0.07,
-    "source": "OCT P-1616 technical description p.16-A (4b Drive scan), transcribed+verified 2026-08-26",
-    "surveyed": "June 2-5, 1954 (approved April 28, 1955)",
-    "fpa": "FPA No. V-43979"
+    "position_version": "v5 operator drag-fit 2026-09-06",
+    "corner1": "14.253992,122.713686",
+    "accuracy_m": "~100-200 (drag-fit)",
+    "validation": "implied BLBM No.1 in Batobalani, 536 m from published brgy point"
    },
    "geometry": {
     "type": "Polygon",
     "coordinates": [
      [
       [
-       0.0,
-       0.0
+       122.713686,
+       14.253992
       ],
       [
-       10.13,
-       153.16
+       122.71378,
+       14.255374
       ],
       [
-       70.49,
-       -81.38
+       122.714339,
+       14.253258
       ],
       [
-       278.33,
-       -164.44
+       122.716266,
+       14.252509
       ],
       [
-       56.69,
-       -365.64
+       122.714211,
+       14.250694
       ],
       [
-       -103.1,
-       -333.86
+       122.71273,
+       14.25098
       ],
       [
-       -255.77,
-       -418.08
+       122.711315,
+       14.25022
       ],
       [
-       -279.56,
-       -224.38
+       122.711095,
+       14.251968
       ],
       [
-       -319.56,
-       -145.87
+       122.710724,
+       14.252676
       ],
       [
-       -358.7,
-       -136.89
+       122.710361,
+       14.252757
       ],
       [
-       -413.29,
-       -154.67
+       122.709855,
+       14.252597
       ],
       [
-       -420.37,
-       -79.33
+       122.70979,
+       14.253276
       ],
       [
-       -215.07,
-       -79.87
+       122.711693,
+       14.253272
       ],
       [
-       -127.75,
-       -22.25
+       122.712502,
+       14.253791
       ],
       [
-       0.69,
-       -70.4
+       122.713692,
+       14.253357
       ],
       [
-       0.0,
-       0.0
+       122.713686,
+       14.253992
       ]
      ]
     ]
