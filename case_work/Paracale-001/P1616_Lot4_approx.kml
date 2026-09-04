@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<name>OCT P-1616 - Lot 4 Psu-143364 (APPROXIMATE v3)</name>
-<description>Allan V. Inocalla - 152,069 sqm - Brgy. San Rafael, Jose Panganiban, Camarines Norte.
-SHAPE exact (title technical description; closure 0.07 m). POSITION v3 (2026-09-02, +/- ~0.8 km):
-constraint-solved - the parcel must lie wholly inside the official Brgy. San Rafael boundary
-(NAMRIA/PSGC 2023 polygon) while its tie line (3,508.83 m at S60E back from corner 1) must land
-inside Brgy. Batobalani (BLBM No.1's barangay). Feasible corner-1 zone: 14.240-14.254 N,
-122.685-122.701 E; centroid used here. Corroborated by the APSA-000322-V claims cluster
-(graticule read ~14.255, 122.702) at the zone's NE edge. Supersedes v2 (which assumed BLBM at
-the modern barangay center - shown wrong by ~3 km; implied true BLBM zone is western Batobalani
-near the Batobalane River). NOT for boundary decisions. Exact fix: BLBM No.1 coordinates + tie
-minutes (DENR R-V SMD + PENRO CamNorte requests sent 2026-09-01), or GPS pins on monumented
-corners 8-11.</description>
-<Style id="lot"><LineStyle><color>ff2d7a2d</color><width>3</width></LineStyle><PolyStyle><color>552d7a2d</color></PolyStyle></Style>
-<Style id="zone"><LineStyle><color>ff2080d0</color><width>2</width></LineStyle><PolyStyle><color>202080d0</color></PolyStyle></Style>
-<Style id="bzone"><LineStyle><color>ff3030b0</color><width>2</width></LineStyle><PolyStyle><color>203030b0</color></PolyStyle></Style>
-<Style id="ref"><IconStyle><scale>0.8</scale></IconStyle></Style>
-<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - approx position v3</name><styleUrl>#lot</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.692220,14.248480,0 122.692314,14.249862,0 122.692873,14.247746,0 122.694800,14.246997,0 122.692745,14.245182,0 122.691264,14.245468,0 122.689849,14.244708,0 122.689629,14.246456,0 122.689258,14.247164,0 122.688895,14.247245,0 122.688389,14.247085,0 122.688324,14.247764,0 122.690227,14.247760,0 122.691036,14.248279,0 122.692226,14.247845,0 122.692220,14.248480,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Feasible corner-1 zone (+/-0.8 km)</name><styleUrl>#zone</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.685200,14.240000,0 122.700800,14.240000,0 122.700800,14.253900,0 122.685200,14.253900,0 122.685200,14.240000,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Implied BLBM No.1 zone (western Batobalani)</name><styleUrl>#bzone</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.713400,14.224100,0 122.729100,14.224100,0 122.729100,14.238300,0 122.713400,14.238300,0 122.713400,14.224100,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Corner 1 (POB, v3 estimate)</name><Point><coordinates>122.692220,14.248480,0</coordinates></Point></Placemark>
-<Placemark><name>APSA-000322-V claims cluster (graticule read)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.702000,14.255000,0</coordinates></Point></Placemark>
-<Placemark><name>San Rafael brgy center</name><styleUrl>#ref</styleUrl><Point><coordinates>122.692800,14.257200,0</coordinates></Point></Placemark>
-<Placemark><name>Batobalane River (mindat)</name><styleUrl>#ref</styleUrl><Point><coordinates>122.732900,14.231300,0</coordinates></Point></Placemark>
+<name>P-1616 Map-Fit v4 (Santa Rosa Sur reconciliation)</name>
+<description>ROUGH MATCH v4 (2026-09-05): parcel corner 1 at 14.24949, 122.71935 - the straight
+tie-line solution (3,508.83 m N60-30'W of the published Batobalani reference points), which
+falls in modern Brgy. SANTA ROSA SUR, Jose Panganiban. Reconciliation: the title's 1963
+"Brgy. San Rafael" most plausibly included today's Santa Rosa strip (later carved out), which
+is also the Progress Map's own locality ("Sta. Rosa Norte/Sur"). The Manila Vein workings sit
+~400 m west of the parcel per the 1:2,000 Progress Map (drawn as the overlay). Estimated
+accuracy +/-800 m. FINE-TUNE: in Google Earth Pro drag the overlay until creeks/tunnels/quarry
+match the terrain; the green lot rides at the same offset. Verify with DENR reply or a GPS pin
+on a monumented corner (8-11).</description>
+<!-- overlay in KMZ only <name>Progress Map of Paracale Nacional (1:2,000, v4 seed)</name>
+<color>b0ffffff</color><Icon><href>files/progress_map.png</href></Icon>
+<LatLonBox><north>14.252039</north><south>14.241320</south><east>122.724499</east><west>122.708906</west><rotation>0</rotation></LatLonBox> -->
+<Style id="lot"><LineStyle><color>ff2dd42d</color><width>3</width></LineStyle><PolyStyle><color>402dd42d</color></PolyStyle></Style>
+<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - v4 position</name><styleUrl>#lot</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.719350,14.249490,0 122.719444,14.250872,0 122.720003,14.248756,0 122.721930,14.248007,0 122.719875,14.246192,0 122.718394,14.246478,0 122.716979,14.245718,0 122.716759,14.247466,0 122.716388,14.248174,0 122.716025,14.248255,0 122.715519,14.248095,0 122.715454,14.248774,0 122.717357,14.248770,0 122.718166,14.249289,0 122.719356,14.248855,0 122.719350,14.249490,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Corner 1 (POB) v4</name><Point><coordinates>122.719350,14.249490,0</coordinates></Point></Placemark>
+<Placemark><name>San Rafael boundary</name><Style><LineStyle><color>ff2020c0</color><width>2</width></LineStyle></Style><LineString><coordinates>122.701590,14.270679,0 122.712506,14.265583,0 122.690292,14.233031,0 122.673465,14.263203,0 122.701590,14.270679,0</coordinates></LineString></Placemark><Placemark><name>Santa Rosa Sur boundary</name><Style><LineStyle><color>ffc07020</color><width>2</width></LineStyle></Style><LineString><coordinates>122.728032,14.275150,0 122.734324,14.257138,0 122.715931,14.233304,0 122.690292,14.233031,0 122.707648,14.251128,0 122.715096,14.273086,0 122.718478,14.268493,0 122.728032,14.275150,0</coordinates></LineString></Placemark><Placemark><name>Batobalani boundary</name><Style><LineStyle><color>ff804020</color><width>2</width></LineStyle></Style><LineString><coordinates>122.745112,14.240679,0 122.747489,14.232930,0 122.719744,14.205796,0 122.677809,14.188864,0 122.690292,14.233031,0 122.745112,14.240679,0</coordinates></LineString></Placemark>
+<Placemark><name>Santa Rosa Mine (mindat)</name><Point><coordinates>122.726700,14.260600,0</coordinates></Point></Placemark>
+<Placemark><name>APSA claims cluster (graticule read)</name><Point><coordinates>122.702000,14.255000,0</coordinates></Point></Placemark>
 </Document></kml>

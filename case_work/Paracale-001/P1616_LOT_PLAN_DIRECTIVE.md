@@ -180,3 +180,18 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   procedure: in Google Earth Pro, drag the overlay until the drawn creeks / Manila Vein workings /
   quarry / Vallejo tunnels align with the satellite terrain; the lot position then reads off
   directly. Anyone who knows the ground (Allan, Joemar, JJ) can close the last ±500 m in minutes.
+
+- **2026-09-05 — ROUGH MAP-FIT v4 (Santa Rosa Sur reconciliation).** Extracting the Santa Rosa
+  barangay polygons resolved the v3 tension: the gap east of modern San Rafael is **Brgy. Santa
+  Rosa Sur / Norte (Jose Panganiban)** — the Progress Map's own stated locality — and BOTH
+  straight tie-line solutions from the published Batobalani points fall inside **Santa Rosa
+  Sur**, as does mindat's Santa Rosa Mine. Reading: the title's 1963 "Brgy. San Rafael"
+  plausibly included today's Santa Rosa strip (later carved out), so the v3 constraint (parcel
+  within MODERN San Rafael) was too strict. **v4 position: corner 1 = 14.24949 N, 122.71935 E**
+  (parcel centroid 14.24821, 122.71807; ±~800 m), with the Manila Vein workings ~400 m west per
+  the 1:2,000 Progress Map. `P1616_Lot4_approx.kml` updated (repo + Drive); `P1616_MapFit_v4.kmz`
+  (map overlay re-seeded to v4) delivered to Jonathan for the Google-Earth drag-fit by
+  Allan/Joemar/JJ. ⚠ Barangay caveat now on record: modern polygons put the v4 position in
+  Santa Rosa Sur while title/tax dec say San Rafael — ask the Municipal Assessor which barangay
+  currently carries PIN 025-05-021-20-004, and note it for the loan papers if the barangay name
+  changed.
