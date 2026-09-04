@@ -37,7 +37,7 @@ Still needed (smaller gap now):
 | --- | --- | --- |
 | Won judgment + finding of bad faith | Have — docs 650, 515 | — |
 | No-occupation-damages confirmation | Have — doc 515 dispositive | — |
-| Property **area (sqm)** & **assessed/market value** | **Have (2026-09-04)** — lot 203 sqm per TCT (44055) 002-2026001670 (reissued to Beatriz 16 Apr 2026) and per land TD AD-14759-00301. The "534 sq" was a building floor area (546 sqm on TD AD-14759-00010, corrected to 504 sqm on AD-14759-00324), NOT the lot. See §6a. | Drive folder `1MQ_Afzy7LwlOjTCpcsQHopEQDpY0lwog` (photos, numeric names) + `Inocalla Vito Cruz Title.pdf` |
+| Property **area (sqm)** & **assessed/market value** | **Have (2026-09-04)** — lot 203 sqm per TCT (44055) 002-2026001670 (reissued to Beatriz 16 Apr 2026) and per land TD AD-14759-00301. The "534 sq" is the **Labo Poblacion urban lot** (Parcel 10 of the 1992 Compromise/Partition Agreement, doc 510 = Drive `Scan Mar 22, 2026 at 8.21 AM.pdf`), NOT this property; the same agreement lists TCT 44055 at 203 sqm. See §6a. | Drive folder `1MQ_Afzy7LwlOjTCpcsQHopEQDpY0lwog` (photos, numeric names) + `Inocalla Vito Cruz Title.pdf` |
 | **BIR zonal value, G. Pilar St., Malate** | Needed | public BIR Manila zonal schedule |
 | **Fair monthly rental** (Malate) | Needed | rental comps / any past lease |
 
@@ -55,10 +55,24 @@ RPT payment trail (same folder): OR U050244954-R 03/16/2022 (land, 2016–2022, 
 
 Also on Drive: `Inocalla Vito Cruz Title.pdf` (id `1bDs3scE7TWAuwIUMOYFYE5YFbSuEx8WU`) = CTC of TCT (44055) 002-2026001670, Beatriz V. Inocalla m/to Vicente Inocalla, entered 16 Apr 2026 per the alias writ in CC 13-131220, 203 sqm, requested by Allan 5 Aug 2026; and the 2023 Perez appraisal (`1496141092258561.pdf`, ₱23M as-is, 203 sqm, BIR zonal ₱66,000/sqm at the time).
 
+**Case-file check (2026-09-04, all Drive case folders read: `Inocalla Case Files`, `Titles/Tax Decs`, `Collection Sa Agrarian`, `Capacuan`, the Mar 21–23 2026 scans):** there is **no** Manila tax declaration in the case file itself. The only tax-dec copies for Vito Cruz are the Messenger-export photos above. The RTC Br. 15 decision (doc 650) records that Vicente Jr's side offered an RPT Statement of Account dated 29 Dec 2014 and receipts (Exhibits 11–15, Rollo Vol. 2 pp. 651–656) — those sit in the court rollo, not in our files. Corpus doc 505 ("Tax Document", 2013-12-20, ingested 2026-05-12, untitled) is unresolved from here: its "534 sq" pairing points to the Labo lot, not Manila. **None of the tax-dec photo file IDs appear in `corpus_manifest.json`** (the 2026-07-04 export ingest baselined other photos but not these) → they are likely NOT in the Paracale-001 corpus yet. Verify on the VPS:
+
+```sql
+SELECT id, document_title, doc_date, LEFT(full_text,300) FROM documents WHERE id IN (505,510);
+SELECT id, original_filename FROM documents WHERE drive_file_id IN
+ ('1nNUzxaKh0NddZuJIALh-h_gs6KvhQHMw','1UUOQF1JAdl2ngB7SuJAUwgpmPED6K23y','1XA3qmq_O2Zd_2LREJpuY1pGWdfUXukj4',
+  '15_cvTPg5kJ-HvrGFVkaerhaAutfSHtAE','1NTrbqQDq-LEe2X0GXHhWWAVlyasmwnU0','1oSCrA1FDZGXsbDObbp2otslr31gOYw9Q',
+  '1xR7hQG9h4JV59IpfW8KHpLhfJTE-sCCH','1Hsb09GDfcQtYZMHk63sX9FJD1RumwICk','17v7kqjP9IZubEJWAGkoPL1mJaE6LBLNp',
+  '1pSIcaGx3id9YxMDjTldhNlMRgBM_S56g','1ilL0fYhBxynjCSRLPsB6LdQ8AfY0rUZb','1Ugy670bbUiNSxTs7rS-l55UR6fATBSv1');
+```
+If the second query returns nothing, run `ingest_paracale_drive.py --run` (photos not skipped) so the tax decs become searchable under Paracale-001.
+
+Also from the 1992 partition agreement (doc 510): the 10 apartment doors were allotted by floor — 4F right Allan / left Heirs of Melvyn; 3F right Herbert / center Francisco / left Marilou; 2F right Senen / center Cipriana / left (illegible); GF right Jesus / left Casper / center Vicente Jr. (OCR-read; confirm against the scan before use.)
+
 **Consequences:** (a) the 22 Jun 2026 counsel-draft memo on Drive states 231 sqm — wrong, use 203; (b) all TDs remain in Vicente Jr's name despite the April 2026 re-titling — a transfer of tax declaration at the Manila Assessor (new TCT CTC + court order + RPT clearance) is needed before any sale/mortgage/estate step; (c) an RPT clearance will surface the post-2022 arrears.
 
 ## 7. Recommended next actions
-1. **[Operator] ~~Verify docs 505/510~~ DONE 2026-09-04** — "534 sq" was building floor area, not lot; lot is 203 sqm. Next: pull a current RPT SOA + transfer the four TDs to the estate/Beatriz name at the Manila City Assessor.
+1. **[Operator] ~~Verify docs 505/510~~ DONE 2026-09-04** — "534 sq" is the Labo urban lot in the partition agreement (doc 510), not this property; lot is 203 sqm per TCT and land TD. Doc 505 still to be pulled on the VPS (SQL in §6a). Next: pull a current RPT SOA + transfer the four TDs to the estate/Beatriz name at the Manila City Assessor.
 2. **[Counsel] Decide the reckoning date** (2019 finality vs 2011 bad-faith entry) — drives the magnitude.
 3. **[Counsel] Pull the BIR zonal value** for G. Pilar St., Malate, + 2–3 rental comps → fair monthly rental.
 4. **[Counsel] Frame the claim** — a motion/complaint for the uncompensated reasonable compensation + moral + exemplary + renewed fees, leveraging the **final judgment + the bad-faith finding** already on record (strong leverage; liability is settled).
