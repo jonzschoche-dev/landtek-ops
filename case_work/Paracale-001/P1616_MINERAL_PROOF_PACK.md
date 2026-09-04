@@ -313,6 +313,42 @@ original and, ideally, identifying its author/date (bottom-right title block rea
 GOLD PROJECT … PROGRESS MAP OF PARACALE NACIONAL"; legend covers lithology, geologic
 structures, alteration, surface openings).
 
-⚠ Discrepancy to resolve: the map labels Lot 4 as "Psu-143364 **(Amd.)**" while the title
+
+**UPDATE 2026-09-05 — digitally restored redraw received** (`Paracale_Progress_Map_restored.pdf`,
+1:2,000, redrawn from the damaged original; "dots (···) mark text illegible on the source" —
+drop into the Drive PGC folder for corpus ingest). Now legible:
+
+- **Title block confirmed:** "PARACALE GOLD PROJECT — Sta. Rosa Norte, Jose Panganiban,
+  Camarines Norte — PROGRESS MAP OF PARACALE NACIONAL", scale 1:2,000.
+- **Claim names:** besides PGP-31/32/35, the sheet shows **PGP-33, PGP-37** and **EAGLE
+  FR. No. B / D / F ("EAGLE" fraction claims)** on the east and west margins — claim names NOT
+  in the family's 13-claim list (Venecia…Latrobe): these are the Paracale Nacional / PGP-side
+  claims. Legend hatching is keyed "**BC PGP CLAIMS**"; drill symbols keyed "**NPIM & BGU
+  holes**" (NPIM ≈ Philippine Iron Mines-era drilling — historical exploration on/next to the
+  family lots).
+- **Assay-grade legend:** shaded classes >3.00 / 2.00–2.99 / 1.00–1.99 / <1.00 g Au/MT — the
+  map classifies ground by gold grade at 1:2,000 around the Manila Vein and Vallejo tunnels.
+- **"LOT-905, PLS-···-D": the PLS number is illegible on the SOURCE itself** (the restorer
+  marked it with dots) — so no amount of re-scanning fixes it; the number comes from LMS
+  (presumably PLS-1047-D per surveyor Joemar Andrew).
+- **Title-number recoveries on neighboring family lots:**
+  - "**TCT No. T-4695**, Lot-··, Psu-143364, **CASPER INOCALLA, Area = 11.1495 Has**" —
+    matches T-20755 (H-128572, 11.1486 ha, DBP/Casper) — **T-4695 is confirmed as the OLD
+    title number of T-20755**, directly answering part of SPECIAL_ADMIN_SUPERVISION action
+    7a-iv ("search old #s 4781/5941/4251/4695"). [V-map]
+  - "**TCT No. T-4792**, Lot-··, PSU-143364 (Amd.), ······ INOCALLA, Area = 8.···· Has" — a
+    title number in NO family inventory (and ~8 ha matches no known lot) — **new lead, chase
+    at RD**. (Close to, but not equal to, the action-7a-iv old number "4781".)
+  - "Lot-3, Psu-143364 (Amd.), M····· V. INOCALLA, Area = 7.3513 Has" and "OCT No. P-····,
+    Lot-··, Psu-143364 (Amd.), Area = 21.43·· Has" — partially legible; reconcile against the
+    15-row inventory (areas 7.3513 and 21.43xx match NO inventory rows — possible subdivided/
+    amended-plan areas).
+- **Plan-number discrepancies now systematic:** the map labels Casper's Lot 5 (23.5845 ha) as
+  "PSU-143364 (Amd.)" where the inventory says Psu-143363 Amd., and labels Lot 4 (P-1616) as
+  "(Amd.)" where the title says original plan. The amended plan evidently re-covered MORE lots
+  than the inventory assumed — **any LMS pull must request Psu-143364, Psu-143364 Amd., AND
+  Psu-143363/Amd. together.**
+
+⚠ (superseded by the UPDATE above) Discrepancy to resolve: the map labels Lot 4 as "Psu-143364 **(Amd.)**" while the title
 inventory treats Lot 4 as on the ORIGINAL plan (Amd. covering Lots 1/7/8). Whether the amended
 plan re-covered Lot 4 changes which plan LMS should pull — ask for BOTH in any follow-up.
