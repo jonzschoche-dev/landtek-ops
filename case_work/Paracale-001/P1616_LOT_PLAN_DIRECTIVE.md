@@ -195,3 +195,13 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   Santa Rosa Sur while title/tax dec say San Rafael — ask the Municipal Assessor which barangay
   currently carries PIN 025-05-021-20-004, and note it for the loan papers if the barangay name
   changed.
+
+- **2026-09-04 — Consolidated-plan cross-check PASSES; Drive KML synced to v4** (new file id
+  `19ybyr80dpGNjkrruy59vN2Vz6yZQUchi`, v3 trashed). Zoom-read of the family's ~1980
+  consolidated plan confirms Lot 4's neighborhood exactly as the title recites it — "LOT 4,
+  Psu-143364" adjoined by Leonardo Lamadrid (H-54763), Heirs of Serapio Banal, Leon Lamadrid
+  (H-47774), with H-44920 and Lot 3 beside it — and places Lot 4 at the SE corner of the family
+  block with the block extending NW, consistent with the v4 position (block toward San Rafael
+  center 2.9 km NW). Progress map, consolidated plan, tie line and barangay layer now agree.
+  The consolidated plan also carries per-lot bearing tables (right margin) — a flat scan of it
+  would let us reconstruct EVERY family lot's polygon the way we did Lot 4.
