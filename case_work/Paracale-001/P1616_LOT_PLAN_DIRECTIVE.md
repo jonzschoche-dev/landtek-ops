@@ -205,3 +205,17 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   center 2.9 km NW). Progress map, consolidated plan, tie line and barangay layer now agree.
   The consolidated plan also carries per-lot bearing tables (right margin) — a flat scan of it
   would let us reconstruct EVERY family lot's polygon the way we did Lot 4.
+
+- **2026-09-05 — SATELLITE VERIFICATION of v4 (Sentinel-2, done in-session).** Pulled open
+  Sentinel-2 L2A imagery (AWS `sentinel-cogs`, tile 51PVR, scene 2026-04-23, 10 m) over
+  122.685–122.740E / 14.235–14.265N and tested three candidate placements against real land
+  use. **v4 (corner 1 = 14.24949, 122.71935) wins**: the polygon lands on a cleared/cultivated
+  mosaic with bare patches inside, large pale sandy ground at its SOUTH edge (consistent with
+  the tax dec's 3.2069-ha "bulas" + 12-ha coconut), an access track from its SE corner toward
+  the Batobalani road, forest closing on its NORTHERN boundary (old property lines persist as
+  land-use edges), and the mining/creek disturbance network to the WNW — the correct side per
+  the Progress Map. The 500-m-WNW alternative sits in closed forest; the APSA-cluster
+  alternative sits ON the workings zone — both rejected. **Confidence now ~±400 m
+  (translation).** Final refinement: Google-Earth drag-fit by someone who knows the
+  tunnels/quarry, a GPS pin on a monumented corner, or the DENR/LMS data. Renders saved in
+  session (`sat_candidates.png`, `sat_zoom2.png`) and sent to Jonathan.
