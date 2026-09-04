@@ -161,3 +161,14 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   Second local avenue: the **Municipal Assessor of Jose Panganiban** (Tax Dec
   GR-2023-I-05-021-00306, PIN 025-05-021-20-004) can usually map an ARP to its cadastral lot
   number over the counter — add to the runner's errand.
+
+- **2026-09-04 — Cadastral lead CONFIRMED on the family's own map:** Allan's photos of the
+  "Progress Map of Paracale Nacional" (Paracale Gold Project sheet) show "**LOT – 905,
+  PLS-⟨smudged⟩-D**" printed beside the family block, next to the "OCT No. P-1616 / Lot 4 /
+  Allan V. Inocalla / 15.2069 Has" annotation. With the Tax Dec's "Lot 4 and 906" reference,
+  the working hypothesis is: **our Lot 4's cadastral equivalent is in the PLS-…-D lot 905/906
+  series** — Joemar to research lots 905 and 906 at LMS Legazpi and pull lot data computation +
+  grid coordinates. See `P1616_MINERAL_PROOF_PACK.md` §A7 for the full map description. Also
+  flagged: the map labels Lot 4 as "Psu-143364 (Amd.)" — request BOTH original and amended plan
+  data. **TODO: drop the 4 map photos into the LANDTEK Drive PGC folder for corpus ingest, and
+  have the paper map flat-scanned.**

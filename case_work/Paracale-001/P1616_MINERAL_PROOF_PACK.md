@@ -276,3 +276,43 @@ match the report's named veins, maintained under a 1992 judicially-approved part
 binding of the tenements to Lot 4 awaits the MGB R-V certification and claim maps (retrieval list
 §B). Do not assert "mineral land classification" — it would expose the 1963 free patent to
 reversion and undercut the parcel's collateral use.*
+
+---
+
+## A7. ⭐ "Progress Map of Paracale Nacional" — the tenement-to-title Rosetta stone (photos, 2026-09-04)
+
+Allan surfaced a large paper map: **"PARACALE GOLD PROJECT — Sta. Rosa Norte / Jose Panganiban,
+Camarines Norte — PROGRESS MAP OF PARACALE NACIONAL"** (scale ~1:2,000; 4 phone photos taken
+2026-09-04, in the Messenger thread with surveyor Joemar Andrew; NOT yet in Drive/corpus —
+**ingest the photos, then get the paper map properly scanned**). What it shows, all on ONE sheet:
+
+- **Claim blocks PGP-31, PGP-32, PGP-35** (rectangular, grid-aligned — consistent with
+  meridional blocks; likely the same blocks as NI 43-101 Table 3's "four contiguous meridional
+  blocks totaling 331.2 ha" overlapping Inocalla land).
+- **The MANILA VEIN drawn and labeled**, with assay annotations along it (0.13g/0.76m,
+  0.17g/4.00m, 0.29g/3.05m, 0.46g/0.76m, 0.67g/0.76m, 1.08g/4.01m, 1.35g/0.80m, 1.80g/0.76m,
+  2.93g/0.76m, 3.71g/0.76m, 5.58g/0.84m …), **Vallejo Tunnels Nos. 3/4/5/6**, a quarry, and
+  PNS-series sample/drill points — i.e., the historical workings mapped at parcel scale.
+- **The family's titled lots annotated by owner**, including a block reading
+  "**OCT No. P-1616 / Lot 4, Psu-143364 (Amd.) / ALLAN V. INOCALLA / Area = 15.2069 Has**"
+  on the east side, and "Lot 5, Psu-143364(?) (Amd.) / CASPER INOCALLA / Area = 23.5845 Has"
+  to its south, plus further Inocalla lots westward.
+- **A cadastral cross-reference: "LOT – 905, PLS-⟨smudged⟩-D"** printed under the PGP-31/32
+  boundary immediately east of the family block. ⚠ The PLS number is unreadable on the photo
+  (presumably PLS-1047-D per surveyor Joemar Andrew); the **lot number 905 is unambiguous**.
+  Recall the 2024 Tax Dec's stray "LOT 4 and 906" — the cadastral lots in this immediate
+  neighborhood are the 905/906 series. → Research task for LMS Legazpi: **pull PLS-…-D lots
+  905 AND 906 lot data; identify which cadastral lot corresponds to our Lot 4, Psu-143364.**
+
+Evidentiary weight: this map is the missing visual link between the mineral layer and the
+titled parcels — it draws the Manila Vein workings and assays in direct spatial relation to
+the P-1616 annotation, corroborating the MGB 2000 certification's "split veins of the Manila
+vein system" probability for row #11 (A0) and giving the NI 43-101 a historical antecedent at
+parcel scale. Provenance: [O] family-held paper map, photographed; upgrade by scanning the
+original and, ideally, identifying its author/date (bottom-right title block reads "PARACALE
+GOLD PROJECT … PROGRESS MAP OF PARACALE NACIONAL"; legend covers lithology, geologic
+structures, alteration, surface openings).
+
+⚠ Discrepancy to resolve: the map labels Lot 4 as "Psu-143364 **(Amd.)**" while the title
+inventory treats Lot 4 as on the ORIGINAL plan (Amd. covering Lots 1/7/8). Whether the amended
+plan re-covered Lot 4 changes which plan LMS should pull — ask for BOTH in any follow-up.
