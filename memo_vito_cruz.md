@@ -37,12 +37,28 @@ Still needed (smaller gap now):
 | --- | --- | --- |
 | Won judgment + finding of bad faith | Have — docs 650, 515 | — |
 | No-occupation-damages confirmation | Have — doc 515 dispositive | — |
-| Property **area (sqm)** & **assessed/market value** | Likely partial in corpus (docs 505/510 show "534 sq" and "MARKET VALUE" — **verify these are this lot**) | TCT 44055 / Manila tax declaration |
+| Property **area (sqm)** & **assessed/market value** | **Have (2026-09-04)** — lot 203 sqm per TCT (44055) 002-2026001670 (reissued to Beatriz 16 Apr 2026) and per land TD AD-14759-00301. The "534 sq" was a building floor area (546 sqm on TD AD-14759-00010, corrected to 504 sqm on AD-14759-00324), NOT the lot. See §6a. | Drive folder `1MQ_Afzy7LwlOjTCpcsQHopEQDpY0lwog` (photos, numeric names) + `Inocalla Vito Cruz Title.pdf` |
 | **BIR zonal value, G. Pilar St., Malate** | Needed | public BIR Manila zonal schedule |
 | **Fair monthly rental** (Malate) | Needed | rental comps / any past lease |
 
+### 6a. Manila tax declarations located (2026-09-04) — PIN 117-14-759-001-024, Brgy 759 Zone 082, Sta. Ana District
+All are Manila City Assessor certified true copies photographed and uploaded to Drive on 2026-07-03 (folder id `1MQ_Afzy7LwlOjTCpcsQHopEQDpY0lwog`, Messenger-style numeric filenames). Figures below are OCR-read from the photos — **inferred_strong, confirm against the images before citing in a filing.**
+
+| Kind | TDN / ARP | Declared owner | Area | Market value | AL | Assessed value | Effectivity | Drive file |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| LAND (Lots 4,5,6 Blk 45) | AD-14759-00301 (cancels AA-14759-00087; prior owner shown "Montinola, Ricardo") | Inocalla, Vicente Jr m/to Corazon D; New TCT 002-2011002723 (5/23/2011) | 203 sqm | ₱1,890,000 | 10% | ₱189,000 | 01/01/2014 | `2264965184329011.jpg` (CTC 5/6/2016, req. Allan), `1003095792689536.jpg` (CTC 2/28/2022, req. Ibañez) |
+| BUILDING B0001 (3-storey) | AD-14759-00010 (cancels AA-14759-00039x) | Inocalla, Vicente Jr | 546 sqm floor | ₱2,202,900 | 40% | ₱881,160 | 01/01/2014 | `1763508868395876.jpg` (CTC 5/6/2016, req. Allan) |
+| BUILDING B0001 (reassessed) | AD-14759-00324 (cancels AD-14759-00010; "correction of type of floor area") | Inocalla, Vicente Jr | 504 sqm floor | ₱3,024,000 | 40% | ₱1,209,600 | 01/01/2016 (appraised 05/31/2018) | `1343134083985041.jpg` (CTC 2/28/2022, req. Ibañez) |
+| BUILDING B0002 (3-storey, 2519 G. Del Pilar) | AD-14759-00219 (cancels AA-14759-00040) | **"Inocalla et al, Allan V"** on 2016 prints; **"Inocalla, Vicente Jr"** on the 2/28/2022 print — same TDN, owner line differs → verify at Assessor | 168 sqm floor | ₱1,008,000 | 35% | ₱352,800 | 01/01/2014 | `1025806933469929.jpg`, `999455809728941.jpg` (Allan), `27722729390685929.jpg` (Vicente Jr) |
+
+RPT payment trail (same folder): OR U050244954-R 03/16/2022 (land, 2016–2022, ~₱28k) `1893601027991496.jpg`; OR U047135560-R 03/17/2022 (B0002, 2018–2022, ₱50,889.69) `1413524487269220.jpg`; SOA 1605-000977 05/03/2016 (B0002 under Allan et al) `4454269751459716.jpg`; SOAs 2405-002292 / 2405-012430 (May 2024, B0002: 2023–2024 unpaid ₱16,045.01, last payment 3/17/2022) `1883784049244479.jpg`, `1710934473483719.jpg`. No payment record after March 2022 was found — expect 2023–2026 arrears.
+
+Also on Drive: `Inocalla Vito Cruz Title.pdf` (id `1bDs3scE7TWAuwIUMOYFYE5YFbSuEx8WU`) = CTC of TCT (44055) 002-2026001670, Beatriz V. Inocalla m/to Vicente Inocalla, entered 16 Apr 2026 per the alias writ in CC 13-131220, 203 sqm, requested by Allan 5 Aug 2026; and the 2023 Perez appraisal (`1496141092258561.pdf`, ₱23M as-is, 203 sqm, BIR zonal ₱66,000/sqm at the time).
+
+**Consequences:** (a) the 22 Jun 2026 counsel-draft memo on Drive states 231 sqm — wrong, use 203; (b) all TDs remain in Vicente Jr's name despite the April 2026 re-titling — a transfer of tax declaration at the Manila Assessor (new TCT CTC + court order + RPT clearance) is needed before any sale/mortgage/estate step; (c) an RPT clearance will surface the post-2022 arrears.
+
 ## 7. Recommended next actions
-1. **[Operator] Verify docs 505/510** — confirm whether the "534 sq.m." + "MARKET VALUE" figures pertain to TCT 44055 (2521 G. Pilar) — if so we already have the value base.
+1. **[Operator] ~~Verify docs 505/510~~ DONE 2026-09-04** — "534 sq" was building floor area, not lot; lot is 203 sqm. Next: pull a current RPT SOA + transfer the four TDs to the estate/Beatriz name at the Manila City Assessor.
 2. **[Counsel] Decide the reckoning date** (2019 finality vs 2011 bad-faith entry) — drives the magnitude.
 3. **[Counsel] Pull the BIR zonal value** for G. Pilar St., Malate, + 2–3 rental comps → fair monthly rental.
 4. **[Counsel] Frame the claim** — a motion/complaint for the uncompensated reasonable compensation + moral + exemplary + renewed fees, leveraging the **final judgment + the bad-faith finding** already on record (strong leverage; liability is settled).
