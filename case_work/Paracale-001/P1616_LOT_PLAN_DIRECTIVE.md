@@ -172,3 +172,11 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   flagged: the map labels Lot 4 as "Psu-143364 (Amd.)" — request BOTH original and amended plan
   data. **TODO: drop the 4 map photos into the LANDTEK Drive PGC folder for corpus ingest, and
   have the paper map flat-scanned.**
+
+- **2026-09-05 — Google Earth map-fit kit built** (`P1616_MapFit.kmz`, delivered to Jonathan;
+  ~3 MB, not committed): the restored 1:2,000 Progress Map as a correctly-scaled, semi-transparent
+  **draggable GroundOverlay** (A1 sheet → 1,682 × 1,188 m ground extent, north-up) seeded at
+  N14.2461–14.2568 / E122.6948–122.7104, bundled with the exact Lot 4 polygon. Field-fit
+  procedure: in Google Earth Pro, drag the overlay until the drawn creeks / Manila Vein workings /
+  quarry / Vallejo tunnels align with the satellite terrain; the lot position then reads off
+  directly. Anyone who knows the ground (Allan, Joemar, JJ) can close the last ±500 m in minutes.
