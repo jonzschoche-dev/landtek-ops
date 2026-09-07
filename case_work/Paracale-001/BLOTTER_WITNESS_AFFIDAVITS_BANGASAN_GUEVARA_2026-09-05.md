@@ -63,17 +63,17 @@ CITY OF MANILA              ) S.S.
 
 ### SWORN STATEMENT
 
-**I, MIKE GUEVARA,** Filipino, of legal age, a licensed **Architect** (PRC License No. ____________), with residence at ______________________________________________, after having been duly sworn to in accordance with law, hereby depose and state:
+**I, MIKE GUEVARA,** Filipino, of legal age, a licensed **Architect** (PRC License No. ____________), with residence at 2649 N. Dominga Street, Pasay City, NCR, after having been duly sworn to in accordance with law, hereby depose and state:
 
 1. On **5 September 2026, at about 5:30 in the afternoon**, upon the invitation of **Mr. Allan V. Inocalla**, I went to his family's property at **2531 G. Del Pilar Street, Barangay 759, Santa Ana, City of Manila** (the "Property"), together with **Mr. Mario Bangasan**, President of the Philippine Inventors, Scientists and Innovators, Inc., for the purpose of assessing and evaluating the building.
 
-2. While we were viewing and taking photographs of the building, a man — whom Mr. Inocalla identified to us as his nephew, **ACE VICENTE INOCALLA III** — **came out of an apartment in the building and started shouting at Mr. Inocalla** in a threatening and insulting manner. Among the words I heard him shout were words to the effect of: **"Umalis ka dito at barilin kita! Putang ina mo, hayop ka! Manloloko, magnanakaw! Alis kayo dito!"** (in English: *"Leave this place or I will shoot you! You son of a whore, you animal! Swindler, thief! All of you, get out of here!"*).
+2. While we were viewing and taking photographs of the building, a man — whom Mr. Inocalla identified to us as his nephew, **ACE VICENTE INOCALLA III** — **came out of an apartment in the building and started shouting at Mr. Inocalla** in a threatening and insulting manner. Among the words I heard him shout were words to the effect of: **"Umalis ka dito! Putang ina mo, hayop ka! Manloloko, magnanakaw! Alis kayo dito!"** (in English: *"Leave this place! You son of a whore, you animal! Swindler, thief! All of you, get out of here!"*).
 
 3. Mr. Inocalla remained calm and tried to pacify him, but the man **did not stop threatening and cursing** him. I also noticed that the man was **holding his phone as if calling someone**.
 
 4. Mr. Inocalla then told us that it was better for us to leave, and we started walking away toward **Pablo Ocampo Street**.
 
-5. I saw the man **go after Mr. Inocalla**, and when Mr. Inocalla stopped and faced him, the man **continued shouting threats** at him, including words to the effect of: **"Anong gusto mo? Patitirahin kita!"** (in English: *"What do you want? I will strike you!"*).
+5. I saw the man **go after Mr. Inocalla**, and when Mr. Inocalla stopped and faced him, the man **continued shouting threats** at him, including words to the effect of: **"Anong gusto mo?"** (in English: *"What do you want?"*).
 
 6. I saw **Mr. Mario Bangasan pull Mr. Inocalla away** because the man was becoming more aggressive. As we left, the man **continued yelling and cursing at Mr. Inocalla and at our group**.
 
@@ -99,6 +99,8 @@ ____________ at ____________________.
 ---
 
 ## PART III — COUNSEL-REVIEW FLAGS (both witnesses)
+
+0. **✅ GUEVARA REVIEWED HIS DRAFT (2026-09-06, handwritten markup on the print).** He personally STRUCK from his own statement: "at barilin kita" + "or I will shoot you" (¶2) and "Patitirahin kita!" + "I will strike you!" (¶5) — **he did not make out those specific words** — and kept the curses, "Manloloko, magnanakaw," "Alis kayo dito," and "Anong gusto mo?". He also wrote in his residence (2649 N. Dominga St., Pasay City — **verify spelling/number against his ID at the jurat**; PRC license number still blank). His files (docx + packet) now carry the corrected text. **This is the honest-divergence outcome working as intended: do NOT "harmonize" Bangasan's or Allan's statements to match, and do NOT re-add the struck words to Guevara's.** Allan (who heard "barilin kita" directly) and Bangasan (still to confirm his own recollection, cold) stand on their own texts. Guevara corroborates the confrontation, pursuit, aggression, defamation ("manloloko, magnanakaw"), and Bangasan pulling Allan away — while the shoot threat rests on Allan and (if he confirms) Bangasan.
 
 1. **Interview each witness separately before he signs, and let him correct the draft to his own memory.** The two drafts above are intentionally NOT word-identical, but they are both built from Allan's account [O]. The quoted utterances especially: each witness should state the words **he** actually heard — if one witness clearly heard "barilin kita" but the other only heard shouting and curses without making out the words, their statements should say exactly that. Honest differences between witnesses corroborate; scripted uniformity impeaches. Keep "words to the effect of" unless a witness is certain of verbatim words (then quote verbatim).
 1a. **"Barilin kita" (I will shoot you) is the gravest utterance in the drafts — it must come from each witness's own ears.** Allan corrected his own account the same day from "susuntukin" (punch) to "barilin" (shoot), with the added epithets "manloloko, magnanakaw" (see the supplemental affidavit's Part IV #1). Do NOT tell the witnesses what Allan heard before asking them what they heard — take each man's version cold, then reconcile. A witness who independently confirms "barilin" makes the grave-threats charge near-unassailable; a witness fed the word is worthless and dangerous. Neither witness statement mentions Allan's knowledge of Ace's firearm — that stays exclusively in Allan's affidavit unless a witness independently knew or saw it.
