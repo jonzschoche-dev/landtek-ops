@@ -11,6 +11,7 @@ Sources: your two Judicial Affidavit versions (Drive: `Judicial Affidavit - Jona
 ## POST-HEARING UPDATE — 2026-09-08 (from Jonathan, in person)
 - **You took the stand. The public prosecutor was not prepared to cross.** Cross is deferred to the **October** setting (get the exact date from the Order/minutes). Next time the prosecutor will have had a month with the letters below — expect a real cross.
 - **Marcia has now also written to the court disavowing you.** Two of three wards oppose in writing. **Nobody has appeared for either aunt** — no counsel, no personal appearance, letters only.
+- **Judge told the objectors they need their own counsel.** The letters are not being treated as oppositions properly before the court; if neither aunt retains Philippine counsel by October, the objections are procedurally not in. (Jonathan is sure Marcia wrote hers herself.)
 - **Rumor: LGU Mercedes will write to the court.** The LGU is your adversary on T-32911 occupation, the road/donation, and the DILG/ARTA/OP-1321 fights. If it files, expect the "litigious foreigner harassing officials" theme with a government voice.
 
 **What changes on the stand (October):**
