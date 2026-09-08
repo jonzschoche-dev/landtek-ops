@@ -231,3 +231,12 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   Repo KML + GeoJSON updated to v5; Drive KML replaced; `P1616_MapFit_v5.kmz` (overlay
   re-seeded at v5) delivered. Remaining to survey-grade: DENR/LMS lot data (email threads +
   Joemar's LMS pull, lots 905/906 PLS-…-D) or GPS pins on monumented corners 8–11.
+
+- **2026-09-08 — Scheduled DENR check-in ran.** No substantive reply on either thread yet —
+  only the Sept 2 acknowledgments from both offices. The cc `smddenr5@gmail.com` is bouncing
+  permanently ("inbox full") — dropped from future correspondence; primary addresses delivered
+  fine. Per Jonathan's no-send instruction, polite follow-up **DRAFTS** were placed in both
+  Gmail threads for his review and sending (SMD draft in thread `1a05f76a181e92a8`, PENRO
+  draft in thread `1a05f92542f6fdd1`). Drive loan folder synced: v5 fitted KML uploaded as
+  `P1616_Lot4_v5_FITTED.kml` (id `1lGbIcCdWLDc2wuuWH7GA9Xu-O5nDpiL0`), superseded copy
+  trashed. `P1616_MapFit_v5.kmz` delivered to Jonathan. Next check-in re-armed for 2026-09-15.
