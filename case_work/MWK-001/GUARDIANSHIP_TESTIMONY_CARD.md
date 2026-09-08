@@ -8,6 +8,37 @@ Sources: your two Judicial Affidavit versions (Drive: `Judicial Affidavit - Jona
 > 2. **Did Gerry file a written opposition** or is anyone appearing for her? (Her 15-Jul email exists; Agcaoili said she won't participate.)
 > 3. **Is tomorrow your direct + cross, or jurisdictional-compliance + marking?** If compliance: bring the publication proof (Drive: `Guardianship Publication.pdf`), OSG service, service on the wards, and the bond quotation.
 
+## POST-HEARING UPDATE — 2026-09-08 (from Jonathan, in person)
+- **You took the stand. The public prosecutor was not prepared to cross.** Cross is deferred to the **October** setting (get the exact date from the Order/minutes). Next time the prosecutor will have had a month with the letters below — expect a real cross.
+- **Marcia has now also written to the court disavowing you.** Two of three wards oppose in writing. **Nobody has appeared for either aunt** — no counsel, no personal appearance, letters only.
+- **Rumor: LGU Mercedes will write to the court.** The LGU is your adversary on T-32911 occupation, the road/donation, and the DILG/ARTA/OP-1321 fights. If it files, expect the "litigious foreigner harassing officials" theme with a government voice.
+
+**What changes on the stand (October):**
+| Dead lines — never say again | Replace with |
+|---|---|
+| "Marcia hasn't signed anything" / "Gerry said she'd give Marcia a POA" | "Both my aunts have written that they don't want me acting. Neither has come, sent a lawyer, or named anyone else. The land still has nobody." |
+| "This petition is not adversarial between me and the wards" (Reconstructed A11) | Concede: "It was filed with my mother's written consent. My aunts have since objected in writing. I accept that." Then the one line. |
+
+**New attacks → your answer**
+| They say | You say |
+|---|---|
+| **Two of the three owners have told this Court they don't want you. Why should the Court impose you on them?** | "I'm not asking to be imposed on them. I'm asking that *someone* answerable to this Court protect land that nobody is protecting. If they name anyone else who will actually come here and do it, I'll step aside. Nobody has." |
+| **Their letters say they never authorized you.** | "That's right — they haven't. My mother has. And their letters say the same thing my petition says: they are in California and won't act. The land can't wait for them to change their minds." |
+| **Isn't this a family dispute the Court shouldn't be in?** | "The dispute isn't between me and my aunts — it's between our family's land and the people building on it and titling it. My aunts and I disagree about who should stand up for it. Nobody disagrees that somebody must." |
+| **The Municipality of Mercedes says you've been harassing its officials / filing complaints everywhere.** | "I asked the Municipal Engineer for public records about my family's land and was refused. I used the legal remedies for that — ARTA, the Court of Appeals, the Office of the President. Those are the lawful channels. The municipality is occupying part of T-32911; it has an interest in nobody having authority over that title." **Stop. Don't argue the donation or the DILG letters — counsel.** |
+| **You said in your affidavit all three consented. That was untrue when you swore it?** | "When I signed it, my mother had signed and my aunts had not objected. Geraldine objected on 15 July; Marcia later. The affidavit should be corrected and my counsel will address it. I'm not hiding it." |
+
+**For Botor before October (his calls, not yours):**
+- [ ] Pull certified copies of **both letters** and any LGU filing from the Br. 41 clerk the day they land.
+- [ ] Are the aunts' letters **verified oppositions** or bare letters? Unverified, un-appeared letters are not evidence — ask that they be treated accordingly, *and* offer them as proof of absence + refusal (both are true at once).
+- [ ] If the **LGU files**, it becomes an oppositor claiming "interest" under the 22-Jun Order — that puts the LGU's occupation of T-32911 and the 1953 donation **on the record and open to cross**. Decide whether to welcome that.
+- [ ] **Pivot decision:** with two competent adults objecting, a Rule 92 guardianship over their thirds is a hard ask. The **alternative prayer for Letters of Administration (petition §15)** doesn't need heir consent — opposition there goes to *who*, not *whether*. Re-cast the October hearing around it, or narrow. Plan B (Patricia's 1/3 via SPA + Art. 487 + partition) stays live regardless.
+- [ ] **Errata / supplemental** to the JA and petition on the consent recital (§12 / A11) *before* October — don't let the prosecutor find it first.
+- [ ] Bond quotation, publication affidavit, OSG service — confirm all are in the record now so October is merits-only.
+- [ ] CV 6839 execution clock — does a one-month slip cost anything under Rule 39 §6? Check the entry-of-judgment date.
+
+---
+
 ## The one line that wins everything
 **"They are not here, they will not act, and the land is being taken while they are gone."**
 Absence + refusal + peril. Not age. Not incapacity. Whenever you feel cornered, come home to it.
