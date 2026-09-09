@@ -1,0 +1,42 @@
+# ANNEX SCHEDULE — Petition + Urgent Motion + Judicial Affidavit
+
+> **As of 2026-09-09** (copies check in dossier §8-A). Certification standard for filing: **certified true copy from the issuing office**, or the original. A corpus scan or a family photocopy is a *drafting source*, not an annex. Columns: **Have** = the paper we can attach today; **Grade** = what it is; **Get** = what is still needed and from whom.
+
+| Annex | Document | Proves (Petition ¶) | Have | Grade | Get |
+|---|---|---|---|---|---|
+| **A** | PSA Certificate of Death — Vicente Inocalla, Sr. († 26 Nov 1984) | 2.3, 3.1–3.2 jurisdiction | ✗ | — | PSA (or LCR Paracale then PSA) — **Allan/Jonathan** |
+| **A-1** | PSA Certificate of Death — Beatriz Villafria Inocalla († 12 Aug 1985) | 2.3, 3.1–3.2 | ✗ | — | PSA — **Allan/Jonathan** |
+| **B** | Schedule of Heirs — full names, ages, residences, per branch | 2.5–2.8, Rule 79 §2(b) | ◐ | `INOCALLA_HEIR_ROSTER.md` (sibling level complete; deceased-branch children blank) | Family census — **Allan**; PSA death certs of Melvyn, Francisco, Vicente Jr., Senen, Cipriana, Casper; **CENOMAR for Senen**; Melvyn's date of death (pre/post 26 Nov 1984 changes the succession mechanics) |
+| **C** | RD Manila Certified True Copy, TCT No. (44055) 002-2026001670 (5 pp, system-generated e-CTC, requested by Allan 5 Aug 2026, OR 1040475498) | 4.6, 7.3, 8.4; Motion ¶2.3 | ✅ | **certified** — Drive `ScannerPro/Inocalla Vito Cruz Title.pdf` (id 1bDs3scE7TWAuwIUMOYFYE5YFbSuEx8WU) | Move to client folder; ingest to corpus; bring the **original e-CTC print** to filing |
+| **D** | Compromise/Partition Agreement (24 Jan 1992) + Order approving (28 Jan 1992) + Certificate of Finality (26 Mar 2014), CC B-5625/"5626", RTC Br. 41 Daet | 3.3, Part V | ◐ | corpus docs 510 (court-stamped copy) / 671 (parties' copy) — **not certified**; docket number unresolved | Certified copies from RTC Br. 41 Daet OCC — **Allan/counsel** — this also fixes 5625 vs 5626 |
+| **E / E-1 / E-2** | Written consent + nomination of Allan as administrator — Jesus, Marilou, Herbert | 7.1, Rule 78 §6 | ✗ | — (the 2024/2025 SPAs show trust, not consent to this petition) | Draft one-page consents; Jesus/Marilou notarized in PH; **Herbert before the Philippine Embassy, Brasilia** — **Allan** |
+| **F** | Omni SPA of the heirs to Allan, acknowledged Philippine Embassy Brasilia 10 Jul 2024 (Herbert), signed Herbert/Cipriana/Jesus/Marilou | 2.2, 7.1, 7.3 | ✅ | corpus doc 647; rescan in `ScannerPro/VITO CRUZ SPA.pdf` (12 Aug 2026) — **originals with Allan ( ? )** | Original or certified copy from the Embassy's notarial register (Series 2024, Doc. No. 123); ⚠ flag: Cipriana's signature lapsed at her death (Art. 1919(3)) — annex it for history, do not rely on it for her branch |
+| **F-1** | SPA of Jesus V. Inocalla to Allan, Daet, Aug 2025, Doc. No. 518, Atty. Sherwin O. Mata | 2.2, 7.1 | ✅ | corpus doc 648; rescan in VITO CRUZ SPA.pdf | Original ( ? with Allan ) |
+| **F-2** | SPA of Marilou V. Inocalla to Allan, Parañaque, 5 Aug 2025 | 2.2, 7.1 | ✅ | corpus doc 649; rescan in VITO CRUZ SPA.pdf | Original ( ? ) |
+| **F-3** | SPA of Herbert V. Inocalla, consularized (doc 657) | 2.2 | ✅ | corpus doc 657 | Original ( ? ) |
+| **G** | NBI clearance — Allan V. Inocalla | 7.2, Rule 78 §1 | ✗ | — | NBI — **Allan** (2 weeks) |
+| **H** | Undertaking of Casper V. Inocalla, Batobalani, Paracale, 25 Aug 1985 (front **and back page**) | 4.5, 8.4; Motion ¶2.4 | ◐ | operator phone photo of the original (front only), not on file | **Clean scan of the original + back page** (check for notarial acknowledgment) — **Allan holds it ( ? )**; if unnotarized, plan a confirmatory acknowledgment by the Heirs of Casper or prove by witnesses |
+| **H-1** | DBP-Daet Certificate of Full Payment / release of mortgage / statement of account, TCT 4251, 4695, 4781, 5941 | 4.5 (condition precedent) | ✗ | — | DBP Daet Branch, ROPA/acquired-assets unit — **Allan** (with heirs-of-Casper authority or as heir-beneficiary's representative) |
+| **I** | Decision, CC 98-88750, RTC Manila Br. 16, 3 Aug 2006; CA Resolution dismissing CA-G.R. CV No. 98831 + Entry of Judgment 29 May 2013 | 7.4 disclosure | ◐ | corpus docs 506/509 (decision), 632/656 (CA/entry) — copies, not certified | Certified copies from RTC Manila Br. 16 / CA — **Manila counsel** (Mata/Uy) |
+| **J** | Prior complaints re occupation by Ace / Elena / the Bombitas (docs 526/644) + any barangay/police blotter | 8.2; Motion ¶2.2 | ◐ | corpus docs 526/644 — read and confirm what they are | Certified copies from the office where filed ( ? ) — **Allan** |
+| **K** | Evidence of the mining on Casper's land: dated photographs, sketch/plan showing the workings vs parcel lines, affidavits of witnesses (Jesus? tenant-neighbours?), any MGB/PNP report | 8.3; Motion ¶2.1 | ✗ | nothing on file | **Allan** to document (do not confront the operation); consider an MGB Region V records request for any permit/Minahang Bayan overlapping the parcels |
+| **L** | RD Camarines Norte certified true copies: **T-3897, T-5656, T-2194, T-3424, T-4185**; **T-20754, T-20755, T-20756, T-20757** (search old nos. 4251/4695/4781/5941); TCT 885 (Ereneo Agon); TCT 1722 (Lot 1, Calaburnay), T-1827 (Malaguit) — the 1992 award parcels | Part IV, 5.3 | ✗ | family inventory table only (docs 520/634/669, OCR-garbled owner column) | **RD Camarines Norte, Daet** — **Allan (field)**; one trip, request all in a single application |
+| **M** | Tax declarations / assessor's certifications of market and assessed value for every parcel in Part IV; ARP 021-0312 (Lot 6); the 145 ha of ARP-only parcels in the 2024 SPA list | 3.5 value, 4.4, docket fee, bond | ◐ | only Allan's own P-1616 tax dec (24 Aug 2026) — **outside the estate** | Municipal Assessors of Paracale and Jose Panganiban; Provincial Assessor Daet — **Allan** |
+| **N** | Certifications of **no pending petition** for settlement of either estate — OCC RTC Camarines Norte (Daet and Labo) and OCC RTC Manila | 3.3 | ✗ | — | OCC — **counsel** |
+| **O** | CA Decision, CA-G.R. SP No. 161072 (4 Mar 2021); SC Resolution G.R. No. 256997 (6 Dec 2021) + Entry of Judgment (31 Aug 2022); RTC Br. 15 Order of 25 Nov 2025 and alias writ of 9 Mar 2026 | 4.6 | ◐ | corpus docs 511/522/516/643 — copies | Certified copies — **Manila counsel** |
+| **P** | Vicente Jr. Certificate of Death — LCR Jose Panganiban Reg. No. 2017-191 | 2.5 item 7 | ◐ | LCR **machine copy** on Drive (`Vicente_Jr_Inocalla_Death_Certificate.pdf`, id 1LyNZJ5851KXp8VKzQwHRoja6yV2QzqE4); PDF p.2 is a stray unrelated page | **PSA copy**; strip p.2 |
+| **Q** | Marriage certificate of the decedents (date/place of marriage; pre-Family Code regime) | 2.4 | ✗ | — | PSA / LCR — **Jonathan** |
+| **R** | Rural Bank of Paracale — certification of shareholding (770 shares) | 4.1 | ✗ | — | Bank — **Allan** |
+| **S** | Labo lot (Gumamela) — RD copy of the title (doc 638 "cancelled") + status of Civil Case No. 4992, RTC Labo | 4.2 | ◐ | corpus docs 636/638/658/1098 — read | RD Labo/Daet + OCC Labo — **Allan/counsel** |
+| **T** | Camarines Sur ricefield (Milaor/San Fernando, ~13 ha) — title/tax dec | 4.3 | ✗ | listed in doc 647 only | RD / Assessor Camarines Sur — **Allan** |
+
+## What can be filed on the paper we hold today
+
+Only **C** (the Manila title) and **F/F-1/F-2/F-3** (the SPAs) are attachable now, and even the SPAs need originals. **A, A-1, B, D, E, G, L, M, N** are mandatory before signing; everything else can be supplemented after filing or produced at the motion hearing.
+
+## One-trip field lists for Allan
+
+- **Daet (one day):** RD Camarines Norte — Annex L (all titles in one application); RTC Br. 41 OCC — Annex D; RTC OCC — Annex N; Provincial Assessor — Annex M values; DBP Daet — Annex H-1; LCR Daet if any death was registered there.
+- **Paracale + Jose Panganiban (one day):** Municipal Assessors — Annex M tax decs; LCR Paracale — parents' deaths if registered locally (then PSA); LCR Jose Panganiban — Vicente Jr. PSA request.
+- **Manila:** NBI clearance (G); RTC Br. 16 and Br. 15 certified copies (I, O) via Atty. Mata/Uy; PSA outlet for A, A-1, P, Q and the siblings' certificates; CENOMAR for Senen.
+- **Brasilia (by courier/e-mail with Herbert):** consent E-2 acknowledged at the Embassy; ask for a certified copy of the 2024 SPA from the Embassy's notarial book (F).
