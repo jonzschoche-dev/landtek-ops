@@ -69,10 +69,10 @@ Work top-to-bottom by PHASE. Phase 0 unblocks everything. Phases 1–3 can run *
 
 ## PARALLEL FRONTS (keep moving on their own tracks)
 
-**FRONT A — Manila building (2531 G. Del Pilar) — almost won, finish it.**
-- Let **Atty. Mata / Atty. Uy** finish the current execution — the sheriff is already implementing the order to cancel the bad titles and put **TCT 44055 back in Beatriz's (the estate's) name.** Do **not** change lawyers on this case while the December-2025 Motion for Reconsideration is pending.
-- Track that **MR to resolution** (it is the only thing delaying the title's return).
-- **Next step once title reverts:** file an **EJECTMENT case against Ace and Elena (Bombita)** to physically recover the apartment units, then **collect the rents into the estate.**
+**FRONT A — Manila building (2531 G. Del Pilar) — TITLE IS BACK; now recover possession.**
+- ✅ **Done (update 2026-09-09):** the Register of Deeds of Manila has **reinstated the title to Beatriz married to Vicente Sr.** — new TCT No. **(44055) 002-2026001670, entered 16 April 2026** — and you already pulled the **certified true copy on 5 Aug 2026**. That copy is on file (Drive, ScannerPro). Nothing on the title side is pending any more.
+- **Next step NOW:** file the **EJECTMENT case against Ace and Elena (Bombita)** to physically recover the apartment units, then **collect the rents into the estate.** The brief for counsel is `MANILA_EJECTMENT_BRIEF_OF_FACTS.md`. Bring the RD CTC as Annex A.
+- Keep **Atty. Mata / Atty. Uy** informed on the closed 13-131220 execution; the ejectment can be handled by whichever counsel you engage (Phase 0).
 
 **FRONT B — Casper's land / the mining — preserve, don't lose value.**
 - The mining run by **Lita → tenant Ignacio Montalban → PNP-officer financier "Arbour" (Jose Panganiban station)** is pulling gold **across boundaries into Senen's and Jesus's land**, without the family's approval or a share of proceeds. This is estate value leaking out daily.

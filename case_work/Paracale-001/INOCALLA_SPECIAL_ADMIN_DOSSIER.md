@@ -2,7 +2,7 @@
 
 > **Matter:** Paracale-001 (Inocalla Estate) · **Client:** Allan "Shishir" Inocalla
 > **Prospective counsel:** Adan Botor & Associates (Naga City) — *not yet engaged (Apr-6-2026 proposal lapsed; see §9)*
-> **Prepared:** 2026-07-04 · **Internal work product — not for external circulation.** LandTek supervises; legal calls are counsel's.
+> **Prepared:** 2026-07-04 · **Copies check 2026-09-09 (§8-A; Front 1B closed — TCT 44055 reinstated 16 Apr 2026, RD CTC in hand)** · **Internal work product — not for external circulation.** LandTek supervises; legal calls are counsel's.
 > **Provenance tags:** **[V]** verified to a primary/court document · **[O]** operator-attested this session (Shishir via Jonathan), pending documentary proof · **[I]** inferred / to verify.
 
 ---
@@ -51,7 +51,7 @@ Decedents: **Vicente Inocalla, Sr. † 26 Nov 1984**; wife **Beatriz Villafria �
 | **Herbert V.** | living, **Brazil** | — | SPA held (consularized); DBP beneficiary (23.58 ha) | [V] SPA doc 657 |
 | **Melvin ("Kuya Ben")** | **MIA, Australia** | 3 kids | ⚠ 1992 partition already says "Heirs of Melvyn" — **alive-vs-dead conflict, resolve** | [O] vs [V] |
 | **Senen "Betty" V.** | **† shot 2021** | **NONE — died without issue** | Estate of Senen; share accretes to collateral line; DBP beneficiary (21.64 ha, 2 lots) | [O] + Final SPA |
-| **Vicente Jr.** | **† assassinated 2017** | **5 kids incl. "ACE"** | Front 1 (§6); Ace's filiation is the fight | [O] |
+| **Vicente Jr.** | **† assassinated 2017** — Certificate of Death, LCR Jose Panganiban, **Registry No. 2017-191**, death read as **11 Sep 2017**, age 64, widower, cause "neurogenic shock / multiple gunshot wound", buried 15 Sep 2017; **informant signed as "DAUGHTER"** (name OCR-garbled, likely Elena — bears on her adoption claim; read the image) | **5 kids incl. "ACE"** | Front 1 (§6); Ace's filiation is the fight | [V] LCR **certified true machine copy** (not PSA) — Drive `Vicente_Jr_Inocalla_Death_Certificate.pdf` id `1LyNZJ5851KXp8VKzQwHRoja6yV2QzqE4` (10 Jul 2026); p.2 of the PDF is an unrelated BC-Canada certificate of incorporation — strip before filing; **PSA copy still needed** |
 | **Cipriana Cambronero** | **deceased** | 7 kids | **No SPA — largest consent gap** | [O] |
 | **Casper V.** | **deceased** | widow **Carmelita "Lita"** + 4 kids | Heirs bound by 1985 Undertaking (§5); also runs Front-2 mining | [O] |
 | **Francisco ("Frank")** | **† 2 Jul 2002, BC Canada** | 10 kids | death cert on 88750 record; rep **Remedios Inocalla Feliciano** | [V] doc 630 |
@@ -101,7 +101,7 @@ Decedents: **Vicente Inocalla, Sr. † 26 Nov 1984**; wife **Beatriz Villafria �
 - **Decision 15 Feb 2019:** TCT 002-2011002723 (Vicente Jr.) **NULL & VOID**, cancellation ordered, atty's fees.
 - Ace/Elena (Vicente Jr.'s heirs) appealed → **CA-G.R. SP No. 161072 (4 Mar 2021)** affirmed → **SC G.R. 256997 DENIED (6 Dec 2021); FINAL & EXECUTORY 31 Aug 2022** (docs 511/522).
 - **Order 25 Nov 2025 (Judge Eduardo Ramon R. Reyes):** alias writ — cancel **both** TCT 002-2011002723 and TCT 206789 and **REINSTATE TCT 44055 in the name of "Beatriz V. Inocalla married to Vicente Inocalla, Sr."** — i.e., **restore the building to the parents' estate** (docs 516/643).
-- **LIVE — the only thing delaying reinstatement:** Ace/Elena (via **Atty. Maria Eleonor J. Eusebio-Cruz**, Malolos) filed a **Motion for Reconsideration on 11 Dec 2025**; plaintiffs' counsel filed a **Comment in Opposition on 12 Dec 2025** urging denial (doc 627). **MR pending, unresolved as of corpus.** Track to resolution.
+- ~~LIVE — the only thing delaying reinstatement: MR of 11 Dec 2025 pending~~ → ✅ **REINSTATEMENT DONE [V] (copies check 2026-09-09).** RD Manila **certified true copy of TCT No. (44055) 002-2026001670**, registered owner **"BEATRIZ V. INOCALLA, MARRIED TO VICENTE INOCALLA"**, entered **16 April 2026, 04:53 pm** (Acting Deputy RD Lorenz Gomez Bautista), issued as a transfer from TCT 002-2011002723 (**TOTALLY CANCELLED**); Entry No. 2026004663 annotates the alias writ of execution **dated 9 March 2026** (RTC Br. 15, CC 13-131220) and recites the 15 Feb 2019 dispositive + Certificate of Finality 23 Jan 2020. **Requested by ALLAN INOCALLA, OR 1040475498, 5 Aug 2026, ₱934.62** (system-generated e-CTC, 5 pp). So the Dec-2025 MR was overtaken by the 9-Mar-2026 alias writ and the RD executed it. Drive: `ScannerPro/Inocalla Vito Cruz Title.pdf` (id `1bDs3scE7TWAuwIUMOYFYE5YFbSuEx8WU`, uploaded 12 Aug 2026; emailed to Shishir same day). ⚠ **Not yet in the Paracale-001 corpus** (manifest has only docs 645/646 "Vito Cruz Ejectment/Case") and sitting in ScannerPro, not the client folder — **ingest + move.** Two things this CTC also settles: the title's 1948 court-order annotation (the two-storey house belongs to the registered owner) and that **no live mortgage survives** (the 1968/1972/1978 mortgages are all cancelled) — consistent with Allan's account below. Next step on this front is now purely **possession (ejectment)**, see `MANILA_EJECTMENT_BRIEF_OF_FACTS.md`.
 - **13-131220 counsel (for handoff/coordination, NOT go-forward estate counsel — per operator):** **Atty. Sherwin O. Mata** (lead; Daet, CamNorte — note: *Daet-based*, mata21sherwin@gmail.com) + **Atty. Catherine G. Uy** (collaborating; Parañaque). *Notably Atty. Uy also holds **Allan's own SPA as attorney-in-fact** (doc 646) — partial corroboration of Allan's SPA-holder role.* ⚠ **Coordination caution:** the estate will use its **own counsel** going forward, but do **not** substitute counsel on 13-131220 mid-MR — let Mata/Uy finish the execution (they know the file and the MR is live), and have new estate counsel handle the settlement petition separately, then fold 13-131220 into the administration once the building reverts.
 - **The bad-faith detail (Allan's account [O], corroborates the ruling):** Vicente Jr. — prospering from the family mining — was **supposed to buy the building back from PDAASPI *for the family* for ₱1.5M**, but instead **titled it in his own name (002-2011002723) and evicted everyone.** That betrayal is exactly the "buyer in bad faith" the court found. 13-131220 also awarded **~₱100k damages/attorney's fees** to the estate side.
 - **Consequence + NEXT STEP:** the Manila building is an **estate asset being judicially returned** — the administrator's job is to **complete execution** (sheriff is *already implementing* the RD reinstatement per Allan) and then **file an EJECTMENT case against Ace and Elena (Bombita)** to physically recover the units, then **manage/collect rents** on the 10-unit income property. This is the estate's most litigation-advanced recovery.
@@ -159,9 +159,36 @@ Decedents: **Vicente Inocalla, Sr. † 26 Nov 1984**; wife **Beatriz Villafria �
 | 7 | **Final disposition of CC 98-88750** (appealed?) | fitness-risk homework (§7) | LandTek |
 | 8 | **SPAs from the gap branches** (Cipriana, Melvin, Ereneo Agon) | Rule 79 completeness / consent | Jonathan |
 | 9 | **Verified 13-131220 pleadings showing Allan as AIF-signatory** (verification / SPA on record) | make Allan's rehabilitation/"prosecuted it" point litigation-proof (§7) | Allan/Manila counsel |
-| 10 | ~~Name of counsel + MR status~~ → **counsel = Atty. Sherwin Mata (Daet, lead) + Atty. Catherine Uy (collab; also Allan's AIF)**; **MR filed 11-Dec-2025, opposed 12-Dec-2025, PENDING** — track to resolution (only live delay on the building) | Jonathan/Allan | ◐ found; MR to track |
+| 10 | ~~Name of counsel + MR status~~ → **counsel = Atty. Sherwin Mata (Daet, lead) + Atty. Catherine Uy (collab; also Allan's AIF)**; ~~MR pending~~ → **✅ RESOLVED: alias writ 9 Mar 2026 executed, TCT 44055 reinstated 16 Apr 2026, RD Manila CTC in hand (§6 Front 1B)** | Jonathan/Allan | ✅ CLOSED 2026-09-09 |
 | 11 | **File EJECTMENT vs Ace + Elena (Bombita)** to recover the Manila building units after RD reinstatement (Allan-identified next step) | estate counsel | ⛔ OPEN — Manila front |
 | 12 | Collect **signed SPAs/consents to Allan from every branch except Ace** for filing with the petition; verify Cipriana + Casper branches specifically | Jonathan/Allan | ⛔ OPEN — backbone of fitness case |
+
+### 8-A. COPIES CHECK — status of every copy on this list as of **2026-09-09** (Drive + Gmail sweep; corpus DB not reachable from this session)
+
+**In hand (Drive, canonical):**
+| Copy | What it is | Where | Grade |
+|---|---|---|---|
+| **RD Manila CTC — TCT (44055) 002-2026001670** | Vito Cruz building reinstated to Beatriz m. Vicente Sr., entered 16 Apr 2026; e-CTC requested by Allan 5 Aug 2026 | `ScannerPro/Inocalla Vito Cruz Title.pdf` (12 Aug) | **[V] certified** — closes §8 #10; **ingest + move to client folder** |
+| **SPA bundle to Allan** | (a) Omni SPA, heirs of Vicente Sr./Beatriz/Senen (dec.)/Ereneo Agon (dec.) → Allan, **consularized Brasilia 10 Jul 2024** (Herbert), signed Herbert/Cipriana/Jesus/Marilou; (b) **Jesus SPA, Aug 2025, Daet, notarized Atty. Sherwin Mata** (Doc 518); (c) **Marilou SPA, 5 Aug 2025, Parañaque** | `ScannerPro/VITO CRUZ SPA.pdf` (12 Aug) | rescans of corpus docs 647/648/649 — ⚠ **Cipriana signed the 2024 Omni SPA; if she has since died, her signature lapsed (Art. 1919(3)) — fix her date of death** |
+| **Vicente Jr. Certificate of Death** | LCR Jose Panganiban Reg. No. 2017-191 | LANDTEK root, 10 Jul 2026 | **LCR machine copy, not PSA** — §8 #5 partially met; PSA copy + strip the stray p.2 |
+| Tax Declaration, Allan's own lot (OCT P-1616, ARP GR-2023-05-021-00306) | MTO Jose Panganiban certified copy, 24 Aug 2026 | `ScannerPro/Tax Dec P-1616.pdf` | Allan's **personal** patent lot — **outside the estate**; loan/mapping use, not a petition annex |
+
+**Requested, pending:**
+| Copy | Status |
+|---|---|
+| **DENR certified survey plan Psu-143364 (Lot 4, OCT P-1616)** + tie-line/BLBM-1 data + cadastral equivalent (PLS-1047-D) | Sent **2 Sep 2026** to PENRO CamNorte (auto-acks only, 2 Sep + 9 Sep — no substantive reply) and DENR R5 Surveys & Mapping (official address acknowledged 2 Sep "being reviewed"; the gmail cc **bounced permanently — inbox full**). Supplement sent 3 Sep. **No fees/timeline answered yet → follow up by phone (PENRO 0960-861-2925) or in person at Daet.** Note: this is Allan's own lot (geometry/mapping), **not** an estate-petition copy. |
+
+**NOT in hand — nothing found in Drive, Gmail, or the repo (still to obtain; these are the petition annexes):**
+1. **RD Camarines Norte CTCs** — T-3897, T-5656, T-2194 (2014 auction?), and the four DBP lots T-20754/55/56/57 (search old nos. 4781/5941/4251/4695). *(§8 #3; Directive Phase 2 item 4)* — **the pivotal gap.**
+2. **PSA death certificates** — Vicente Sr. (1984), Beatriz (1985), Casper, Cipriana, Francisco, Senen; plus **PSA** copy for Vicente Jr.; **CENOMAR for Senen**. *(§8 #5)*
+3. **DBP-Daet Certificate of Full Payment / release of mortgage** for the four lots. *(§8 #2)*
+4. **1985 Undertaking** — clean scan of the original **+ back page** (notarial block?); the operator photo was never placed in Drive or ingested. *(§8 #1)*
+5. **Civil Case B-5625/"5626" certified partition record + Certificate of Finality (26 Mar 2014)**, RTC Br. 41 Daet. *(§8 #4)*
+6. **13-131220 pleadings showing Allan as AIF-signatory.** *(§8 #9)* — the Jesus SPA above is notarized by Atty. Mata (13-131220 lead counsel), a small corroboration, but not the pleading itself.
+7. **Consents/SPAs from the deceased-branch heirs** (Casper's, Cipriana's, Francisco's, Melvin's children). *(§8 #8, #12)* — none received.
+8. **Counsel engagement** — no ABLAW/Botor correspondence on Inocalla since 6 Apr 2026 (Gmail swept to 9 Sep). §9 still stands: **never engaged.**
+
+*Sweep limits: Drive = the shared LANDTEK folder only (service-account view); Gmail = jonathan@hayuma.org only — anything Allan sent to jonzschoche@gmail.com or by WhatsApp is not covered. Re-run against the VPS corpus (`scripts/paracale_corpus_watch.py`) to confirm none of the "not in hand" items was ingested from another source.*
 
 ---
 
