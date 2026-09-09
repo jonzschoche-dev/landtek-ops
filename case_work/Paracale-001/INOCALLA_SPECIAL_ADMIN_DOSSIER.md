@@ -188,6 +188,21 @@ Decedents: **Vicente Inocalla, Sr. † 26 Nov 1984**; wife **Beatriz Villafria �
 7. **Consents/SPAs from the deceased-branch heirs** (Casper's, Cipriana's, Francisco's, Melvin's children). *(§8 #8, #12)* — none received.
 8. **Counsel engagement** — no ABLAW/Botor correspondence on Inocalla since 6 Apr 2026 (Gmail swept to 9 Sep). §9 still stands: **never engaged.**
 
+### 8-B. FACTS READ DIRECTLY FROM THE TWO PRIMARY SCANS (2026-09-09) — logged so the petition's [V RD-CTC] / [V SPA-scan] cites are traceable
+
+**From the RD Manila e-CTC of TCT (44055) 002-2026001670** (`ScannerPro/Inocalla Vito Cruz Title.pdf`, 5 pp):
+- Owner: "BEATRIZ V. INOCALLA, MARRIED TO VICENTE INOCALLA, Filipino, Address: PARACALE, CAMARINES NORTE, PHILS." (address of record on the title, not proof of residence at death).
+- Technical description (Spanish, from the 1908-origin cadastral record): Lote No. 6, Sub-Block No. 16, Psd-1554, parte del Lote No. 1, Block No. 3057, medición catastral de la Ciudad de Manila, GLRO Cad. Rec. No. 327, Distrito de Santa Ana; **203.00 sq m**; original registration 14 Apr 1908, Decree 2317, OCT 1245.
+- Transfer from TCT 2011002723 (TOTALLY CANCELLED); entered **16 Apr 2026, 04:53 pm**, Lorenz Gomez Bautista, Acting Deputy RD.
+- Memorandum of encumbrances: 1948 court-order annotation (two-storey house belongs to the registered owner); mortgages to Orient Savings (1968, 1972) and Phil. Veterans Bank (1978) — **all cancelled** (1976, 1976, 1986); **Entry No. 2026004663, 16 Apr 2026** — court order under the alias writ of execution dated **9 Mar 2026**, RTC Manila Br. 15, CC 13-131220, reciting the 15 Feb 2019 dispositive: TCT 002-2011002723 null and void; RD to cancel; defendants Vicente de Leon Inocalla III and Elena de Leon Inocalla to pay **₱100,000.00 attorney's fees** and costs; counterclaim dismissed; **Certificate of Finality 23 Jan 2020**.
+- "Requested By: ALLAN INOCALLA · OR No. 1040475498 · 05 Aug 2026 · Amt Paid ₱934.62".
+
+**From the SPA rescan** (`ScannerPro/VITO CRUZ SPA.pdf` = docs 647/648/649 + Embassy acknowledgment):
+- Omni SPA: principals "the undersigned heirs of Vicente Inocalla Sr., Beatriz Villafria Inocalla, Senen Inocalla (deceased), Ereneo Agon (deceased)"; appoints Allan Inocalla, "of legal age, **separated**, Filipino, residing at Purok 4, Brgy. Capacuan, Paracale"; signed Herbert, Cipriana I. Cambronero, Jesus, Marilou; acknowledged Philippine Embassy Brasilia **10 Jul 2024** (Consul General Joselito Chad N. Jacinto, Jr.; "Series 2024 · Service No. 156 · Document No. 123 · O.R. 10631379"); Herbert's senior-citizen ID reproduced (ID No. 6766, born 13 Jan 1951 per OCR).
+- Its **26-item property list** (family-drafted): (1) 2531 G. Del Pilar St., Santa Ana, Manila, 4-storey/10 units; (2) "±13 ha ricefield, Milaor/San Fernando, Camarines Sur"; (3) "534 sqm residential lot, Burgos St., Brgy. Gumamela, Labo"; (4) other Paracale/J. Panganiban properties, itemised: ARP-only parcels in Dancalan, Calaburnay (Paracale), Sta. Rosa Sur, Sta. Rosa Norte, San Rafael (J. Panganiban) under Vicente Inocalla / "Vicente Inocalla c/o Senen" / the spouses (items 1–13, 26); TCT 885, 23.7633 ha, San Rafael, under Ereneo Agon (14); then the titled lots T-3897, T-3424, T-5656, T-20754, T-29841 (Marilou), T-20756, T-20757, T-20755, T-2194, Lot 3 Psu-143364 (T-4185), a 161 sqm residential lot in Batobalani under Senen — all given as "San Rafael, J. Panganiban" except the Batobalani lot.
+- Jesus SPA: Daet, Aug 2025, Doc. No. 518, Atty. Sherwin O. Mata; gives Allan's address as "2531 G. Del Pilar St., Singalong, Malate, Manila".
+- Marilou SPA: Parañaque City, 5 Aug 2025, Doc. No. 56, Page 24; scope includes "TCT No. 2836" (Labo) and the 13 patentable mineral claims.
+
 *Sweep limits: Drive = the shared LANDTEK folder only (service-account view); Gmail = jonathan@hayuma.org only — anything Allan sent to jonzschoche@gmail.com or by WhatsApp is not covered. Re-run against the VPS corpus (`scripts/paracale_corpus_watch.py`) to confirm none of the "not in hand" items was ingested from another source.*
 
 ---

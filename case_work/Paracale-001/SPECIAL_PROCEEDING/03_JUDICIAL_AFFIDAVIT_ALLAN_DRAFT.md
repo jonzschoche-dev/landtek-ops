@@ -27,7 +27,7 @@ I, **ALLAN VILLAFRIA INOCALLA**, Filipino, of legal age, with residence at Purok
 *Identity and relationship*
 
 1. **Q:** Please state your name, age, civil status, and address.
-   **A:** Allan Villafria Inocalla, ( age ? ), ( civil status ? ), Purok 4, Barangay Capacuan, Paracale, Camarines Norte. I also stay at 2531 G. Del Pilar St., Singalong, Manila, one of our family's properties. [V addresses in docs 647/648]
+   **A:** Allan Villafria Inocalla, ( age ? ), ( civil status ? ), Purok 4, Barangay Capacuan, Paracale, Camarines Norte. I also stay at 2531 G. Del Pilar St., ( Singalong / Santa Ana ? — the SPAs say "Singalong, Malate", the title says District of Santa Ana; use one ), Manila, one of our family's properties. [V addresses in docs 647/648 (SPA scan) and RD-CTC]
 
 2. **Q:** How are you related to Vicente Inocalla, Sr. and Beatriz Villafria Inocalla?
    **A:** They were my parents. I am one of their ten children. [V doc 509]
@@ -87,7 +87,7 @@ I, **ALLAN VILLAFRIA INOCALLA**, Filipino, of legal age, with residence at Purok
     **A:** ( Allan: who occupies which units; whether Ace/Elena collect rents; how much; since when ? ) [O]
 
 19. **Q:** What other assets did your parents leave?
-    **A:** Shares in the Rural Bank of Paracale (770 shares) [V partition]; a residential lot in Barangay Gumamela, Labo ( status ? ); a ricefield of about 13 hectares in Milaor/San Fernando, Camarines Sur ( ? ); and several parcels covered only by tax declarations in Paracale and Jose Panganiban ( ? ). [V doc 647 list; O]
+    **A:** Shares in the Rural Bank of Paracale (770 shares) [V partition]; a residential lot in Barangay Gumamela, Labo ( status ? ); a ricefield of about 13 hectares in Milaor/San Fernando, Camarines Sur ( ? — Allan to confirm it exists and whose name it is in ); and several parcels covered only by tax declarations in Paracale and Jose Panganiban ( ? ). [the *listing* of these in the 2024 Omni SPA is V (SPA scan, doc 647); ownership by the parents is O]
 
 20. **Q:** What are the "DBP lots"?
     **A:** Four parcels, about 64 hectares in all, that my brother Casper had mortgaged to the Development Bank of the Philippines in Daet. DBP foreclosed. Casper repurchased them from DBP on instalment. On 25 August 1985 he signed an Undertaking, before two witnesses, that once fully paid he would transfer them to Marilou, Herbert and Senen. [V operator photo of original — Annex "H" ( ? clean copy )] The repurchase has been fully paid. [O; ( ? ) DBP certificate] Casper has died and his widow and children have not made the transfers. [O]
@@ -124,7 +124,7 @@ I, **ALLAN VILLAFRIA INOCALLA**, Filipino, of legal age, with residence at Purok
     **A:** ( No ? ) [O; NBI clearance, Annex "G" ( ? )]
 
 30. **Q:** Do your living siblings agree to your appointment?
-    **A:** Yes. Jesus, Marilou and Herbert have each signed a written consent and nomination, Annexes "E", "E-1" and "E-2" ( ? ). They also gave me the special powers of attorney marked Annexes "F", "F-1" and "F-2", which I identify. [V docs 647/648/649]
+    **A:** Yes. Jesus, Marilou and Herbert have each signed a written consent and nomination, Annexes "E", "E-1" and "E-2" ( ? ). They also gave me the special powers of attorney marked Annexes "F", "F-1", "F-2" and "F-3", which I identify. [V docs 647/648/649/657]
 
 31. **Q:** Have any of the children of your deceased siblings consented?
     **A:** ( names ? ) [O]
@@ -148,7 +148,7 @@ I, **ALLAN VILLAFRIA INOCALLA**, Filipino, of legal age, with residence at Purok
     **A:** No. It is final. I accept it. [⟦Counsel: this is the answer. Allan must NOT add his alternative account of the 1978 deed; if pressed on cross he may say he was about twenty at the time and that the judgment speaks for itself.⟧]
 
 38. **Q:** What has happened since then?
-    **A:** The mortgage the court annulled left no debt on the property. Since 2024 my brothers and sisters have trusted me with their powers of attorney over that same property and our other properties (Annexes "F"), and I helped them recover it for our parents' estate, which is why the title is back in my mother's name today (Annex "C"). [V]
+    **A:** The mortgage the court annulled left no debt on the property [V RD-CTC: all mortgages cancelled of record]. Since 2024 my brothers and sisters have trusted me with their powers of attorney over that same property and our other properties (Annexes "F") [V]. ( Allan, in his own words, what he did to help recover it — [O]; the certified copy of the reinstated title, Annex "C", which I obtained myself, is [V] ).
 
 39. **Q:** Do the plaintiffs in that 1998 case, or their heirs, oppose your appointment?
     **A:** Francisco has died; his children ( position ? ). Vicente Jr. has died; the persons who claim under him are the ones occupying our properties. ( ? ) [O]
