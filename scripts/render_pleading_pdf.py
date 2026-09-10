@@ -128,7 +128,7 @@ def caption(job, kind):
 
 
 def banner(job):
-    if job.get("noBanner"):
+    if job.get("noBanner") or job.get("bannerBox") is False:   # bannerBox:false keeps the DRAFT footer, drops the box
         return []
     txt = ("<b>DRAFT — NOT FOR FILING IN THIS FORM.</b> Prepared by LandTek as work product "
            "for counsel; no counsel of record has adopted it. Before filing: fill every "
