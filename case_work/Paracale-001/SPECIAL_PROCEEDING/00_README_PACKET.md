@@ -7,6 +7,29 @@
 
 ---
 
+## 0. THE PATHWAY — final, narrow, to a Rule 80 order (2026-09-10)
+
+**The filing is file 06 and nothing else.** No consents, no disclosure, no names beyond the notice list, no murders, no mining narrative, no blotters, no ejectment before the order. Eight steps; the first five are paper and one trip.
+
+| # | Step | Owner | Output |
+|---|---|---|---|
+| 1 | **Engage one lawyer for this petition only** — a one-page engagement limited to "petition for letters with interim Rule 80 relief" | Jonathan / Allan | signed engagement; counsel's name on the caption |
+| 2 | **PSA death certificates of both parents** (Annexes A, A-1) — order online; they settle **residence at death**, the only fact that can defeat venue | Jonathan | 2 PSA certs |
+| 3 | **Allan's PSA birth certificate** (Annex E) | Allan | 1 PSA cert |
+| 4 | **Schedule B** — one row per heir (name, age, residence) across the ten branches; **creditors inquiry** written up (ask each living sibling; list the BIR for estate tax as "amount undetermined"); the two claimants' address for notice | Allan, with the family | Annex B |
+| 5 | **The Daet trip** — RD Camarines Norte CTCs of T-3897, T-5656, T-2194; assessor's tax declarations with assessed values (these fix the docket fee and the bond, Annex G); RTC Br. 41 OCC certified copy of the 1992 partition, order and finality (Annex D) | Allan (one day) | Annexes D, G |
+| 6 | **Allan's affidavit** (Annex H) completed **in his own words** per its blanks — rents: who, since when, records; provincial: only what he saw, dated, with photos; his work under the SPAs; availability. Counsel fills the petition blanks, signs; Allan swears the verification and the affidavit before a notary | Allan + counsel | executed petition + affidavit |
+| 7 | **File** at RTC Camarines Norte (station per counsel — Daet expected), pay the docket fee on the Annex G value, get the raffle. **Same day:** motion to set the Rule 80 prayer for the earliest hearing or ex parte consideration; **bond quotation** from a court-accredited surety in hand; **proposed order** attached | counsel | docket number; hearing date |
+| 8 | **Hearing on the urgent prayer** — Allan appears; affidavit (or JA if the court requires testimony); court fixes bond; bond posted; oath; **letters of special administration issue** — the order names the powers in prayer (a)(i)–(vi) and its own sunset | counsel + Allan | **the order** |
+
+**Day one after the order:** open the two estate accounts; annotate the order on the Manila title and the Camarines Norte titles; serve the written demand on the building's occupants **as special administrator, with the order attached** (this starts the ejectment clock, now with authority); secure the estates' TINs; preliminary inventory within 30 days; monthly reports. Regular letters follow the published hearing and are outside this pathway.
+
+**Rough clock, uncontested:** steps 2–5 run in parallel, two to three weeks; step 6 a few days; the hearing per the court's calendar, two to six weeks after filing. **Six to ten weeks to an order** if nothing is contested. Estimates, not promises.
+
+**Two calls that are counsel's:** Daet vs Labo station for a Paracale decedent; monthly vs quarterly reporting to offer at the hearing.
+
+---
+
 ## 1. What is in the packet
 
 | # | File | What it is | Drafting state |
@@ -36,7 +59,7 @@ Companion analysis (already in the parent folder): `INOCALLA_SPECIAL_ADMIN_DOSSI
 
 ---
 
-## 3. FILING GATES — what must close before counsel can sign (in order of pain)
+## 3. FILING GATES for the LONG packet (regular-administration stage — §0 governs the interim filing)
 
 | Gate | Why it blocks | Owner | Status 2026-09-09 |
 |---|---|---|---|
