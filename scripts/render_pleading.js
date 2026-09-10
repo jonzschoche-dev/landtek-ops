@@ -22,6 +22,9 @@
  *   <!-- align:center -->  next block is centered
  *   <!-- pagebreak -->     page break here
  *   <!-- filing:skip -->   ... <!-- /filing:skip --> omit from the filing copy
+ *   <!-- section:NAME -->  ... <!-- /section --> one execution copy among several
+ *                          in one source file; select it with "section" in the job.
+ *                          With "section" set, everything outside it is dropped.
  *
  * Usage: node scripts/render_pleading.js <job.json> [more.json ...]
  */
@@ -242,6 +245,8 @@ function parseBody(md, job) {
   let mode = null;      // alignment mode, persists until reset or the next heading
   let skipping = false;
   let firstH2 = true;
+  let section = null;   // current <!-- section:NAME -->
+  const wantSection = job.section || null;
 
   const alignFor = () => {
     if (mode === 'right') return { indent: { left: Math.round(CONTENT_W * 0.42) }, alignment: AlignmentType.LEFT };
@@ -259,12 +264,15 @@ function parseBody(md, job) {
       const d = c[1];
       if (d === 'filing:skip') skipping = true;
       else if (d === '/filing:skip') skipping = false;
+      else if (d === '/section') section = null;
+      else if (d.startsWith('section:')) section = d.slice(8);
       else if (d === 'pagebreak') out.push(new Paragraph({ children: [new PageBreak()] }));
       else if (d === 'align:reset') mode = null;
       else if (d.startsWith('align:')) mode = d.slice(6);
       i++; continue;
     }
     if (skipping) { i++; continue; }
+    if (wantSection && section !== wantSection) { i++; continue; }
 
     if (!t) { i++; continue; }
     if (/^---+$/.test(t)) { i++; continue; }
