@@ -62,7 +62,14 @@ WHEREFORE, petitioner prays that this Honorable Court, after such hearing as it 
 
 ( City ? ), Camarines Norte, ( date ? ) 2026.
 
-( COUNSEL block as in the Petition )
+<!-- align:right -->
+**( LAW FIRM ? )**
+Counsel for Petitioner
+( address ? )
+By:
+**( ATTY. ? )**
+Roll No. ( ? ) · PTR No. ( ? ) · IBP No. ( ? ) · MCLE Compliance No. ( ? )
+<!-- align:reset -->
 
 ---
 
@@ -73,7 +80,9 @@ RTC Branch ( ? ), ( Daet ? ), Camarines Norte
 
 Greetings: Please submit the foregoing Motion for the consideration and approval of the Honorable Court on ( date ? ) at ( time ? ), or at the earliest date the Court's calendar allows. ⟦2019 Amendments, Rule 15: this is a litigious motion; set it for hearing and serve on every person named in Petition Part II whose address is known, with proof of service. Coordinate the setting with the order giving due course to the Petition.⟧
 
-( ATTY. ? )
+<!-- align:right -->
+**( ATTY. ? )**
+<!-- align:reset -->
 
 ### EXPLANATION / PROOF OF SERVICE
 

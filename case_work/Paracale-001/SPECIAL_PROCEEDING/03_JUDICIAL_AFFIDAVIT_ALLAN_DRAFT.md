@@ -166,8 +166,10 @@ I, **Atty. ( ? )**, hereby attest that I faithfully recorded or caused to be rec
 
 ( place, date ? )
 
+<!-- align:right -->
 **ATTY. ( ? )**
 Roll No. ( ? ) · PTR ( ? ) · IBP ( ? ) · MCLE ( ? )
+<!-- align:reset -->
 
 ---
 

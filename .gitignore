@@ -121,3 +121,12 @@ juris_targets*.json
 # land in scripts/ are exact dupes that only dirty the tree; never track them here.
 scripts/deploy_*.sql
 .venv-tlfh/
+
+# Node toolchain for scripts/render_pleading.js (docx-js). package.json +
+# package-lock.json ARE tracked so `npm install` reproduces it; the tree is not.
+node_modules/
+
+# Rendered pleadings (.docx/.pdf) are Drive-canonical like every other generated
+# binary here — regenerate with:
+#   node scripts/render_pleading.js case_work/<matter>/SPECIAL_PROCEEDING/filing/*.job.json
+case_work/**/filing/out/

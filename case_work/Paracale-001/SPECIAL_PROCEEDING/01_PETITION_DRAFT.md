@@ -199,6 +199,7 @@ WHEREFORE, petitioner respectfully prays that this Honorable Court:
 
 ( City ? ), Camarines Norte, ( date ? ) 2026.
 
+<!-- align:right -->
 **( LAW FIRM ? )**
 Counsel for Petitioner
 ( address ? )
@@ -206,6 +207,7 @@ By:
 **( ATTY. ? )**
 Roll No. ( ? ) · PTR No. ( ? ) · IBP No. ( ? ) · MCLE Compliance No. ( ? )
 ( e-mail / mobile ? )
+<!-- align:reset -->
 
 ---
 
@@ -224,9 +226,11 @@ I, **ALLAN V. INOCALLA**, of legal age, Filipino, with residence at Purok 4, Bar
 
 IN WITNESS WHEREOF, I have signed this instrument on ( date ? ) at ( place ? ).
 
+<!-- align:center -->
 **ALLAN V. INOCALLA**
 Affiant
 ( Competent evidence of identity: ? )
+<!-- align:reset -->
 
 SUBSCRIBED AND SWORN to before me this ( date ? ) at ( place ? ), affiant exhibiting to me his ( ID ? ).
 
