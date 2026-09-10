@@ -72,7 +72,7 @@ function extractNotes(s) {
 
 /** Split a source line into styled runs, converting draft markers to notes/blanks. */
 function runs(text, opts = {}) {
-  const base = { size: opts.size || BODY_SIZE };
+  const base = { size: opts.size || BODY_SIZE, bold: opts.bold, italics: opts.italics };
   const out = [];
   const push = (t, extra = {}) => {
     const v = t.replace(/`/g, '');
@@ -97,8 +97,8 @@ function runs(text, opts = {}) {
     push(text.slice(last, m.index));
     last = pattern.lastIndex;
     const [tok, bold, ital, drafter, prov, blank] = m;
-    if (bold) push(bold.slice(2, -2), { bold: true });
-    else if (ital) push(ital.slice(1, -1), { italics: true });
+    if (bold) out.push(...runs(bold.slice(2, -2), { ...opts, bold: true }));   // blanks inside bold
+    else if (ital) out.push(...runs(ital.slice(1, -1), { ...opts, italics: true }));
     else if (drafter) note(' [' + drafter.slice(1, -1).trim() + '] ');
     else if (prov) note(' ' + prov + ' ');
     else if (blank) {
