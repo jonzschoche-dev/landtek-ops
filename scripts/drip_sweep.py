@@ -17,7 +17,8 @@ drafts.create only; no send endpoint is ever called from this module (truth-test
   python3 scripts/drip_sweep.py --status                      # the clock board
   python3 scripts/drip_sweep.py --tick                        # daily sweep (lapses + due editions)
   python3 scripts/drip_sweep.py --draft-edition DILG-supervision [--date YYYY-MM-DD]
-  python3 scripts/drip_sweep.py --record-service <id> --date YYYY-MM-DD --proof "received-stamp ..."
+  python3 scripts/drip_sweep.py --record-service <id> --date YYYY-MM-DD --proof-doc <documents.id>
+        # proof = the received-stamp copy / registry card IN THE CORPUS. No corpus proof ⇒ NOT served.
   python3 scripts/drip_sweep.py --record-reply <id> --kind replied_not_performed|partial|performed
 """
 import argparse
@@ -209,21 +210,36 @@ def status(cur, today=None):
     print("-" * 100)
 
 
-def record_service(cur, oid, served, proof):
+def record_service(cur, oid, served, proof_doc_id, note=None):
+    """Service exists ONLY when its proof is a CORPUS DOCUMENT (the received-stamp copy / registry
+    card, ingested). Operator rule 2026-09-12: unless the evidence is in the corpus, a document is
+    always assumed NOT served. Free text is not proof; a drafted letter is not proof."""
     cur.execute("SELECT * FROM office_obligation WHERE id=%s", (oid,))
     ob = cur.fetchone()
     if not ob:
         raise SystemExit(f"no obligation #{oid}")
     if ob["state"] in ("withdrawn", "held_counsel_route"):
         raise SystemExit(f"#{oid} is {ob['state']} — it cannot be served/ticked (ledger rule).")
-    if not proof:
-        raise SystemExit("service requires --proof (received-stamp / registry card). Drafting never starts a clock.")
+    if not proof_doc_id:
+        raise SystemExit("REFUSED: service requires --proof-doc <documents.id> — the received-stamp copy or "
+                         "registry card IN THE CORPUS. No corpus evidence ⇒ assumed NOT served.")
+    cur.execute("SELECT id, case_file, matter_code, original_filename FROM documents WHERE id=%s", (proof_doc_id,))
+    doc = cur.fetchone()
+    if not doc:
+        raise SystemExit(f"REFUSED: doc {proof_doc_id} is not in the corpus — ingest the proof first; "
+                         "until then the instrument is assumed NOT served.")
+    fam = (ob["matter_code"] or "").split("-")[0]
+    if fam and not ((doc["case_file"] or "").startswith(fam) or (doc["matter_code"] or "").startswith(fam)):
+        raise SystemExit(f"REFUSED: proof doc {proof_doc_id} belongs to {doc['case_file'] or doc['matter_code']!r}, "
+                         f"not this matter's client — A5 wall.")
     due = date.fromisoformat(served) + timedelta(days=DEMAND_PERIOD_DAYS)
-    cur.execute("""UPDATE office_obligation SET served_at=%s, service_proof=%s, due_at=%s,
-                         state='served_running', updated_at=now() WHERE id=%s""",
-                (served, proof, due, oid))
-    _event(cur, "state_change", obligation_id=oid, to="served_running", served=served, due=str(due), proof=proof)
-    print(f"#{oid} served {served} (proof: {proof}) → clock runs, D+{DEMAND_PERIOD_DAYS} = {due} "
+    proof_txt = f"doc:{proof_doc_id} {doc['original_filename'] or ''}".strip() + (f" — {note}" if note else "")
+    cur.execute("""UPDATE office_obligation SET served_at=%s, service_proof=%s, service_proof_doc_id=%s,
+                         due_at=%s, state='served_running', updated_at=now() WHERE id=%s""",
+                (served, proof_txt, proof_doc_id, due, oid))
+    _event(cur, "state_change", obligation_id=oid, to="served_running", served=served, due=str(due),
+           proof_doc_id=proof_doc_id)
+    print(f"#{oid} served {served} (proof {proof_txt}) → clock runs, D+{DEMAND_PERIOD_DAYS} = {due} "
           f"(day math: {ob['day_math']})")
 
 
@@ -251,7 +267,9 @@ def main():
     ap.add_argument("--draft-edition", metavar="TRACK")
     ap.add_argument("--date")
     ap.add_argument("--record-service", type=int, metavar="ID")
-    ap.add_argument("--proof")
+    ap.add_argument("--proof-doc", type=int, metavar="DOC_ID",
+                    help="documents.id of the received-stamp copy / registry card IN THE CORPUS (required)")
+    ap.add_argument("--note")
     ap.add_argument("--record-reply", type=int, metavar="ID")
     ap.add_argument("--kind")
     a = ap.parse_args()
@@ -272,7 +290,7 @@ def main():
             print(f"  → {_stage_draft_with_fallback(cur, subject, body, 'edition', ed['id'])}")
             conn.commit()
         elif a.record_service:
-            record_service(cur, a.record_service, a.date or date.today().isoformat(), a.proof)
+            record_service(cur, a.record_service, a.date or date.today().isoformat(), a.proof_doc, a.note)
             conn.commit()
         elif a.record_reply:
             record_reply(cur, a.record_reply, a.kind or "replied_not_performed")

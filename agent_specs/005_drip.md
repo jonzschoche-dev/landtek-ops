@@ -37,6 +37,17 @@ The failure mode Jonathan rejected on 2026-09-08 is exactly what a naive "drip" 
 
 ---
 
+## Service exists only as a corpus document (operator rule, 2026-09-12)
+
+> *"Unless the evidence is in the corpus, a document has to be assumed NOT served."*
+
+Proof of service is a **`documents.id`** — the received-stamp copy or registry card, ingested — never
+free text and never a drafted letter. `service_proof_doc_id` is required by DB `CHECK` for any
+`served_at`; the doc must exist and belong to the same client (A5). The default state of every
+instrument is therefore **not served**, and a clock can only start from a fact the corpus can show.
+(Teope's 26-Aug demand: no proof doc in the corpus ⇒ unserved, no clock — regardless of what any desk
+remembers.)
+
 ## Three lanes (all staged, none auto-send)
 
 **Lane 1 — Demand clocks (per officer).** One row per officer per obligation. Served (proof of

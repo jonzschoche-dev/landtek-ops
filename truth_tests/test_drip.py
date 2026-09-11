@@ -34,6 +34,15 @@ def _restore(monkey_store):
         DS.stage_gmail_draft = monkey_store.pop()
 
 
+def _any_mwk_doc(tc):
+    """A real MWK corpus document to stand in as proof-of-service in ROLLBACK fixtures."""
+    tc.execute("SELECT id FROM documents WHERE case_file='MWK-001' ORDER BY id LIMIT 1")
+    r = tc.fetchone()
+    if not r:
+        raise TruthFailure("no MWK-001 document in the corpus to use as a proof fixture.")
+    return r["id"]
+
+
 def no_clock_without_receipt(cur):
     """Drafting never starts a clock: every unserved row has due_at NULL, and the DB CHECK refuses a
     due date without service + a cited rule."""
@@ -60,9 +69,9 @@ def lapse_stages_consequence_never_letter(cur):
     _no_gmail(mk)
     try:
         tc.execute("""UPDATE office_obligation SET state='served_running', served_at=%s,
-                            service_proof='TEST received-stamp', due_at=%s
+                            service_proof='TEST received-stamp', service_proof_doc_id=%s, due_at=%s
                       WHERE officer='Abla' RETURNING id""",
-                   (date.today() - timedelta(days=20), date.today() - timedelta(days=5)))
+                   (date.today() - timedelta(days=20), _any_mwk_doc(tc), date.today() - timedelta(days=5)))
         oid = tc.fetchone()["id"]
         tc.execute("SELECT count(*) n FROM work_orders WHERE created_by='drip'")
         before = tc.fetchone()["n"]
@@ -90,8 +99,9 @@ def reply_is_not_performance(cur):
     _no_gmail(mk)
     try:
         tc.execute("""UPDATE office_obligation SET state='replied_not_performed', served_at=%s,
-                            service_proof='TEST', due_at=%s WHERE officer='Abla' RETURNING id""",
-                   (date.today() - timedelta(days=30), date.today() - timedelta(days=2)))
+                            service_proof='TEST', service_proof_doc_id=%s, due_at=%s
+                      WHERE officer='Abla' RETURNING id""",
+                   (date.today() - timedelta(days=30), _any_mwk_doc(tc), date.today() - timedelta(days=2)))
         oid = tc.fetchone()["id"]
         DS.tick(tc, date.today())
         tc.execute("SELECT state FROM office_obligation WHERE id=%s", (oid,))
@@ -113,7 +123,7 @@ def held_rows_never_tick(cur):
             if not ob or ob["state"] not in ("withdrawn", "held_counsel_route"):
                 raise TruthFailure(f"{officer} seed state wrong: {ob and ob['state']}")
             try:
-                DS.record_service(tc, ob["id"], date.today().isoformat(), "TEST proof")
+                DS.record_service(tc, ob["id"], date.today().isoformat(), _any_mwk_doc(tc))
             except SystemExit:
                 continue                                # refused — correct
             raise TruthFailure(f"{officer} ({ob['state']}) accepted service — held rows must never tick.")
@@ -163,7 +173,39 @@ def edition_counters_recompute_from_anchors(cur):
         conn.rollback(); conn.close()
 
 
+def service_requires_corpus_proof(cur):
+    """Operator rule 2026-09-12: unless the proof is IN THE CORPUS, assume NOT served. Free text,
+    a missing doc id, or a doc from another client are all refused — by the code AND by the DB."""
+    conn, tc = _rb()
+    try:
+        tc.execute("SELECT id FROM office_obligation WHERE officer='Abla'")
+        oid = tc.fetchone()["id"]
+        for bad in (None, 999999999):                      # no proof · not-in-corpus
+            try:
+                DS.record_service(tc, oid, date.today().isoformat(), bad)
+            except SystemExit:
+                continue
+            raise TruthFailure(f"service recorded with proof={bad!r} — must be a corpus document.")
+        tc.execute("SELECT id FROM documents WHERE case_file IS NOT NULL AND case_file NOT LIKE 'MWK%' LIMIT 1")
+        other = tc.fetchone()
+        if other:
+            try:
+                DS.record_service(tc, oid, date.today().isoformat(), other["id"])
+                raise TruthFailure("service recorded with ANOTHER client's document as proof — A5 wall breach.")
+            except SystemExit:
+                pass
+        try:                                                # the DB itself refuses served_at without a proof doc
+            tc.execute("UPDATE office_obligation SET served_at=%s WHERE id=%s", (date.today(), oid))
+        except psycopg2.Error:
+            tc.connection.rollback()
+            return
+        raise TruthFailure("DB accepted served_at with no service_proof_doc_id — CHECK missing.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
+    ("drip.service_requires_corpus_proof", service_requires_corpus_proof),
     ("drip.no_clock_without_receipt", no_clock_without_receipt),
     ("drip.lapse_stages_consequence_never_letter", lapse_stages_consequence_never_letter),
     ("drip.reply_is_not_performance", reply_is_not_performance),
