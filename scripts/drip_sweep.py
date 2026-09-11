@@ -12,7 +12,7 @@ Offices stay on their toes because nothing lapses silently — not because they 
     same-day "partial is not compliance" reply draft.
 
 A21: everything STAGES (Gmail drafts + work orders). The sweep contains no send path at all —
-drafts.create only, messages.send does not appear in this file.
+drafts.create only; no send endpoint is ever called from this module (truth-test greps for it).
 
   python3 scripts/drip_sweep.py --status                      # the clock board
   python3 scripts/drip_sweep.py --tick                        # daily sweep (lapses + due editions)
