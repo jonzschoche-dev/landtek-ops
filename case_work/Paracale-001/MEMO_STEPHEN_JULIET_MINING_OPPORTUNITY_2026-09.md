@@ -13,7 +13,7 @@
 
 ## 1. The picture in one paragraph
 
-We are building one business in three waves. **Wave 1** starts now inside the already-declared SMBC Minahang Bayan at Casalugan, around the already-built ₱29-million mercury-free plant that Stephen operates: activate the plant with the ₱5 million committed in principle from our side (a private investor, through us), add the LAB X gravity circuit, run a toll station and ore-supply agreements with SMBC's contract holders, and set up the gold-selling channel. **Wave 2** is Allan's new plant, **AVI Gold Processing**, on Allan's own titled lot at Brgy. Santa Rosa Sur, Jose Panganiban, with Allan's own Minahang Bayan at the same site — as Allan describes it today; the site and its filings are being confirmed. **Wave 3** is the exploration upside on NIBDC's 2,360-hectare tenement (EXPA-000250-V, endorsed for Exploration Permit issuance), which we propose to enter through an earn-in — and that is the asset a Canadian listing would be built on. Philippine law fixes the shape: **Filipinos hold the mining contracts and at least 60% of any mine once it converts to an MPSA; a foreign company may own a stand-alone processing plant (sited outside a Minahang Bayan processing zone), the financing, the ore trading and the exploration-stage tenement outright.** So the vehicle is a Filipino extraction layer (Allan) plus a foreign-eligible processing / finance / exploration layer — and that second layer is **Paracale Gold Company, the Canadian company already formed, in from Wave 1**, so that Canadian capital is already at the table before NIBDC is approached (§4A). Waves 1 and 2 do not depend on NIBDC: as we read the 2022 small-scale mining rules (text being obtained), a Minahang Bayan may be declared over an area under a pending Exploration Permit application, with the applicant notified.
+We are building one business in three waves. **Wave 1** starts now inside the already-declared SMBC Minahang Bayan at Casalugan, around the already-built ₱29-million mercury-free plant that Stephen operates: activate the plant with the ₱5 million committed in principle from our side (a private investor, through us), add the LAB X gravity circuit, run a toll station and ore-supply agreements with SMBC's contract holders, and set up the gold-selling channel. **Wave 2** is Allan's new plant, **AVI Gold Processing**, on Allan's own titled lot at Brgy. Santa Rosa Sur, Jose Panganiban, with Allan's own Minahang Bayan at the same site — as Allan describes it today; the site and its filings are being confirmed. **Wave 3** is the exploration upside on NIBDC's 2,360-hectare tenement (EXPA-000250-V, endorsed for Exploration Permit issuance), which we propose to enter through an earn-in — and that is the asset a Canadian listing would be built on. Philippine law fixes the shape: **Filipinos hold the mining contracts and at least 60% of any mine once it converts to an MPSA; a foreign company may own a stand-alone processing plant (sited outside a Minahang Bayan processing zone), the financing, the ore trading and the exploration-stage tenement outright.** So the vehicle is a Filipino extraction layer (Allan) plus a foreign-eligible processing / finance / exploration layer — and the chain is simple: **Paracale Gold Company (PGC), the Canadian company already formed, invests in AVI Gold Processing, Allan's Philippine company; AVI does the deal with Stephen and SMBC.** Canadian capital is therefore at the table from Wave 1, before NIBDC is approached (§4A). Waves 1 and 2 do not depend on NIBDC: as we read the 2022 small-scale mining rules (text being obtained), a Minahang Bayan may be declared over an area under a pending Exploration Permit application, with the applicant notified.
 
 ---
 
@@ -24,7 +24,7 @@ We are building one business in three waves. **Wave 1** starts now inside the al
 |---|---|
 | What | Finance the rehabilitation and activation of the MFPS so the plant and its Minahang Bayan are operating within three months of funding |
 | Ownership | SMBC owns the plant. SMBC Board Resolution No. 2026-009 authorises an Operational Partnership Agreement with Stephen as Investor and Operational Partner; we have not yet seen the executed agreement (§2.6, item 1). Marlon Malaluan's role and the Johson Mines interest Stephen has described are to be confirmed in writing |
-| Terms as we understand them — for Stephen's confirmation | ₱5,000,000 from our side (a private investor, through Jonathan and Allan) into the plant and its operations; full repayment within six months; interest-only at 30%; Stephen's personal undertaking, together with the equipment bought with the money and his SMBC profit share, stands behind repayment — the latter subject to the executed agreement and confirmation that the profit share is assignable. None of this is agreed until the alignment note comes back marked up. Two open items: whether 30% is flat for the term (₱1.5M) or per annum (₱750k for six months), and whether the money is released in one sum or in stages tied to equipment purchase → installation → commissioning. Our preference is stages, with the repayment schedule aligned to when the plant actually earns (nothing due in months 1–3, then three instalments plus principal) |
+| Terms as we understand them — for Stephen's confirmation | ₱5,000,000 from our side into the plant and its operations — the contracting party is AVI Gold Processing once incorporated, funded by PGC and a private investor (until then, personal / private investor, assignable to AVI); full repayment within six months; interest-only at 30%; Stephen's personal undertaking, together with the equipment bought with the money and his SMBC profit share, stands behind repayment — the latter subject to the executed agreement and confirmation that the profit share is assignable. None of this is agreed until the alignment note comes back marked up. Two open items: whether 30% is flat for the term (₱1.5M) or per annum (₱750k for six months), and whether the money is released in one sum or in stages tied to equipment purchase → installation → commissioning. Our preference is stages, with the repayment schedule aligned to when the plant actually earns (nothing due in months 1–3, then three instalments plus principal) |
 | Why it is lawful for outside money | This is financing and equipment into a processing facility. It is not equity in, or control of, any small-scale mining contract — contracts are reserved to Filipinos (RA 7076; 13th Foreign Investment Negative List, 2026). Management of extraction stays with SMBC and its Filipino members |
 | How we hold ourselves | As partners, not as a bank. We intend the repayment papers to read as partner protection in plain words, not as lender mechanics |
 
@@ -67,11 +67,11 @@ Permit stack to build for the new site: ECC (site-specific; a new application), 
 
 The sequence is deliberate: **Canadian capital enters at Wave 1, NIBDC is approached only afterwards.** Concretely:
 
-1. **Now — Paracale Gold Company (PGC), the Canadian company already formed, is the vehicle.** Juliet's group comes in at PGC level; PGC forms and owns the Philippine ProcessCo and FinanceCo (§5). The Wave-1 financing is written so it can be assigned to FinanceCo, and PGC's first capital goes into Wave 1 (plant activation, LAB X, toll station, trader) and Wave 2 (AVI Gold Processing). Housekeeping before money moves: PGC's jurisdiction and good standing, current shareholder register and officers, and a minute book that will stand up to a listing review.
-2. **Wave 2 under the same vehicle.** If AVI Gold Processing is sited outside the Minahang Bayan processing zone, ProcessCo holds it under a Mineral Processing Permit and leases the lot from Allan; if inside the zone, Allan's Philippine company holds the mill and PGC participates by equipment, financing and tolling.
-3. **Only then, NIBDC.** With a running plant, audited books and a working cooperative relationship, PGC — not the individuals — proposes the earn-in to NIBDC's board. The listing of PGC follows at Exploration Permit stage.
+1. **Now — PGC invests in the Philippine operating company.** Paracale Gold Company (Canada, already formed; Juliet's group comes in at PGC level) invests in Allan's Philippine company. Two ways to create that company, and either works: **(a) incorporate AVI Gold Processing** as an SEC corporation (today it is a DTI business name — a sole proprietorship, which cannot take a shareholder), or **(b) start a new SEC-registered mining company** with Allan as the principal Filipino shareholder. Either way it is one SEC corporation whose primary purpose covers mining *and* mineral processing (the Mining Act's "qualified person" test looks at the purpose clause), and the AVI trade name can sit under it. **Our recommendation is (b): a new corporation.** There is nothing to convert — a DTI name has no legal personality — so the filing is the same either way, and a fresh company starts with a clean record, a cap table designed on day one (Allan and Filipino partners 60%, PGC 40%), and a name and purpose clause that read correctly to MGB, the PMRB, the BSP and a Canadian exchange; "AVI Gold Processing" stays as the plant's trade name under it. Two rules that come with a 60/40 company: foreign shareholders may hold board seats in proportion to their equity but not management offices (Anti-Dummy Law), so Allan, not Jonathan, is President; and because PGC stays at or below 40%, the company is a Philippine national and the Foreign Investments Act's US$200,000 minimum paid-in capital for foreign-owned companies does not apply. PGC's percentage is the design choice: **at or below 40%, AVI remains a Philippine national** and can hold anything a Filipino company can (including a mill inside a Minahang Bayan processing zone and every relationship with cooperatives and contract holders); above 40%, AVI becomes foreign-owned and is confined to what a foreign company may hold (a stand-alone Mineral Processing Permit plant, financing, equipment, trading). Our recommendation is to keep the company Filipino (PGC ≤ 40%, with any further PGC money in as shareholder loans), so it is free to act on the whole small-scale side — and, later, to hold the MPSA-stage tenement itself, which is exactly the Masbate shape (§5). For the rest of this memo "AVI" means this company, whichever route creates it.
+2. **AVI does the deal with Stephen.** AVI is the contracting party for Wave 1 — the plant financing with Stephen and SMBC, the equipment, LAB X, the toll station and ore-supply agreements, and the BSP-accredited trader — and for Wave 2, its own plant and Minahang Bayan at Jose Panganiban. PGC participates through its stake in AVI, not by contracting in the Philippines itself. Housekeeping before money moves: PGC's jurisdiction and good standing, shareholder register, officers and minute book; AVI's SEC papers.
+3. **Only then, NIBDC.** With AVI running and audited, PGC — not the individuals — proposes the earn-in to NIBDC's board through a project company. The listing of PGC follows at Exploration Permit stage. One rule for later: a 60/40 AVI can hold an MPSA directly, but it must not be used to hold the Filipino 60% of a further company, because the grandfather rule traces foreign equity through layers.
 
-This order does three things: it gives the Canadian partners a real operating position before any tenement negotiation; it keeps the NIBDC approach a corporate proposal from a funded vehicle rather than a personal one; and it means nothing in Waves 1–2 waits on a third party's board.
+This order does three things: it gives the Canadian partners a real operating position, through AVI, before any tenement negotiation; it keeps the NIBDC approach a corporate proposal from a funded vehicle rather than a personal one; and it means nothing in Waves 1–2 waits on a third party's board.
 
 ## 4. Wave 3 — NIBDC and the exploration upside (entered after Waves 1–2 are running)
 
@@ -94,30 +94,30 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 
 **The proven template is Masbate:** B2Gold holds 40% of the tenement company (Filminera, 60% Filipino) and 100% of the processing company that buys all the ore under an ore-sales agreement and runs the plant. Same shape as ours.
 
-**Target structure (proposed — PGC exists; its Philippine subsidiaries are formed first; none of the NIBDC or cooperative positions below exist yet):**
+**Target structure (proposed — PGC exists; AVI is incorporated next; none of the NIBDC or cooperative positions below exist yet):**
 
 ```
 CANADA
   Paracale Gold Company (PGC) — already formed; private now → public later via a Capital Pool Company or IPO; CSE as fallback
                                ← Juliet's group enters here, Wave 1
-   └─ 100%  HoldCo
-        ├─ 100%  PH ProcessCo   — Mineral Processing Permit holder (AVI Gold Processing if sited outside the MB zone);
-        │                         owner/lessor of equipment placed at the MFPS; toll station; BSP-accredited trader.
-        ├─ 100%  PH FinanceCo   — financing, equipment and technical/safety/assay services to cooperatives and
-        │                         contract holders; partner posture; no management control of extraction.
-        ├─ ≥50%  PROPOSED earn-in: project company holding EXPA-000250-V → Exploration Permit  [the qualifying property]
-        │          → at MPSA: 40% PubCo / 60% Allan + Filipino partners, plus ore-purchase agreement to ProcessCo
-        │          → or an FTAA (100%) if the project reaches US$50M scale
-        └─ 0%    Small-scale mining contracts (SMBC members; Allan's JP cooperative) — contract relationships only
+   ├─ ≤40% (recommended; keeps it Filipino)  AVI GOLD PROCESSING CORP. — or a NEW SEC MINING COMPANY (Philippines) — Allan ≥60%
+   │        AVI is the operating company and the contracting party on the Philippine side:
+   │          · Wave 1: plant financing + equipment with Stephen/SMBC; LAB X; toll station; ore-supply
+   │                    agreements with SMBC contract holders; BSP-accredited trader
+   │          · Wave 2: its own plant + Minahang Bayan at Brgy. Santa Rosa Sur, Jose Panganiban
+   │          · 0% in any small-scale mining contract — contract relationships only
+   ├─ ≥50%  PROPOSED earn-in (later): project company holding EXPA-000250-V → Exploration Permit  [the qualifying property]
+   │          → at MPSA: the 60/40 AVI can hold the tenement itself (Masbate shape), or 40% PGC / 60% Allan directly
+   │          → or an FTAA (100%) if the project reaches US$50M scale
+   └─ (shareholder loans to AVI for capital beyond the equity line)
 
-PHILIPPINES — FILIPINO SIDE (outside PubCo)
-  Allan's company — PROPOSED ≥60% of the MPSA-stage holder; TO BE NEGOTIATED: an NIBDC shareholding and board role
-                    (not yet held); TO BE CONFIRMED: principal of the JP cooperative; the MB-zone mill if counsel
-                    places it inside the small-scale reservation
-  SMBC — owns the MFPS; Stephen as operational partner under Res. 2026-009 (executed agreement to be seen)
+PHILIPPINES — FILIPINO SIDE
+  Allan — ≥60% of AVI; TO BE NEGOTIATED: an NIBDC
+          shareholding and board role (not yet held); TO BE CONFIRMED: principal of the JP cooperative
+  SMBC — owns the MFPS; Stephen as operational partner under Res. 2026-009 (executed agreement to be seen); deals with AVI
 ```
 
-Each line between the boxes is its own paper (financing, equipment, tolling, ore supply, services, earn-in). How value is shared inside the partnership is negotiated separately and is not the subject of this memo.
+Each line between the boxes is its own paper (PGC's subscription and shareholder loans to AVI; AVI's financing, equipment, tolling, ore-supply and services agreements; the earn-in). How value is shared inside the partnership is negotiated separately and is not the subject of this memo.
 
 ---
 
@@ -125,7 +125,7 @@ Each line between the boxes is its own paper (financing, equipment, tolling, ore
 
 **What the exchange actually tests (TSX Venture Policy 2.1, as at 31 March 2026, Tier 2 Mining, applying the Policy 1.1 definition of Significant Interest):** the issuer must hold a *Significant Interest* — at least 50% — in a Qualifying Property, or the right to earn one, and the Exchange expects control and direction over operations; at least C$100,000 of approved expenditures on the property in the prior 36 months (waivable where the Phase 1, or Phase 1+2 non-contingent, program exceeds C$400,000, or the property is a Tier 1 Property); a current NI 43-101 technical report recommending an initial-phase program of at least C$200,000; working capital for 12 months plus C$100,000 unallocated; a public float of 500,000 shares and 200 public board-lot holders. No net-tangible-asset test for Mining.
 
-**The consequence that shapes the whole design:** a 40% MPSA stake does not meet the 50% test on its face. The compliant route is to list at **Exploration Permit stage**, where a foreign-owned company may hold the tenement and PGC's proposed earn-in would reach at least 50% of the project company, and to restructure to 40% plus processing and ore-purchase at MPSA conversion (or to an FTAA if the scale justifies it). The CSE, which has no Significant-Interest test, is the fallback.
+**The consequence that shapes the whole design:** a 40% MPSA stake does not meet the 50% test on its face. The compliant route is to list at **Exploration Permit stage**, where a foreign-owned company may hold the tenement and PGC's proposed earn-in would reach at least 50% of the project company (AVI's operations are the cash-flow story, not the qualifying property), and to restructure to 40% plus processing and ore-purchase at MPSA conversion (or to an FTAA if the scale justifies it). The CSE, which has no Significant-Interest test, is the fallback.
 
 **Route options:** a Capital Pool Company (Policy 2.4, rewritten 2021 — up to C$10M may now be raised, and the 24-month qualifying-transaction deadline is gone), a direct IPO by prospectus, or a reverse takeover of an existing shell. The sponsor requirement has been eliminated. Board and insiders (Policy 3.1): at least three directors, two independent; every director, officer, promoter and insider files a Personal Information Form and passes security screening — we will run our own background checks on every principal early and decide board composition well before filing. Standard package: audited IFRS financial statements (two to three years or since inception — the Philippine subsidiaries keep audit-grade books from day one), an independent Qualified Person's NI 43-101 report (the Benguet-era historical estimates on the Paracale veins can be disclosed only as historical estimates under s.2.4, never as resources), a Philippine title opinion on the permit, and escrow of principals' shares (36 months for Tier 2). US-resident investors will need the PFIC and Reg S / Rule 144A points handled.
 
@@ -142,11 +142,11 @@ Each line between the boxes is its own paper (financing, equipment, tolling, ore
 | Who | By | What |
 |---|---|---|
 | Stephen | 26 Sep (proposed) | The six asks in §2.6 |
-| Jonathan | 19 Sep | Decide the 30% basis and staged-release position; decide who signs the Wave-1 financing (personal / private investor now, assignable to FinanceCo once PGC forms it) |
-| Juliet + Jonathan + Allan | 30 Sep (proposed) | PGC housekeeping: jurisdiction and good standing, shareholder register and officers, minute book; the entry terms for Juliet's group; and the first-capital plan for Waves 1–2 — before any NIBDC approach |
-| Allan | 30 Sep | Ore sample for the gravity test; LAB X crew and cost basis; formal close-out of the Gracesen record with EMB; start BSP trader accreditation; confirm AVI's site and filing status |
+| Jonathan | 19 Sep | Decide the 30% basis and staged-release position; decide who signs the Wave-1 financing (personal / private investor now, assignable to AVI once incorporated) |
+| Juliet + Jonathan + Allan | 30 Sep (proposed) | PGC housekeeping: jurisdiction and good standing, shareholder register and officers, minute book; the entry terms for Juliet's group; PGC's subscription in AVI (percentage and shareholder-loan line); and the first-capital plan for Waves 1–2 — before any NIBDC approach |
+| Allan | 30 Sep | File the new SEC mining corporation (recommended over converting AVI — mining + processing in the primary purpose; Allan ≥60% / PGC ≤40%; the DTI name stays as the plant's trade name); ore sample for the gravity test; LAB X crew and cost basis; formal close-out of the Gracesen record with EMB; start BSP trader accreditation under AVI; confirm AVI's site and filing status |
 | Allan + Jonathan + Stephen | 30 Sep | AVI Gold Processing: site relative to the MB zone, and the circuit — the two decisions that fix ownership eligibility and the permit list |
-| Jonathan | 30 Sep | Engage Philippine mining counsel on a fixed scope: Wave-1 financing papers, ore-supply template, trader accreditation, the MB-mill ownership question |
+| Jonathan | 30 Sep | Engage Philippine corporate and mining counsel on a fixed scope: AVI's incorporation and PGC's subscription (nationality test), Wave-1 financing papers, ore-supply template, trader accreditation, the MB-mill ownership question |
 | Juliet | 30 Sep (proposed) | The four asks in §6 |
 | Jonathan + Allan | 15 Oct | NIBDC: status inquiry to MGB Central Office; earn-in term sheet outline, to be tabled by PGC |
 
@@ -155,7 +155,7 @@ Each line between the boxes is its own paper (financing, equipment, tolling, ore
 ## 8. Working rules for the four of us
 
 - **Partners, not lenders.** We intend the repayment papers to read as partner protection, not lender mechanics.
-- **Canadians in before NIBDC.** PGC is funded into Waves 1–2 first; the NIBDC earn-in is PGC's proposal, made from an operating position.
+- **Canadians in before NIBDC.** PGC invests in AVI first; AVI does the deal with Stephen; the NIBDC earn-in is PGC's proposal, made from an operating position.
 - **Nothing in SMBC's or NIBDC's name** without that board's resolution and its president's written sign-off.
 - **The Filipino side stays Filipino** — contracts, cooperatives, and at least 60% of any MPSA-stage holder — genuinely, not nominally.
 - **Every number is unquoted until a vendor quote or a test result replaces it**, and we say so.
