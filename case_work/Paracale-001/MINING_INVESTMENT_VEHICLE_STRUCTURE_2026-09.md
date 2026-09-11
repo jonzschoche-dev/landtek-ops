@@ -8,7 +8,7 @@
 
 ## 1. Phasing as directed (Jonathan, 2026-09-12)
 
-> **Order of entry (Jonathan, 2026-09-12): the Canadian vehicle (private BC CanCo → future PubCo, Juliet's group) is formed NOW and funds Waves 1–2 through ProcessCo/FinanceCo; NIBDC is approached only afterwards, by CanCo, from an operating position.** AVI Gold Processing site = Allan's own lot, OCT P-1616, Brgy. Santa Rosa Sur, **Jose Panganiban** (DTI kit corrected 2026-09-12).
+> **Order of entry (Jonathan, 2026-09-12): the Canadian vehicle is Paracale Gold Company (PGC) — ALREADY FORMED (Allan is its President per the 2026-03 RFP); Juliet's group enters at PGC level; PGC forms ProcessCo/FinanceCo and funds Waves 1–2; NIBDC is approached only afterwards, by PGC, from an operating position.** [PV] PGC's jurisdiction, good standing, register and officers are not in the corpus — obtain before money moves. Anti-Dummy note: Allan presiding over the foreign layer is lawful, but PGC's PH subsidiaries are foreign regardless of his role, and his 60% on the Filipino side still cannot be PGC-funded. AVI Gold Processing site = Allan's own lot, OCT P-1616, Brgy. Santa Rosa Sur, **Jose Panganiban** (DTI kit corrected 2026-09-12).
 >
 > **Read first:** `IMMEDIATE_OPPORTUNITIES_SMBC_CASALUGAN_2026-09.md` — the Wave-1 sheet (SMBC plant financing, LAB X tables, toll station + ore-supply, BSP trader; Gracesen retired). None of it needs NIBDC; MGB-V's 29 Jul 2026 letter confirms an EP applicant has notice rights only. NIBDC is the *later* chapter of this memo (Phase 3), entered only for the exploration upside the listing needs.
 
@@ -58,7 +58,7 @@ The listing thesis therefore reads: *"Paracale gold-district exploration company
 
 ```
 CANADA
-  PubCo (BC corp) — TSXV Tier 2 Mining via CPC QT or IPO; CSE fallback
+  PGC — Paracale Gold Company (ALREADY FORMED; jurisdiction/standing [PV]) → TSXV Tier 2 Mining via CPC QT or IPO; CSE fallback
    └─ 100%  HoldCo (Canada; an intermediate treaty jurisdiction only if tax counsel shows a gain over the 15%/15% Canada–PH rates)
         ├─ 100% ● PH ProcessCo    — foreign-eligible: MPP holder for a stand-alone plant (AVI Gold Processing, JP, if sited outside the MB zone);
         │                           owner/lessor of equipment placed at the SMBC MFPS; secondary toll station;
@@ -73,7 +73,7 @@ CANADA
                  ore-supply/offtake, financing, equipment, processing
 
 PHILIPPINES — FILIPINO SIDE (outside PubCo, but the reason PubCo has anything to list)
-  Allan's company (PGC or NewCo — SEC status of Paracale Gold Corp. to verify [PV])
+  Allan's PHILIPPINE company (NewCo — an SEC corporation; "AVI Gold Processing" is currently a DTI sole-proprietorship name; PGC is the CANADIAN company, not this one)
    • ≥60% of the MPSA-stage OpCo, own capital / contributed assets (1992-partition mineral-claim covenant, family data)
    • NIBDC shareholding + board/officer role (Deal Memo §8, Maribel sign-off) — control of the tenement side
    • Principal of CSSMA (after the authority checklist) — control of the Capacuan MB side
@@ -107,7 +107,7 @@ PHILIPPINES — FILIPINO SIDE (outside PubCo, but the reason PubCo has anything 
 | G6 | NIBDC current GIS (2025/26) + Marcelo bloc position on an SPV/earn-in | ≥50% earn-in needs 2/3 acts | Maribel Villareal |
 | G7 | CSSMA officer line-up, membership roll, Allan's authority resolution; MB area reconciliation (5.18 vs 250 ha) | Phase 2 | Allan |
 | G8 | Estate administrator (Rule 80) | Surface-use signature for Phase 2/3 ground | Allan + estate counsel |
-| G9 | Paracale Gold Corp. SEC registration/GIS; "Golden Inocalla" DTI status (verified-absent in corpus) | Which Filipino entity anchors the 60% | Allan |
+| G9 | PGC (Canada): jurisdiction, good standing, register, officers, minute book — not in corpus. Filipino side: which SEC corporation anchors Allan's 60% (AVI is a DTI sole prop; "Golden Inocalla" DTI verified-absent) | Both layers need a real entity | Allan + Juliet |
 | G10 | RA 12253 enrolled text (export-ban question); PH thin-cap rules for shareholder loans | Phase 3 economics | PH tax counsel |
 
 ---
