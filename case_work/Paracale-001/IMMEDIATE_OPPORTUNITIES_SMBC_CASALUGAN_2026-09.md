@@ -52,11 +52,13 @@
 | Who | A Filipino-owned trader (Allan's company) is the safe first mover; [PV] whether a foreign-owned ProcessCo can be accredited — counsel/BSP question |
 | Gates | BSP accreditation package; BIR registration; certified copies of the supplying miners' contracts (RR 4-2020 requires them) |
 
-### 5. Gracesen plant, Brgy. Capacuan — Allan's own permitted plant + tailings (ALLAN-OWNED, needs compliance cure; no MB or NIBDC dependency)
+### 5. Gracesen plant, Brgy. Capacuan — **OBSOLETE (Jonathan, 2026-09-12: "Gracesen is obsolete now")**
+
+> Retired as an asset. Retained below only as compliance history: the ECC/NAF record follows Allan as proponent, so it must be formally closed with EMB before the AVI Gold Processing ECC is filed. Do not plan throughput, tailings or revenue on it.
 | | |
 |---|---|
 | What | "Gracesen Small Scale Gold Processing Plant", **Brgy. Capacuan, Paracale** (not Jose Panganiban as the PGC review assumed): ECC-RO5-1203-0045 of 8 May 2012 — crusher 50 t/d + ball mill 50 t/d, cyanide (CIP) circuit; proponent amended to **Allan V. Inocalla 25 May 2021** [V docs 1284, 1304]. Wastewater Discharge Permit WDP-16L-O5CN-088 (Dec 2016, 23.5 m³/d tailings) [V doc 1272]; Mayor's Permit 148 (expired 31 Dec 2016) [V doc 1281]; CCO cyanide registration, hazwaste generator, sanitary permit, barangay clearances [V docs 1267–1297] |
-| Opportunity | Tailings reprocessing (PGC report: 20k / 25k / 200k t — a 10× spread; Benguet-era CIL residue) and a second permitted processing point owned by a Filipino entity that is already Allan's [V PGC_INVESTOR_GRADE_REVIEW] |
+| Opportunity | ~~Tailings reprocessing / second processing point~~ — withdrawn 2026-09-12 (obsolete). Any tailings on the site are a separate question for later, not a Wave-1 item |
 | Compliance debt (must cure first) | EMB **Notice of Adverse Findings NAF-LEGAL-EIA-2017-17 (5 Jan 2017)** — ECC conditions 14 & 15.2, incl. no air Permit-to-Operate [V doc 1289]; 2015 tailings-pond water test: **cyanide 2.07 mg/L vs 0.2 limit, TSS 3,040 vs 70** inside the pond [V doc 1290]; every permit's 2026 currency unverified [PV] |
 | Gates | Permit-currency audit (EMB, LGU, PMRB); NAF cure/closure letter; pond water re-test; volumetric survey + auger sampling + bottle-roll metallurgy before any recovery % is quoted; whether the plant needs a PMRB Mineral Processing License / DENR MPP under DAO 2022-03 [PV] |
 | Precedent on file | A third-party draft "Gold Tailings Reprocessing and Profit-Sharing Agreement" (Ganesha Resources Mining Corp., doc 1351) — useful as a term template, not a commitment |
@@ -94,7 +96,7 @@ All plant-economics numbers (throughput, grade, recovery, ₱/month) are **absen
 
 1. **Stephen · 26 Sep** — signed SMBC Operational Partnership Agreement (emailed, not chat); use-of-funds line list; 6-month throughput/revenue; Marlon and Johson Mines status; 30% basis ticked. *Drafts on file: Alignment Note; Questions Rev 2.*
 2. **Jonathan · 19 Sep** — decide flat-vs-p.a. position and staged release; decide which entity signs the financing (personal/private investor now; assignable to the future FinanceCo).
-3. **Allan · 30 Sep** — ore sample for the GRG test; crew list and cost basis for LAB X; start the Gracesen permit-currency audit and pull the NAF file; begin BSP trader accreditation for his company.
+3. **Allan · 30 Sep** — ore sample for the GRG test; crew list and cost basis for LAB X; close out the Gracesen record with EMB (retired plant); begin BSP trader accreditation for his company.
 4. **Jonathan · 30 Sep** — scan and ingest the MGB 29-Jul letter (evidence grade); PH counsel engagement scoped to: financing papers, ore-supply template, trader accreditation, DAO 2022-03 processing-license question.
 5. **LandTek · 16 Sep** — fetch DAO 2022-03 text; correct the PGC review's Gracesen location; log the 2017 NAF and 2015 pond test on the Paracale-001 watchlist.
 6. **Allan + Jonathan · 30 Sep** — AVI Gold Processing: fix the site relative to the MB processing zone and the circuit (gravity vs cyanide) — this decides ownership eligibility and the permit list; put the site plan, land status and any drawings/quotes into the corpus (nothing exists yet).
@@ -110,9 +112,9 @@ Wave 1 (SMBC, Casalugan)            Wave 2 (Jose Panganiban, Allan)    Wave 3 (N
 #1 ₱5M plant activation             AVI Gold Processing permit stack   EP status (MGB CO)
 #2 LAB X table (after GRG test)     JP Minahang Bayan petition         ≥50% earn-in / SPV
 #3 toll station + ore-supply        CSSMA/JP co-op authority package   NI 43-101 QP report
-#4 BSP trader                       Gracesen cure → tailings resource  CPC/IPO or CSE
+#4 BSP trader                       (Gracesen retired)                 CPC/IPO or CSE
                                     estate administrator (Rule 80)
-#5 Gracesen compliance audit
+#5 Gracesen close-out (retired)
         ↑ needs: Stephen's 5 papers        ↑ needs: siting/ownership call + PMRB   ↑ needs: Maribel/Marcelos + counsel
 ```
 
