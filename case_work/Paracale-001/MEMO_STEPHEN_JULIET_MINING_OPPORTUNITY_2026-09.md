@@ -30,7 +30,7 @@ What we propose is large from the very beginning. Not a plant upgrade: a distric
 
 ## Three waves, in order
 
-**Wave 1 — Casalugan, starting now.** Activate the plant with the ₱5 million already committed in principle from our side, add the LAB X gravity circuit, run a toll station and ore-supply agreements with the cooperative's contract holders, and set up the tax-exempt gold-selling channel to the Bangko Sentral. Stephen has also offered shares in a smaller processing operation that does not need large volumes of ore. And there are lending opportunities in the shafts and mining operations themselves — production financing to the people already mining, repaid in ore through our plants — which we intend to take up as a line of business in its own right. The plant is built and the area is declared, so the first revenue does not wait on a permit or a drill program.
+**Wave 1 — Casalugan, starting now.** Activate the plant with the ₱5 million already committed in principle from our side, add the LAB X gravity circuit, run a toll station and ore-supply agreements with the cooperative's contract holders, and set up the tax-exempt gold-selling channel to the Bangko Sentral. Stephen has also offered shares in a smaller processing operation that does not need large volumes of ore. There are lending opportunities in the shafts and mining operations themselves — production financing to the people already mining, repaid in ore through our plants — and an equipment-rental business alongside it, renting the LAB X-built and sourced equipment to the shafts and cooperatives while we keep title to it. The plant is built and the area is declared, so the first revenue does not wait on a permit or a drill program.
 
 **Wave 2 — Jose Panganiban.** AVI Gold Processing on Allan's own land, with Allan's Minahang Bayan at the same site, designed from the LAB X programme and sited and permitted with the whole model in view. Stephen's assessment is that ore supply there is not the constraint; the plant sets the pace.
 
@@ -65,9 +65,9 @@ The order of entry is deliberate: **the Canadians come in at Wave 1, before NIBD
 
 ## The Canadian role, and why it is worth PGC's full attention
 
-Canadian capital comes in at the level of a company that already exists, before any of the assets above have been priced by a market, into an operation that is already built and already permitted. The Canadian side puts the capital in, governs without managing, makes the company listable, and becomes the exploration operator when the tenement chapter opens. It is paid seven ways, in the order they arrive: dividends from the operating company; interest on the money it lends beyond its equity; the lending book to the shafts and mining operations, secured on ore that flows through our own plants; the PGC shares themselves, which re-rate when PGC lists; a processing company it may own outright later, the way the country's largest gold producer captures its processing margin with a minority of the mine; the exploration upside; and the fees of the services arm. And the goal at the top of this page is the investment thesis itself — a planetGOLD-aligned, mercury-free, TESDA-trained, cooperative-based operation is the ESG story resource investors are asked for and rarely shown.
+Canadian capital comes in through a company that already exists, before any of the assets above have been priced by a market, into an operation that is already built and permitted. The Canadian side puts the capital in, governs without managing, makes the company listable, and becomes the exploration operator when the tenement chapter opens. It is paid eight ways, in the order they arrive: dividends from the operating company; interest on the money it lends beyond its equity; the lending book to the shafts and mining operations, secured on ore that flows through our own plants; equipment rental to the shafts and cooperatives; the PGC shares themselves, which re-rate when PGC lists; a processing company it may own outright later, the way the country's largest gold producer captures its processing margin with a minority of the mine; the exploration upside; and the fees of the services arm. And the goal at the top of this page is the investment thesis itself — a planetGOLD-aligned, mercury-free, TESDA-trained, cooperative-based operation is the ESG story resource investors are asked for and rarely shown.
 
-We say up front what the Canadian side does not get: any share of a small-scale mining contract, any management office in the Filipino company, more than its share of declared profit, or any return the board has not voted. Everything above is built inside those lines, which is why it survives a listing review.
+We say up front what the Canadian side does not get: any share of a small-scale mining contract, any management office in the Filipino company, more than its share of declared profit, or any return the board has not voted. Everything above is built inside those lines.
 
 ---
 
@@ -77,7 +77,7 @@ Every party that brings something to this — capital, land, permits, labour, op
 
 ## What happens next
 
-Three things in the next month, and each of us owns one: Stephen returns the plant papers and the use-of-funds picture that release Wave 1; Allan files the Filipino operating company and puts the ore in front of the gravity test; Juliet gives us her view on the Canadian route and the team to get there. Jonathan brings the counsel. The detail pack lists every item with a proposed date — change the dates, the owners or the items.
+Three things in the next month, one each: Stephen returns the plant papers and the use-of-funds picture that release Wave 1; Allan files the Filipino operating company and puts the ore in front of the gravity test; Juliet gives us her view on the Canadian route and the team to get there. Jonathan brings the counsel. The detail pack lists every item with a proposed date.
 
 ## Add to this
 
