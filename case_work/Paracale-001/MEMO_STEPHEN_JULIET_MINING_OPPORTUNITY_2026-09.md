@@ -9,7 +9,7 @@
 
 ## The goal
 
-To make these operations the poster child of sustainable community and mining operations — the place in the Philippines that regulators, funders, cooperatives and other operators point to when they want to see formal, mercury-free, community-owned mining done right, and the one they come to us to replicate.
+To make these operations the poster child of sustainable community and mining operations — the place in the Philippines that regulators, funders, cooperatives and other operators point to when they want to see formal, mercury-free, community-owned mining done right, and come to us to replicate.
 
 ## The scale
 
@@ -22,7 +22,7 @@ What we propose is large from the very beginning. Not a plant upgrade: a distric
 - **A working plant.** The ₱29-million mercury-free processing plant at Casalugan, built under the UN-backed planetGOLD programme inside an already-declared Minahang Bayan, with Stephen as its operating partner and a small-scale mining community around it.
 - **A second site.** Allan's own titled land at Santa Rosa Sur, Jose Panganiban, where the new plant — AVI Gold Processing — and Allan's own Minahang Bayan are planned.
 - **The tenement next door.** NIBDC's 2,360-hectare exploration permit application across Paracale, Jose Panganiban and Labo, endorsed by the regional mines bureau for issuance — the exploration upside, and the asset a Canadian listing would be built on. Stephen holds a power of attorney over a substantial shareholding in NIBDC, which is what makes that chapter reachable when its time comes.
-- **The district.** Paracale is one of the oldest gold-producing districts in the Philippines, worked for centuries and mined at industrial scale into the 1990s. (The history is real; the numbers wait for a Qualified Person before anyone quotes them.)
+- **The district.** Paracale is one of the oldest gold-producing districts in the Philippines, worked for centuries and mined at industrial scale into the 1990s. (The history is real; the numbers wait for a Qualified Person.)
 - **A Canadian company that already exists.** Paracale Gold Company (PGC), formed and ready to be the vehicle through which Canadian capital comes in — before any of this has been priced by a market.
 - **The people.** Stephen on the plant and engineering; Allan on the ground, the cooperatives and the community; Juliet on the Canadian market and the investors; LandTek on structure, records and equipment.
 
@@ -81,4 +81,4 @@ Three things in the next month, one each: Stephen returns the plant papers and t
 
 ## Add to this
 
-This is a proposed model, not a finished one. What would make it better is what each of you knows that we do not: Stephen, the plant, the circuits and what the ore actually does; Allan, the ground, the people, the cooperatives and the estate; Juliet, the Canadian market, the exchange and the investors. Mark it up and send it back. The next version is issued under all four names.
+This is a proposed model, not a finished one. What would make it better is what each of you knows that we do not: Stephen, the plant and what the ore actually does; Allan, the ground, the people and the cooperatives; Juliet, the Canadian market and the investors. Mark it up and send it back. The next version is issued under all four names.
