@@ -20,7 +20,7 @@
 | | |
 |---|---|
 | What | Finance the rehabilitation/activation of the SMBC Mercury-Free Processing System so the plant and its Minahang Bayan are operating within 3 months of funding [V deal memo §2] |
-| Who owns what | SMBC owns the plant; Stephen Lloyd is Investor & Operational Partner, 50/50 net profit (Board Res. 2026-009); Marlon Malaluan's status unconfirmed; "Johson Mines 40%" unverified [V deal memo §1] |
+| Who owns what | SMBC owns the plant; Stephen Lloyd is Investor & Operational Partner, 50/50 net profit (Board Res. 2026-009); Marlon Malaluan's status unconfirmed; **Johson has nothing to do with SMBC (Jonathan 2026-09-12) — the deal memo's "Johson Mines 40%" line is dropped**; the 30% is the return on the ₱5M, not a stake; Stephen will also offer shares in a smaller processing operation not needing large ore volumes [O 2026-09-12, to be papered] |
 | Our economics | ₱5M returned within 6 months, interest-only at 30% (**flat ₱1.5M vs p.a. ₱750k — unresolved**, Alignment Note §3); Jonathan+Allan retain a royalty share (blank); equipment bought with the money is ours; Stephen's personal guarantee + his 50% profit share stand behind repayment [V Alignment Note] |
 | Legal character | Financing + equipment into a processing facility. **Not** equity in, or control of, any small-scale mining contract → foreign money is lawful here (13th FINL reserves *mining* contracts, not plant financing). Anti-Dummy stays clear so long as management of extraction stays with SMBC/Filipinos [V structure memo facts 2, 5] |
 | Posture | Partnership, not a bank — no waterfalls, no chattel-mortgage language in the partner papers; protection is the guarantee and "equipment and profit share stand behind repayment" [V feedback memory] |
