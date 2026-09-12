@@ -104,7 +104,7 @@ PHILIPPINES — FILIPINO SIDE (outside PubCo, but the reason PubCo has anything 
 | G3 | PH counsel opinion: is an MB-internal custom mill "small-scale mining" (0% foreign)? BSP trader accreditation for a foreign-owned corp? | Decides ProcessCo's ownership | PH mining counsel (not Barandon — per-matter counsel rule; none engaged for Paracale mining) |
 | G4 | Canadian securities counsel view on Allan's PIF (98-88750) and board design | Listing eligibility | Jonathan to brief; Canadian counsel |
 | G5 | Executed SMBC–Stephen Operational Partnership Agreement; Johson Mines claim | Phase 1 counterparty and assignability | Stephen Lloyd |
-| G6 | NIBDC current GIS (2025/26) + Marcelo bloc position on an SPV/earn-in | ≥50% earn-in needs 2/3 acts | Maribel Villareal |
+| G6 | NIBDC current GIS (2025/26) + Marcelo bloc position on an SPV/earn-in. **[O 2026-09-12] Stephen holds an SPA over a 40% NIBDC shareholding** — almost certainly the Marcelo bloc (41.1%); obtain the instrument (scope/term/principal) [PV]; with Villareal 58.9% + Stephen-as-AIF the 2/3 threshold is reachable; Stephen is then on both sides of Wave 3 (related-party handling) | ≥50% earn-in needs 2/3 acts | Maribel Villareal; Stephen (SPA copy) |
 | G7 | CSSMA officer line-up, membership roll, Allan's authority resolution; MB area reconciliation (5.18 vs 250 ha) | Phase 2 | Allan |
 | G8 | Estate administrator (Rule 80) | Surface-use signature for Phase 2/3 ground | Allan + estate counsel |
 | G9 | PGC (Canada): jurisdiction, good standing, register, officers, minute book — not in corpus. Filipino side: which SEC corporation anchors Allan's 60% (AVI is a DTI sole prop; "Golden Inocalla" DTI verified-absent) | Both layers need a real entity | Allan + Juliet |
