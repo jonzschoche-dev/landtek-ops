@@ -11,6 +11,8 @@
 
 **Our goal:** to make these operations the poster child of sustainable community and mining operations — the reference site in the Philippines that regulators, funders, cooperatives and other operators point to when they want to see formal, mercury-free, community-owned mining done right, and the one they come to us to replicate.
 
+**Scale, and how we read the detail.** This is a large project from the very beginning — a district-scale programme, not a plant upgrade: three waves of operations across two municipalities and a 2,360-hectare tenement, a Canadian public listing, a TESDA-certified school, a care facility, an institute, and a services arm that carries the model across the region. The first steps are small and specific on purpose. Every fine detail in this memo — which entity signs, what percentage, which permit, which site, which programme — is chosen so that it fits the long-term effort exactly, and nothing done in Wave 1 has to be undone in Wave 3. Read the particulars as the foundations of that scale, coordinated with it, not as the scale itself.
+
 ---
 
 ## 1. The picture in one paragraph
@@ -206,6 +208,7 @@ Each line between the boxes is its own paper (PGC's subscription and shareholder
 
 ## 8. Working rules for the four of us
 
+- **Built to the full scale from day one.** Every Wave-1 paper, entity, permit, site and programme is written to fit the whole programme — three waves, the listing, the school, the care facility, the institute, the services arm — so that nothing done now has to be undone later. When a detail and the long-term effort pull in different directions, the long-term effort decides the detail.
 - **Partners, not lenders.** We intend the repayment papers to read as partner protection, not lender mechanics.
 - **Canadians in before NIBDC.** PGC invests in AVI first; AVI does the deal with Stephen; the NIBDC earn-in is PGC's proposal, made from an operating position.
 - **Nothing in SMBC's or NIBDC's name** without that board's resolution and its president's written sign-off.
