@@ -13,7 +13,7 @@ To make these operations the poster child of sustainable community and mining op
 
 ## The scale
 
-What we propose is large from the very beginning. Not a plant upgrade: a district-scale programme across two municipalities of Camarines Norte and a 2,360-hectare exploration tenement; a Canadian public company at the top; a trade school that trains the region's next miners; a care facility on the coast; an institute that carries one discipline through everything we do; and a services arm that takes the whole model to other operators across the Bicol gold belt. The first steps are deliberately small and specific, each chosen to fit that larger effort so that nothing we do this year has to be undone later.
+What we propose is large from the very beginning: a district-scale programme across two municipalities of Camarines Norte and a 2,360-hectare exploration tenement; a Canadian public company at the top; a trade school that trains the region's next miners; a care facility on the coast; an institute that carries one discipline through everything we do; and a services arm that takes the whole model to other operators across the Bicol gold belt. The first steps are deliberately small and specific, each chosen to fit that larger effort so that nothing we do this year has to be undone later.
 
 ---
 
@@ -23,7 +23,7 @@ What we propose is large from the very beginning. Not a plant upgrade: a distric
 - **A second site.** Allan's own titled land at Santa Rosa Sur, Jose Panganiban, where the new plant — AVI Gold Processing — and Allan's own Minahang Bayan are planned.
 - **The tenement next door.** NIBDC's 2,360-hectare exploration permit application across Paracale, Jose Panganiban and Labo, endorsed by the regional mines bureau for issuance — the exploration upside, and the asset a Canadian listing would be built on. Stephen holds a power of attorney over a substantial shareholding in NIBDC, which is what makes that chapter reachable when its time comes.
 - **The district.** Paracale is one of the oldest gold-producing districts in the Philippines, worked for centuries and mined at industrial scale into the 1990s. (The history is real; the numbers wait for a Qualified Person.)
-- **A Canadian company that already exists.** Paracale Gold Company (PGC), formed and ready to be the vehicle through which Canadian capital comes in — before any of this has been priced by a market.
+- **A Canadian company that already exists.** Paracale Gold Company (PGC), formed and ready to be the vehicle for Canadian capital — before any of this has been priced by a market.
 - **The people.** Stephen on the plant and engineering; Allan on the ground, the cooperatives and the community; Juliet on the Canadian market and the investors; LandTek on structure, records and equipment.
 
 ---
@@ -45,7 +45,7 @@ Philippine law fixes the shape, and the shape works. Filipinos hold the small-sc
 - **A Filipino operating company, led by Allan** — a new mining corporation with Allan and Filipino partners holding the majority — that contracts with Stephen and SMBC, runs the plants and the trading, and holds everything the law reserves to Filipinos.
 - **PGC, the Canadian company, holding a minority stake in it and carrying the listing** — with Juliet's group entering at PGC level, and PGC later taking the exploration position in its own name.
 
-The order of entry is deliberate: **the Canadians come in at Wave 1, before NIBDC is approached.** PGC invests in Allan's company first; that company does the deal with Stephen; and the tenement negotiation, when it comes, is made by a funded company from an operating position rather than by individuals from a concept. This is the same shape the largest gold mine in the country runs on — a Filipino tenement company with a foreign minority partner that owns the processing outright — and it is the shape the exchange has seen work.
+The order of entry is deliberate: **the Canadians come in at Wave 1, before NIBDC is approached.** PGC invests in Allan's company first; that company does the deal with Stephen; and the tenement negotiation, when it comes, is made by a funded company from an operating position rather than by individuals from a concept. It is the shape the largest gold mine in the country runs on — a Filipino tenement company with a foreign minority partner that owns the processing outright — and the shape the exchange has seen work.
 
 ---
 
