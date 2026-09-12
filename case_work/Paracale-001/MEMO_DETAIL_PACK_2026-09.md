@@ -70,7 +70,7 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 
 **A care facility at Gumaus Beach** — caretaking, rest and recuperation for our workers, trainees and their families first, and for the community around the operations.
 
-**The Maharlika Institute — the theme through everything.** Our warriors' institute carries one discipline through all training and operations — **arnis**, **yoga**, mind-body practice, meditation and heart-centred training — on our own land facilities and in **partnership with the Warriors at their 30-hectare deep-training site on the Calaguas islands**, as they have described it to us; partnership, site and terms to be put in writing.
+**The Maharlika Institute — the theme through everything.** Our warriors' institute carries one discipline through all training and operations — **arnis**, **yoga**, mind-body practice, meditation and heart-centred training — on our own land facilities and through **Warriors Gym, with whom we already have a working relationship and intend to expand it** — including their 30-hectare deep-training site on the Calaguas islands, as they have described it to us; the expanded partnership, the site and its terms to be put in writing.
 
 **A services arm for the region.** The strategies, papers and team we build here will be **for hire to other opportunities in the region** — other Minahang Bayan, cooperatives, plant owners and tenement holders in the Bicol gold belt — each a fee-earning engagement that widens our ore-supply, offtake and roll-up options.
 
@@ -118,7 +118,7 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 | Juliet + Jonathan + Allan | 30 Sep (proposed) | PGC housekeeping: jurisdiction and good standing, shareholder register and officers, minute book; entry terms for Juliet's group; PGC's subscription in AVI; the first-capital plan for Waves 1–2 |
 | Juliet | 30 Sep (proposed) | The asks in §7 |
 | Jonathan + Allan | 15 Oct | NIBDC: status inquiry to MGB Central Office; earn-in term sheet outline, to be tabled by PGC |
-| Allan + Jonathan + Stephen | 31 Oct (proposed) | Trade school outline (TESDA registration path, first three programmes, training floor, scholarship lines); services-arm entity and first two regional prospects; Gumaus care-facility site and scope; the written partnership with the Warriors on the Calaguas site |
+| Allan + Jonathan + Stephen | 31 Oct (proposed) | Trade school outline (TESDA registration path, first three programmes, training floor, scholarship lines); services-arm entity and first two regional prospects; Gumaus care-facility site and scope; the written, expanded partnership with Warriors Gym incl. the Calaguas site |
 
 ---
 
@@ -213,7 +213,7 @@ Each line between the boxes is its own paper (PGC's subscription and shareholder
 | The Inocalla estate and its heirs | Surface rights over the family land | Any surface-use or royalty arrangement runs through the estate's administrator to all heirs, separately from Allan's own positions |
 | NIBDC | The tenement (Wave 3) | Approached later, by PGC, with an arm's-length coexistence MOA and an earn-in its board can accept — a partner in the exploration upside, not a party to be worked around |
 | Future miners and trainees | Their labour and the region's next workforce | TESDA national certificates; training subsidised by national scholarship funds; hands-on training on the working plants; first call on Wave-1 and Wave-2 crews |
-| The Warriors (Calaguas) and the Maharlika Institute | The deep-training site and the discipline that runs through the programme | A written partnership on the Calaguas site and the institute's role in the curriculum; the same terms discipline as every other line |
+| Warriors Gym (existing relationship) and the Maharlika Institute | The gym, the discipline that runs through the programme, and the Calaguas deep-training site | The existing relationship carried into a written, expanded partnership covering the gym's role, the Calaguas site and the institute's place in the curriculum; the same terms discipline as every other line |
 | The Gumaus community and the families of our crews | The coast, the care, the social licence around the plants | The care facility; local hiring and training; the community-development programme delivered through it |
 | Other operators in the region | Ore, sites, cooperatives, plants that need formalising | Fee-earning service contracts through the services arm; offtake and coexistence agreements on the same written-terms discipline |
 | LandTek | The structuring, the records, the engineering programme (LAB X) | A written services and principal role in the operating company's programme, on the same terms discipline as everyone else |

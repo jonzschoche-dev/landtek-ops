@@ -57,7 +57,7 @@ The order of entry is deliberate: **the Canadians come in at Wave 1, before NIBD
 
 **A care facility at Gumaus Beach** — caretaking, rest and recuperation for our workers, trainees and their families, and for the community around the operations.
 
-**The Maharlika Institute** — one discipline running through all of it: arnis, yoga, mind-body practice, meditation and heart-centred training, on our own land facilities and in partnership with the Warriors at their deep-training site on the Calaguas islands.
+**The Maharlika Institute** — one discipline running through all of it: arnis, yoga, mind-body practice, meditation and heart-centred training, on our own land facilities and through **Warriors Gym**, with whom we already have a working relationship and intend to expand it — including their deep-training site on the Calaguas islands.
 
 **A services arm** that offers the strategies, the papers and the team to other Minahang Bayan, cooperatives, plant owners and tenement holders across the region — each engagement a fee, and each one widening our reach.
 
@@ -73,7 +73,7 @@ We say up front what the Canadian side does not get: any share of a small-scale 
 
 ## No stakeholder gets left behind
 
-Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms: Allan and his company; Stephen and Marlon; SMBC and its members, who keep their plant and their contracts; Juliet and the Canadian investors; the private investor behind the first money; the cooperatives and their miners; the barangays and municipalities; the Inocalla estate and its heirs; the Warriors and the institute; the Gumaus community and our crews' families; other operators in the region; NIBDC, approached as a partner in the upside; and LandTek. A wave is not done until every one of them has its paper.
+Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms: Allan and his company; Stephen and Marlon; SMBC and its members, who keep their plant and their contracts; Juliet and the Canadian investors; the private investor behind the first money; the cooperatives and their miners; the barangays and municipalities; the Inocalla estate and its heirs; Warriors Gym and the institute; the Gumaus community and our crews' families; other operators in the region; NIBDC, approached as a partner in the upside; and LandTek. A wave is not done until every one of them has its paper.
 
 ## What happens next
 
