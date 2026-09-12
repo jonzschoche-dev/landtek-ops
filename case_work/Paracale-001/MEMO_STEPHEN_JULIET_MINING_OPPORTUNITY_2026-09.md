@@ -1,19 +1,23 @@
 # THE PARACALE GOLD OPPORTUNITY
 ## An introduction to a proposed model — for Allan, Stephen and Juliet
 
+*Part I is the investment opportunity and the partnership. Part II is the community programme that runs alongside it, on its own footing. They are kept apart on purpose.*
+
 **From:** Jonathan Zschoche · **Date:** 12 September 2026
 
 **How to read this.** An introduction, not a term sheet: what we propose to build, in what order, who does what, and why it is worth each of our attention. The working detail — legal rules, exchange tests, stakeholder map, scenario arithmetic, open questions for counsel — sits in a companion detail pack, available on request. Everything here is a proposal for the four of us to build on: add to it, correct it, send it back with your name on the changes. Confidential to the four of us and our counsel; not legal or investment advice; nothing is agreed until the parties named say so in writing.
 
 ---
 
+# PART I — THE INVESTMENT OPPORTUNITY AND THE PARTNERSHIP
+
 ## The goal
 
-To make these operations the poster child of sustainable community and mining operations — the place in the Philippines that regulators, funders, cooperatives and other operators point to when they want to see formal, mercury-free, community-owned mining done right, and come to us to replicate.
+To build the reference operation for formal, mercury-free, cooperative-based gold mining and processing in the Philippines — the one regulators, funders, cooperatives and other operators point to, and come to us to replicate.
 
 ## The scale
 
-What we propose is large from the very beginning: a district-scale programme across two municipalities of Camarines Norte and a 2,360-hectare exploration tenement; a Canadian public company at the top; a trade school that trains the region's next miners; a care facility on the coast; an institute that carries one discipline through everything we do; and a services arm that takes the whole model to other operators across the Bicol gold belt. The first steps are deliberately small and specific, each chosen to fit that larger effort so that nothing we do this year has to be undone later.
+What we propose is large from the very beginning: a district-scale programme across two municipalities of Camarines Norte and a 2,360-hectare exploration tenement; two plants; a lending book and a rental fleet into the shafts; a Canadian public company at the top; and a services arm that takes the whole model to other operators across the Bicol gold belt. The first steps are deliberately small and specific, each chosen to fit that larger effort so that nothing we do this year has to be undone later.
 
 ---
 
@@ -49,15 +53,9 @@ The order of entry is deliberate: **the Canadians come in at Wave 1, before NIBD
 
 ---
 
-## What travels with us
-
-**A sustainable mining trade school.** TESDA-certified, with training subsidised by national funds, teaching the region's future miners the way we intend to mine — mercury-free processing, mine safety, environmental monitoring, cooperative governance — and bioremediation of the mercury- and cyanide-affected ground a century of artisanal mining has left behind. The plants are the training floor; the LAB X workshop is the fabrication classroom; the first graduates crew Waves 1 and 2.
+## Two lines that travel with the operations
 
 **LAB X — the equipment programme.** Our effort to co-source and fabricate the equipment sustainable mining needs, Philippine-made wherever possible and sourced around the world where it must be. The shaking tables now in design are the first project and the proof that it can be built here.
-
-**A care facility at Gumaus Beach** — caretaking, rest and recuperation for our workers, trainees and their families, and for the community around the operations.
-
-**The Maharlika Institute** — one discipline running through all of it: arnis, yoga, mind-body practice, meditation and heart-centred training, on our own land facilities and through **Warriors Gym**, with whom we already have a working relationship and intend to expand it — including their deep-training site on the Calaguas islands.
 
 **A services arm** that offers the strategies, the papers and the team to other Minahang Bayan, cooperatives, plant owners and tenement holders across the region — each engagement a fee, and each one widening our reach.
 
@@ -65,17 +63,17 @@ The order of entry is deliberate: **the Canadians come in at Wave 1, before NIBD
 
 ## What each of us gets
 
-**Allan and his companies — the means to operate aggressively.** The Filipino operating company is Allan's to run: he holds the majority, he is its President, and it is capitalised from day one — PGC's equity, PGC's shareholder loans beyond it, and the ₱5 million line into the Casalugan plant — so it can move on the ground without waiting on anyone's board. It gets its own plant on Allan's own land and its own Minahang Bayan at Jose Panganiban; the lending book and the rental fleet to put money and machines into the shafts and cooperatives it already knows; the tax-exempt gold channel; the LAB X equipment programme building for it; the school training its crews at public expense; and the care facility and the institute for the community it leads. Everything the law reserves to Filipinos sits in Allan's company by design, and the exploration chapter, when it opens, runs through positions Allan and Stephen already hold. The estate's own interests are carried separately, so the family's land and Allan's operations never get in each other's way.
+**Allan and his companies — the means to operate aggressively.** The Filipino operating company is Allan's to run: he holds the majority, he is its President, and it is capitalised from day one — PGC's equity, PGC's shareholder loans beyond it, and the ₱5 million line into the Casalugan plant — so it can move on the ground without waiting on anyone's board. It gets its own plant on Allan's own land and its own Minahang Bayan at Jose Panganiban; the lending book and the rental fleet to put money and machines into the shafts and cooperatives it already knows; the tax-exempt gold channel; and the LAB X equipment programme building for it. Everything the law reserves to Filipinos sits in Allan's company by design, and the exploration chapter, when it opens, runs through positions Allan and Stephen already hold. The estate's own interests are carried separately, so the family's land and Allan's operations never get in each other's way.
 
-**Stephen — the engineer at the centre of the poster child.** Wave 1 puts the money into the plant Stephen operates and the circuit he designs: the ₱5 million activation, the LAB X tables, the toll station, and a ready ore-supply and gold channel around it. He is head engineer and designer of the AVI plant and of the equipment programme that will carry his methods across the region — and the services arm turns that into fees each time another operator wants what he built here. His offer of shares in a smaller processing operation is part of the model, his coexistence framing is the Wave-3 chapter, and his position in NIBDC is what makes that chapter reachable. The school trains the crews he needs on the floor he runs; the institute gives them the discipline he wants on a working site.
+**Stephen — the engineer at the centre of the poster child.** Wave 1 puts the money into the plant Stephen operates and the circuit he designs: the ₱5 million activation, the LAB X tables, the toll station, and a ready ore-supply and gold channel around it. He is head engineer and designer of the AVI plant and of the equipment programme that will carry his methods across the region — and the services arm turns that into fees each time another operator wants what he built here. His offer of shares in a smaller processing operation is part of the model, his coexistence framing is the Wave-3 chapter, and his position in NIBDC is what makes that chapter reachable.
 
-**The Canadian investors, through Juliet and PGC — early, structured, and paid eight ways.** Canadian capital comes in through a company that already exists, before any of the assets above have been priced by a market, into an operation that is already built and permitted. The Canadian side puts the capital in, governs without managing, makes the company listable, and becomes the exploration operator when the tenement chapter opens. It is paid eight ways, in the order they arrive: dividends from the operating company; interest on the money it lends beyond its equity; the lending book to the shafts, secured on ore that flows through our own plants; equipment rental; the PGC shares themselves, which re-rate when PGC lists; a processing company it may own outright later, the way the country's largest gold producer captures its processing margin with a minority of the mine; the exploration upside; and the fees of the services arm. The goal at the top of this page is the investment thesis itself — a planetGOLD-aligned, mercury-free, TESDA-trained, cooperative-based operation is the ESG story resource investors are asked for and rarely shown. And we say up front what the Canadian side does not get: any share of a small-scale mining contract, any management office in the Filipino company, more than its share of declared profit, or any return the board has not voted. Everything above is built inside those lines.
+**The Canadian investors, through Juliet and PGC — early, structured, and paid eight ways.** Canadian capital comes in through a company that already exists, before any of the assets above have been priced by a market, into an operation that is already built and permitted. The Canadian side puts the capital in, governs without managing, makes the company listable, and becomes the exploration operator when the tenement chapter opens. It is paid eight ways, in the order they arrive: dividends from the operating company; interest on the money it lends beyond its equity; the lending book to the shafts, secured on ore that flows through our own plants; equipment rental; the PGC shares themselves, which re-rate when PGC lists; a processing company it may own outright later, the way the country's largest gold producer captures its processing margin with a minority of the mine; the exploration upside; and the fees of the services arm. The goal at the top of this page is the investment thesis itself — a planetGOLD-aligned, mercury-free, cooperative-based operation with the community programme of Part II beside it is the ESG story resource investors are asked for and rarely shown. And we say up front what the Canadian side does not get: any share of a small-scale mining contract, any management office in the Filipino company, more than its share of declared profit, or any return the board has not voted. Everything above is built inside those lines.
 
 ---
 
 ## No stakeholder gets left behind
 
-Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms: Allan and his company; Stephen and Marlon; SMBC and its members, who keep their plant and their contracts; Juliet and the Canadian investors; the private investor behind the first money; the cooperatives and their miners; the barangays and municipalities; the Inocalla estate and its heirs; Warriors Gym and the institute; the Gumaus community and our crews' families; other operators in the region; NIBDC, approached as a partner in the upside; and LandTek. A wave is not done until every one of them has its paper.
+Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms: Allan and his company; Stephen and Marlon; SMBC and its members, who keep their plant and their contracts; Juliet and the Canadian investors; the private investor behind the first money; the cooperatives and their miners; the barangays and municipalities; the Inocalla estate and its heirs; other operators in the region; NIBDC, approached as a partner in the upside; and LandTek. The community programme's own partners are named in Part II. A wave is not done until every one of them has its paper.
 
 ## What happens next
 
@@ -84,3 +82,17 @@ Three things in the next month, one each: Stephen returns the plant papers and t
 ## Add to this
 
 This is a proposed model, not a finished one. What would make it better is what each of you knows that we do not: Stephen, the plant and what the ore actually does; Allan, the ground, the people and the cooperatives; Juliet, the Canadian market and the investors. Mark it up and send it back. The next version is issued under all four names.
+
+---
+
+# PART II — THE COMMUNITY PROGRAMME THAT RUNS ALONGSIDE
+
+This is the social side of what we are building. It is kept apart from Part I on purpose: it is not a return channel of the investment and it is not a term of the partnership. It stands on its own footing — its own entities, its own funding lines, its own partners — and it is what makes the operations in Part I welcome where they sit. Investors should read it as the context the operation lives in, not as something their capital is asked to carry.
+
+**A sustainable mining trade school.** TESDA-certified, with training subsidised by national funds, teaching the region's future miners the way we intend to mine — mercury-free processing, mine safety, environmental monitoring, cooperative governance — and bioremediation of the mercury- and cyanide-affected ground a century of artisanal mining has left behind. The plants are the training floor; the LAB X workshop is the fabrication classroom; graduates crew the operations.
+
+**A care facility at Gumaus Beach** — caretaking, rest and recuperation for workers, trainees and their families, and for the community around the operations.
+
+**The Maharlika Institute** — one discipline running through the programme: arnis, yoga, mind-body practice, meditation and heart-centred training, on our own land facilities and through **Warriors Gym**, with whom we already have a working relationship and intend to expand it — including their deep-training site on the Calaguas islands.
+
+**Its partners:** the trainees and the region's next workforce; Warriors Gym and the institute; the Gumaus community and the families of our crews; the barangays; TESDA and the national scholarship lines; the planetGOLD programme. Its ownership follows Philippine rules for schools and care, on the Filipino side, and its accounts are kept separate from the operating company's.

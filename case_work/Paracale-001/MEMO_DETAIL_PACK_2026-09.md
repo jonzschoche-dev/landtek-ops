@@ -5,11 +5,11 @@
 
 **From:** Jonathan Zschoche · **Date:** 12 September 2026
 
-**Status:** The working detail behind the introductory memorandum, for whoever asks for it. A proposed model for the four of us to build on — not a finished plan. Every section is open: add, strike, correct, send it back marked up. Confidential to the four of us and our counsel. Not legal, tax or securities advice; every legal point is for Philippine and Canadian counsel to confirm before anything is incorporated, filed, wired or listed. Nothing is agreed until the parties named say so in writing. Structure and sequence only; commercial splits are negotiated separately. Reference material is in the annexes.
+**Status:** The working detail behind the introductory memorandum, for whoever asks for it. As in the introduction, the investment opportunity and the partnership (Part I) are kept apart from the community programme (Part II). A proposed model for the four of us to build on — not a finished plan. Every section is open: add, strike, correct, send it back marked up. Confidential to the four of us and our counsel. Not legal, tax or securities advice; every legal point is for Philippine and Canadian counsel to confirm before anything is incorporated, filed, wired or listed. Nothing is agreed until the parties named say so in writing. Structure and sequence only; commercial splits are negotiated separately. Reference material is in the annexes.
 
 **The goal we propose:** to make these operations the poster child of sustainable community and mining operations — the reference site in the Philippines that regulators, funders, cooperatives and other operators point to when they want to see formal, mercury-free, community-owned mining done right, and the one they come to us to replicate.
 
-**Scale.** What we propose is large from the very beginning — a district-scale programme across two municipalities and a 2,360-hectare tenement, a Canadian listing, a TESDA-certified school, a care facility, an institute, and a services arm that carries the model across the region. The first steps are small on purpose: every detail is chosen to fit that long-term effort, so nothing done in Wave 1 has to be undone in Wave 3.
+**Scale.** What we propose is large from the very beginning — a district-scale programme across two municipalities and a 2,360-hectare tenement, two plants, a lending book and a rental fleet, a Canadian listing, and a services arm that carries the model across the region; the community programme (Part II) runs alongside on its own footing. The first steps are small on purpose: every detail is chosen to fit that long-term effort, so nothing done in Wave 1 has to be undone in Wave 3.
 
 ---
 
@@ -64,23 +64,17 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 
 ---
 
-## 6. What we propose travels with us — the school, the care facility, the Maharlika Institute, the services arm
-
-**A sustainable mining trade school.** A TESDA-certified school, with training subsidised by national funds, to train our future miners and the region's in the way we intend to mine — mercury-free processing, mine safety, gravity and leach circuits, assaying, environmental monitoring, cooperative governance — and **bioremediation** of the mercury- and cyanide-affected tailings, soils and watercourses a century of artisanal mining has left. We would register with TESDA as a training institution, register each programme for national certificates, and apply for TESDA's scholarship lines (TWSP, STEP, PESFA), which in their design pay training costs and allowances per trainee to a registered provider; eligibility, budgets and mechanics are unverified. The plants are the training floor, the LAB X workshop the fabrication classroom, and the curriculum doubles as the safety and community programmes every contractor already owes. Built this way the school would be funded, not a cost centre, and its first graduates would crew Waves 1 and 2.
-
-**A care facility at Gumaus Beach** — caretaking, rest and recuperation for our workers, trainees and their families first, and for the community around the operations.
-
-**The Maharlika Institute — the theme through everything.** Our warriors' institute carries one discipline through all training and operations — **arnis**, **yoga**, mind-body practice, meditation and heart-centred training — on our own land facilities and through **Warriors Gym, with whom we already have a working relationship and intend to expand it** — including their 30-hectare deep-training site on the Calaguas islands, as they have described it to us; the expanded partnership, the site and its terms to be put in writing.
+## 6. The services arm
 
 **A services arm for the region.** The strategies, papers and team we build here will be **for hire to other opportunities in the region** — other Minahang Bayan, cooperatives, plant owners and tenement holders in the Bicol gold belt — each a fee-earning engagement that widens our ore-supply, offtake and roll-up options.
 
-**The counsel question inside this.** Technical services are not nationalised, so the services arm can be owned outright by the Canadian side or LandTek. The school is different: the Constitution (Art. XIV §4(2)) confines ownership and control of educational institutions to at least 60% Filipino, and the Negative List carves out only short-term skills training outside the formal system — whether a TESDA-registered institution sits inside that carve-out is for counsel. The care facility's staffing is subject to the Filipino-reserved health professions. Until counsel answers, the school, care facility and institute are 60/40 by default, land held or leased through the Filipino side.
+**Ownership.** Technical services are not nationalised, so the services arm can be owned outright by the Canadian side or LandTek.
 
 ---
 
 ## 7A. What Allan's companies and Stephen get
 
-**Allan's companies — the means to operate aggressively.** The Filipino operating company is Allan's to run — majority owner, President — and it is capitalised from day one (PGC's equity, PGC's shareholder loans, the ₱5M line into the Casalugan plant), so it moves on the ground without waiting on anyone's board. It holds its own plant on Allan's land and its own Minahang Bayan at Jose Panganiban; runs the lending book and the rental fleet into the shafts and cooperatives it already knows; holds the BSP trader accreditation; is the customer of the LAB X programme; is crewed by the school; and leads the care facility and the institute for its community. Everything the law reserves to Filipinos sits in it by design; the estate's interests are carried separately through the administrator.
+**Allan's companies — the means to operate aggressively.** The Filipino operating company is Allan's to run — majority owner, President — and it is capitalised from day one (PGC's equity, PGC's shareholder loans, the ₱5M line into the Casalugan plant), so it moves on the ground without waiting on anyone's board. It holds its own plant on Allan's land and its own Minahang Bayan at Jose Panganiban; runs the lending book and the rental fleet into the shafts and cooperatives it already knows; holds the BSP trader accreditation; is the customer of the LAB X programme; Everything the law reserves to Filipinos sits in it by design; the estate's interests are carried separately through the administrator.
 
 **Stephen — the engineer at the centre.** Wave 1 funds the plant he operates and the circuit he designs; he is head engineer and designer of the AVI plant and of the LAB X programme; the services arm turns his methods into fees wherever another operator wants them; his offer of shares in the smaller processing operation (§2.3), his coexistence framing (§5) and his power of attorney over 40% of NIBDC (§5) are all part of the model, on written terms and with the related-party handling §5 describes.
 
@@ -102,7 +96,7 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 **Route options:** a Capital Pool Company (Policy 2.4, rewritten 2021 — up to C$10M may now be raised, and the 24-month qualifying-transaction deadline is gone), a direct IPO by prospectus, or a reverse takeover of an existing shell. The sponsor requirement has been eliminated. Board and insiders (Policy 3.1): at least three directors, two independent; every director, officer, promoter and insider files a Personal Information Form and passes security screening — we will run our own background checks on every principal early and decide board composition well before filing. Standard package: audited IFRS financial statements (two to three years or since inception — the Philippine subsidiaries keep audit-grade books from day one), an independent Qualified Person's NI 43-101 report (the Benguet-era historical estimates on the Paracale veins can be disclosed only as historical estimates under s.2.4, never as resources), a Philippine title opinion on the permit, and escrow of principals' shares (36 months for Tier 2). US-resident investors will need the PFIC and Reg S / Rule 144A points handled. or CSE; principals' shares sit in escrow for 36 months on Tier 2 and release in stages; a consultant's position is normally options or founder shares at PGC level.
 6. **A 100%-owned processing company, later** — a stand-alone plant outside the Minahang Bayan zone may be owned outright under a Mineral Processing Permit and buy the ore under an ore-purchase agreement: exactly how B2Gold captures Masbate's processing margin while holding only 40% of the tenement company.
 7. **The exploration upside** — a majority of the project company at permit stage; then, at MPSA, 40% of the tenement holder plus the processing margin above it; or 100% under an FTAA at US$50 million scale.
-8. **Services and programme fees** — the services arm is designed as foreign-ownable and its fees sit outside the 40% rule; the school, care facility and institute are 60/40 by default until counsel answers the ownership question.
+8. **Services fees** — the services arm (§6) is designed as foreign-ownable and its fees sit outside the 40% rule. The community programme (Part II) is not a return channel.
 
 **What PGC does not get:** any share of a small-scale mining contract, any management office in AVI, more than 40% of its declared profit, or any return the board has not voted. Everything above is built inside those lines, which is why it survives a listing review. The exchange's tests and the compliant route are in Annex B.
 
@@ -122,11 +116,11 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 | Jonathan | 19 Sep | Decide the 30% basis and staged release; decide who signs the Wave-1 financing (personal / private investor now, assignable to AVI once incorporated) |
 | Allan | 30 Sep | File the new SEC mining corporation (mining + processing in the primary purpose; Allan ≥60% / PGC ≤40%); file the DTI trade name once availability is confirmed; ore sample for the gravity test; LAB X crew and cost basis; close out the Gracesen record with EMB; start BSP trader accreditation under AVI; confirm AVI's site and filing status |
 | Allan + Jonathan + Stephen | 30 Sep | AVI Gold Processing: site relative to the MB zone, and the circuit — the two decisions that fix ownership eligibility and the permit list |
-| Jonathan | 30 Sep | Engage Philippine corporate and mining counsel on a fixed scope: AVI's incorporation and PGC's subscription (nationality test), Wave-1 financing papers, ore-supply template, trader accreditation, the MB-mill ownership question, the school's ownership question |
+| Jonathan | 30 Sep | Engage Philippine corporate and mining counsel on a fixed scope: AVI's incorporation and PGC's subscription (nationality test), Wave-1 financing papers, ore-supply template, trader accreditation, the MB-mill ownership question; and, for Part II, the school's ownership question |
 | Juliet + Jonathan + Allan | 30 Sep (proposed) | PGC housekeeping: jurisdiction and good standing, shareholder register and officers, minute book; entry terms for Juliet's group; PGC's subscription in AVI; the first-capital plan for Waves 1–2 |
 | Juliet | 30 Sep (proposed) | The asks in §7 |
 | Jonathan + Allan | 15 Oct | NIBDC: status inquiry to MGB Central Office; earn-in term sheet outline, to be tabled by PGC |
-| Allan + Jonathan + Stephen | 31 Oct (proposed) | Trade school outline (TESDA registration path, first three programmes, training floor, scholarship lines); services-arm entity and first two regional prospects; Gumaus care-facility site and scope; the written, expanded partnership with Warriors Gym incl. the Calaguas site |
+| Allan + Jonathan + Stephen | 31 Oct (proposed) | Part II — trade school outline (TESDA registration path, first three programmes, training floor, scholarship lines); services-arm entity and first two regional prospects; Gumaus care-facility site and scope; the written, expanded partnership with Warriors Gym incl. the Calaguas site |
 
 ---
 
@@ -144,6 +138,23 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 ## 10. Add to this
 
 This is a proposed model, not a finished one. What would make it better is what each of you knows that we do not: Stephen, the plant, the circuits and what the ore actually does; Allan, the ground, the people, the cooperatives and the estate; Juliet, the Canadian market, the exchange and the investors. Mark up any section, add the stakeholders and opportunities we have missed, challenge the assumptions in Annex D with real numbers, and send it back. The next version is issued under all four names.
+
+
+---
+
+# PART II — THE COMMUNITY PROGRAMME THAT RUNS ALONGSIDE
+
+Kept apart from Part I on purpose: not a return channel of the investment and not a term of the partnership. It stands on its own entities, funding lines and partners, and it is what makes the operations welcome where they sit.
+
+**A sustainable mining trade school.** A TESDA-certified school, with training subsidised by national funds, to train our future miners and the region's in the way we intend to mine — mercury-free processing, mine safety, gravity and leach circuits, assaying, environmental monitoring, cooperative governance — and **bioremediation** of the mercury- and cyanide-affected tailings, soils and watercourses a century of artisanal mining has left. We would register with TESDA as a training institution, register each programme for national certificates, and apply for TESDA's scholarship lines (TWSP, STEP, PESFA), which in their design pay training costs and allowances per trainee to a registered provider; eligibility, budgets and mechanics are unverified. The plants are the training floor, the LAB X workshop the fabrication classroom, and the curriculum doubles as the safety and community programmes every contractor already owes. Built this way the school would be funded, not a cost centre, and its first graduates would crew Waves 1 and 2.
+
+**A care facility at Gumaus Beach** — caretaking, rest and recuperation for our workers, trainees and their families first, and for the community around the operations.
+
+**The Maharlika Institute — the theme through everything.** Our warriors' institute carries one discipline through all training and operations — **arnis**, **yoga**, mind-body practice, meditation and heart-centred training — on our own land facilities and through **Warriors Gym, with whom we already have a working relationship and intend to expand it** — including their 30-hectare deep-training site on the Calaguas islands, as they have described it to us; the expanded partnership, the site and its terms to be put in writing.
+
+**The counsel question.** The school: the Constitution (Art. XIV §4(2)) confines ownership and control of educational institutions to at least 60% Filipino, and the Negative List carves out only short-term skills training outside the formal system — whether a TESDA-registered institution sits inside that carve-out is for counsel. The care facility's staffing is subject to the Filipino-reserved health professions. Until counsel answers, the school, care facility and institute are 60/40 by default, land held or leased through the Filipino side.
+
+**Its accounts are kept separate from the operating company's.**
 
 <<<ANNEX-SMALL>>>
 
