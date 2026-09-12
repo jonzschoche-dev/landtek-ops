@@ -104,6 +104,7 @@ def render_md(md, width, story):
     lines = md.splitlines(); i = 0; first_h1 = True
     while i < len(lines):
         ln = lines[i]
+        if ln.startswith("<!--"): i += 1; continue
         if ln.startswith("```"):
             buf = []; i += 1
             while i < len(lines) and not lines[i].startswith("```"): buf.append(lines[i]); i += 1
@@ -145,7 +146,7 @@ def render_md(md, width, story):
         if ln.strip() == "": i += 1; continue
         # paragraph (merge soft-wrapped lines)
         buf = [ln.strip()]; i += 1
-        while i < len(lines) and lines[i].strip() and not re.match(r"^(#|\||>|```|---|\s*- |\d+\. )", lines[i]):
+        while i < len(lines) and lines[i].strip() and not re.match(r"^(#|\||>|```|---|<!--|\s*- |\d+\. )", lines[i]):
             buf.append(lines[i].strip()); i += 1
         txt = " ".join(buf)
         st = "meta" if (txt.startswith("*") and txt.endswith("*") and txt.count("*") == 2) else "body"

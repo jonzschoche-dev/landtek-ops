@@ -28,8 +28,8 @@ We are building one business in three waves. **Wave 1** starts now inside the al
 | Why it is lawful for outside money | This is financing and equipment into a processing facility. It is not equity in, or control of, any small-scale mining contract — contracts are reserved to Filipinos (RA 7076; 13th Foreign Investment Negative List, 2026). Management of extraction stays with SMBC and its Filipino members |
 | How we hold ourselves | As partners, not as a bank. We intend the repayment papers to read as partner protection in plain words, not as lender mechanics |
 
-### 2.2 LAB X — the gravity circuit at the MFPS
-One full-size Wilfley/6-S-class shaking table, locally fabricated, on a rigid concrete pad inside or beside the MFPS, targeting 10 tonnes a day of gravity feed; table 2 is decided from measured recovery. Stephen is head engineer and designer; Allan supplies the crew. Planning range ₱177–306k for the table, mid-point ₱190–220k, all unquoted; pad, water, feed preparation and electrical excluded. The one gate before steel is cut is a gravity-recoverable-gold test on a 20–50 kg representative ore sample — Paracale gold is often sulfide-locked, and the test sets stroke, slope and riffle geometry. We also need SMBC's written consent and confirmation that added tables sit inside the MFPS permits.
+### 2.2 LAB X — the equipment programme, and the gravity circuit at the MFPS
+**LAB X is our effort to co-source and fabricate the equipment sustainable mining needs — Philippine-made wherever possible, sourced around the world where it must be.** The aim is a plant that can be built, repaired and expanded locally, at local cost, to mercury-free standards, rather than imported as a black box. The shaking tables are the ongoing first project and the working example of what can be fabricated here: one full-size Wilfley/6-S-class table, locally fabricated, on a rigid concrete pad inside or beside the MFPS, targeting 10 tonnes a day of gravity feed, with table 2 decided from measured recovery. Stephen is head engineer and designer; Allan supplies the crew; LandTek carries the design record and the sourcing map. Planning range ₱177–306k for the table, mid-point ₱190–220k, all unquoted; pad, water, feed preparation and electrical excluded. The one gate before steel is cut is a gravity-recoverable-gold test on a 20–50 kg representative ore sample — Paracale gold is often sulfide-locked, and the test sets stroke, slope and riffle geometry. We also need SMBC's written consent and confirmation that added tables sit inside the MFPS permits. What the tables prove carries straight into the AVI plant (Wave 2): the same programme sources or fabricates its crushing, milling, gravity and water circuits.
 
 ### 2.3 Toll station and ore-supply agreements with SMBC contract holders
 After the upgrade, equipment is allocated to a small-batch toll station, and we sign ore-supply / toll-processing agreements with individual SMBC contract holders, with production advances repaid in ore where useful. This is the only lawful way outside money participates in contract-holder output — offtake, advances, equipment and processing — and it works today because the SMBC area is already declared.
@@ -212,5 +212,91 @@ Each line between the boxes is its own paper (PGC's subscription and shareholder
 | The Inocalla estate and its heirs | Surface rights over the family land | Any surface-use or royalty arrangement runs through the estate's administrator to all heirs, separately from Allan's own positions |
 | NIBDC | The tenement (Wave 3) | Approached later, by PGC, with an arm's-length coexistence MOA and an earn-in its board can accept — a partner in the exploration upside, not a party to be worked around |
 | LandTek | The structuring, the records, the engineering programme (LAB X) | A written services and principal role in the operating company's programme, on the same terms discipline as everyone else |
+
+---
+
+<!-- ANNEX-A-START -->
+## Annex A — Illustrative scenarios by wave (planning arithmetic, not forecasts)
+
+> **How to read this annex.** These are scenario calculations, not projections we assert. Every input is listed with its status; the ones marked *assumption* or *placeholder* have no quote, assay, test or agreement behind them yet, and the ones marked *placeholder* are exactly the commercial terms this memo says are negotiated separately. The arithmetic is reproducible (a script regenerates this annex from the inputs), so any partner can change an input and see the result. Nothing here is a mineral resource, a production forecast or an economic analysis in the NI 43-101 sense, and none of it may be used in any listing document until a Qualified Person's report exists. Gold at US$4,362/oz (11 Sep 2026) and ₱62.60/US$ (BSP reference, 8 Sep 2026) give **₱8,779 per gram**; the BSP buying price is taken as world price less ~1% (to confirm).
+
+### A1. Wave 1 — MFPS activation, Casalugan (monthly, once the plant is running)
+
+| Input | Low | Base | High | Status |
+|---|---|---|---|---|
+| Throughput, tonnes/day | 3.5 | 7 | 10 | reported current circuit ≈ 3.5 t/d; 10 t/d = LAB X target |
+| Operating days/month | 25 | 25 | 25 | assumption |
+| Head grade of delivered ore, g/t | 2 | 3.5 | 5 | **assumption** — no assays on file |
+| Gravity recovery | 50% | 60% | 70% | **assumption** — set by the GRG test |
+| Treatment margin retained by plant | 25% | 35% | 45% | **placeholder** — negotiated separately |
+| Plant operating cost, ₱/t | 1,500 | 1,200 | 1,000 | assumption |
+| Fixed overhead, ₱/month | ₱300,000 | ₱250,000 | ₱200,000 | assumption |
+
+| Result (per month) | Low | Base | High |
+|---|---|---|---|
+| Ore treated, t | 88 | 175 | 250 |
+| Gold recovered, g | 88 | 368 | 875 |
+| Value of recovered gold at BSP | ₱760,491 | ₱3.2M | ₱7.6M |
+| Plant gross (its retained margin) | ₱190,123 | ₱1.1M | ₱3.4M |
+| Plant net before tax | ₱-241,127 | ₱657,922 | ₱3.0M |
+| PGC's 40% of net after 25% tax (if declared) | ₱0 | ₱197,376 | ₱891,663 |
+
+Known Wave-1 numbers on file, not scenarios: the ₱5,000,000 financing returns ₱5.75M or ₱6.5M within six months depending on the 30% basis; the LAB X table costs ₱177–306k plus pad and utilities, unquoted. The Low case shows the point: at today's reported circuit rate and a thin plant margin, the plant roughly covers itself — the money is in throughput (LAB X) and recovery (the ore test), which is why those are the first two Wave-1 actions.
+
+### A2. Wave 2 — AVI Gold Processing, Jose Panganiban (monthly, at steady state)
+
+| Input | Low | Base | High | Status |
+|---|---|---|---|---|
+| Throughput, tonnes/day | 10 | 25 | 50 | 50 t/d = the Gracesen ECC precedent rating |
+| Head grade, g/t | 2 | 3.5 | 5 | **assumption** |
+| Recovery | 55% | 70% | 88% | gravity-only (Low) → gravity + leach (High; heavier permit stack) |
+| Margin retained by plant | 35% | 45% | 55% | **placeholder** — own Minahang Bayan, integrated |
+| Plant operating cost, ₱/t | 1,500 | 1,800 | 2,200 | assumption; rises with reagents |
+| Fixed overhead, ₱/month | ₱500,000 | ₱600,000 | ₱750,000 | assumption |
+| Plant build (capex) | ₱15.0M | ₱35.0M | ₱60.0M | **assumption, no quotes** |
+| Permit stack | ₱1.5M | ₱2.5M | ₱4.0M | assumption |
+
+| Result (per month) | Low | Base | High |
+|---|---|---|---|
+| Ore treated, t | 250 | 625 | 1,250 |
+| Gold recovered, g | 275 | 1,531 | 5,500 |
+| Value of recovered gold at BSP | ₱2.4M | ₱13.3M | ₱47.8M |
+| Plant gross (its retained margin) | ₱836,540 | ₱6.0M | ₱26.3M |
+| Plant net before tax | ₱-38,460 | ₱4.3M | ₱22.8M |
+| PGC's 40% of net after 25% tax (if declared) | ₱0 | ₱1.3M | ₱6.8M |
+| Simple payback on capex + permits, months | n/a | 9 | 3 |
+
+The Wave-2 spread is wide on purpose: it is driven by three unknowns we can actually resolve before committing capital — the ore test (recovery), the site and circuit decision (permit stack and opex), and a fabricator's quote (capex). Until those exist, the table says what the plant *could* be, not what it will be.
+
+### A3. Wave 3 — exploration earn-in on EXPA-000250-V (spend, not revenue)
+
+No production or resource figure is projected here: a resource is what the program is for, and only a Qualified Person may state one. What can be planned is the spend that earns PGC its majority of the project company, phased per the 36-month plan.
+
+| Program element | Low | Base | High | Status |
+|---|---|---|---|---|
+| Phase 1 — baseline, access, shaft inventory, MOA, MB petition (months 1–6) | C$0.30M | C$0.45M | C$0.60M | assumption |
+| Phase 2 — underground mapping and sampling (months 7–18) | C$0.80M | C$1.10M | C$1.50M | assumption |
+| Phase 3 — diamond drilling, metres | 3,000 m | 5,000 m | 8,000 m | assumption |
+| Drilling all-in cost, C$/m | 180 | 200 | 220 | assumption |
+| Phase 3 — drilling spend | C$0.54M | C$1.00M | C$1.76M |
+| **Exploration total over 36 months** | C$1.64M | C$2.55M | C$3.86M |
+| Listing costs (CPC/IPO, audit, QP report, exchange) | C$0.40M | C$0.60M | C$0.80M | assumption |
+| **Total Canadian program, Wave 3** | C$2.04M | C$3.15M | C$4.66M |
+
+For scale: the exchange's minimum recommended initial-phase program for a Tier 2 mining listing is C$200,000, and the prior-expenditure test is waived where the non-contingent program exceeds C$400,000 — every case above clears both. What the spend buys is not a number in this annex: it is PGC's majority of the project company holding the permit, the NI 43-101 report that makes PGC listable, and the option on a 2,360-hectare district-scale property.
+
+### A4. What moves the numbers most
+
+| Lever | Effect on Wave 1 Base | Effect on Wave 2 Base | Who resolves it |
+|---|---|---|---|
+| Gold price −20% / +20% | -34% / +34% | -28% / +28% | the market |
+| Recovery 50% instead of 60% / 70% (W2: 60% / 80% instead of 70%) | -28% / +28% | -20% / +20% | the ore test, then the circuit |
+| Grade 2.5 g/t instead of 3.5 / 4.5 g/t | -49% / +49% | -40% / +40% | sampling and assays |
+| Plant margin 25% instead of 35% / 45% (W2: 35% / 55% instead of 45%) | -49% / +49% | -31% / +31% | the ore-supply terms |
+
+*Annex generated by `opportunity_projections.py` from the inputs shown; regenerate after any input changes. Market inputs dated as stated.*
+
+<!-- ANNEX-A-END -->
+
 
 *Authorities relied on: RA 7942 (Philippine Mining Act) §§3, 19(e), 55–56; RA 7076 (People's Small-Scale Mining Act) §§3, 9, 12, 13, 14, 17, 18; DAO 2022-03 (text being obtained); EO 113 s.2026 (13th Foreign Investment Negative List); CA 108 (Anti-Dummy Law); Narra Nickel v. Redmont; RA 11256; RA 12253; RA 7652 as amended by RA 12252; RA 7042 as amended by RA 11647; Canada–Philippines Income Tax Convention (1976); TSX Venture Exchange Policies 1.1, 2.1, 2.4, 3.1 and 5.4 (Corporate Finance Manual as at 31 March 2026); B2Gold public filings on the Masbate structure; MGB Region V's July 2025 endorsement of EXPA-000250-V; SMBC Board Resolution No. 2026-009.*
