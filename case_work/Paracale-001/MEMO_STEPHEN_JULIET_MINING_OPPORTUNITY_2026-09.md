@@ -13,7 +13,7 @@ To make these operations the poster child of sustainable community and mining op
 
 ## The scale
 
-What we propose is large from the very beginning. Not a plant upgrade: a district-scale programme across two municipalities of Camarines Norte and a 2,360-hectare exploration tenement; a Canadian public company at the top; a trade school that trains the region's next miners; a care facility on the coast; an institute that carries one discipline through everything we do; and a services arm that takes the whole model to other operators across the Bicol gold belt. The first steps are deliberately small and specific, and every one of them is chosen to fit that larger effort, so that nothing we do this year has to be undone later.
+What we propose is large from the very beginning. Not a plant upgrade: a district-scale programme across two municipalities of Camarines Norte and a 2,360-hectare exploration tenement; a Canadian public company at the top; a trade school that trains the region's next miners; a care facility on the coast; an institute that carries one discipline through everything we do; and a services arm that takes the whole model to other operators across the Bicol gold belt. The first steps are deliberately small and specific, each chosen to fit that larger effort so that nothing we do this year has to be undone later.
 
 ---
 
@@ -24,7 +24,7 @@ What we propose is large from the very beginning. Not a plant upgrade: a distric
 - **The tenement next door.** NIBDC's 2,360-hectare exploration permit application across Paracale, Jose Panganiban and Labo, endorsed by the regional mines bureau for issuance — the exploration upside, and the asset a Canadian listing would be built on. Stephen holds a power of attorney over a substantial shareholding in NIBDC, which is what makes that chapter reachable when its time comes.
 - **The district.** Paracale is one of the oldest gold-producing districts in the Philippines, worked for centuries and mined at industrial scale into the 1990s. (The history is real; the numbers wait for a Qualified Person before anyone quotes them.)
 - **A Canadian company that already exists.** Paracale Gold Company (PGC), formed and ready to be the vehicle through which Canadian capital comes in — before any of this has been priced by a market.
-- **The people.** Stephen on the plant and the engineering; Allan on the ground, the cooperatives and the community; Juliet on the Canadian market, the exchange and the investors; LandTek on the structure, the records and the equipment programme.
+- **The people.** Stephen on the plant and engineering; Allan on the ground, the cooperatives and the community; Juliet on the Canadian market and the investors; LandTek on structure, records and equipment.
 
 ---
 
@@ -73,7 +73,7 @@ We say up front what the Canadian side does not get: any share of a small-scale 
 
 ## No stakeholder gets left behind
 
-Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms: Allan and his company; Stephen and Marlon; SMBC and its members, who keep their plant and their contracts; Juliet and the Canadian investors; the private investor behind the first money; the cooperatives and the miners in them; the barangays and municipalities; the Inocalla estate and its heirs; the Warriors and the institute; the Gumaus community and the families of our crews; other operators in the region; NIBDC, approached as a partner in the upside, not a party to be worked around; and LandTek. A wave is not done until every one of them has its paper.
+Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms: Allan and his company; Stephen and Marlon; SMBC and its members, who keep their plant and their contracts; Juliet and the Canadian investors; the private investor behind the first money; the cooperatives and their miners; the barangays and municipalities; the Inocalla estate and its heirs; the Warriors and the institute; the Gumaus community and our crews' families; other operators in the region; NIBDC, approached as a partner in the upside; and LandTek. A wave is not done until every one of them has its paper.
 
 ## What happens next
 
