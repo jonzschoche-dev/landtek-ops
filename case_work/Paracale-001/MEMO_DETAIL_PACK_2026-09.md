@@ -78,6 +78,12 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 
 ---
 
+## 7A. What Allan's companies and Stephen get
+
+**Allan's companies — the means to operate aggressively.** The Filipino operating company is Allan's to run — majority owner, President — and it is capitalised from day one (PGC's equity, PGC's shareholder loans, the ₱5M line into the Casalugan plant), so it moves on the ground without waiting on anyone's board. It holds its own plant on Allan's land and its own Minahang Bayan at Jose Panganiban; runs the lending book and the rental fleet into the shafts and cooperatives it already knows; holds the BSP trader accreditation; is the customer of the LAB X programme; is crewed by the school; and leads the care facility and the institute for its community. Everything the law reserves to Filipinos sits in it by design; the estate's interests are carried separately through the administrator.
+
+**Stephen — the engineer at the centre.** Wave 1 funds the plant he operates and the circuit he designs; he is head engineer and designer of the AVI plant and of the LAB X programme; the services arm turns his methods into fees wherever another operator wants them; his offer of shares in the smaller processing operation (§2.3), his coexistence framing (§5) and his power of attorney over 40% of NIBDC (§5) are all part of the model, on written terms and with the related-party handling §5 describes.
+
 ## 7. The Canadian role as we propose it — and how it pays
 
 **The setup.** A ₱29-million mercury-free plant already built inside a declared Minahang Bayan, with an operator in place; a second plant site on Allan's own titled land; next door, a 2,360-hectare exploration permit application endorsed for issuance — all in the Paracale district, one of the oldest gold-producing districts in the Philippines, mined at industrial scale by Benguet Corporation into the 1990s (historical figures to be verified through a Qualified Person; nothing here is a resource statement). Government policy is to formalise exactly this kind of mining, which is what the UN-backed planetGOLD programme built the Casalugan plant to demonstrate. Canadian capital comes in **before any of this has been priced by a market**, through a company that already exists — and the goal at the top of this memo is the investment thesis: the ESG story resource investors are asked for and rarely shown.
