@@ -195,6 +195,22 @@ Each line between the boxes is its own paper (PGC's subscription and shareholder
 - **Nothing in SMBC's or NIBDC's name** without that board's resolution and its president's written sign-off.
 - **The Filipino side stays Filipino** — contracts, cooperatives, and at least 60% of any MPSA-stage holder — genuinely, not nominally.
 - **Every number is unquoted until a vendor quote or a test result replaces it**, and we say so.
+- **No stakeholder gets left behind.** Every party that brings something to this — capital, land, permits, labour, operating skill, community standing — is carried through all three waves on written terms. The map below is the checklist; a wave is not "done" until every line in it has its paper.
 - **Confidential** to the four of us and our counsel until we agree otherwise.
+
+### Stakeholder map — who brings what, and how each is carried
+
+| Stakeholder | What they bring | How they are carried (the paper, not the percentage) |
+|---|---|---|
+| Allan and his Philippine company | The Filipino side: the operating company, the Santa Rosa Sur lot, the Jose Panganiban Minahang Bayan, the cooperative standing, the district relationships | Majority owner and President of the operating company; land contributed or leased on written terms; the shareholders' agreement with PGC |
+| Stephen (and Marlon, once his role is confirmed) | The plant operation, the engineering (LAB X, AVI circuit), the SMBC partnership | The executed SMBC Operational Partnership Agreement; the Wave-1 financing papers with the operating company; a written role in the AVI plant design and build |
+| SMBC and its member contract holders | The declared Minahang Bayan, the plant, the ore, the workforce | SMBC keeps title to the MFPS; members keep their contracts (never touched); ore-supply and toll agreements at transparent, market-linked pricing; the tax-exempt BSP channel; training and safety standards |
+| Juliet and the Canadian investors (through PGC) | Capital, the listing path, governance discipline | Shares in PGC; PGC's stake and loans in the operating company; the shareholders' agreement Juliet leads; board seats in proportion to equity |
+| The private investor behind the ₱5M | The first money | The repayment terms in the alignment note, honoured as written; assignment to the operating company once it exists |
+| The Capacuan / Jose Panganiban cooperative and the miners in it | The small-scale contracts and the workings | Contracts stay 100% theirs; the coexistence terms, offtake and advances are written with them, not over them; the community-trust-fund royalty where the law provides one |
+| The barangays and municipalities (Casalugan, Santa Rosa Sur; Paracale, Jose Panganiban) | Endorsements, permits, the social licence | Sanggunian and barangay resolutions sought before filings, not after; local hiring; the mercury-free, planetGOLD-aligned operation the LGUs endorsed |
+| The Inocalla estate and its heirs | Surface rights over the family land | Any surface-use or royalty arrangement runs through the estate's administrator to all heirs, separately from Allan's own positions |
+| NIBDC | The tenement (Wave 3) | Approached later, by PGC, with an arm's-length coexistence MOA and an earn-in its board can accept — a partner in the exploration upside, not a party to be worked around |
+| LandTek | The structuring, the records, the engineering programme (LAB X) | A written services and principal role in the operating company's programme, on the same terms discipline as everyone else |
 
 *Authorities relied on: RA 7942 (Philippine Mining Act) §§3, 19(e), 55–56; RA 7076 (People's Small-Scale Mining Act) §§3, 9, 12, 13, 14, 17, 18; DAO 2022-03 (text being obtained); EO 113 s.2026 (13th Foreign Investment Negative List); CA 108 (Anti-Dummy Law); Narra Nickel v. Redmont; RA 11256; RA 12253; RA 7652 as amended by RA 12252; RA 7042 as amended by RA 11647; Canada–Philippines Income Tax Convention (1976); TSX Venture Exchange Policies 1.1, 2.1, 2.4, 3.1 and 5.4 (Corporate Finance Manual as at 31 March 2026); B2Gold public filings on the Masbate structure; MGB Region V's July 2025 endorsement of EXPA-000250-V; SMBC Board Resolution No. 2026-009.*
