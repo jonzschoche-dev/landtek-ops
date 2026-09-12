@@ -9,6 +9,8 @@
 
 **Status:** Partners' working document — confidential to the four of us and our counsel. Not legal, tax or securities advice; every legal point below is to be confirmed by Philippine mining counsel, Philippine tax counsel and Canadian securities counsel before anything is incorporated, filed, wired or listed. Nothing in this memo is agreed until the parties named say so in writing. This memo is about structure and sequence; commercial splits are deliberately not addressed here and are negotiated separately.
 
+**Our goal:** to make these operations the poster child of sustainable community and mining operations — the reference site in the Philippines that regulators, funders, cooperatives and other operators point to when they want to see formal, mercury-free, community-owned mining done right, and the one they come to us to replicate.
+
 ---
 
 ## 1. The picture in one paragraph
@@ -172,7 +174,7 @@ Each line between the boxes is its own paper (PGC's subscription and shareholder
 5. **The exploration upside** — a majority of the project company at permit stage; then, at MPSA, 40% of the tenement holder plus the processing margin above it; or 100% under an FTAA if the project reaches US$50 million scale.
 6. **Training and services fees, uncapped** — the trade school and the services arm (§4B) are not nationalised activities, so a foreign-owned or LandTek entity may own them outright and earn regional fees without the 40% ceiling.
 
-**Why this is a good entry, not just a lawful one.** The cash-flow story starts in a plant that is already built, so the first dividends do not wait on a drill program. The gold-selling channel is tax-exempt by statute (sales to the Bangko Sentral). The listing asset is an exploration permit in a district with a documented production history, held through the one structure (permit-stage majority, then Masbate-shape) that satisfies both Philippine law and the exchange's 50% test. And the sequence puts Canadian partners at the table with a running operation *before* the tenement negotiation — the position every junior wishes it had.
+**Why this is a good entry, not just a lawful one.** The goal stated at the top of this memo — the poster child of sustainable community and mining operations — is also the investment thesis: a planetGOLD-aligned, mercury-free, TESDA-trained, cooperative-based operation is the ESG story Canadian resource investors are asked for and rarely shown, and it is what makes the regional services arm sellable. The cash-flow story starts in a plant that is already built, so the first dividends do not wait on a drill program. The gold-selling channel is tax-exempt by statute (sales to the Bangko Sentral). The listing asset is an exploration permit in a district with a documented production history, held through the one structure (permit-stage majority, then Masbate-shape) that satisfies both Philippine law and the exchange's 50% test. And the sequence puts Canadian partners at the table with a running operation *before* the tenement negotiation — the position every junior wishes it had.
 
 **What protects the 40%.** The shareholders' agreement is the document that makes the stake worth having: dividend policy, reserved matters, information rights, anti-dilution, tag/drag, related-party rules, and the exit path into the listing. We would ask Juliet to lead its Canadian side alongside Philippine counsel.
 
