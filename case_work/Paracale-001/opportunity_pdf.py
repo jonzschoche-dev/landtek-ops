@@ -33,7 +33,8 @@ pdfmetrics.registerFontFamily("Mono", normal="Mono", bold="MonoB", italic="Mono"
 NAVY = colors.HexColor("#1a2e4a"); ACCENT = colors.HexColor("#8a6d1f")
 GRAY = colors.HexColor("#555555"); LIGHT = colors.HexColor("#f2f0ea"); RULE = colors.HexColor("#c9c4b6")
 
-S = {
+def make_styles():
+  return {
  "cover_t": ParagraphStyle("ct", fontName="ArB", fontSize=22, leading=27, textColor=NAVY),
  "cover_s": ParagraphStyle("cs", fontName="ArB", fontSize=13, leading=17, textColor=ACCENT),
  "part":    ParagraphStyle("pt", fontName="ArB", fontSize=18, leading=22, textColor=NAVY, spaceAfter=6),
@@ -51,7 +52,8 @@ S = {
  "cellh":   ParagraphStyle("cellh", fontName="ArB", fontSize=8.3, leading=10.6, textColor=colors.white),
  "code":    ParagraphStyle("code", fontName="Mono", fontSize=6.4, leading=8.2, backColor=LIGHT,
                            borderPadding=(5,6,5,6), spaceBefore=4, spaceAfter=8),
-}
+  }
+S = make_styles()
 
 def glyphfix(t):
     return t.replace("▶", ">").replace("✔", "[x]").replace("☐", "[ ]")
@@ -101,10 +103,15 @@ def table(rows, width):
     return t
 
 def render_md(md, width, story):
+    global S
     lines = md.splitlines(); i = 0; first_h1 = True
     while i < len(lines):
         ln = lines[i]
         if ln.startswith("<!--"): i += 1; continue
+        if ln.strip() == "<<<ANNEX-SMALL>>>":
+            global S
+            S = make_styles(); scale_styles(10.5)
+            story.append(PageBreak()); i += 1; continue
         if ln.startswith("```"):
             buf = []; i += 1
             while i < len(lines) and not lines[i].startswith("```"): buf.append(lines[i]); i += 1
@@ -161,6 +168,8 @@ def on_page(c, doc):
 
 MEMO_MD = "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.md"
 MEMO_OUT = os.path.join(HERE, "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.pdf")
+DETAIL_MD = "MEMO_DETAIL_PACK_2026-09.md"
+DETAIL_OUT = os.path.join(HERE, "MEMO_DETAIL_PACK_2026-09.pdf")
 
 def scale_styles(body_pt):
     """Re-size every text style so body text renders at body_pt (memo default 14 pt, Jonathan 2026-09-12).
@@ -178,22 +187,24 @@ def scale_styles(body_pt):
         if k in ("bul",):
             st.leftIndent = 22
 
-def build_memo(body_pt=14):
+def build_memo(body_pt=14, md=None, out=None, footer=None):
     """Partner memo (Allan + Stephen + Juliet): no cover, memo header comes from the markdown. 14 pt body."""
     scale_styles(body_pt)
-    doc = BaseDocTemplate(MEMO_OUT, pagesize=letter, leftMargin=0.75*inch, rightMargin=0.75*inch,
+    md = md or MEMO_MD; out = out or MEMO_OUT
+    footer = footer or "The Paracale gold opportunity · Introduction · Confidential — partners' working document"
+    doc = BaseDocTemplate(out, pagesize=letter, leftMargin=0.75*inch, rightMargin=0.75*inch,
                           topMargin=0.7*inch, bottomMargin=0.8*inch,
-                          title="Memorandum — The Paracale gold opportunity", author="Jonathan Zschoche & Allan V. Inocalla")
+                          title="The Paracale gold opportunity", author="Jonathan Zschoche")
     W = letter[0] - 1.5*inch
     def foot(c, d):
         c.saveState(); c.setFont("Ar", 7.5); c.setFillColor(GRAY)
-        c.drawString(0.75*inch, 0.5*inch, "Memorandum · The Paracale gold opportunity · Confidential — partners' working document")
+        c.drawString(0.75*inch, 0.5*inch, footer)
         c.drawRightString(letter[0]-0.75*inch, 0.5*inch, f"Page {d.page}"); c.restoreState()
     doc.addPageTemplates([PageTemplate(id="p", frames=[Frame(doc.leftMargin, doc.bottomMargin, W,
                           letter[1]-1.5*inch, id="f")], onPage=foot)])
     st = []
-    render_md(open(os.path.join(HERE, MEMO_MD), encoding="utf-8").read(), W, st)
-    doc.build(st); print("wrote", MEMO_OUT)
+    render_md(open(os.path.join(HERE, md), encoding="utf-8").read(), W, st)
+    doc.build(st); print("wrote", out)
 
 def build():
     doc = BaseDocTemplate(OUT, pagesize=letter, leftMargin=0.75*inch, rightMargin=0.75*inch,
@@ -234,4 +245,7 @@ def build():
 
 if __name__ == "__main__":
     import sys
-    build_memo() if (len(sys.argv) > 1 and sys.argv[1] == "memo") else build()
+    mode = sys.argv[1] if len(sys.argv) > 1 else ""
+    if mode == "memo": build_memo()
+    elif mode == "detail": build_memo(md=DETAIL_MD, out=DETAIL_OUT, footer="The Paracale gold opportunity · Detail pack · Confidential — partners' working document")
+    else: build()

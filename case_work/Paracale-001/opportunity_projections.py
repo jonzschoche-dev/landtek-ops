@@ -6,7 +6,7 @@ Usage: python3 opportunity_projections.py            (rewrites the annex in the 
 """
 import os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
-MEMO = os.path.join(HERE, "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.md")
+MEMO = os.path.join(HERE, "MEMO_DETAIL_PACK_2026-09.md")  # the scenario annex lives in the detail pack
 
 # ---------------- market inputs (dated; sourced) ----------------
 GOLD_USD_OZ = 4362.0        # spot, 11 Sep 2026 (Kitco/USAGOLD/JM Bullion, ~4,361–4,386)
