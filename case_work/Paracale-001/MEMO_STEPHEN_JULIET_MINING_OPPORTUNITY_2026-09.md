@@ -3,7 +3,7 @@
 
 **From:** Jonathan Zschoche · **Date:** 12 September 2026
 
-**How to read this.** This is an introduction, not a term sheet. It says what we propose to build, in what order, who does what, and why it is worth each of our attention. The working detail — the legal rules, the exchange tests, the stakeholder map, the scenario arithmetic and the open questions for counsel — sits in a companion detail pack, available to any of us on request. Everything here is a proposal for the four of us to build on: add to it, correct it, send it back with your name on the changes. It is confidential to the four of us and our counsel, it is not legal or investment advice, and nothing in it is agreed until the parties named say so in writing.
+**How to read this.** An introduction, not a term sheet: what we propose to build, in what order, who does what, and why it is worth each of our attention. The working detail — legal rules, exchange tests, stakeholder map, scenario arithmetic, open questions for counsel — sits in a companion detail pack, available on request. Everything here is a proposal for the four of us to build on: add to it, correct it, send it back with your name on the changes. Confidential to the four of us and our counsel; not legal or investment advice; nothing is agreed until the parties named say so in writing.
 
 ---
 
