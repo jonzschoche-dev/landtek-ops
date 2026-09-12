@@ -144,6 +144,35 @@ Each line between the boxes is its own paper (PGC's subscription and shareholder
 
 ---
 
+## 6A. The Canadian role — and why this is worth PGC's full attention
+
+**The setup, in plain terms.** A ₱29-million mercury-free processing plant already built and permitted inside an already-declared Minahang Bayan, with an operator in place. A second plant site on Allan's own titled land in Jose Panganiban. Next door, a 2,360-hectare exploration permit application endorsed by the regional mines bureau for issuance. All of it in the Paracale district — one of the oldest gold-producing districts in the Philippines, worked for centuries and mined at industrial scale by Benguet Corporation into the 1990s (historical figures we will verify through a Qualified Person before anyone quotes them; nothing here is a resource statement). And the Philippine government's stated policy is to formalise exactly this kind of small-scale mining through Minahang Bayan and mercury-free processing, which is what the UN-backed planetGOLD programme built the Casalugan plant to demonstrate. Canadian capital comes in **before any of this has been priced by a market**, at the level of a company that already exists, through a structure the exchange has seen work before.
+
+**What the Canadian side does**
+
+- **Puts the capital in at PGC level.** Juliet's group subscribes for PGC shares in a private round. PGC subscribes for up to 40% of the new Philippine mining company and lends it the rest as shareholder loans. Canadian money never contracts in the Philippines directly; it arrives through PGC's stake, which is what keeps every permit and contract on the Philippine side valid.
+- **Governs, without managing.** Board seats in the Philippine company in proportion to equity, up to 40% of the seats, and no officer roles. The real controls sit in a shareholders' agreement: dividend policy, information and audit rights, anti-dilution, related-party rules, tag and drag rights, and a short list of protective vetoes. Protective, not operational — vetoes over day-to-day operations would read as foreign control and invite an Anti-Dummy challenge.
+- **Makes the company listable.** Audit-grade books from day one, the NI 43-101 technical report, the Philippine title opinion, the ESG and mercury-free story, and the Capital Pool Company or IPO process. This is the work that turns an operating company in Camarines Norte into a Canadian public company, and it is where Juliet's group earns its position.
+- **Becomes the exploration operator.** In Wave 3, PGC funds the exploration program on the permit through a project company it majority-owns. That project company is the asset the exchange lists.
+
+**How it pays — five channels, in the order they arrive**
+
+1. **Dividends from the Philippine operating company** — PGC's 40% of what the board declares from plant activation, tolling, ore trading and financing returns (Waves 1–2). Fifteen percent Philippine withholding under the treaty, then exempt surplus in Canada: no second tax. Allan's board majority decides when dividends are declared, which is why the dividend policy is written into the shareholders' agreement, not left to goodwill.
+2. **Interest on shareholder loans** — the way PGC puts in money beyond the 40% equity line (Waves 1–2). Fifteen percent withholding, taxable in Canada.
+3. **The PGC shares themselves — the main prize.** Early private shares re-rate when PGC lists at Exploration Permit stage and become liquid on TSXV or CSE. Principals' shares sit in escrow for 36 months on Tier 2 and release in stages; a consultant's position is normally options or founder shares at PGC level.
+4. **A 100%-owned processing company, later** — the lever that takes Canadian economics past the 40% cap. A stand-alone plant outside the Minahang Bayan zone may be owned outright by a foreign company under a Mineral Processing Permit and buy the ore under an ore-purchase agreement. That is exactly how B2Gold captures Masbate's processing margin while holding only 40% of the tenement company.
+5. **The exploration upside** — a majority of the project company at permit stage; then, at MPSA, 40% of the tenement holder plus the processing margin above it; or 100% under an FTAA if the project reaches US$50 million scale.
+
+**Why this is a good entry, not just a lawful one.** The cash-flow story starts in a plant that is already built, so the first dividends do not wait on a drill program. The gold-selling channel is tax-exempt by statute (sales to the Bangko Sentral). The listing asset is an exploration permit in a district with a documented production history, held through the one structure (permit-stage majority, then Masbate-shape) that satisfies both Philippine law and the exchange's 50% test. And the sequence puts Canadian partners at the table with a running operation *before* the tenement negotiation — the position every junior wishes it had.
+
+**What protects the 40%.** The shareholders' agreement is the document that makes the stake worth having: dividend policy, reserved matters, information rights, anti-dilution, tag/drag, related-party rules, and the exit path into the listing. We would ask Juliet to lead its Canadian side alongside Philippine counsel.
+
+**What PGC does not get** — and we say so up front: any share of a small-scale mining contract, any management office in the Philippine company, more than 40% of its declared profit, or any return the board has not voted. Everything above is built inside those lines, which is why it will survive a listing review.
+
+**What we are asking Juliet's group to do now:** subscribe at PGC level, fund Waves 1 and 2, and bring the listing team (venue view, CPC or shell, Qualified Person, BC counsel, auditor) so that PGC is listing-ready by the time the Exploration Permit issues.
+
+---
+
 ## 7. The next thirty days (dates proposed — tell us if they don't work)
 
 | Who | By | What |
