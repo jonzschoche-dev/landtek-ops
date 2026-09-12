@@ -94,27 +94,34 @@ NIBDC's EXPA-000250-V (2,360.04 ha across Paracale, Jose Panganiban and Labo) wa
 
 **The proven template is Masbate:** B2Gold holds 40% of the tenement company (Filminera, 60% Filipino) and 100% of the processing company that buys all the ore under an ore-sales agreement and runs the plant. Same shape as ours.
 
-**Target structure (proposed — PGC exists; AVI is incorporated next; none of the NIBDC or cooperative positions below exist yet):**
+**Target structure (proposed — PGC exists; the Philippine operating company is formed next; none of the NIBDC or cooperative positions below exist yet):**
 
 ```
 CANADA
-  Paracale Gold Company (PGC) — already formed; private now → public later via a Capital Pool Company or IPO; CSE as fallback
-                               ← Juliet's group enters here, Wave 1
-   ├─ ≤40% (recommended; keeps it Filipino)  AVI GOLD PROCESSING CORP. — or a NEW SEC MINING COMPANY (Philippines) — Allan ≥60%
-   │        AVI is the operating company and the contracting party on the Philippine side:
-   │          · Wave 1: plant financing + equipment with Stephen/SMBC; LAB X; toll station; ore-supply
-   │                    agreements with SMBC contract holders; BSP-accredited trader
-   │          · Wave 2: its own plant + Minahang Bayan at Brgy. Santa Rosa Sur, Jose Panganiban
-   │          · 0% in any small-scale mining contract — contract relationships only
-   ├─ ≥50%  PROPOSED earn-in (later): project company holding EXPA-000250-V → Exploration Permit  [the qualifying property]
-   │          → at MPSA: the 60/40 AVI can hold the tenement itself (Masbate shape), or 40% PGC / 60% Allan directly
-   │          → or an FTAA (100%) if the project reaches US$50M scale
-   └─ (shareholder loans to AVI for capital beyond the equity line)
+  PARACALE GOLD COMPANY (PGC) — already formed; private now, public later
+                                (Capital Pool Company or IPO; CSE as fallback)
+                                <- Juliet's group enters here, Wave 1
+   |
+   |-- <=40% (recommended: keeps it Filipino)
+   |     NEW SEC MINING COMPANY (or AVI Gold Processing incorporated) — Allan >=60%
+   |       the operating company and the contracting party on the Philippine side
+   |       . Wave 1: plant financing + equipment with Stephen/SMBC; LAB X;
+   |                 toll station; ore-supply agreements; BSP-accredited trader
+   |       . Wave 2: its own plant + Minahang Bayan, Santa Rosa Sur, Jose Panganiban
+   |       . 0% in any small-scale mining contract — relationships by contract only
+   |
+   |-- >=50% PROPOSED earn-in (later): project company holding EXPA-000250-V -> EP
+   |       [the qualifying property for the listing]
+   |       at MPSA: the 60/40 company can hold the tenement itself (Masbate shape),
+   |                or 40% PGC / 60% Allan directly; or an FTAA (100%) at US$50M scale
+   |
+   '-- shareholder loans to the operating company for capital beyond the equity line
 
 PHILIPPINES — FILIPINO SIDE
-  Allan — ≥60% of AVI; TO BE NEGOTIATED: an NIBDC
-          shareholding and board role (not yet held); TO BE CONFIRMED: principal of the JP cooperative
-  SMBC — owns the MFPS; Stephen as operational partner under Res. 2026-009 (executed agreement to be seen); deals with AVI
+  Allan — >=60% of the operating company; TO BE NEGOTIATED: an NIBDC shareholding
+          and board role (not yet held); TO BE CONFIRMED: principal of the JP cooperative
+  SMBC  — owns the MFPS; Stephen as operational partner under Res. 2026-009
+          (executed agreement to be seen); deals with the operating company
 ```
 
 Each line between the boxes is its own paper (PGC's subscription and shareholder loans to AVI; AVI's financing, equipment, tolling, ore-supply and services agreements; the earn-in). How value is shared inside the partnership is negotiated separately and is not the subject of this memo.

@@ -72,9 +72,11 @@ def table(rows, width):
     ncol = max(len(r) for r in rows)
     rows = [r + [""]*(ncol-len(r)) for r in rows]
     if ncol == 2 and not has_hdr:
-        widths = [1.35*inch, width-1.35*inch]
+        k = 1.6*inch if S["body"].fontSize >= 13 else 1.35*inch
+        widths = [k, width-k]
     elif ncol == 2:
-        widths = [2.2*inch, width-2.2*inch]
+        k = 2.7*inch if S["body"].fontSize >= 13 else 2.2*inch
+        widths = [k, width-k]
     else:
         first = min(1.7*inch, width*0.28)
         widths = [first] + [(width-first)/(ncol-1)]*(ncol-1)
@@ -105,7 +107,7 @@ def render_md(md, width, story):
         if ln.startswith("```"):
             buf = []; i += 1
             while i < len(lines) and not lines[i].startswith("```"): buf.append(lines[i]); i += 1
-            story.append(Preformatted(glyphfix("\n".join(buf)), S["code"], maxLineLength=128, splitChars=" ", newLineChars="        ")); i += 1; continue
+            story.append(Preformatted(glyphfix("\n".join(buf)), S["code"], maxLineLength=100, splitChars=" ", newLineChars="        ")); i += 1; continue
         if ln.startswith("|"):
             rows = []
             while i < len(lines) and lines[i].startswith("|"):
@@ -159,8 +161,25 @@ def on_page(c, doc):
 MEMO_MD = "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.md"
 MEMO_OUT = os.path.join(HERE, "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.pdf")
 
-def build_memo():
-    """Partner memo (Stephen + Juliet): no cover, memo header comes from the markdown."""
+def scale_styles(body_pt):
+    """Re-size every text style so body text renders at body_pt (memo default 14 pt, Jonathan 2026-09-12).
+    Code blocks stay small enough for the structure diagram to fit the page width."""
+    f = body_pt / 9.6
+    for k, st in S.items():
+        if k == "code":
+            st.fontSize, st.leading = 8.2, 10.2
+        elif k in ("cell", "cellh"):
+            st.fontSize, st.leading = round(body_pt * 0.86, 1), round(body_pt * 0.86 * 1.3, 1)
+        else:
+            st.fontSize = round(st.fontSize * f, 1); st.leading = round(st.leading * f, 1)
+        if k in ("num",):
+            st.leftIndent, st.firstLineIndent = 26, -26
+        if k in ("bul",):
+            st.leftIndent = 22
+
+def build_memo(body_pt=14):
+    """Partner memo (Allan + Stephen + Juliet): no cover, memo header comes from the markdown. 14 pt body."""
+    scale_styles(body_pt)
     doc = BaseDocTemplate(MEMO_OUT, pagesize=letter, leftMargin=0.75*inch, rightMargin=0.75*inch,
                           topMargin=0.7*inch, bottomMargin=0.8*inch,
                           title="Memorandum — The Paracale gold opportunity", author="Jonathan Zschoche & Allan V. Inocalla")

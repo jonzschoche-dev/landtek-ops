@@ -108,6 +108,7 @@ PHILIPPINES — FILIPINO SIDE (outside PubCo, but the reason PubCo has anything 
 | G7 | CSSMA officer line-up, membership roll, Allan's authority resolution; MB area reconciliation (5.18 vs 250 ha) | Phase 2 | Allan |
 | G8 | Estate administrator (Rule 80) | Surface-use signature for Phase 2/3 ground | Allan + estate counsel |
 | G9 | PGC (Canada): jurisdiction, good standing, register, officers, minute book — not in corpus. Filipino side: which SEC corporation anchors Allan's 60% (AVI is a DTI sole prop; "Golden Inocalla" DTI verified-absent) | Both layers need a real entity | Allan + Juliet |
+| G9a | NewCo capitalisation: Allan's 60% via property-for-shares contribution of Lot 4 (OCT P-1616) — SEC appraisal; NIRC §40(C)(2) tax-free exchange (CREATE: no prior BIR ruling) [PV]; DAR conversion/exemption if agricultural; PGC ≤40% tested on BOTH voting and total shares (SEC MC 8-2013), so preferred shares to PGC count — surplus PGC money as shareholder loans | Decides whether the 60% is genuinely Allan's without PGC funding it | PH corporate + tax counsel |
 | G10 | RA 12253 enrolled text (export-ban question); PH thin-cap rules for shareholder loans | Phase 3 economics | PH tax counsel |
 
 ---
