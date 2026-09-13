@@ -182,7 +182,8 @@ def answer_arta_op_referrals(cur, client_code: str) -> str:
             }
 
     # 2) Restrict "sent to OP" count to ARTA CTNs + OP-PETITION with hard evidence
-    #    (0690, 0747, 0792 are the three CTNs on the May 2026 supervisory petition;
+    #    (0690 + 0792 are the CTNs ON the 5 May 2026 supervisory petition; 0747 is tied to the
+    #     OP spine only via the 4 Jun 2026 Second Manifestation — see _petition_member_ctns;
     #     MWK-OP-PETITION is the docket vehicle — reported separately, not double-counted
     #     as a fourth "referral" if the question is "how many matters".)
     arta_sent = sorted(
@@ -305,31 +306,43 @@ def answer_matter_inventory(cur, client_code: str) -> str:
     return "\n".join(lines)
 
 
+# The 5 May 2026 OP petition INSTRUMENT (Transmittal 050526-MRO-234187), and nothing else in
+# the OP spine. Since 2026-09-14 every OP-spine doc is matter_code='MWK-OP-PETITION' with a
+# canonical_filename prefixed by its filing (B1 = the May petition packet, B2 = First
+# Manifestation/Errata, B3 = Second Manifestation, B4 = Third Manifestation, B5 = the SEPARATE
+# Sep 2026 petition re ARTA 1321 — see case_work/MWK-001/OP_FILINGS_DOCKET_2026-09-14.md §D).
+# The old title-regex scope ('petition' + 'OP') swept doc 8240 (B5, the 1321 petition, whose text
+# legitimately recites 0747/1210/1212) into the May petition's membership set. Alias: documents d.
+PETITION_INSTRUMENT_WHERE = (
+    "d.matter_code = 'MWK-OP-PETITION' "
+    "AND coalesce(d.canonical_filename,'') ~ '^B1_2026-05-05_OP_Petition'"
+)
+
+
 def _petition_member_ctns(cur) -> list[str]:
-    """CTNs the OP petition ITSELF carries — MEMBERSHIP, never matter-aggregate MENTION.
+    """CTNs the 5 May 2026 OP petition ITSELF carries — MEMBERSHIP, never matter-aggregate MENTION.
 
-    Membership = extracted from the petition instrument's own text (document_fields rows on docs
-    whose title marks them as the OP petition). A CTN discussed in CART minutes or a dialogue
-    invitation linked to the matter is a MENTION and is NOT on the petition.
+    Membership = extracted from the petition instrument's own text (document_fields ctn rows on
+    the B1 docs selected by PETITION_INSTRUMENT_WHERE). A CTN discussed in CART minutes, a dialogue
+    invitation, a later manifestation on the same OP docket, or a DIFFERENT OP petition (doc 8240,
+    the Sep 2026 petition re ARTA 1321) is a MENTION and is NOT on the May petition.
 
-    Grounded finding (2026-07-18): the instrument (docs 702/703, 'Petition to the OP', ~110k chars
-    each) carries CTNs SL-2025-1008-0690 and SL-2025-1104-0792 ONLY. The long-standing '3 CTNs
-    incl. 0747' belief is unsupported — '0747' appears NOWHERE in the petition text and zero
-    verified facts tie 0747 to an OP/ES filing. If a supplemental filing later adds CTNs, this
-    query picks them up from that instrument's extracted fields; never hardcode the list again.
+    Grounded finding (2026-07-18, re-verified 2026-09-14): the instrument (docs 702/703/13941,
+    ~110k chars) carries CTNs SL-2025-1008-0690 and SL-2025-1104-0792 ONLY. '0747' appears NOWHERE
+    in the petition text (it enters the OP spine via the 4 Jun 2026 Second Manifestation, doc
+    1189); 1210 enters via the 29 May 2026 First Manifestation (doc 13943). If a supplemental
+    filing later adds CTNs to the petition proper, extend the scope deliberately; never hardcode
+    the list again.
     """
     short = []
     try:
         cur.execute(
-            """
+            f"""
             SELECT DISTINCT df.value_norm
               FROM document_fields df
               JOIN documents d ON d.id = df.doc_id
              WHERE df.field_kind = 'ctn'
-               AND (coalesce(d.document_title,'') || ' ' || coalesce(d.original_filename,''))
-                   ~* 'petition'
-               AND (coalesce(d.document_title,'') || ' ' || coalesce(d.original_filename,''))
-                   ~* '\\yop\\y|office of the president'
+               AND {PETITION_INSTRUMENT_WHERE}
              ORDER BY 1
             """
         )

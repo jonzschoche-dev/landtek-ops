@@ -5,6 +5,11 @@ A CTN "on the OP petition" is a MEMBERSHIP claim and must come from the petition
 extracted fields (document_fields on the petition docs) — never from matter-aggregate mentions
 (fact_fields across every doc linked to the matter). Grounded: the instrument carries 0690 + 0792;
 '0747' appears nowhere in the petition text; 1210 is mention-only (CART minutes / dialogue docs).
+
+Scope (re-tightened 2026-09-14): "the petition instrument" = the 5 May 2026 B1 packet ONLY, selected
+by corpus_answer.PETITION_INSTRUMENT_WHERE. The OP spine also holds later manifestations (B2-B4) and
+a DIFFERENT Sep 2026 petition re ARTA 1321 (doc 8240, B5) whose text legitimately recites
+0747/1210/1212 — a title-regex scope swept those in and broke this invariant from 2026-09-07.
 """
 import os
 import sys
@@ -33,11 +38,8 @@ def membership_comes_from_instrument(cur):
         if not member:
             raise TruthFailure("no petition-member CTNs found — instrument extraction is dark "
                                "(document_fields on the petition docs lost their ctn rows?).")
-        tc.execute("""SELECT string_agg(extracted_text,' ') AS t FROM documents d
-                       WHERE (coalesce(d.document_title,'')||' '||coalesce(d.original_filename,''))
-                             ~* 'petition'
-                         AND (coalesce(d.document_title,'')||' '||coalesce(d.original_filename,''))
-                             ~* '\\yop\\y|office of the president'""")
+        tc.execute(f"""SELECT string_agg(extracted_text,' ') AS t FROM documents d
+                        WHERE {CA.PETITION_INSTRUMENT_WHERE}""")
         txt = (tc.fetchone() or {}).get("t") or ""
         for c in member:
             if c not in txt:
@@ -48,17 +50,17 @@ def membership_comes_from_instrument(cur):
 
 
 def mention_only_ctns_are_not_members(cur):
-    """1210 is mentioned in matter-linked docs but is NOT on the petition face — it must never be
-    a member. Same for any CTN absent from the instrument text (0747 as of 2026-07-18)."""
+    """1210 is mentioned in matter-linked docs (First Manifestation, CART minutes) but is NOT on the
+    petition face — it must never be a member. Same for any CTN absent from the instrument text
+    (0747 as of 2026-07-18; re-verified 2026-09-14 after doc 8240, the 1321 petition, joined the
+    OP spine and had to be kept OUT of the May petition's scope)."""
     conn, tc = _rb()
     try:
         member = set(CA._petition_member_ctns(tc))
         if "1210" in member:
             raise TruthFailure("1210 graded as petition MEMBER — mention/membership conflation is back.")
         tc.execute("SELECT (string_agg(extracted_text,' ') ILIKE '%0747%') AS has FROM documents d "
-                   "WHERE (coalesce(d.document_title,'')||' '||coalesce(d.original_filename,'')) "
-                   "~* 'petition' AND (coalesce(d.document_title,'')||' '||coalesce(d.original_filename,'')) "
-                   "~* '\\yop\\y|office of the president'")
+                   f"WHERE {CA.PETITION_INSTRUMENT_WHERE}")
         has_0747 = bool((tc.fetchone() or {}).get("has"))
         if not has_0747 and "0747" in member:
             raise TruthFailure("0747 graded as member but is absent from the instrument text — "
