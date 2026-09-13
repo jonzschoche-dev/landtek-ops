@@ -1,7 +1,7 @@
 # AVI Gold Processing — Mineral Processing Permit application pack (MGB Regional Office V)
 
 **Status:** DRAFT-HELD · prepared 2026-09-13 · nothing filed, nothing sent · NEEDS-COUNSEL on §2 route question before filing · Paracale-001 (Allan V. Inocalla). Keep strictly separate from MWK and NIBDC matters.
-**Companion:** `DTI_BUSINESS_NAME_REGISTRATION_KIT.md` (the DTI name AVI GOLD PROCESSING is acceptance requirement #2 of this application).
+**Companion:** `DTI_BUSINESS_NAME_REGISTRATION_KIT.md` — **DTI name ISSUED 11 Sep 2026: "AVI GOLD PROCESSING PLANT", BN No. 8480852, Regional (Region V), valid to 11 Sep 2031** (acceptance requirement A2 / proof of legal personality). Use the registered name, with PLANT, throughout.
 
 **One-sentence position:** The "mineral processing licence from Region 5" is the DENR **Mineral Processing Permit (MPP)** under RA 7942 §55 / DAO 2010-21 §§109–115, filed with and approved by the **MGB Regional Director, Region V (Rawis, Legazpi City)** for projects costing ₱200M or less — the exact instrument MGB-V issued on 31 Mar 2026 to Elnar's Gold Processing-B at Purok 5, Sta. Rosa Norte, Jose Panganiban, the barangay next to Allan's lot — and Allan can apply for it as an individual Filipino citizen under the DTI name, with the ECC from EMB-V as the gating document.
 
@@ -44,7 +44,7 @@
 | # | Requirement (charter wording, condensed) | Where secured | Status for AVI | Owner · next act |
 |---|---|---|---|---|
 | A1 | **Application Form MGB Form No. 08-1** (DAO text says Form 11-2 — use whatever MGB-V hands out) | MGB RO-V, Mine Management Division | not obtained | Jonathan/Allan · request the current form + fee order from MMD, Rawis |
-| A2 | **Proof of Filipino citizenship** (individual) — or SEC papers if a company applies | PSA birth cert / passport | Allan born 12 Jan 1955, Paracale (docs 478/479, 4454; confirmed by Jonathan) — need the PSA copy or passport | Allan |
+| A2 | **Proof of Filipino citizenship** (individual) + business registration | PSA birth cert / passport; DTI | **DTI cert in hand (BN 8480852, 11 Sep 2026)**; Allan born 12 Jan 1955, Paracale — still need the PSA copy or passport | Allan |
 | A3 | **Feasibility Study** with work programs, plant site, mill layout/design, technology, anti-pollution measures, plant capacity — *or* Project Description + detailed financial statement (existing operations only) | applicant; signed by a licensed **Metallurgical Engineer** | nothing exists; LAB X brief (`SHAKER_TABLE_PROTOTYPE_DESIGN.md`) is the engineering seed; all costs ESTIMATE/UNQUOTED | Stephen Lloyd (design) + a PH-licensed Met. Engineer to sign · outline in §5 |
 | A4 | **Location map / sketch plan** on NAMRIA 1:50,000 with geographic coordinates and boundaries | NAMRIA / MGB-deputized Geodetic Engineer | Lot 4 technical description is on doc 639 p.2-A (tie-line to BLLM No. 1); no plotted map | Geodetic Engineer · plot Lot 4 + plant footprint; mapping subsystem can hold the GeoJSON |
 | A5 | **CEMCRR** (Certificate of Environmental Management and Community Relations Record) or Certificate of Exemption, or the **MGB Form 16-04 application** duly received by MGB RO | MGB RO-V | Gracesen filed CEMCRR applications (PGC review §Permitting) — under Gracesen/Senen, not AVI | Allan · file Form 16-04 for AVI at MGB-V; a *received* application suffices for acceptance |
@@ -68,7 +68,7 @@
 
 ## 4. Draft application letter (DRAFT-HELD — Allan signs; nothing sent)
 
-> **[AVI GOLD PROCESSING letterhead — after DTI issues]**
+> **[AVI GOLD PROCESSING PLANT letterhead]**
 > Purok __, Barangay Santa Rosa Sur, Jose Panganiban, Camarines Norte · shiraction2@gmail.com · 0917 155 4782
 >
 > [date]
@@ -78,7 +78,7 @@
 > Mines and Geosciences Bureau, Regional Office No. V
 > Rawis, Legazpi City
 >
-> **Subject: Application for Mineral Processing Permit — AVI Gold Processing, Lot 4 Psu-143364 (OCT P-1616), Barangay Santa Rosa Sur, Jose Panganiban, Camarines Norte**
+> **Subject: Application for Mineral Processing Permit — AVI Gold Processing Plant, Lot 4 Psu-143364 (OCT P-1616), Barangay Santa Rosa Sur, Jose Panganiban, Camarines Norte**
 >
 > Sir:
 >
@@ -93,7 +93,7 @@
 > Respectfully,
 >
 > **ALLAN V. INOCALLA**
-> Proprietor, AVI Gold Processing (DTI Certificate No. ______)
+> Proprietor, AVI Gold Processing Plant (DTI Business Name No. 8480852, Regional–Region V, valid 11 Sep 2026–11 Sep 2031)
 > TIN 200-011-253
 
 ## 5. Feasibility Study / Project Description — outline for the engineer
@@ -111,7 +111,7 @@
 
 | Step | What | Office | Depends on | Time |
 |---|---|---|---|---|
-| 0 | DTI name AVI GOLD PROCESSING | BNRS | — | same day once paid |
+| 0 | DTI name **AVI GOLD PROCESSING PLANT** — ✅ issued 11 Sep 2026, BN 8480852 | BNRS | — | done |
 | 1 | Tax declaration in Allan's name + RPT; fresh OCT P-1616 CTC | JP Assessor/Treasurer; RD Daet | title | days–weeks |
 | 2 | Zoning/locational clearance for the plant footprint (DAR conversion/exemption if agricultural per CLUP) | JP MPDO / DAR | 1 | weeks |
 | 3 | Brgy. Santa Rosa Sur resolution → SB Jose Panganiban endorsement | LGU | 2 | 1–2 SB sessions |

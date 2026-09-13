@@ -42,7 +42,7 @@
 |---|---|---|---|---|
 | R1 | Government ID of proponent (account registration) | Allan | have (senior ID / passport) | Allan |
 | R2 | Authorization letter if a representative files | Allan → Jonathan | draft below §7 | Allan signs |
-| R3 | **DTI Certificate** (sole proprietorship) | BNRS | **not yet filed** — see DTI kit | Jonathan/Allan · file first |
+| R3 | **DTI Certificate** (sole proprietorship) | BNRS | ✅ **in hand — "AVI GOLD PROCESSING PLANT", BN No. 8480852, Regional (Region V), 11 Sep 2026–11 Sep 2031** (`case_work/Paracale-001/DTI/`) | upload the PDF at registration |
 | 1 | **Project Description / Fact Sheet** with geographic coordinates of each lot corner (WGS 84) | system-generated from Step 3 (≤ 4,000 characters) | draft text in §4 | LandTek → Allan approves |
 | 2 | **Project Components and Operation Information** — every component with floor area (m²), sum = declared project size; capacities of MRF, wastewater treatment/septic tank, rainwater cistern, hazwaste storage (if any), oil-water separator (if any) | applicant | table in §5, quantities ESTIMATE | Stephen (layout) |
 | 3 | **IEE Checklist Report** (system template) | applicant | content in §6 | LandTek drafts; Allan signs |
@@ -60,7 +60,7 @@
 
 ## 4. Draft Project Description (Step 3 text; ≤ 4,000 characters — this draft is ~2,300)
 
-> **AVI Gold Processing Plant** is a mercury-free, cyanide-free gold gravity-concentration plant proposed by Allan V. Inocalla (sole proprietor, DTI-registered business name AVI Gold Processing) on his own titled land, Lot 4, Psu-143364, Original Certificate of Title No. P-1616 (15.2069 ha), Purok ___, Barangay Santa Rosa Sur, Jose Panganiban, Camarines Norte. The plant occupies approximately ______ m² of the lot; the remainder stays in its present use.
+> **AVI Gold Processing Plant** is a mercury-free, cyanide-free gold gravity-concentration plant proposed by Allan V. Inocalla (sole proprietor, DTI Business Name No. 8480852 "AVI Gold Processing Plant", Regional–Region V) on his own titled land, Lot 4, Psu-143364, Original Certificate of Title No. P-1616 (15.2069 ha), Purok ___, Barangay Santa Rosa Sur, Jose Panganiban, Camarines Norte. The plant occupies approximately ______ m² of the lot; the remainder stays in its present use.
 >
 > The plant will receive run-of-mine ore and old tailings from permitted small-scale mining contractors and mining-rights holders in the Paracale–Jose Panganiban gold district under written supply agreements, at a design throughput of 10 tonnes per day (about 3,000 tonnes per year, below 10,000 tonnes per year). Ore is crushed and milled, classified, passed through a centrifugal gravity rougher, and cleaned on shaking (concentrating) tables of the Wilfley/6-S type fabricated locally; the concentrate is smelted to doré. **No mercury and no cyanide or other chemicals listed in the Priority Chemical List or under a Chemical Control Order are used at any stage.** All gold produced will be sold to the Bangko Sentral ng Pilipinas or its accredited traders.
 >
@@ -107,7 +107,7 @@ PEMAPS rates to declare (fill from the flowsheet): ore input t/day; process wate
 
 **7a. Cover letter (for the hard-copy/notarised set EMB-V asks for at orientation or on request)**
 
-> **[AVI GOLD PROCESSING letterhead]** · Purok ___, Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte · shiraction2@gmail.com · 0917 155 4782
+> **[AVI GOLD PROCESSING PLANT letterhead]** · Purok ___, Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte · shiraction2@gmail.com · 0917 155 4782
 >
 > [date]
 >
@@ -124,12 +124,12 @@ PEMAPS rates to declare (fill from the flowsheet): ore input t/day; process wate
 >
 > I respectfully submit the hard copies of my ECC application filed through the ECC Online System under the above application number, for a mercury-free, chemical-free gold gravity-concentration plant with a design input of 10 tonnes per day (about 3,000 tonnes per year), a Category B project under EMB MC 2014-005, Annex A, item 2.1.5(a), on land titled in my name.
 >
-> Enclosed: (1) notarized IEE Checklist Report with the Sworn Statement of Accountability; (2) Project Description and Component/Operation table; (3) EMP checklist and PEMAPS; (4) Site Development Plan signed by ____________, PRC No. ______; (5) LGU land-use certification; (6) geotagged site photographs; (7) certified true copy of OCT No. P-1616 and Tax Declaration No. ______; (8) DTI Certificate of Business Name Registration No. ______; (9) LandBank receipt for the ₱5,070 application fee; (10) CENRO certification of land classification.
+> Enclosed: (1) notarized IEE Checklist Report with the Sworn Statement of Accountability; (2) Project Description and Component/Operation table; (3) EMP checklist and PEMAPS; (4) Site Development Plan signed by ____________, PRC No. ______; (5) LGU land-use certification; (6) geotagged site photographs; (7) certified true copy of OCT No. P-1616 and Tax Declaration No. ______; (8) DTI Certificate of Business Name Registration, Business Name No. 8480852 (11 Sep 2026); (9) LandBank receipt for the ₱5,070 application fee; (10) CENRO certification of land classification.
 >
 > I confirm that this is a new project on a new site, distinct from the Gracesen Small Scale Gold Processing Plant at Barangay Capacuan, Paracale (ECC-RO5-1203-0045), whose compliance record I have addressed by separate letter dated ______.
 >
 > Respectfully,
-> **ALLAN V. INOCALLA**, Proprietor, AVI Gold Processing · TIN 200-011-253
+> **ALLAN V. INOCALLA**, Proprietor, AVI Gold Processing Plant (DTI BN No. 8480852) · TIN 200-011-253
 
 **7b. Sworn Statement of Accountability** — use the MC 2022-002 form the system generates; substance: *"I, Allan V. Inocalla, proponent of the AVI Gold Processing Plant at Lot 4 Psu-143364, Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte, take full responsibility for the accuracy of the information in this IEE Checklist and for complying with all conditions of the ECC that may be issued."* Notarised with a government ID; CTC number if the notary asks.
 
@@ -147,7 +147,7 @@ PEMAPS rates to declare (fill from the flowsheet): ore input t/day; process wate
 
 | Step | What | Depends on | Time |
 |---|---|---|---|
-| 1 | DTI certificate (ECC Online account needs it) | — | 1 day |
+| 1 | DTI certificate — ✅ issued 11 Sep 2026 (BN 8480852) | — | done |
 | 2 | Fresh OCT CTC; tax declaration in Allan's name; CENRO land-classification cert | — | 1–3 weeks |
 | 3 | **Gracesen close-out at EMB-V** (§7d) | site facts | file now |
 | 4 | JP MPDO zoning/land-use certification (+ DAR exemption/conversion for the footprint if agricultural) | 2 | weeks |
