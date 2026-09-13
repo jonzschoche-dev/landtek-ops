@@ -204,7 +204,48 @@ def service_requires_corpus_proof(cur):
         conn.rollback(); conn.close()
 
 
+def feeds_calendar_pulse(cur):
+    """Calendar is the pulse: edition due-dates and RUNNING clocks become calendar_events (source='drip')
+    and pulse rows; UNSERVED instruments produce NO calendar date (no invented periods on the calendar);
+    a closed clock's event is cancelled, not deleted."""
+    conn, tc = _rb()
+    try:
+        DS.sync_calendar(tc)
+        tc.execute("SELECT count(*) n FROM calendar_events WHERE source='drip' AND deadline_kind='drip_edition' "
+                   "AND status='scheduled'")
+        if tc.fetchone()["n"] < 1:
+            raise TruthFailure("edition due-date did not reach calendar_events.")
+        tc.execute("""SELECT count(*) n FROM calendar_events ce JOIN office_obligation o
+                        ON ce.source_msg_id = 'drip:ob:'||o.id
+                       WHERE ce.source='drip' AND o.served_at IS NULL""")
+        if tc.fetchone()["n"]:
+            raise TruthFailure("an UNSERVED instrument has a calendar date — drafting dated something.")
+        rows = DS.pulse_rows(tc)
+        if not any(r["kind"] == "deadline" and "edition" in r["label"] for r in rows):
+            raise TruthFailure("pulse_rows omits the edition due-date — deadlines.gather() won't see the drip.")
+        if any(r["source"] != "drip" for r in rows):
+            raise TruthFailure("pulse row without source='drip' — provenance of the date is unmarked.")
+        # a served clock → scheduled event; closing it → cancelled (never deleted)
+        tc.execute("""UPDATE office_obligation SET state='served_running', served_at=%s,
+                            service_proof='TEST', service_proof_doc_id=%s, due_at=%s
+                      WHERE officer='Abla' RETURNING id""",
+                   (date.today(), _any_mwk_doc(tc), date.today() + timedelta(days=15)))
+        oid = tc.fetchone()["id"]
+        DS.sync_calendar(tc)
+        tc.execute("SELECT status FROM calendar_events WHERE source_msg_id=%s", (f"drip:ob:{oid}",))
+        if (tc.fetchone() or {}).get("status") != "scheduled":
+            raise TruthFailure("served clock did not become a scheduled calendar event.")
+        tc.execute("UPDATE office_obligation SET state='performed' WHERE id=%s", (oid,))
+        DS.sync_calendar(tc)
+        tc.execute("SELECT status FROM calendar_events WHERE source_msg_id=%s", (f"drip:ob:{oid}",))
+        if (tc.fetchone() or {}).get("status") != "cancelled":
+            raise TruthFailure("closed clock's calendar event was not cancelled.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
+    ("drip.feeds_calendar_pulse", feeds_calendar_pulse),
     ("drip.service_requires_corpus_proof", service_requires_corpus_proof),
     ("drip.no_clock_without_receipt", no_clock_without_receipt),
     ("drip.lapse_stages_consequence_never_letter", lapse_stages_consequence_never_letter),

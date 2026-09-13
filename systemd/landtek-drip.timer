@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the LandTek DRIP tick daily at 23:30 UTC (07:30 AM Manila) — 30 minutes BEFORE the 00:00 UTC deadline-refresh pulse, so any newly lapsed clock / newly due edition is already staged and its dates are fresh when the calendar pulse (deadlines.py --write + calendar_sync) runs. Persistent so a missed tick catches up on boot.
+
+[Timer]
+OnCalendar=*-*-* 23:30:00 UTC
+AccuracySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

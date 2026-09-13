@@ -1,0 +1,12 @@
+[Unit]
+Description=LandTek DRIP tick (agent_specs/005) — scripts/drip_sweep.py --tick: the obligation-clock engine. Lapsed clocks (served with corpus proof, past D+15) STAGE their pre-built consequence as an outward_action work order (T3 human+counsel); due editions draft the concise Schedule-of-Continuing-Default letter (counters advanced from the record) into Gmail DRAFTS / file fallback; drip dates feed the calendar pulse (deadlines.py gather + calendar_events). Sends NOTHING, decides nothing — LandTek builds, Jonathan + counsel pull (A21). $0, deterministic.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+SuccessExitStatus=0 2
+ExecStart=/usr/bin/python3 /root/landtek/scripts/drip_sweep.py --tick
+StandardOutput=append:/var/log/landtek_drip.log
+StandardError=append:/var/log/landtek_drip.log

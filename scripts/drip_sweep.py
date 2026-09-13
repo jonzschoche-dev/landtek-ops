@@ -161,6 +161,70 @@ def render_edition(ed, as_of):
     return subject, body
 
 
+# ── CALENDAR IS THE PULSE: drip dates become calendar_events (→ calendar_sync → Google Calendar) ──
+def sync_calendar(cur):
+    """Every RUNNING clock and every edition due-date is a calendar event; unserved rows produce NO
+    event (a drafted letter has no date — the no-invented-period rule extends to the calendar).
+    Idempotent: dedup on source_msg_id 'drip:ob:<id>' / 'drip:ed:<id>'; closed rows are cancelled."""
+    n = 0
+    cur.execute("""SELECT id, matter_code, officer, obligation, due_at, state, consequence_ref
+                     FROM office_obligation WHERE due_at IS NOT NULL""")
+    for ob in cur.fetchall():
+        key = f"drip:ob:{ob['id']}"
+        live = ob["state"] in TICKING
+        title = f"DRIP clock lapses — {ob['officer']}: {ob['obligation'][:60]}"
+        desc = (f"Obligation #{ob['id']} ({ob['matter_code']}). On lapse the PRE-BUILT consequence stages "
+                f"(never a letter): {ob['consequence_ref'] or '—'}. Day math NEEDS-COUNSEL.")
+        cur.execute("SELECT id FROM calendar_events WHERE source='drip' AND source_msg_id=%s", (key,))
+        row = cur.fetchone()
+        status = "scheduled" if live else "cancelled"
+        if row:
+            cur.execute("UPDATE calendar_events SET title=%s, description=%s, start_at=%s, end_at=%s, "
+                        "status=%s, updated_at=now() WHERE id=%s",
+                        (title, desc, ob["due_at"], ob["due_at"], status, row["id"]))
+        else:
+            cur.execute("""INSERT INTO calendar_events (title, description, start_at, end_at, related_case,
+                                source, source_msg_id, status, deadline_kind, extraction_method)
+                           VALUES (%s,%s,%s,%s,%s,'drip',%s,%s,'drip_clock','deterministic')""",
+                        (title, desc, ob["due_at"], ob["due_at"], ob["matter_code"], key, status))
+        n += 1
+    cur.execute("SELECT id, track, matter_code, next_edition_due, state FROM drip_edition WHERE next_edition_due IS NOT NULL")
+    for ed in cur.fetchall():
+        key = f"drip:ed:{ed['id']}"
+        title = f"DRIP edition due — {ed['track']} Schedule of Continuing Default"
+        desc = f"Re-issue with counters advanced from the record; staged to Gmail drafts for review (edition #{ed['id']})."
+        cur.execute("SELECT id FROM calendar_events WHERE source='drip' AND source_msg_id=%s", (key,))
+        row = cur.fetchone()
+        if row:
+            cur.execute("UPDATE calendar_events SET title=%s, description=%s, start_at=%s, end_at=%s, "
+                        "status='scheduled', updated_at=now() WHERE id=%s",
+                        (title, desc, ed["next_edition_due"], ed["next_edition_due"], row["id"]))
+        else:
+            cur.execute("""INSERT INTO calendar_events (title, description, start_at, end_at, related_case,
+                                source, source_msg_id, status, deadline_kind, extraction_method)
+                           VALUES (%s,%s,%s,%s,%s,'drip',%s,'scheduled','drip_edition','deterministic')""",
+                        (title, desc, ed["next_edition_due"], ed["next_edition_due"], ed["matter_code"], key))
+        n += 1
+    return n
+
+
+def pulse_rows(cur):
+    """For deadlines.gather(): drip dates as pulse obligations. Only RUNNING clocks + edition dues —
+    an unserved instrument contributes nothing (no invented dates)."""
+    out = []
+    cur.execute("SELECT id, matter_code, officer, obligation, due_at FROM office_obligation "
+                "WHERE due_at IS NOT NULL AND state = ANY(%s)", (list(TICKING),))
+    for ob in cur.fetchall():
+        out.append({"date": ob["due_at"], "matter": ob["matter_code"],
+                    "label": f"DRIP clock: {ob['officer']} — {ob['obligation'][:50]}",
+                    "kind": "obligation", "source": "drip"})
+    cur.execute("SELECT track, matter_code, next_edition_due FROM drip_edition WHERE next_edition_due IS NOT NULL")
+    for ed in cur.fetchall():
+        out.append({"date": ed["next_edition_due"], "matter": ed["matter_code"],
+                    "label": f"DRIP edition: {ed['track']} schedule re-issue", "kind": "deadline", "source": "drip"})
+    return out
+
+
 # ── core verbs ──────────────────────────────────────────────────────────────────────────────────────
 def tick(cur, today=None):
     today = today or date.today()
@@ -190,6 +254,10 @@ def tick(cur, today=None):
         cur.execute("UPDATE drip_edition SET next_edition_due=%s WHERE id=%s",
                     (today + timedelta(days=15), ed["id"]))
         staged.append(f"EDITION drafted ({ed['track']}) → {where}")
+    # 3) CALENDAR IS THE PULSE — every tick re-syncs drip dates to calendar_events (→ Google Calendar).
+    n_cal = sync_calendar(cur)
+    _event(cur, "tick", calendar_rows=n_cal, staged=len(staged), as_of=str(today))
+    staged.append(f"calendar synced: {n_cal} drip date(s) on the pulse")
     return staged
 
 

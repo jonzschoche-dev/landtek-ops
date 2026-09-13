@@ -162,6 +162,14 @@ def gather(cur):
     for g in cur.fetchall():
         obs.append({"date": g["target_date"], "matter": g["case_file"],
                     "label": _tag_safe_label(g["goal_text"] or ""), "kind": "goal", "source": "client_goals"})
+    # THE DRIP (agent_specs/005): running obligation clocks + edition due-dates join the pulse through
+    # this same writer (bucket/dedup/as_of) — never a parallel deadline path. Unserved instruments
+    # contribute nothing (drafting never dates anything). Degrade silently if the drip isn't installed.
+    try:
+        import drip_sweep as _drip
+        obs.extend(_drip.pulse_rows(cur))
+    except Exception:
+        pass
     # matters with no date at all = the awareness gap (carry the stage so we can classify honestly)
     no_date = [(m["matter_code"], m["stage"]) for m in matters if m["matter_code"] not in dated_matters]
     return obs, no_date, len(matters), timeline
