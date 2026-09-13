@@ -52,11 +52,11 @@
 | Business scope (PSIC) | Manufacturing → manufacture of basic precious metals / processing of gold ore & tailings (small-scale) | — | pick the closest PSIC line the form offers; the descriptor "Gold Processing" must sit under it |
 | Payment | GCash / Maya / LandBank Link.Biz / Visa-Master-JCB; must pay **within 7 calendar days** of application | BNRS guide + flyer | fund the wallet first |
 
-### 3a. The site — OCT P-1616, Santa Rosa Sur (decided 2026-09-11)
+### 3a. The site — OCT P-1616, Santa Rosa Sur, Jose Panganiban (decided 2026-09-11; municipality corrected 2026-09-13 from the title)
 
 | Fact | Source | Grade |
 |---|---|---|
-| OCT No. P-1616, Register of Deeds Camarines Norte, Book 14 Page 26 — **Free Patent No. 225537, dated 10 May 1963, to ALLAN V. INOCALA (Minor)**, Lot 4, Psu-143364; tie-line references Mon. BLLM No. 1, Batobalani, Paracale | doc 639 (LRA certified true copy), doc 633 (owner's duplicate) | verified |
+| OCT No. P-1616, Register of Deeds Camarines Norte, Book 14 Page 26 — **Free Patent No. 225537, dated 10 May 1963, to ALLAN V. INOCALA (Minor)**, Lot 4, Psu-143364, "situated in the barrio of San Rafael, municipality of **Jose Panganiban**", 15 ha 20 a 69 ca | doc 639 (LRA certified true copy), doc 633 (owner's duplicate) | verified |
 | Area 15.2069 ha; carried in the family inventory as Allan's sole title | docs 520/634/647; `titles` row P-1616 | inferred_strong (summary table) — the technical description in doc 639 is the verified source |
 | CA 141 §118 five-year no-alienation period on free patents | face of the patent, doc 639 | expired 1968 — no bar today |
 | Barangay = Santa Rosa Sur, **Municipality = Jose Panganiban** | Jonathan, 2026-09-11 (barangay) and 2026-09-12 (municipality) | operator statement — the title text names neither; the tax declaration will. NB the tie-line monument (BLLM No. 1, Batobalani, Paracale) is a survey reference, not the lot's municipality |
@@ -65,7 +65,9 @@
 
 **Decision (Jonathan, 2026-09-11; municipality fixed 2026-09-12): the processing plant — AVI Gold Processing — will be BUILT on Lot 4, Brgy. Santa Rosa Sur, Jose Panganiban.** Every LGU step below therefore runs through the Municipality of Jose Panganiban, not Paracale; Paracale items are kept only as precedent. Consequence: ECC-RO5-1203-0045 covers the Capacuan site only and cannot be amended onto a new site. The Santa Rosa Sur plant needs its own permit stack from zero. The DTI name is step one of that stack, not the end of it.
 
-### 3b. New-site permit roadmap — AVI Gold Processing, Lot 4 Psu-143364, Santa Rosa Sur
+### 3b. New-site permit roadmap — AVI Gold Processing, Lot 4 Psu-143364, Santa Rosa Sur, Jose Panganiban
+
+> **Municipality is Jose Panganiban, not Paracale** (title, doc 639). Every LGU line below reads Jose Panganiban: Assessor, MPDO, Sangguniang Bayan, BPLO. The MGB permit for the plant is worked up separately in `AVI_MPP_APPLICATION_MGB5.md`.
 
 Sequenced the way the agencies actually gate each other. Each line is a document to obtain and ingest; nothing below exists yet for this site. Gracesen's Capacuan stack (docs 1284/1285/1288/1294, PGC review §Permitting) is the template for what each office will ask.
 
@@ -77,7 +79,7 @@ Sequenced the way the agencies actually gate each other. Each line is a document
 | 3 | **Barangay Santa Rosa Sur** resolution of no-objection / endorsement + Barangay Business Clearance | Punong Barangay + Sangguniang Barangay | 0, 2 | Gracesen precedent: barangay clearances + Brgy. Capacuan Res. for the MB file |
 | 4 | **Sangguniang Bayan Jose Panganiban resolution** endorsing the plant | SB Jose Panganiban | 3 | precedent (Paracale, for form only): SB Res. No. 140-2012 (Gracesen), 790-2021 (Capacuan MB) |
 | 5 | **ECC application** (PD 1586) — IEE checklist for a small-scale gold processing plant | EMB Region V, Legazpi | 2, 3, 4 | new project, new site → **new ECC**, not an amendment. Attach DTI cert, OCT, tax dec, zoning, brgy/SB endorsements, process flow, site plan. The **process decides the rest of the stack**: gravity-only (LAB X-type, mercury-free) is a lighter file than cyanide leaching. |
-| 6 | **PMRB / MGB Region V** — registration/accreditation as a small-scale mineral processor under RA 7076 + DAO 2015-03; source of ore must be a declared Minahang Bayan or permitted small-scale contract | Provincial Mining Regulatory Board, Daet; MGB-V | 5 | ⚠ verify which instrument PMRB issues for a **processor** (as opposed to a miner); Gracesen's file shows MGB CEMCRR applications. The Capacuan MB application (May 2021, doc 660) status is still unknown — it is the ore-source link. |
+| 6 | **Mineral Processing Permit** (RA 7942 §55; DAO 2010-21 §§109–115) — MGB Regional Director V approves at ≤ ₱200M project cost; ₱10,000 filing + ₱5,000 registration; 18 working days once complete. Alternative: PMRB Mineral Processor's License (DAO 2022-03) only inside a designated Mineral Processing Zone | MGB RO-V, Rawis, Legazpi | 5 (ECC is an acceptance requirement) | full checklist, route analysis and draft letter in `AVI_MPP_APPLICATION_MGB5.md` |
 | 7 | **Building Permit** for plant structures, pad, tailings pond | Office of the Building Official, Jose Panganiban | 2, 5 | engineering by Stephen Lloyd's drawings if LAB X hardware goes here |
 | 8 | **Wastewater Discharge Permit** (RA 9275) | EMB-V | 5 | precedent WDP-16L-O5CN-088 |
 | 9 | **Permit to Operate** — air (RA 8749) for mills/blowers/generator | EMB-V | 5 | precedent: 2017 PTO application (doc 1285) |
