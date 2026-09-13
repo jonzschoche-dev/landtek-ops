@@ -62,6 +62,20 @@ Executed before two witnesses; notarial acknowledgment not visible on the face (
 | T-1827, Malaguit | Not in inventory | 8.12 | A-4 | — | To be searched at the Registry |
 | Labo lot, Gumamela | Not in inventory | 534 sq m | A-5 | — | Title status and Civil Case No. 4992 to be established |
 
+### D. OTHER PROPERTIES LISTED BY THE HEIRS, NOT COVERED BY EITHER INSTRUMENT
+
+The heirs' special power of attorney of 10 July 2024 lists the following among the family's properties. None of them is an award under the 1992 partition or a parcel under the 1985 undertaking, and none appears in the family's title inventory. They are listed here so that the schedule is complete; whether each forms part of the estates, and in whose name it stands, is to be established from the Registry and the assessors' records before it is inventoried.
+
+| No. | Property | Location | Area | Listed under | Standing | To establish |
+|---|---|---|---|---|---|---|
+| D-1 | **Ricefield** | Milaor / San Fernando, **Camarines Sur** | about 13 ha | The family's properties, item 2 of the 2024 list; also named in Marilou V. Inocalla's special power of attorney of 5 August 2025 | No title, tax declaration or owner of record in the file; not in the 1992 partition | Registry of Deeds, Camarines Sur, and the Municipal Assessors of Milaor and San Fernando: title or tax declaration, registered owner, area, encumbrances |
+| D-2 | Tax-declared parcels under the name of Vicente Inocalla | Dancalan and Calaburnay, Paracale; Sta. Rosa Sur, Sta. Rosa Norte and San Rafael, Jose Panganiban | ARP nos. 012-0176, 007-0045, 007-0053, 007-0044, 007-0143, 026-0048, 026-0047, 025-0157, 021-0211 (two entries); together about 165 ha as listed | Items 1 to 10 of the 2024 list | Tax declarations only; two entries coincide by area with titled parcels in Part C (22.8024 ha with P-1516; 19.7729 ha with T-5656) and may be the tax declarations of those titles rather than separate land | Current tax declarations from the Municipal Assessors of Paracale and Jose Panganiban; reconcile against Part C by survey number |
+| D-3 | Tax-declared parcel "Vicente Inocalla c/o Senen Inocalla" | Capacuan, Paracale | 14.7380 ha (ARP 008-00563) | Item 11 of the 2024 list | Tax declaration only | Assessor, Paracale |
+| D-4 | Tax-declared parcels under the names of Vicente Inocalla and Beatriz Villafria Inocalla | San Rafael, Jose Panganiban | 22.517 ha (ARP 021-00252) and 23.0935 ha (ARP 021-00328) | Items 12 and 13 of the 2024 list | Coincide by area with T-3424 and T-3897 in Part C; probably their tax declarations | Reconcile against the titles |
+| D-5 | Tax-declared parcel | San Rafael, Jose Panganiban | 7.8844 ha (ARP 021-00470) | Item 26 of the 2024 list | Tax declaration only; name of declarant to be read from the record | Assessor, Jose Panganiban |
+| D-6 | Residential lot listed under Senen Inocalla | Batobalani, Paracale | 161 sq m (ARP 006-00271) | Item 25 of the 2024 list | Senen's own estate, not the decedents' | Assessor, Paracale |
+| D-7 | TCT No. 885 | San Rafael, Jose Panganiban | 23.7633 ha | Item 14 of the 2024 list, under the name of Ereneo Agon | Not the decedents' property on its face; the relationship of the Heirs of Ereneo Agon to the estates is to be identified | Registry of Deeds, Camarines Norte |
+
 <!-- filing:skip -->
 
 ---
