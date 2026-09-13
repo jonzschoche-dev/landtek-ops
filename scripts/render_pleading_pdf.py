@@ -146,10 +146,12 @@ def table(rows):
     st = ParagraphStyle("tc", fontName=FONT, fontSize=10, leading=12)
     data = [[Paragraph(inline(c.replace("**", "") if i == 0 else c), st)
              for c in (r + [""] * n)[:n]] for i, r in enumerate(cells)]
-    # column widths proportional to content, clamped so no column starves or hogs
-    weights = [max(8, min(60, max(len(r[i]) for r in cells))) ** 0.75 for i in range(n)]
-    tot = sum(weights)
-    t = Table(data, colWidths=[CONTENT_W * w / tot for w in weights], repeatRows=1)
+    # column widths: a floor for every column (short codes and numbers must not wrap
+    # character by character), the remainder shared in proportion to content length
+    floor = min(0.55 * inch, CONTENT_W / n)
+    weights = [min(60, max(len(r[i]) for r in cells)) ** 0.75 for i in range(n)]
+    spare = CONTENT_W - floor * n
+    t = Table(data, colWidths=[floor + spare * w / sum(weights) for w in weights], repeatRows=1)
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
                            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EDEDED")),
                            ("VALIGN", (0, 0), (-1, -1), "TOP")]))
