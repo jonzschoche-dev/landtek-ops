@@ -10,6 +10,7 @@ Markers:  ( ? ) / ( hint ? ) -> blank (+ gray hint) · ⟦note⟧ -> gray note �
           [V …] / [O …] -> gray note · **bold** · *italic*
 Directives (HTML comments in the .md):
   <!-- caption:full|short|none -->  caption block from the job (full/short title)
+  <!-- include:other.md -->         splice another source here (relative to the source file)
   <!-- align:right|center|reset --> · <!-- pagebreak --> ·
   <!-- filing:skip --> … <!-- /filing:skip --> · <!-- section:NAME --> … <!-- /section -->
 Job keys: source, output, court[], captionFull[], captionShort[], captionRight[],
@@ -176,6 +177,9 @@ def body(md, job):
                 section = None
             elif d.startswith("section:"):
                 section = d[8:]
+            elif d.startswith("include:") and not skipping and (not want or section == want):
+                inc = (Path(job["_srcdir"]) / d[8:].strip()).resolve()
+                lines[i + 1:i + 1] = inc.read_text(encoding="utf8").splitlines()
             elif not skipping and (not want or section == want):
                 if d == "pagebreak":
                     flow.append(PageBreak())
@@ -253,6 +257,7 @@ def render(job_path):
     out = (jp.parent / job["output"]).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     md = src.read_text(encoding="utf8")
+    job["_srcdir"] = str(src.parent)          # base for <!-- include:file.md -->
 
     doc = BaseDocTemplate(str(out), pagesize=PAGE, leftMargin=MARGIN["left"],
                           rightMargin=MARGIN["right"], topMargin=MARGIN["top"],

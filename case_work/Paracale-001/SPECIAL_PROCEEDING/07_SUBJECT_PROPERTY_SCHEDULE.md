@@ -4,7 +4,7 @@
 
 <!-- caption:none -->
 
-## SCHEDULE OF SUBJECT PROPERTIES
+## ANNEX "G" — SCHEDULE OF SUBJECT PROPERTIES
 
 ### A. THE JUDICIAL PARTITION — Civil Case No. B-5625 (also cited as 5626), RTC Camarines Norte, Branch 41, Daet
 
@@ -12,13 +12,13 @@ Compromise/Partition Agreement executed 24 January 1992; approved by the Court 2
 
 | No. | Property | Description | Area | Awarded to | Registration after the award | Source |
 |---|---|---|---|---|---|---|
-| A-1 | **TCT No. T-3897** | Lot 1, Psu-152027, San Rafael, Jose Panganiban | 23.0935 ha | **Cipriana, Vicente Jr. and Jesus**, one-third each | **Never transferred** — still in the name of Vicente Inocalla | partition (docs 510/671) [V]; inventory (docs 520/634/669) |
-| A-2 | **TCT No. 1722, Lot 1** | Calaburnay, Paracale | 16.43 ha | **Eight heirs, equally** (the eight to be read from the certified copy) | ( ? ) — this title does not appear in the current family inventory; search at RD | partition (docs 510/671) [V] |
-| A-3 | **TCT No. T-5656** | Lot 2-B, (LRC) Psd-56979, San Rafael, Jose Panganiban | 19.7727 ha | **Herbert and Senen** | **Never transferred** — still in the name of Vicente Inocalla, Sr. | partition [V]; inventory |
-| A-4 | **TCT No. T-1827** | Malaguit | 8.12 ha | **Marilou** | ( ? ) — not in the current inventory; search at RD | partition [V] |
-| A-5 | **Urban lot, Labo** | Barangay Gumamela, Labo, Camarines Norte | 534 sq m | **All ten branches** | ( ? ) — a corpus scan of a Labo title is captioned "cancelled" (doc 638) and Civil Case No. 4992, RTC Labo, concerns it (docs 636/658); status to be established | partition [V] |
-| A-6 | **Rural Bank of Paracale shares** | 770 shares, ₱77,000 | — | **All ten branches** | ( ? ) — bank certification to obtain | partition [V] |
-| A-7 | **Thirteen patentable mineral claims** (names below) | Paracale and Jose Panganiban | about 117 ha | **Casper**, under the 1984 assignment, **subject to the covenant stated below** | Claims: MGB status ( ? ). The heirs' approval right and proceeds interest subsist as rights under the judgment | partition (docs 510/671) [V] |
+| A-1 | **TCT No. T-3897** | Lot 1, Psu-152027, San Rafael, Jose Panganiban | 23.0935 ha | **Cipriana, Vicente Jr. and Jesus**, one-third each | **Never transferred** — still in the name of Vicente Inocalla | partition (docs 510/671); family inventory (docs 520/634/669) |
+| A-2 | **TCT No. 1722, Lot 1** | Calaburnay, Paracale | 16.43 ha | **Eight heirs, equally** (the eight to be read from the certified copy) | Not in the family's current inventory; to be searched at the Registry | partition (docs 510/671) |
+| A-3 | **TCT No. T-5656** | Lot 2-B, (LRC) Psd-56979, San Rafael, Jose Panganiban | 19.7727 ha | **Herbert and Senen** | **Never transferred** — still in the name of Vicente Inocalla, Sr. | partition; family inventory |
+| A-4 | **TCT No. T-1827** | Malaguit | 8.12 ha | **Marilou** | Not in the family's current inventory; to be searched at the Registry | partition |
+| A-5 | **Urban lot, Labo** | Barangay Gumamela, Labo, Camarines Norte | 534 sq m | **All ten branches** | A copy of a Labo title in the family's papers is captioned "cancelled" and Civil Case No. 4992, RTC Labo, concerns the lot; status to be established at the Registry | partition |
+| A-6 | **Rural Bank of Paracale shares** | 770 shares, ₱77,000 | — | **All ten branches** | Bank certification to be obtained | partition |
+| A-7 | **Thirteen patentable mineral claims** (names below) | Paracale and Jose Panganiban | about 117 ha | **Casper**, under the 1984 assignment, **subject to the covenant stated below** | MGB status of the claims to be certified. The heirs' approval right and proceeds interest subsist as rights under the judgment | partition (docs 510/671) |
 
 **The A-7 covenant, as the partition records it.** The claims — Venecia, Naga, Pennsylvania, Braddock, Virginia, Pittsburg, Manila, Corregidor, Chico, Vallejo, Daet, Pasacao and Latrobe — were assigned by Vicente Sr. to Casper on 2 November 1984, and the partition recognises the assignment. Casper, and Jesus on his incapacity, maintain the claims and may contract operators, **subject to** (i) the approval of a **majority** of the named heirs for any operating contract, and (ii) the division of royalties and proceeds among **all** the heirs on a stated schedule: Casper; Jesus; a professional share to Nourhalma Uriarte; a sales commission; a reserve for taxes; occupation fees; and the remaining eight heirs in equal shares. The percentages are deliberately not stated here; they are to be certified from the original before they are pleaded anywhere.
 
@@ -30,10 +30,10 @@ Executed before two witnesses; notarial acknowledgment not visible on the face (
 
 | No. | Title in the Undertaking | Location | Area | To be conveyed to | Present title (matched by area) | Present registration per inventory | Source |
 |---|---|---|---|---|---|---|---|
-| B-1 | **TCT No. 4781** | San Rafael, Jose Panganiban | 18.9591 ha | **Marilou Inocalla-Kissler** | **T-20756**, Lot 10, Psu-143364 | "DBP / (Casper Inocalla)" | Undertaking [V]; match [I] |
-| B-2 | **TCT No. 5941** | San Rafael, Jose Panganiban | 23.5845 ha | **Herbert V. Inocalla** | **T-20757**, Lot 5, Psu-143363 Amd. | "DBP / (Casper Inocalla)" | Undertaking [V]; match [I] |
-| B-3 | **TCT No. 4251** | San Rafael, Jose Panganiban | 10.2928 ha | **Senen V. Inocalla** | **T-20754**, Lot 2, Psu-14364 | "DBP / (Casper Inocalla)" | Undertaking [V]; match [I] |
-| B-4 | **TCT No. 4695** | Capacuan, Paracale | 11.1486 ha | **Senen V. Inocalla** | **T-20755**, H-128572 | "DBP / (Casper Inocalla)" | Undertaking [V]; match [I] |
+| B-1 | **TCT No. 4781** | San Rafael, Jose Panganiban | 18.9591 ha | **Marilou Inocalla-Kissler** | **T-20756**, Lot 10, Psu-143364 | "DBP / (Casper Inocalla)" | Undertaking; matched by area |
+| B-2 | **TCT No. 5941** | San Rafael, Jose Panganiban | 23.5845 ha | **Herbert V. Inocalla** | **T-20757**, Lot 5, Psu-143363 Amd. | "DBP / (Casper Inocalla)" | Undertaking; matched by area |
+| B-3 | **TCT No. 4251** | San Rafael, Jose Panganiban | 10.2928 ha | **Senen V. Inocalla** | **T-20754**, Lot 2, Psu-14364 | "DBP / (Casper Inocalla)" | Undertaking; matched by area |
+| B-4 | **TCT No. 4695** | Capacuan, Paracale | 11.1486 ha | **Senen V. Inocalla** | **T-20755**, H-128572 | "DBP / (Casper Inocalla)" | Undertaking; matched by area |
 | | | | **63.985 ha** | Marilou 18.9591 · Herbert 23.5845 · Senen 21.6414 | | | |
 
 **Notes on Part B.** (1) The beneficiaries are three individual siblings, not the estate; Senen having died without issue, her two parcels pass through her own estate to her brothers and sisters and the children of deceased siblings. (2) Casper having died, the obligation binds his heirs. (3) The pivotal registry question is whether title reverted from DBP to Casper on full payment or the reconveyance was never registered; the RD certified copies of T-20754, T-20755, T-20756 and T-20757, searched also under the old numbers 4251, 4695, 4781 and 5941, answer it.
@@ -44,7 +44,7 @@ Executed before two witnesses; notarial acknowledgment not visible on the face (
 |---|---|---|---|---|---|
 | T-3897, Lot 1 Psu-152027 | Vicente Inocalla | 23.0935 | A-1 | — | Estate res; award unregistered |
 | T-5656, Lot 2-B Psd-56979 | Vicente Inocalla, Sr. | 19.7727 | A-3 | — | Estate res; award unregistered |
-| T-2194, H-44920 | Vicente Inocalla / (Senen) | 13.3690 | — | — | Estate res on its face; a 2014 execution sale against Senen's interest is on record (doc 630) — status ( ? ) |
+| T-2194, H-44920 | Vicente Inocalla / (Senen) | 13.3690 | — | — | Estate res on its face; a 2014 execution sale against Senen's interest is on record; status to be verified at the Registry |
 | ARP 021-0312, Lot 6 Psu-143364 | Vicente Inocalla (tax declaration only) | 18.0003 | — | — | Estate res, untitled |
 | T-3424, Lot 1 Psu-152156 | Beatriz Villafria (Marilou & Allan) | 22.5178 | — | — | Beatriz's estate; not partitioned |
 | T-4185, Lot 3 Psu-143364 | Beatriz Villafria (Herbert) | 11.3042 | — | — | Beatriz's estate; not partitioned |
@@ -58,9 +58,9 @@ Executed before two witnesses; notarial acknowledgment not visible on the face (
 | P-1616, Lot 4 Psu-143364 | Allan Inocalla | 15.2069 | — | — | Patent title; outside the estate |
 | P-1617, Lot 8 Psu-143364 Amd. | Jesus Inocalla | 23.4356 | — | — | Patent title; outside the estate |
 | P-1516, Lot 7 Psu-143364 Amd. | Vicente Inocalla, Jr. | 22.8024 | — | — | Patent title; Vicente Jr.'s own estate |
-| TCT 1722, Lot 1, Calaburnay | ( ? ) | 16.43 | A-2 | — | Not in inventory — search RD |
-| T-1827, Malaguit | ( ? ) | 8.12 | A-4 | — | Not in inventory — search RD |
-| Labo lot, Gumamela | ( ? ) | 534 sq m | A-5 | — | Title status and Civil Case 4992 to establish |
+| TCT 1722, Lot 1, Calaburnay | Not in inventory | 16.43 | A-2 | — | To be searched at the Registry |
+| T-1827, Malaguit | Not in inventory | 8.12 | A-4 | — | To be searched at the Registry |
+| Labo lot, Gumamela | Not in inventory | 534 sq m | A-5 | — | Title status and Civil Case No. 4992 to be established |
 
 <!-- filing:skip -->
 
