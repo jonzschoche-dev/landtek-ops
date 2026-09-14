@@ -162,11 +162,12 @@ def main():
                           ("SOURCE", "drip_sweep.render_edition — counters recomputed from the record")]),
                   Spacer(1, 10), Paragraph("Body as it would send:", S_NOTE), Spacer(1, 4),
                   letter_block(body), Spacer(1, 10),
-                  Paragraph("ANNEXES TO ATTACH — <b>not yet auto-built</b> (attach manually this cycle):", S_BODY),
-                  Paragraph("A — Schedule of Continuing Default (printed above, in the letter)<br/>"
-                            "B — the prior instruments of record (the 10 Sep Reiteration + predecessors)<br/>"
-                            "C — proofs of receipt for those instruments<br/>"
-                            "D — verbatim provisions relied on", S_MONO)]
+                  Paragraph("<b>ANNEX A — Schedule of Continuing Default</b> (travels as an ATTACHMENT; "
+                            "kept out of the letter so the letter is always one page):", S_BODY),
+                  Spacer(1, 4), letter_block(DRIP.render_schedule_annex(ed, fire)), Spacer(1, 8),
+                  Paragraph("Annexes B–D — <b>not yet auto-built</b> (attach manually this cycle): "
+                            "B the prior instruments of record · C proofs of receipt · D verbatim "
+                            "provisions relied on.", S_NOTE)]
 
     # partial-reply template
     story += [PageBreak(), Paragraph("2. Same-day reply — “Partial is not compliance”", S_H),

@@ -145,28 +145,56 @@ def _stage_draft_with_fallback(cur, subject, body, ref_kind, ref_id):
     return f"file:{path} (gmail: {err})"
 
 
-# ── the edition letter (the operator's formula: very concise letter; annexes carry the weight) ─────
-def render_edition(ed, as_of):
-    counters = ed["counters"] or {}
-    rows = []
+# ── the edition letter ────────────────────────────────────────────────────────────────────────────
+# OPERATOR RULE (2026-09-14): a drip letter is ALWAYS ONE PAGE; it may carry attachments. So the
+# itemised schedule lives in Annex A (an attachment), NEVER in the letter body — that is what makes
+# one page STRUCTURAL rather than aspirational: the letter's length is fixed no matter how many rows
+# accumulate (8 today, 40 in two years — same letter). The letter states the headline; Annex A proves it.
+EDITION_MAX_LINES = 26
+EDITION_MAX_CHARS = 1500
+
+
+def _counter_rows(counters, as_of):
+    out = []
     for label, anchor in sorted(counters.items(), key=lambda kv: kv[1]):
-        days = (as_of - date.fromisoformat(str(anchor))).days
-        rows.append(f"  {days:>4} days   {label}   (of record since {anchor})")
-    schedule = "\n".join(rows)
+        out.append(((as_of - date.fromisoformat(str(anchor))).days, label, str(anchor)))
+    return out
+
+
+def render_edition(ed, as_of):
+    """THE LETTER — one page, always. Headline only; the schedule is Annex A (attached)."""
+    rows = _counter_rows(ed["counters"] or {}, as_of)
+    n = len(rows)
+    longest_days, longest_label, _ = (rows[0] if rows else (0, "—", ""))
     body = (
         f"[DRAFT — edition {as_of.isoformat()} · {ed['track']} · STAGED BY THE DRIP, NOT SERVED]\n\n"
         "Dear Sir/Madam:\n\n"
-        "This reiterates the pending matters of record in the attached Schedule of Continuing\n"
-        "Default. No new request is made. Each counter below runs from a documented instrument\n"
-        "or letter already before your office; performed items, if any, are so marked.\n\n"
-        f"Annex A — Schedule of Continuing Default (as of {as_of.isoformat()}):\n{schedule}\n\n"
-        "The prior instruments, proofs of receipt, and the verbatim provisions are re-enclosed as\n"
-        "Annexes B–D. On continued default through the next schedule date, the record supports the\n"
-        "elevation already described in the instrument of 10 September 2026.\n\n"
-        "Respectfully,\n[for Jonathan's review — attach annex PDFs before sending; nothing has been sent]\n"
+        f"This reiterates the matters of record that remain outstanding as of {as_of.isoformat()}. "
+        "No new request is made.\n\n"
+        f"{n} matter(s) remain in continuing default. The longest has stood {longest_days} days "
+        f"({longest_label}). Each counter runs from a documented instrument or letter already before "
+        "your office; any item performed since the last edition is marked as performed.\n\n"
+        "Annex A — Schedule of Continuing Default (itemised, attached) sets out each matter, its "
+        "anchor date of record, and its day count. Annexes B–D re-enclose the prior instruments, the "
+        "proofs of receipt, and the verbatim provisions relied on.\n\n"
+        "On continued default through the next schedule date, the record supports the elevation "
+        "already described in the instrument of 10 September 2026.\n\n"
+        "Respectfully,\n"
+        "[for Jonathan's review — attach Annexes A–D before sending; nothing has been sent]\n"
     )
     subject = f"[DRIP DRAFT] {ed['track']} — Schedule of Continuing Default, edition {as_of.isoformat()}"
     return subject, body
+
+
+def render_schedule_annex(ed, as_of):
+    """ANNEX A — the itemised schedule that travels as an ATTACHMENT, not in the letter."""
+    rows = _counter_rows(ed["counters"] or {}, as_of)
+    lines = [f"ANNEX A — SCHEDULE OF CONTINUING DEFAULT ({ed['track']})",
+             f"As of {as_of.isoformat()}. Each day count runs from the anchor date of record shown.",
+             ""]
+    lines += [f"  {d:>5} days   {label}   (of record since {anchor})" for d, label, anchor in rows]
+    lines += ["", f"  {len(rows)} matter(s) itemised. Items performed since the last edition are marked PERFORMED."]
+    return "\n".join(lines)
 
 
 # ── CALENDAR IS THE PULSE: drip dates become calendar_events (→ calendar_sync → Google Calendar) ──

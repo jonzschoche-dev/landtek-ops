@@ -164,11 +164,16 @@ def edition_counters_recompute_from_anchors(cur):
         ed = tc.fetchone()
         if not ed:
             raise TruthFailure("DILG-supervision edition seed missing.")
-        _subject, body = DS.render_edition(ed, date(2026, 9, 10))
-        for expect in ("  78 days", " 227 days", " 476 days"):
-            if expect not in body:
-                raise TruthFailure(f"edition at 2026-09-10 did not reproduce '{expect.strip()}' — "
+        # Day counts live in ANNEX A (the attachment) since the one-page rule — assert there.
+        annex = DS.render_schedule_annex(ed, date(2026, 9, 10))
+        for expect in ("78 days", "227 days", "476 days"):
+            if expect not in annex:
+                raise TruthFailure(f"Annex A at 2026-09-10 did not reproduce '{expect}' — "
                                    "counters are not anchored to the record.")
+        # and the letter's headline must carry the longest count, so the punch survives the move
+        _s, body = DS.render_edition(ed, date(2026, 9, 10))
+        if "476 days" not in body:
+            raise TruthFailure("letter headline lost the longest-standing day count.")
     finally:
         conn.rollback(); conn.close()
 
@@ -244,7 +249,44 @@ def feeds_calendar_pulse(cur):
         conn.rollback(); conn.close()
 
 
+def edition_letter_is_always_one_page(cur):
+    """OPERATOR RULE: a drip letter is ALWAYS one page; attachments carry the weight. Structural, not
+    aspirational — with 40 accumulated counters the letter must be the SAME length, because the
+    itemised schedule lives in Annex A (attached), never in the body."""
+    conn, tc = _rb()
+    try:
+        tc.execute("SELECT * FROM drip_edition WHERE track='DILG-supervision'")
+        ed = dict(tc.fetchone() or {})
+        if not ed:
+            raise TruthFailure("DILG-supervision edition seed missing.")
+        _s, body = DS.render_edition(ed, date(2026, 9, 25))
+        lines, chars = len(body.splitlines()), len(body)
+        if lines > DS.EDITION_MAX_LINES or chars > DS.EDITION_MAX_CHARS:
+            raise TruthFailure(f"edition letter over one page ({lines} lines / {chars} chars; "
+                               f"budget {DS.EDITION_MAX_LINES}/{DS.EDITION_MAX_CHARS}).")
+        # the schedule must NOT be inline: inflate to 40 counters, letter length must barely move
+        fat = dict(ed)
+        fat["counters"] = {f"Matter {i:02d} default": f"2025-01-{(i % 28) + 1:02d}" for i in range(40)}
+        _s2, body2 = DS.render_edition(fat, date(2026, 9, 25))
+        if len(body2.splitlines()) > DS.EDITION_MAX_LINES or len(body2) > DS.EDITION_MAX_CHARS:
+            raise TruthFailure(f"letter GREW with 40 counters ({len(body2.splitlines())} lines) — the "
+                               "schedule is inline; it must live in Annex A as an attachment.")
+        # The headline may name exactly ONE item (the longest-standing) — that is the punch. Anything
+        # beyond that means the itemised list leaked into the letter.
+        rows40 = DS._counter_rows(fat["counters"], date(2026, 9, 25))
+        named = [label for _d, label, _a in rows40 if label in body2]
+        if len(named) > 1:
+            raise TruthFailure(f"{len(named)} itemised rows appear in the LETTER ({named[:3]}…) — the "
+                               "schedule must travel as Annex A, not in the body.")
+        annex = DS.render_schedule_annex(fat, date(2026, 9, 25))
+        if "Matter 00 default" not in annex or "ANNEX A" not in annex:
+            raise TruthFailure("Annex A does not carry the itemised schedule.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
+    ("drip.edition_letter_is_always_one_page", edition_letter_is_always_one_page),
     ("drip.feeds_calendar_pulse", feeds_calendar_pulse),
     ("drip.service_requires_corpus_proof", service_requires_corpus_proof),
     ("drip.no_clock_without_receipt", no_clock_without_receipt),
