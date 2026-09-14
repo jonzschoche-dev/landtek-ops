@@ -113,7 +113,9 @@ with OMNIBUS MOTION
   (2) to admit tender of appeal fees / late payment;
   (3) to admit the attached Consolidated Appeal Memorandum;
   (4) to direct transmittal of records by ARTA (A.O. 22 §4);
-  (5) in the alternative, for supervisory / corrective action under the President's power of control
+  (5) in the alternative, for supervisory / corrective action under the President's power of control;
+  (6) for directives to the Department of Finance (BLGF), the Department of Public Works and Highways,
+      the Department of the Interior and Local Government, and the Anti-Red Tape Authority
 ```
 
 **I. Entry of appearance.** Undersigned counsel enters appearance for Petitioner-Appellant Patricia Keesey Zschoche, through her Attorney-in-Fact Jonathan Paul Zschoche (SPA of 12 Feb 2025, notarized and apostilled, Annex "A"; counsel's engagement, Annex "A-1"). All notices to: ______ [counsel's address / email]. Prior filings signed by the Attorney-in-Fact are adopted and ratified.
@@ -128,9 +130,42 @@ with OMNIBUS MOTION
 
 **VI. Motion to direct transmittal of records.** ARTA has not transmitted the records of any docket (A.O. 22 §4). Ask for an order to transmit within ten days, with the chronological summary.
 
-**VII. Alternative prayer — supervisory / corrective action.** Should the OP hold any appeal unperfected or the resolutions non-final and non-appealable (ARTA's 28 Apr 2026 letter: "merely recommendatory"), Petitioner invokes the President's control over ARTA (Const. VII §17; E.O. 292 Bk III §1) and asks the Executive Secretary (§27(3),(5)) to direct ARTA to (a) refer CTN 1321, 1210 and 0747 to the CSC/Ombudsman under §17(d) and to assist Petitioner under §17(e), as it did for Balane on 30 Apr 2026; and (b) apply, in all pending and future complaints, the standards that §4 covers "any … requesting party" without citizenship qualification, that §9(a)(1) makes acceptance mandatory, and that charter omission is not a defense to §21(b).
+**VII. Alternative prayer — supervisory / corrective action over ARTA.** Should the OP hold any appeal unperfected, or the resolutions non-final and non-appealable (ARTA Litigation Division letter of 28 Apr 2026: findings "merely recommendatory"), Petitioner invokes the President's control over ARTA (Const. art. VII §17; E.O. 292 Bk III §1) and the Executive Secretary's functions under E.O. 292 Bk III §27(2),(3),(5),(8), and asks that ARTA be directed to (a) refer CTN SL-2026-0209-1321, SL-2026-0128-1210 and SL-2025-1021-0747 to the CSC and/or the Ombudsman under R.A. 11032 §17(d) and to assist Petitioner under §17(e), as it did for the Municipal Engineer on 30 Apr 2026; and (b) apply, in all pending and future complaints, the standards that §4 covers "any … requesting party" without citizenship qualification, that §9(a)(1) makes acceptance mandatory, that a Citizen's-Charter omission is not a defense to §21(b), and that "due cause" under §21(e) is measured against the single written extension §9(b)(1) allows and the written-denial rule of §9(c).
 
-**VIII. Prayer.** (1) Docket + consolidate; (2) admit fees; (3) admit memorandum; (4) order transmittal; (5) set aside and remand 1321 and 1210 with stated standards, and 0690/0792 as to the legal standards; (6) alternatively, the §VII directives; (7) other just relief.
+**VII-A. Motion for directives to the departments and agency that hold the national handle on the Mercedes offices concerned.** Petitioner does not ask this Office to command the Municipality. The offices that hold the records answer, by statute, to departments under the President's control (Const. art. VII §17; E.O. 292 Bk III §1), and this Office may direct those departments to exercise the supervision the law already vests in them. Petitioner therefore moves that the Executive Secretary, by authority of the President, direct:
+
+1. **The Secretary of Finance, through the Bureau of Local Government Finance** — which exercises "administrative and technical supervision and coordination over the treasury and assessment operations of local governments" (E.O. 292 Bk IV Tit. II ch. 4) *[verify §]*, and which appoints the Municipal Treasurer (LGC §470(a)) —
+   (a) to require the Municipal Treasurer of Mercedes to issue official receipts for the real property tax paid under protest on 19 and 20 December 2025 and to act on the protest under LGC §252 within the period the Code fixes, and to report compliance to this Office;
+   (b) to require the Municipal Assessor of Mercedes to complete the chartered service "Research/Verify History of Records of Tax Declaration" on Petitioner's request of 27 May 2025 (research fee paid 20 June 2025, O.R. No. 7383466), or to cause the requested certified copies to be issued from the records held by the Provincial Assessor of Camarines Norte, which has already produced the same record classes;
+   (c) to conduct a BLGF review of the treasury and assessment operations of the Municipality with respect to Petitioner's transactions, and to take such administrative action against its appointee as the review warrants.
+
+2. **The Secretary of Public Works and Highways** — in whom "the administration and enforcement" of the National Building Code is vested and who exercises "general powers of supervision and control" over its Building Officials (P.D. 1096 §§201, 203, 205) —
+   (a) to require the Building Official of Mercedes (the Municipal Engineer) to act, in writing and within the Citizen's-Charter period, on Petitioner's requests for building-permit verification, certification of no record, and inspection/enforcement records over the properties covered by TCT No. 48336 and related titles, and to report compliance;
+   (b) to take cognizance, for purposes of its supervision over Building Officials, of the Building Official's letter of 5 February 2026 threatening Petitioner with "prison time" and "deportation proceedings" for pursuing those records.
+
+3. **The Secretary of the Interior and Local Government** — who "shall assist the President in the exercise of general supervision over local governments" and may "establish and prescribe rules, regulations and other issuances" for that purpose (E.O. 292, DILG mandate §§2–3) —
+   (a) to require the Municipal Mayor of Mercedes, as head of office primarily responsible under R.A. 11032 §8, to submit within a fixed period a written report on the action taken on each of Petitioner's pending chartered requests and on the completeness of the Municipality's Citizen's Charter, through the Municipal Local Government Operations Officer;
+   (b) to record the findings of this proceeding and of ARTA in the Municipality's file for purposes of the Seal of Good Local Governance and related performance assessments *[verify RA 11292 criteria]*;
+   (c) to advise this Office whether the facts of record warrant an administrative complaint against the elective officials concerned before the Sangguniang Panlalawigan under LGC §§60–61(b), with appeal to this Office.
+
+4. **The Director General of the Anti-Red Tape Authority** — an agency attached to this Office (R.A. 11032 §17) —
+   (a) to issue Compliance Orders under §17(c) and its Rules (Rule VIII, 2020 Rules; corresponding rule of the 2023 Rules *[verify]*) to the Municipal Assessor, the Municipal Treasurer and the Municipal Engineer of Mercedes on the chartered services found undelivered on the face of ARTA's own resolutions, and Notices of Warning on non-compliance;
+   (b) to act on Petitioner's pending requests as applications for an Order of Automatic Approval / Extension under §10 and Rule VI, with the three-day compliance directive that Rule provides;
+   (c) to issue a Request for Comment under Rule IX to the Municipality on its practice of conditioning chartered services on a "verified legal mandate", personality, or citizenship pre-condition not listed in the Citizen's Charter, and to submit its policy recommendation to this Office and the Congressional Oversight Committee on Ease of Doing Business;
+   (d) to conduct a Citizen's-Charter compliance audit of the Municipality of Mercedes through its Compliance, Monitoring and Evaluation Office and to issue the corresponding compliance order to the head of office under §8.
+
+Each directive asks a department or agency to do only what its own charter already empowers it to do; none asks this Office to substitute its judgment for a discretionary act of the Municipality.
+
+**VIII. Prayer.** WHEREFORE, Petitioner respectfully prays that this Office:
+1. NOTE the entry of appearance of undersigned counsel;
+2. DOCKET the filings under Transmittal Refs. 050526-MRO-234187, 060426-MRO-240932 and 072326-MRO-251125, and the Petition shipped on 11 September 2026 (LBC 142061372862), as one proceeding, assign an O.P. Case No., and CONSOLIDATE them;
+3. ADMIT the tender of appeal fees and excuse the late payment;
+4. ADMIT the Consolidated Appeal Memorandum (Annex "B");
+5. DIRECT the Anti-Red Tape Authority to transmit the complete records of the five dockets within ten (10) days (A.O. 22 §4);
+6. On the merits, SET ASIDE the Resolutions of 25 August 2026 (CTN SL-2026-0209-1321) and 13 May 2026 (CTN SL-2026-0128-1210) and REMAND with the standards stated in §VII(b); and, as to the Resolution of 7 April 2026 (CTN SL-2025-1008-0690 / SL-2025-1104-0792), DECLARE the legal standards there applied erroneous as stated in §VII(b);
+7. In the alternative, or in addition, DIRECT the Anti-Red Tape Authority as prayed in §VII(a);
+8. DIRECT the Secretary of Finance (BLGF), the Secretary of Public Works and Highways, the Secretary of the Interior and Local Government, and the Director General of the Anti-Red Tape Authority as prayed in §VII-A, and require each to report compliance to this Office within thirty (30) days; and
+9. GRANT such other relief as is just and equitable.
 
 **Verification / certification of non-forum shopping** (Jonathan as AIF; disclose CV-26360, Spec. Proc. 2680, Ombudsman IC-OC-JUL-26-1214, CSC OAC-L 270, DILG/BLGF letters). **Proof of service** on ARTA DG, Litigation Division, each respondent. **Annexes** A–C as above plus the four stamped transmittals and the LBC waybill.
 
