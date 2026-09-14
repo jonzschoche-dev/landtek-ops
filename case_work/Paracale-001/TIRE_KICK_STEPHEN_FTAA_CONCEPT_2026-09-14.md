@@ -47,3 +47,36 @@
 | planetGOLD model "scaled up" | planetGOLD model *replicated* through the services arm and Part II | Replicate, don't convert |
 
 **Bottom line for Jonathan:** thank Stephen for the engineering, adopt §7, decline the vehicle for Casalugan, hold the FTAA idea for the tenement at real scale, and get the turnover deed and the applicant's identity before this paper travels anywhere. Nothing in it changes the memos.
+
+---
+
+## 5. UPDATE (Jonathan, 2026-09-14): Stephen's plan is to fold Allan's areas and the NIBDC mineral claim in
+
+That answers flat tires 2 and 3 and re-frames the paper: it is not a Casalugan plant upgrade, it is a **district FTAA** — NIBDC's EXPA-000250-V (2,360 ha across Paracale, Jose Panganiban and Labo) as the contract area, Allan's ground (the Santa Rosa Sur lot, the planned Jose Panganiban Minahang Bayan, the Capacuan petition area, the family's ~250 ha of surface) folded into or alongside it, and the Casalugan plant as the processing seed. Re-assessed on that basis:
+
+**What now works**
+- **There is a lawful path — through the EP, not through the Minahang Bayan.** An Exploration Permit holder may, on declaring mining feasibility, apply for an MPSA *or* an FTAA over the permit area (RA 7942 §23). So the route is: EP issues to NIBDC → exploration to a code-compliant resource → Declaration of Mining Project Feasibility → FTAA (or MPSA). The Minahang Bayan is not the vehicle; the EP is. [V statute; counsel to confirm the §23 conversion mechanics under DAO 2010-21 — PV]
+- **The nationality problem inverts.** While NIBDC holds only an EP, a foreign-owned corporation may own it outright (RA 7942 §3), and an FTAA contractor may be 100% foreign. So PGC could hold NIBDC or the project company at any percentage from 40% to 100%, and the FTAA door needs no 60/40 dilution at all. That is exactly the "or an FTAA at US$50M scale" branch the memos already carry for Wave 3.
+- **Consent is reachable through people at the table.** Assignment or conversion needs NIBDC's board, a supermajority of its shareholders, and MGB approval — Stephen's power of attorney over 40% and Allan's proposed NIBDC position are the levers (§5 of the detail pack). Allan controlling the Jose Panganiban / Capacuan cooperative side supplies the small-scale miners' consent under RA 7942 §19(e) where an MB overlaps, with the trust-fund royalty — the Big Brother / Little Brother mechanics Stephen wrote for the BBSB paper.
+
+**What still does not**
+- **Casalugan and SMBC still do not belong in it.** SMBC's Minahang Bayan sits (on our reading of the barangay list) outside the EXPA; its members' contracts cannot be transferred; the MFPS is a donor asset under a turnover deed nobody has seen. Casalugan is Wave 1 — plant activation, LAB X, tolling, trading — and stays that way. Fold in the *ground* Stephen names, not SMBC's plant or contracts.
+- **An FTAA is still a major's instrument.** ≥US$50M firm commitment, the government's share of net revenue after cost recovery, presidential execution, and a track record of years-long politics. A CPC-sized PGC cannot carry that; a mid-tier or major joint-venture partner can. The junior's route — PGC at ≥50% of the EP-holder, listing at EP stage, MPSA at 60/40 with a 100% processing company — is what a listed junior can actually execute, and it *keeps the FTAA door open* at DMPF if a major arrives. Stephen's plan is the end-state; ours is the road to it.
+- **Sequencing conflict remains.** Declaring Allan's Minahang Bayan inside the EXPA before the EP issues closes that ground to the EP absent cooperative consent (§19(e)); if the FTAA is the end-state, the MB must be a deliberate carve-out with consent papered from day one — not a competing claim. This is the same "sequence, don't race" point in the memos, now with higher stakes.
+- **Surface rights.** An FTAA over the family's ~250 ha needs surface-use agreements; the estate has no administrator, so nobody can sign for it today. Allan's own titled lot can. The Rule 80 petition becomes a Wave-3 prerequisite, not a background item.
+
+**The fork this creates for Jonathan and Allan — decide before Stephen's paper travels**
+
+| | MPSA route (memos as written) | FTAA route (Stephen's plan) |
+|---|---|---|
+| Who owns the mine | Allan's company 60% / PGC 40% | PGC (or the FTAA contractor) up to 100% |
+| Where Allan's upside sits | Majority of the tenement holder + his PGC shares | His PGC shares, surface-owner royalties, cooperative carve-outs, the Filipino operating company (processing, small-scale side) |
+| Capital threshold | none statutory beyond MGB financial capability | ≥US$50M firm commitment |
+| State take | excise, income tax, RA 12253 royalty/windfall | the same plus the FTAA government share of net revenue after cost recovery [PV interplay] |
+| Approval | MGB / DENR Secretary | DENR → President → notice to Congress |
+| Who can carry it | a listed junior (PGC) | a major or a major's JV |
+| Fit with "Filipino side stays Filipino" | yes by design | only through Allan's shareholding in PGC and contractual roles — the reserved-ownership protection disappears |
+
+**Whose FTAA?** This is the question that decides everything. If the contractor is **PGC** — Allan its President, Juliet's group inside it, the Canadian listing built on it — then Stephen's plan is our Wave-3 end-state and the memos absorb it in one sentence. If the contractor is a **third party** Stephen represents, then Allan's ground and NIBDC's claim are being folded into someone else's project, and PGC, AVI and the community are the ones being "incorporated" through "equity, offtake or royalty." Ask him first, ask him plainly, and ask under the NDA.
+
+**Revised bottom line:** With the ground folded in, the FTAA is a legitimate end-state for Wave 3, reached through the EP, and it is already a branch of our model. It is still not a Casalugan instrument, still not a Wave-1 or Wave-2 instrument, and still a major's instrument that a listed junior gets to by way of the EP and an MPSA. Adopt §7 as the AVI design brief now; write the FTAA into the Wave-3 fork explicitly (MPSA vs FTAA, with the Allan-position table above); hold Casalugan and SMBC out of it; get the applicant's identity and the MFPS turnover deed before anything else moves.
