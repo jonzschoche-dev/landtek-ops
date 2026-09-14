@@ -41,6 +41,14 @@ DRAFT_FALLBACK_DIR = "/root/landtek/case_work/MWK-001/drip_drafts"
 DEMAND_PERIOD_DAYS = 15          # D+15 per the instruments; day_math stays NEEDS-COUNSEL on every row
 
 TICKING = ("served_running", "replied_not_performed", "partial")   # states whose clocks can lapse
+
+# Single source for the same-day reply text — the sender AND the review pack read this one string,
+# so what Jonathan reviews is byte-identical to what would stage.
+PARTIAL_REPLY_BODY = (
+    "[DRAFT — same-day response, STAGED NOT SENT]\n\nDear Sir/Madam:\n\n"
+    "We acknowledge receipt of a partial response. Partial performance is not compliance "
+    "with the demand of record; the specific items outstanding remain due and the period "
+    "stated in our instrument continues to run.\n\nRespectfully,\n")
 NEVER_TICK = ("draft_held", "held_counsel_route", "withdrawn", "performed",
               "lapsed", "consequence_staged", "consequence_filed")
 
@@ -318,10 +326,7 @@ def record_reply(cur, oid, kind):
     ob = cur.fetchone()
     _event(cur, "reply_recorded", obligation_id=oid, kind=kind)
     if kind == "partial":   # same-day "partial ≠ compliance" reply — staged, never sent
-        body = ("[DRAFT — same-day response, STAGED NOT SENT]\n\nDear Sir/Madam:\n\n"
-                "We acknowledge receipt of a partial response. Partial performance is not compliance "
-                "with the demand of record; the specific items outstanding remain due and the period "
-                "stated in our instrument continues to run.\n\nRespectfully,\n")
+        body = PARTIAL_REPLY_BODY
         where = _stage_draft_with_fallback(cur, f"[DRIP DRAFT] Partial is not compliance — {ob['officer']}",
                                            body, "obligation", oid)
         print(f"partial recorded → same-day reply staged: {where}")
