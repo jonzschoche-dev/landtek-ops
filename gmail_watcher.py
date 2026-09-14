@@ -7,10 +7,16 @@ stored in gmail_messages or gmail_messages_archived.
 
 Usage:
   python3 gmail_watcher.py                              # need-only incremental pull
-  python3 gmail_watcher.py --query 'ARTA OR DILG'       # focused pull
-  python3 gmail_watcher.py --since 2026-04-01           # explicit since
-  python3 gmail_watcher.py --max 200                    # cap
+  python3 gmail_watcher.py --query 'ARTA OR DILG'       # focused pull (incremental per account)
+  python3 gmail_watcher.py --query '...' --no-since     # focused pull, whole mailbox history
+  python3 gmail_watcher.py --since 2026-04-01           # explicit since (backfill)
+  python3 gmail_watcher.py --max 200                    # cap PER STREAM (paged)
   python3 gmail_watcher.py --full-inbox                 # legacy: mirror all mail
+
+Incremental "since" is computed PER ACCOUNT (max received_at for that inbox,
+minus 1 day overlap). Upsert is on message_id, so overlap/backfill re-runs are
+idempotent. received_at = Gmail internalDate (true receipt); sent_at = the
+sender's claimed Date header.
 
 Categories assigned (onboarded mail only):
   legal_correspondence, bill, receipt, bank_statement, client_inquiry,
@@ -24,6 +30,7 @@ import re
 import sys
 import time
 from datetime import datetime, timezone, timedelta
+from email.utils import parsedate_to_datetime
 import psycopg2
 import psycopg2.extras
 
@@ -185,11 +192,74 @@ def correlate_case(text, by_case):
     return max(scores.items(), key=lambda x: x[1])[0]
 
 
+def list_message_ids(svc, q, cap):
+    """Page messages.list until `cap` ids or results exhausted.
+
+    A single un-paged list() silently dropped everything past the first page
+    (the backup sweep hit its 40 cap every run with nextPageToken set)."""
+    ids, token = [], None
+    while len(ids) < cap:
+        kw = {"userId": "me", "q": q, "maxResults": min(500, cap - len(ids))}
+        if token:
+            kw["pageToken"] = token
+        resp = svc.users().messages().list(**kw).execute()
+        ids.extend(m["id"] for m in resp.get("messages", []))
+        token = resp.get("nextPageToken")
+        if not token:
+            break
+    return ids
+
+
+def walk_attachments(payload):
+    """All named attachment parts, at any nesting depth."""
+    out, stack = [], list(payload.get("parts") or [])
+    while stack:
+        part = stack.pop(0)
+        if part.get("filename"):
+            out.append({
+                "filename": part["filename"],
+                "mime": part.get("mimeType"),
+                "size": part.get("body", {}).get("size", 0),
+                "attachmentId": part.get("body", {}).get("attachmentId"),
+            })
+        stack.extend(part.get("parts") or [])
+    return out
+
+
+def sender_email(from_addr):
+    m = re.search(r"<([^>]+)>", from_addr or "")
+    return (m.group(1) if m else (from_addr or "")).strip().lower()
+
+
+def get_matter_senders(cur):
+    """Addresses that already have matter-linked inbound mail in the KB.
+
+    Mail from a known matter correspondent is onboarded even when this one
+    message carries no keyword signal (e.g. Allan's empty-body .docx sends
+    of 2026-09-14). This only admits the row — case_file is still decided
+    from the message's OWN content, never inherited from the sender
+    (client-separation: a correspondent can span matters)."""
+    cur.execute("""
+        SELECT DISTINCT lower(substring(from_addr from '<([^>]+)>')) AS a1,
+                        lower(trim(from_addr)) AS a2
+        FROM gmail_messages
+        WHERE (case_file IS NOT NULL OR client_code IS NOT NULL)
+          AND NOT ('SENT' = ANY(coalesce(labels, '{}')))
+    """)
+    out = set()
+    for r in cur.fetchall():
+        out.add(r["a1"] or r["a2"])
+    # Our own inboxes are not "correspondents" — self-mail must earn its way in.
+    return out - set(ACCOUNT_ADDR.values())
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--query", default=None, help="Gmail query (e.g. 'ARTA OR DILG')")
     ap.add_argument("--since", default=None, help="YYYY-MM-DD lower bound")
-    ap.add_argument("--max", type=int, default=200)
+    ap.add_argument("--no-since", action="store_true",
+                    help="no date bound (manual whole-history --query pulls)")
+    ap.add_argument("--max", type=int, default=200, help="cap per stream (paged)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--send-tg", action="store_true")
     ap.add_argument(
@@ -207,9 +277,12 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     # Determine since
+    # Per-account: a global max(received_at) let backup-inbox rows push the
+    # primary watermark forward past un-ingested primary mail.
     since = args.since
-    if not since and not args.query:
-        cur.execute("SELECT max(received_at) AS m FROM gmail_messages")
+    if not since and not args.no_since:
+        cur.execute("SELECT max(received_at) AS m FROM gmail_messages WHERE account = %s",
+                    (acct_addr,))
         m = cur.fetchone()["m"]
         since = (m - timedelta(days=1)).strftime("%Y/%m/%d") if m else "2025/01/01"
 
@@ -230,23 +303,23 @@ def main():
         ("need", base_q),
         ("sent", sent_q),
     ]
-    print(f"  base query: {base_q!r}  max per stream: {args.max}")
+    print(f"  account: {acct_addr}  base query: {base_q!r}  max per stream: {args.max}")
 
     msgs = []
     seen_ids = set()
     for label, q in streams:
         try:
-            resp = svc.users().messages().list(userId="me", q=q, maxResults=min(500, args.max)).execute()
-            stream_msgs = resp.get("messages", [])
-            new = [m for m in stream_msgs if m["id"] not in seen_ids]
-            seen_ids.update(m["id"] for m in stream_msgs)
+            stream_ids = list_message_ids(svc, q, args.max)
+            new = [{"id": i} for i in stream_ids if i not in seen_ids]
+            seen_ids.update(stream_ids)
             msgs.extend(new)
-            print(f"  [{label}] matched: {len(stream_msgs)} ({len(new)} new this stream)")
+            print(f"  [{label}] matched: {len(stream_ids)} ({len(new)} new this stream)")
         except Exception as e:
             print(f"  [{label}] FAILED: {e!r}")
     print(f"  total unique: {len(msgs)} messages")
 
     by_case = get_case_keywords(cur)
+    matter_senders = get_matter_senders(cur)
     stats = {}
     inserted = updated = skipped = 0
     actionable = []  # for Telegram digest
@@ -256,7 +329,9 @@ def main():
     )
     active_threads = {r["thread_id"] for r in cur.fetchall() if r.get("thread_id")}
 
-    for i, m in enumerate(msgs[:args.max]):
+    # Each stream is already capped at --max; slicing the union to --max here
+    # starved the SENT stream whenever the need stream filled the cap.
+    for i, m in enumerate(msgs):
         full = svc.users().messages().get(userId="me", id=m["id"], format="full").execute()
         headers = {h["name"]: h["value"] for h in full.get("payload", {}).get("headers", [])}
         subject = headers.get("Subject", "")
@@ -267,38 +342,34 @@ def main():
         thread_id = full.get("threadId")
         plain, html = extract_body(full.get("payload", {}))
         labels = full.get("labelIds", [])
-        # Attachments
-        attachments = []
-        for part in (full.get("payload", {}).get("parts") or []):
-            if part.get("filename"):
-                attachments.append({
-                    "filename": part["filename"],
-                    "mime": part.get("mimeType"),
-                    "size": part.get("body", {}).get("size", 0),
-                    "attachmentId": part.get("body", {}).get("attachmentId"),
-                })
+        attachments = walk_attachments(full.get("payload", {}))
+        # Attachment filenames are content: "SHERWIN CERTIORARI SC INOCALLA.docx"
+        # under an empty body is the whole signal of the message.
+        att_names = " ".join(a["filename"] for a in attachments)
+        gate_body = f"{plain}\n{att_names}" if att_names else plain
 
-        category, conf = classify_email(subject, plain, from_addr)
+        category, conf = classify_email(subject, gate_body, from_addr)
         is_sent = bool(labels and "SENT" in labels)
-        case_file = correlate_case(f"{subject} {plain}", by_case)
+        case_file = correlate_case(f"{subject} {gate_body}", by_case)
         thread_in_kb = bool(thread_id and thread_id in active_threads)
+        known_sender = (not is_sent) and sender_email(from_addr) in matter_senders
         onboard = args.full_inbox or should_onboard_email(
             from_addr=from_addr,
             subject=subject,
-            body_plain=plain,
+            body_plain=gate_body,
             to_addrs=to_addrs,
             cc_addrs=cc_addrs,
             case_file=case_file,
             raw_category=category,
             is_sent=is_sent,
-            thread_in_active_kb=thread_in_kb,
+            thread_in_active_kb=thread_in_kb or known_sender,
         )
         if not onboard:
             skipped += 1
             stats["skipped_not_needed"] = stats.get("skipped_not_needed", 0) + 1
             if args.dry_run:
                 print(
-                    f"  [DRY SKIP] {date_str[:25]:25s}  "
+                    f"  [DRY SKIP] {m['id']}  {date_str[:25]:25s}  "
                     f"{(subject or '')[:70]}"
                 )
             continue
@@ -312,15 +383,23 @@ def main():
         # Upsert
         if args.dry_run:
             print(
-                f"  [DRY ONBOARD] {date_str[:25]:25s}  [{category:18s}]  "
+                f"  [DRY ONBOARD] {m['id']}  {date_str[:25]:25s}  [{category:18s}]  "
                 f"{(subject or '')[:70]}  case={case_file or '—'}"
             )
             inserted += 1
             continue
 
+        # received_at = Gmail internalDate (TRUE receipt); sent_at = claimed Date
+        # header. Both stored as naive UTC. Never collapse the two.
         try:
-            received_at = datetime.strptime(date_str[:31].strip(), "%a, %d %b %Y %H:%M:%S %z") if date_str else None
-        except: received_at = None
+            received_at = datetime.fromtimestamp(int(full["internalDate"]) / 1000, tz=timezone.utc).replace(tzinfo=None)
+        except Exception:
+            received_at = None
+        try:
+            sent_at = parsedate_to_datetime(date_str).astimezone(timezone.utc).replace(tzinfo=None) if date_str else None
+        except Exception:
+            sent_at = None
+        received_at = received_at or sent_at
 
         cur.execute("""
             INSERT INTO gmail_messages
@@ -336,7 +415,7 @@ def main():
               attachment_refs = EXCLUDED.attachment_refs
             RETURNING (xmax = 0) AS is_new
         """, (m["id"], thread_id, from_addr, to_addrs, cc_addrs, subject,
-              plain[:50000], html[:50000] if html else None, received_at, received_at,
+              plain[:50000], html[:50000] if html else None, sent_at, received_at,
               labels, bool(attachments), json.dumps(attachments) if attachments else None,
               case_file, client_code, acct_addr, conf, [category],
               json.dumps({"category": category, "bill_metadata": bill_meta})))
@@ -357,7 +436,7 @@ def main():
             })
 
         if (i+1) % 20 == 0:
-            print(f"  ... {i+1}/{len(msgs[:args.max])} processed")
+            print(f"  ... {i+1}/{len(msgs)} processed")
         time.sleep(0.05)  # gentle on API
 
     # Emit heartbeat
