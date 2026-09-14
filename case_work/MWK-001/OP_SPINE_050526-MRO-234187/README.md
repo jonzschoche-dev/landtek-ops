@@ -11,6 +11,6 @@ PDFs/JPG here are gitignored; the same files are in Drive `01 - Clients/Heirs of
 | B3 | Second Manifestation re 0747 | 4 Jun 2026 | 060426-MRO-240932 | 87-pp stamped scan + v19 narrative + cover letter (Downloads) |
 | B4 | Third Manifestation re 1212 | 23 Jul 2026 | 072326-MRO-251125 | 12-pp narrative (Downloads `..._Narrative.pdf`, matched to stamped last page) + 4-pp stamped cover/verification (VPS ScannerPro `1kQu2N…`) + Annexes O1–O12 bound |
 | B5 | Petition re 1321 (Abla) with consolidation prayer | 8 Sep 2026 | pending | 71-pp packet, UNSIGNED copy (signed/stamped set not yet located) |
-| B6 | LBC waybill 142061372862 to PACE | shipped 11 Sep 2026 | — | photo of waybill |
+| B6 | LBC waybill 142061372862 to PACE + tracking record | shipped 11 Sep 2026; **delivered to MRO 14 Sep 2026** (Neil Javier, office staff/employee) | — | photo of waybill (doc 13948); LBC Track & Trace screenshot (doc 14076) |
 
 Not here (already canonical elsewhere): ARTA-side originals and resolutions live under their `MWK-ARTA-*` matters.
