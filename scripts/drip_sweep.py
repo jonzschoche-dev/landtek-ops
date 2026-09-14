@@ -271,17 +271,31 @@ def tick(cur, today=None):
     for ob in cur.fetchall():
         cur.execute("UPDATE office_obligation SET state='lapsed', updated_at=now() WHERE id=%s", (ob["id"],))
         _event(cur, "lapse", obligation_id=ob["id"], due_at=ob["due_at"], officer=ob["officer"])
+        # A lapse advances exactly ONE rung — the lowest still pending. Never a second letter to the
+        # same officer, never the whole ladder at once (operator: "rungs, not separate clocks").
+        cur.execute("""SELECT * FROM escalation_rung WHERE obligation_id=%s AND state='pending'
+                        ORDER BY seq LIMIT 1""", (ob["id"],))
+        rung = cur.fetchone()
+        target = (f"{rung['office']} — {rung['instrument_ref'] or '?'}" if rung
+                  else (ob["consequence_ref"] or "?"))
         steps = json.dumps([{"name": "prepare", "agent": "domain-agent", "mode": "handoff", "tier": "T2"},
                             {"name": "approve", "agent": "human", "mode": "handoff", "tier": "T3"}])
         cur.execute("""INSERT INTO work_orders (kind, matter_code, title, status, steps, current_step,
                                                 governed, created_by, target_ref)
                        VALUES ('outward_action', %s, %s, 'queued', %s, 0, true, 'drip', %s)""",
                     (ob["matter_code"],
-                     f"DRIP lapse — {ob['officer']}: file pre-built consequence ({(ob['consequence_ref'] or '?')[:80]}) — {ob['counsel_gate'] or 'NEEDS-COUNSEL'}",
-                     steps, f"drip:{ob['officer']}:{ob['id']}"))
+                     f"DRIP lapse — {ob['officer']}: advance to rung "
+                     f"{rung['seq'] if rung else '—'} · {target[:80]} — {ob['counsel_gate'] or 'NEEDS-COUNSEL'}",
+                     steps, f"drip:{ob['officer']}:{ob['id']}:rung{rung['seq'] if rung else 0}"))
+        if rung:
+            cur.execute("UPDATE escalation_rung SET state='staged', staged_at=now() WHERE id=%s", (rung["id"],))
+            _event(cur, "stage_rung", obligation_id=ob["id"], rung_seq=rung["seq"],
+                   office=rung["office"], email=rung["email"], confidence=rung["email_confidence"])
+        else:
+            _event(cur, "stage_consequence", obligation_id=ob["id"], consequence=ob["consequence_ref"],
+                   note="no rung ladder defined — fell back to consequence_ref")
         cur.execute("UPDATE office_obligation SET state='consequence_staged', updated_at=now() WHERE id=%s", (ob["id"],))
-        _event(cur, "stage_consequence", obligation_id=ob["id"], consequence=ob["consequence_ref"])
-        staged.append(f"LAPSED→consequence staged: {ob['officer']} ({ob['obligation'][:50]}…)")
+        staged.append(f"LAPSED→rung {rung['seq'] if rung else '—'} staged: {ob['officer']} → {target[:55]}")
     # 2) EDITIONS due → concise letter draft into Gmail drafts.
     cur.execute("SELECT * FROM drip_edition WHERE next_edition_due IS NOT NULL AND next_edition_due <= %s", (today,))
     for ed in cur.fetchall():

@@ -81,8 +81,9 @@ def lapse_stages_consequence_never_letter(cur):
             raise TruthFailure(f"lapsed row did not reach consequence_staged: {staged}")
         tc.execute("SELECT count(*) n, max(title) t FROM work_orders WHERE created_by='drip'")
         row = tc.fetchone()
-        if row["n"] != before + 1 or "consequence" not in (row["t"] or ""):
-            raise TruthFailure("lapse did not stage exactly one consequence work order.")
+        title = row["t"] or ""
+        if row["n"] != before + 1 or "DRIP lapse" not in title or "rung" not in title:
+            raise TruthFailure(f"lapse did not stage exactly one rung/consequence work order (got {title[:80]!r}).")
         tc.execute("SELECT count(*) n FROM drip_event WHERE kind IN ('draft_staged','draft_staged_file') "
                    "AND obligation_id=%s", (oid,))
         if tc.fetchone()["n"]:
@@ -285,7 +286,61 @@ def edition_letter_is_always_one_page(cur):
         conn.rollback(); conn.close()
 
 
+def lapse_advances_one_rung_only(cur):
+    """Rungs, not parallel clocks: a lapse stages exactly ONE rung (lowest pending), never the whole
+    ladder and never a second letter to the same officer. Held/gated officers have no ladder at all."""
+    conn, tc = _rb()
+    mk = []
+    _no_gmail(mk)
+    try:
+        tc.execute("""UPDATE office_obligation SET state='served_running', served_at=%s,
+                            service_proof='TEST', service_proof_doc_id=%s, due_at=%s
+                      WHERE officer='Abla' RETURNING id""",
+                   (date.today() - timedelta(days=20), _any_mwk_doc(tc), date.today() - timedelta(days=5)))
+        oid = tc.fetchone()["id"]
+        tc.execute("SELECT count(*) n FROM escalation_rung WHERE obligation_id=%s", (oid,))
+        if tc.fetchone()["n"] < 2:
+            raise TruthFailure("Abla has no escalation ladder seeded.")
+        DS.tick(tc, date.today())
+        tc.execute("SELECT seq, state FROM escalation_rung WHERE obligation_id=%s ORDER BY seq", (oid,))
+        rungs = tc.fetchall()
+        staged = [r for r in rungs if r["state"] == "staged"]
+        if len(staged) != 1 or staged[0]["seq"] != 1:
+            raise TruthFailure(f"expected exactly rung 1 staged, got {[(r['seq'], r['state']) for r in rungs]} "
+                               "— a lapse must advance ONE rung, not the ladder.")
+        tc.execute("SELECT count(*) n FROM work_orders WHERE created_by='drip' AND target_ref LIKE %s",
+                   (f"drip:Abla:{oid}:rung%",))
+        if tc.fetchone()["n"] != 1:
+            raise TruthFailure("lapse did not stage exactly one rung work order.")
+    finally:
+        _restore(mk)
+        conn.rollback(); conn.close()
+
+
+def gated_officers_have_no_ladder(cur):
+    """Engr. Balane (CV 26-360 defendant, Barandon-gated) and Olaguera (withdrawn) must have NO rungs
+    and NO address — the drip can never route anything toward them."""
+    conn, tc = _rb()
+    try:
+        for officer in ("Engr. Balane", "Olaguera"):
+            tc.execute("""SELECT o.email, count(r.id) AS rungs FROM office_obligation o
+                            LEFT JOIN escalation_rung r ON r.obligation_id=o.id
+                           WHERE o.officer=%s GROUP BY o.email""", (officer,))
+            row = tc.fetchone()
+            if not row:
+                raise TruthFailure(f"{officer} row missing.")
+            if row["rungs"]:
+                raise TruthFailure(f"{officer} has {row['rungs']} escalation rung(s) — must have none.")
+            if officer == "Engr. Balane" and row["email"]:
+                raise TruthFailure("Engr. Balane carries an email address — he is Barandon-gated; "
+                                   "the drip must hold no route to a CV 26-360 defendant.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
+    ("drip.lapse_advances_one_rung_only", lapse_advances_one_rung_only),
+    ("drip.gated_officers_have_no_ladder", gated_officers_have_no_ladder),
     ("drip.edition_letter_is_always_one_page", edition_letter_is_always_one_page),
     ("drip.feeds_calendar_pulse", feeds_calendar_pulse),
     ("drip.service_requires_corpus_proof", service_requires_corpus_proof),
