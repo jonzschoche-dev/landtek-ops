@@ -26,6 +26,7 @@ from datetime import datetime, timedelta, timezone
 from calendar_sync import (
     db, table_exists, columns_of, load_matters_index, load_env,
     gather_from_matters, gather_from_events, gather_from_case_actions,
+    gather_from_deadline_substrate,
 )
 
 JONATHAN_CHAT_ID = "6513067717"
@@ -61,7 +62,8 @@ def get_agenda(cur):
         clients_by_id = {cid: code for cid, code in cur.fetchall()}
     items = (gather_from_matters(cur, None, index, by_code)
              + gather_from_events(cur, None, index, clients_by_id)
-             + gather_from_case_actions(cur, None, index))
+             + gather_from_case_actions(cur, None, index)
+             + gather_from_deadline_substrate(cur, None, index))
     # NB: matter_plays (kind='play') are deliberately EXCLUDED from the spoken
     # reminder — they are strategic-move suggestions that pile onto a matter's
     # deadline date, not scheduled commitments. A human reminder names the event,

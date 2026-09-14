@@ -405,6 +405,71 @@ def gather_from_case_actions(cur, client_filter, index):
     return items
 
 
+# The dedicated DEADLINE SUBSTRATE — the date-bearing tables the pulse/brief were blind to
+# (deploy fix: "calendar starved"). The agenda gather read only matters/events/case_actions, so
+# a deadline landing in any of these went unseen. Each future-dated row → one agenda item, client
+# resolved via the matters index (matter_code OR case_file handle); UNRESOLVED stays untagged,
+# never guessed (A5). key_kind 'array' = the key column is text[] (take element 1). Degrade per
+# source: a missing table/column skips that source, never crashes the gather.
+DEADLINE_SOURCES = [
+    # (table, date_col, label_expr, key_col, key_kind, extra_where)
+    ("surfaced_deadlines", "due_date", "label", "matter_code", "scalar",
+     "as_of = (SELECT max(as_of) FROM surfaced_deadlines)"),
+    ("case_deadlines", "due_date", "title", "case_file", "scalar",
+     "COALESCE(status,'') NOT IN ('done','cancelled','completed','resolved')"),
+    ("case_events", "scheduled_for", "short_label", "case_file", "scalar",
+     "COALESCE(status,'') NOT IN ('cancelled','done','completed')"),
+    ("arta_cases", "next_deadline", "COALESCE(next_action, subject_summary, 'ARTA next step')",
+     "matter_code", "scalar", "COALESCE(status,'') NOT IN ('closed','resolved','dismissed')"),
+    ("case_reports", "next_hearing_date", "COALESCE('Hearing: '||next_hearing_type, 'Next hearing')",
+     "matter_code", "scalar", ""),
+    ("resolutions", "next_deadline", "COALESCE(next_action_required, 'Resolution follow-up')",
+     "affected_matter_codes", "array", ""),
+    ("drip_edition", "next_edition_due", "COALESCE('Obligation drip: '||instrument_ref, 'Drip edition')",
+     "matter_code", "scalar", "COALESCE(state,'') NOT IN ('closed','done','lapsed')"),
+]
+
+
+def gather_from_deadline_substrate(cur, client_filter, index):
+    """Source E: the full deadline substrate (deploy fix for the starved pulse). Reads every
+    date-bearing deadline table, not just matters/events/case_actions — so a deadline in any of
+    them reaches the pulse + brief. Client resolved through the matters index; unresolved stays
+    untagged. Cross-source dedup by (matter/file, date, label). Degrade-don't-crash per source."""
+    items, seen = [], set()
+    for table, dcol, lbl, kcol, kkind, extra in DEADLINE_SOURCES:
+        if not table_exists(cur, table):
+            continue
+        keysel = f"{kcol}[1]" if kkind == "array" else kcol
+        where = f"{dcol} >= CURRENT_DATE" + (f" AND {extra}" if extra else "")
+        try:
+            cur.execute(f"SELECT id, {keysel} AS k, {dcol}::date AS d, ({lbl}) AS lbl "
+                        f"FROM {table} WHERE {where}")
+            rows = cur.fetchall()
+        except Exception as e:  # noqa: BLE001 — schema drift degrades this source, not the gather
+            try:
+                cur.connection.rollback()
+            except Exception:
+                pass
+            print(f"[agenda] deadline source {table} skipped: {e}", file=sys.stderr)
+            continue
+        for rid, k, d, lbl_v in rows:
+            mi = index.get(str(k).strip().lower()) if k else None
+            client = mi.client if mi else None
+            if not _client_match(client, client_filter):
+                continue
+            dk = ((mi.label if mi else k) or "?", d, str(lbl_v or "")[:50].lower())
+            if dk in seen:
+                continue
+            seen.add(dk)
+            items.append(Item(
+                uid=f"{table}:{rid}", source=table, source_id=str(rid),
+                title=str(lbl_v or "Deadline")[:200], start=d, end=None, all_day=True,
+                client=client, matter=(mi.label if mi else k),
+                owner=(mi.owner if mi else None), kind="deadline", status="scheduled",
+                desc=f"Deadline from {table} (deadline substrate)."))
+    return items
+
+
 def gather_from_plays(cur, client_filter, index, by_code):
     """Source D: matter_plays — READY offensive moves, anchored to the matter's next
     deadline (a play has no date of its own). Only 'ready' plays with a real deadline."""
@@ -616,6 +681,7 @@ def main():
     items = (gather_from_matters(cur, args.client, index, by_code)
              + gather_from_events(cur, args.client, index, clients_by_id)
              + gather_from_case_actions(cur, args.client, index)
+             + gather_from_deadline_substrate(cur, args.client, index)
              + gather_from_plays(cur, args.client, index, by_code))
     items = [i for i in items if i.start is not None]
 
