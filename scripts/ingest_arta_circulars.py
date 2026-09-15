@@ -41,6 +41,8 @@ MANIFEST = [
     ("2021-11",  "ARTA", "ARTA MC No. 2021-11",                           "Nationwide Implementation — Referral & Handling of Complaints (ss.12(f),21(a)-(g)) to CART"),
     ("2022-05",  "ARTA", "ARTA MC No. 2022-05",                           "Harmonized Client Satisfaction Measurement (CSM) [confirm title from PDF]"),
     ("2023-02",  "ARTA", "ARTA MC No. 2023-02",                           "2023 ARTA Revised Rules of Procedure"),
+    ("2024-03",  "ARTA", "ARTA MC No. 2024-03",                           "Recognition and Awards Program (RAP) for the Philippine Good Regulatory Principles (PGRP)"),
+    ("2025-02",  "ARTA", "ARTA MC No. 2025-02",                           "Guidelines on the Implementation of the Zero-Contact Policy and the Conduct of a Preliminary Assessment of Submitted Applications or Requests under RA 11032 and its IRR"),
     ("2023-08",  "ARTA", "ARTA MC No. 2023-08",                           "Amendment on Certain Provisions of ARTA MC No. 2020-07 (CART Guidelines)"),
     ("2010-13",  "ARTA", "ARTA MC No. 2010-13",                           "Legacy issuance [confirm title/issuing body from PDF]"),
     ("2024-20",  "ARTA", "ARTA Advisory No. 2024-20",                     "Citizen's Charter / compliance-deadline advisory [confirm title from PDF]"),
