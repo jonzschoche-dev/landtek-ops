@@ -240,3 +240,22 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   draft in thread `1a05f92542f6fdd1`). Drive loan folder synced: v5 fitted KML uploaded as
   `P1616_Lot4_v5_FITTED.kml` (id `1lGbIcCdWLDc2wuuWH7GA9Xu-O5nDpiL0`), superseded copy
   trashed. `P1616_MapFit_v5.kmz` delivered to Jonathan. Next check-in re-armed for 2026-09-15.
+
+- **2026-09-15 — Weekly check-in: BOTH offices have now answered. Jurisdiction settled; research
+  is LIVE at SMD Region V.**
+  - **PENRO Camarines Norte (Sept 10, thread `1a05f92542f6fdd1`):** formal reply — PENRO is *not*
+    authorized to issue and does *not* hold the requested records; ALL of it (cadastral control
+    maps, survey plans/returns, lot data computations, technical descriptions, cadastral index
+    maps, digital cadastral data, survey control info, **BLLM records, tie-line records**) is
+    under the **Survey Management Division (SMD), DENR Regional Office V, Legazpi**
+    (smd.r5@denr.gov.ph, CP 0917-139-0360). They also emailed their referral letter as
+    `lms.pdf` (message `1a08af4021a49ed7`; open in Gmail — attachment not retrievable via this
+    session's connector). → **PENRO/Daet route CLOSED for records; the runner's Stop A is now
+    Legazpi-only (or phone-first).** Directive Stop A updated by this note.
+  - **SMD Region V (Sept 14, thread `1a05f76a181e92a8`):** after Jonathan sent the staged
+    follow-up on Sept 11 ✓, SMD replied: request **referred to their Land Records Section for
+    research**; follow up directly at **CP No. 0917-139-0360**. No fees/timeline stated yet.
+  - **Next move (human, fastest): call/text 0917-139-0360** citing the Sept 2 email request re
+    Psu-143364 Lot 4 / OCT P-1616 — ask research status, fees, and claiming. Allan's signed
+    authorization still pending (unsigned draft flagged 2026-09-06 — sign before claiming).
+  - Next automated check: 2026-09-22 (email-watch only; no autonomous sends per Jonathan).
