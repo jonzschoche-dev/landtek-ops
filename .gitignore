@@ -124,3 +124,9 @@ scripts/deploy_*.sql
 
 # Signature asset — forgeable material; distributed by scp, never committed (deploy_1010)
 assets/signature/
+
+# Daemon runtime checkpoint — landtek_daemon.py load_state() rebuilds it in full
+# (axioms included) from module constants when absent. Tracking it meant every VPS
+# daemon cycle re-dirtied the tree, which blocked pull --rebase and drove the
+# 85-behind divergence found at deploy_1057. See [[vps-stash-accumulation-and-drift]].
+system_state.json
