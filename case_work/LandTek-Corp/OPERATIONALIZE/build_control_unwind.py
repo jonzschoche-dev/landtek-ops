@@ -97,6 +97,13 @@ story = [
     P("- <b>Buy-out-on-cause (optional):</b> if you want a forced-exit mechanic for the principal, it must run to a "
       "<b>REPLACEMENT Filipino you designate</b>, at fair value - NEVER back to you. \"Transfer to me on demand\" is the nominee red flag.", li),
     P("- <b>Separate the crown jewel:</b> the platform/IP stays with you/holdco throughout - it is licensed in, never contributed to the opco.", li),
+    P("- <b>Separate the clusters:</b> the principal is Allan Inocalla, who is ALSO the Paracale/mining client. "
+      "Keep mining in its own vehicle (PGC / PIF), served arm's-length; never co-mingle it with the MWK estate "
+      "books. Paper a short <b>conflict acknowledgment</b> (Allan-as-owner <-> MWK and Paracale as clients).", li),
+    P("- <b>Because the principal is a real partner, not a placeholder:</b> a fallout would touch the mining "
+      "relationship too, so the primary lever is the <b>revocable IP license</b> (holds against anyone), backed "
+      "by Patricia's terminable mandate - not a share grab. Cluster separation is what keeps a dispute in one "
+      "from bleeding into the other.", li),
 
     P("6. The citizenship endgame", sec),
     P("Because the value is always in your IP, you lose nothing by waiting. On naturalization (yours or "

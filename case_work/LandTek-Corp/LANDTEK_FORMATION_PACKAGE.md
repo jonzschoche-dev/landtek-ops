@@ -35,8 +35,9 @@ JONATHAN (or a US IP-holdco)  ──owns──►  LandTek platform + ALL IP  �
 |---|---|
 | **Registered name** | "LandTek [___]" — [DECIDE + SEC name reservation] |
 | **Form** | Filipino-owned corporation, OR a Filipino-owned OPC — [decide with counsel per §5] |
-| **Owner(s)/incorporator(s)** | **genuine Filipino principal(s)** — [NAME THEM: Kristyle? others?] — real equity, real control |
-| **Authorized signatory** | the opco President/authorized rep — [NAME] (signs demands + the estate agreement; NOT Jonathan/Patricia) |
+| **Owner(s)/incorporator(s)** | **DECIDED: Allan Inocalla** — single OPC owner; a real, substantial, genuinely-controlling Filipino owner (strongest Anti-Dummy posture). Owns the **services opco only**. |
+| **Authorized signatory** | the opco President/authorized rep — [NAME] (signs demands + the estate agreement; NOT Jonathan/Patricia). [Allan or a designated officer — confirm.] |
+| **Cluster separation** | The Paracale/mining business stays in its **own vehicle (PGC/PIF)**, served **arm's-length** — never co-mingled with the MWK estate books. Allan is owner of the services opco AND a client (Paracale); paper a short **conflict acknowledgment** disclosing the overlap. |
 | **Primary purpose** | land / property services + legal-operations support (records intelligence, property recovery, management, development coordination) — **NOT the practice of law** |
 | **Capital** | minimal for a Filipino-owned services co (~₱[__]); no foreign min-capital under Path C |
 | **Principal office** | [Daet / Camarines Norte] |
@@ -71,11 +72,11 @@ min-capital hurdle — **confirm with counsel before name reservation.**
 7. **Corporate bank account** (for the estate collections held in trust).
 8. **Execute:** the IP license (Jonathan→opco) + the estate management agreement (Patricia→opco, apostilled).
 
-## 7. Decisions needed from Jonathan (these unblock counsel)
-1. **Name the genuine Filipino principal(s) + the authorized signatory.** ← the one that gates everything.
-2. **Registered company name.**
-3. **IP holder:** Jonathan personally vs a US IP-holdco.
-4. **Royalty rate** (§2) + **opco capital** (§3).
-5. **Counsel:** which PH corporate/IP lawyer will form it (separate from Barandon/Botor).
+## 7. Decisions
+1. ~~Name the genuine Filipino principal + authorized signatory.~~ **DONE — principal = Allan Inocalla (services opco only; mining stays separate in PGC/PIF; conflict acknowledgment to be papered).** Authorized signatory (Allan or a designated officer) — confirm.
+2. **Registered company name.** — open
+3. **IP holder:** Jonathan personally vs a US IP-holdco. — open
+4. **Royalty rate** (§2) + **opco capital** (§3). — open
+5. Engaging a PH lawyer is **optional and Jonathan's call** — not a prerequisite to forming the OPC / BIR / LGU / signing the instruments; a lawyer is only needed to file actual court suits (UPL line).
 
 *Internal formation package — not legal/corporate advice; a PH lawyer + SEC/BIR formalize. Nothing filed or incorporated.*

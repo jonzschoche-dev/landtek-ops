@@ -55,9 +55,15 @@ story += [
               "makes your control durable (revoke the license, pull the mandate), and makes any future "
               "consolidation on naturalization a clean, arms-length transaction.", body),
     Spacer(1, 0.2*inch),
+    Paragraph("Principal &amp; separation", toc),
+    Paragraph("Filipino principal / single OPC owner: <b>Allan Inocalla</b> - a real, controlling owner "
+              "(strongest Anti-Dummy posture). He owns the <b>services opco only</b>. The Paracale / mining "
+              "business stays in its own vehicle (PGC / PIF), served arm's-length; a short conflict "
+              "acknowledgment discloses the owner-and-client overlap. The two clusters stay separate.", body),
+    Spacer(1, 0.2*inch),
     Paragraph("Minimum headcount", toc),
-    Paragraph("One genuine Filipino owner (the OPC's single stockholder) + one Filipino corporate secretary "
-              "(an officer, no equity). That's the floor.", body),
+    Paragraph("One genuine Filipino owner (the OPC's single stockholder - Allan) + one Filipino corporate "
+              "secretary (an officer, no equity). That's the floor.", body),
     Spacer(1, 0.3*inch),
     Paragraph("<font size=8 color='#888'>Internal formation packet - not legal/corporate advice. You execute "
               "the structure yourself; a lawyer is optional and only files actual court suits. Nothing filed or "

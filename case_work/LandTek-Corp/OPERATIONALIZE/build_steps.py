@@ -28,6 +28,12 @@ story = [
     P("STEP 0 - Lock your five decisions (you decide - do this first)", stp),
     P("- <b>(1)</b> the genuine Filipino principal (the single OPC owner) + the authorized signatory, "
       "<b>(2)</b> entity form (Step 1), <b>(3)</b> company name, <b>(4)</b> capital, <b>(5)</b> the purpose clause.", li),
+    P("- <b>Principal DECIDED: Allan Inocalla</b> - a real, substantial, genuinely-controlling Filipino owner "
+      "(strongest possible Anti-Dummy posture, zero nominee smell). He owns the <b>services opco only</b>.", li),
+    P("- <b>Keep the clusters separate.</b> The Paracale / mining business stays in its own vehicle (PGC / PIF) "
+      "and is served as an <b>arm's-length client</b> - never co-mingled with the MWK estate books. Paper a "
+      "short <b>conflict acknowledgment</b> (Allan-as-owner <-> MWK and Paracale as clients) so the overlap is "
+      "disclosed, not buried.", li),
     P("- Structure it right so it holds up under <b>Anti-Dummy</b>: the value stays in your IP (you license it "
       "in), the Filipino principal genuinely owns and runs the lean opco shell, and any future path to your "
       "ownership is a real transaction on naturalization - never a hold-for-me option. (If you ever want extra "
