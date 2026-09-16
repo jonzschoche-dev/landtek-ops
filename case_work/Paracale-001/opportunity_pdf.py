@@ -168,6 +168,8 @@ def on_page(c, doc):
 
 MEMO_MD = "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.md"
 MEMO_OUT = os.path.join(HERE, "MEMO_STEPHEN_JULIET_MINING_OPPORTUNITY_2026-09.pdf")
+PROPOSAL_MD = "PROPOSAL_PARACALE_GOLD_PROJECT_PERMIT_INTERFACE_2026-09.md"
+PROPOSAL_OUT = os.path.join(HERE, "PROPOSAL_PARACALE_GOLD_PROJECT_PERMIT_INTERFACE_2026-09.pdf")
 DETAIL_MD = "MEMO_DETAIL_PACK_2026-09.md"
 DETAIL_OUT = os.path.join(HERE, "MEMO_DETAIL_PACK_2026-09.pdf")
 
@@ -247,5 +249,6 @@ if __name__ == "__main__":
     import sys
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
     if mode == "memo": build_memo()
+    elif mode == "proposal": build_memo(body_pt=11, md=PROPOSAL_MD, out=PROPOSAL_OUT, footer="Paracale Gold Project · Proposal and permit interface · Confidential — proposed model for discussion")
     elif mode == "detail": build_memo(md=DETAIL_MD, out=DETAIL_OUT, footer="The Paracale gold opportunity · Detail pack · Confidential — partners' working document")
     else: build()
