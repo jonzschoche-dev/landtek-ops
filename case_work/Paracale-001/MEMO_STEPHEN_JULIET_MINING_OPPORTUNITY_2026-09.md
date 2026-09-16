@@ -23,7 +23,7 @@ What we propose is large from the very beginning: a district-scale programme acr
 
 ## What we have to start with
 
-- **A working plant.** The ₱29-million mercury-free processing plant at Casalugan, built under the UN-backed planetGOLD programme inside an already-declared Minahang Bayan, with Stephen as its operating partner and a small-scale mining community around it.
+- **A working plant.** The ₱29-million mercury-free processing plant at Casalugan, built under the UN-backed planetGOLD programme inside an already-declared Minahang Bayan, owned by the cooperative that runs it, with Stephen as its operating partner and a small-scale mining community around it.
 - **A second site.** Allan's own titled land at Santa Rosa Sur, Jose Panganiban, where the new plant — AVI Gold Processing — is planned.
 - **Allan's own Minahang Bayan.** At the same site, petitioned in his cooperative's name and declared first: once declared, that ground can enter no permit or large-scale project without the cooperative's consent — Wave 2's asset and, when the tenement chapter opens, Allan's seat at that table.
 - **The tenement next door.** NIBDC's 2,360-hectare exploration permit application across Paracale, Jose Panganiban and Labo, endorsed by the regional mines bureau for issuance — the exploration upside, and the asset a Canadian listing would be built on. Stephen has described a power of attorney over a substantial shareholding in NIBDC, which, once seen and put on written terms, would help make that chapter reachable when its time comes.

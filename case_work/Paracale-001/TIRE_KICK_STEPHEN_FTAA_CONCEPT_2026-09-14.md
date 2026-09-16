@@ -1,3 +1,6 @@
+> # ⛔ CLOSED — THE FTAA ROUTE IS DROPPED
+> **Jonathan, 2026-09-17: "Drop the FTAA completely. It's overcomplicated."** This assessment is retained as the record of why the route was examined and what was learned from it, and because §1's technical pillars remain the design brief for the AVI plant. **Nothing below is a live option.** The model stays inside the 60/40 rule: exploration permit, then a mineral production sharing agreement with Allan's company holding at least 60%, and a processing company that may be foreign-owned. Superseded on the counterparty side by `INFINITI_STONES_DEVELOPMENT_2026-09-17.md`.
+
 # TIRE-KICK — Stephen's "Minahang Bayan → FTAA" concept paper (Casalugan)
 *LandTek internal assessment, 2026-09-14. INTERNAL-HELD / UNDER NDA. For Jonathan. Not legal advice; the points marked [PV] need Philippine mining counsel. Source: `received/STEPHEN_CONCEPT_PAPER_MB_TO_FTAA_CASALUGAN_2026-09.md`.*
 

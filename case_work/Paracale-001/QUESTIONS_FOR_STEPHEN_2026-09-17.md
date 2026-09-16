@@ -1,17 +1,17 @@
 # QUESTIONS FOR STEPHEN — what we need from him, and why each one matters
 *LandTek internal, 2026-09-17. INTERNAL-HELD. Ordered so that the first block gates the money and the last block can wait. Each question names the instrument we need, not just the answer — an answer without a document does not close the item. Governing rule: control stays with our vehicles, roles are earned in stages, Allan is protected at every step.*
 
-**How to use this.** Send blocks A and B now; they are the gate before any peso moves. Block C goes with the proposal. Block D is the FTAA conversation and waits for the answer to C1. Nothing in blocks C or D is discussed until A is answered in documents.
+**How to use this.** Blocks A and B go now; they are the gate before any peso moves, and block B has overtaken the rest — Stephen's new company changes who our counterparty is. Block C goes with the proposal. Block D waits. Nothing in C or D is discussed until A and B are answered in documents.
 
 ---
 
 ## BLOCK A — Gate 0: before any money moves (ask now, in writing)
 
 **The plant and your position in it**
-1. Please send the **signed** Operational Partnership Agreement with SMBC — by email, not chat; our bridge drops attachments. Board Resolution 2026-009 authorises it; we have never seen the executed document.
-2. **Who holds title to the MFPS?** SMBC, the planetGOLD programme, the Artisanal Gold Council, UNIDO, or a government agency? Please send the turnover deed or MOA by which the plant came to SMBC in 2025, with its conditions.
-3. Does that turnover instrument **allow SMBC to encumber the plant, to host third-party equipment, or to bring in a commercial partner** — and does it restrict transfer, change of use, or scale-up? If there are covenants, we need them before we place a single machine there.
-4. Your **50% net-profit share**: is it assignable, and does SMBC's consent have to be obtained to assign it? (It is part of what stands behind repayment.)
+1. Please send the **signed Operating Agreement with SMBC in your personal name** — by email, not chat; our bridge drops attachments. Board Resolution 2026-009 authorises it and you have told us it is executed; we have never seen it.
+2. **The MFPS turnover deed.** You have told us SMBC owns everything at Casalugan. Please send the turnover deed or MOA by which the plant came to SMBC in 2025, with its conditions — what it permits SMBC to do with the plant is now the question, not who owns it.
+3. Does that turnover instrument **allow SMBC to encumber the plant, to host third-party equipment, or to contract with a commercial operator** — and does it restrict transfer, change of use, or scale-up? If there are covenants, we need them before a single machine goes in, and before the Infiniti Stones contract is signed.
+4. Your **50% net-profit share** under that personal agreement: is it assignable, and does SMBC's consent have to be obtained? (See also block B — if it moves into Infiniti Stones, it is no longer yours to pledge.)
 5. **Marlon Malaluan** — what is his role under the SMBC arrangement, and does he sign anything?
 
 **The money**
@@ -27,15 +27,19 @@
 
 ---
 
-## BLOCK B — the concept paper (ask now, under the NDA)
+## BLOCK B — Infiniti Stones Resource and the SMBC contract (ask now — this has overtaken everything)
 
-13. **Who is the "prospective FTAA applicant"** in your concept paper — and are you acting for them? This is the question that decides how we read everything else: if the applicant is PGC, your plan is our Wave 3 and we absorb it; if it is a third party, Allan's ground and NIBDC's claim are being folded into someone else's project.
-14. Have you raised the FTAA concept with **SMBC's board, the PMRB, MGB Region V, or planetGOLD / the Artisanal Gold Council**? If so, with whom and what was said? We need to know whether anything is already in motion in SMBC's name.
-15. What is the **declared area of the Casalugan Minahang Bayan** in hectares, and its PMRB resolution number and date? And does it lie inside or outside the EXPA-000250-V polygon?
-16. Your paper contemplates SMBC's members' contracts being "surrendered or converted". **Have the members been told that?** Our position is that their contracts are not ours or yours to trade.
-17. Would you be content to see the **technical sections of your paper adopted as the design brief for the AVI plant**, with the FTAA idea held for the tenement at genuine scale? That is where we think it belongs.
+*You have told us that your new mining company, **Infiniti Stones Resource**, is making a full contract with SMBC now, and that your existing Operating Agreement is in your personal name. That changes who our counterparty is, so these come before anything else.*
 
----
+13. **What is Infiniti Stones Resource?** Where incorporated, when, with what registered purpose, and who owns it — the full shareholder list. If it is Philippine, what is its Filipino ownership percentage?
+14. **What is the "full contract" with SMBC?** Please send the draft. What does it cover — the plant, the processing, the ore, the Minahang Bayan area, the small-scale mining contracts, or all of it? For what term?
+15. **What happens to your personal Operating Agreement** when the Infiniti Stones contract is signed — is it superseded, novated into the company, or does it survive alongside? Please send both documents.
+16. **What happens to your 50% net-profit share?** If it moves from you personally into Infiniti Stones, it is no longer yours to stand behind repayment of our ₱5 million. Tell us plainly which entity holds it after the new contract.
+17. **Where do we sit in the new arrangement?** Our financing was structured against your personal position. If Infiniti Stones becomes the operator, is our counterparty you, Infiniti Stones, or SMBC — and who signs the repayment obligation?
+18. **Does SMBC acknowledge in writing that equipment we place at the plant remains ours?** You have told us SMBC owns everything there. We are content with that, but it means our machines need express retained title and a right of removal, signed by SMBC, before anything is delivered.
+19. **Have SMBC's members been told** what the Infiniti Stones contract does to their contracts and their plant?
+20. **Is there anyone else in Infiniti Stones** — investors, partners, financiers — whose interests we should know about before we fund anything at that plant?
+21. **The concept paper.** We are not pursuing the large-scale contract route; it is overcomplicated for what we are building, and the model stays inside the 60/40 rule. The **technical sections** of your paper are excellent and we would like to adopt them as the design brief for the AVI plant. Would you be content with that?
 
 ## BLOCK C — the engineering and the plants (with the proposal)
 
@@ -61,8 +65,8 @@
 ## What each block gates
 | Block | Gates |
 |---|---|
-| A | Any release of the ₱5M; any equipment placed at the MFPS; any Wave-3 planning that relies on the power of attorney |
-| B | Whether Stephen's concept paper travels anywhere, and whether the FTAA is ours or someone else's |
+| A | Any release of the ₱5M; any equipment placed at the MFPS (retained title first); any Wave-3 planning that relies on the power of attorney |
+| B | **Who our counterparty actually is.** Until Infiniti Stones, the SMBC contract and the fate of Stephen's personal agreement and profit share are on paper, the ₱5M has no defined obligor and no security |
 | C | The AVI circuit decision, the permit list that follows from it, and Stephen's engineering-services agreement |
 | D | The regional roll-out, the institute partnership, and Stephen's long-term position |
 
