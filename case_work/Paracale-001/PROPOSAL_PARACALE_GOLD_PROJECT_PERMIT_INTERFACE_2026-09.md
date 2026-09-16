@@ -117,8 +117,9 @@ What we propose is not a land sale. The 2023 plan offered to sell 81 hectares of
 | 6 | Central Office status of the exploration permit application | NIBDC |
 | 7 | Paracale Gold Company: jurisdiction, good standing, share register, officers, minute book | PGC |
 | 8 | Paracale National Mining Corp — the family company named in the 2023 plan: does it exist, who owns it, does it hold anything? | Allan |
-| 9 | The 2010 small-scale permit over TCT 2194 named in the 2023 plan, and the current status of that title | Allan |
+| 9 | The 2010 small-scale permit over TCT 2194 named in the 2023 plan. Our corpus puts T-2194 at 13.3690 ha in Batobalani, not 6.6941 ha in Capacuan, registered to Vicente and Beatriz, mortgaged to PNB, and touched by a 2014 execution sale and a lost tenancy case. **Not to be cited until a fresh certified copy is obtained** | Allan |
 | 10 | The siting and circuit decision for AVI, which fixes the permit list | Allan, Jonathan, Stephen |
+| 11 | **The barangay of record for Lot 4** — the title, the tax declaration and the family inventory all say San Rafael; the drafted endorsement request says Santa Rosa Sur. One question to the Municipal Assessor, together with the unexplained "Lot 4 and 906" entry. **Endorsement requests are held until it is answered** | Allan |
 
 ---
 
