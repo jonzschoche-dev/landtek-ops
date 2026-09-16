@@ -145,3 +145,61 @@ Appeal for 1319 and 1378** with the P1,500 fee each. Do not restart a fresh cons
   parallel: R.A. 11032 §23 provides that administrative liability under that Act "shall not be a bar to the
   filing of criminal, civil or other related charges". That is a cleaner answer than arguing the special law
   displaces the general one.
+
+---
+
+## 8. Review of revision 2 (received 16 Sep 2026)
+
+Revision 2 adopts the vehicle split, drops the unsourced circular and the unverified case, and corrects the
+1319 characterisation. Four problems remain; two are new.
+
+**a) NEW ERROR — the payment figure. Revert to P75,000.00.** Revision 2 attaches P41,119 to docket 1210.
+The 1210 record is explicit: "Remittances totaling Seventy-Five Thousand Pesos (Php 75,000.00) were made on
+19 December 2025 (Confirmation Nos. VCHMU47RH and VYFLCEPVH). However, no official receipts annotated
+'PAID UNDER PROTEST' have been issued" (doc 624), of which P50,000 was a supplement tendered 20 December
+2025. The P41,119 is a different, later payment and appears only in the COA / BLGF / Ombudsman documents
+(docs 1247, 2431, 5362). Putting it in an ARTA appeal misstates the docket and hands the respondent an easy
+correction.
+
+**b) NEW ERROR — 1321 did not find a violation.** Revision 2 says ARTA "found that a violation had occurred
+regarding a ten-month processing delay" and then ordered no remedy. It found the opposite: "Accordingly,
+while the requested government service was not fully rendered within the processing period indicated in the
+Citizen's Charter, the fourth element of Section 21(e) has not been established", and it closed for want of
+prima facie evidence. The accurate and still-devastating formulation is: ARTA found the service covered,
+found the charter period blown by roughly ten months, excused the delay as "just cause" with no written
+extension in evidence, and ordered nothing produced.
+
+**c) The committee point is garbled.** "The committee's blanket refusal to act, with respondents simply
+sitting on requests" loses the finding. The point is that the LGU's own Committee on Anti-Red Tape passed a
+standing refusal — "the Local Government Unit (LGU) of Mercedes shall not release, provide, or act upon the
+requested documents of Mr. Jonathan Zschoche unless and until he sufficiently establishes and submits proof
+of his legal personality" (docs 712-717) — and that the respondents in 1210, 1212 and 1321 sat as members of
+that committee, alongside Antonio B. Teope, whose structure is the subject of the 1378 request. It is a
+conflict-of-interest point, not a delay point.
+
+**d) The 1212 referral is misdescribed.** ARTA referred Coun. Torralba to the Ombudsman on R.A. 6713 and
+Tony Teope on R.A. 3019 §3(i) (doc 1614). It did not refer "the 15-day rule".
+
+**e) 1321's posture.** It is not merely a lapsed docket awaiting a supplement — its own OP petition was
+filed 8 September and delivered to the Malacanang Records Office on 14 September (docs 8240, 14076). The
+supplement should reference that pending petition and its consolidation prayer, not re-argue it from scratch.
+
+**f) Appeal mechanics.** Revision 2 reads as though the memorandum is also due within 15 days. AO 22 §1 and
+§3 fix 15 days for the Notice of Appeal and the fee. The memorandum period is not in our excerpt of AO 22 —
+confirm it before calendaring.
+
+**g) Tone.** "Absurdly", "shockingly", and "bad faith interpretation" attribute motive to named ARTA
+lawyers. The inconsistencies are strong enough stated flatly, and a filing that argues motive invites a
+fight about motive. Recommend neutral phrasing throughout.
+
+**Still missing, and worth adding:**
+- ARTA's own retreat in the letter of 21 May 2026 (doc 972), which is the cleanest answer to the citizenship
+  holding because it comes from ARTA itself.
+- 1378's concession against its own result: "the fact that the request is not expressly included in the
+  Citizen's Charter does not, by itself, remove it from the ambit of a 'government service'".
+- The §21(b) three-element test (docs 719, 1614), whose second element has no statutory basis.
+- In 1319: the §21(b) item was ticked on the referral form and never adjudicated, and the charter was sent
+  for "reengineering" with no finding in the body to support it.
+
+**Calendar.** 1319's window closes **22 September 2026** — six days from today. If that docket is to be
+appealed, the Notice of Appeal, proof of service and P1,500 fee must go this week. 1378 closes 30 September.
