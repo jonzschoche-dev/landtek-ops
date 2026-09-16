@@ -27,7 +27,7 @@ Sir/Madam:
 **Reference is respectfully made to the following:**
 
 1. Letter of the **Office of the Municipal Engineer, Mercedes**, dated **21 October 2025**, signed **ENGR. ERWIN H. BALANE**, Municipal Engineer, stating that *"there is no building permit issued recently pertaining to that particular area."* (Annex "A")
-2. **Request for inspection and enforcement** under Sections 207, 301, 309 and 215, P.D. No. 1096, addressed to the Building Official of Mercedes, dated `[FILL]`, received `[FILL]`. (Annex "B")
+2. **Reiteration and request for enforcement** under Sections 207, 301, 309 and 215, P.D. No. 1096, addressed to the Building Official of Mercedes, dated `[FILL]`, received `[FILL]`; and the parallel request to the Municipal Mayor under Section 444(b)(3)(vi), R.A. No. 7160, dated `[FILL]`, received `[FILL]` — each carrying the fifteen (15) working days that Section 5(a), R.A. No. 6713 allows, which has `[FILL: lapsed on ___ / not yet expired]`. (Annex "B")
 3. **Transfer Certificate of Title No. T-4497** and its derivative titles T-32917, T-32916 and T-32911, registered to the **Heirs of Mary Worrick Keesey**. (Annex "C")
 4. **Declarations of Real Property of the Municipality of Mercedes** — 29 parcels, 72,384 sq m, declared by the Municipality in the heirs' names; real property taxes paid `[FILL years]`, including O.R. Nos. 0434682–84. (Annex "D")
 5. **Apostilled Special Power of Attorney**, Patricia Keesey Zschoche to the undersigned. (Annex "E")

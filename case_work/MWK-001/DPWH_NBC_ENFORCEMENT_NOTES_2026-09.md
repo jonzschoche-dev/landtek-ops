@@ -92,3 +92,49 @@ better aim: records requests in this cluster have been closed five times on the 
 Building Code is a duty, not a service.** No §4(f) wall stands in front of it, and no citizenship
 question reaches it either — which is why the letter says, in its own second paragraph, that it asks
 for no record and no information. Keep it that way.
+
+---
+
+## Update, 16 Sep 2026 — the predicate is now built, as a reiteration pair
+
+Section 2(a) above said the predicate was missing. It is now built, and as a **reiteration** rather
+than a fresh demand — which is the stronger form here, because a reiteration is item N+1 in a chain
+the officer has already answered, and a chain is what an indorsement carries.
+
+| Instrument | Addressee | Hook | Clock |
+|---|---|---|---|
+| `MEO_REITERATION_2026-09_draft.md` | Engr. Balane, Building Official | P.D. 1096 §§207, 301, 302(2), 308–309, 215 + R.A. 7160 §210 | R.A. 6713 §5(a) — 15 working days |
+| `MAYOR_REITERATION_2026-09_draft.md` | Mayor Pajarillo | R.A. 7160 §§444(b)(3)(vi), 444(b)(1)(x) | R.A. 6713 §5(a) — 15 working days |
+
+Both supersede in practice (not in force) the narrower `MEO_205_ENFORCEMENT_REQUEST_2026-09_draft.md`
+and ride alongside the unserved `MWK-001_DEMAND_Mayor_Demolition_444b3vi_05Sep2026`.
+
+**Sequence: serve the pair → let the 15 working days run → then the DPWH letter**, enclosing both with
+proof of service. DPWH is being asked to supervise a duty; a duty that has just been demanded, in
+writing, with a statutory period that has run, is a duty the Department can actually act on.
+
+### The re-characterisation, and why it is not a re-argument
+
+The 24 Jan 2026 request was captioned under **E.O. No. 2, s. 2016 (FOI)**. That word is what built the
+§4(f) wall: ARTA's own resolution records the complaint as stemming from *"the alleged bad-faith denial
+of a Freedom of Information (FOI) request."* The MEO reiteration **withdraws that characterisation**
+and restates the same subject matter as a request that a **statutory duty** be performed — which is
+open to us, because the Resolution says in terms that its finding *"should not … be construed as a
+determination by ARTA that Respondent's refusal or failure to release the requested documents was
+proper."*
+
+Verified from the Resolution's own Annex "G" (the Charter, pp. 242–250): the Municipal Engineering
+Office lists **seven** external services — Program of Works · Project Inspection Report · Certificate
+of Final Inspection · Building & Electrical Permit · Demolition Permit · Fencing Permit · Occupancy
+Permit. **No records or certified-copy service is listed.** That cuts both ways and the letters use it
+correctly: it means these requests are *not* chartered services (so no §4(f) argument is available to
+us), and it means enforcement is a **duty under §207**, owed regardless of who asks. Do not let any
+future draft claim the Charter lists a records service — it does not, and ARTA holds the annex.
+
+### Two things to settle before service
+
+1. **Barandon clears the MEO letter.** Its addressee is a CV 26-360 defendant (ledger line 76).
+2. **Answer Annex "A" item 8 of the Mayor letter from the record** — whether the LGU rendered the
+   five-working-day report the DILG 2nd Indorsement of 25 Aug required. MLGOO Guerrero undertook in
+   writing to advise. Our non-receipt is not proof of non-performance, and pleading a lapse that did
+   not happen is the one error that would cost the letter its credibility.
