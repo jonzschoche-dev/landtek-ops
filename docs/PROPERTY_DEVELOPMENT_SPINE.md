@@ -1,9 +1,8 @@
 # Property Development Spine — Design (reconciled)
 
-> **Status:** APPLIED — deploy_911–913 + **deploy_914 continuous profitability prep cycle**.
-> Full portfolio ledger + unprompted prep loop (`profitability_prep_cycle` every 4h): every property
-> gets prep moves for profitability **without requiring a controlling_matter**. Matter is optional
-> schedule context only. V12 remains **log**.
+> **Status:** APPLIED — deploy_911–915. Continuous prep scores every property on **six axes**
+> (documents · status · occupants · ownership · title issues · mapping) and queues prep moves
+> unprompted every 4h. Matter is optional schedule context only. V12 remains **log**.
 > **Date:** 2026-07-14 (v2 — operator/engine write split + asset-owned-as-cache refinements)  
 > **Supersedes:** the chat draft’s project-only / develop-only / `primary_project_code` shape.  
 > **Authority:** `MASTER_PLAN.md` decides sequencing; this doc is the technical design for the

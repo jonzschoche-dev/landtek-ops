@@ -206,5 +206,180 @@ P1 upstream/ingestion (§2A) — highest leverage, do first. P2 core+synthesis (
 the next one cheap. Each phase is an independent read-only pass ending in a partial findings report; nothing
 downstream depends on a phase completing, so they can run in parallel.
 
-## Close-out
-*(executor appends the ranked findings report here)*
+## Close-out — Full-stack reasoning audit (parallel multi-agent, 2026-07-19)
+
+**Mode:** read-only · 4 explore finders (OCR · extract/entity/geometry · verify/gates/synth · emission/router) · parent triangulation on live VPS Postgres + code.  
+**No flips.** Operator picks; shadow A/B before any production change.
+
+### Live re-baseline (VPS, 2026-07-19) — corrects the seed narrative
+
+| Signal | Live | Implication |
+|---|---|---|
+| `matter_facts` | ~42.5k · **inferred_strong 36,511** · **verified 6,002** · operator 22 · **inferred_weak 7** | ~86/14 ratio **CONFIRMED** |
+| 7d writers | **doc_populate 27,582** + **harvest 8,530** inferred · **verify_worker 948** verified | Bulk “harvester” is **regex/table populate, not 7B LLM** |
+| `inference_audit` 7d | **543× verify / qwen2.5:7b** · 3× gemini tier2 · **0 fails** (3 fail rows older) · only `task_type=verify` | F3 **CONFIRMED**; health looks fine because only verify is visible |
+| Latency by day | 6.5s (n=393) → 20s (quiet days) | Cold-start variance, not model death |
+| Ollama (Mac TS) | 7b, 14b, vl:7b, nomic, llama3:8b **up** | Availability OK; VPS `127.0.0.1:11434` may be empty — workers use `100.117.118.47` |
+| `ocr_quality` | **2,137** docs · **avg score 0.36** | Corpus OCR is weak on average; only doc-level score |
+| Compounding | doc **958 → 667 facts** (2 verified / 665 inferred) | F7 concentration **CONFIRMED** |
+| Short inferred | **~18.5k** statements length &lt;20 | Much of “strong” is atom shards (AMOUNT: lines), not deep reasoning |
+| `proposed_facts` | pending 221 · contradiction_hold 14 · accepted 7 | Adjudication still backlog |
+| Open contradictions | **45** | Backstops catching something |
+
+**Meta-lesson applied:** the first narrow pass over-attributed the 86% mass to “7B harvest.” Live `created_by` shows **mechanical extraction outrunning verification**. Tier inversion on *LLM* paths remains real, but the **volume** problem is F2+F5 on **regex writers**, not only F1 on 7B.
+
+---
+
+### Ranked findings (most severe first)
+
+#### R1 — Instrumentation blindness · F3 · **CRITICAL** · CONFIRMED
+- **Site:** `inference_audit` + fleet Ollama callers  
+- **Evidence:**  
+  - *code:* only `verify_worker` + rare `model_router`/`classify` write audit; comprehend, brief_drafter, leo_service, reocr_*, legal_agent, case_synthesizer, harvest (N/A), etc. bypass  
+  - *DB:* 7d audit = 100% `task_type=verify`  
+  - *logs:* separate reocr/awareness files, not unified  
+- **Scenario:** comprehend / OCR / free Leo degrades for a week; dashboards still green on verify  
+- **Fix:** thin shared logger or force `model_router.call_model` for every generate; `task_type` ∈ {verify,extract,classify,reason,ocr_vision,synth,reply}  
+- **Measure:** every timed unit appears in `SELECT created_by, task_type, count(*) … 24h`; alert on known timer with 0 rows  
+
+#### R2 — Un-adjudicated dominance + miscalibrated “strong” · F2+F5 · **CRITICAL** · CONFIRMED
+- **Site:** `harvest_facts` + `populate_tables_from_docs` → `matter_facts.inferred_strong` always  
+- **Evidence:**  
+  - *code:* both hard-code `provenance_level='inferred_strong'`; no weak band  
+  - *DB:* 86% strong · **7 weak total** · writers above  
+  - *sample:* repeated `AMOUNT: ₱35,000.00` shards from doc_populate  
+- **Scenario:** operators/tools that don’t filter verified treat atom spam as knowledge; verify never catches up (948 vs 36k/7d)  
+- **Fix:** (1) harvest single-hit → `inferred_weak` or side table; (2) rate-limit populate facts per doc; (3) product surfaces default to verified/publish only; (4) drain short-duplicate atoms  
+- **Measure:** weekly `verified/(verified+inferred)` + % short statements + facts-per-source_doc P95  
+
+#### R3 — OCR silent rewrite + no arithmetic + doc-level confidence only · F6+F5+F2 · **CRITICAL** · CONFIRMED
+- **Site:** `reocr_local` / `reocr_gemini` / `write_ocr`  
+- **Evidence:**  
+  - *code:* `extracted_text` overwritten with no `[OCR: raw]`; accept = doc score ↑ only; no sum/area reconcile on general path (geometry path *does* close+area — positive control)  
+  - *DB:* `ocr_quality` has score/chars/word_quality only; avg 0.36  
+  - *sample:* drafts/ocr_pending_write flags; A77 doc 379 low score still underwrote many verified facts  
+- **Scenario:** clean misread digit → excerpt-grounded → **verified** forever (A77 honest limit)  
+- **Fix:** adoption chokepoint + Principle 9 lint; internal arithmetic hold for amounts/areas; keystone docs structured OCR; dual-pass hold on disagreement  
+- **Measure:** reocr accepts with internal-arithmetic fail = 0; % verified facts from docs with score&lt;0.55  
+
+#### R4 — Tier–stakes inversion on real LLM paths · F1 · **HIGH** · CONFIRMED
+- **Site:** defaults vs `model_router` policy  
+| Path | Default | Stakes |
+|---|---|---|
+| verify_worker, brief_drafter, case_memo, analyst, relevance, comprehend fallback | **7B** | corpus + counsel drafts |
+| legal_agent, case_synthesizer, leo_service, proof, ombudsman | **14B** | synthesis / chat |
+| reocr_local | **VL 7B** | keystone text |
+| model_router declared | **14B reasoning** | almost unused |
+
+- **Evidence:** code hardcodes × router TASK_QUALITY × audit only 7B verify  
+- **Scenario:** 7B wrong-but-groundable claim becomes verified; 14B only polishes later  
+- **Fix:** shadow A/B 7B vs 14B on ~20 real docs for verify + brief + keystone OCR; flip only with measured delta  
+- **Measure:** disagreement rate names/dates/amounts/courses; never flip on vibes  
+
+#### R5 — Live emission can ship model text without enforce-mode A79 · F6 · **HIGH** · CONFIRMED
+- **Site:** Telegram `llm.handle` + `leo_service.generate_reply` + shadow `apply_comms_role_clamp`  
+- **Evidence:**  
+  - *code:* A79 returns output **unchanged** (shadow); TG free path skips clamp + often human projection; `gate_error` returns **raw candidate**; outward_guard fail-open allow  
+  - *tests:* `shadow_never_blocks` floors the non-bite  
+- **Scenario:** fluent wrong reply lands on phone before hearing — operator catches, not gate (matches prior “clueless” class)  
+- **Fix:** one chokepoint (CAM/process) for all live sends; A79 enforce after soak; never return unremediated candidate on gate_error  
+- **Measure:** negative tests: free TG path cannot send without clamp+gate; count live sends without via label  
+
+#### R6 — Unscoped RAG in playbook synthesizer · F8 · **HIGH** · CONFIRMED
+- **Site:** `case_synthesizer` `rag.retrieve(query)` **without `ids`**  
+- **Evidence:** code path global; docket path correctly passes ids; `rag_local` has no client column in filter  
+- **Scenario:** MWK memo pulls Paracale chunks → cross-client contamination in counsel prose  
+- **Fix:** fail closed if retrieve without matter/client/`ids` for synthesis  
+- **Measure:** two-client plant (rollback) — zero foreign chunks in synth context  
+
+#### R7 — Entity keystone multi-client AUTO merge · F6/F9 · **HIGH** · CONFIRMED (logic)
+- **Site:** `entity_resolve` `protected_present → auto` even when `len(clients)>1`  
+- **Evidence:** code; daily cross-client timer applies auto; docs claim stricter than code  
+- **Scenario:** keystone name + OCR twin other client → fused identity  
+- **Fix:** AUTO only single-client; keystone only picks survivor inside one client  
+- **Measure:** `--scan` count of multi-client AUTO groups → 0  
+
+#### R8 — Gate floors incomplete · F6 · **MEDIUM–HIGH** · CONFIRMED
+- **Site:** V11 null-owner **shadow log**; V4 NULL owner pass; truth_negotiator challenger **stub-agrees** without Anthropic key; **legal_agent skips A70** while brief/dossier enforce  
+- **Evidence:** code + A77/A78 workorder history  
+- **Scenario:** ownerless/thin counsel memo ships; challenger never refutes  
+- **Fix:** V11 soak→block; wire A70 into legal_agent/case_memo; don’t trust negotiator “verified” when challenger stubbed  
+- **Measure:** block-mode soak report; % counsel synth with A70 pass  
+
+#### R9 — Compounding from single weak source · F7 · **MEDIUM** · CONFIRMED
+- **Site:** harvest/populate → many facts per doc  
+- **Evidence:** doc 958 = 667 facts / 2 verified; OCR avg weak  
+- **Scenario:** one bad re-OCR underwrites a matter’s graph  
+- **Fix:** cap inferred density per doc; dual-source or human for keystone amounts/dates; re-OCR demotion path  
+- **Measure:** top-20 docs by fact count with ocr_score and verified ratio  
+
+#### R10 — Prompt / doctrine drift · F4 · **MEDIUM** · CONFIRMED (partial)
+- **Site:** per-script PROMPTs; `model_router` SYSTEM_PROMPTS mostly unused; ops docs still call “comprehend” the fact front door  
+- **Evidence:** code inventory + F-A2 architecture drift  
+- **Fix:** versioned prompt files; ops labels match `created_by` census  
+- **Measure:** prompt hash column on audit; doc/code grep for stale “comprehend harvests facts” claims  
+
+#### Positive controls (keep)
+- **Excerpt gate** (`excerpt_grounded` + V3) — mechanical, OCR-robust normalize, real anti-fabrication  
+- **classify_document_type** — only clean model_router + shadow-commit pattern (clone this)  
+- **geometry_consensus** — closure/compactness/area; multi-doc corroboration  
+- **brief_drafter / case_dossier verified filter + A70** on some paths  
+- **Verify health** — 0 fail/24h-class availability; fallback to Gemini worked  
+
+---
+
+### Failure taxonomy coverage
+
+| Class | Result this pass |
+|---|---|
+| F1 Tier–stakes | CONFIRMED (LLM paths) |
+| F2 Un-adjudicated | CONFIRMED (regex mass + debt) |
+| F3 Invisible | CONFIRMED |
+| F4 Prompt drift | CONFIRMED partial |
+| F5 Calibration | CONFIRMED (always-strong + weak≈0) |
+| F6 Gate bypass | CONFIRMED (OCR tags, A79 shadow, TG, V11, A70 uneven) |
+| F7 Compounding | CONFIRMED (doc 958 class) |
+| F8 Retrieval | CONFIRMED (playbook RAG) |
+| F9 Human-in-loop | CONFIRMED (auto-verify OCR-true wrongs; entity auto) |
+
+---
+
+### What stayed dark (§4.8 completeness critic) — next audit
+
+1. **Golden set** — re-extract ~20 operator-attested docs; accuracy meter does not exist yet  
+2. **7B vs 14B shadow A/B** — not run ($0 local; needs scheduled pass)  
+3. **Calibration sample** — human grade N random `inferred_strong` (frontier optional, budget-gated)  
+4. **Adversarial plant** — wrong fact / cross-client cite in rolled-back txn to prove V3/V4/A5 bite live  
+5. **Live entity AUTO multi-client rate** — logic confirmed; bite rate not scanned  
+6. **Telegram live send sample** vs shadow outward logs  
+7. **Whether residual n8n reply brain** still fires on any channel  
+8. **Comprehend title-status error rate** vs chain ground truth  
+9. **reocr_log engine distribution** last 30d (accept/reject by local vs gemini)  
+
+---
+
+### Recommended operator sequence (additive, no nuke)
+
+| Priority | Action | Cost | Risk |
+|---|---|---|---|
+| **P0** | Telemetry wrap all generate → `inference_audit` (closes permanent blindness) | $0 eng | Low |
+| **P0** | Product/read surfaces: verified + publish only (don’t “fix” 86% in UI) | $0 | Low |
+| **P1** | Harvest/populate: stop always-strong; cap atoms; weak tier or side table | $0 | Med (throughput) |
+| **P1** | OCR write chokepoint + Principle 9 lint + arithmetic hold where possible | $0–eng | Med |
+| **P1** | Fail-closed RAG scope on synthesizer | $0 | Low |
+| **P2** | Entity AUTO cross-client hole | $0 | Low |
+| **P2** | Shadow A/B then consider 14B on verify/brief/keystone OCR | $0 local | Med if flipped blind |
+| **P2** | A79 enforce + single send chokepoint after soak | policy | High if early |
+| **P3** | V11 block soak; A70 on legal_agent; golden set + calibration sample | mixed | — |
+
+**Do not:** flip all defaults to 14B without A/B; resurrect truth_qa LLM-judge; blame “the model is down” (it isn’t).
+
+---
+
+### Parallel workflow notes
+
+- Finders: OCR, extract/entity/geometry, verify/gates/synth, emission/router — all completed.  
+- Adversarial parent pass: **refuted** seed claim “7B LLM produced the 35k/7d spike” → **doc_populate+harvest mechanical**; kept tier inversion as separate F1.  
+- Anything single-lens only is marked PLAUSIBLE above; multi-lens items are CONFIRMED.
+
+*End close-out 2026-07-19.*

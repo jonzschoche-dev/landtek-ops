@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B0F14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LandTek">
+<link rel="manifest" href="/client/_app/manifest.webmanifest">
+<title>Portfolio — Heirs of Mary Worrick Keesey · LandTek</title>
+<style>
+:root {
+  --bg: #0B0F14;
+  --bg2: #121820;
+  --card: #141A22;
+  --card2: #1A222D;
+  --line: #243041;
+  --text: #E8EEF7;
+  --muted: #8B9BB0;
+  --faint: #5C6B80;
+  --accent: #3DDC97;
+  --accent2: #5B9FD4;
+  --bad: #FF6B6B;
+  --warn: #F0B429;
+  --ok: #3DDC97;
+  --radius: 16px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; background:var(--bg); color:var(--text);
+  font-family:var(--font); -webkit-font-smoothing:antialiased; }
+a { color:inherit; text-decoration:none; }
+.shell-top {
+  position:sticky; top:0; z-index:20;
+  display:flex; align-items:center; gap:12px;
+  padding:14px 18px; background:rgba(11,15,20,.92);
+  backdrop-filter: blur(12px); border-bottom:1px solid var(--line);
+}
+.brand { font-weight:700; letter-spacing:.04em; font-size:15px; }
+.brand span { color:var(--accent); font-weight:600; }
+.who { margin-left:auto; font-size:12px; color:var(--muted); font-weight:600;
+  text-align:right; max-width:45%; }
+.wrap { max-width:480px; margin:0 auto; padding:8px 16px 100px; }
+.tabbar {
+  display:flex; gap:6px; margin:8px 0 18px; padding:4px;
+  background:var(--bg2); border-radius:14px; border:1px solid var(--line);
+}
+.tab {
+  flex:1; text-align:center; padding:10px 6px; border-radius:11px;
+  font-size:12px; font-weight:600; color:var(--muted);
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.tab .ti { font-size:14px; opacity:.85; }
+.tab.on { background:var(--card2); color:var(--text); box-shadow:0 1px 0 rgba(255,255,255,.04); }
+.hero { margin:6px 0 18px; }
+.eyebrow { font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--faint); font-weight:600; margin-bottom:6px; }
+.hero h1 { margin:0 0 8px; font-size:26px; line-height:1.15; font-weight:700;
+  letter-spacing:-.02em; }
+.lede { margin:0; color:var(--muted); font-size:14px; line-height:1.45; }
+.stats {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px;
+}
+.stat {
+  background:linear-gradient(180deg, var(--card2), var(--card));
+  border:1px solid var(--line); border-radius:14px; padding:12px 8px; text-align:center;
+}
+.stat .n { font-size:22px; font-weight:700; letter-spacing:-.03em; color:var(--text); }
+.stat .l { font-size:10px; color:var(--muted); margin-top:2px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.04em; }
+.map-note { font-size:12px; color:var(--muted); margin:0 0 16px; line-height:1.4; }
+.block { margin:22px 0; }
+.block-h { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; }
+.block-h h2 { margin:0; font-size:15px; font-weight:700; letter-spacing:-.01em; }
+.block-h .count {
+  font-size:11px; color:var(--faint); background:var(--bg2);
+  border:1px solid var(--line); border-radius:999px; padding:2px 8px; font-weight:600;
+}
+.attn-grid { display:flex; flex-direction:column; gap:8px; }
+.attn-card {
+  display:block; background:var(--card); border:1px solid var(--line);
+  border-radius:var(--radius); padding:14px 14px 12px;
+  transition: border-color .15s, transform .15s;
+}
+.attn-card:active { transform: scale(.99); }
+a.attn-card:hover { border-color:#3a4d66; }
+.muted-card { opacity:.9; }
+.attn-top { margin-bottom:8px; }
+.attn-title { font-size:14px; font-weight:650; line-height:1.3; margin-bottom:4px; }
+.attn-sub { font-size:12px; color:var(--muted); line-height:1.4; }
+.title-list { display:flex; flex-direction:column; gap:8px; }
+.title-row {
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px; display:flex; flex-direction:column; gap:10px;
+}
+.title-no { font-size:15px; font-weight:700; letter-spacing:-.01em; }
+.title-reg { font-size:13px; color:var(--text); margin-top:2px; opacity:.92; }
+.title-meta { font-size:11px; color:var(--faint); margin-top:4px; }
+.title-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip {
+  display:inline-flex; align-items:center; font-size:10.5px; font-weight:700;
+  letter-spacing:.02em; padding:4px 8px; border-radius:999px; border:1px solid transparent;
+}
+.chip-ok { background:rgba(61,220,151,.12); color:var(--ok); border-color:rgba(61,220,151,.25); }
+.chip-warn { background:rgba(240,180,41,.12); color:var(--warn); border-color:rgba(240,180,41,.28); }
+.chip-bad { background:rgba(255,107,107,.12); color:var(--bad); border-color:rgba(255,107,107,.28); }
+.chip-off { background:rgba(139,155,176,.1); color:var(--muted); border-color:rgba(139,155,176,.2); }
+.cta { display:flex; flex-direction:column; gap:10px; margin:28px 0 12px; }
+.btn {
+  display:block; text-align:center; padding:14px 16px; border-radius:14px;
+  font-weight:700; font-size:14px; border:1px solid transparent;
+}
+.btn.primary { background:var(--accent); color:#062816; }
+.btn.ghost { background:transparent; color:var(--text); border-color:var(--line); }
+.fineprint { font-size:11px; color:var(--faint); margin:12px 0 0; line-height:1.4; }
+.empty-block, .empty { color:var(--muted); font-size:13px; padding:16px; text-align:center;
+  border:1px dashed var(--line); border-radius:var(--radius); }
+.shell-foot {
+  max-width:480px; margin:0 auto; padding:8px 20px 28px; color:var(--faint);
+  font-size:11px; line-height:1.5; text-align:center;
+}
+.shell-foot strong { color:var(--muted); font-weight:600; }
+@media (min-width:720px) {
+  .wrap { max-width:560px; padding-top:16px; }
+  .stats { gap:10px; }
+  .stat .n { font-size:26px; }
+}
+</style>
+</head>
+<body>
+<header class="shell-top">
+  <div class="brand">LANDTEK <span>portfolio</span></div>
+  <div class="who">Heirs of Mary Worrick Keesey</div>
+</header>
+<main class="wrap">
+
+
+<nav class="tabbar">
+  <a class="tab on" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4"><span class="ti">▣</span>Home</a>
+  <a class="tab" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/map"><span class="ti">◎</span>Map</a>
+  <a class="tab" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/cases"><span class="ti">☰</span>Cases</a>
+</nav>
+<section class="hero">
+  <div class="eyebrow">Portfolio · 2026-07-18</div>
+  <h1>Heirs of Mary Worrick Keesey</h1>
+  <p class="lede">Your land at a glance — titles, map, tax, and what needs attention.</p>
+</section>
+
+<section class="stats">
+  <div class="stat"><div class="n">16</div><div class="l">Titles</div></div>
+  <div class="stat"><div class="n">5</div><div class="l">On map</div></div>
+  <div class="stat"><div class="n">10</div><div class="l">Need tax</div></div>
+  <div class="stat"><div class="n">6</div><div class="l">Due soon</div></div>
+</section>
+<p class="map-note">Map shows 5 of 16 living titles with survey placement. The rest are queued.</p>
+
+<section class="block">
+  <div class="block-h">
+    <h2>Needs attention</h2>
+  </div>
+  <div class="attn-grid"><a class="attn-card" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/matter/MWK-TCT4497"><div class="attn-top"><span class="chip chip-bad">61d overdue</span></div><div class="attn-title">TCT T-4497 Chain Verification</div><div class="attn-sub">Send demand letter to Register of Deeds Camarines Norte requesting title history update for T-4497 chain</div></a><a class="attn-card" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/matter/MWK-ARTA-DILG"><div class="attn-top"><span class="chip chip-bad">16d overdue</span></div><div class="attn-title">ARTA Referral to DILG</div><div class="attn-sub">Follow up on DILG-referral leg of CTN SL-2026-0423-1891 — DILG R5 issued NOTICE OF REFERRAL (recv 2026-06-02, ). 30d operator follow-up w…</div></a><a class="attn-card" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/matter/MWK-ARTA-1212"><div class="attn-top"><span class="chip chip-bad">In 4d</span></div><div class="attn-title">ARTA SL-2026-0128-1212 (referenced docs#753, …</div><div class="attn-sub">Due 2026-07-22</div></a><a class="attn-card" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/matter/MWK-ARTA-1210"><div class="attn-top"><span class="chip chip-bad">In 6d</span></div><div class="attn-title">ARTA SL-2026-0128-1210</div><div class="attn-sub">Determine respondent identity + ARTA hearing schedule. Currently sparse evidence in corpus — needs Jonathan to upload the complaint affid…</div></a><a class="attn-card" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/matter/MWK-ARTA-1891"><div class="attn-top"><span class="chip chip-bad">In 6d</span></div><div class="attn-title">ARTA SL-2026-0423-1891</div><div class="attn-sub">Follow up with CSC (Asst Comm Ronquillo) re ARTA CTN SL-2026-0423-1891 onward-referral to OMB (CSC NOTICE OF REFERRAL recv 2026-06-24, OA…</div></a><a class="attn-card" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/matter/MWK-GUARDIANSHIP"><div class="attn-top"><span class="chip chip-warn">In 9d</span></div><div class="attn-title">Judicial Guardianship — Real Properties/Estates of Mary Worrick Keesey</div><div class="attn-sub">RTC Br 41 Daet initial hearing on the guardianship petition, set for late July (8:30am, in-court). Petitioner must present jurisdictional…</div></a></div>
+</section>
+
+<section class="block">
+  <div class="block-h">
+    <h2>Living titles</h2>
+    <span class="count">18</span>
+  </div>
+  <div class="title-list"><div class="title-row"><div class="title-main"><div class="title-no">TCT 4497</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mother title · Mercedes, Camarines Norte · 139,132 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 32911</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Lot 2-A · Mercedes</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-ok">On map</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 32912</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte · 1,395 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 32913</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte · 1,022 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-off">Map pending</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 32914</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 15616</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-off">Map pending</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 147652</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 30681</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte · 804,188 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-off">Map pending</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 30683</div><div class="title-reg">Mary Worrick Keesey</div><div class="title-meta">Manguisoc, Mercedes, Camarines Norte · 804,148 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 38838</div><div class="title-reg">Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte · 32,448 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 4502</div><div class="title-reg">Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte · 804,188 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-off">Map pending</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 32478</div><div class="title-reg">Heirs of Mary Worrick Keesey</div><div class="title-meta">Mercedes, Camarines Norte</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 33776</div><div class="title-reg">Rosco Leano</div><div class="title-meta">Lot 2-X-6-H · 1,295 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-ok">On map</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 36668</div><div class="title-reg">Alsa O. Iligan</div><div class="title-meta">Lot 2-X-6-A · 500 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-ok">On map</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 47656</div><div class="title-reg">—</div><div class="title-meta">Lot 2-X-6-N · 15,250 sqm</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-ok">On map</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 079-2018001329</div><div class="title-reg">Elsa O. Iligan</div><div class="title-meta">Mercedes, Camarines Norte</div></div><div class="title-chips"><span class="chip chip-ok">Active</span><span class="chip chip-warn">Tax pending</span><span class="chip chip-warn">Map queued</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 52540</div><div class="title-reg">—</div><div class="title-meta">Cancelled → 079-2021002126</div></div><div class="title-chips"><span class="chip chip-off">Cancelled</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-off">Map pending</span></div></div><div class="title-row"><div class="title-main"><div class="title-no">TCT 079-2021002126</div><div class="title-reg">Gloria H. Balane</div><div class="title-meta">Subject of CV-26360 · 2,587 sqm · 2,587 sqm</div></div><div class="title-chips"><span class="chip chip-bad">Contested</span><span class="chip chip-ok">Tax linked</span><span class="chip chip-ok">On map</span></div></div></div>
+  
+</section>
+
+<section class="cta">
+  <a class="btn primary" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/map">Open property map</a>
+  <a class="btn ghost" href="/client/YqgKb-TMaoa-kkGwSNiXT-Xn_OEjR6lhzMdXFl2C0a4/cases">View cases &amp; deadlines</a>
+</section>
+
+</main>
+<footer class="shell-foot">
+  <strong>LandTek</strong> property &amp; legal-operations · not legal advice<br>
+  Updated 2026-07-18 13:02 UTC
+</footer>
+</body>
+</html>
