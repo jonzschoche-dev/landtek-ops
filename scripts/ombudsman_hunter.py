@@ -21,8 +21,8 @@ What it does, deterministically ($0):
 Discipline (load-bearing):
   * Candidates are LEADS, not verified facts (provenance=inferred_strong). Every signal a candidate
     claims points to a source row — no naked assertions.
-  * The engine NEVER files and NEVER sets status='filed'. Filing against a named public officer is a
-    held, human-approved decision. The ripe ceiling is 'held_for_filing'.
+  * The engine NEVER files and NEVER sets status='filed' or 'held_for_filing'. Machine assessments
+    remain inference-grade. Legacy holds are not evidence of human approval.
   * Statute PERIODS (prescription, counter-affidavit windows) are flagged NEEDS-COUNSEL-VERIFICATION,
     matching the agency:OMBUDSMAN desk posture in agents.py.
 
@@ -59,6 +59,17 @@ def _conn():
     _load_pg()
     c = psycopg2.connect(DSN)
     c.autocommit = True
+    with c.cursor() as cur:
+        cur.execute("SELECT 1 FROM clients WHERE client_code=%s", (_client_code(),))
+        if not cur.fetchone():
+            c.close()
+            raise ValueError("Unknown canonical client; refusing an unscoped hunt")
+        if _MATTER[0]:
+            cur.execute("SELECT 1 FROM matters WHERE matter_code=%s AND client_code=%s",
+                        (_MATTER[0], _client_code()))
+            if not cur.fetchone():
+                c.close()
+                raise ValueError("Matter does not belong to the selected client")
     return c
 
 
@@ -71,6 +82,29 @@ def _conn():
 # the current posture with the caveat that it is counsel-verifiable, not asserted.
 # ─────────────────────────────────────────────────────────────────────────────
 VIOLATIONS = {
+    "ra3019_3i": {
+        "statute": "R.A. 3019, Sec. 3(i)",
+        "gist": "personal-gain or material interest in an act requiring discretionary approval by a body of which the officer is a member",
+        "authority_url": "https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/2/22050",
+        "forum_default": "OMBUDSMAN",
+        "review_only": True,
+        "elements": {
+            "public_officer": {"needs": ["official_capacity"], "label": "public-officer identity and capacity at the relevant time"},
+            "personal_material_interest": {"needs": ["material_interest"], "label": "personal-gain interest or material interest in the identified transaction or act"},
+            "body_membership": {"needs": ["body_membership"], "label": "membership of the board, panel or group whose approval is required"},
+            "discretionary_approval": {"needs": ["discretionary_approval"], "label": "the same transaction or act requires that body's discretionary approval"},
+        },
+        "prescription": "NEEDS-COUNSEL-VERIFICATION against act dates and applicable law",
+    },
+    "ra6713_unspecified": {
+        "statute": "R.A. 6713 — subsection not specified in the referral",
+        "gist": "agency-referred allegation; exact provision and elements require source review",
+        "forum_default": "OMBUDSMAN",
+        "review_only": True,
+        "referral_only": True,
+        "elements": {"provision_and_elements": {"needs": [], "label": "identify the referred provision and test its elements; referral alone is not proof"}},
+        "prescription": "NEEDS-COUNSEL-VERIFICATION; no period inferred from referral",
+    },
     "ra3019_3e": {
         "statute": "R.A. 3019, Sec. 3(e)",
         "gist": "manifest partiality / evident bad faith / gross inexcusable negligence causing "
@@ -144,6 +178,9 @@ VIOLATIONS = {
 # The signal LEXICON — deterministic keyword patterns over the verified matter_facts. Each match
 # yields an evidence HANDLE (the fact id + its source doc), never an assertion. Extend, don't fork.
 SIGNAL_PATTERNS = {
+    "material_interest": r"\b(material interest|personal gain|financial interest|pecuniary interest)\b",
+    "body_membership": r"\b(member of (?:the |a )?(?:board|panel|committee|CART)|CART member|sitting as members)\b",
+    "discretionary_approval": r"\b(discretionary approval|exercises? discretion|requiring the approval of)\b",
     "official_capacity":   r"\b(mayor|assessor|treasurer|engineer|penro|cenro|register of deeds|registrar|"
                            r"sanggunian|councilor|kagawad|provincial|municipal|officer|official|department head)\b",
     "records_refusal":     r"\b(refus\w+|denied release|did not release|withheld|would not (?:give|release|provide)|"
@@ -251,6 +288,8 @@ def _classify_capacity(blob):
     """Capacity from the officer's OWN title = the EARLIEST-occurring office keyword. A co-mentioned
     official ('...Treasurer, with Mayor Pajarillo') must not flip the classification."""
     b = blob.lower()
+    if re.search(r"chief of staff|personal assistant|assistant to (?:the )?(?:municipal )?mayor", b):
+        return "unknown"  # assistant is not the elective mayor; verify appointment separately
     best_pos, best_cap = len(b) + 1, "unknown"
     for kw in _ELECTIVE_KW:
         i = b.find(kw)
@@ -289,12 +328,22 @@ def discover_officers(cur):
                COALESCE(affiliation,''), COALESCE(mentions_count,0)
         FROM entities
         WHERE type ILIKE '%%person%%' AND canonical_name IS NOT NULL
+          AND EXISTS (
+              SELECT 1 FROM doc_entities_safe de
+              JOIN documents d ON d.id=de.doc_id
+              JOIN document_matter_links dl ON dl.doc_id=d.id
+              JOIN matters m ON m.matter_code=dl.matter_code
+              WHERE de.entity_id=entities.id AND m.client_code=%s AND m.matter_code LIKE %s
+                AND (d.case_file=%s OR (COALESCE(d.case_file,'')='' AND d.matter_code=m.matter_code))
+                AND NOT EXISTS (SELECT 1 FROM matters owner WHERE owner.matter_code=d.matter_code
+                                AND owner.client_code IS DISTINCT FROM m.client_code)
+          )
           AND ( canonical_name ~* '(^| )(mayor|vice.?mayor|assessor|treasurer|engineer|penro|cenro|register of deeds|registrar|commissioner|director|administrator|sheriff|prosecutor|governor|councilor|kagawad|undersecretary|hon\\.)'
              OR role ~* '(mayor|assessor|treasurer|register|registrar|penro|cenro|engineer|commissioner|director|administrator|sheriff|clerk|prosecutor|officer|official|undersecretary|adjudicator|governor|councilor|kagawad|sanggunian)'
              OR affiliation ~* '(municipal|provincial|LGU|DENR|register of deeds|civil service|anti-red tape|ARTA|RTC|MTC|office of|government|city of)' )
           AND (COALESCE(role,'') || ' ' || COALESCE(affiliation,'') || ' ' || canonical_name) !~* %s
         ORDER BY mentions_count DESC NULLS LAST
-    """, (active_ourside(),))
+    """, (_client_code(), _scope(), _client_code(), active_ourside()))
     out = []
     for eid, name, aliases, role, aff, mc in cur.fetchall():
         blob = f"{name} {role} {aff}"
@@ -320,6 +369,20 @@ def build_roster(cur):
         if any(t.lower() in disc_tokens for t in toks) and name != (active_case().get("flagship") or ""):
             continue
         roster.append((name, office, cap, toks, note, "seed"))
+    # Explicit agency-referred actors must not disappear because the entity graph lacks an office role.
+    # These remain named allegations; their stored capacity may deliberately be unknown.
+    if _table_exists(cur, "ombudsman_candidates"):
+        cur.execute("""SELECT official,office,capacity,matters FROM ombudsman_candidates
+                       WHERE client_code=%s AND signals ? 'agency_referral'
+                         AND (%s IS NULL OR %s=ANY(matters)) ORDER BY official""",
+                    (_client_code(), _MATTER[0], _MATTER[0]))
+        existing = {r[0].lower() for r in roster}
+        for name, office, capacity, matters in cur.fetchall():
+            _validate_candidate_matters(cur, matters)
+            if name.lower() not in existing:
+                roster.append((name, office, capacity or "unknown", _match_tokens_from(name, []),
+                               "Agency-referred allegation; no liability finding", "agency_referral"))
+                existing.add(name.lower())
     return roster
 
 
@@ -340,41 +403,7 @@ MATTER_SCOPE = os.environ.get("LANDTEK_OMBUDS_SCOPE", "MWK%")
 # discovery + scope; this registry only enriches --reason with the case narrative. Add a client = add
 # an entry (or externalize to a config file). `--client KEY` selects the active case.
 CASES = {
-    "MWK": {
-        "scope": "MWK%",
-        "flagship": "Mayor Alexander Pajarillo",
-        "insider_names": ["Teope", "Baliza"],
-        "scheme": [
-            "The principals denied the ABSENTEE AMERICAN heirs their own property records — on a",
-            "citizenship pretext (EO 2) and an unlawful All-Heirs-SPA requirement — WHILE tolerating",
-            "and favoring municipal INSIDERS occupying, building on, and claiming the heirs' titled",
-            "land. Refusal of the owners + preference to insiders = manifest partiality, not neglect.",
-        ],
-        "beneficiaries": [
-            ("Antonio Teope", "Mayor's Chief of Staff",
-             "occupies a portion of the heirs' titled land; a cement cottage is under construction there; "
-             "the recipient of the officials' non-enforcement",
-             "§3(e) CONSPIRACY (recipient of the unwarranted preference); Grave Misconduct IF his "
-             "Chief-of-Staff post is confirmed a public office"),
-            ("Miguel Baliza", "draftsman in the Municipal Assessor's office",
-             "claims 1 hectare 'purchased for ₱3.4M from the late Cesar de la Fuente' (the void CV-26360 "
-             "source); the Treasurer declines to collect his RPT",
-             "§3(e) CONSPIRACY; his office-insider status + the void source are the partiality evidence"),
-        ],
-        "defense": [
-            "• EO-2 citizenship limitation — COLORABLE (EO 2 restricts FOI to citizens); REBUT: a",
-            "  property owner's OWN records aren't pure FOI; citizenship is no bar under RA 11032; the",
-            "  rule was applied DISCRIMINATORILY (dismiss heirs / favor insiders) — that IS the purpose.",
-            "• Good faith / workload — NEGATED by the CART conflict + Balane's self-dealing (his office",
-            "  approved the subdivision to his mother).",
-            "• 'Unpermitted' construction — currently DRAFT-only; neutralize by obtaining a certificate",
-            "  of no permit before pleading it as fact.",
-        ],
-        "next_facts": [
-            "• Teope's appointment/plantilla status (public officer? → own counts vs conspiracy-only).",
-            "• Certificate of NO building permit for the Teope structure (converts 'reported' → proven).",
-        ],
-    },
+    "MWK": {"flagship": "Mayor Alexander Pajarillo"},
 }
 # Universal own-side terms — litigant ROLE words only, NO client-specific names. A client that has
 # no configured own-side falls back to this, so one client's allies (Keesey/Barandon…) never leak in.
@@ -394,6 +423,9 @@ CASES["MWK"]["roster"] = SEED_ROSTER
 CASES["MWK"]["ourside"] = _OURSIDE_RE
 CASES["MWK"]["client_code"] = "MWK-001"   # the canonical clients.client_code _client_of() resolves MWK matters to
 _ACTIVE_CLIENT = ["MWK"]
+_MATTER = [None]
+CLIENT_ALIASES = {"MWK": "MWK-001", "PAR": "Paracale-001", "PARACALE": "Paracale-001",
+                  "NIBDC": "NIBDC-001"}
 
 
 def active_case():
@@ -402,14 +434,20 @@ def active_case():
 
 def _scope():
     """The active client's matter scope (client separation)."""
-    return active_case().get("scope") or MATTER_SCOPE
+    return _MATTER[0] or "%"  # canonical client ownership, not a prefix, is the isolation boundary
 
 
 def set_client(key):
-    """Select the active client (e.g. MWK, PAR, NIBDC). Scope = the case's scope or KEY + '%'."""
+    """Accept explicit aliases or canonical codes; never accept wildcard client scopes."""
+    if not re.fullmatch(r"[A-Za-z0-9-]+", key or ""):
+        raise ValueError("Use an exact client code, not a wildcard or matter prefix")
+    canonical = CLIENT_ALIASES.get(key.upper(), key)
+    key = "MWK" if canonical == "MWK-001" else canonical
     _ACTIVE_CLIENT[0] = key
+    _MATTER[0] = None
     if key not in CASES:
-        CASES[key] = dict(GENERIC_CASE, scope=(key.rstrip("%") + "%"))
+        CASES[key] = dict(GENERIC_CASE, client_code=canonical)
+    _COMPILED.clear()
 
 
 def _client_code():
@@ -430,7 +468,6 @@ def active_ourside():
     """The active client's own-side exclusion regex — client-scoped (A37). One client's allies are
     never applied to another; an unconfigured client gets only universal litigant-role words."""
     return active_case().get("ourside") or GENERIC_OURSIDE
-    _COMPILED.clear()
 
 
 # Compiled signal patterns (built once) + the active client's insider surnames injected — fast combing.
@@ -443,34 +480,54 @@ def _compile_signals():
         _COMPILED[sig] = re.compile(pat, re.IGNORECASE)
 
 
-def _fetch_facts(cur, scope=None):
-    """Every in-scope matter_fact we can scan — taken through the `ombudsman-hunter` RecipientProfile
-    (A75, deploy_844): MACHINE form, provenance handles intact, client scope enforced in the query,
-    PULL_COMPLETE (a work-slice is never truncated). First agent-facing projection proof."""
-    scope = scope or _scope()
-    if not _table_exists(cur, "matter_facts"):
-        return []
+class _OwnedFactCursor:
+    """Apply Hunter-specific ownership restrictions before the shared projection reads anything."""
+    def __init__(self, cursor, client_code, rx):
+        self.cursor, self.client_code, self.rx = cursor, client_code, rx
+
+    def execute(self, query, params):
+        self.cursor.execute("""
+            WITH matter_facts AS (
+                SELECT f.* FROM public.matter_facts f
+                JOIN matters m ON m.matter_code=f.matter_code
+                JOIN documents d ON d.id::text=f.source_id AND f.source_kind='doc'
+                WHERE m.client_code=%s
+                  AND f.provenance_level IN ('verified','inferred_strong')
+                  AND (%s IS NULL OR f.statement ~* %s)
+                  AND (d.case_file=%s OR (COALESCE(d.case_file,'')='' AND d.matter_code=m.matter_code))
+                  AND NOT EXISTS (SELECT 1 FROM matters owner WHERE owner.matter_code=d.matter_code
+                                  AND owner.client_code IS DISTINCT FROM m.client_code)
+                  AND lower(COALESCE(d.execution_status,'')) NOT LIKE '%%draft%%'
+                  AND COALESCE(d.original_filename,'') !~* '([.]docx?$|draft|reconstructed)'
+            )
+        """ + query, (self.client_code, self.rx, self.rx, self.client_code) + tuple(params))
+
+    def fetchall(self):
+        return self.cursor.fetchall()
+
+
+def _fetch_facts(cur, scope=None, rx=None):
+    """Use the existing governed projection over a fail-closed, client-owned source slice."""
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "leo_tools"))
     from recipient_projection import project_fact_slice
+    scoped_cursor = _OwnedFactCursor(cur, _client_code(), rx)
     return [(d["fact_id"], d["matter_code"], d["statement"], d["source_id"], d["provenance_level"])
-            for d in project_fact_slice(cur, "ombudsman-hunter", scope)]
+            for d in project_fact_slice(scoped_cursor, "ombudsman-hunter", scope or _scope())]
 
 
 def _fetch_docmap(cur):
     """source_id (as text) -> document filename, for identity-bearing evidence handles."""
     if not _table_exists(cur, "documents"):
         return {}
-    cur.execute("SELECT id::text, COALESCE(original_filename,'') FROM documents")
-    return {r[0]: r[1] for r in cur.fetchall()}
+    return {str(r[0]): r[1] for r in _scoped_docs(cur, ".", include_text=False)}
 
 
 def _fetch_fact_texts(cur, fact_ids):
     """id -> statement, for the discernment pass to READ the actual evidence."""
     if not fact_ids:
         return {}
-    cur.execute("SELECT id, COALESCE(statement,'') FROM matter_facts WHERE id = ANY(%s)",
-                (list(fact_ids),))
-    return {r[0]: r[1] for r in cur.fetchall()}
+    wanted = set(fact_ids)
+    return {r[0]: r[2] for r in _fetch_facts(cur) if r[0] in wanted}
 
 
 def _ensure_table(cur):
@@ -482,6 +539,51 @@ def _ensure_table(cur):
 
 
 # ── Discernment reasoner (local Ollama — sovereign, $0) ──────────────────────
+def _validate_candidate_matters(cur, matters):
+    if not matters or any(not m or '%' in m for m in matters):
+        raise ValueError("Candidate needs exact, registered matter codes")
+    cur.execute("SELECT matter_code FROM matters WHERE client_code=%s AND matter_code=ANY(%s)",
+                (_client_code(), list(matters)))
+    if {r[0] for r in cur.fetchall()} != set(matters):
+        raise ValueError("Candidate contains unknown or foreign-client matters; review required")
+
+
+def _review_label(row):
+    if row["status"] == "held_for_filing":
+        return "LEGACY HOLD — human review not established"
+    if (row["signals"] or {}).get("agency_referral"):
+        return "AGENCY REFERRAL — allegations, not element proof"
+    return "MACHINE LEAD — human review required"
+
+
+def _show_referrals(cur):
+    """Reuse ingested mailbox/attachment metadata, including missing matter links; never infer a stage."""
+    cur.execute("""
+        SELECT g.message_id, g.sent_at, g.subject, g.from_addr, g.matter_codes,
+               COALESCE(array_agg(DISTINCT ed.doc_id) FILTER (WHERE d.id IS NOT NULL),'{}')
+        FROM gmail_messages g
+        LEFT JOIN email_documents ed ON ed.message_id=g.message_id
+        LEFT JOIN documents d ON d.id=ed.doc_id AND d.case_file=g.client_code
+        WHERE g.client_code=%s AND (
+            g.from_addr ~* '@ombudsman[.]gov[.]ph[> ]*$'
+            OR g.subject ~* '(ombudsman|IC-OC-|OAC-L|notice of referral|endorsement|indorsement)')
+          AND NOT ('DRAFT'=ANY(COALESCE(g.labels,'{}')))
+          AND (%s IS NULL OR %s=ANY(g.matter_codes))
+        GROUP BY g.message_id,g.sent_at,g.subject,g.from_addr,g.matter_codes
+        ORDER BY g.sent_at DESC NULLS LAST,g.message_id LIMIT 25
+    """, (_client_code(), _MATTER[0], _MATTER[0]))
+    print("AGENCY CORRESPONDENCE — latest 25 matching ingested messages; not a complete mailbox audit")
+    for mid, sent, subject, sender, matters, docs in cur.fetchall():
+        scope = ', '.join(matters or []) or 'UNLINKED — routing review required'
+        print(f"  {sent} | {subject} | {scope} | docs {docs} | gmail:{mid}")
+    print("  Read originals; forwarding is not proof of liability or a preliminary-investigation order.\n")
+
+
+def cmd_referrals():
+    with _conn() as conn, conn.cursor() as cur:
+        _show_referrals(cur)
+
+
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 VERIFY_MODEL = os.environ.get("LANDTEK_OMBUDS_MODEL", "qwen2.5:14b-instruct")
 
@@ -512,7 +614,7 @@ def _match_official(fact_stmt, match_tokens):
     low = fact_stmt.lower()
     for tok in match_tokens:
         t = tok.lower()
-        if t in MATCH_STOPWORDS:
+        if t in MATCH_STOPWORDS or t in _TITLE_WORDS:
             continue
         if " " in t:  # phrase token, e.g. "municipal engineer"
             if t in low:
@@ -526,12 +628,7 @@ def _scan_signals(text):
     if not _COMPILED:
         _compile_signals()
     hits = {sig: True for sig, rx in _COMPILED.items() if rx.search(text)}
-    # the active client's named insiders trigger political_favor (parameterized, not hardcoded)
-    names = active_case().get("insider_names") or []
-    if names and "political_favor" not in hits:
-        low = text.lower()
-        if any(n.lower() in low for n in names):
-            hits["political_favor"] = True
+    # A person's name alone is never a political-favor signal.
     return hits
 
 
@@ -547,7 +644,7 @@ def cull_and_profile(facts, roster, docmap=None):
                               "source": source, "matters": set(), "incidents": []}
         tokens_by_official[official] = match_tokens
     for fid, matter, stmt, src, prov in facts:
-        if prov and prov not in ("verified", "inferred_strong"):
+        if prov not in ("verified", "inferred_strong"):
             continue  # scan only grounded facts, never weak/draft
         for official in list(profiles):
             if _match_official(stmt, tokens_by_official[official]):
@@ -575,7 +672,7 @@ def _element_gate(vtemplate, present_signals):
         any_mode = espec.get("any", False)
         got = [s for s in needs if s in present_signals]
         got_weak = [s for s in weak if s in present_signals]
-        if (any_mode and got) or (not any_mode and len(got) == len(needs)):
+        if needs and ((any_mode and got) or (not any_mode and len(got) == len(needs))):
             state = "have"
             proven += 1
         elif got or got_weak:
@@ -612,6 +709,8 @@ def build_candidates(profiles):
             for s in sigs:
                 agg.setdefault(s, handle)
         for vcode, vtmpl in VIOLATIONS.items():
+            if vtmpl.get("referral_only"):
+                continue
             report, strength = _element_gate(vtmpl, agg)
             if strength == 0:
                 continue  # no element even thinly supported — not a lead
@@ -621,17 +720,18 @@ def build_candidates(profiles):
             n_facts = len({fid for fid, _h, _s, _m in prof["incidents"]})
             # DISCERNMENT RULE: the deterministic keyword scan caps at 'ripe' — keyword presence
             # alone can NOT declare a case ready. Only the evidence-reading pass (--verify), which
-            # actually reads each cited fact, promotes 'ripe' -> 'held_for_filing'. A single fact is
-            # never 'ripe' (needs >=2 distinct grounding facts).
+            # reads evidence but remains inference-grade. A single fact is never 'ripe'.
             if all_have and identified and n_facts >= 2:
                 status = "ripe"
             elif (all_have or strength >= 0.5) and identified:
                 status = "building"
             else:
                 status = "seed"
+            if vtmpl.get("review_only"):
+                status = "building" if strength else "seed"
             gaps = [f"pin element '{report[e]['label']}'" for e in report if report[e]["state"] != "have"]
             if status == "ripe":
-                gaps.append("run --verify: an evidence-read must confirm each element before this is filing-ready")
+                gaps.append("Source review and human/counsel approval required; keyword support is not element proof")
             if not identified:
                 gaps.append("confirm respondent identity + term/appointment of record (elective vs appointive)")
             leverage = 5 if prof["capacity"] == "elective" else 4
@@ -655,6 +755,9 @@ def build_candidates(profiles):
 
 def upsert(cur, cands):
     _ensure_table(cur)
+    # Validate the complete batch before any write; shadow database checks are not an isolation wall.
+    for c in cands:
+        _validate_candidate_matters(cur, c["matters"])
     for c in cands:
         cur.execute("""
             INSERT INTO ombudsman_candidates
@@ -666,7 +769,9 @@ def upsert(cur, cands):
               statute=EXCLUDED.statute, forum=EXCLUDED.forum, elements=EXCLUDED.elements,
               signals=EXCLUDED.signals, prescription=EXCLUDED.prescription, status=EXCLUDED.status,
               strength=EXCLUDED.strength, leverage=EXCLUDED.leverage, score=EXCLUDED.score,
-              gaps=EXCLUDED.gaps, rationale=EXCLUDED.rationale, updated_at=now()
+              gaps=EXCLUDED.gaps, rationale=EXCLUDED.rationale, provenance=EXCLUDED.provenance, updated_at=now()
+            WHERE NOT (COALESCE(ombudsman_candidates.signals,'{}') ? 'agency_referral')
+              AND ombudsman_candidates.status <> 'filed'
         """, (_client_code(), c["official"], c["office"], c["capacity"], c["matters"], c["violation_code"],
               c["statute"], c["forum"], json.dumps(c["elements"]), json.dumps(c["signals"]),
               c["prescription"], c["status"], c["strength"], c["leverage"], c["score"],
@@ -674,7 +779,9 @@ def upsert(cur, cands):
 
 
 # ── Commands ─────────────────────────────────────────────────────────────────
-def cmd_scan():
+def cmd_scan(dry_run=False):
+    if _MATTER[0] and not dry_run:
+        raise ValueError("A partial matter scan cannot overwrite client-wide candidates; use --dry-run")
     with _conn() as conn, conn.cursor() as cur:
         facts = _fetch_facts(cur)
         if not facts:
@@ -682,13 +789,15 @@ def cmd_scan():
             return
         roster = build_roster(cur)
         n_disc = sum(1 for r in roster if r[5] == "discovered")
+        n_agency = sum(1 for r in roster if r[5] == "agency_referral")
         docmap = _fetch_docmap(cur)
         profiles = cull_and_profile(facts, roster, docmap)
         cands = build_candidates(profiles)
-        upsert(cur, cands)
+        if not dry_run:
+            upsert(cur, cands)
         ripe = sum(1 for c in cands if c["status"] == "ripe")
-        print(f"[hunter] learned {len(roster)} officers ({n_disc} corpus-discovered + "
-              f"{len(roster)-n_disc} seed) from the entities graph; scanned {len(facts)} facts -> "
+        print(f"[hunter] {'DRY RUN — no writes; ' if dry_run else ''}learned {len(roster)} officers ({n_disc} corpus-discovered + "
+              f"{len(roster)-n_disc-n_agency} seed + {n_agency} agency-referred) from existing records; scanned {len(facts)} facts -> "
               f"{len(cands)} candidate lead(s) across "
               f"{sum(1 for p in profiles.values() if p['incidents'])} officer(s) with signal-bearing facts; "
               f"{ripe} at 'ripe' (keyword-scan, UNVERIFIED). Run --verify; filing stays human-gated.")
@@ -699,7 +808,7 @@ CORE_SEVEN = [
     ("Mayor Alexander Pajarillo",        ["Pajarillo"],                         "elective"),
     ("Loida E. Macale — Mun. Treasurer", ["Macale"],                            "appointive"),
     ("Gemma P. Abla — Mun. Assessor",    ["Abla"],                              "appointive"),
-    ("Erwin H. Balane — Mun. Engineer",  ["Erwin Balane", "Engr. Balane", "Engr Balane", "Municipal Engineer"], "appointive"),
+    ("Erwin H. Balane — Mun. Engineer",  ["Erwin Balane", "Erwin H. Balane"], "appointive"),
     ("PENRO Fortuno",                    ["Fortuno"],                           "career"),
     ("PENRO Remoto",                     ["Remoto"],                            "career"),
     ("Sangguniang Bayan (Mercedes)",     ["Sangguniang", "Sanggunian"],         "elective"),
@@ -725,27 +834,30 @@ def _windows(text, tokens, half=140, cap=8):
     return wins
 
 
-def _scoped_docs(cur, rx, scope=None):
+def _scoped_docs(cur, rx, scope=None, include_text=True):
     scope = scope or _scope()
-    """Documents whose text matches AND are linked to the client's matters (client separation)."""
-    if _table_exists(cur, "document_matter_links"):
-        cur.execute("""SELECT DISTINCT d.id, COALESCE(d.original_filename,''), COALESCE(d.extracted_text,'')
-                       FROM documents d JOIN document_matter_links l ON l.doc_id=d.id
-                       WHERE d.extracted_text ~* %s AND l.matter_code LIKE %s""", (rx, scope))
-        return cur.fetchall()
-    cur.execute("""SELECT id, COALESCE(original_filename,''), COALESCE(extracted_text,'')
-                   FROM documents WHERE extracted_text ~* %s""", (rx,))
+    # Missing ownership tables fail closed; NEVER fall back to the entire documents table.
+    text_column = "COALESCE(d.extracted_text,'')" if include_text else "''"
+    cur.execute(f"""SELECT d.id, COALESCE(d.original_filename,''), {text_column}
+        FROM documents d WHERE d.extracted_text ~* %s
+          AND (d.case_file=%s OR (COALESCE(d.case_file,'')='' AND EXISTS (
+              SELECT 1 FROM matters owner WHERE owner.matter_code=d.matter_code AND owner.client_code=%s)))
+          AND NOT EXISTS (SELECT 1 FROM matters owner WHERE owner.matter_code=d.matter_code
+                          AND owner.client_code IS DISTINCT FROM %s)
+          AND EXISTS (SELECT 1 FROM matters m WHERE m.client_code=%s AND m.matter_code LIKE %s
+              AND (d.matter_code=m.matter_code OR EXISTS (
+                  SELECT 1 FROM document_matter_links l WHERE l.doc_id=d.id AND l.matter_code=m.matter_code)))
+          AND lower(COALESCE(d.execution_status,'')) NOT LIKE '%%draft%%'
+          AND COALESCE(d.original_filename,'') !~* '(\\.docx?$|draft|reconstructed)'
+        ORDER BY d.id DESC
+    """, (rx, _client_code(), _client_code(), _client_code(), _client_code(), scope))
     return cur.fetchall()
 
 
 def _hunt_one(cur, label, tokens, capacity):
     rx = _rx(tokens)
     # 1) the distilled fact ledger — SCOPED to the client's matters (no cross-client contamination)
-    cur.execute("""SELECT id, matter_code, COALESCE(statement,''), COALESCE(source_id::text,'')
-                   FROM matter_facts
-                   WHERE statement ~* %s AND matter_code LIKE %s
-                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, _scope()))
-    facts = cur.fetchall()
+    facts = [r[:4] for r in _fetch_facts(cur, rx=rx)]
     # 2) the FULL document corpus (what the old hunt ignored) — SCOPED to client-linked docs
     docs = _scoped_docs(cur, rx)
 
@@ -775,7 +887,7 @@ def _hunt_one(cur, label, tokens, capacity):
     print(f"   corpus reach: {len(facts)} grounded fact(s) + {len(docs)} document(s) mined; "
           f"{len(doc_src_hits)} document(s) held a signal NOT necessarily in the fact-ledger.")
     print("   element evidence AVAILABLE (co-occurrence in the record; attribution is --verify's job):")
-    forums = ["ra3019_3e", "ra3019_3f", "grave_misconduct", "rpc_171"] if capacity != "unknown" else ["ra3019_3f"]
+    forums = ["ra3019_3e", "ra3019_3f", "ra3019_3i", "grave_misconduct", "rpc_171"]
     for vcode in forums:
         vt = VIOLATIONS[vcode]
         report, _ = _element_gate(vt, present)
@@ -801,7 +913,9 @@ def cmd_hunt(query):
     build a per-respondent element-proof map. `--hunt seven` runs the 7 core individuals."""
     with _conn() as conn, conn.cursor() as cur:
         if query.lower() in ("seven", "7", "the-seven"):
-            print("OMBUDSMAN HUNTER — DEEP corpus hunt of the 7 core individuals (facts + full document text)")
+            if _client_code() != "MWK-001":
+                raise ValueError("The curated seven-person roster is MWK-only; use --officers for this client")
+            print("OMBUDSMAN HUNTER — curated MWK roster (includes office-level leads; facts + full document text)")
             for label, toks, cap in CORE_SEVEN:
                 _hunt_one(cur, label, toks, cap)
         else:
@@ -820,144 +934,32 @@ def cmd_hunt(query):
 # ── CASE-REASONING LAYER (the "think like a prosecutor" brain) ───────────────
 # Legal-status doctrine: is this role a public officer, in what forum, on what clock. Answers the
 # threshold question (e.g. "is the Mayor's Chief of Staff chargeable?"). Periods NEEDS-COUNSEL-VERIFY.
-STATUS_DOCTRINE = [
-    # chief-of-staff FIRST — else "Mayor's Chief of Staff" wrongly matches the elective 'mayor' rule
-    (r"chief of staff|personal assistant|confidential|coterminous",
-     "coterminous/confidential LGU staff — TREAT as a public officer, but CONFIRM the appointment/"
-     "plantilla; if he is in fact private, he is still chargeable ONLY in CONSPIRACY with the officers "
-     "(Go v. Sandiganbayan)",
-     "Ombudsman (criminal) / CSC (admin) — or via conspiracy if private"),
-    (r"\bmayor\b|vice.?mayor|governor|councilor|kagawad|sanggunian|punong",
-     "elective local official — a public officer",
-     "Ombudsman → Sandiganbayan if SG ≥ 27 (a mayor is SG 27; verify the SG)"),
-    (r"assessor|treasurer|engineer|building official|register|registrar|draftsman|clerk|department head",
-     "appointive/career public officer",
-     "Ombudsman (criminal) / CSC (administrative)"),
-    (r"prosecutor|commissioner|director|undersecretary|adjudicator",
-     "national appointive officer",
-     "Ombudsman"),
-]
-DEFAULT_STATUS = ("status UNCONFIRMED — if a PRIVATE person, chargeable ONLY in conspiracy with public "
-                  "officers (Go v. Sandiganbayan); if a public officer, directly",
-                  "Ombudsman (directly, or via conspiracy)")
-
-# (The favored insiders / beneficiaries now live per-client in CASES[...]["beneficiaries"].)
-
-# For each thin/missing element, the ONE fact that would clinch it (self-critique → next hunt).
-CLINCH_HINTS = {
-    "injury_or_benefit": "a quantified figure of the heirs' loss (fees paid for an undelivered service) OR a "
-                         "record pinning the unwarranted preference to the insider (a permit/tax entry favoring Teope/Baliza)",
-    "purpose": "a document showing the officials KNEW of the insider's illegal occupation and declined to act because of his status",
-    "unjustified_refusal": "the received/stamped refusal, or the Charter-clock breach in the officer's own hand",
-    "flagrant_breach": "the officer's own record of the conflict (CART minutes naming him) or the unlawful requirement",
-    "modality": "the conflict-of-interest record (sitting on his own complaint) or the unlawful-requirement document",
-    "official_document": "the received official communication bearing the false/omitted statement",
-    "untruthful_narration": "the officer's own statement contradicted by a received copy (a provable false denial)",
-    "communication": "the received/stamped request letter proving the demand reached the office",
-    "due_demand": "the received/stamped demand letter",
-    "public_officer": "the appointment/plantilla record confirming the office",
-}
-
-
-def _classify_status(name, office):
-    blob = f"{name} {office}".lower()
-    for pat, basis, forum in STATUS_DOCTRINE:
-        if re.search(pat, blob):
-            return basis, forum
-    return DEFAULT_STATUS
+# Forum and legal-status conclusions require source review, not title-word shortcuts.
 
 
 def cmd_reason(client):
-    """CASE-REASONING: assemble the verified candidates into a prosecutor's THEORY OF THE CASE —
-    actor/role/legal-STATUS map, the common-design/CONSPIRACY thread, counts ranked by real strength,
-    a defense pre-mortem, and the single CLINCHING fact each thin count needs. Deterministic ($0);
-    grounded in the verified candidate rows. This is what turns leads into a case."""
-    set_client(client.rstrip("%"))   # align the active case theory with the --reason target
-    scope = _scope()
+    """Read-only, client-scoped review board; no canned narrative or guilt inference."""
+    matter = _MATTER[0]
+    set_client(client)
+    _MATTER[0] = matter
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-        if not _table_exists(cur, "ombudsman_candidates"):
-            print("No candidates. Run --scan then --verify first.")
-            return
+        _show_referrals(cur)
         cur.execute("SELECT * FROM ombudsman_candidates WHERE client_code=%s ORDER BY score DESC",
                     (_client_code(),))
-        rows = [r for r in cur.fetchall()]
-        if not rows:
-            print("No candidates. Run --scan / --verify.")
-            return
-        # actors = officials with at least one non-seed count
-        by_off = {}
-        for r in rows:
-            by_off.setdefault(r["official"], []).append(r)
-        actors = {o: cs for o, cs in by_off.items() if any(c["status"] != "seed" for c in cs)}
-
-        cfg = active_case()
-        print(f"══════ OMBUDSMAN HUNTER — THEORY OF THE CASE: {client} ══════\n")
-        print("I. THE SCHEME (common design)")
-        for ln in cfg["scheme"]:
-            print("   " + ln)
-        print()
-
-        print("II. ACTORS, ROLES & LEGAL STATUS")
-        for official, cs in sorted(actors.items(), key=lambda kv: -max(c["score"] for c in kv[1])):
-            office = cs[0]["office"]
-            basis, forum = _classify_status(official, office)
-            best = max(cs, key=lambda c: (c["status"] == "held_for_filing", c["score"]))
-            verified = "✓verified" if best["provenance"] == "operator" else "unverified"
-            print(f"   [PRINCIPAL] {official}  ({office})")
-            print(f"       status: {basis}")
-            print(f"       forum : {forum}")
-            counts = ", ".join(f"{c['violation_code']}={c['status']}" for c in sorted(cs, key=lambda c: -c['score']) if c['status'] != 'seed')
-            print(f"       counts: {counts}  [{verified}]")
-        for name, role, conduct, theory in cfg["beneficiaries"]:
-            basis, forum = _classify_status(name, role)
-            print(f"   [BENEFICIARY / CONSPIRATOR] {name}  ({role})")
-            print(f"       status: {basis}")
-            print(f"       conduct: {conduct}")
-            print(f"       theory : {theory}")
-        print()
-
-        print("III. COUNTS — ranked by verified strength")
-        ranked = sorted([c for c in rows if c["status"] != "seed"],
-                        key=lambda c: (c["status"] == "held_for_filing", c["score"]), reverse=True)
-        for c in ranked[:10]:
-            thin = [ek for ek, ev in dict(c["elements"]).items() if ev.get("state") != "have"]
-            ready = "READY" if c["status"] == "held_for_filing" else c["status"].upper()
-            print(f"   • [{ready:<9}] {c['official']} — {c['statute'].split(';')[0][:52]}  (score {c['score']})")
-            if c["status"] == "held_for_filing":
-                print("        clinch: none — elements established (evidence-verified); ready for counsel.")
-            elif c["provenance"] != "operator":
-                print("        UNVERIFIED (keyword-scan only) — run --verify to element-test before relying.")
-            elif thin:
-                wk = thin[0]
-                print(f"        WEAK LINK: {wk} — CLINCH: {CLINCH_HINTS.get(wk, 'pin this element to a received document')}")
-            else:
-                print("        verified but sub-ceiling — re-run --verify (evidence may have shifted).")
-        print()
-
-        print("IV. DEFENSE PRE-MORTEM")
-        for ln in cfg["defense"]:
-            print("   " + ln)
-        print()
-
-        print("V. WHAT TO GET NEXT (clinching facts, ranked)")
-        needs = []
-        for c in ranked:
-            if c["status"] == "held_for_filing":
+        print("REVIEW SCAFFOLD — allegations and machine leads; no charge is certified")
+        for row in cur.fetchall():
+            if _MATTER[0] and _MATTER[0] not in (row["matters"] or []):
                 continue
-            for ek, ev in dict(c["elements"]).items():
-                if ev.get("state") != "have" and ek in CLINCH_HINTS:
-                    needs.append((c["official"], c["violation_code"], ek, CLINCH_HINTS[ek]))
-        seen = set()
-        for off, vc, ek, hint in needs:
-            key = (ek, hint)
-            if key in seen:
+            try:
+                _validate_candidate_matters(cur, row["matters"])
+            except ValueError:
+                print(f"  #{row['id']}: HOLD — unresolved matter ownership")
                 continue
-            seen.add(key)
-            print(f"   • [{ek}] {hint}")
-        for ln in cfg["next_facts"]:
-            print("   " + ln)
-        print("\n(This is a grounded case-theory scaffold from the VERIFIED rows. Filing stays human-gated; "
-              "intent is argued circumstantially; jurisprudence + periods are NEEDS-COUNSEL-VERIFICATION.)")
+            print(f"  #{row['id']} {row['official']} | {row['statute']} | {_review_label(row)}")
+            print(f"    matters: {row['matters']}; last assessment: {row['updated_at']}")
+            for gap in row["gaps"] or []:
+                print(f"    gap: {gap}")
+        print("Separate official acts, private interests, procedural referrals and findings. Nothing filed.")
 
 
 def cmd_officers():
@@ -978,7 +980,7 @@ def cmd_officers():
 
 def _official_tokens(cur, official_name):
     """Resolve a candidate's official name -> distinctive match tokens (for deep evidence gather)."""
-    for label, toks, _cap in CORE_SEVEN:
+    for label, toks, _cap in (CORE_SEVEN if _client_code() == "MWK-001" else []):
         if label.split(" —")[0].split("(")[0].strip().lower() in official_name.lower() \
            or any(t.lower() in official_name.lower() for t in toks):
             return toks
@@ -989,20 +991,18 @@ def _official_tokens(cur, official_name):
     return [t for t in re.split(r"[^A-Za-z]+", official_name) if len(t) >= 4 and t.lower() not in _TITLE_WORDS][:4] or [official_name]
 
 
-def _gather_element_evidence(cur, tokens, signals, limit=6):
+def _gather_element_evidence(cur, tokens, signals, limit=6, matter=None):
     """DEEP, client-scoped evidence for ONE element: facts + document passages that mention the
     official AND carry one of the element's signals. This feeds --verify the full corpus, not just
     the scan's first-handle-per-signal."""
     rx = _rx(tokens)
     sset = set(signals)
     out, seen = [], set()
-    cur.execute("""SELECT id, COALESCE(statement,'') FROM matter_facts
-                   WHERE statement ~* %s AND matter_code LIKE %s
-                     AND COALESCE(provenance_level,'') IN ('verified','inferred_strong')""", (rx, _scope()))
-    for fid, stmt in cur.fetchall():
+    for fid, source_matter, stmt, source, provenance in _fetch_facts(cur, scope=matter, rx=rx):
         if sset & set(_scan_signals(stmt)) and f"fact:{fid}" not in seen:
-            seen.add(f"fact:{fid}"); out.append((f"fact:{fid}", stmt[:300]))
-    for did, fname, text in _scoped_docs(cur, rx):
+            seen.add(f"fact:{fid}")
+            out.append((f"fact:{fid}|doc:{source}", f"[{source_matter}; {provenance}; assertion, not adjudication] {stmt[:600]}"))
+    for did, fname, text in _scoped_docs(cur, rx, scope=matter):
         for w in _windows(text, tokens):
             if sset & set(_scan_signals(w)) and f"doc:{did}" not in seen:
                 seen.add(f"doc:{did}"); out.append((f"doc:{did}", f"[{fname[:30]}] {w[:240]}")); break
@@ -1013,34 +1013,14 @@ def _gather_element_evidence(cur, tokens, signals, limit=6):
 # CIRCUMSTANTIALLY, by reasonable inference from the totality of conduct. Judging them by a
 # direct-proof standard is legally wrong, so verify uses an inference standard + a connective theory.
 INTENT_ELEMENTS = {"purpose", "modality", "flagrant_breach", "bad_faith", "unjustified_refusal"}
-THEORY_HINTS = {
-    ("ra3019_3f", "purpose"):
-        "Wrongful/discriminatory purpose, shown by the PATTERN: (a) officials applied a CITIZENSHIP "
-        "LIMITATION (EO 2) to dismiss the AMERICAN heirs' records requests (fact 5576) — near-direct "
-        "discrimination pleaded to the Office of the President as 'citizenship-based dismissals'; "
-        "while (b) FAVORING two LGU insiders on the SAME land — Antonio Teope (Mayor's Chief of "
-        "Staff) erecting an unpermitted cottage 'without owner agreement', and Miguel Baliza "
-        "(draftsman IN the Assessor's office) claiming a hectare via the VOID de la Fuente sale, with "
-        "the Treasurer declining to collect Baliza's tax (shielding the paper trail).",
-    ("ra3019_3e", "injury_or_benefit"):
-        "The unwarranted BENEFIT/PREFERENCE = giving an insider an advantage they are not entitled "
-        "to (tolerating the Chief of Staff's unpermitted construction on the heirs' land) while "
-        "denying the titled heirs; OR undue injury = the heirs' concrete deprivation of records.",
-    ("ra3019_3e", "modality"):
-        "Manifest partiality / bad faith is inferred where an official invents an unlawful hurdle "
-        "(All-Heirs-SPA) AND sits in judgment of the complaint against his own office (CART chair), "
-        "or favors an insider over the titled owner.",
-    ("grave_misconduct", "flagrant_breach"):
-        "A flagrant breach: sitting in judgment of the complaint against one's own office; imposing "
-        "an unlawful requirement; or favoring an insider's illegal construction over titled heirs.",
-}
+THEORY_HINTS = {}  # No client-specific narrative may be supplied as evidence to the verifier.
 
 
 def cmd_verify(target):
     """DISCERNMENT PASS — gather DEEP, client-scoped evidence per element (facts + full document
     text) and judge whether it ESTABLISHES the element as to the named respondent. Factual elements
     use a direct-proof standard; INTENT elements use the correct circumstantial-inference standard
-    (with a connective theory). Only an evidence-read confirmation promotes to 'held_for_filing'.
+    No LLM result promotes a lead to human-approved or held-for-filing status.
     Local Ollama, $0.  target: id | 'ripe' | 'all' (all non-seed candidates)."""
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
         if not _table_exists(cur, "ombudsman_candidates"):
@@ -1060,8 +1040,17 @@ def cmd_verify(target):
             print("Nothing to verify (no matching 'ripe' candidate). Run --board to see statuses.")
             return
         for r in rows:
+            if _MATTER[0] and _MATTER[0] not in (r["matters"] or []):
+                continue
+            _validate_candidate_matters(cur, r["matters"])
+            if len(set(r["matters"])) != 1:
+                print(f"[review required] #{r['id']}: separate multi-matter acts before element assessment")
+                continue
             elements = dict(r["elements"])
             vtmpl = VIOLATIONS.get(r["violation_code"], {})
+            if not vtmpl or vtmpl.get("referral_only"):
+                print(f"[review required] #{r['id']}: exact provision/elements require source and counsel review")
+                continue
             tokens = _official_tokens(cur, r["official"])
             print(f"\n[verify] #{r['id']} {r['official']} — {r['statute']}  (deep, scoped {_scope()})")
             proven = 0
@@ -1073,16 +1062,16 @@ def cmd_verify(target):
                 sigs = espec.get("needs", []) + espec.get("weak", [])
                 # intent elements need the FULL pattern, not 6 scattered snippets, to infer from
                 lim = 12 if ekey in INTENT_ELEMENTS else 6
-                evidence = _gather_element_evidence(cur, tokens, sigs, limit=lim) if sigs else []
+                evidence = _gather_element_evidence(cur, tokens, sigs, limit=lim, matter=r["matters"][0]) if sigs else []
                 ev["handle"] = [h for h, _sn in evidence]   # store the DEEP evidence handles
                 excerpts = "\n".join(f"- ({h}) {sn}" for h, sn in evidence) or "(no in-scope evidence found)"
                 if ekey in INTENT_ELEMENTS:
                     hint = THEORY_HINTS.get((r["violation_code"], ekey), "")
                     prompt = (
                         "You are a Philippine anti-graft preliminary-investigation analyst. This is an "
-                        "INTENT/state-of-mind element. Intent is NEVER proven by direct admission — it is "
-                        "established CIRCUMSTANTIALLY, by a reasonable inference from the TOTALITY of the "
-                        "conduct. Do not demand a single fact that says it outright.\n\n"
+                        "INTENT/state-of-mind element. Distinguish direct evidence from circumstantial "
+                        "inference. Test alternative explanations and respondent-specific attribution. "
+                        "Allegations, referrals, co-mentions and draft wording are not findings.\n\n"
                         f"STATUTE: {r['statute']}\n"
                         f"ELEMENT (intent): {ev['label']}\n"
                         f"RESPONDENT: {r['official']} ({r['office']})\n"
@@ -1123,22 +1112,25 @@ def cmd_verify(target):
             strength = round(proven / max(1, total), 3)
             all_have = all(ev["state"] == "have" for ev in elements.values())
             identified = r["capacity"] in ("elective", "appointive", "career")
-            status = "held_for_filing" if (all_have and identified) else ("building" if strength >= 0.5 else "seed")
+            status = "building" if strength >= 0.5 else "seed"
             forum_fit = 1.0 if r["forum"] == "OMBUDSMAN" else 0.7
             score = round(strength * (r["leverage"] or 3) * forum_fit, 3)
             gaps = [f"pin element '{ev['label']}'" for ev in elements.values() if ev["state"] != "have"]
-            rationale = (f"{status.upper()} (VERIFIED by evidence-read): {int(strength*100)}% of "
-                         f"{r['statute']} elements established. " + " · ".join(notes))
+            gaps.append("Human review of source attribution, legal elements and defenses is required; AI assessment is not proof")
+            rationale = (f"{status.upper()} (machine assessment, NOT human-verified): "
+                         f"{int(strength*100)}% element-support score for {r['statute']}. " + " · ".join(notes))
             cur.execute("""UPDATE ombudsman_candidates
                            SET elements=%s, status=%s, strength=%s, score=%s, gaps=%s, rationale=%s,
-                               provenance='operator', updated_at=now() WHERE id=%s AND client_code=%s""",
+                               provenance='inferred_strong', updated_at=now() WHERE id=%s AND client_code=%s
+                               AND status <> 'filed'""",
                         (json.dumps(elements), status, strength, score, json.dumps(gaps), rationale, r["id"], _client_code()))
             print(f"  => {status.upper()}  (strength {int(strength*100)}%, score {score})")
-        print("\n[verify] done. Filing remains human-gated — 'held_for_filing' is the ceiling.")
+        print("\n[verify] done. Machine assessments stay inference-grade; no filing approval was issued.")
 
 
 def cmd_board():
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+        _show_referrals(cur)
         if not _table_exists(cur, "ombudsman_candidates"):
             print("No candidates yet. Run --scan (after applying the migration on the VPS).")
             return
@@ -1149,16 +1141,16 @@ def cmd_board():
             print("No candidates yet. Run --scan.")
             return
         print("OMBUDSMAN HUNTER — ranked leads (filing is held; these are LEADS, not verified facts)")
-        print("  RIPE = keyword-scan only, UNVERIFIED.  READY = evidence-read confirmed (--verify).\n")
+        print("  Scores are heuristic; no label here certifies readiness or human approval.\n")
         for r in rows:
-            vtag = "✓verified" if r["provenance"] == "operator" else "unverified"
-            flag = {"held_for_filing": "READY (hold)", "ripe": "RIPE", "building": "building",
-                    "seed": "seed"}.get(r["status"], r["status"])
+            if _MATTER[0] and _MATTER[0] not in (r["matters"] or []):
+                continue
+            vtag = _review_label(r)
+            flag = r["status"]
             print(f"  #{r['id']:>3}  [{flag:<12}] {vtag:<10} score {r['score']:<5}  {r['official']} — {r['statute']}")
-            print(f"        {r['rationale']}")
+            print(f"        last candidate update: {r['updated_at']}; use --candidate for detail")
         n_ripe = sum(1 for r in rows if r["status"] == "ripe")
-        print(f"\n{n_ripe} 'ripe' lead(s) await evidence-read. Next: --verify ripe (reads the facts, "
-              "promotes only what survives); --candidate N; --playbook N (draft; still not filed).")
+        print(f"\n{n_ripe} keyword-ripe lead(s) await review. --verify is advisory; no automated filing approval.")
 
 
 def cmd_candidate(cid):
@@ -1174,7 +1166,8 @@ def cmd_candidate(cid):
         print(f"  Forum      : {r['forum']}")
         print(f"  Matters    : {', '.join(r['matters'])}")
         print(f"  Prescript. : {r['prescription']}")
-        vtag = "VERIFIED by evidence-read" if r["provenance"] == "operator" else "keyword-scan only (run --verify)"
+        _validate_candidate_matters(cur, r["matters"])
+        vtag = _review_label(r)
         print(f"  Grounding  : {vtag}")
         print("\n  Element gate (each 'have' points to an evidence handle):")
         for ek, ev in r["elements"].items():
@@ -1199,7 +1192,8 @@ def cmd_playbook(cid):
         if not r:
             print(f"No candidate #{cid}.")
             return
-        if r["status"] not in ("ripe", "held_for_filing"):
+        _validate_candidate_matters(cur, r["matters"])
+        if r["status"] != "ripe":
             print(f"Candidate #{cid} is '{r['status']}', not ripe. Close its gaps first (--candidate {cid}).")
             return
         # A70 — incorporation precedes decision: every matter this candidate's theory cites must have an
@@ -1225,15 +1219,15 @@ def cmd_playbook(cid):
         slug = re.sub(r"[^a-z0-9]+", "_", r["official"].lower()).strip("_")
         vtmpl = VIOLATIONS[r["violation_code"]]
         pb = {
-            "title": f"Evidence Support Dossier — Office of the Ombudsman",
+            "title": "UNVERIFIED REVIEW DRAFT — Office of the Ombudsman",
             "subtitle": f"{r['statute']} — {r['official']} ({r['office']})",
-            "matter": "MWK",
+            "matter": _client_code(),
             "purpose_note": ("Prepared by LandTek for counsel. NOT a pleading and NOT a filing — the "
                              "grounded evidentiary support for a working Complaint-Affidavit. Every "
                              "charge is tied to the record; gaps are marked. Filing is counsel's decision."),
             "dispositive_frame": {
                 "heading": f"{vtmpl['gist']}",
-                "theory": r["rationale"],
+                "theory": "MACHINE HYPOTHESIS — HUMAN VERIFY: " + r["rationale"],
                 "rag_query": f"{r['official']} {vtmpl['gist']} {' '.join(r['matters'])}",
                 "exhibits": [],
                 "statutes": [{"cite": r["statute"],
@@ -1242,7 +1236,7 @@ def cmd_playbook(cid):
                               "kw_ilike": vtmpl["gist"].split()[0]}],
             },
             "elements": [
-                {"heading": ev["label"], "theory": f"Supported at level '{ev['state']}'.",
+                {"heading": ev["label"], "theory": f"MACHINE SUPPORT ONLY: '{ev['state']}'; source and element attribution require human review.",
                  "statutes": [{"cite": r["statute"],
                                "citation_ilike": re.search(r"\d{3,5}", r["statute"]).group(0)
                                if re.search(r"\d{3,5}", r["statute"]) else r["statute"],
@@ -1250,7 +1244,7 @@ def cmd_playbook(cid):
                  "rag_query": f"{r['official']} {ev['label']}"}
                 for ev in r["elements"].values()
             ],
-            "record": {"matters": [m + "%" for m in r["matters"]] or ["MWK%"], "since": "2025-01-01"},
+            "record": {"matters": list(r["matters"]), "since": "2025-01-01"},
             "gaps": list(r["gaps"]) + [
                 "Confirm the respondent's exact identity, office, and term/appointment of record.",
                 f"Verify the prescription posture: {r['prescription']}",
@@ -1258,13 +1252,13 @@ def cmd_playbook(cid):
             ],
         }
         here = os.path.dirname(os.path.abspath(__file__))
-        out = os.path.join(os.path.dirname(here), "playbooks", f"ombudsman_hunter_{slug}_{r['violation_code']}.json")
+        out = os.path.join(os.path.dirname(here), "playbooks", f"ombudsman_hunter_{_client_code()}_{slug}_{r['violation_code']}.json")
         with open(out, "w") as f:
             json.dump(pb, f, indent=2)
         print(f"[hunter] wrote {out}")
         print(f"        render it (drafting only, no filing) with:")
         print(f"        python3 scripts/case_synthesizer.py --playbook {os.path.relpath(out)} "
-              f"--out ombudsman_output/{slug}_{r['violation_code']}.md [--frontier]")
+              f"--out ombudsman_output/{_client_code()}_{slug}_{r['violation_code']}.md [--frontier]")
 
 
 def cmd_law_check():
@@ -1304,24 +1298,31 @@ def cmd_doctrine():
 def main():
     ap = argparse.ArgumentParser(description="OMBUDSMAN HUNTER — offensive graft-case lead engine ($0; filing is human-gated).")
     ap.add_argument("--scan", action="store_true", help="run the pipeline and write candidates")
+    ap.add_argument("--dry-run", action="store_true", help="with --scan, preview candidates without writes")
     ap.add_argument("--board", action="store_true", help="phone-friendly ranked leads")
+    ap.add_argument("--referrals", action="store_true", help="read recent client-scoped agency correspondence, including unlinked emails")
+    ap.add_argument("--matter", help="restrict the work slice to one exact matter owned by --client")
     ap.add_argument("--candidate", type=int, metavar="ID", help="one lead: elements + evidence handles + gaps")
     ap.add_argument("--playbook", type=int, metavar="ID", help="emit a case_synthesizer playbook for a ripe lead")
     ap.add_argument("--verify", metavar="ID|ripe", help="DISCERNMENT PASS: read each cited fact + judge grounding "
-                    "(local LLM $0); promotes only what survives to held_for_filing. 'ripe' verifies all ripe leads")
+                    "(local LLM); advisory only, never human-approved or filing-ready")
     ap.add_argument("--reason", metavar="CLIENT", help="CASE-REASONING: assemble verified candidates into a prosecutor's theory of the case — actor/role/legal-status map, conspiracy thread, ranked counts, defense pre-mortem, clinching fact per thin count (e.g. --reason MWK)")
     ap.add_argument("--hunt", metavar="NAME|seven", help="DEEP per-individual corpus hunt — mines matter_facts AND full document text, builds an element-proof map. 'seven' = the 7 core individuals")
     ap.add_argument("--officers", action="store_true", help="show the LIVE roster the engine learned from the corpus (discovered + seed)")
     ap.add_argument("--law-check", action="store_true", help="is the RA 3019/6713/6770 law library embedded?")
     ap.add_argument("--doctrine", action="store_true", help="print templates + seed overlay (dry, no DB)")
     ap.add_argument("--client", default=os.environ.get("LANDTEK_OMBUDS_CLIENT", "MWK"),
-                    help="which client to hunt (MWK | PAR | NIBDC | any matter-code prefix). Sets the "
-                         "corpus scope; the analytical commands work for any client, --reason enriches "
-                         "for configured cases. Default MWK.")
+                    help="exact canonical client code or MWK/PAR/NIBDC alias; unknown clients fail closed")
     a = ap.parse_args()
     set_client(a.client)     # scope + active case theory + (re)compile signals for this client
+    if a.matter:
+        if not re.fullmatch(r"[A-Za-z0-9-]+", a.matter):
+            ap.error("--matter must be an exact matter code")
+        _MATTER[0] = a.matter
 
-    if a.doctrine:
+    if a.referrals:
+        cmd_referrals()
+    elif a.doctrine:
         cmd_doctrine()
     elif a.reason is not None:
         cmd_reason(a.reason)
@@ -1330,7 +1331,7 @@ def main():
     elif a.officers:
         cmd_officers()
     elif a.scan:
-        cmd_scan()
+        cmd_scan(dry_run=a.dry_run)
     elif a.board:
         cmd_board()
     elif a.candidate is not None:
