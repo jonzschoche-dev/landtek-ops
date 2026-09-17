@@ -318,6 +318,16 @@ def client_portal(client_code: str):
     return _layout(title, body, active="clients")
 
 
+@bp.route("/portal/<client_code>/portfolio")
+def client_portal_portfolio(client_code: str):
+    """Ops preview of the client Portfolio Home (same HTML the token sees,
+    without a token — map/cases links are inert placeholders)."""
+    from client_portfolio_ui import render_portfolio_page
+    from flask import Response
+    html = render_portfolio_page(client_code, token=None)
+    return Response(html, mimetype="text/html")
+
+
 def _default_doc_url(doc_id: int) -> str:
     """Ops-chrome doc link — the ops-gated public proxy. ONLY used for the internal
     /ops/portal view (behind nginx basic-auth). The client chrome NEVER uses this."""

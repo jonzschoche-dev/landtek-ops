@@ -86,10 +86,61 @@ def _decide_handler(row):
     return "llm", llm_handler
 
 
+def _propagate_before_surface(conn, row):
+    """A76: no handler output until the inbound perturbation is propagated.
+    Still P2-clamped: propagate() records propagation_log and emits nothing
+    to the client. Operator replies may proceed after the ledger row exists
+    (or an A5 hold is recorded). Never-ghost: a propagate exception does not
+    drop the handler; it is logged and the row is marked held.
+    """
+    scripts = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    try:
+        from equilibrium_propagate import propagate
+    except Exception as e:
+        print(f"[router] equilibrium import failed: {e}", file=sys.stderr)
+        row["_equilibrium"] = {"held": True, "reason": f"import:{type(e).__name__}"}
+        return row["_equilibrium"]
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    seed_type, seed_id = "chat", row.get("id")
+    sender = str(row.get("sender_id") or "")
+    try:
+        cur.execute(
+            """SELECT cm.id
+                 FROM channel_messages cm
+                 JOIN channels c ON c.id = cm.channel_id
+                WHERE c.name = 'telegram'
+                  AND cm.channel_user_id = %s
+                ORDER BY cm.id DESC
+                LIMIT 1""",
+            (sender,),
+        )
+        hit = cur.fetchone()
+        if hit:
+            seed_id = hit["id"]
+    except Exception as e:
+        print(f"[router] channel_messages lookup: {e}", file=sys.stderr)
+    try:
+        result = propagate(
+            cur, seed_type, seed_id,
+            interaction_ref=f"tg_inbox:{row.get('id')}",
+            hops=2,
+            mode="operator",
+        )
+    except Exception as e:
+        result = {"held": True, "reason": f"propagate:{type(e).__name__}:{e}"}
+        print(f"[router] propagate failed: {e}", file=sys.stderr)
+    row["_equilibrium"] = result
+    print(f"[router] equilibrium inbox#{row.get('id')} -> {result}", file=sys.stderr)
+    return result
+
+
 def _process_one(conn, row):
     decision, handler = _decide_handler(row)
     if handler is None:
         return decision, None
+    _propagate_before_surface(conn, row)
     try:
         result = handler.handle(row) or {}
         return result.get("outcome", decision), None

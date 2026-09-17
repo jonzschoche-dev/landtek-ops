@@ -1,0 +1,16 @@
+[Unit]
+Description=LandTek loop-liveness — scripts/loop_liveness.py: the reconciler that watches the watchers. Holds a declared registry of the critical loops that MUST be alive, reads live systemctl state, and surfaces any loop that is MISSING/DISABLED/INACTIVE/FAILED/STALE as an open holes_findings row (which meta_pulse promotes to the decision queue and auto-closes on recovery). Prevents the 2026-07-20 failure where meta_pulse was dead for 8 days unnoticed. Calls NO model; $0 deterministic.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+# A dead-loop finding is DATA, not a failure of this script. loop_liveness exits 1 when
+# it surfaced at least one unhealthy loop (useful for a manual run) and 0 when all clean;
+# treat 1 as success for systemd hygiene so `systemctl --failed` stays at zero — the
+# finding is durable in holes_findings and the digest/meta_pulse carry it forward.
+SuccessExitStatus=0 1
+ExecStart=/usr/bin/python3 /root/landtek/scripts/loop_liveness.py
+StandardOutput=append:/var/log/landtek_loop_liveness.log
+StandardError=append:/var/log/landtek_loop_liveness.log

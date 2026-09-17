@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the LandTek loop-liveness reconciler hourly — cheap ($0, ~1s) and frequent, so a stalled/dead critical loop is caught within the hour instead of going silently dark for days.
+
+[Timer]
+OnCalendar=*-*-* *:07:00 UTC
+AccuracySec=2min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

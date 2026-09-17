@@ -207,18 +207,72 @@ def _token_link_builder(token: str):
 
 @bp.route("/<token>")
 def client_entry(token: str):
-    """The client's own portal, reached by their magic-link token ONLY.
+    """Client product home — Portfolio (titles · map · attention).
 
-    Unknown / revoked / malformed token → 404 (no information leak). A valid
-    token renders exactly one client's portal in the client-only chrome, with
-    every doc/matter link rewritten to the token-scoped, ownership-checked routes."""
+    Unknown / revoked / malformed token → 404 (no information leak). Legacy
+    legal portal (matters/deadlines dump) lives at /client/<token>/cases."""
     client_code = _resolve_token(token)
     if not client_code:
         abort(404)
-    # Import lazily to avoid a hard import cycle at module load.
+    from client_portfolio_ui import render_portfolio_page
+    from flask import Response
+    html = render_portfolio_page(client_code, token=token)
+    r = Response(html, mimetype="text/html")
+    r.headers["Referrer-Policy"] = "no-referrer"
+    r.headers["Cache-Control"] = "no-store"
+    return r
+
+
+@bp.route("/<token>/cases")
+def client_cases(token: str):
+    """Legacy legal portal (matters + deadlines) — still available from Portfolio nav."""
+    client_code = _resolve_token(token)
+    if not client_code:
+        abort(404)
     from client_portal import _client_layout, _client_name, render_client_portal
     title, body = render_client_portal(client_code, link_builder=_token_link_builder(token))
     return _client_layout(title, body, client_name=_client_name(client_code))
+
+
+@bp.route("/<token>/money")
+def client_money(token: str):
+    """Accounting (property ledger) + LandTek billing — publish-safe client Money tab."""
+    client_code = _resolve_token(token)
+    if not client_code:
+        abort(404)
+    from client_portfolio_ui import render_money_page
+    from flask import Response
+    r = Response(render_money_page(client_code, token=token), mimetype="text/html")
+    r.headers["Referrer-Policy"] = "no-referrer"
+    r.headers["Cache-Control"] = "no-store"
+    return r
+
+
+@bp.route("/<token>/chat", methods=["GET", "POST"])
+def client_chat(token: str):
+    """In-app chat with LandTek (client_app_messages). Human-answered; no Leo auto-brain."""
+    client_code = _resolve_token(token)
+    if not client_code:
+        abort(404)
+    from client_portfolio_ui import post_chat, render_chat_page
+    from flask import Response, redirect, request
+
+    flash = None
+    if request.method == "POST":
+        ok, err = post_chat(client_code, request.form.get("body") or "")
+        if ok:
+            return redirect(f"/client/{token}/chat?sent=1", code=303)
+        flash = err or "Could not send."
+    elif request.args.get("sent") == "1":
+        flash = "Message sent. Your LandTek team will reply here."
+
+    r = Response(
+        render_chat_page(client_code, token=token, flash=flash),
+        mimetype="text/html",
+    )
+    r.headers["Referrer-Policy"] = "no-referrer"
+    r.headers["Cache-Control"] = "no-store"
+    return r
 
 
 @bp.route("/<token>/doc/<int:doc_id>")
