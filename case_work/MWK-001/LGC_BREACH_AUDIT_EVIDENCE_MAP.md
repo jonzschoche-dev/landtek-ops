@@ -49,10 +49,13 @@
   today under RA 6713 §5(a) / 11032 instead.
 
 ### 4. §203 — LGU's duty to declare its own improvements — **STRONG-NEGATIVE (one limb DEFINITIVE)**
-- **DEFINITIVE limb:** Engr. Balane's own letter admitting **no building permit was ever
-  issued** for the LGU structures (0690/0792 record; referenced in doc 719 and the 1378
-  supplemental affidavit, doc 1082). Locate the admission letter's doc id on VPS before
-  annexing (PENDING-LOCATE).
+- ~~**DEFINITIVE limb:** Engr. Balane's own letter admitting no building permit was ever
+  issued for the LGU structures~~ — **RETRACTED 2026-09-07 (Jonathan: "this is untrue").**
+  Checked docs 719 and 1082: neither contains any such admission. The only Balane statement
+  of record is the 21 Oct 2025 letter (doc 837, item 11 below), which concerns the **Teope
+  structure area** ("no building permit issued recently pertaining to that particular
+  area"). Nothing in the corpus says anything about permits for the Municipality's OWN
+  structures. Do not cite. The §203 row therefore rests on the negative limb only.
 - **Negative limb:** no declaration of the sports complex / structures appears, and the
   Dec 2025 inquiries designed to surface one were never answered. Provable by silence +
   the COA route (audit request drafted, docs 1247, 2431 — COA can compel the rolls).

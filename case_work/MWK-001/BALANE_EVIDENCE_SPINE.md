@@ -246,4 +246,67 @@ Opposing counsel's cleanest chain attack is: *"Mr. Zschoche, how does your T-525
 
 ---
 
-*Work product for MWK-001, grounded in corpus. §3/§9/§10 added 2026-07-05 (chain-hole resolution + SJ exhibit list + cross-exam outline). Items marked GAP/INFERRED are not yet court-grade — upgrade before use.*
+## 11. Subdivision authority — did Cesar have power to SUBDIVIDE, and does an "unauthorized subdivision" theory help or hurt 26-360? (added 2026-09-14)
+
+**Question posed:** the 1992 SPA (doc 246 clean / doc 416 consular scan) gives Cesar only a limited-object *sell/negotiate* power (para 7) plus a general "any and every act… requisite or proper" clause (para 8). It contains **no express power to subdivide or partition**. Balane's 2,587 sqm lot sits many subdivision levels below "Lot 2" of the mother title. So: did Cesar have authority to subdivide, and is "unauthorized subdivision" a usable ground in the Balane case?
+
+### 11a. The subdivision chain, empirically (from the register, doc-by-doc)
+
+Each step traced against the certified titles and their annotation pages. `VERIFIED` = read verbatim from the CTC in corpus; `GAP` = the register does not name the actor.
+
+| # | Subdivision step | Plan | Registered | Who executed / caused it | Instrument · doc-id · grade |
+|---|---|---|---|---|---|
+| 0 | Mother partition: OCT → **T-4497 "Lot 2" (139,132 sqm)** carved from the Keesey/Ortega commonhold | (LRC) Psd-12802 / Psd-12803 | 1941/1944 | **Mary Worrick-Keesey & Dolores G. Ortega** (the original co-owners) | Deed of Partition & Subdivision Agreement · **doc 25** · VERIFIED. *Pre-Cesar family act.* |
+| 1 | **T-4497 (Lot 2) → the "2-X" series incl. Lot 2-X-4 and Lot 2-X-6 (→ T-32917)** | (LRC) **Psd-256008** & Psd-221861 | inscribed **20 Aug 1993** (deed notarized 3 Aug 1993, NP Juanito S. Subia, Doc 2714/Pg 97/Bk LXXIV/S.1993) | **Cesar M. de la Fuente** *and* **Dolores Nicodemus Espinosa et al.** | Subdivision Agreement (PE-170455-42-19) · **doc 25** (T-4497 CTC) · **VERIFIED verbatim** |
+| 2 | **Lot 2-X-6 (T-32917) → sub-lots 2-X-6-A … -V** (incl. the "-I" branch) | Psd-051607-014971 | segregation **requests 1996–2000** | requester **not named** in the "REQUEST" annotations; Cesar concurrently executing sub-lot *sales* | doc 21 (T-32917 CTC) VERIFIED entries · **author = GAP** |
+| 3 | Lot 2-X-6-I → **Lot 2-X-6-I-4 (T-49061, 31,027 sqm)** | Psd-051607-014971 | ~1998–2000 | requester **not named** | doc 21 / doc 50 · **author = GAP** |
+| 4 | **T-49061 → Lot 2-X-6-I-4-C (T-52540, 28,891 sqm)** + siblings (T-52539 298 sqm, etc.) | segregation **Psd-05-026197** (entry P-238420, **24 Apr 2000**); tech-desc plan Psd-05-019929 | 2000 | "REQUEST for segregation" — requester **not named** | doc 50 (T-49061 CTC) VERIFIED · **author = GAP** |
+| 5 | **T-52540 → Lot 2-X-6-I-4-C-1 (Balane …2126, 2,587 sqm) + Lot 2-X-6-I-4-C-2 (heirs …2127, 26,304 sqm)** | (LRA) **PSD-E2020005406** (LRA-approved) | registered **23 Nov 2021**, per Partition-Subdivision Agreement **notarized 15 Mar 2017** (Doc 402/Pg 81/Bk CXXII/S.2017, NP Donald E. Asis) | executor of the 15 Mar 2017 partition **not named** in the annotation (Cesar was *alive* on that date — he died 21 Jun 2017; his Deed of Confirmation is 28 Mar 2017) | doc 48 / doc 96 (T-52540 CTC) · **VERIFIED entry · executor = GAP** |
+
+*Verbatim, step 1 (doc 25):* `PE-170455-42-19 -- SUBDIVISION AGREEMENT -- executed by CESAR M. DE LA FUENTE and DOLORES NICODIMUS ESPINOSA, et al., agreed to subdivide the land described in this title such that Lot 2-X-4; Lot 2-W, Lot 2-Z, Lot 2-R, Lot 2-X-2, Lot 2-X-5 and Lot 2-L… the lot which was sold to DOLORES NICODIMUS ESPINOSA, ELSA C. ILIGAN and ELZENA L. VARGARA is inside Lot 2-[X]-6 … all of the subdivision plan (LRC) Psd-256008 and (LRC) Psd-221861`. Registered the **same day** (20 Aug 1993, PE-170453) as the 1992 SPA itself. *(Cesar's stated capacity in this entry is not the word "attorney-in-fact"; he signs for the Keesey side, whose SPA to him is inscribed on the same page — INFERRED that he acted as their AIF; the instruments_on_title extraction labels it "attorney-in-fact / 1992 SPA," provenance `verified`.)*
+
+*Verbatim, step 5 (doc 48):* `PARTITION - SUBDIVISION AGREEMENT : THE LAND COVERED BY THIS TITLE HAS BEEN SUBDIVIDED INTO TWO (2) LOTS … LOT 2-X-6-I-4-C-1 WITH AN AREA OF 2,587 SQM. BELONGS TO GLORIA H. BALANE AND LOT 2-X-6-I-4-C-2 WITH AN AREA OF 26,304 SQM. BELONGS TO GERALDINE K. HOPPE, PATRICIA K. ZSCHOCH & MARCIA ELLEN KEESEY … DOC. NO. 402 … SERIES OF 2017 … DONALD E. ASIS, DATED MARCH 15, 2017.` **Note:** 2,587 + 26,304 = **28,891 sqm** — independently confirms the Complaint's 28,891 for T-52540 (resolves the §6-item-9 28,891-vs-28,981 transposition in *favor* of 28,891).
+
+### 11b. THE DECISIVE FACT — the whole chain above Balane is FAMILY title
+
+Registered owner of every node **above** Balane's, from the register (VERIFIED):
+
+- **T-4497** (mother) — Heirs of Mary Worrick Keesey (doc 25)
+- **T-32917** (Lot 2-X-6) — Heirs of Mary Worrick Keesey (titles rec.; doc 21)
+- **T-49061** (Lot 2-X-6-I-4) — Heirs of Mary Worrick Keesey (titles rec.; doc 50)
+- **T-52540** (Lot 2-X-6-I-4-C) — **registered in the name of Geraldine K. Hoppe / the Heirs** (doc 233 Deed of Confirmation: *"…now covered … under TCT No. T-52540 registered in the name of GERALDINE K. HOPPE"*; CTCs doc 96/48/272)
+- **T-52539** (298 sqm sibling of C) — Heirs of MWK (doc 263)
+- **079-2021002127** (Lot 2-X-6-I-4-C-2, the 26,304 sqm remainder) — Hoppe / Patricia / Marcia (doc 20 / doc 48 partition entry)
+
+**Only ONE node ever left the family: 079-2021002126 (Lot 2-X-6-I-4-C-1, Balane), and it left via the void 2016 SALE — not via a subdivision.** T-52540 was a **valid family title**; the subdivision chain that produced it kept every parcel in the co-owners' names. The plaintiffs' own SJ/complaint prayer **relies on T-52540 as their valid title and asks the court to reinstate it.** *(Data note: the `titles` row for T-52540 carries `registrant_name_raw = "Cancelled Fraud"` — that is a lifecycle-status artifact, not an owner; the ownership fact rests on doc 233 + the CTCs.)*
+
+**So the answer to "was any subdivision in the chain caused by Cesar under the 1992 SPA?"** — **Yes at step 1** (the 1993 agreement that created the 2-X-6 line, VERIFIED), and Cesar was concurrently running the sub-lot *sales* campaign across T-32917 (docs 21: Deeds/Confirmations to Pascual, Leaño, Tychingco, Iligan, Ocan, Capistrano 1994–2003). The **downstream** segregations (steps 2–5) are VERIFIED as register events but the register **does not name who requested each** — GAP. Critically, **whoever caused them, the titles issued to the family**, so the subdivision never divested the co-owners.
+
+### 11c. The law — subdivision/partition as an act of strict dominion (verified authority)
+
+- **Civil Code Art. 1878** (verbatim, quoted in *Bautista-Spille v. Nicorp*, G.R. 214057, in the law library, full text verified to contain the article): *"Special powers of attorney are necessary in the following cases: … (5) To enter into any contract by which the ownership of an immovable is transmitted or acquired either gratuitously or for a valuable consideration…"* Art. 1878's residual clause **(15) "any other act of strict dominion"** captures a partition/subdivision that reallots registered land. **Art. 1877** confines a power "however general in its terms" to acts of *administration* unless strict-dominion acts are *expressly* granted — so para 8's general "any and every act" clause **cannot** supply a subdivision/partition power the special clause omits. *(Art. 1877 / 1878(15) stated as settled doctrine; verbatim in hand is Art. 1874 and Art. 1878(5) from the Bautista-Spille text — INFERRED that (15) governs the internal-reallotment case; upgrade with the codal text if this is ever briefed.)*
+- **Cosmic Lumber Corp. v. CA**, G.R. 114311, 29 Nov 1996 (full text verified: G.R. no. + holding phrase present) — the strict-construction anchor: *"When the sale of a piece of land or any interest thereon is through an agent, the authority of the latter shall be in writing; otherwise, the sale shall be void… The sale ipso jure is consequently void."* An agent does only what is **expressly** granted; anything outside is void *ab initio*. **This cuts BOTH ways** — it is our best strict-construction authority against the *sale*, and it is exactly why an "unauthorized subdivision" argument is dangerous (see 11d).
+- **Alcantara v. Nido**, G.R. 165133, 19 Apr 2010 (verified) — Art. 1874 written-authority rule; an unauthorized agent's land conveyance "produced no legal effect."
+- **Ratification — Civil Code Art. 1910:** the principal is bound by the agent's act, even one exceeding authority, that the principal **ratifies expressly or tacitly.** The heirs holding T-32917/T-49061/T-52540 in their own names and suing to reinstate T-52540 is textbook **tacit ratification** of the subdivision that produced those titles.
+- **PD 1529 / LRA mechanics:** a subdivision of registered land is effected through an **LRA-approved subdivision plan** and RD registration (steps 1–5 each cite a Psd-/PSD- plan; step 5's PSD-E2020005406 is expressly "DULY APPROVED BY LRA"). The approving authority is the LRA, not the SPA — the plan's regularity is a separate track from the *agent's* authority to bind the owners to a partition. *(No LRA/PD 1529 verbatim pulled this pass — GAP if a PD 1529 point is ever briefed.)*
+
+### 11d. STRAIGHT VERDICT — keep "unauthorized subdivision" OUT of 26-360
+
+**"Cesar had no authority to subdivide" is a DISTRACTION for the Balane case, bordering on self-inflicted. Do NOT plead it as a nullity ground. Reasons:**
+
+1. **It attacks the plaintiffs' own root of title.** If the 1993 subdivision (step 1) is void for want of Cesar's authority, then Lot 2-X-6 — and everything under it, **including T-52540** — never validly came into being, and there is **nothing to "reinstate."** The SJ prayer to reinstate T-52540 depends on the subdivision being *good*.
+2. **It is barred by ratification (Art. 1910).** The heirs adopted the subdivision's fruits (they hold T-32917/T-49061/T-52540/…2127 in their own names and sue on them). You cannot ratify the subdivision and disavow it in the same breath.
+3. **It reopens the entire 2-X-6 tree** — the 18 other transferee titles and the Municipality road-lot donation all descend from the same 1993 agreement. None of that collateral exposure is needed to beat Balane, and inviting it hands the defense a "plaintiffs say their own title chain is void" soundbite.
+4. **Cosmic Lumber is double-edged.** The same strict-construction rule that voids the *sale* would void the *subdivision* if aimed there. Aim it only at the divestment the family never ratified (the sale to a stranger), not at the internal reallotment the family kept and adopted.
+
+**Where the subdivision facts DO help — as CLASS corroboration, not as a nullity ground:** the 1993 Subdivision Agreement (doc 25) names the actual authorized transferee set in the 2-X-6 tree — de Arao, **Onrubio**, de Leon, King, Espinosa, **Iligan**, Vargara, Yasis (the Llamanzares-era rights/CTS holders Cesar's mandate ran to). **Balane is conspicuously absent.** That reinforces Prong A's spine — Cesar's authorized universe was a *defined, pre-existing class of buyers*, and Balane (who entered as a ₱50/mo tenant via Kenneth Asistin, doc 1089 T13/T18) was never in it. Deploy the 1993 agreement to *prove the class*, never to argue the tree is void.
+
+**Sequencing / forum:** if an "unauthorized subdivision/partition" theory is ever wanted at all, its only safe home is a **different matter** where the family did *not* adopt the resulting title (e.g., unwinding a specific transferee title the heirs disclaim) — and even there it collides with the road-lot donation and the other transferees, so it is a whole-estate strategic decision for counsel, **not** a 26-360 move. For Balane: lead with **class limitation + 2005 revocation** (Prongs A/B), cite the 1993 agreement only as class evidence.
+
+**Residual GAPs (owner-assigned):**
+- **Who requested each downstream segregation (steps 2–4) and who executed the 15 Mar 2017 partition (step 5)** — the register does not name them. *Owner: Jonathan / Atty. Barandon — pull certified copies of Psd-051607-014971, Psd-05-026197, and the 15 Mar 2017 Partition-Subdivision Agreement (Doc 402/81/CXXII/2017, NP Donald E. Asis) and LRA plan PSD-E2020005406 from RD Daet. Not blocking — the case does not need them, since the divestment is the sale, not the subdivision.*
+- **Stale internal metadata:** several `instruments_on_title` notes on doc 25/21 still carry the retired "negotiate-only SPA" / "KILL-SHOT: negotiate-only" framing. Consistent with the §2a/§6-item-8 crack about our filed papers; harmless to the record but should be re-labeled to the class-limitation frame when the DB is next touched. *Owner: whoever next edits `instruments_on_title` — do NOT auto-execute.*
+
+---
+
+*Work product for MWK-001, grounded in corpus. §3/§9/§10 added 2026-07-05 (chain-hole resolution + SJ exhibit list + cross-exam outline). §11 added 2026-09-14 (subdivision-authority deep-dive: chain empirically traced, decisive family-title finding, Art. 1878/Cosmic Lumber authority, verdict = keep it out of 26-360). Items marked GAP/INFERRED are not yet court-grade — upgrade before use.*

@@ -35,7 +35,7 @@ def md_to_rl(s):
     return s
 
 
-BASE = dict(fontName="TNR", fontSize=11.5, leading=15, spaceAfter=8, alignment=TA_JUSTIFY)
+BASE = dict(fontName="TNR", fontSize=11.5, leading=14.6, spaceAfter=6.5, alignment=TA_JUSTIFY)
 S = {
     "h1": ParagraphStyle("h1", fontName="TNR-Bold", fontSize=14.5, leading=18, alignment=TA_CENTER, spaceBefore=4, spaceAfter=8),
     "h2": ParagraphStyle("h2", fontName="TNR-Bold", fontSize=12.5, leading=16, spaceBefore=8, spaceAfter=5),
@@ -47,7 +47,7 @@ S = {
     "bullet": ParagraphStyle("bullet", **{**BASE, "leftIndent": 0.4 * inch, "bulletIndent": 0.18 * inch, "spaceAfter": 5}),
     "cell": ParagraphStyle("cell", fontName="TNR", fontSize=8.6, leading=11),
     "sig": ParagraphStyle("sig", **{**BASE, "alignment": TA_LEFT, "spaceAfter": 0, "leading": 14.5}),
-    "encl": ParagraphStyle("encl", **{**BASE, "fontSize": 10, "leading": 12.8}),
+    "encl": ParagraphStyle("encl", **{**BASE, "fontSize": 9.6, "leading": 12}),
 }
 
 
@@ -161,6 +161,8 @@ def render_md(md_path, out_path, footer, letter_mode=False):
             story.append(Paragraph("Respectfully,", S["sig"]))
             story.append(Spacer(1, 34))
         elif text.startswith("**JONATHAN PAUL ZSCHOCHE**"):
+            if not (story and isinstance(story[-1], Spacer) and getattr(story[-1], "height", 0) >= 30):
+                story.append(Spacer(1, 40))
             for part in ["**JONATHAN PAUL ZSCHOCHE**", "Attorney-in-Fact for Patricia Keesey Zschoche",
                          "Heir, Estate of Mary Worrick Keesey",
                          "Dasmariñas Street, Barangay 8, Daet, Camarines Norte",
@@ -245,6 +247,66 @@ def jpeg_to_pdf_page(jpg_path):
     return PdfReader(buf).pages[0]
 
 
+def verification_page(out_path, footer):
+    """Verification and Certification of Non-Forum Shopping — one folio page, same form as the
+    5 May / 4 Jun / 23 Jul 2026 filings in the 234187 proceeding. Jurat blanks left for the notary."""
+    V = ParagraphStyle("v", **{**BASE, "fontSize": 11.2, "leading": 14.4, "spaceAfter": 6})
+    VN = ParagraphStyle("vn", **{**BASE, "fontSize": 11.2, "leading": 14.4, "spaceAfter": 5, "leftIndent": 0.45 * inch})
+    VL = ParagraphStyle("vl", **{**BASE, "fontSize": 11.2, "leading": 14.4, "spaceAfter": 0, "alignment": TA_LEFT})
+    st = [Paragraph("VERIFICATION AND CERTIFICATION OF NON-FORUM SHOPPING",
+                    ParagraphStyle("vh", fontName="TNR-Bold", fontSize=13.2, leading=17, alignment=TA_CENTER, spaceBefore=4, spaceAfter=8)), Spacer(1, 6)]
+    st.append(Paragraph(md_to_rl(
+        "I, **JONATHAN PAUL ZSCHOCHE**, of legal age, American citizen, with service address at Dasmariñas Street, "
+        "Barangay 8, Daet, Camarines Norte, after having been duly sworn in accordance with law, depose and state:"), V))
+    items = [
+        "I am the Attorney-in-Fact of **PATRICIA KEESEY ZSCHOCHE**, an heir of the late **MARY WORRICK KEESEY**, under a "
+        "Special Power of Attorney duly notarized and apostilled in the United States of America, in the matters subject of "
+        "the foregoing Petition.",
+        "I caused the preparation of the Petition and have read it; its allegations are true and correct of my own personal "
+        "knowledge or based on authentic records.",
+        "I disclose the following related proceedings: **(a)** the proceeding pending before this Office under Transmittal "
+        "Ref. No. 050526-MRO-234187 — the Petition of 5 May 2026 (ARTA CTN SL-2025-1008-0690 and CTN SL-2025-1104-0792), "
+        "with the Manifestation of 29 May 2026 and its Errata (CTN SL-2026-0128-1210), the Second Manifestation of 4 June 2026 "
+        "(Ref. 060426-MRO-240932; CTN SL-2025-1021-0747) and the Third Manifestation of 23 July 2026 (Ref. 072326-MRO-251125; "
+        "CTN SL-2026-0128-1212) — with which consolidation is here prayed; **(b)** my Manifestation of 27 August 2026 in "
+        "CTN SL-2026-0209-1321 before the Anti-Red Tape Authority (Annex \"I\"), which seeks no relief inconsistent with this "
+        "Petition; **(c)** a Criminal and Administrative Complaint before the Office of the Ombudsman, and the Ombudsman docket "
+        "arising from the Authority's own referral in CTN SL-2026-0128-1212, each concerning other officials and other causes; "
+        "and **(d)** requests for supervisory action before the Department of the Interior and Local Government and the Bureau "
+        "of Local Government Finance concerning the same Municipality, which seek neither review of the Resolution assailed "
+        "here nor the discipline of the respondent.",
+        "Save for the proceedings disclosed above, I have not commenced any other action involving the same causes of action "
+        "in any court, tribunal, or quasi-judicial agency; to the best of my knowledge no such action is pending; and should I "
+        "learn of any such action, I undertake to inform this Honorable Office within five (5) calendar days.",
+    ]
+    for n, t in enumerate(items, 1):
+        st.append(Paragraph(f"<b>{n}.</b> " + md_to_rl(t), VN))
+    st.append(Paragraph(md_to_rl("IN WITNESS WHEREOF, I have hereunto set my hand this 8th day of September 2026 at "
+                                 "______________________________."), V))
+    st.append(Spacer(1, 34))
+    for line in ["**JONATHAN PAUL ZSCHOCHE**", "Affiant", "Passport No. 583107536, issued at California, USA"]:
+        st.append(Paragraph(md_to_rl(line), VL))
+    st.append(Spacer(1, 14))
+    st.append(Paragraph(md_to_rl("**SUBSCRIBED AND SWORN** to before me this ____ day of September 2026 at "
+                                 "______________________________, affiant exhibiting to me the competent evidence of identity "
+                                 "stated above."), V))
+    st.append(Spacer(1, 6))
+    for line in ["Doc. No. ________;", "Page No. ________;", "Book No. ________;", "Series of 2026."]:
+        st.append(Paragraph(line, VL))
+    st.append(Spacer(1, 40))
+    st.append(Paragraph("NOTARY PUBLIC", ParagraphStyle("np", **{**BASE, "alignment": TA_LEFT, "leftIndent": 3.6 * inch, "fontName": "TNR-Bold"})))
+
+    class NC(pdfcanvas.Canvas):
+        def save(self):
+            self.setFont("TNR-Italic", 7.5)
+            self.drawCentredString(FOLIO[0] / 2, 0.36 * inch, footer)
+            super().save()
+    doc = SimpleDocTemplate(out_path, pagesize=FOLIO, leftMargin=1.0 * inch, rightMargin=1.0 * inch,
+                            topMargin=0.9 * inch, bottomMargin=0.85 * inch, title=footer)
+    doc.build(st, canvasmaker=NC)
+    return out_path
+
+
 def index_page(entries):
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=FOLIO, leftMargin=1.0 * inch, rightMargin=1.0 * inch,
@@ -299,6 +361,10 @@ def main():
           ("pdf", os.path.join(SRC, "AnnexE_doc105.pdf"))]),
         ("F", "Respondent's Counter-Affidavit, sworn 28 May 2026", [("pdf", os.path.join(SRC, "AnnexF_doc1046_counter_affidavit.pdf"))]),
         ("G", "Petitioner's Reply-Affidavit", [("pdf", os.path.join(SRC, "AnnexG_doc1158_reply_affidavit.pdf"))]),
+        ("H", "ARTA Endorsement to CSC RO-V, 30 Apr 2026 (CTN SL-2025-1008-0690/-1104-0792 — the Municipal Engineer referral)", [("pdf", os.path.join(SRC, "AnnexH_ARTA_CSC_endorsement.pdf"))]),
+        ("H-1", "ARTA Notice of Referral to the CSC, 4 May 2026 (CTN SL-2026-0423-1891 — the Mercedes CART)", [("pdf", os.path.join(MWK, "DILG_enclosures", "source", "Enc3c_1891_NOR_CSC.pdf"))]),
+        ("I", "Petitioner's Manifestation in CTN SL-2026-0209-1321, served on the ARTA Litigation Division 27 August 2026", [("pdf", os.path.join(MWK, "ARTA_1321_MANIFESTATION.pdf"))]),
+        ("J", "CART Resolution No. 6, s. 2026 (6 April 2026) — \"UNANIMOUSLY APPROVED\", signed by the CART Members incl. the respondent; with the 6 Apr 2026 minutes and the Referral Report of 16 Apr 2026 signed by the Municipal Mayor as CART Chairperson", [("pdf", os.path.join(SRC, "SuppB_CART_Res6.pdf"))]),
     ]
 
     # 3) stamp + count
@@ -321,6 +387,11 @@ def main():
     out = PdfWriter()
     for pg in PdfReader(pet_pdf).pages:
         out.add_page(normalize(pg))
+    footer_v = "Zschoche — Verification and Certification, Petition re ARTA CTN SL-2026-0209-1321"
+    ver_pdf = verification_page(os.path.join(HERE, "verification.pdf"), footer_v)
+    vpages = PdfReader(ver_pdf).pages
+    assert all(not (pg.extract_text() or "").replace(footer_v, "").strip() for pg in vpages[1:]), "verification overflowed one page"
+    out.add_page(normalize(vpages[0]))
     for pg in index_page(index_entries).pages:
         out.add_page(normalize(pg))
     for pages in stamped:

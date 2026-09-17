@@ -1,3 +1,11 @@
+# MWK-GUARDIANSHIP — READINESS PACK
+**LIVE SETTING (locked 3 Sep 2026): Mon 8 Sep 2026, 11:00 AM, RTC Branch 41 Daet, Spec. Proc. No. 2680.**
+Counsel: Atty. Adan Botor / ABLAW. No mail unless Jonathan says go.
+
+The body below is the 27 Jul pack. Treat every “07-27 / 8:30 a.m.” date as **superseded**. Ground, schedule, Rule 95, and bond issues are unchanged.
+
+---
+
 # MWK-GUARDIANSHIP — 07-27 HEARING READINESS PACK (+ Plan B)
 
 **Matter:** `MWK-GUARDIANSHIP` — *In the Matter of the Petition for Appointment of a Judicial Guardian of the Properties/Estates of Patricia Keesey Zschoche, Geraldine Alice Teresita Keesey Hoppe, and Marcia Ellen Keesey* — **Spec. Proc. No. 2680, RTC Branch 41, Daet, Camarines Norte.** Petitioner: Jonathan Paul Zschoche. Counsel: **Atty. Adan Marcelo B. Botor / Adan Botor and Associates Law Office (ABLAW), Naga City.**
