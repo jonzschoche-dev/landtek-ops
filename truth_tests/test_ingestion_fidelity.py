@@ -111,7 +111,7 @@ def harvest_refuses_unresolved_owner(cur):
         orphan = _mk_doc(c, None, LONG_TEXT)          # case_file NULL -> owner unresolvable
         c.execute("INSERT INTO document_matter_links (doc_id, matter_code) VALUES (%s,%s)",
                   (orphan, matter))
-        n, nd = harvest_facts.harvest_matter(c, matter, go=True)
+        n, nd, _ = harvest_facts.harvest_matter(c, matter, go=True)
         c.execute("SELECT count(*) AS n FROM matter_facts WHERE matter_code=%s AND source_id=%s",
                   (matter, str(orphan)))
         if c.fetchone()["n"] != 0:
