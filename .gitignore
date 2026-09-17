@@ -143,3 +143,10 @@ tmp/
 # safety copies for the live session, not history; git already has history.
 *.bak-*
 *.bak_*
+
+# Bare pre-edit copies and pre-deploy snapshots (foo.py.bak, foo.py.pre973). Same
+# rationale as *.bak-* above; these were missed by that pattern and kept ~6 files
+# dirtying the VPS tree. NOTE: landtek-daemon.service.bak is already tracked and
+# stays tracked — .gitignore never untracks an existing file.
+*.bak
+*.pre[0-9]*
