@@ -130,3 +130,16 @@ assets/signature/
 # daemon cycle re-dirtied the tree, which blocked pull --rebase and drove the
 # 85-behind divergence found at deploy_1057. See [[vps-stash-accumulation-and-drift]].
 system_state.json
+
+# Regenerable producer output — rewritten every run, never source. Tracking these
+# re-dirtied the tree on both desks and kept tripping the session-start dirty-guard
+# (the pull is SKIPPED when the tree is dirty, which is how the VPS drifts N-behind).
+# Regenerate rather than commit. See [[vps-stash-accumulation-and-drift]].
+output/
+tmp/
+
+# Editor / agent pre-edit backups (*.bak-<label>, *.bak_<label>) — the .bak discipline
+# from [[feedback-vps-live-file-races]] writes these before every overwrite. They are
+# safety copies for the live session, not history; git already has history.
+*.bak-*
+*.bak_*
