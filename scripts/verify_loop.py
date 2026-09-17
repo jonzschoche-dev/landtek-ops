@@ -92,7 +92,14 @@ def doc_worklist(cur, matter_scope="%"):
         WHERE (m.status IS NULL OR m.status NOT IN ('closed','archived'))
           AND length(coalesce(d.extracted_text,'')) >= 1000
           AND coalesce(q.flagged,false)=false
-          AND (e.document_id IS NOT NULL OR coalesce(q.score,0) >= 0.40)
+          -- Legibility gate: email attachments, score>=0.40, OR long body with usable score>=0.30
+          -- (many dense title/pleadings score 0.30–0.39 yet have 10k–400k chars of high-alpha text;
+          --  blocking them freezes continuous table fill).
+          AND (
+                e.document_id IS NOT NULL
+                OR coalesce(q.score,0) >= 0.40
+                OR (length(coalesce(d.extracted_text,'')) >= 4000 AND coalesce(q.score,0) >= 0.30)
+              )
           AND NOT EXISTS (SELECT 1 FROM matter_facts f   -- not yet read FOR THIS matter (per-matter)
                           WHERE f.provenance_level='verified' AND f.source_kind='doc'
                             AND f.source_id=d.id::text AND f.matter_code=dm.matter_code)

@@ -104,6 +104,95 @@ def cross_check(text: str, stated_hectares: float, tol_pct: float = 5.0):
     return a
 
 
+# ---------------------------------------------------------------------------
+# Segment-aware parsing — a single scanned doc (esp. a re-OCR'd bundle) often
+# holds SEVERAL technical descriptions. analyze() walks ALL calls as one polygon,
+# which cannot close across parcels. These functions split the text into one
+# block per parcel ("beginning at a point ... to the point of beginning"), drop
+# the TIE LINE (a call reading "... from <monument>", which runs from a control
+# monument to corner 1 and is NOT a boundary course — it's the georeference
+# anchor), and analyze each parcel on its own.
+# ---------------------------------------------------------------------------
+
+_SEG = re.compile(r"beginning at (?:a|the) point.*?to the point of beginning",
+                  re.IGNORECASE | re.DOTALL)
+# a call is a TIE (not a boundary course) when immediately followed by "from <monument>"
+_TIE_TAIL = re.compile(r"^\s*[.,]?\s*from\s+"
+                       r"(?:BL[LB]M|P\.?\s?L\.?\s?R\.?\s?M?\.?\s?N?\.?|BBM|MBM|MON|MBL)",
+                       re.IGNORECASE)
+
+
+def _call_azd(ns, deg, mins, ew, dist):
+    """One _CALL match's groups → (azimuth, distance_m), or None if the distance is absurd."""
+    ang = float(deg) + (float(mins) / 60.0 if mins else 0.0)
+    ns, ew = ns.upper(), ew.upper()
+    if ns == "N" and ew == "E":
+        az = ang
+    elif ns == "S" and ew == "E":
+        az = 180.0 - ang
+    elif ns == "S" and ew == "W":
+        az = 180.0 + ang
+    else:  # N..W
+        az = 360.0 - ang
+    d = float(dist)
+    return (az % 360.0, d) if 0 < d < 100000 else None
+
+
+def parcel_courses(seg_text: str):
+    """(courses, tie) for ONE technical-description block. The tie line is excluded from
+    the boundary and returned separately (its raw text) as the georeferencing anchor."""
+    courses, tie = [], None
+    for m in _CALL.finditer(seg_text or ""):
+        tail = seg_text[m.end():m.end() + 24]
+        if _TIE_TAIL.match(tail):
+            tie = tie or m.group(0)
+            continue
+        azd = _call_azd(*m.groups())
+        if azd:
+            courses.append(azd)
+    return courses, tie
+
+
+def _analyze_courses(courses):
+    if len(courses) < 3:
+        return {"calls": len(courses), "ok": False, "reason": "need >=3 courses"}
+    pts = [(0.0, 0.0)]
+    for az, d in courses:
+        a = math.radians(az)
+        x, y = pts[-1]
+        pts.append((x + d * math.sin(a), y + d * math.cos(a)))
+    ring = pts + [pts[0]]
+    closure = math.hypot(pts[-1][0] - pts[0][0], pts[-1][1] - pts[0][1])
+    perim = sum(math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])
+                for i in range(len(pts) - 1))
+    area = _shoelace(ring)
+    return {"ok": True, "calls": len(courses), "area_sqm": round(area, 2),
+            "area_ha": round(area / 10000.0, 4), "perimeter_m": round(perim, 2),
+            "closure_error_m": round(closure, 3),
+            "closure_pct_of_perimeter": round(100 * closure / perim, 3) if perim else None,
+            "wkt_local": "POLYGON((" + ", ".join(f"{x:.3f} {y:.3f}" for x, y in ring) + "))"}
+
+
+def analyze_segments(text: str):
+    """Parse EACH technical-description block separately; return the parcels (a valid
+    polygon each) sorted best-closure-first. A multi-parcel doc yields multiple parcels
+    instead of one mashed non-closing shape. Falls back to whole-text analyze() when no
+    'beginning ... point of beginning' block is present (a bare course list)."""
+    out = []
+    for seg in _SEG.finditer(text or ""):
+        courses, tie = parcel_courses(seg.group(0))
+        a = _analyze_courses(courses)
+        if a.get("ok"):
+            a["tie"] = tie
+            out.append(a)
+    if not out:
+        a = analyze(text)
+        if a.get("ok"):
+            out.append(a)
+    out.sort(key=lambda x: x["closure_error_m"])
+    return out
+
+
 if __name__ == "__main__":
     import sys
     import json

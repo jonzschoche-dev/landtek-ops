@@ -59,6 +59,9 @@ MODELS = [m.strip() for m in os.environ.get(
     "VERIFY_WORKER_MODELS", "gemini-2.5-flash-lite,gemini-2.5-flash,gemini-2.0-flash").split(",") if m.strip()]
 MIN_CONF = float(os.environ.get("VERIFY_WORKER_MIN_CONF", "0.55"))
 COOLDOWN_DAYS = 14
+# Zero-yield attempts (read, nothing landed) retry sooner so continuous table fill does not stall
+# for two weeks on hard docs. Successful yields keep the full cooldown.
+ZERO_YIELD_COOLDOWN_DAYS = 2
 
 # Tier 1: in-house Ollama on the Mac Studio (sovereign, unlimited, $0). Local-first; Gemini = fallback.
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
@@ -87,6 +90,8 @@ def _conn():
 def _ensure(cur):
     cur.execute("""CREATE TABLE IF NOT EXISTS verify_worker_log (
         doc_id int, attempted_at timestamptz DEFAULT now(), n_verified int, n_proposed int, status text)""")
+    # matter-aware cooldown: a read for matter A must not freeze matter B on the same doc
+    cur.execute("ALTER TABLE verify_worker_log ADD COLUMN IF NOT EXISTS matter_code text")
     cur.execute("""CREATE TABLE IF NOT EXISTS proposed_facts (
         id serial PRIMARY KEY, matter_code text, statement text, excerpt text, source_doc_id int,
         confidence numeric, created_by text DEFAULT 'verify_worker', created_at timestamptz DEFAULT now(),
@@ -168,9 +173,34 @@ def _next_docs(cur, limit, matter=None):
     work = _projected_worklist(cur)
     if matter:
         work = [w for w in work if w["matter_code"] == matter]
-    cur.execute(f"SELECT DISTINCT doc_id FROM verify_worker_log WHERE attempted_at > now() - interval '{COOLDOWN_DAYS} days'")
-    recent = {r["doc_id"] for r in cur.fetchall()}
-    work = [w for w in work if w["id"] not in recent]
+    # Matter-aware cooldown. Worklist is per (doc, matter); a successful read for matter A must
+    # not freeze matter B. Legacy rows without matter_code: only zero-yield applies a short
+    # doc-level cooldown (successful legacy yields do not block other matters — the worklist
+    # already excludes pairs that already have verified facts).
+    cur.execute(f"""
+        SELECT doc_id, matter_code, n_verified, n_proposed, status, attempted_at
+        FROM verify_worker_log
+        WHERE attempted_at > now() - interval '{COOLDOWN_DAYS} days'
+    """)
+    blocked_pairs = set()   # (doc_id, matter_code)
+    legacy_zero_docs = set()  # doc_id — short cooldown only
+    now = time.time()
+    for r in cur.fetchall():
+        nv = int(r["n_verified"] or 0)
+        np = int(r["n_proposed"] or 0)
+        zero = (nv + np) == 0 and (r["status"] or "ok") in ("ok", "held_unresolved_owner")
+        age_days = (now - r["attempted_at"].timestamp()) if r["attempted_at"] else 0
+        if zero and age_days >= ZERO_YIELD_COOLDOWN_DAYS:
+            continue  # zero-yield cooled off — re-queue for continuous fill
+        mc = r.get("matter_code")
+        if mc:
+            blocked_pairs.add((r["doc_id"], mc))
+        elif zero:
+            legacy_zero_docs.add(r["doc_id"])
+        # else: legacy yield without matter_code — do NOT freeze other matters
+    work = [w for w in work
+            if (w["id"], w["matter_code"]) not in blocked_pairs
+            and w["id"] not in legacy_zero_docs]
     if not work:
         return []
     cur.execute("SELECT matter_code, count(*) c FROM matter_facts WHERE provenance_level='verified' GROUP BY matter_code")
@@ -199,8 +229,8 @@ def process_doc(cur, w, go):
     # inference is spent, visible in holes_findings (V4 passes on a NULL owner; the writer refuses).
     if not ingest_gate.owner_gate(cur, w["matter_code"], w["id"], "verify_worker", record=go):
         if go:
-            cur.execute("INSERT INTO verify_worker_log (doc_id,n_verified,n_proposed,status) "
-                        "VALUES (%s,0,0,'held_unresolved_owner')", (w["id"],))
+            cur.execute("INSERT INTO verify_worker_log (doc_id,matter_code,n_verified,n_proposed,status) "
+                        "VALUES (%s,%s,0,0,'held_unresolved_owner')", (w["id"], w["matter_code"]))
         return {"doc": w["id"], "matter": w["matter_code"],
                 "skip": "HELD: doc owner unresolvable (A77 — no edge, see holes_findings)"}
     facts, tier = _extract_facts(cur, text, w)
@@ -254,8 +284,11 @@ def process_doc(cur, w, go):
                 VALUES (%s,%s,%s,%s,%s) ON CONFLICT (matter_code,statement) DO NOTHING""",
                 (w["matter_code"], stmt, exc, w["id"], conf)); npr += 1
     if go:
-        cur.execute("INSERT INTO verify_worker_log (doc_id,n_verified,n_proposed,status) VALUES (%s,%s,%s,%s)",
-                    (w["id"], nv, npr, "ok"))
+        cur.execute(
+            "INSERT INTO verify_worker_log (doc_id,matter_code,n_verified,n_proposed,status) "
+            "VALUES (%s,%s,%s,%s,%s)",
+            (w["id"], w["matter_code"], nv, npr, "ok"),
+        )
     return {"doc": w["id"], "matter": w["matter_code"], "verified": nv, "proposed": npr, "tier": tier, "shown": shown}
 
 

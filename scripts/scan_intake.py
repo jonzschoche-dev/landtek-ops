@@ -118,7 +118,7 @@ def main():
               (drive_file_id, original_filename, smart_filename, file_name, file_path,
                content_hash, sha256, mime_type, master_form, ingest_source, ingest_status,
                case_file, matter_code, created_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,'application/pdf','scanned','scannerpro','ingested',
+            VALUES (%s,%s,%s,%s,%s,%s,%s,'application/pdf','digital','scannerpro','ingested',
                     NULL, NULL, now())
             RETURNING id""",
             (fid, fname, fname, fname, str(local), sha, sha))
