@@ -278,7 +278,7 @@ def build():
     colw = (CW - 24) / 2
     d.card(LM, y, colw, 252, "What we are building")
     d.bullets([
-        "A full-size Wilfley / 6-S-class <b>gold shaking table</b> — about 4.5 m long, 1.8 m wide — that separates free gold from sand by density using a short asymmetric shake, a thin film of water and tapered riffles.",
+        "A full-size Wilfley / 6-S-class <b>gold shaking table</b> — about 4.5 m long, 1.8 m wide: a steel frame, a light marine-ply deck lined with rubber — that separates free gold from sand by density using a short asymmetric shake, a thin film of water and tapered riffles.",
         "<b>Mercury-free.</b> Gravity only; the concentrate is cleaned, not amalgamated.",
         "<b>Built in the Philippines</b> with Camarines Norte / Metro Manila fabricators and installed inside an operating mercury-free plant that Stephen already runs.",
         "<b>Prototype first, then table 2.</b> The first unit is tuned and measured before the second identical unit is ordered.",
@@ -295,7 +295,7 @@ def build():
         ["Positioning", "Part of the UN-backed (planetGOLD) sustainable Minahang Bayan; a platform for further funding and partners — p.05"],
         ["Program documentation", "LandTek (engineering record, project control)"],
         ["Status", "Design draft v0.1 — no steel cut, no quotes in hand"],
-        ["Next hard gate", "Ore gravity test (p.22) + plant equipment inventory (p.17)"],
+        ["Next hard gate", "Ore gravity test (p.32) + plant equipment inventory (p.27)"],
     ], x2, y - 28, [118, colw - 20 - 118], font_size=8.4)
     y2 = y - 252 - 16
     d.label("Reading this document", LM, y2)
@@ -418,7 +418,7 @@ def build():
         ["Throughput", "10 t/day total; 0.5–1.2 t/h per table", "Feed-rate log at the band-smear limit (p.15)", "Design target"],
         ["Gold recovery (free gold)", "________ % of gravity-recoverable gold", "Feed vs tails assay around the table", "TO CLARIFY C-5 — set after ore test"],
         ["Mercury", "Zero", "No amalgamation step anywhere in the circuit", "Design rule"],
-        ["Local content", "Frame, deck, head-motion housing, launders, shaft all local; only motor, VFD, bearings, rubber bought in", "BOM source column (p.20)", "Design rule"],
+        ["Local content", "Frame, deck, head-motion housing, launders, shaft all local; only motor, VFD, bearings, rubber bought in", "BOM source column (p.30)", "Design rule"],
         ["Cost", "Well under an imported 6-S landed cost", "Quoted BOM vs import quote", "Unquoted both sides"],
         ["Repairability", "Every wear part replaceable by the plant's own shop", "Spares list at commissioning", "To be written"],
         ["Table 2", "Ordered only after table 1 is measured", "Decision D-1 with data (p.10)", "Gated"],
@@ -497,14 +497,14 @@ def build():
     d.table([
         ["Parameter", "Specification", "Note"],
         ["Deck", "≈ 4.5 m long × 1.8 m wide at the head end, concentrate end slightly narrower", "Standard full-size 6-S class"],
-        ["Deck construction", "Welded steel skeleton, 3–4 mm plate or 6 mm marine-ply skin, 8–12 mm abrasion-grade rubber/EPDM lining, tapered riffles", "FRP deck deferred to table 2 (D-6)"],
+        ["Deck construction", "Light welded steel grid skinned with 12 mm marine plywood, sealed; 8–12 mm abrasion-grade rubber/EPDM lining; tapered riffles", "Moving deck must be light: ply ≈ 65 kg vs 3 mm steel plate ≈ 190 kg over 8 m². FRP deck deferred to table 2 (D-6)"],
         ["Capacity", "0.5–1.2 t/h of ≤ 2 mm feed at 15–30 % solids", "Strongly dependent on feed size — ore test"],
         ["Stroke", "Adjustable 8–22 mm; commission at 12–16 mm", "Hand-wheel / threaded stop"],
         ["Frequency", "240–360 strokes/min; commission at 280–320", "VFD-controlled"],
         ["Cross (side) slope", "Adjustable 0–8°; commission at ≈ 3°", "Screw jacks"],
         ["End slope", "Level to concentrate end raised ≤ 1°", "Tuning parameter"],
         ["Drive", "1.1–1.5 kW electric motor, V-belt to eccentric shaft, toggle/pitman head motion, heavy driven pulley as flywheel", "Motor type per power supply (p.14)"],
-        ["Empty weight", "≈ 600–900 kg", "Weigh the finished unit"],
+        ["Empty weight", "≈ 1 100 kg (6-S class)", "Steel ≈ 850 kg per cut list + deck, drive, head motion; weigh the finished unit"],
         ["Footprint", "≈ 6 m × 3 m incl. launders + working space both long sides", ""],
         ["Water", "≈ 1–3 m³/h wash + feed water, recycled", "Settling pond / tank — site item"],
         ["Power", "220 V; 3-phase preferred, single-phase workable via 1-ph-in / 3-ph-out VFD", "Plant supply phase and spare kW — C-8"],
@@ -533,7 +533,7 @@ def build():
     ], LM + colw + 34, y - 30, colw - 20, BODY_S, gap=5)
     y -= 248
     d.label("Decision path", LM, y)
-    d.para("The prototype is the same machine under either circuit, so fabrication is not blocked. The ore gravity test (p.22) tells us how fine the gold is; fine gold favours B. "
+    d.para("The prototype is the same machine under either circuit, so fabrication is not blocked. The ore gravity test (p.32) tells us how fine the gold is; fine gold favours B. "
            "At the MFPS a third use exists: the tables as the <b>toll-basis secondary station</b> for smaller ore batches (C-18). Decision D-1 is taken by Stephen and Allan with the test result and the plant inventory in hand, before table 2 is ordered.",
            LM, y - 10, CW - 260, BODY_S)
     d.flag(RM - 230, y - 8, "TO CLARIFY — C-4 circuit A or B", w=230)
@@ -568,7 +568,7 @@ def build():
     d.para("8–12 mm abrasion-grade rubber / EPDM, bonded and bolted to the skeleton. Local conveyor-grade rubber for the prototype; "
            "imported Linatex-class only if wear rate proves it necessary.", xr, ytop - 128, RM - xr, BODY_S)
     d.flag(xr, ytop - 200, "TO CLARIFY — C-6 copy a reference deck", w=RM - xr)
-    d.para("<i>Before any riffle is cut: photograph and measure an operating 6-S deck on local ore (see p.17) and copy it. "
+    d.para("<i>Before any riffle is cut: photograph and measure an operating 6-S deck on local ore (see p.27) and copy it. "
            "The numbers at left are textbook-class; the reference deck is proven.</i>", xr, ytop - 214, RM - xr, NOTE)
 
     # ---------------- 10 head motion ----------------
@@ -617,7 +617,7 @@ def build():
     d.card(LM, y, colw, 300, "Frame and deck supports")
     d.bullets([
         "<b>Base frame</b>: 150×75 or 200×75 mild-steel channel with 50–65 mm angle bracing; four or six feet drilled for M16–M20 anchors. Stiff and square — no flex when a corner is loaded.",
-        "<b>Deck skeleton</b>: flat bar and angle, skinned, flat to within ≈ 2 mm over its length.",
+        "<b>Deck</b>: light grid of flat bar and angle skinned with <b>12 mm marine plywood</b>, epoxy-sealed, flat to within ≈ 2 mm — about 65 kg before rubber. Steel plate was dropped: 3 mm plate would be ≈ 190 kg on the part that has to shake.",
         "<b>Supports</b>: four to six flexure legs (spring-steel strip or stacked leaf) that let the deck move only lengthwise — fewer wear parts than rocker stands (D-5 default).",
         "<b>Slope adjustment</b>: M16–M20 screw jacks for side and end tilt, adjustable while running.",
         "<b>Motor mount</b> on slotted rails for belt tension; guard over belt and pulley.",
@@ -627,7 +627,7 @@ def build():
     xr = LM + colw + 34
     d.bullets([
         "<b>Concrete pad</b> ≈ 5.5 m × 2.5 m × 0.3 m (≈ 4 m³, ≈ 10 t) — an order of magnitude heavier than the machine — inside or beside the MFPS, where the plant's existing floor slab may already serve if thick enough. Single reinforcing mat; cast-in anchors; top level to ±3 mm.",
-        "<b>Why rigid</b>: the gold crawls because the stroke shape is true in the ground frame. On soft mounts a ~600 kg base moves in antiphase with a 200–300 kg moving deck and the stroke degrades. <b>No coil springs.</b>",
+        "<b>Why rigid</b>: the gold crawls because the stroke shape is true in the ground frame. On soft mounts a ~750 kg base moves in antiphase with a 200–300 kg moving deck and the stroke degrades. <b>No coil springs.</b>",
         "Thin (10–15 mm) rubber under the feet <i>only</i> if structure-borne noise becomes a problem.",
         "<b>Drainage</b>: surrounding slab falls to a sump; the tailings launder must run away freely.",
         "<b>Trial alternative</b>: a ≥ 1.5 t steel skid pinned to the ground — acceptable for trials, not for production.",
@@ -694,7 +694,384 @@ def build():
     # ---------------- 14 section: build ----------------
     y = d.page("Build", "Section 2", dark=True)
     c.setFont("FutXB", 60); c.setFillColor(GOLD); c.drawString(LM - 2, H - 230, "Local fabrication")
-    d.para("Who makes what · build sequence and gates · schedule.", LM, H - 262, 600, LEAD_W)
+    d.para("Manufacturing package — general arrangement, assembly trees, deck and suspension details, head-motion sizing, services schematics, cut list, drawing list · who makes what · build sequence and gates · schedule.", LM, H - 262, 640, LEAD_W)
+
+    # ================= MANUFACTURING PACKAGE (10 pages) =================
+    def dim(x1, y1, x2, y2, text, off=0, vert=False):
+        """dimension line with end ticks and a centred label"""
+        c.setStrokeColor(INK); c.setLineWidth(0.5); c.setFillColor(INK); c.setFont("Mono", 6.4)
+        c.line(x1, y1, x2, y2)
+        if vert:
+            c.line(x1 - 3, y1, x1 + 3, y1); c.line(x2 - 3, y2, x2 + 3, y2)
+            c.saveState(); c.translate(x1 - 4 + off, (y1 + y2) / 2); c.rotate(90); c.drawCentredString(0, 0, text); c.restoreState()
+        else:
+            c.line(x1, y1 - 3, x1, y1 + 3); c.line(x2, y2 - 3, x2, y2 + 3)
+            c.drawCentredString((x1 + x2) / 2, y1 + 3 + off, text)
+
+    # ---- M1 general arrangement ----
+    y = d.page("General arrangement — key dimensions", "Manufacturing package · drawing LX-001")
+    k = 80  # pt per metre
+    px, py = LM + 70, 236
+    FL, FW = 5.0 * k, 2.3 * k
+    c.setFillColor(WHITE); c.setStrokeColor(INK); c.setLineWidth(1)
+    c.rect(px, py, FL, FW, stroke=1, fill=1)                       # base frame footprint
+    # tilting sub-frame (dashed)
+    c.setDash(3, 2); c.setLineWidth(0.7); c.rect(px + 0.1 * k, py + 0.15 * k, 4.8 * k, 2.0 * k, stroke=1, fill=0); c.setDash()
+    # deck trapezoid
+    dx0 = px + 0.4 * k; dyc = py + FW / 2
+    pth = c.beginPath(); pth.moveTo(dx0, dyc - 0.9 * k); pth.lineTo(dx0 + 4.5 * k, dyc - 0.75 * k); pth.lineTo(dx0 + 4.5 * k, dyc + 0.75 * k); pth.lineTo(dx0, dyc + 0.9 * k); pth.close()
+    c.setFillColor(STONE2); c.setLineWidth(1); c.drawPath(pth, stroke=1, fill=1)
+    c.setFillColor(GOLD)
+    for i in range(14):
+        t = i / 13; yy = dyc - 0.8 * k + t * 1.5 * k; L = 4.2 * k * (1 - 0.72 * t)
+        c.setLineWidth(1.2 - 0.6 * t); c.setStrokeColor(GOLD); c.line(dx0 + 0.15 * k, yy, dx0 + 0.15 * k + L, yy)
+    c.setStrokeColor(INK)
+    c.setFillColor(GRAPHITE); c.rect(px + 0.05 * k, dyc - 0.45 * k, 0.32 * k, 0.9 * k, stroke=0, fill=1)
+    c.setFillColor(WHITE); c.setFont("FutM", 5.5)
+    c.saveState(); c.translate(px + 0.2 * k, dyc - 0.38 * k); c.rotate(90); c.drawString(0, 0, "HEAD MOTION"); c.restoreState()
+    c.setFillColor(STONE2); c.setStrokeColor(INK); c.rect(dx0 - 2, dyc + 0.55 * k, 0.6 * k, 0.3 * k, stroke=1, fill=1)
+    c.setFillColor(INK); c.setFont("FutM", 5.5); c.drawString(dx0 + 4, dyc + 0.66 * k, "FEED BOX")
+    c.setFont("Ch", 7); c.setFillColor(SLATE); c.drawString(dx0 + 0.8 * k, dyc + 0.95 * k, "wash-water header along this edge")
+    c.setFillColor(MUTE); c.drawString(dx0 + 1.2 * k, py + 2, "tailings launder, full length, this edge")
+    c.setFillColor(GOLD_D); c.drawString(dx0 + 4.5 * k + 4, dyc + 0.5 * k, "CONC."); c.setFillColor(SLATE); c.drawString(dx0 + 4.5 * k + 4, dyc - 0.1 * k, "MIDD.")
+    # dimensions
+    dim(dx0, py + FW + 16, dx0 + 4.5 * k, py + FW + 16, "deck 4 500")
+    dim(px, py - 16, px + FL, py - 16, "base frame 5 000 (anchor centres 4 800)")
+    dim(px - 18, dyc - 0.9 * k, px - 18, dyc + 0.9 * k, "1 800 head end", vert=True)
+    dim(px + FL + 18, py, px + FL + 18, py + FW, "frame 2 300", vert=True)
+    dim(dx0 + 4.5 * k + 40, dyc - 0.75 * k, dx0 + 4.5 * k + 40, dyc + 0.75 * k, "1 500 conc. end", vert=True, off=28)
+    # end elevation
+    ex, ey = LM + 70, 60
+    c.setStrokeColor(INK); c.setLineWidth(1.2); c.line(ex - 10, ey, ex + FW + 30, ey)   # ground
+    c.setFillColor(STONE2); c.setLineWidth(0.8)
+    c.rect(ex, ey, FW, 0.12 * k, stroke=1, fill=1)                                  # pad
+    for lx in (ex + 0.15 * k, ex + FW - 0.15 * k - 0.075 * k):
+        c.rect(lx, ey + 0.12 * k, 0.075 * k, 0.85 * k, stroke=1, fill=1)             # legs
+    c.rect(ex + 0.1 * k, ey + 0.97 * k, FW - 0.2 * k, 0.1 * k, stroke=1, fill=1)     # frame rail
+    # tilted deck (3°)
+    c.saveState(); c.translate(ex + FW - 0.25 * k, ey + 1.25 * k); c.rotate(3)
+    c.setFillColor(GOLD); c.rect(-(FW - 0.5 * k), 0, FW - 0.5 * k, 6, stroke=0, fill=1); c.restoreState()
+    c.setFillColor(INK); c.setFont("Mono", 6.4)
+    c.drawString(ex + 0.3 * k, ey + 1.25 * k + 14, "pivot (wash-water side)")
+    c.drawString(ex + FW - 1.1 * k, ey + 1.0 * k - 12, "screw jack (tailings side)")
+    dim(ex + FW + 30, ey, ex + FW + 30, ey + 1.25 * k, "deck ≈ 1 100 (1 000–1 200)", vert=True, off=26)
+    c.setFont("FutM", 6.5); c.setFillColor(GOLD_D); c.drawString(ex, ey + 1.6 * k, "END ELEVATION — CROSS SLOPE 0–8°, SHOWN 3°", charSpace=1)
+    c.setFont("FutM", 6.5); c.drawString(px, py + FW + 34, "PLAN — 1 : 125 (dimensions mm)", charSpace=1)
+    # right column
+    xr = LM + 560
+    d.label("Envelope", xr, y - 4)
+    d.table([
+        ["Item", "mm"],
+        ["Deck length", "4 500"],
+        ["Deck width, head / conc. end", "1 800 / 1 500"],
+        ["Base frame L × W", "5 000 × 2 300"],
+        ["Deck height above pad", "1 100 (adj. 1 000–1 200)"],
+        ["Overall height incl. feed box", "≈ 1 500"],
+        ["Pad", "5 500 × 2 500 × 300"],
+        ["Working clearance each long side", "≥ 1 000"],
+        ["Installed footprint", "≈ 7 500 × 4 500"],
+        ["Moving mass, wet (deck + slurry)", "≈ 350 kg"],
+        ["Empty weight (whole machine)", "≈ 1 100 kg"],
+    ], xr, y - 14, [150, RM - xr - 150], mono_cols=(1,), pad=2.6)
+    d.para("<i>Scale sketch for the fabricator's first read; the dimensioned drawing set (LX-001 …) is Stephen's to issue — list on the last page of this section.</i>",
+           xr, y - 250, RM - xr, NOTE)
+
+    # ---- M2 assembly tree I ----
+    y = d.page("Assembly tree I — base frame, sub-frame, deck, suspension", "Manufacturing package · every part, who makes it")
+    d.table([
+        ["Ref", "Part", "Material / specification", "Qty", "Made by"],
+        ["A", "<b>Base frame</b> (fixed, anchored)", "", "", ""],
+        ["A1", "Longitudinal rails", "Channel C125×65×5, 5 000 long", "2", "Fabricator"],
+        ["A2", "Cross members", "Channel C125×65×5, 2 200 long", "4", "Fabricator"],
+        ["A3", "Legs", "SHS 75×75×4, ≈ 900 long, with gusset", "6", "Fabricator"],
+        ["A4", "Diagonal bracing", "Angle 50×50×5", "≈ 14 m", "Fabricator"],
+        ["A5", "Foot plates with anchor holes", "Plate 150×150×10, Ø18 hole", "6", "Fabricator"],
+        ["A6", "Head-motion mounting plate", "Plate 10 mm, ≈ 500×400, machined flat", "1", "Fabricator / lathe shop"],
+        ["B", "<b>Tilting sub-frame</b> (carries deck + head motion; tilts for cross slope)", "", "", ""],
+        ["B1", "Sub-frame rails", "Channel C100×50×5, 4 800 long", "2", "Fabricator"],
+        ["B2", "Sub-frame cross members", "Channel C100×50×5, 2 000 long", "5", "Fabricator"],
+        ["B3", "Longitudinal pivot (wash-water side)", "Ø30 pins in bronze bushes, 2 pivot brackets", "2", "Lathe shop"],
+        ["B4", "Cross-slope screw jacks (tailings side)", "M20 trapezoidal or threaded rod + handwheel + lock-nut", "2", "Lathe shop / bought"],
+        ["B5", "End-slope adjuster", "M20 jack or shim pack under the concentrate end", "1", "Fabricator"],
+        ["C", "<b>Deck</b> (the moving part — keep it light)", "", "", ""],
+        ["C1", "Perimeter frame", "Angle 40×40×4", "≈ 13 m", "Fabricator"],
+        ["C2", "Longitudinal ribs, on edge, 300 mm centres", "Flat bar 40×5, 4 500 long", "7", "Fabricator"],
+        ["C3", "Cross ribs, 500 mm centres", "Angle 30×30×3, ≈ 1 700 long", "10", "Fabricator"],
+        ["C4", "Deck skin", "Marine plywood 12 mm, 4×8 ft sheets, screwed 150 mm pitch", "7", "Fabricator / plant shop"],
+        ["C5", "Sealer", "Epoxy, 2 coats all faces and edges", "≈ 4 L", "Plant shop"],
+        ["C6", "Wear lining", "Rubber / EPDM 10 mm (8–12), contact-cemented, rolled", "12–15 m²", "Supplier + plant shop"],
+        ["C7", "Riffles, tapered 10 → 1.5 mm", "Hardwood 10×12 strips, sealed, PU-bonded + SS screws", "45–48", "Allan's crew"],
+        ["C8", "Side rims (head end + wash-water edge)", "Ply 12 mm, 60 high, rubber-faced", "2", "Plant shop"],
+        ["C9", "Concentrate-end splitters", "Adjustable plate dividers 3 mm, 3 products", "2", "Fabricator"],
+        ["C10", "Flexure mounting brackets on deck", "Plate 60×60×8 with slot", "6", "Fabricator"],
+        ["D", "<b>Suspension</b>", "", "", ""],
+        ["D1", "Flexure legs (allow lengthwise motion only)", "Spring-steel strip 60×4×280 (leaf-spring stock / 65Mn)", "6", "Bought + fabricator"],
+        ["D2", "Clamp plates, top and bottom", "Flat 60×10×80", "12", "Fabricator"],
+        ["D3", "Clamp bolts", "M10 × 40, grade 8.8", "24", "Hardware"],
+    ], LM, y, [32, 230, 370, 50, CW - 682], mono_cols=(0, 3), pad=1.8)
+
+    # ---- M3 assembly tree II ----
+    y = d.page("Assembly tree II — head motion and drive", "Manufacturing package")
+    yb3 = d.table([
+        ["Ref", "Part", "Material / specification", "Qty", "Made by"],
+        ["E", "<b>Head motion</b> (mounted on the sub-frame, moves with the cross tilt)", "", "", ""],
+        ["E1", "Housing, oil-tight", "Welded plate 6–8 mm, bolted lid, drain plug, sight level", "1", "Fabricator"],
+        ["E2", "Eccentric shaft", "AISI 1045 / S45C, Ø50 journals, 8 mm throw — spec p.12", "1", "Lathe shop"],
+        ["E3", "Main bearings", "Pillow block UCP 210 (Ø50), sealed", "2", "Bought"],
+        ["E4", "Big-end on the eccentric lobe", "Deep-groove ball bearing 6212 in a split housing, or bronze bush with grease nipple", "1", "Lathe shop"],
+        ["E5", "Pitman / connecting rod", "Flat bar 60×12 or SHS 50×30×3, ≈ 350 long, eye each end", "1", "Fabricator"],
+        ["E6", "Toggle / rocker arm", "Plate 60×16, on Ø25 pivot pin in bronze bush; arm ratio set by drawing LX-007", "1", "Fabricator + lathe shop"],
+        ["E7", "Return spring", "Compression, ≈ Ø60 × 150, rate 150–250 N/mm, preload adjustable by screw", "1 (+1 spare)", "Bought"],
+        ["E8", "Stroke adjuster", "M24 threaded stop with handwheel and lock-nut on the toggle", "1", "Lathe shop"],
+        ["E9", "Deck push link", "Rod Ø20 with rubber-bushed eye to the deck head-end bracket", "1", "Fabricator"],
+        ["E10", "Counterweight", "Bolt-on plates 10 mm on the shaft boss, slotted for adjustment", "1 set", "Fabricator"],
+        ["E11", "Oil", "ISO VG 68 gear oil, bath level to lobe centre", "≈ 2 L", "Bought"],
+        ["F", "<b>Drive</b>", "", "", ""],
+        ["F1", "Motor", "1.1 kW (1.5 HP) 3-phase 4-pole TEFC, 230/400 V, ≈ 1 740 rpm at 60 Hz, foot-mounted", "1", "Bought"],
+        ["F2", "Motor pulley", "Ø80 B-section, taper-lock or keyed to motor shaft", "1", "Bought"],
+        ["F3", "Driven pulley = flywheel", "Ø420 B-section cast iron, 25–35 kg, keyed to shaft drive end (12×8 key)", "1", "Local casting / bought"],
+        ["F4", "V-belt", "B-section, length to suit ≈ 700 mm centres (≈ B88)", "1 (+1 spare)", "Bought"],
+        ["F5", "Motor slide rails", "Slotted angle 50×50×5, tensioning screw", "1 set", "Fabricator"],
+        ["F6", "Belt and pulley guard", "Sheet 1.5 mm on angle frame, hinged", "1", "Fabricator"],
+        ["F7", "Ratio check", "Ø80 / Ø420 = 5.25 → 331 strokes/min at 60 Hz; VFD 44–65 Hz gives 240–360", "—", "Stephen"],
+    ], LM, y, [32, 210, 400, 60, CW - 702], mono_cols=(0, 3), pad=2)
+    d.para("<i>Sizing on the head-motion page that follows is initial and is Stephen's to confirm before the shaft, spring or pulleys are ordered.</i>", LM, yb3 - 12, CW, NOTE)
+
+    # ---- M4 assembly tree III ----
+    y = d.page("Assembly tree III — water, launders, electrical, foundation, finish", "Manufacturing package")
+    d.table([
+        ["Ref", "Part", "Material / specification", "Qty", "Made by"],
+        ["G", "<b>Feed and water</b>", "", "", ""],
+        ["G1", "Feed box", "Steel 3 mm or PP, 600×300×250, 8–10 distribution slots, baffle", "1", "Fabricator"],
+        ["G2", "Wash-water header", "PVC Ø50, 4 200 long, Ø3 holes at 50 mm, rubber apron to spread the sheet", "1", "Plant shop"],
+        ["G3", "Head tank (constant pressure)", "200 L with float valve, 1.5 m above deck — or pump feed with bypass", "1", "Bought"],
+        ["G4", "Valves", "Ball valves Ø50 ×2 (wash, feed box), Ø25 ×1 (dilution)", "3", "Bought"],
+        ["G5", "Hose and fittings", "Ø50 / Ø25 reinforced hose, clamps", "lot", "Bought"],
+        ["H", "<b>Launders</b>", "", "", ""],
+        ["H1", "Concentrate launder + splitter box", "Plate 3 mm, 300 wide, at the concentrate end", "1", "Fabricator"],
+        ["H2", "Middlings launder", "Plate 3 mm, 300 wide, below H1", "1", "Fabricator"],
+        ["H3", "Tailings launder, full length", "Plate 3 mm 250 wide or PVC Ø200 half-pipe, 4 600 long, 2 % fall", "1", "Fabricator"],
+        ["H4", "Discharge pipes", "PVC Ø100 to settling / return", "lot", "Plant shop"],
+        ["I", "<b>Electrical</b> (schematic on the services page)", "", "", ""],
+        ["I1", "VFD", "1.5 kW, 230 V 1-ph in / 3-ph out (or 3-ph in if the plant has it), in IP54 enclosure", "1", "Bought"],
+        ["I2", "Supply breaker", "MCB 2-pole 20 A (+ RCD 30 mA)", "1", "Bought"],
+        ["I3", "Emergency stop", "Mushroom-head, latching, at the operator position, wired to VFD enable", "1", "Bought"],
+        ["I4", "Run / stop / speed", "Push-buttons + 10 kΩ potentiometer on the enclosure door", "1 set", "Bought"],
+        ["I5", "Cable", "3C 2.5 mm² supply; 4C 1.5 mm² shielded to motor; conduit", "lot", "Electrician"],
+        ["I6", "Earthing", "Earth rod + bonding of frame and motor", "1", "Electrician"],
+        ["J", "<b>Foundation</b>", "", "", ""],
+        ["J1", "Concrete pad", "5 500 × 2 500 × 300, single mat, level ±3 mm — or existing plant slab if ≥ 200 mm (C-9)", "1", "Contractor + Allan's crew"],
+        ["J2", "Anchor bolts", "M16 × 300 L-type, cast in from the frame template", "6–8", "Bought"],
+        ["J3", "Grout / shims", "Non-shrink grout under foot plates", "lot", "Contractor"],
+        ["K", "<b>Finish and consumables</b>", "", "", ""],
+        ["K1", "Paint", "Zinc-rich epoxy primer + polyurethane topcoat, all steel", "lot", "Fabricator"],
+        ["K2", "Fasteners", "M10–M20 grade 8.8, hot-dip galvanised; SS A2 screws for riffles", "lot", "Hardware"],
+        ["K3", "Adhesives", "Contact cement ≈ 4 L (rubber); PU adhesive ≈ 4 tubes (riffles); epoxy ≈ 4 L (ply)", "lot", "Hardware"],
+        ["K4", "Lubricants", "Gear oil 2 L, bearing grease 1 kg", "lot", "Hardware"],
+    ], LM, y, [32, 210, 400, 60, CW - 702], mono_cols=(0, 3), pad=1.8)
+
+    # ---- M5 deck construction detail ----
+    y = d.page("Deck construction detail", "Manufacturing package · drawing LX-004")
+    gx, gy, gw, gh = LM + 10, 150, 450, 180   # grid plan at 1:10 (450 pt = 4.5 m)
+    c.setFillColor(WHITE); c.setStrokeColor(INK); c.setLineWidth(1.2); c.rect(gx, gy, gw, gh, stroke=1, fill=1)
+    c.setLineWidth(0.8)
+    for i in range(1, 7):
+        yy = gy + i * 30; c.line(gx, yy, gx + gw, yy)                           # 7 ribs at 300 mm (edges + 5 inner)
+    c.setLineWidth(0.5); c.setStrokeColor(MUTE)
+    for j in range(1, 9):
+        xx = gx + j * 50; c.line(xx, gy, xx, gy + gh)                           # cross ribs at 500 mm
+    c.setStrokeColor(INK); c.setFont("Mono", 6.4); c.setFillColor(INK)
+    c.drawString(gx, gy - 12, "longitudinal ribs flat bar 40×5 on edge @ 300   ·   cross ribs angle 30×30×3 @ 500   ·   perimeter angle 40×40×4")
+    dim(gx, gy + gh + 12, gx + gw, gy + gh + 12, "4 500")
+    dim(gx - 14, gy, gx - 14, gy + gh, "1 800", vert=True)
+    # section sketch
+    sx, sy = LM + 490, y - 90
+    d.label("Section through the deck", sx, sy + 70)
+    c.setFillColor(GOLD); c.rect(sx, sy + 40, 160, 10, stroke=0, fill=1)            # rubber
+    c.setFillColor(HexColor("#C8B58E")); c.rect(sx, sy + 28, 160, 12, stroke=0, fill=1)  # ply
+    c.setFillColor(GRAPHITE)
+    for i in range(4):
+        c.rect(sx + 10 + i * 45, sy - 2, 5, 30, stroke=0, fill=1)                   # ribs
+    c.setFillColor(INK); c.setFont("Mono", 6.4)
+    c.drawString(sx + 168, sy + 43, "rubber 10"); c.drawString(sx + 168, sy + 31, "marine ply 12"); c.drawString(sx + 168, sy + 8, "rib 40×5 @ 300")
+    c.setFillColor(HexColor("#8B6B3E")); c.rect(sx + 60, sy + 50, 9, 9, stroke=0, fill=1); c.setFillColor(INK); c.drawString(sx + 72, sy + 52, "riffle 10×10 → 1.5")
+    # build notes
+    d.label("Build sequence and checks", LM + 490, y - 150)
+    d.bullets([
+        "Weld perimeter and ribs on a flat jig table: tack, check diagonals, weld alternately. Flatness ≤ 2 mm before the skin goes on.",
+        "Ply screwed to the ribs at 150 mm pitch, countersunk, joints over a rib; edges sealed first, then 2 coats epoxy everywhere.",
+        "Rubber: contact cement both faces, lay from the head end, roll out air, trim at the rims; 24 h before riffles.",
+        "Rims 60 mm on the head end and wash-water edge only; tailings edge and concentrate end stay open.",
+        "Chalk the riffle layout from the reference deck (C-6). Weigh the deck before the flexures go on: target ≤ 300 kg dry.",
+    ], LM + 490, y - 162, RM - LM - 490, BODY_S, gap=3)
+    d.para("<i>Plan at 1:10. The ply is what keeps the deck flat and light; the ribs only carry it. No steel plate skin.</i>", LM + 10, gy - 30, 450, NOTE)
+
+    # ---- M6 suspension and slope mechanism ----
+    y = d.page("Suspension and slope mechanism", "Manufacturing package · drawings LX-005, LX-006")
+    colw = (CW - 24) / 2
+    d.label("Flexure legs — side view", LM, y - 4)
+    fx, fy = LM + 30, y - 150
+    c.setFillColor(STONE2); c.setStrokeColor(INK); c.setLineWidth(0.8)
+    c.rect(fx, fy, 300, 12, stroke=1, fill=1)                       # sub-frame rail
+    c.setFillColor(GOLD); c.rect(fx + 10, fy + 96, 280, 8, stroke=0, fill=1)   # deck
+    c.setStrokeColor(GRAPHITE); c.setLineWidth(4)
+    for lx in (fx + 40, fx + 150, fx + 260):
+        c.line(lx, fy + 12, lx + 18, fy + 96)                         # legs inclined ~12°
+    c.setStrokeColor(INK); c.setLineWidth(0.6); c.setFillColor(INK); c.setFont("Mono", 6.4)
+    c.drawString(fx + 60, fy + 50, "spring-steel 60×4×280, 6 off, inclined 10–15°")
+    c.drawString(fx + 10, fy + 110, "deck — moves lengthwise ± 8 mm; legs flex, nothing slides")
+    c.drawString(fx, fy - 12, "sub-frame rail — clamp plates 60×10, 2 × M10 each end")
+    d.bullets([
+        "Six legs, three per side, clamped top and bottom between 10 mm plates; slot the deck bracket so the legs can be set parallel.",
+        "±8 mm at 280 mm free length is a bending strain well inside spring-steel limits; if spring strip is unobtainable, 12 mm marine-ply flexures (as the BGS table used) work for the prototype.",
+        "Incline all legs the same way so the deck lifts slightly on the forward stroke — that is part of the conveying action.",
+    ], LM, y - 180, colw, BODY_S, gap=4)
+    xr = LM + colw + 24
+    d.label("Cross-slope tilt — end view", xr, y - 4)
+    tx, ty = xr + 30, y - 150
+    c.setFillColor(STONE2); c.setStrokeColor(INK); c.setLineWidth(0.8); c.rect(tx, ty, 300, 12, stroke=1, fill=1)   # base frame
+    c.saveState(); c.translate(tx + 10, ty + 60); c.rotate(3); c.setFillColor(WHITE); c.rect(0, 0, 280, 12, stroke=1, fill=1); c.restoreState()  # sub-frame tilted
+    c.setFillColor(GRAPHITE); c.circle(tx + 16, ty + 66, 5, stroke=0, fill=1)          # pivot
+    c.setStrokeColor(GRAPHITE); c.setLineWidth(3); c.line(tx + 280, ty + 12, tx + 280, ty + 74)   # jack
+    c.setStrokeColor(INK); c.setLineWidth(0.6); c.setFillColor(INK); c.setFont("Mono", 6.4)
+    c.drawString(tx, ty + 82, "pivot Ø30 in bronze bush (wash-water side)")
+    c.drawString(tx + 180, ty - 12, "M20 screw jack + handwheel (tailings side)")
+    c.drawString(tx + 100, ty + 30, "sub-frame carries deck + head motion")
+    d.bullets([
+        "The whole sub-frame tilts about the longitudinal pivot; the head motion rides with it, so the stroke stays in the plane of the deck at any slope.",
+        "Two jacks at the tailings side, 4 m apart, turned together; 8° needs ≈ 280 mm of travel at the jacks — fit a scale so settings repeat.",
+        "End slope: a third jack or shim pack under the concentrate-end cross member, ≤ 1°.",
+    ], xr, y - 180, colw, BODY_S, gap=4)
+    d.flag(LM, 46, "INITIAL SIZING — STEPHEN TO CONFIRM LEG SECTION, PIVOT AND JACK LOADS BEFORE ORDERING", w=CW)
+
+    # ---- M7 head motion sizing ----
+    y = d.page("Head motion and drive — sizing", "Manufacturing package · drawings LX-007, LX-008")
+    d.table([
+        ["Quantity", "Value", "Basis"],
+        ["Moving mass, wet", "≈ 350 kg", "deck grid ≈ 105 + ply 65 + rubber 100 + riffles/rims 35 + slurry on deck ≈ 50"],
+        ["Stroke / frequency (design point)", "16 mm / 330 per min (5.5 Hz)", "fine-sand setting; range 8–22 mm, 240–360"],
+        ["Peak deck acceleration", "≈ 9.6 m/s²", "a = (2πf)² × A, A = 8 mm"],
+        ["Peak inertia force on pitman / toggle / spring", "≈ 3.4 kN", "m × a"],
+        ["Peak deck velocity", "≈ 0.28 m/s", "2πf × A"],
+        ["Power", "≈ 0.95 kW peak, ≈ 0.3–0.4 kW average", "F × v; 1.1 kW motor has margin (6-S fits 1.1 kW)"],
+        ["Return spring", "rate 150–250 N/mm, ≈ 15 mm preload → ≈ 3 kN", "must return the deck against the inertia force; preload adjustable"],
+        ["Eccentric throw", "8 mm (adjustable 4–12.5)", "toggle ratio ≈ 1 : 1 gives 16 mm deck stroke; adjuster trims"],
+        ["Drive ratio", "Ø80 / Ø420 = 5.25", "4-pole motor ≈ 1 740 rpm at 60 Hz → 331 strokes/min"],
+        ["VFD range", "44–65 Hz", "240–360 strokes/min without changing pulleys"],
+        ["Flywheel", "Ø420 cast iron, 25–35 kg", "smooths the torque pulse; also the driven pulley"],
+        ["Shaft bearings", "UCP 210 ×2 (Ø50)", "dynamic load ≫ 3.4 kN; sealed; grease"],
+        ["Counterweight", "start ≈ mass of lobe × throw, opposite the lobe", "tune by ear and hand on the dry run"],
+    ], LM, y, [200, 190, CW - 390], bold_col0=True, mono_cols=(1,), pad=2.6)
+    d.para("<i>All values are first-pass sizing from the design basis; Stephen confirms them — especially spring rate, toggle geometry and pivot loads — before the shaft, spring and pulleys are ordered. "
+           "The Philippines grid is 60 Hz: a '1 440 rpm' motor from a 50 Hz catalogue runs at ≈ 1 740 rpm here, which is why the ratio above is 5.25 and not the 4.8 a 50 Hz design would use.</i>",
+           LM, y - 312, CW, NOTE)
+
+    # ---- M8 services schematics ----
+    y = d.page("Water, launders and electrical — schematics", "Manufacturing package · drawings LX-009, LX-010")
+    colw = (CW - 24) / 2
+    d.label("Water circuit", LM, y - 4)
+    bx = LM; by = y - 30
+    def box(x, yy, w, h, text, fill=WHITE):
+        c.setFillColor(fill); c.setStrokeColor(INK); c.setLineWidth(0.8); c.rect(x, yy, w, h, stroke=1, fill=1)
+        c.setFillColor(INK); c.setFont("FutM", 6.3); c.drawCentredString(x + w / 2, yy + h / 2 - 2, text.upper(), charSpace=0.8)
+    def arrow(x1, y1, x2, y2, col=SLATE):
+        c.setStrokeColor(col); c.setLineWidth(1.2); c.line(x1, y1, x2, y2)
+        ang = math.atan2(y2 - y1, x2 - x1)
+        for s_ in (0.4, -0.4):
+            c.line(x2, y2, x2 - 7 * math.cos(ang + s_), y2 - 7 * math.sin(ang + s_))
+    box(bx, by - 30, 110, 26, "plant water / pump"); arrow(bx + 110, by - 17, bx + 140, by - 17)
+    box(bx + 140, by - 30, 90, 26, "head tank 200 L"); arrow(bx + 230, by - 17, bx + 260, by - 17)
+    box(bx + 260, by - 30, 80, 26, "wash header"); arrow(bx + 300, by - 30, bx + 300, by - 60)
+    box(bx + 140, by - 86, 90, 26, "feed box ≤ 2 mm", STONE2); arrow(bx + 230, by - 73, bx + 260, by - 73)
+    box(bx + 260, by - 86, 80, 26, "deck", GOLD); arrow(bx + 340, by - 73, bx + 370, by - 73)
+    box(bx + 370, by - 100, 40, 54, "3 launders"); arrow(bx + 390, by - 100, bx + 390, by - 130)
+    box(bx + 330, by - 156, 120, 26, "settling / tailings"); arrow(bx + 330, by - 143, bx + 55, by - 143); arrow(bx + 55, by - 143, bx + 55, by - 30)
+    c.setFont("Mono", 6.4); c.setFillColor(INK)
+    c.drawString(bx, by - 180, "wash 1.5–2.5 m³/h · dilution 0.5–1 m³/h · head tank 1.5 m above deck keeps the sheet steady")
+    c.drawString(bx, by - 192, "tailings launder 2 % fall · settling pond sized for ≥ 6 h · return water to the tank")
+    d.bullets([
+        "Valves: Ø50 on the wash header and the feed box, Ø25 on dilution; all reachable from the operator side.",
+        "Never feed the deck from a pump directly — surges wreck the band. The tank is the buffer.",
+    ], LM, by - 210, colw, BODY_S, gap=3)
+    xr = LM + colw + 24
+    d.label("Electrical one-line", xr, y - 4)
+    ex = xr; ey = y - 30
+    box(ex, ey - 30, 90, 26, "plant supply 230 V"); arrow(ex + 90, ey - 17, ex + 120, ey - 17, INK)
+    box(ex + 120, ey - 30, 70, 26, "MCB 20 A + RCD"); arrow(ex + 190, ey - 17, ex + 220, ey - 17, INK)
+    box(ex + 220, ey - 30, 90, 26, "VFD 1.5 kW"); arrow(ex + 310, ey - 17, ex + 340, ey - 17, INK)
+    box(ex + 340, ey - 30, 60, 26, "motor 1.1 kW", GOLD)
+    box(ex + 220, ey - 80, 90, 26, "E-stop · run · speed", STONE2); arrow(ex + 265, ey - 54, ex + 265, ey - 30, INK)
+    box(ex + 340, ey - 80, 60, 26, "earth rod", STONE2); arrow(ex + 370, ey - 54, ex + 370, ey - 30, INK)
+    c.setFont("Mono", 6.4); c.setFillColor(INK)
+    c.drawString(ex, ey - 104, "VFD in IP54 enclosure at the operator position · E-stop on the enable loop")
+    c.drawString(ex, ey - 116, "motor cable shielded 4C 1.5 mm² · supply 3C 2.5 mm² · all in conduit")
+    c.drawString(ex, ey - 128, "if the plant has 3-phase: 3-ph-in VFD, same motor")
+    d.bullets([
+        "Speed shown on the VFD display is motor Hz; mark the enclosure with the Hz ↔ strokes/min conversion (×5.6 at ratio 5.25).",
+        "Water pump (if used) on its own circuit, interlocked so the table cannot run dry.",
+    ], xr, ey - 146, colw, BODY_S, gap=3)
+    d.flag(LM, 46, "TO CLARIFY — C-8 plant supply phase / spare kW · C-10 water and tailings capacity", w=CW)
+
+    # ---- M9 cut list and QA ----
+    y = d.page("Steel cut list, mass and shop tolerances", "Manufacturing package")
+    cut = [
+        ("Channel C125×65×5", 13.4, "A1 ×2 @ 5.0 m + A2 ×4 @ 2.2 m", 18.8),
+        ("Channel C100×50×5", 9.4, "B1 ×2 @ 4.8 m + B2 ×5 @ 2.0 m", 19.6),
+        ("SHS 75×75×4", 8.9, "A3 ×6 @ 0.9 m", 5.4),
+        ("Angle 50×50×5", 3.77, "A4 bracing + F5 rails", 16.0),
+        ("Angle 40×40×4", 2.42, "C1 perimeter", 13.0),
+        ("Flat bar 40×5", 1.57, "C2 ribs ×7 @ 4.5 m", 31.5),
+        ("Angle 30×30×3", 1.36, "C3 cross ribs ×10 @ 1.7 m", 17.0),
+        ("Plate 10 mm", 78.5, "A5, A6, D2, E10 (m²)", 0.45),
+        ("Plate 6–8 mm", 55.0, "E1 housing (m²)", 0.9),
+        ("Plate 3 mm", 23.6, "G1, H1–H3, C9 (m²)", 4.5),
+        ("Sheet 1.5 mm", 11.8, "F6 guard (m²)", 1.2),
+    ]
+    rows = [["Section", "kg/m (or kg/m²)", "Used for", "Length m (or m²)", "Mass kg"]]
+    tot = 0
+    for sec, kgm, use, L in cut:
+        m = kgm * L; tot += m
+        rows.append([sec, f"{kgm:g}", use, f"{L:g}", f"{m:,.0f}"])
+    rows.append(["<b>Total structural steel</b>", "", "allow +10 % cutting waste", "", f"<b>{tot:,.0f}</b>  (order ≈ {tot*1.1:,.0f})"])
+    yy = d.table(rows, LM, y, [150, 90, 260, 110, CW - 610], mono_cols=(1, 3, 4), pad=2.2) - 20
+    d.label("Shop tolerances and QA hold points", LM, yy)
+    d.table([
+        ["Check", "Tolerance", "When"],
+        ["Base frame diagonals", "≤ 3 mm difference", "after tack, before full weld"],
+        ["Deck flatness (straight-edge + feeler)", "≤ 2 mm over 4.5 m", "before ply; again before rubber"],
+        ["Eccentric throw / journal runout", "±0.05 mm / ≤ 0.03 mm TIR", "lathe shop, dial indicator, before delivery"],
+        ["Sub-frame pivot alignment", "pins coaxial ≤ 0.5 mm", "before the deck goes on"],
+        ["Flexure legs", "parallel, same incline ±1°", "at clamping"],
+        ["Belt alignment", "pulleys in plane ≤ 1 mm", "dry run"],
+        ["Deck free motion", "no rub, no knock, stroke equal both sides ±0.5 mm", "dry run, card trace"],
+        ["Vibration at bearings", "no loosening after 2 h dry run", "dry run"],
+        ["Deck mass", "≤ 300 kg dry", "weigh before flexures"],
+    ], LM, yy - 10, [250, 220, CW - 470], pad=1.6)
+
+    # ---- M10 drawing list ----
+    y = d.page("Drawing list and issue status", "Manufacturing package · Stephen issues; the shop builds to these, not to this deck")
+    rows = [["Dwg", "Title", "Sheet / scale", "Shows", "Status"]]
+    dl = [
+        ("LX-001", "General arrangement", "A1 / 1:20", "plan, elevations, footprint, anchor template"),
+        ("LX-002", "Base frame", "A1 / 1:10", "members, gussets, foot plates, head-motion plate"),
+        ("LX-003", "Tilting sub-frame and pivot", "A1 / 1:10", "rails, pivot brackets, jack seats"),
+        ("LX-004", "Deck assembly", "A1 / 1:10 + details 1:2", "grid, ply layout, rims, splitters, flexure brackets"),
+        ("LX-004a", "Riffle layout", "A1 / 1:10", "pitch, lengths, taper, cleaning plane — from the reference deck"),
+        ("LX-005", "Flexure legs and clamps", "A3 / 1:2", "strip, plates, bolts, incline"),
+        ("LX-006", "Slope jacks and end adjuster", "A3 / 1:2", "screw, handwheel, lock, scale"),
+        ("LX-007", "Head-motion assembly", "A1 / 1:2", "housing, shaft, big-end, pitman, toggle, spring, adjuster"),
+        ("LX-007a", "Eccentric shaft", "A3 / 1:1", "machining drawing — dimensions on p.12"),
+        ("LX-008", "Drive", "A3 / 1:5", "motor mount, pulleys, belt, guard"),
+        ("LX-009", "Feed box, wash header, launders", "A2 / 1:5", "sheet-metal developments"),
+        ("LX-010", "Electrical one-line and enclosure", "A3", "VFD, protection, E-stop, cable schedule"),
+        ("LX-011", "Foundation and anchor plan", "A2 / 1:20", "pad, reinforcement, anchor positions"),
+        ("LX-012", "Commissioning and setup sheet", "A4", "tuning record per p.15"),
+    ]
+    for a, b_, cc, dd in dl:
+        rows.append([a, b_, cc, dd, "________"])
+    d.table(rows, LM, y, [54, 200, 110, 360, CW - 724], mono_cols=(0, 4), pad=2)
+    d.para("<i>Drawing owner: Stephen Lloyd. Issue order: LX-007a first (longest lead), then LX-002/003/004 for the fabricator's quote, LX-004a only after the reference deck is measured. "
+           "Status column: draft / for quote / for construction / as built.</i>", LM, y - 318, CW, NOTE)
 
     # ---------------- 15 fabrication plan ----------------
     y = d.page("Local fabrication — who makes what", "Build")
@@ -722,7 +1099,7 @@ def build():
     seq = [
         ("Ore gravity test", "Allan / Stephen", "GATE — sets stroke, slope, riffle height; decides D-1", "____ wks"),
         ("MFPS equipment inventory; measure the plant's own table / head motion", "Stephen", "GATE for riffle layout and head-motion geometry; in-house", "____ wks"),
-        ("Freeze dimensions; shop sketches; three fabrication quotes", "Stephen", "Replaces every estimate on p.20 with a quote", "____ wks"),
+        ("Freeze dimensions; shop sketches; three fabrication quotes", "Stephen", "Replaces every estimate on p.30 with a quote", "____ wks"),
         ("Eccentric shaft machined", "Lathe shop", "Critical path — longest lead", "____ wks"),
         ("Frame → skeleton → supports → head-motion housing → launders", "Fabricator", "", "____ wks"),
         ("Rubber bonded; riffles cut, sealed, fitted", "Fabricator / plant shop", "After the ore test and the reference measurement", "____ wks"),
@@ -747,7 +1124,8 @@ def build():
     # ---------------- 18 BOM ----------------
     y = d.page("Bill of materials and cost — one table", "Cost model · ESTIMATE / UNQUOTED")
     bom = [
-        ("Structural steel (channel, SHS, angle, plate, flat bar; deck skin)", "450–550 kg", "Daet yards / Manila service centres", 35000, 48000),
+        ("Structural steel per cut list (frame, sub-frame, deck grid, plate)", "≈ 850 kg (+10 %)", "Daet yards / Manila service centres", 60000, 80000),
+        ("Deck skin — 12 mm marine plywood, epoxy sealer, SS screws", "≈ 7 sheets", "Lumber yard / hardware", 6000, 10000),
         ("Deck lining — abrasion-grade rubber / EPDM 8–12 mm", "12–15 m²", "Matlex, Dela Torre, conveyor-rubber dealers", 18000, 35000),
         ("Riffles — hardwood strips, adhesive, SS screws", "45–50 pcs", "Local lumber / hardware", 3000, 8000),
         ("Motor 1.1 kW 3-ph TEFC (or 1.5 HP 1-ph)", "1", "Industrial motor houses", 6000, 15000),
@@ -768,7 +1146,7 @@ def build():
         rows.append([a, q, s, f"{l:,}", f"{h:,}", "________"])
     rows.append(["<b>Total — one table (materials + local fabrication)</b>", "", "", f"<b>{lo:,}</b>", f"<b>{hi:,}</b>", "________"])
     d.table(rows, LM, y, [300, 52, 230, 80, 80, CW - 742], mono_cols=(3, 4, 5), pad=2.6, font_size=8)
-    d.para(f"<i>Excludes: concrete pad, water tank / pump, feed preparation, site electrical run, transport. Planning mid-point carried from the design chat: ₱160,000–190,000 per table. "
+    d.para(f"<i>Excludes: concrete pad, water tank / pump, feed preparation, site electrical run, transport. Planning mid-point: ₱190,000–220,000 per table. "
            f"Basis: mid-2026 desk research on Philippine steel, motor, rubber and shop-labour prices — not quotes.</i>", LM, y - 372, CW - 220, NOTE)
     d.flag(RM - 200, y - 372, "C-13 replace with quotes", w=200)
 
@@ -778,7 +1156,7 @@ def build():
     def rng(a, b): return f"{a:,} – {b:,}"
     rows = [
         ["Line", "1 table (prototype)", "2 tables", "Basis / status"],
-        ["Tables — materials + fabrication (p.20)", rng(lo, hi), rng(2 * lo, 2 * hi), "Sum of the BOM; table 2 identical, no design time"],
+        ["Tables — materials + fabrication (p.30)", rng(lo, hi), rng(2 * lo, 2 * hi), "Sum of the BOM; table 2 identical, no design time"],
         ["Design, drawings, QA (Stephen)", "________", "________", "TO CLARIFY C-14 — internal or billed?"],
         ["Pad inside / beside the MFPS, anchors, drainage", "________", "________", "Local contractor quote — C-9"],
         ["Water tie-in to the plant system (or tank / pump if short)", "________", "________", "Plant capacity — C-10"],
@@ -871,7 +1249,7 @@ def build():
         ("Inventory the MFPS and measure its own gravity equipment", "Stephen", "Power, water, mill, classifier, and — if there is one — the plant's shaking table. The cheapest engineering in the program, and it is in-house."),
         ("Sample the Minahang Bayan ore, book the gravity test, name the crew", "Allan / Stephen", "Sets every operating number and decides one table or two; Allan confirms the crew he supplies (C-20)."),
         ("Executed agreement copy and SMBC's written consent", "Stephen", "The program stands on Board Resolution 2026-009; hold the signed agreement and the consent to add equipment before any spend."),
-        ("Freeze dimensions and collect three quotes", "Stephen", "Shop sketches for frame, skeleton, housing and the shaft; quotes replace every estimate on p.20–21."),
+        ("Freeze dimensions and collect three quotes", "Stephen", "Shop sketches for frame, skeleton, housing and the shaft; quotes replace every estimate on p.30–31."),
         ("Assemble the accolade file and the partner list", "Stephen / Allan / Jonathan", "Documents only; then the planetGOLD / agency / investor approaches with LAB X as the showcase (p.05)."),
     ]
     for i, (a, b, cc) in enumerate(steps):

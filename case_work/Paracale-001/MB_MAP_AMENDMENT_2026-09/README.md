@@ -1,0 +1,14 @@
+# Minahang Bayan — amendment substituting Lot 4 (OCT P-1616) as the SOLE applied area, custom mill inside it (Paracale-001)
+
+**Status:** DRAFT-HELD · prepared 2026-09-13 · nothing filed · Allan signs as CSSMA President and as landowner. Direction (Jonathan 2026-09-13): the AVI plant is a new plant at a new location under Allan's own company, and **the Minahang Bayan is to cover this area only** (Jonathan 2026-09-13) — so the MB application is amended to substitute Lot 4 (15.2069 ha, within the 20-ha SSMC-area cap, DAO 2022-03 §11) for the Capacuan / Inocalla-properties parcels, which are withdrawn; the same substitution is asked of the 21 Jun 2026 Interim SSMC request to MGB CO.
+**Files:** `CSSMA_MB_AREA_AMENDMENT_LOT4_OCT_P-1616.pdf` / `.docx` (gitignored; `python3 build.py`). Letter to RD Molina (PMRB-CN Chairman), cc MGB CO Director Herradez · Annex A spec for the Geodetic Engineer · Annex B Landowner's Consent and Affidavit.
+
+**Record it builds on.** CSSMA MB petition resubmitted 9 Jun 2026 to RD Molina/PMRB-CN with DOLE cert, 26 Feb 2026 appeal letter, Brgy. Capacuan Res. 18 s-2021, SB Paracale Res. 790-2021, sketch plan (doc 4894); CSSMA letter 21 Jun 2026 to MGB CO for an Interim SSMC over "Inocalla Properties, Paracale–Jose Panganiban, ~250 ha" (doc 1358); Brgy. Capacuan Kapasyahan 64 s-2024 (5.1816 ha, Purok 4); MGB letter 29 Jul 2026 (NIBDC consent = notice only, per the Sep-12 memos — scan still to be ingested). Lot 4: OCT P-1616, Allan's sole title, Jose Panganiban (docs 633/639).
+
+**Legal hooks used.** DAO 2022-03 §14 (processing only in an MPZ under an MPL), §15 (MPZ designated by LGU on Board recommendation), §26 (private landowner rights → consent), §9 (declaration procedure — amendment may trigger re-posting/verification, hence request 4); DAO 2026-08 §4(4)(a) (processing confined to the Interim SSMC area or under an MPL in an MPZ).
+
+**What must exist before filing.** (1) Amended sketch plan by a licensed Geodetic Engineer from a fresh RD certified copy of OCT P-1616 — the scanned technical descriptions in the corpus disagree with each other (OCR) and must not be retyped; (2) the notarized landowner's consent (Annex B); (3) barangay Santa Rosa Sur and SB Jose Panganiban endorsements to follow (already drafted in `../BRGY_ENDORSEMENT_CUSTOM_MILL_2026-09-14/` and `../SB_ENDORSEMENT_JOSE_PANGANIBAN_2026-09/`).
+
+**Open questions for MGB-V / counsel.** Whether the substitution is processed as an amendment of the pending Paracale petition or as a fresh petition in Jose Panganiban (the Sanggunian changes); whether the Association's members' registration with the Board (DAO 2022-03 §6) needs re-doing for a JP area; the 250-ha figure in the 21 Jun letter is superseded by 15.2069 ha.
+
+**Blanks:** date; notary; Allan's ID; corner coordinates (from the GE plot).

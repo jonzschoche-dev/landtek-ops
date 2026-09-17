@@ -40,8 +40,9 @@ body = [
      "concentrate smelted to doré. <b>No mercury and no cyanide will be used at any stage.</b> All gold produced will be sold to "
      "the Bangko Sentral ng Pilipinas or its accredited traders. The plant will process ore from registered small-scale miners "
      "and lawful mining-rights holders of Jose Panganiban and the Paracale–Jose Panganiban gold district under written supply "
-     "agreements, including the Minahang Bayan already declared in Barangay Santa Rosa Norte and the Minahang Bayan applied for "
-     "by the Capacuan Small-Scale Miners Association over the Inocalla properties in Paracale–Jose Panganiban."),
+     "agreements. The same parcel is the area applied for by the Capacuan Small-Scale Miners Association, of which I am President, "
+     "for declaration as a Minahang Bayan (pending with MGB Region V / PMRB and MGB Central Office; being amended to cover this parcel "
+     "alone), so that the Association's members mine and process within one area of 15.2069 hectares in this Municipality."),
     ("<b>Why the Sanggunian's resolution is needed.</b> The Mines and Geosciences Bureau requires, for a Mineral Processing Permit, "
      "\"project approval/endorsement by at least majority of the Sanggunian concerned\" (MGB Citizen's Charter 2026, Mineral "
      "Processing Permit, Other Requirements). Under Sections 26 and 27 of the Local Government Code, projects of this kind require "
@@ -113,8 +114,9 @@ res_body = [
      "Norte, registered solely in his name, situated at Barangay Santa Rosa Sur, this Municipality, together with the endorsement of "
      "the Sangguniang Barangay of Santa Rosa Sur under its Resolution No. ____ s-2026, the sketch plan of the site, the project "
      "description and other supporting documents;"),
-    ("WHEREAS, the plant will process ore from registered small-scale miners and lawful mining-rights holders of this Municipality "
-     "and the Paracale–Jose Panganiban gold district, will sell all gold produced to the Bangko Sentral ng Pilipinas or its "
+    ("WHEREAS, the same parcel is the area applied for by the Capacuan Small-Scale Miners Association for declaration as a Minahang Bayan "
+     "in this Municipality, and the plant will process the ore of the Association's members and of other registered small-scale miners of "
+     "this Municipality and the Paracale–Jose Panganiban gold district, will sell all gold produced to the Bangko Sentral ng Pilipinas or its "
      "accredited traders, will give preference in employment to residents of Barangay Santa Rosa Sur and of this Municipality, and "
      "will contain all tailings within a lined tailings facility in compliance with the conditions of its Environmental Compliance "
      "Certificate;"),

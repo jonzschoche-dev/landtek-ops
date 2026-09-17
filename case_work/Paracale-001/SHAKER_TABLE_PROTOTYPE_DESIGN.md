@@ -2,7 +2,7 @@
 
 **Project:** LAB X — a LandTek project (LandTek is a principal, not just service provider) under **Golden Inocalla Management Services** (Allan Inocalla, Principal). **Site (rev. 2026-08-23):** the **SMBC Mercury-Free Processing System (MFPS), Barangay Casalugan, Paracale** — the ₱29M planetGOLD facility owned and managed by the Samahan ng mga Minero sa Barangay Casalugan, where **Stephen Lloyd is Investor and Operational Partner under SMBC Board Resolution No. 2026-009** (SMBC owns the plant; Stephen holds no equity; net profits 50/50). Site facts per `case_work/NIBDC-001/DEAL_MEMO_PLANET_GOLD_PROCESSING_NIBDC.md` (a draft for negotiation — executed agreement copy still to be obtained). Filed under Paracale-001; keep strictly separated from MWK per the client-separation invariant. Registered in `MASTER_PLAN.md` §7 / §8. Presentation: `LAB_X_SHAKER_TABLE_DESIGN.pdf` (generator `lab_x_deck.py`).
 **Design authority:** Stephen Lloyd, head mechanical engineer and designer. **Manpower:** Allan Inocalla supplies the site crew (installation, pad works, riffle fitting) and the table operators. This brief consolidates the starting point; every decision marked **D-n** is his to make or overrule.
-**Status:** DRAFT v0.2 — 2026-08-23 (site moved from the Inocalla farm to the SMBC MFPS; Stephen Lloyd as design lead and plant operator). Consolidated from the 2026-08-22 design chat (which drew on ~100 web sources, none vendor-quoted). Nothing here is a measured quote or a test result; cost figures are marked **ESTIMATE / UNQUOTED** throughout.
+**Status:** DRAFT v0.3 — 2026-08-23 (site moved from the Inocalla farm to the SMBC MFPS; Stephen Lloyd as design lead and plant operator). Consolidated from the 2026-08-22 design chat (which drew on ~100 web sources, none vendor-quoted). Nothing here is a measured quote or a test result; cost figures are marked **ESTIMATE / UNQUOTED** throughout.
 **Goal:** 10 tonnes/day of gravity feed at the SMBC MFPS plant, mercury-free, built with local fabricators wherever possible. Build **one** full-size prototype first, tune it, then decide on table 2.
 
 **Programme positioning (2026-08-23):** LAB X is part of the UN-backed **planetGOLD** sustainable Minahang Bayan agenda (the MFPS was established under planetGOLD Philippines — UNEP-led, GEF-funded); the partnership's alignment note names the MFPS as the model to replicate regionally. Stephen's and the project's accolades are to spearhead further funding and involvement — **documents-only accolade file (C-21) and funding-line map (C-22) still to compile; nothing asserted without a document.**
@@ -19,7 +19,7 @@ The earlier chat is a good first pass. Three parts need correcting before anythi
 
 Roughly a third of the chat computed spring stiffness, natural frequency, transmissibility and damping ratios for isolation mounts, and ended by recommending a mount natural frequency of 2.0–2.5 Hz under a 5 Hz table. **That is HVAC / generator isolation logic and it is the wrong direction for a concentrating table.**
 
-Why: the gold "crawls" because the deck accelerates slowly one way and snaps back the other — the bed of particles slides relative to the deck on the fast return. That only works if the deck's motion in the ground frame is the motion the head motion was designed to produce. Put the whole machine on soft springs and the base moves in antiphase with the deck: with a moving deck-plus-slurry mass around 200–300 kg on a ~600 kg base, the base would absorb a meaningful fraction of the stroke and the stroke shape degrades. The chat itself noticed this ("soft isolation can reduce effectiveness") but kept computing anyway.
+Why: the gold "crawls" because the deck accelerates slowly one way and snaps back the other — the bed of particles slides relative to the deck on the fast return. That only works if the deck's motion in the ground frame is the motion the head motion was designed to produce. Put the whole machine on soft springs and the base moves in antiphase with the deck: with a moving deck-plus-slurry mass around 200–300 kg on a ~750 kg base, the base would absorb a meaningful fraction of the stroke and the stroke shape degrades. The chat itself noticed this ("soft isolation can reduce effectiveness") but kept computing anyway.
 
 **Replacement design rule:** bolt the frame rigidly to a concrete pad sized to many times the machine mass (see §9). Thin rubber pad under the feet *only* if noise to neighbours becomes a problem, and never coil springs. All the transmissibility/damping arithmetic is retired from this design; it is not wrong as physics, it is irrelevant to this machine.
 
@@ -49,7 +49,7 @@ Deck geometry, the eccentric-shaft spec, the materials list, the local-sourcing 
 | Item | Prototype target | Note |
 |---|---|---|
 | Deck | ≈ 4.5 m long × 1.8 m wide at the head end, concentrate end slightly narrower | standard full-size 6-S class |
-| Deck construction | welded steel skeleton + 8–12 mm abrasion-grade rubber/EPDM lining + tapered riffles | FRP deck deferred to table 2 |
+| Deck construction | light welded steel grid (flat bar / angle) skinned with **12 mm marine plywood**, sealed, + 8–12 mm abrasion-grade rubber/EPDM lining + tapered riffles | The moving deck must be light: 12 mm ply ≈ 65 kg over 8 m² vs 3 mm steel plate ≈ 190 kg (rubber at 10 mm adds ≈ 100 kg). Steel-plate skin dropped 2026-08-23. FRP deck deferred to table 2 (D-6) |
 | Capacity | 0.5–1.2 t/h of ≤2 mm feed, 15–30 % solids | depends heavily on feed size |
 | Stroke | adjustable 8–22 mm; commission at 12–16 mm | |
 | Frequency | 240–360 strokes/min; commission at 280–320 | |
@@ -88,7 +88,7 @@ We are building a gold shaking table about 4.5 m long and 1.8 m wide. It is a fl
 What the shop builds:
 
 1. **A heavy base frame** from 150 × 75 (or 200 × 75) mild-steel channel and 50–65 mm angle, with four (or six) feet drilled for M16–M20 anchor bolts. It must be stiff — no flexing when you stand on a corner — and square.
-2. **A deck skeleton**: a welded frame of flat bar and angle, skinned with 3–4 mm plate or 6 mm marine ply, that stays flat to within ~2 mm over its length. The rubber sheet is glued and bolted on top later.
+2. **A deck**: a light welded grid of flat bar and angle, skinned with 12 mm marine plywood screwed to the grid and sealed with epoxy on all faces and edges, flat to within ~2 mm over its length. Keep it light — it is the part that shakes. The rubber sheet is glued and bolted on top later.
 3. **Deck supports**: four to six flexure legs (spring steel strip or stacked leaf) or pivoting rocker stands that let the deck move only lengthwise, plus screw jacks to tilt the deck sideways and lengthwise while it runs.
 4. **The head-motion box**: a steel housing carrying the eccentric shaft on two pillow-block bearings, a connecting rod, a toggle/rocker arm and a return spring, with a hand-wheel or threaded stop to change the stroke. The eccentric shaft itself is a separate job for a lathe shop (§6).
 5. **A motor mount** on slotted rails for belt tension, guard over belt and pulley.
@@ -105,8 +105,9 @@ Costs are **ESTIMATE / UNQUOTED** (mid-2026 web-research ranges from the design 
 
 | Category | Items | Qty (approx.) | Likely source | Est. ₱ | Quote |
 |---|---|---|---|---|---|
-| Structural steel | C-channel 150×75 / 200×75; SHS 50×50×3; angle 50×50×5 and 65×65×6; plate 6–10 mm; flat bar | 450–550 kg | Daet steel yards (e.g. Double R Steel) or QC/Manila service centres | 35,000–48,000 | |
-| Deck skin | 3–4 mm plate or 6 mm marine ply on skeleton | ≈ 8 m² | same | incl. above | |
+| Structural steel (per cut list: base frame C125×65, tilting sub-frame C100×50, legs SHS 75×75×4, bracing angle, deck grid flat bar 40×5 + angle 30×30×3, plates) | ≈ 850 kg per cut list (order +10 %) | Daet steel yards (e.g. Double R Steel) or QC/Manila service centres | 60,000–80,000 | |
+| Deck grid | flat bar / angle, light welded grid | incl. in steel above | same | incl. above | |
+| Deck skin | 12 mm marine plywood (≈ 7 sheets 4×8 ft) + epoxy sealer + SS screws | ≈ 8 m² + edges | lumber yard / hardware | 6,000–10,000 | |
 | Deck lining | abrasion-grade rubber / EPDM 8–12 mm | 12–15 m² | Matlex, Dela Torre & Co., conveyor-rubber suppliers (Manila) | 18,000–35,000 | |
 | Riffles | hardwood strips (or rubber strip) + adhesive + SS screws | ≈ 45–50 riffles, 1–4 m each | local lumber / hardware | 3,000–8,000 | |
 | Motor | 1.1 kW 3-ph 4-pole TEFC (or 1.5 HP 1-ph) | 1 | industrial motor houses, QC/Manila | 6,000–15,000 | |
@@ -120,7 +121,7 @@ Costs are **ESTIMATE / UNQUOTED** (mid-2026 web-research ranges from the design 
 | Anchors + hardware | M16–M20 anchor bolts, fasteners, grease nipples | assorted | hardware | 3,000–6,000 | |
 | Finish | primer, topcoat, sealant, epoxy | | hardware | 3,000–5,000 | |
 | Fabrication labour | cutting, welding, assembly, fitting | | one primary shop | 45,000–75,000 | |
-| **Total, one table** | | | | **≈ 145,000–260,000** | |
+| **Total, one table** | | | | **≈ 177,000–306,000** | |
 
 Realistic mid-point with local labour: **₱160,000–190,000** per the design chat — treat as a planning number only until three lines above carry real quotes. Excluded: concrete pad (§9), water tank/pump, feed preparation (screen/mill), site electrical run.
 
@@ -244,7 +245,7 @@ Three slopes/motions are adjustable. Start values below are published 6-S / Wilf
 
 | Item | ₱ |
 |---|---|
-| One prototype table, materials + local fabrication (§5) | 145,000–260,000 (planning mid-point 160,000–190,000) |
+| One prototype table, materials + local fabrication (§5) | 177,000–306,000 (planning mid-point 190,000–220,000) |
 | Concrete pad, anchors, drainage | separate — local quote |
 | Water tank/pump, feed screen, site electrical | separate |
 | Second table, if D-1 → circuit A | ≈ same again, less design time |
@@ -271,4 +272,18 @@ Imported 6-S units were cited in the chat at roughly USD 1,500–3,500 FOB befor
 
 ---
 
-*Document history:* v0.1 2026-08-23 — consolidated from the design chat, isolation track retired, circuit/ore-test gates added, riffle fabrication and slope settings written up. v0.2 2026-08-23 — site moved to the SMBC MFPS (Casalugan), Stephen Lloyd spotlighted as design lead + operating partner, consent/title/inventory open items added; LAB X deck generated. Next revision after Stephen's D-1…D-8 calls.
+## 13. Manufacturing package (deck pp. 17–26; Stephen issues the drawings)
+
+The LAB X deck carries the component-level package a fabricator builds from. Summary of record:
+
+**Assembly tree** — A base frame (C125×65 rails, SHS 75×75 legs, angle bracing, foot plates, head-motion plate) · B tilting sub-frame (C100×50; longitudinal pivot Ø30 in bronze bushes on the wash-water side; two M20 screw jacks on the tailings side; end-slope adjuster) · C deck (angle 40×40 perimeter, flat-bar 40×5 ribs at 300 mm, angle 30×30 cross ribs at 500 mm, 12 mm marine-ply skin, epoxy sealer, 10 mm rubber, 45–48 hardwood riffles, 60 mm rims on two edges, concentrate splitters) · D suspension (six spring-steel flexure legs 60×4×280, clamp plates) · E head motion (oil-tight housing, eccentric shaft, UCP 210 mains, 6212/bronze big-end, pitman, toggle on Ø25 pin, compression return spring 150–250 N/mm, M24 stroke adjuster, push link, counterweight) · F drive (1.1 kW 4-pole 3-ph motor, Ø80 / Ø420 B-section, belt, slide rails, guard) · G feed/water (feed box 600×300×250, Ø50 PVC wash header with Ø3 holes at 50 mm, 200 L head tank, valves) · H launders (concentrate + splitter, middlings, full-length tailings at 2 % fall) · I electrical (1.5 kW VFD 1-ph-in/3-ph-out, MCB+RCD, E-stop on enable loop, run/stop/speed) · J foundation (pad, M16 L-anchors, grout) · K finish.
+
+**Sizing (first pass, Stephen to confirm):** moving mass wet ≈ 350 kg; design point 16 mm / 330 spm → peak acceleration ≈ 9.6 m/s², peak inertia force ≈ 3.4 kN, peak velocity 0.28 m/s, power ≈ 0.95 kW peak / 0.3–0.4 kW average (1.1 kW motor OK). **Grid is 60 Hz**: 4-pole motor ≈ 1 740 rpm → ratio Ø80/Ø420 = 5.25 → 331 spm; VFD 44–65 Hz spans 240–360 spm. Steel per cut list ≈ 850 kg (+10 % waste) — base frame 252, sub-frame 184, deck grid 103, legs/bracing 108, plate/sheet 205. Deck mass target ≤ 300 kg dry.
+
+**QA hold points:** frame diagonals ≤ 3 mm; deck flatness ≤ 2 mm over 4.5 m (before ply, again before rubber); shaft throw ±0.05 mm, runout ≤ 0.03 mm; pivot pins coaxial ≤ 0.5 mm; flexures parallel ±1°; dry-run stroke equal both sides ±0.5 mm; weigh the deck.
+
+**Drawing list (owner Stephen):** LX-001 GA · 002 base frame · 003 sub-frame/pivot · 004 deck · 004a riffle layout (after the reference deck) · 005 flexures · 006 jacks · 007 head motion · 007a eccentric shaft (issue first) · 008 drive · 009 feed/wash/launders · 010 electrical · 011 foundation · 012 commissioning sheet.
+
+---
+
+*Document history:* v0.1 2026-08-23 — consolidated from the design chat, isolation track retired, circuit/ore-test gates added, riffle fabrication and slope settings written up. v0.2 2026-08-23 — site moved to the SMBC MFPS (Casalugan), Stephen Lloyd spotlighted as design lead + operating partner, consent/title/inventory open items added; LAB X deck generated. v0.3 2026-08-23 — deck skin pinned to 12 mm marine plywood on a light steel grid (steel-plate option dropped on moving-mass grounds); manpower and planetGOLD positioning carried from the deck; §13 manufacturing package (assembly tree, sizing, QA, drawing list) added to match deck pp. 17–26. Next revision after Stephen's D-1…D-8 calls.

@@ -50,10 +50,10 @@ letter_body = [
      "small-scale mineral processing is undertaken in custom mills within a Mineral Processing Zone designated by the local "
      "government unit upon the recommendation of the Provincial Mining Regulatory Board, under a Mineral Processor's License "
      "issued by the Board through MGB Region V. The Board and the Municipal Government look to the host barangay's resolution "
-     "of endorsement as part of the application. The plant will serve the registered small-scale miners of Jose Panganiban and "
-     "the Paracale–Jose Panganiban gold district, including the Minahang Bayan already declared in neighbouring Barangay Santa "
-     "Rosa Norte and the Minahang Bayan applied for by the Capacuan Small-Scale Miners Association over the Inocalla properties "
-     "in Paracale–Jose Panganiban (pending with MGB Region V and MGB Central Office since June 2026)."),
+     "of endorsement as part of the application. The same parcel is the area applied for by the Capacuan Small-Scale Miners "
+     "Association, of which I am President, for declaration as a Minahang Bayan (application pending with MGB Region V / PMRB and the "
+     "MGB Central Office since June 2026, now being amended to cover this parcel alone), so that the Association's members mine and "
+     "process within one area; the plant will also serve the other registered small-scale miners of Jose Panganiban."),
     "I therefore respectfully ask the Sangguniang Barangay to resolve:",
     ("1. To endorse and interpose no objection to the application of Allan V. Inocalla / AVI Gold Processing Plant for a "
      "Custom Mill / Mineral Processor's License for the processing plant on Lot 4, Psu-143364 (OCT No. P-1616), Barangay Santa "
@@ -110,9 +110,10 @@ kap_body = [
      "at 15, ang pagpoproseso ng mineral ng maliliit na minero ay isasagawa lamang sa loob ng Mineral Processing Zone na itinatalaga "
      "ng pamahalaang lokal sa rekomendasyon ng Provincial Mining Regulatory Board, sa ilalim ng Mineral Processor's License na "
      "ipinagkakaloob ng Lupon sa pamamagitan ng MGB Regional Office, at ipinagbabawal ang paggamit ng mercury sa anumang yugto nito;"),
-    ("SAPAGKAT, may idineklara nang Minahang Bayan sa karatig na Barangay Santa Rosa Norte ng bayang ito (2024), at nakabinbin sa "
-     "MGB Region V at MGB Central Office ang aplikasyon ng Capacuan Small-Scale Miners Association para sa Minahang Bayan sa mga "
-     "lupang Inocalla sa Paracale–Jose Panganiban (Hunyo 2026), na nangangailangan ng lehitimo at mercury-free na custom mill;"),
+    ("SAPAGKAT, ang nasabing lote ang siyang lugar na inaaplayan ng Capacuan Small-Scale Miners Association, na pinamumunuan ni G. Allan "
+     "V. Inocalla, upang ideklarang Minahang Bayan (nakabinbin sa MGB Region V / PMRB at MGB Central Office mula Hunyo 2026, at "
+     "inaamyendahan upang ang lote lamang na ito ang sakupin), upang sa iisang lugar magmina at magproseso ang mga kasapi nito, at may "
+     "idineklara na ring Minahang Bayan sa karatig na Barangay Santa Rosa Norte (2024);"),
     ("SAPAGKAT, si G. Allan V. Inocalla, may-ari ng Lot 4, Psu-143364 na sakop ng Original Certificate of Title Blg. P-1616 "
      "(Free Patent Blg. 225537, ika-10 ng Mayo 1963), 15.2069 ektarya, na matatagpuan sa Barangay na ito at nakatala sa kaniyang "
      "pangalan lamang, ay nag-aaplay ng Custom Mill / Mineral Processor's License para sa bagong planta ng pagpoproseso ng ginto "
