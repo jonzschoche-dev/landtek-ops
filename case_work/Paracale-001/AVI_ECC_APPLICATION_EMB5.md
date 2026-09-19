@@ -1,6 +1,7 @@
 # AVI Gold Processing — ECC application pack (EMB Regional Office V, Legazpi)
 
 **Status:** DRAFT-HELD · prepared 2026-09-13 · nothing filed, nothing sent · Paracale-001 (Allan V. Inocalla). Keep separate from MWK and NIBDC.
+**Built pack:** `AVI_ECC_APPLICATION_2026-09/` — the 8 filing instruments this advisory calls for (letter-request, Project Description, components table, EMP, PEMAPS, sworn statement, authorization, filing checklist), built 2026-09-19. Two decisions were taken there: the annual input ceiling is **declared at 9,000 t/yr** rather than a bare "under 10,000", and the Gracesen plant is **named nowhere** in the instruments, per Jonathan's 2026-09-13 rule ("new plant, new location, Allan's own company — no reference to any prior facility"); §7a below still carries the old Gracesen paragraph and §7d the close-out letter — both are held, not filed.
 **Companions:** `AVI_MPP_APPLICATION_MGB5.md` (the ECC is MPP acceptance requirement A6) · `DTI_BUSINESS_NAME_REGISTRATION_KIT.md` (DTI certificate is an ECC Online account requirement).
 
 **One-sentence position:** A mercury-free gravity gold plant taking under 10,000 tonnes of ore a year on Allan's titled Lot 4 (OCT P-1616), Santa Rosa Sur, Jose Panganiban is a **Category B project filed as an IEE Checklist through EMB's ECC Online system to EMB Region V**, fee ₱5,070, decided within 20 working days of a complete file — provided the plant is sized below the 10,000 t/yr input line, stays gravity-only, and the Gracesen record under Allan's name at EMB-V is closed first.
@@ -105,6 +106,8 @@ PEMAPS rates to declare (fill from the flowsheet): ore input t/day; process wate
 
 ## 7. Draft instruments (DRAFT-HELD; Allan signs; nothing sent)
 
+> **Superseded for filing by `AVI_ECC_APPLICATION_2026-09/`.** The texts below are the working drafts; the built pack is what Allan signs. §7a's Gracesen paragraph was dropped there; §7d has no counterpart there and remains a separate lane.
+
 **7a. Cover letter (for the hard-copy/notarised set EMB-V asks for at orientation or on request)**
 
 > **[AVI GOLD PROCESSING PLANT letterhead]** · Purok ___, Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte · shiraction2@gmail.com · 0917 155 4782
@@ -129,7 +132,7 @@ PEMAPS rates to declare (fill from the flowsheet): ore input t/day; process wate
 > I confirm that this is a new project on a new site, distinct from the Gracesen Small Scale Gold Processing Plant at Barangay Capacuan, Paracale (ECC-RO5-1203-0045), whose compliance record I have addressed by separate letter dated ______.
 >
 > Respectfully,
-> **ALLAN V. INOCALLA**, Proprietor, AVI Gold Processing Plant (DTI BN No. 8480852) · TIN 200-011-253
+> **ALLAN V. INOCALLA**, Proprietor, AVI Gold Processing Plant (DTI BN No. 8480852) · TIN 200-031-253
 
 **7b. Sworn Statement of Accountability** — use the MC 2022-002 form the system generates; substance: *"I, Allan V. Inocalla, proponent of the AVI Gold Processing Plant at Lot 4 Psu-143364, Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte, take full responsibility for the accuracy of the information in this IEE Checklist and for complying with all conditions of the ECC that may be issued."* Notarised with a government ID; CTC number if the notary asks.
 
