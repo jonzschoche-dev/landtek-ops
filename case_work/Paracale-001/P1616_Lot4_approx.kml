@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<name>P-1616 Lot 4 - FITTED v5 (operator drag-fit)</name>
-<description>FITTED POSITION v5 (2026-09-06): corner 1 at 14.253992 N, 122.713686 E
-(14d15'14.37"N 122d42'49.27"E) - OPERATOR DRAG-FIT in Google Earth Pro (Jonathan/team,
-matching the 1:2,000 Progress Map overlay to terrain). Independently validated: running the
-title's tie line back (S60-30'E, 3,508.83 m) lands the implied BLBM No.1 INSIDE Brgy.
-Batobalani, 536 m from its published reference point - the fit and the title agree. Parcel is
-in modern Brgy. Santa Rosa Sur (1963 "San Rafael"). Shape exact from OCT technical description
-(closure 0.07 m). Est. accuracy: the drag-fit's, ~100-200 m. Final survey-grade fix: DENR/LMS
-data or GPS on monumented corners 8-11. Orientation is true-north per the title bearings - do
-not rotate.</description>
-<Style id="lot"><LineStyle><color>ff2dd42d</color><width>3</width></LineStyle><PolyStyle><color>402dd42d</color></PolyStyle></Style>
-<Style id="tie"><LineStyle><color>ff3030b0</color><width>2</width></LineStyle></Style>
-<Placemark><name>Lot 4, Psu-143364 (OCT P-1616) - v5 FITTED</name><styleUrl>#lot</styleUrl>
-<Polygon><outerBoundaryIs><LinearRing><coordinates>122.713686,14.253992,0 122.713780,14.255374,0 122.714339,14.253258,0 122.716266,14.252509,0 122.714211,14.250694,0 122.712730,14.250980,0 122.711315,14.250220,0 122.711095,14.251968,0 122.710724,14.252676,0 122.710361,14.252757,0 122.709855,14.252597,0 122.709790,14.253276,0 122.711693,14.253272,0 122.712502,14.253791,0 122.713692,14.253357,0 122.713686,14.253992,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Corner 1 (POB) v5 - 14d15'14.37"N 122d42'49.27"E</name><Point><coordinates>122.713686,14.253992,0</coordinates></Point></Placemark>
-<Placemark><name>Implied BLBM No.1 (from tie line; in Batobalani, 536 m from brgy point)</name><styleUrl>#tie</styleUrl><Point><coordinates>122.741990,14.238400,0</coordinates></Point></Placemark>
-<Placemark><name>Tie line N.60-30'W 3,508.83 m</name><styleUrl>#tie</styleUrl>
-<LineString><coordinates>122.741990,14.238400,0 122.713686,14.253992,0</coordinates></LineString></Placemark>
+<name>P-1616 Lot 4 — v6 tie-point anchored</name>
+<Style id="v6"><LineStyle><color>ff00ff00</color><width>3</width></LineStyle><PolyStyle><color>3300ff00</color></PolyStyle></Style>
+<Style id="v5"><LineStyle><color>66ffffff</color><width>1.5</width></LineStyle><PolyStyle><color>00ffffff</color></PolyStyle></Style>
+<Style id="mon"><IconStyle><color>ff0000ff</color><scale>1.3</scale></IconStyle></Style>
+<Style id="tie"><LineStyle><color>ff00ffff</color><width>2</width></LineStyle></Style>
+<Placemark><name>Lot 4 Psu-143364 (v6 — official tie point)</name><styleUrl>#v6</styleUrl>
+<description>Lot 4, Psu-143364 — OCT P-1616 (Allan V. Inocalla), 152,069 sqm. POSITION v6 (2026-09-20): corner 1 fixed by DOCUMENT MATH — official DENR tie-point table (Camarines Norte), BLBM No. 1 Bo. Batobalane, Paracale (id 52589, PTM-4 471803.27/1574167.76, Luzon/PRS92 14.2348333 N 122.7387250 E; table datum PROVEN Luzon by 0.00 m PTM round-trip; PRS92→WGS84 EPSG transform acc 0.05 m) + title tie line N.60°31'W 3,508.83 m (minutes digit 31' is middle candidate of 01'/31'/51' crease-illegible set; spread ±25 m). Corner 1 = 14.248967 N, 122.711928 E approx. Est. accuracy ±30-60 m. Supersedes v5 drag-fit (retained as faint outline, 590 m NE). Bearings true north; polygon closure 0.07 m; area check 152,068.9 sqm vs 152,069 titled. PENDING VERIFICATION: bearing minutes digit (runner to read off official plan), GPS pin on physical mojon.</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.711783,14.248970,0 122.711877,14.250352,0 122.712436,14.248236,0 122.714362,14.247487,0 122.712308,14.245672,0 122.710827,14.245959,0 122.709412,14.245199,0 122.709192,14.246946,0 122.708821,14.247654,0 122.708458,14.247735,0 122.707952,14.247575,0 122.707887,14.248255,0 122.709790,14.248250,0 122.710599,14.248770,0 122.711789,14.248335,0 122.711783,14.248970,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>v5 drag-fit (superseded, for comparison)</name><styleUrl>#v5</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.713686,14.253992,0 122.713780,14.255374,0 122.714339,14.253258,0 122.716266,14.252509,0 122.714211,14.250694,0 122.712731,14.250980,0 122.711315,14.250220,0 122.711095,14.251968,0 122.710724,14.252676,0 122.710361,14.252757,0 122.709855,14.252597,0 122.709790,14.253276,0 122.711693,14.253272,0 122.712502,14.253791,0 122.713692,14.253357,0 122.713686,14.253992,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>BLBM No. 1, Bo. Batobalani (OFFICIAL — DENR tie-point id 52589)</name><styleUrl>#mon</styleUrl>
+<description>WGS84 14.233391, 122.740090 (14°14'00.21"N 122°44'24.32"E). PTM-4 471803.27 E / 1574167.76 N. Title tie point of OCT P-1616. MOJON HUNT TARGET.</description>
+<Point><coordinates>122.740090,14.233391,0</coordinates></Point></Placemark>
+<Placemark><name>BLBM No. 2, Bo. Batobalani (official, id 52592)</name><styleUrl>#mon</styleUrl>
+<description>WGS84 14.233889, 122.740762 (14°14'02.00"N 122°44'26.74"E). 91 m NE of No. 1 — second hunt target / cross-check.</description>
+<Point><coordinates>122.740762,14.233889,0</coordinates></Point></Placemark>
+<Placemark><name>Tie line N.60°31'W 3,508.83 m</name><styleUrl>#tie</styleUrl>
+<LineString><coordinates>122.740090,14.233391,0 122.711783,14.248970,0</coordinates></LineString></Placemark>
 </Document></kml>

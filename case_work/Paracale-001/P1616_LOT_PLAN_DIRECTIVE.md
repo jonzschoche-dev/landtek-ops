@@ -270,3 +270,32 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   Records research (in progress) and — QUEUED for VPS corpus — read the tie lines from sibling
   family titles (T-20757, T-3424, P-1617, adjoining H-plans), which likely tie to the same
   monument and triangulate it from multiple rays.
+
+- **2026-09-20 (later) — TIE-POINT TABLE OBTAINED → POSITION v6 (document-anchored).** Jonathan
+  supplied a Camarines Norte tie-points table (CSV-as-PDF; DENR-style: municipality, pointref,
+  id, lat, lon, PTM zone 4 x/y). It contains the exact title tie point:
+  - **BLBM No. 1, Bo. of Batobalane, Mp. of Paracale** — id **52589**, lat 14.2348333 /
+    lon 122.7387250, PTM-4 E 471,803.2707 / N 1,574,167.757.
+  - **BLBM No. 2, Bo. of Batobalane** — id **52592**, lat 14.2353306 / lon 122.7393972,
+    PTM-4 E 471,875.8787 / N 1,574,222.684 (91 m NE of No. 1).
+  - **Datum PROVEN:** forward-projecting the table's lat/lon as Luzon-1911 into PTM zone 4
+    (Clarke 1866, CM 123°E, k 0.99995, FE 500,000) reproduces the table's x/y to **0.00 m** —
+    so the lat/lon columns are Luzon/PRS92, NOT WGS84. Plotting them raw in Google Earth would
+    be ~225 m off. Converted PRS92→WGS84 (EPSG transform, 0.05 m accuracy):
+    **BLBM No. 1 = 14.233391 N, 122.740090 E** (14°14'00.21"N 122°44'24.32"E);
+    BLBM No. 2 = 14.233889 N, 122.740762 E (14°14'02.00"N 122°44'26.74"E).
+  - **v6 solve:** title tie line N.60°31'W (middle candidate of the crease-illegible
+    01'/31'/51' set; full spread only ±25 m) × 3,508.83 m from the official monument gives
+    **corner 1 (POB) = 14.248970 N, 122.711783 E**. Estimated accuracy ±30–60 m — the
+    residual unknowns are the minutes digit and monument-table fidelity, both checkable.
+  - **v6 sits ~590 m SSW of the v5 drag-fit.** Document math (verified monument + verified
+    3,508.83 m distance) outranks the satellite eyeball fit; v5 retained in the KML as a
+    faint comparison outline. Notably v6 independently confirms the v3/v4 tie-line-solution
+    zone that the drag-fit had pulled away from.
+  - Files: repo `P1616_Lot4_approx.kml` + `p1616_lot4_polygon.geojson` now v6 (monument pins
+    + tie line included); Drive copy `P1616_Lot4_v6_TIEPOINT.kml` in the loan folder.
+  - **Mojon hunt still on, now with a known pin:** driver goes to 14.233391, 122.740090,
+    finds the concrete post, stands on it, sends one GPS pin → confirms the table and removes
+    the last transform doubt. BLBM No. 2 (91 m NE) is the cross-check target. PENDING
+    VERIFICATION: bearing minutes digit (read off official plan when obtained) and physical
+    monument pin.
