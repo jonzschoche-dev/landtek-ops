@@ -259,3 +259,14 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
     Psu-143364 Lot 4 / OCT P-1616 — ask research status, fees, and claiming. Allan's signed
     authorization still pending (unsigned draft flagged 2026-09-06 — sign before claiming).
   - Next automated check: 2026-09-22 (email-watch only; no autonomous sends per Jonathan).
+
+- **2026-09-20 — BLLM No. 1 MONUMENT-HUNT play (operator-endorsed).** The tie-point monument is
+  a physical, documented Bureau-of-Lands concrete post ("mojon") in Batobalani. Implied position
+  from the v5 fit + tie-line back-computation: **14.23840 N, 122.74199 E (±~200 m)** — western
+  Batobalani near the Batobalane River. Play: Allan/driver goes to that pin, asks locals for the
+  mojon, stands on it, sends ONE phone GPS pin → monument + tie bearing + 3,508.83 m locks
+  corner 1 to meters, no DENR wait. If two candidate posts exist (BLBM vs BLLM), pin BOTH and
+  photograph markings; the tie-distance math discriminates. Parallel paper tracks: SMD Land
+  Records research (in progress) and — QUEUED for VPS corpus — read the tie lines from sibling
+  family titles (T-20757, T-3424, P-1617, adjoining H-plans), which likely tie to the same
+  monument and triangulate it from multiple rays.
