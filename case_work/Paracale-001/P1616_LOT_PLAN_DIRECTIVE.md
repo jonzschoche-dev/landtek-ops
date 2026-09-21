@@ -325,3 +325,27 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
     digit off the official plan" downgraded from blocking to confirmatory.
   - Mojon-hunt pin unchanged: 14.233391, 122.740090 (BLBM No. 1), second target BLBM No. 2
     at 14.233889, 122.740762.
+
+- **2026-09-21 (Jonathan's correction) — BLLM vs BLBM naming, resolved against the registry.**
+  Jonathan flagged: the 2012 plan's tie box reads "TIE LINES from **BLLM** No.1, Barrio of
+  Batobalane" — not BLBM. (The OCT itself reads "BLBM No. 1, Bo. Batobalani"; Joemar also said
+  "BLLM No. 1 of Batobalani". The two names refer to different monument classes: Location
+  Monument vs Barrio Boundary Monument.) Checked against the official CN tie-point registry:
+  - **No "BLLM No. X, Barrio of Batobalane" exists in the registry.** Every Paracale BLLM row
+    is either "Municipality of Paracale" or "Pls 1047 D" (both at 14.28044/122.78768 Luzon,
+    near the poblacion). The ONLY registered monuments for Barrio Batobalane are **BLBM No. 1
+    (52589) and BLBM No. 2 (52592)**.
+  - **Alternative tested and refuted:** tying the surveys from the municipality/Pls-1047-D
+    BLLM No. 1 would put Lot 4 corner 1 at 14.295 N, 122.761 E — outside ALL five candidate
+    barangays, ~2 km NNE near the poblacion, contradicting the plan's own "Brgy. Capacuan"
+    situs, the progress map, and every prior position line. From BLBM No. 1 it lands in
+    Santa Rosa Sur, Jose Panganiban — consistent with everything.
+  - **Conclusion:** the 2012 surveyor (and Joemar) used "BLLM" loosely; the physical tie
+    monument is the registered Batobalane barrio monument at 14.233391, 122.740090 (WGS84) —
+    or an unregistered post co-located with it. The 0.1–0.2 m dual-survey interlock requires
+    both surveys to share one physical point, and the digit=01' resolution is relative
+    geometry, so it stands under either name.
+  - **Residual risk (what the mojon hunt now settles):** if the physical post the surveyors
+    used is NOT where registry row 52589 says, the absolute anchor shifts by that error.
+    Driver instruction updated: PHOTOGRAPH THE POST'S INSCRIPTION — it may be stamped BLLM
+    or BLBM; the pin + the marking photo close the question either way.
