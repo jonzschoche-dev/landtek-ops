@@ -372,3 +372,12 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   - **The GE deliverable (Lot Plan + Vicinity Map) does not need a runner either** once LMS
     releases the certified plan — a Daet/Legazpi geodetic engineer can be commissioned by
     phone/email with the certified copy; §3 STOP D wording still applies.
+
+- **2026-09-21 — Satellite visual corroboration of v7.** Rendered v7 over Sentinel-2 TCI
+  (S2C_51PVR_20260423, 10 m/px): the Senen 2012 mining-permit parcel lands directly on a
+  cluster of bright bare-ground disturbance (visible workings/diggings), while Lot 4 is
+  predominantly canopy and the superseded v5 outline sits on undifferentiated forest. A
+  mining-application boundary coinciding with visible mine scars is independent physical
+  corroboration of the v7 anchor. Renders: scratchpad `P1616_v7_satellite_closeup.png` /
+  `_wide.png` (sent to Jonathan 2026-09-21). [Provenance: imagery verified; interpretation
+  of scars as workings = inferred_strong.]
