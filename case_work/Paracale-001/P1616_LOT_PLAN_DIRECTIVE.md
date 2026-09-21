@@ -396,3 +396,28 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   mining-permit plan, and 2026 imagery now tell one consistent story at the v7 position.
   [Overlay fit inherits the drag-fit heritage: inferred_strong, ±~100 m; polygons remain
   document-anchored v7.]
+
+- **2026-09-21 — RETRACTION: progress-map overlay fit WITHDRAWN (Jonathan: "if we cannot
+  prove the alignment do not guess").** Verification was attempted and FAILED, so the
+  2026-09-21 "map re-fitted to v7" entry above is retracted:
+  1. Projecting the v5-heritage fit into map-pixel space shows the polygon does NOT trace
+     the map's drawn parcel linework (offsets up to ~250 m at the east vertex).
+  2. The map's own scale bar is unlabeled (part of the digital restoration) — no independent
+     pixel calibration.
+  3. Exhaustive similarity fitting (Procrustes over all 30 corner correspondences) between
+     the title's verified 15-corner geometry and the parcel outline drawn around the
+     "OCT No. P-1616 / Lot-4 / ALLAN V. INOCALLA / 15.2069 Has" label: best fit needs a
+     +68° rotation (impossible on a north-up sheet); all near-zero-rotation fits leave
+     60+ m RMS residuals. The restoration is hand-redrawn ("Redrawn digitally from the
+     damaged original map" per its legend) and is NOT geometrically faithful.
+  - **Status:** `P1616_MapFit_v7.kmz` and the composite `P1616_v7_map_over_satellite.png`
+    are UNVERIFIED — do not use for any positional claim. The earlier "three layers align"
+    statement is withdrawn as to the map layer.
+  - **Unaffected:** the v7 polygon, monument coordinates, dual-survey interlock, and the
+    satellite renders WITHOUT the map layer (P1616_v7_satellite_closeup/wide.png) — none of
+    these depend on the overlay. The Senen-parcel/visible-workings observation also stands
+    (it is polygon-vs-imagery, no map layer involved).
+  - **What would enable a true fit:** the official Psu-143364 plan from LMS, or a flat,
+    straight-on photo of the ORIGINAL paper sheet where Lot 4's drawn outline and two-plus
+    corners are cleanly legible — then corners can be matched and the fit proven by
+    residuals, not assumed.
