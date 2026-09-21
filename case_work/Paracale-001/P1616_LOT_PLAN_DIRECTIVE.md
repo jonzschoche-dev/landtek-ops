@@ -356,3 +356,19 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   (per the naming-correction entry above). Targets: BLBM No. 1 at 14.233391, 122.740090 and
   BLBM No. 2 at 14.233889, 122.740762 (WGS84). Delivered as paste-ready Taglish text in chat;
   Jonathan posts it (no autonomous outbound per standing constraint).
+
+- **2026-09-21 — NO DRIVER / NO GROUP (Jonathan): field errands are now self-serve.** The
+  Messenger driver group no longer exists; there is no runner. Consequences:
+  - **Mojon hunt → standing self-serve task, off the critical path.** v7 is document-anchored
+    (dual-survey interlock); the pin is confirmation only. Whenever Jonathan or Allan is next
+    physically in Paracale: open Google Maps → 14.233391, 122.740090 → find the concrete post
+    within ~30 m → stand on it, drop/share a pin, photograph the post and its inscription
+    (may read BLBM or BLLM No. 1). Second post ~90 m NE at 14.233889, 122.740762. No deadline.
+  - **Paper tracks are the active front, all remote-capable:** (1) call/text SMD Land Records
+    CP 0917-139-0360 re the Sept 2 request (Psu-143364 Lot 4 / OCT P-1616) — status, fees,
+    claiming logistics, and whether they will release scans by email; (2) Sept 22 email-watch
+    check-in stays armed; (3) sibling-title tie-line triangulation stays queued on the VPS
+    corpus; (4) Allan's authorization still needs signing before anything is claimed in person.
+  - **The GE deliverable (Lot Plan + Vicinity Map) does not need a runner either** once LMS
+    releases the certified plan — a Daet/Legazpi geodetic engineer can be commissioned by
+    phone/email with the certified copy; §3 STOP D wording still applies.
