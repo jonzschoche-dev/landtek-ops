@@ -299,3 +299,29 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
     the last transform doubt. BLBM No. 2 (91 m NE) is the cross-check target. PENDING
     VERIFICATION: bearing minutes digit (read off official plan when obtained) and physical
     monument pin.
+
+- **2026-09-21 — SENEN INOCALLA 2012 MINING-PLAN UPLOAD → MINUTES DIGIT RESOLVED → POSITION v7.**
+  Jonathan uploaded the Jan 27, 2012 "Sketch Plan of Small Scale Mining Permit Application &
+  Topographic Survey" for **Senen Villafria Inocalla** (Brgy. Capacuan, Paracale, 133,690 sqm,
+  GE Jose Mari P. Ayton, PPCS-TM/PRS92, true bearings) — full exhibit write-up in
+  P1616_MINERAL_PROOF_PACK.md §A8. Its boundary adjoins Lots 1 and 4 of Psu-143364 and it ties
+  to the SAME monument: "TIE LINES from BLLM No.1, Barrio of Batobalane… to corner 1" —
+  boundary **N.57°49'W 3,579.00 m**, topo **N.60°32'W 3,877.65 m**.
+  - **Transcription validated:** 16-course boundary closes at **0.09 m**, area **133,700 sqm
+    vs 133,690 stated** (course 11-12 corrected to S64°48'W from scan-misread S84°48'W; the
+    correction was found by closure analysis, then is consistent with the faint scan).
+  - **THE MINUTES DIGIT IS 01'.** Plotting both surveys from the shared monument (datum-free
+    relative geometry): with P-1616 tie **N.60°01'W** the parcels interlock at 0.1–0.2 m
+    (Lot 4 corner 2 sits ON the Senen boundary; Senen corner 1 sits ON Lot 4's boundary);
+    with 31' the gap is 23 m, with 51' 39 m. The Senen plan's own topo tie endpoint also
+    lands 0.6 m off its boundary — internal consistency. Two independent surveys mutually
+    confirm; the crease-illegible digit on the OCT is resolved without waiting for LMS.
+  - **v7 position:** Lot 4 corner 1 (POB) = **14.249210 N, 122.711924 E** (WGS84; monument
+    id 52589 + N.60°01'W × 3,508.83 m). ~27 m NE of v6. Accuracy ±20–30 m absolute (datum
+    transform + tie-table fidelity); Lot4↔Senen relative geometry decimeter-grade. v5
+    drag-fit retained as faint outline (~560 m NE — superseded).
+  - Files: repo KML/GeoJSON now v7 (Lot 4 + Senen parcel + monument pins + both tie lines);
+    Drive `P1616_Lot4_v7_INTERLOCK.kml` in the loan folder. Runner task "read the minutes
+    digit off the official plan" downgraded from blocking to confirmatory.
+  - Mojon-hunt pin unchanged: 14.233391, 122.740090 (BLBM No. 1), second target BLBM No. 2
+    at 14.233889, 122.740762.

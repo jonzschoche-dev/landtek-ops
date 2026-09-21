@@ -352,3 +352,35 @@ drop into the Drive PGC folder for corpus ingest). Now legible:
 ⚠ (superseded by the UPDATE above) Discrepancy to resolve: the map labels Lot 4 as "Psu-143364 **(Amd.)**" while the title
 inventory treats Lot 4 as on the ORIGINAL plan (Amd. covering Lots 1/7/8). Whether the amended
 plan re-covered Lot 4 changes which plan LMS should pull — ask for BOTH in any follow-up.
+
+## A8. ⭐ Senen V. Inocalla Small-Scale Mining Permit Sketch Plan (Jan 27, 2012) — family mining application ADJOINING Lot 4 **[V — plan PDF in hand, 2026-09-21]**
+
+Scanned original: `2026-09-21_Plan.pdf` (Jonathan's upload; LMB Form GSD-C-3). "SKETCH PLAN of
+Small Scale Mining Permit Application & Topographic Survey, as prepared for **SENEN VILLAFRIA
+INOCALLA**", Brgy. **Capacuan**, Paracale, Camarines Norte; **133,690 sqm**; Zone IV,
+**PPCS-TM/PRS 92**, bearings TRUE, scale 1:2,000; dated **January 27, 2012**, GE **Jose Mari P.
+Ayton** (Reg. Cert. 4851, License 0113375). Carries an unfilled DENR Regional Surveys Division
+verification block ("THIS PLAN SHALL NOT BE USED FOR LAND REGISTRATION").
+
+**Why it matters (three ways):**
+1. **Mineral layer:** a 2012 small-scale **mining permit application survey by the family**
+   (Senen Villafria Inocalla) on the parcel directly adjoining Lot 4 — contemporary mining
+   intent + a paid topographic survey (topo block A = 42,972 sqm) on Inocalla ground. Slots
+   beside A2 (the 13 patentable claims) and A4 (operating gold business) as activity/intent
+   proof; per §A6 framing, this is SURFACE-adjoining mining activity, not a statement that
+   Lot 4 itself is mineral land.
+2. **Geometry keystone — resolved the tie-bearing minutes digit:** the plan ties to the SAME
+   monument as OCT P-1616 ("TIE LINES from BLLM No.1, Barrio of Batobalane… to corner 1"):
+   boundary **N.57°49'W 3,579.00 m**, topo **N.60°32'W 3,877.65 m**. Its 16-course boundary
+   transcription validates at **closure 0.09 m, area 133,700 sqm vs 133,690 stated** (one scan
+   misread corrected: course 11-12 is S64°48'W, not S84°48'W). Plotted from the shared
+   monument, the two surveys interlock (Lot 4 corner 2 on the Senen boundary at 0.2 m; Senen
+   corner 1 on the Lot 4 boundary at 0.1 m) **only when the P-1616 tie bearing is N.60°01'W**
+   — candidates 31'/51' leave 23/39 m gaps. **The crease-illegible minutes digit is 01'.**
+3. **Adjoiner record:** names the neighbors — Lot 1 and Lot 4 of Psu-143364 (family),
+   **Merquiades Lamadrid** (N boundary), public land (S), creek (E boundary) — usable for
+   adjoiner notices and for the RD/LMS chase (Capacuan-side family holdings).
+
+Position of record is **v7** (see P1616_LOT_PLAN_DIRECTIVE.md OUTREACH LOG 2026-09-21):
+Lot 4 corner 1 = **14.249210 N, 122.711924 E** (WGS84), ±20–30 m absolute, relative geometry
+decimeter-grade. PENDING VERIFICATION: physical mojon GPS pin; official plan copies from LMS.
