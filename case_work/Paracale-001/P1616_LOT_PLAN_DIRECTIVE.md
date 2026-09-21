@@ -381,3 +381,18 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   corroboration of the v7 anchor. Renders: scratchpad `P1616_v7_satellite_closeup.png` /
   `_wide.png` (sent to Jonathan 2026-09-21). [Provenance: imagery verified; interpretation
   of scars as workings = inferred_strong.]
+
+- **2026-09-21 — New progress-map photo; map re-fitted to v7; three layers align.** Jonathan
+  photographed the physical Paracale Gold Project progress map again (full sheet, title block:
+  "PARACALE GOLD PROJECT, STA. ROSA NORTE, JOSE PANGANIBAN — PROGRESS MAP OF PARACALE
+  NACIONAL"). Photo re-confirms the §A7 annotation blocks, including clearly the
+  "OCT No. P-1616 / Lot-4, Psu-143364 / ALLAN V. INOCALLA / Area = 15.2069 Has" block and
+  Casper's Lot 5 (23.5845 Has) block, plus Manila Vein assay strings (0.17g/4.00m,
+  1.60g/0.75m, 2.9xg/0.75m, 1.35g/0.80m etc.) and Vallejo Tunnel labels. The v5-era
+  GroundOverlay fit was shifted by the v5→v7 delta → `P1616_MapFit_v7.kmz` (scratchpad +
+  sent to Jonathan). Composite render `P1616_v7_map_over_satellite.png`: the map's
+  vein/tunnel/workings zone runs along Lot 4's WESTERN flank and the modern Sentinel-visible
+  scars trace the same corridor north into the Senen parcel — 1990s exploration map, 2012
+  mining-permit plan, and 2026 imagery now tell one consistent story at the v7 position.
+  [Overlay fit inherits the drag-fit heritage: inferred_strong, ±~100 m; polygons remain
+  document-anchored v7.]
