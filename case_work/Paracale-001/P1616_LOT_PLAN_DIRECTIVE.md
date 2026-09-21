@@ -349,3 +349,10 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
     used is NOT where registry row 52589 says, the absolute anchor shifts by that error.
     Driver instruction updated: PHOTOGRAPH THE POST'S INSCRIPTION — it may be stamped BLLM
     or BLBM; the pin + the marking photo close the question either way.
+
+- **2026-09-21 — Final mojon-hunt message issued to Jonathan (for the Messenger driver group).**
+  Asks for three things per post: (1) GPS pin standing on the post, (2) photo of the whole post,
+  (3) close-up of the inscription — explicitly noting it may read "BLBM No. 1" OR "BLLM No. 1"
+  (per the naming-correction entry above). Targets: BLBM No. 1 at 14.233391, 122.740090 and
+  BLBM No. 2 at 14.233889, 122.740762 (WGS84). Delivered as paste-ready Taglish text in chat;
+  Jonathan posts it (no autonomous outbound per standing constraint).
