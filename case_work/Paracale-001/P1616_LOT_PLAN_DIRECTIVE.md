@@ -20,7 +20,7 @@
 | Area | **152,069 sq m (15.2069 ha)** |
 | Origin | Free patent under C.A. 141 / R.A. 782; **Free Patent Application (FPA) No. V-43979**; patent signed May 1963 (Pres. Macapagal); transcribed in the Registration Book **September 3, 1963** by RD Leopoldo L. de Jesus |
 | Survey | Executed **June 2–5, 1954** by a private land surveyor; **approved April 28, 1955**; checked for the Director of Lands by Isabelo del Carmen (Chief, Surveys Division) / Sergio Libranda |
-| Tie line | **N. 60°⟨minutes unreadable — fold crease; candidates 01'/31'/51'⟩ W., 3,508.83 m from BLBM No. 1, Bo. Batobalani, Mp. of Paracale** ← runner must read this digit off the official plan and report it back |
+| Tie line | **N. 60°01' W., 3,508.83 m from BLBM No. 1, Bo. Batobalani, Mp. of Paracale** — minutes digit OFFICIALLY CONFIRMED by DENR SMD letter SMD-SCS-INC-26-172 (2026-09-22); matches the Sept-21 dual-survey interlock |
 | Shape | 15 corners; perimeter 2,230.18 m; corners 8–11 monumented with PLS cylindrical concrete monuments; distinctive ~150 m narrow spike at corner 2 (NE) |
 | Adjoining owners (per title) | NW (line 1-2) Leonardo Lamadrid (H-54763); NE (2-3) Heirs of Serapia Banal (H-47686); (3-4) H-47774; SE (4-5) Filomena L. Madrid (Lot 1, Psu-143365); S (5-6-7) Pastor Dasco (H-128572); W (7–11) Lot 5, Psu-143364; (11-12) creek and Lot 1; N (12–15-1) Leonardo Lamadrid (H-54763) |
 | Tax record | Tax Dec **ARP No. GR-2023-I-05-021-00306**, PIN **025-05-021-20-004**, Municipal Assessor of Jose Panganiban (12 ha coconut + 3.2069 ha bulas; AV ₱235,930) |
