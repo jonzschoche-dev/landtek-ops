@@ -507,3 +507,10 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   2/5/10/6 and Amd. 1/7/8 (T-20754/56/57, P-1615/P-1516/P-1617) — sources: paper titles, RD, or
   the SMD certified plan. (f) 1991 Partition Agreement (docs 510/671) mapped: T-3424 → Marilou+
   Allan; T-4185 → Herbert; corpus doc 1487 flagged as OCR hallucination (corpus-hygiene item).
+
+- **2026-09-22 — Sister-plan supplement STAGED (draft r4175263737633787558, same thread as the
+  sent resend-request).** Adds to the SMD request: certified copies of **Psu-143364 Amd.**
+  (Lots 1/7/8 = P-1615/P-1516/P-1617) and **Psu-143363 / Psu-143363 Amd.** (Lot 5 = T-20757)
+  with lot data computations — one combined fee assessment with the Psu-143364 set + GPPC.
+  These two sheets + the original plan unlock 7 parcels on the acquisition list in one release.
+  NOT sent — Jonathan reviews and sends.
