@@ -433,3 +433,26 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   replaced with a true WEEKLY routine (Mondays 09:00 PH, trig_01NCApA2EkhpsxNF3js1EZwq)
   carrying the current v7 state (and the overlay retraction) so future checks don't work
   from stale v5 facts.
+
+- **2026-09-22 — ⭐ DENR SMD DELIVERS: tie bearing OFFICIALLY N 60°01' W — v7 CONFIRMED.**
+  SMD R-V emailed the LandTek mailbox (jonzschoche@gmail.com, msg 1a0c809be775207b, ingested
+  as doc 15139): official letter to Allan V. Inocalla (P-4 Capacuan; Ref. Code
+  **SMD-SCS-INC-26-172**, signed Chief, Surveys & Mapping Division, Sept 22, 2026):
+  "the tie line of Lot 4, Psu-143364 is **N 60° 01' W, 3,508.83 meters from BLBM No. 1,
+  Bo. of Batobalani, Paracale**." [verified — letter text extracted from the ingested PDF]
+  - This is the SAME value the dual-survey interlock resolved on Sept 21 — **v7 stands
+    unchanged, now government-confirmed on the bearing.** §1 tie-line row: minutes = 01'.
+  - The letter says SMD is FORWARDING: the **GPPC Certification** (Geographic Position and
+    Plane Coordinates of the Tie Point — the official monument coordinates), plus certified
+    **lot data computation** and **survey plan**. Related mailbox traffic: Sept 21 SMD
+    "Re: Acknowledgement Receipt Re: Survey map" (has attachment) and Shishir's reply (has
+    attachment) — the loan deliverable documents appear to be arriving THROUGH SHISHIR'S
+    parallel request on the LandTek mailbox.
+  - **Cheapest next step (Jonathan, ~1 minute):** in jonzschoche@gmail.com open the SMD
+    emails → on each PDF attachment tap "Add to Drive" → LANDTEK folder. Then this side
+    reads them via the Drive connector and (a) georeferences to survey grade from the GPPC
+    coordinates, (b) checks the certified plan against the title traverse, (c) slots Lot
+    Plan + Vicinity Map into the loan packet. (VPS→Drive push was blocked: service accounts
+    have no storage quota; deploy pipeline logs 035–040 in leolandtek-deploys/outbox.)
+  - Weekly SMD email-watch can stand down once the attachments are in; the GE-signed
+    bank-format Lot Plan + Vicinity Map (§3 STOP D) is the only remaining loan item.
