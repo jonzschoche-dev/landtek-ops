@@ -484,3 +484,11 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   0956-241-2769, Mon–Thu 7:00–18:00 — likely faster; enclosures may simply need the fee
   paid first). 45-min ingest re-check trigger deleted (nothing to await until SMD re-sends);
   weekly Monday routine remains armed.
+
+- **2026-09-22 — SENT (Jonathan's explicit instruction): resend-the-attachments email to SMD.**
+  From jonathan@hayuma.org to smd.r5@denr.gov.ph (msg `1a0c8f8083d21e92`): notes only the
+  transmittal letter was attached to the Sept 22 email; requests re-send of the GPPC
+  Certification, lot data computation, and survey plan as attachments; asks assessed fees +
+  payment mode; cites Ref. Code SMD-SCS-INC-26-172 and Allan's Sept 3 authorization (release
+  by email). Standing "no autonomous sends" rule intact — this send was Jonathan's direct
+  instruction. Watch for the reply on both mailboxes; weekly Monday check remains armed.
