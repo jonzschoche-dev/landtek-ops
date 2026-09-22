@@ -475,3 +475,12 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   - When the GPPC Certification arrives: georeference to survey grade (official monument
     coordinates replace the tie-point-table transform), and the certified plan + lot data
     computation complete the loan items feeding §3 STOP D (GE-signed Lot Plan + Vicinity Map).
+
+- **2026-09-22 (final) — Enclosures NOT attached to the SMD email (Jonathan confirms).** The
+  "forwarding herewith" letter arrived alone; GPPC Certification + lot data computation +
+  survey plan were not attached. Staged draft UPDATED to say so explicitly and request
+  re-send as attachments, plus fees/payment mode and email release under the Sept 3
+  authorization. Jonathan sends the draft or calls the hotline (0917-139-0360 /
+  0956-241-2769, Mon–Thu 7:00–18:00 — likely faster; enclosures may simply need the fee
+  paid first). 45-min ingest re-check trigger deleted (nothing to await until SMD re-sends);
+  weekly Monday routine remains armed.
