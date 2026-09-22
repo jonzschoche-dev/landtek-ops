@@ -492,3 +492,18 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   payment mode; cites Ref. Code SMD-SCS-INC-26-172 and Allan's Sept 3 authorization (release
   by email). Standing "no autonomous sends" rule intact — this send was Jonathan's direct
   instruction. Watch for the reply on both mailboxes; weekly Monday check remains armed.
+
+- **2026-09-22 — Corpus sweep for sibling Psu-143364 titles (deploys 044–047).** Full results:
+  (a) **Family inventory completed** — all 15 rows with title numbers/areas/holders, quadruple-
+  corroborated (docs 520/669/1523/5121); now in PSU143364_FAMILY_MAP.kml header. (b) **H-44920/
+  T-2194 identity triple-confirmed** (Vicente 1931 homestead = Senen 2012 mining parcel; incl.
+  independent confirmation of the S64°48'W course). (c) **NEW: Calaburnay T-1722** (H-36999,
+  16.4337 has, CARP Psd-05-020842, CLOAs 1998) — tie-point markers added to the family map from
+  the Municipality BLLM No. 1 (registry 52594); sublot polygons withheld (closures fail 567/198 m).
+  (d) **Lot 3, Psu-143364 (T-4185) FOUND in corpus** (docs 494/628 = Allan's 2024 RD CTC; 18
+  courses, tie ~N49°17'W 3,775.97 m) but the two OCR copies contradict each other — NOT plotted;
+  heightened-OCR retry scheduled for 2026-09-23 02:00 UTC (trig_01Vu9PhjLqdziyhPBGhu67Xm), or
+  Jonathan photographs the tech-description page. (e) NOT in corpus: tech descriptions of Lots
+  2/5/10/6 and Amd. 1/7/8 (T-20754/56/57, P-1615/P-1516/P-1617) — sources: paper titles, RD, or
+  the SMD certified plan. (f) 1991 Partition Agreement (docs 510/671) mapped: T-3424 → Marilou+
+  Allan; T-4185 → Herbert; corpus doc 1487 flagged as OCR hallucination (corpus-hygiene item).
