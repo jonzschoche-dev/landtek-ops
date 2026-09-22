@@ -456,3 +456,22 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
     have no storage quota; deploy pipeline logs 035–040 in leolandtek-deploys/outbox.)
   - Weekly SMD email-watch can stand down once the attachments are in; the GE-signed
     bank-format Lot Plan + Vicinity Map (§3 STOP D) is the only remaining loan item.
+
+- **2026-09-22 (cont.) — Enclosures NOT yet in the mailbox; fees pending; AUTHORIZATION
+  ALREADY ON FILE.** Follow-through on the SMD letter (deploys 041–042, text/metadata reads):
+  - The Sept 22 email carried ONLY the transmittal letter; the Sept 21 "Survey map" emails'
+    sole attachment is IMG_9786.jpeg = **Allan's ID** from the authorization email. The
+    letter's blank "OR No. / Date / Amount Paid" block + SMD's Sept 21 note ("processing
+    the GPPC for BLBM No. 1… will inform you once ready for release") mean the GPPC
+    Certification + certified lot data computation + survey plan release **upon payment**.
+  - ⭐ **Authorization blocker CLOSED:** Sept 3, 2026 — Shishir (shiraction2@gmail.com,
+    cc jonathan@hayuma.org) sent SMD Allan's signed authorization naming JONATHAN ZSCHOCHE
+    to "request, pay for, and receive on my behalf… by email or in person," WITH Allan's ID
+    attached. On file with SMD for ~3 weeks. The held/unsigned draft authorization is moot.
+  - **Draft staged** (jonathan@hayuma.org → smd.r5@denr.gov.ph, NOT sent): cites Ref. Code
+    SMD-SCS-INC-26-172, asks assessed fees + payment mode + email release under the Sept 3
+    authorization. Jonathan reviews/sends. Phone lever: SMD hotlines 0917-139-0360 /
+    0956-241-2769, Mon–Thu 7:00–18:00.
+  - When the GPPC Certification arrives: georeference to survey grade (official monument
+    coordinates replace the tie-point-table transform), and the certified plan + lot data
+    computation complete the loan items feeding §3 STOP D (GE-signed Lot Plan + Vicinity Map).
