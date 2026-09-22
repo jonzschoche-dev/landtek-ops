@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
+<name>Psu-143364 Family Map — Inocalla holdings</name>
+<description>Master map of the Inocalla family parcels on and around Plan Psu-143364, Paracale / Jose Panganiban, Camarines Norte. Every polygon here is plotted from a validated technical description (traverse closure and area checked) anchored to the official BLBM No. 1 Batobalani monument. Grows one parcel at a time as sibling titles are transcribed and validated. Started 2026-09-22. PENDING SLOTS (awaiting clean title photos or SMD certified plan): Lot 5 (Casper Inocalla, 23.5845 has, adjoins Lot 4 west), Lot 1 (across the creek NW), Lot 3 Amd. (7.3513 has), Lot 6 (Vicente Inocalla), Lots 1/7/8 Amd. (P-1615 / P-1516 / P-1617), T-20755/T-4695 (11.1495 has), T-20757 (Lot 5, Psu-143363).</description>
+<Style id="lot4"><LineStyle><color>ff00ff00</color><width>3</width></LineStyle><PolyStyle><color>3300ff00</color></PolyStyle></Style>
+<Style id="vicente"><LineStyle><color>ffff8800</color><width>2.5</width></LineStyle><PolyStyle><color>22ff8800</color></PolyStyle></Style>
+<Style id="mon"><IconStyle><color>ff0000ff</color><scale>1.3</scale></IconStyle></Style>
+<Style id="tie"><LineStyle><color>ff00ffff</color><width>2</width></LineStyle></Style>
+<Folder><name>Titled parcels (validated)</name>
+<Placemark><name>Lot 4, Psu-143364 — OCT P-1616 (Allan V. Inocalla)</name><styleUrl>#lot4</styleUrl>
+<description>152,069 sqm / 15.2069 has. Free patent 1963 (FPA V-43979). Position: BLBM No. 1 + tie N 60°01' W × 3,508.83 m — bearing OFFICIALLY CONFIRMED by DENR SMD letter Ref. SMD-SCS-INC-26-172 (Sept 22, 2026). Traverse closure 0.07 m; area check 152,068.9 sqm. Accuracy ±20–30 m absolute (GPPC Certification pending will tighten to survey grade).</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.711924,14.249210,0 122.712017,14.250592,0 122.712577,14.248476,0 122.714503,14.247727,0 122.712449,14.245912,0 122.710968,14.246198,0 122.709553,14.245439,0 122.709333,14.247186,0 122.708962,14.247894,0 122.708599,14.247975,0 122.708093,14.247815,0 122.708028,14.248495,0 122.709930,14.248490,0 122.710740,14.249009,0 122.711930,14.248575,0 122.711924,14.249210,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Vicente Inocalla homestead (OCT 239, 1931) = Senen 2012 mining parcel</name><styleUrl>#vicente</styleUrl>
+<description>133,690 sqm / 13.3690 has. Titled to VICENTE INOCALLA (m. Beatriz Villafria) via homestead patent, OCT No. 239 registered July 6, 1931 — identity established by exact area match + course fingerprint with the 2012 Senen V. Inocalla small-scale-mining sketch plan (GE Ayton), whose validated boundary this polygon uses (closure 0.09 m). Tie N 57°49' W × 3,579.00 m from the same BLBM No. 1. Adjoins Lot 4 (shared boundary 0.1–0.2 m). Visible mine workings on 2026 Sentinel-2 imagery. [Identity: inferred_strong pending clean OCR of the 1931 title.]</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.712018,14.250588,0 122.709760,14.250227,0 122.708425,14.250753,0 122.708983,14.251367,0 122.708666,14.251582,0 122.709282,14.253032,0 122.709187,14.253314,0 122.709469,14.254100,0 122.713165,14.252740,0 122.713024,14.252336,0 122.712914,14.252328,0 122.712596,14.252182,0 122.712577,14.251859,0 122.712235,14.251551,0 122.712220,14.251254,0 122.712093,14.250994,0 122.712018,14.250588,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+</Folder>
+<Folder><name>Control monuments</name>
+<Placemark><name>BLBM No. 1, Bo. Batobalani (tie point of Psu-143364)</name><styleUrl>#mon</styleUrl>
+<description>WGS84 14.233391, 122.740090 (PTM-4 471803.27 E / 1574167.76 N; DENR CN tie-point registry id 52589, Luzon/PRS92 datum proven by 0.00 m round-trip). Named tie point of OCT P-1616 per DENR letter SMD-SCS-INC-26-172 and of the 2012 mining plan.</description>
+<Point><coordinates>122.740090,14.233391,0</coordinates></Point></Placemark>
+<Placemark><name>BLBM No. 2, Bo. Batobalani</name><styleUrl>#mon</styleUrl>
+<description>WGS84 14.233889, 122.740762 (registry id 52592). 91 m NE of No. 1 — cross-check monument.</description>
+<Point><coordinates>122.740762,14.233889,0</coordinates></Point></Placemark>
+</Folder>
+<Folder><name>Tie lines</name>
+<Placemark><name>Lot 4 tie: N 60°01' W × 3,508.83 m (DENR-confirmed)</name><styleUrl>#tie</styleUrl>
+<LineString><coordinates>122.740090,14.233391,0 122.711924,14.249210,0</coordinates></LineString></Placemark>
+<Placemark><name>Vicente/Senen tie: N 57°49' W × 3,579.00 m</name><styleUrl>#tie</styleUrl>
+<LineString><coordinates>122.740090,14.233391,0 122.712018,14.250588,0</coordinates></LineString></Placemark>
+</Folder>
+</Document></kml>
