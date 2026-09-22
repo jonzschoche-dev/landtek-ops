@@ -421,3 +421,15 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
     straight-on photo of the ORIGINAL paper sheet where Lot 4's drawn outline and two-plus
     corners are cleanly legible — then corners can be matched and the fit proven by
     residuals, not assumed.
+
+- **2026-09-22 — Weekly SMD check-in (scheduled): NO REPLY since Sept 14.** Thread
+  `1a05f76a181e92a8` re-read in full: last message remains SMD's Sept 14 referral to the
+  Land Records Section (follow up at CP 0917-139-0360). 8 days elapsed, so a polite
+  status-ask reply was STAGED AS A DRAFT in the thread (asks: research status, fees, mode
+  of payment, claiming arrangements; invites partial release / advance advice by email —
+  important now that no runner exists). NOT sent — Jonathan reviews and sends. Fastest
+  lever remains calling/texting 0917-139-0360. Allan's authorization still unsigned.
+  Housekeeping: the old check-in trigger was a one-shot that disabled itself after firing;
+  replaced with a true WEEKLY routine (Mondays 09:00 PH, trig_01NCApA2EkhpsxNF3js1EZwq)
+  carrying the current v7 state (and the overlay retraction) so future checks don't work
+  from stale v5 facts.
