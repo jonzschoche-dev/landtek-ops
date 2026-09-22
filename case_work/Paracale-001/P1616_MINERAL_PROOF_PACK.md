@@ -384,3 +384,18 @@ verification block ("THIS PLAN SHALL NOT BE USED FOR LAND REGISTRATION").
 Position of record is **v7** (see P1616_LOT_PLAN_DIRECTIVE.md OUTREACH LOG 2026-09-21):
 Lot 4 corner 1 = **14.249210 N, 122.711924 E** (WGS84), ±20–30 m absolute, relative geometry
 decimeter-grade. PENDING VERIFICATION: physical mojon GPS pin; official plan copies from LMS.
+
+### A8-b. ⭐ The Senen 2012 mining parcel IS Vicente Inocalla's 1931 HOMESTEAD TITLE **[inferred_strong — area exact-match + course fingerprint; original doc 634 in corpus, PENDING heightened-OCR verification]**
+
+Corpus doc 634 ("Calaburnay.pdf") contains an old transfer title tracing to **OCT No. 239,
+registered July 6, 1931** (homestead patent, Act 2875, granted March 20, 1931), in the name
+of **VICENTE INOCALLA, married to Beatriz Villafria**, Paracale — area **13.3690 has =
+133,690 sqm, EXACTLY the stated area of the Senen V. Inocalla 2012 mining-permit parcel
+(§A8)**. The garbled OCR course list shares distinctive values with the 2012 plan's boundary
+(41.66, 90.82, 33.04, S64°48'/37.5x, S25°27', S10°0x'/45.x; ~16 corners; creek boundaries
+"Banuit Munti Creek" E / "Pasilladay Creek"). Conclusion (pending clean OCR of doc 634): the
+2012 small-scale-mining application parcel adjoining Lot 4 is Vicente's TITLED 1931 homestead
+— three generations of documented family tenure (1931 homestead → 2012 mining application →
+2026 visible workings on satellite) on the parcel adjoining OCT P-1616. Chain: OCT 239 →
+TCT 146 → 1958 transfer (doc 634; number partly illegible — possibly T-1722 per the CARP
+schedule rows "Vicente Inocalla T-1722"). Verify at RD when convenient.
