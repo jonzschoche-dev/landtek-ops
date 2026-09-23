@@ -514,3 +514,15 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   with lot data computations — one combined fee assessment with the Psu-143364 set + GPPC.
   These two sheets + the original plan unlock 7 parcels on the acquisition list in one release.
   NOT sent — Jonathan reviews and sends.
+
+- **2026-09-23 — Scheduled heightened-OCR run (deploy 048): FAILED VALIDATION — nothing plotted.**
+  gemini-2.5-flash still unavailable (slot 0: 429 quota; slots 1–2: **402 Payment Required —
+  those two API keys need billing attention, standing infra issue**). The fallback
+  gemini-2.5-flash-lite responded but its transcriptions are provably unreliable: for doc 494
+  (T-4185) it produced courses contradicting BOTH tesseract copies, an invalid bearing
+  ("S.28°70'"), and a wrong municipality; for doc 628 it transcribed a different property
+  entirely (a Psd-15647 grid of 993.90-sqm lots, looping) — hallucination. Per the
+  no-guessing rule, Lot 3 stays unplotted. **Machine-OCR path exhausted for T-4185: the
+  unlocks are (a) Jonathan's photo of the T-4185 technical-description page (2024 RD CTC in
+  hand, Ref. 2024003960) or (b) the SMD certified plan.** No new SMD mail overnight (only the
+  weekly digest). No further OCR retries scheduled — the 402s won't self-heal.
