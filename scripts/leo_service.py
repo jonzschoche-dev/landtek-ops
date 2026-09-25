@@ -61,22 +61,56 @@ SYSTEM = ("You are Leo for LandTek (Philippine land/property ops, Camarines Nort
           "State a date/docket/title/amount/name ONLY if it appears below. "
           "If ungrounded: say so in one sentence — never invent.")
 
+try:
+    import leo_config as _lcfg                 # leo_config@N (Improvement Lab, spec Part II A1)
+except Exception:
+    _lcfg = None
 
-def _llm(prompt, temp=0.2):
+# leo_config@N defaults — EXACTLY the hardcoded behavior above. The active leo_config row overrides them;
+# scripts/improvement_lab.py A/Bs candidates against it. Floors (answer gate, stack-first inquiry gate,
+# A5/A21/A25/A79) are code above the config and cannot be reached from here.
+DEFAULT_CONFIG = {
+    "prompt_set": {"system": SYSTEM},
+    "model_selection": {"model": MODEL, "temperature": 0.2, "seed": None},
+    "retrieval_params": {"facts_hit_limit": 12, "facts_recent_limit": 8, "facts_total": 16,
+                         "facts_fallback_limit": 12},
+    "memory_context_assembly": {"recent_turns": 10},
+    "routing": {"mprb_brief": True},
+    "tool_manifest": {"exposed": ["purpose_route", "matter_brief"]},
+    "recipient_projection": {"strip_fluff": True},
+}
+
+
+def active_config(cur):
+    """(body, hash) of the active leo_config; the defaults (hash None) when there is none. Never raises."""
+    if _lcfg is None:
+        return DEFAULT_CONFIG, None
+    try:
+        return _lcfg.load_active(cur, DEFAULT_CONFIG)
+    except Exception:
+        return DEFAULT_CONFIG, None
+
+
+def _llm(prompt, temp=0.2, model=None, seed=None):
     """Local Ollama, $0 sovereign. Raises on unreachable (caller degrades)."""
-    body = {"model": MODEL, "stream": False, "options": {"temperature": temp}, "prompt": prompt}
+    opts = {"temperature": temp}
+    if seed is not None:
+        opts["seed"] = seed
+    body = {"model": model or MODEL, "stream": False, "options": opts, "prompt": prompt}
     req = urllib.request.Request(OLLAMA_URL + "/api/generate", data=json.dumps(body).encode(),
                                  headers={"content-type": "application/json"}, method="POST")
     with urllib.request.urlopen(req, timeout=180) as r:
         return json.loads(r.read()).get("response", "").strip()
 
 
-def _grounded_facts(cur, client_code, message=""):
+def _grounded_facts(cur, client_code, message="", rp=None):
     """A5-safe verified facts for the client FAMILY, RELEVANCE-first then recent.
 
     Old behavior (ORDER BY updated_at LIMIT 12) made Leo 'unaware' of ARTA/OP
     while 4000+ verified facts existed — the window simply never included them.
+    Window sizes come from leo_config retrieval_params (rp).
     """
+    rp = rp or DEFAULT_CONFIG["retrieval_params"]
     fam = (client_code or "").split("-")[0]
     if not fam:
         return []
@@ -96,7 +130,7 @@ def _grounded_facts(cur, client_code, message=""):
                WHERE matter_code LIKE %s AND provenance_level='verified'
                  AND source_id ~ '^[0-9]+$'
                  AND ({clauses})
-               ORDER BY updated_at DESC LIMIT 12
+               ORDER BY updated_at DESC LIMIT %s
             ) hit
             UNION ALL
             SELECT statement, source_id, provenance_level FROM (
@@ -104,11 +138,12 @@ def _grounded_facts(cur, client_code, message=""):
                 FROM matter_facts
                WHERE matter_code LIKE %s AND provenance_level='verified'
                  AND source_id ~ '^[0-9]+$'
-               ORDER BY updated_at DESC LIMIT 8
+               ORDER BY updated_at DESC LIMIT %s
             ) rec
-            LIMIT 16
+            LIMIT %s
         """
-        cur.execute(sql, [fam + "%"] + [f"%{t}%" for t in toks] + [fam + "%"])
+        cur.execute(sql, [fam + "%"] + [f"%{t}%" for t in toks] + [rp["facts_hit_limit"], fam + "%",
+                    rp["facts_recent_limit"], rp["facts_total"]])
         rows = cur.fetchall()
         seen, out = set(), []
         for r in rows:
@@ -117,12 +152,12 @@ def _grounded_facts(cur, client_code, message=""):
                 continue
             seen.add(k)
             out.append(r)
-        return out[:16]
+        return out[:rp["facts_total"]]
     cur.execute("""SELECT statement, source_id, provenance_level
                      FROM matter_facts
                     WHERE matter_code LIKE %s AND provenance_level='verified'
                       AND source_id ~ '^[0-9]+$'
-                    ORDER BY updated_at DESC LIMIT 12""", (fam + "%",))
+                    ORDER BY updated_at DESC LIMIT %s""", (fam + "%", rp["facts_fallback_limit"]))
     return cur.fetchall()
 
 
@@ -224,8 +259,9 @@ def _recent_turns(cur, channel, channel_user_id, before_id=None, limit=10):
 
 
 def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None, inbound_msg_id=None,
-                  internal_context=None, relationship_profile=None, relationship_tending=None):
-    facts = _grounded_facts(cur, client_code, message=message or "")
+                  internal_context=None, relationship_profile=None, relationship_tending=None, config=None):
+    cfg = config or DEFAULT_CONFIG
+    facts = _grounded_facts(cur, client_code, message=message or "", rp=cfg["retrieval_params"])
     fblock = "\n".join(f"- (doc:{f['source_id']}) {f['statement']}" for f in facts) or "(none on record yet)"
     c = ctx.recent_context(cur, None, client_code)
     items = "\n".join(f"- {a['description']} (due {a['due_date'] or 'n/a'})"
@@ -254,7 +290,8 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
         else:
             who = f"WHO YOU'RE TALKING TO: {name or 'a contact'} (role: {role}). Address them by name if known."
             label = name or "them"
-        convo = _recent_turns(cur, channel, channel_user_id, before_id=inbound_msg_id)
+        convo = _recent_turns(cur, channel, channel_user_id, before_id=inbound_msg_id,
+                              limit=cfg["memory_context_assembly"]["recent_turns"])
     # Wire existing readiness/prep/parties into operator (and counsel/client) context — no new stack
     prop_block = _property_context(cur, client_code, message) if (is_op or client_code) else ""
     rel = ""
@@ -271,7 +308,7 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
             tend = f"\n{tblock}\n" if tblock else ""
         except Exception:
             tend = ""
-    return (f"{SYSTEM}\n\n{who}\n{eq}{mprb}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n"
+    return (f"{cfg['prompt_set']['system']}\n\n{who}\n{eq}{mprb}{rel}{tend}\nGROUNDED FACTS (cite as doc:ID):\n{fblock}\n"
             f"{prop_block}\n"
             f"OPEN ITEMS FOR THIS CLIENT:\n{items}\n\n"
             f"CONVERSATION SO FAR (most recent last — remember it, don't repeat yourself):\n{convo}\n\n"
@@ -279,18 +316,24 @@ def _build_prompt(cur, client_code, message, channel=None, channel_user_id=None,
 
 
 def generate_reply(cur, channel, channel_user_id, message, client_code, internal_context=None,
-                   relationship_profile=None, inbound_msg_id=None, relationship_tending=None):
+                   relationship_profile=None, inbound_msg_id=None, relationship_tending=None, config=None,
+                   dry_run=False):
     """PURE generation for orchestrators — but inquiries MUST hit corpus first.
 
     For is_inquiry(message): only try_purpose_route (tables + reasoning). Never free LLM.
     For non-inquiry (greetings / vault narrative): grounded LLM still allowed.
+    `config` = a leo_config body (the Improvement Lab passes candidates); None → the active config.
+    `dry_run` = no writeback from the inquiry stack (the Lab rolls the caller's transaction back).
     Returns {text, verdict, remediated, via?} or {text:None, error:...}.
     """
+    if config is None:
+        config, _ = active_config(cur)
+    ms = config["model_selection"]
     # ── HARD GATE: corpus/reasoning before any freestyle model text ──
     if client_code and is_inquiry(message or ""):
         try:
             route = try_purpose_route(cur, client_code, message or "",
-                                      channel=channel, channel_user_id=channel_user_id)
+                                      channel=channel, channel_user_id=channel_user_id, dry_run=dry_run)
             if route and route.get("text"):
                 return {
                     "text": route["text"],
@@ -310,9 +353,9 @@ def generate_reply(cur, channel, channel_user_id, message, client_code, internal
         }
 
     prompt = _build_prompt(cur, client_code, message, channel, channel_user_id, inbound_msg_id,
-                           internal_context, relationship_profile, relationship_tending)
+                           internal_context, relationship_profile, relationship_tending, config=config)
     try:
-        candidate = _llm(prompt)
+        candidate = _llm(prompt, temp=ms["temperature"], model=ms["model"], seed=ms.get("seed"))
     except Exception as e:
         return {"text": None, "error": f"ollama_unreachable:{type(e).__name__}"}
     try:
@@ -328,11 +371,12 @@ def generate_reply(cur, channel, channel_user_id, message, client_code, internal
 
 def _log(cur, **kw):
     kw.setdefault("order", None)
+    kw.setdefault("cfg_hash", None)
     cur.execute("""INSERT INTO leo_shadow_replies
         (inbound_msg_id, channel, channel_user_id, client_code, candidate_internal, verdict, fails,
-         warns_n, remediated, would_send_human, guard_class, model, action, reason, order_id)
+         warns_n, remediated, would_send_human, guard_class, model, action, reason, order_id, leo_config_hash)
         VALUES (%(msg)s,%(channel)s,%(uid)s,%(client)s,%(cand)s,%(verdict)s,%(fails)s,%(warns)s,
-                %(remed)s,%(human)s,%(guard)s,%(model)s,%(action)s,%(reason)s,%(order)s)
+                %(remed)s,%(human)s,%(guard)s,%(model)s,%(action)s,%(reason)s,%(order)s,%(cfg_hash)s)
         ON CONFLICT (inbound_msg_id) WHERE inbound_msg_id IS NOT NULL DO NOTHING""", kw)
 
 
@@ -537,7 +581,7 @@ def _unknown_identifier_gate(cur, message):
     return None
 
 
-def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=None):
+def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=None, dry_run=False):
     """Corpus + reasoning FIRST. Every inquiry is stack-bound.
 
     channel/channel_user_id are OPTIONAL sender identity — identity-gated routes (Drive) fire only
@@ -546,6 +590,8 @@ def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=N
     Returns None only for non-inquiries (chitchat / vault narrative).
     For inquiries: always returns a pack — either stack hit or fail-closed.
     Free LLM must never invent property/legal facts (T-52540 PA-T disaster).
+    dry_run=True (Improvement Lab): the inquiry stack runs on `cur` with writeback off, so a caller that
+    rolls back leaves no inquiry_runs / atoms / agent jobs / facts behind.
     """
     if not client_code or not (message or "").strip():
         return None
@@ -636,7 +682,8 @@ def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=N
     try:
         import inquiry_stack as ist
         pack = ist.try_inquiry_stack(
-            cur, client_code, message, go=True, force=inquiry,
+            cur, client_code, message, go=not dry_run, force=inquiry,
+            eval_cur=cur if dry_run else None,
         )
         if pack and pack.get("text"):
             return _emit(
@@ -702,9 +749,11 @@ def _deliver_preformed(cur, base, channel, channel_user_id, client, pack, via):
 
 def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
     """Run the full spine for one message. SHADOW: logs, never sends. Returns the ledger dict."""
-    base = dict(msg=inbound_msg_id, channel=channel, uid=str(channel_user_id), model=MODEL,
+    cfg, cfg_hash = active_config(cur)
+    ms = cfg["model_selection"]
+    base = dict(msg=inbound_msg_id, channel=channel, uid=str(channel_user_id), model=ms["model"],
                 cand=None, verdict=None, fails=None, warns=0, remed=False, human=None,
-                guard=None, reason=None, order=None)
+                guard=None, reason=None, order=None, cfg_hash=cfg_hash)
     # A25 resolve-or-HOLD: never answer with a guessed client's context
     client = coord.client_of(cur, channel, channel_user_id)
     if not client:
@@ -733,15 +782,16 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
     # MPRB prompt block for LLM path (angles selected; not a full dump) — chitchat / narrative only
     mprb_block = ""
     try:
-        import matter_brief as mb
-        brief = mb.assemble_for_message(cur, client, message or "")
-        if brief:
-            mprb_block = mb.render(brief) or ""
+        if cfg["routing"]["mprb_brief"]:
+            import matter_brief as mb
+            brief = mb.assemble_for_message(cur, client, message or "")
+            if brief:
+                mprb_block = mb.render(brief) or ""
     except Exception as e:
         print(f"[leo_service] mprb assemble: {type(e).__name__}: {e}", flush=True)
 
     try:
-        prompt = _build_prompt(cur, client, message, channel, channel_user_id, inbound_msg_id)
+        prompt = _build_prompt(cur, client, message, channel, channel_user_id, inbound_msg_id, config=cfg)
         if mprb_block:
             prompt = prompt.replace(
                 "GROUNDED FACTS (cite as doc:ID):",
@@ -749,7 +799,7 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
                 f"{mprb_block}\n\nGROUNDED FACTS (cite as doc:ID):",
                 1,
             )
-        candidate = _llm(prompt)
+        candidate = _llm(prompt, temp=ms["temperature"], model=ms["model"], seed=ms.get("seed"))
     except Exception as e:
         _log(cur, **{**base, "client": client, "action": "ollama_unreachable",
                      "reason": f"{type(e).__name__}: {str(e)[:160]}"})
@@ -766,7 +816,8 @@ def process(cur, channel, channel_user_id, message, inbound_msg_id=None):
         # + short-by-construction routers. S14 applies on Telegram send for Jonathan.
         try:
             from distill import strip_fluff, prefer_conclusion, EMISSION_CAP
-            human = strip_fluff(human)
+            if cfg["recipient_projection"]["strip_fluff"]:
+                human = strip_fluff(human)
             if len(human) > EMISSION_CAP:
                 human = prefer_conclusion(human, EMISSION_CAP)
         except Exception:

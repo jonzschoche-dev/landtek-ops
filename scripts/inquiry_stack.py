@@ -1675,10 +1675,16 @@ def run_inquiry(
     role: str = None,
     go: bool = False,
     drain: bool = False,
+    eval_cur=None,
 ) -> dict:
+    """eval_cur: run on the CALLER's cursor instead of an own autocommit connection (Improvement Lab
+    dry runs — the caller rolls the transaction back, so the run leaves nothing behind)."""
     t0 = time.time()
-    c = _conn()
-    cur = _cur(c)
+    if eval_cur is not None:
+        c, cur = None, eval_cur
+    else:
+        c = _conn()
+        cur = _cur(c)
     norm = re.sub(r"\s+", " ", (message or "").lower()).strip()
 
     # Double-fire guard: channel handlers invoke the stack twice per inbound
@@ -1699,8 +1705,9 @@ def run_inquiry(
     )
     dup = cur.fetchone()
     if dup:
-        cur.close()
-        c.close()
+        if c is not None:
+            cur.close()
+            c.close()
         return {
             "inquiry_id": dup["id"],
             "text": dup["answer_text"] or "",
@@ -1789,8 +1796,9 @@ def run_inquiry(
         ),
     )
 
-    cur.close()
-    c.close()
+    if c is not None:
+        cur.close()
+        c.close()
     return {
         "inquiry_id": inquiry_id,
         "text": ans["text"],
@@ -1919,6 +1927,7 @@ def try_inquiry_stack(cur, client_code: str, message: str, **kwargs) -> Optional
         role=kwargs.get("role"),
         go=go,
         drain=kwargs.get("drain", False),
+        eval_cur=kwargs.get("eval_cur"),
     )
     return {
         "text": result["text"],

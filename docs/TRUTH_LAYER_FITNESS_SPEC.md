@@ -230,6 +230,17 @@ off) · `findability_never_demotes_grounding` (a planted retrieval miss leaves g
 The Lab is **not** built in v1. This appendix is **binding**: the foundation above is built to these interfaces
 so the Lab plugs in **without redesign**.
 
+> **BUILT 2026-09-26 (deploy_1091).** `leo_config` + `scripts/leo_config.py` (A1/A2 — schema whitelist, floor
+> gate in Python AND a DB CHECK, immutable content-addressed bodies, one active row) · `leo_service` reads the
+> active config per message (defaults = the previously hardcoded behavior, byte-for-byte) ·
+> `scripts/improvement_lab.py` (A3 A/B on the real spine inside always-rolled-back transactions — the inquiry
+> stack runs on the caller's cursor with writeback off; §6 battery; A4 verdict; A5 content-hashed report,
+> `--promote` requires `--approved-by jonathan`, rollback pointer + append-only audit; A6 `lab_experience`) ·
+> A7 re-point (`leo_improvement_proposals.patch_kind='leo_config'`; the n8n applier refuses those rows) ·
+> A8 fingerprint (a world that moves mid-run → `not_comparable`). Guardrails: `truth_tests/test_improvement_lab.py`.
+> Eval-set hygiene added: a "must not exist" mutation is verified absent before seeding and retired
+> (`eval_scenario.retired_reason`) if the title later appears; the scorer marks such a scenario n/a, never a failure.
+
 ### A1. `leo_config@N` — what a versioned assistant is
 
 A row in a new `leo_config` table, content-addressed by `config_hash`, versioning **exactly**:

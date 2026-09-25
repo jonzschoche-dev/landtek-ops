@@ -147,6 +147,9 @@ def main():
         print(f"proposal #{pid} not found"); sys.exit(2)
     if p["status"] not in ("pending", "approved"):
         print(f"proposal #{pid} status is {p['status']!r} — refusing to apply"); sys.exit(2)
+    if p["patch_kind"] == "leo_config":
+        print(f"proposal #{pid} is a leo_config candidate — it is applied by the Improvement Lab "
+              f"(scripts/improvement_lab.py --ab / --promote), never by patching the n8n node."); sys.exit(2)
 
     print(f"━━━ Proposal #{pid} — {p['failure_pattern']} ━━━")
     print(f"  kind:        {p['patch_kind']}")
