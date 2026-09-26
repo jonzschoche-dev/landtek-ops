@@ -10,10 +10,10 @@ The properties over which administration is presently sought are the two below. 
 
 | No. | Property | Description | Area | Registration | Standing |
 |---|---|---|---|---|---|
-| G-1 | **TCT No. T-2194** | H-44920, San Rafael, Jose Panganiban, Camarines Norte | 13.3690 ha | In the name of Vicente Inocalla per the family's title inventory; certified copy applied for | A 2014 levy and scheduled execution sale affecting the interest of the late Senen Inocalla in it are of record; its present registration and possession are to be verified at the Registry. No person presently holds authority to protect the estates' interest in it or to receive its fruits |
+| G-1 | **TCT No. T-2194** | Plan H-44920, Barrio Batobalani, Paracale, Camarines Norte; originally registered 6 July 1931 as OCT No. 250 on a homestead patent; entered as T-2194 on 25 March 1958 | 13.3690 ha | In the name of Vicente Inocalla, married to Beatriz Villafria, per the certified copy issued by the Registry of Deeds of Camarines Norte on 11 July 2024 (Annex "G-1"); the last entry on the memorandum of encumbrances in petitioner's hands is a cancellation of mortgage inscribed 21 February 1994 | A 2014 levy and scheduled execution sale upon the interest of the late Senen Inocalla in it are of record; what was done under them, and the parcel's possession, are to be verified against the Registry's complete record. No person presently holds authority to protect the estates' interest in it or to receive its fruits |
 | G-2 | **TCT No. (44055) 002-2026001670** | Lot 6, Sub-Block 16, Psd-1554, District of Santa Ana, City of Manila, with the four-storey, ten-unit apartment building at 2531 G. Del Pilar Street | 203 sq m | In the name of Beatriz V. Inocalla, married to Vicente Inocalla, restored 16 April 2026 by the Register of Deeds of Manila in execution of the final judgment in Civil Case No. 13-131220 (Annex "C") | In the possession of the persons named in ¶ 5 of the petition, who claim under the cancelled title; its rents are not received by the estates |
 
-The assessed values of the two properties, from the current tax declarations of the City of Manila and the Municipality of Jose Panganiban, will be supplemented to this schedule for the assessment of the docket fee.
+The assessed values of the two properties, from the current tax declarations of the City of Manila and the Municipality of Paracale, will be supplemented to this schedule for the assessment of the docket fee.
 
 <!-- filing:skip -->
 <!-- HELD FOR EXPANSION (operator, 2026-09-26: "I think 2194 and Vito Cruz are enough").
@@ -48,7 +48,7 @@ Compromise/Partition Agreement executed 24 January 1992; approved by the Court 2
 |---|---|---|---|---|
 | T-3897, Lot 1 Psu-152027 | Vicente Inocalla | 23.0935 | A-1 | Estate res; award unregistered |
 | T-5656, Lot 2-B Psd-56979 | Vicente Inocalla, Sr. | 19.7727 | A-3 | Estate res; award unregistered |
-| T-2194, H-44920 | Vicente Inocalla / (Senen) | 13.3690 | To verify | A 2014 levy and scheduled execution sale affecting Senen's interest are of record; whether the parcel was a partition award, and the result of the sale, to be verified at the Registry |
+| T-2194, H-44920, Batobalani, Paracale | Vicente Inocalla m. Beatriz Villafria [V RD CamNorte CTC 11 Jul 2024, pp. 1–4 of 5] | 13.3690 | Senen's award [V sheriff's notice 7 Apr 2014] | Estate res on the title; award unregistered; 2014 levy on Senen's awardee interest (result unknown — CTC page 5 not scanned); DARAB tenancy of Mauro Bombita Sr. over ~2,000 sq m, CA affirmed 19 Oct 2023, SC G.R. 274321 pending (Radj for Senen); DARCO 2008 CARP exclusion as mineral land |
 | ARP 021-0312, Lot 6 Psu-143364 | Vicente Inocalla (tax declaration only) | 18.0003 | — | Estate res, untitled |
 | T-3424, Lot 1 Psu-152156 | Beatriz Villafria (Marilou & Allan) | 22.5178 | — | Beatriz's estate; not partitioned |
 | T-4185, Lot 3 Psu-143364 | Beatriz Villafria (Herbert) | 11.3042 | — | Beatriz's estate; not partitioned |

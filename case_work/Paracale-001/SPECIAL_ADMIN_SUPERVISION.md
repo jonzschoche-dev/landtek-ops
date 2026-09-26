@@ -115,7 +115,7 @@ Each line is drawn from a document we hold. "Verified" here means *the document 
 | TCT T-3897 (Lot 1, Psu-152027) | Vicente Inocalla | 23.0935 ha | partition-*awarded* to Cipriana/Vicente Jr./Jesus but **title never moved** |
 | TCT T-5656 (Lot 2-B, Psd-56979) | Vicente Inocalla, **Sr.** | 19.7727 ha | (associated: Herbert & Senen) |
 | Lot 6, ARP 021-0312 | Vicente Inocalla | 18.0003 ha | **tax dec only** — no Torrens title; weakest tenure |
-| TCT T-2194 (H-44920) | Vicente Inocalla | 13.3690 ha | ⚠ **doc 630 (2014): "TCT No. 2194… registered in the name of defendant Senen Inocalla" was scheduled for PUBLIC AUCTION 2014-05-21** to execute the 98-88750 judgment — title may have moved to Senen and then been levied/sold. **Verify current status before counting it in the estate.** |
+| TCT T-2194 (H-44920), Batobalani, Paracale | Vicente Inocalla m. Beatriz Villafria | 13.3690 ha | **Verified 2026-09-26 from the RD CamNorte CTC of 11 Jul 2024: still in Vicente's name.** The 2014 levy was on Senen's *awardee interest* under the 1992 partition (sheriff's notice 7 Apr 2014), not on a title in her name; sale result unknown (CTC page 5 not scanned). See dossier §2/§8-B. |
 | **Subtotal in decedent's name** | | **≈ 74.6 ha** | the estate res |
 | + 4 DBP lots (T-20754/55/56/57) | DBP / (Casper Inocalla) | ≈ 64 ha | **claimed for the estate via Casper's pledge-back (operator-grade, §5-G)** — instrument + DBP status unverified |
 
@@ -140,7 +140,7 @@ The heirs' **P-series patent titles** (P-1615/1616/1617/1516) are original State
 | **"Ereneo Agon"** (branch) | — | Heirs of Ereneo Agon | ⚠ **NEW co-owner branch** (Final SPA + adjudicated TCT 885, 23.76 ha). Not a sibling — identify the relationship (in-law? earlier co-heir?). Must be named. |
 
 **What this resolves & what it flips:**
-- **The heirless death is SENEN, not Vicente Jr.** (my earlier hypothesis was wrong). Senen died without issue → her share (incl. the two DBP lots pledged to her) accretes to the collateral line. **"No heirs" still needs formal proof for the petition:** PSA death cert + CENOMAR + disinterested-person affidavits.
+- ~~**The heirless death is SENEN.**~~ **Withdrawn 2026-09-26:** Senen is survived by her son **Radj Gymson Inocalla** ("sole heir and surviving child", SC G.R. 274321). Her share, the T-2194 award and the DBP earmarks pass to him. No CENOMAR needed; PSA death cert only.
 - **Ace claims *through* Vicente Jr., who has 5 children** — so the fight is Ace's specific filiation/legitimacy, not whether the branch has heirs. "25 hectares controlled by ACE" = active adverse possession to break.
 - **Consent map:** SPAs in hand or indicated for Jesus, Marilou, Herbert, + reps for Senen (Radj Gymson) and Francisco (Remedios). **Gaps: Cipriana's branch (7 heirs, no SPA), Casper's branch (wife+4), Vicente Jr.'s branch (contested via Ace), Melvin's branch, Ereneo Agon's branch.** A clean petition needs every branch named and (ideally) consenting.
 
