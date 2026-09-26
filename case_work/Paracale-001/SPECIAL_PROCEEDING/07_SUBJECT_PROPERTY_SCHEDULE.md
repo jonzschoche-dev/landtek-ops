@@ -6,9 +6,27 @@
 
 ## ANNEX "G" — SCHEDULE OF SUBJECT PROPERTIES
 
+The properties over which administration is presently sought are the two below. The compromise partition among the heirs approved by the Regional Trial Court of Camarines Norte, Branch 41, Daet, on 28 January 1992 in Civil Case No. B-5625 (also cited as 5626), Certificate of Finality 26 March 2014 (Annex "D"), was never carried into the certificates of title; neither property below was transferred out of the decedents' names under it. Other property of the decedents will be brought in by the inventory under Rule 83.
+
+| No. | Property | Description | Area | Registration | Standing |
+|---|---|---|---|---|---|
+| G-1 | **TCT No. T-2194** | H-44920, San Rafael, Jose Panganiban, Camarines Norte | 13.3690 ha | In the name of Vicente Inocalla per the family's title inventory; certified copy applied for | A 2014 levy and scheduled execution sale affecting the interest of the late Senen Inocalla in it are of record; its present registration and possession are to be verified at the Registry. No person presently holds authority to protect the estates' interest in it or to receive its fruits |
+| G-2 | **TCT No. (44055) 002-2026001670** | Lot 6, Sub-Block 16, Psd-1554, District of Santa Ana, City of Manila, with the four-storey, ten-unit apartment building at 2531 G. Del Pilar Street | 203 sq m | In the name of Beatriz V. Inocalla, married to Vicente Inocalla, restored 16 April 2026 by the Register of Deeds of Manila in execution of the final judgment in Civil Case No. 13-131220 (Annex "C") | In the possession of the persons named in ¶ 5 of the petition, who claim under the cancelled title; its rents are not received by the estates |
+
+The assessed values of the two properties, from the current tax declarations of the City of Manila and the Municipality of Jose Panganiban, will be supplemented to this schedule for the assessment of the docket fee.
+
+<!-- filing:skip -->
+<!-- HELD FOR EXPANSION (operator, 2026-09-26: "I think 2194 and Vito Cruz are enough").
+     The full schedule below — the 1992 partition awards, the cross-reference of all 19
+     current titles, the Undertaking of Casper V. Inocalla, and the heirs' own property
+     list — stays OUT of the filing copy. To restore it, move this filing:skip line to
+     just before "HELD — THE UNDERTAKING". -->
+
+## HELD — FULL SCHEDULE OF SUBJECT PROPERTIES
+
 ### A. THE JUDICIAL PARTITION — Civil Case No. B-5625 (also cited as 5626), RTC Camarines Norte, Branch 41, Daet
 
-Compromise/Partition Agreement executed 24 January 1992; approved by the Court 28 January 1992; Certificate of Finality 26 March 2014. Parties: nine of the children of Vicente Inocalla, Sr. and Beatriz Villafria Inocalla, and the Heirs of Melvyn Inocalla by their attorney-in-fact. The instrument contains **no clause concerning the DBP lots**; those are the subject of Part B.
+Compromise/Partition Agreement executed 24 January 1992; approved by the Court 28 January 1992; Certificate of Finality 26 March 2014. Parties: nine of the children of Vicente Inocalla, Sr. and Beatriz Villafria Inocalla, and the Heirs of Melvyn Inocalla by their attorney-in-fact.
 
 | No. | Property | Description | Area | Awarded to | Registration after the award | Source |
 |---|---|---|---|---|---|---|
@@ -22,9 +40,40 @@ Compromise/Partition Agreement executed 24 January 1992; approved by the Court 2
 
 **The A-7 covenant, as the partition records it.** The claims — Venecia, Naga, Pennsylvania, Braddock, Virginia, Pittsburg, Manila, Corregidor, Chico, Vallejo, Daet, Pasacao and Latrobe — were assigned by Vicente Sr. to Casper on 2 November 1984, and the partition recognises the assignment. Casper, and Jesus on his incapacity, maintain the claims and may contract operators, **subject to** (i) the approval of a **majority** of the named heirs for any operating contract, and (ii) the division of royalties and proceeds among **all** the heirs on a stated schedule: Casper; Jesus; a professional share to Nourhalma Uriarte; a sales commission; a reserve for taxes; occupation fees; and the remaining eight heirs in equal shares. The percentages are deliberately not stated here; they are to be certified from the original before they are pleaded anywhere.
 
-**What the partition did not reach:** the Manila building (TCT 44055, restored 16 April 2026); the four DBP lots (Part B); TCT T-3424 (22.5178 ha), TCT T-4185 (11.3042 ha), the tax-declared parcel Lot 6, Psu-143364 (18.0003 ha), and the further tax-declared parcels in the family's 2024 list; liquidation of the conjugal partnership; estate tax; and the shares of heirs who have since died.
+**What the partition did not reach:** the Manila building (TCT 44055, restored 16 April 2026); TCT T-3424 (22.5178 ha), TCT T-4185 (11.3042 ha) and the tax-declared parcel Lot 6, Psu-143364 (18.0003 ha); liquidation of the conjugal partnership; estate tax; and the shares of heirs who have since died.
 
-### B. THE UNDERTAKING OF CASPER V. INOCALLA — Batobalani, Paracale, 25 August 1985
+### B. CROSS-REFERENCE — the family's current title inventory against Part A
+
+| Title / parcel | Registered owner per inventory | Area | Under A? | Position |
+|---|---|---|---|---|
+| T-3897, Lot 1 Psu-152027 | Vicente Inocalla | 23.0935 | A-1 | Estate res; award unregistered |
+| T-5656, Lot 2-B Psd-56979 | Vicente Inocalla, Sr. | 19.7727 | A-3 | Estate res; award unregistered |
+| T-2194, H-44920 | Vicente Inocalla / (Senen) | 13.3690 | To verify | A 2014 levy and scheduled execution sale affecting Senen's interest are of record; whether the parcel was a partition award, and the result of the sale, to be verified at the Registry |
+| ARP 021-0312, Lot 6 Psu-143364 | Vicente Inocalla (tax declaration only) | 18.0003 | — | Estate res, untitled |
+| T-3424, Lot 1 Psu-152156 | Beatriz Villafria (Marilou & Allan) | 22.5178 | — | Beatriz's estate; not partitioned |
+| T-4185, Lot 3 Psu-143364 | Beatriz Villafria (Herbert) | 11.3042 | — | Beatriz's estate; not partitioned |
+| TCT (44055) 002-2026001670, Manila | Beatriz V. Inocalla m. to Vicente Inocalla | 203 sq m + building | — | Beatriz's estate; restored 16 April 2026 |
+| T-20754, Lot 2 Psu-14364 | DBP / (Casper) | 10.2928 | — | Recorded to the Development Bank of the Philippines per the inventory; not the decedents' property of record |
+| T-20755, H-128572 | DBP / (Casper) | 11.1486 | — | Recorded to the Development Bank of the Philippines per the inventory; not the decedents' property of record |
+| T-20756, Lot 10 Psu-143364 | DBP / (Casper) | 18.9591 | — | Recorded to the Development Bank of the Philippines per the inventory; not the decedents' property of record |
+| T-20757, Lot 5 Psu-143363 Amd. | DBP / (Casper) | 23.5845 | — | Recorded to the Development Bank of the Philippines per the inventory; not the decedents' property of record |
+| T-29841, Lot 9-A Psd-05-012242 | Marilou Inocalla | 2.3513 | — | Marilou's own |
+| P-1615, Lot 1 Psu-143364 Amd. | Cipriana Inocalla | 23.0238 | — | Patent title; outside the estate |
+| P-1616, Lot 4 Psu-143364 | Allan Inocalla | 15.2069 | — | Patent title; outside the estate |
+| P-1617, Lot 8 Psu-143364 Amd. | Jesus Inocalla | 23.4356 | — | Patent title; outside the estate |
+| P-1516, Lot 7 Psu-143364 Amd. | Vicente Inocalla, Jr. | 22.8024 | — | Patent title; Vicente Jr.'s own estate |
+| TCT 1722, Lot 1, Calaburnay | Not in inventory | 16.43 | A-2 | To be searched at the Registry |
+| T-1827, Malaguit | Not in inventory | 8.12 | A-4 | To be searched at the Registry |
+| Labo lot, Gumamela | Not in inventory | 534 sq m | A-5 | Title status and Civil Case No. 4992 to be established |
+
+<!-- HELD FOR EXPANSION (operator, 2026-09-26: "leave it narrow without divulging all ...
+     we can go after Senen's properties if they have not been retitled as well as Vito Cruz").
+     The Undertaking and the heirs' own list stay OUT of the filing copy. Rationale: the
+     Undertaking tells Casper's heirs (who run the mining) that conveyance will be compelled,
+     and the heirs' list pleads ~165 ha and a Camarines Sur ricefield with no paper. Neither
+     is needed for a Rule 80 order. To restore either, move the /filing:skip line. -->
+
+### HELD — THE UNDERTAKING OF CASPER V. INOCALLA — Batobalani, Paracale, 25 August 1985
 
 Executed before two witnesses; notarial acknowledgment not visible on the face (reverse to be checked). Casper, former owner of four parcels **mortgaged to the Development Bank of the Philippines, Daet Branch, and foreclosed**, title then in DBP, the parcels **being repurchased in his name on instalment**, undertakes **to transfer and convey** each parcel to the named sibling, or to persons designated by them, **after the lands have been fully paid to DBP**. The repurchase is stated by the family to have been fully paid; the DBP certificate of full payment has not yet been obtained.
 
@@ -36,33 +85,9 @@ Executed before two witnesses; notarial acknowledgment not visible on the face (
 | B-4 | **TCT No. 4695** | Capacuan, Paracale | 11.1486 ha | **Senen V. Inocalla** | **T-20755**, H-128572 | "DBP / (Casper Inocalla)" | Undertaking; matched by area |
 | | | | **63.985 ha** | Marilou 18.9591 · Herbert 23.5845 · Senen 21.6414 | | | |
 
-**Notes on Part B.** (1) The beneficiaries are three individual siblings, not the estate; Senen having died, and not being known to have left issue, her two parcels pass through her own estate to her heirs. (2) Casper having died, the obligation binds his heirs. (3) The pivotal registry question is whether title reverted from DBP to Casper on full payment or the reconveyance was never registered; the RD certified copies of T-20754, T-20755, T-20756 and T-20757, searched also under the old numbers 4251, 4695, 4781 and 5941, answer it.
+**Notes on the Undertaking.** (1) The beneficiaries are three individual siblings, not the estate; Senen having died, and not being known to have left issue, her two parcels pass through her own estate to her heirs — so these two lots are reached through Senen's estate, not the parents'. (2) Casper having died, the obligation binds his heirs. (3) The pivotal registry question is whether title reverted from DBP to Casper on full payment or the reconveyance was never registered; the RD certified copies of T-20754, T-20755, T-20756 and T-20757, searched also under the old numbers 4251, 4695, 4781 and 5941, answer it.
 
-### C. CROSS-REFERENCE — the family's current title inventory against Parts A and B
-
-| Title / parcel | Registered owner per inventory | Area | Under A? | Under B? | Position |
-|---|---|---|---|---|---|
-| T-3897, Lot 1 Psu-152027 | Vicente Inocalla | 23.0935 | A-1 | — | Estate res; award unregistered |
-| T-5656, Lot 2-B Psd-56979 | Vicente Inocalla, Sr. | 19.7727 | A-3 | — | Estate res; award unregistered |
-| T-2194, H-44920 | Vicente Inocalla / (Senen) | 13.3690 | To verify | — | A 2014 levy and scheduled execution sale affecting Senen's interest are of record; whether the parcel was a partition award, and the result of the sale, to be verified at the Registry |
-| ARP 021-0312, Lot 6 Psu-143364 | Vicente Inocalla (tax declaration only) | 18.0003 | — | — | Estate res, untitled |
-| T-3424, Lot 1 Psu-152156 | Beatriz Villafria (Marilou & Allan) | 22.5178 | — | — | Beatriz's estate; not partitioned |
-| T-4185, Lot 3 Psu-143364 | Beatriz Villafria (Herbert) | 11.3042 | — | — | Beatriz's estate; not partitioned |
-| TCT (44055) 002-2026001670, Manila | Beatriz V. Inocalla m. to Vicente Inocalla | 203 sq m + building | — | — | Beatriz's estate; restored 16 April 2026 |
-| T-20754, Lot 2 Psu-14364 | DBP / (Casper) | 10.2928 | — | B-3 | Undertaking beneficiary Senen |
-| T-20755, H-128572 | DBP / (Casper) | 11.1486 | — | B-4 | Undertaking beneficiary Senen |
-| T-20756, Lot 10 Psu-143364 | DBP / (Casper) | 18.9591 | — | B-1 | Undertaking beneficiary Marilou |
-| T-20757, Lot 5 Psu-143363 Amd. | DBP / (Casper) | 23.5845 | — | B-2 | Undertaking beneficiary Herbert |
-| T-29841, Lot 9-A Psd-05-012242 | Marilou Inocalla | 2.3513 | — | — | Marilou's own |
-| P-1615, Lot 1 Psu-143364 Amd. | Cipriana Inocalla | 23.0238 | — | — | Patent title; outside the estate |
-| P-1616, Lot 4 Psu-143364 | Allan Inocalla | 15.2069 | — | — | Patent title; outside the estate |
-| P-1617, Lot 8 Psu-143364 Amd. | Jesus Inocalla | 23.4356 | — | — | Patent title; outside the estate |
-| P-1516, Lot 7 Psu-143364 Amd. | Vicente Inocalla, Jr. | 22.8024 | — | — | Patent title; Vicente Jr.'s own estate |
-| TCT 1722, Lot 1, Calaburnay | Not in inventory | 16.43 | A-2 | — | To be searched at the Registry |
-| T-1827, Malaguit | Not in inventory | 8.12 | A-4 | — | To be searched at the Registry |
-| Labo lot, Gumamela | Not in inventory | 534 sq m | A-5 | — | Title status and Civil Case No. 4992 to be established |
-
-### D. OTHER PROPERTIES LISTED BY THE HEIRS, NOT COVERED BY EITHER INSTRUMENT
+### HELD — OTHER PROPERTIES LISTED BY THE HEIRS, NOT COVERED BY EITHER INSTRUMENT
 
 The heirs' special power of attorney of 10 July 2024 lists the following among the family's properties. None of them is an award under the 1992 partition or a parcel under the 1985 undertaking, and none appears in the family's title inventory. They are listed here so that the schedule is complete; whether each forms part of the estates, and in whose name it stands, is to be established from the Registry and the assessors' records before it is inventoried.
 
@@ -75,8 +100,6 @@ The heirs' special power of attorney of 10 July 2024 lists the following among t
 | D-5 | Tax-declared parcel | San Rafael, Jose Panganiban | 7.8844 ha (ARP 021-00470) | Item 26 of the itemised schedule in the 2024 special power of attorney | Tax declaration only; name of declarant to be read from the record | Assessor, Jose Panganiban |
 | D-6 | Residential lot listed under Senen Inocalla | Batobalani, Paracale | 161 sq m (ARP 006-00271) | Item 25 of the itemised schedule in the 2024 special power of attorney | Senen's own estate, not the decedents' | Assessor, Paracale |
 | D-7 | TCT No. 885 | San Rafael, Jose Panganiban | 23.7633 ha | Item 14 of the 2024 list, under the name of Ereneo Agon | Not the decedents' property on its face; the relationship of the Heirs of Ereneo Agon to the estates is to be identified | Registry of Deeds, Camarines Norte |
-
-<!-- filing:skip -->
 
 ---
 
