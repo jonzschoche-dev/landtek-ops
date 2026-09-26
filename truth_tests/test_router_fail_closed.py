@@ -41,6 +41,23 @@ def unknown_title_fails_closed(cur):
         conn.rollback(); conn.close()
 
 
+def bare_etitle_fails_closed(cur):
+    """A phantom e-title asked in Registry format (079-##########, bare or T-) must fail closed — it used to
+    fall through to the nearest-match answer and get another title's status (Improvement Lab, 2026-09-26).
+    A real e-title, in either stored form, must pass. Gate-only: never runs the (writing) inquiry stack."""
+    conn, tc = _rb()
+    try:
+        for q in ("Confirm title 079-2010000664 exists", "what about T-079-2010000664?"):
+            r = LS._unknown_identifier_gate(tc, q)
+            if not r or r.get("via") != "unknown_identifier" or "079-2010000664" not in r["text"]:
+                raise TruthFailure(f"phantom e-title did not fail closed: {q!r} -> {(r or {}).get('text')!r}")
+        for q in ("status of 079-2021002126", "status of T-079-2018001329", "status of 079-2018001329"):
+            if LS._unknown_identifier_gate(tc, q) is not None:
+                raise TruthFailure(f"real e-title was blocked by the gate: {q!r}")
+    finally:
+        conn.rollback(); conn.close()
+
+
 def known_identifier_passes_through(cur):
     """A real docket/title must NOT be blocked by the gate (route proceeds to a real answerer)."""
     conn, tc = _rb()
@@ -92,6 +109,7 @@ def year_is_not_an_identifier(cur):
 TESTS = [
     ("router_fail_closed.unknown_docket", unknown_docket_fails_closed),
     ("router_fail_closed.unknown_title", unknown_title_fails_closed),
+    ("router_fail_closed.bare_etitle", bare_etitle_fails_closed),
     ("router_fail_closed.known_passes", known_identifier_passes_through),
     ("router_fail_closed.no_identifier_untouched", no_identifier_ask_is_untouched),
     ("router_fail_closed.mixed_passes", mixed_known_unknown_passes),

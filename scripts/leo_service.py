@@ -533,6 +533,11 @@ def _asked_identifiers(message):
         ids.add(("title", m.group(1)))
     for m in re.finditer(r"\b(T-[0-9]{4,6})\b", t):
         ids.add(("title", m.group(1)))
+    # e-titles (Registry format 079-##########) are asked bare as often as with T- — without this a phantom
+    # e-title fell through to the nearest-match answer (Improvement Lab baseline, 2026-09-26)
+    for m in re.finditer(r"(?<![0-9A-Za-z-])(?:T-)?([0-9]{3}-[0-9]{10})(?![0-9])", t):
+        if not any(k == "title" and v.upper().endswith(m.group(1)) for k, v in ids):
+            ids.add(("title", m.group(1)))
     for m in re.finditer(r"\b(?:SL-)?(\d{4}-\d{4}-\d{4})\b", t):
         ids.add(("docket", m.group(1)))
     return ids
@@ -545,10 +550,11 @@ def _identifier_known(cur, kind, val):
         return True                                    # nothing checkable → never block on it
     try:
         if kind == "title":
-            tnum = v if v.startswith("T-") else ("T-" + v.lstrip("T").lstrip("-"))
-            cur.execute("SELECT 1 FROM titles WHERE upper(tct_number)=%s "
+            core = v[2:] if v.startswith("T-") else v.lstrip("T").lstrip("-")
+            # titles are stored both ways ("079-2021002126" and "T-079-2018001329") — probe both forms
+            cur.execute("SELECT 1 FROM titles WHERE upper(tct_number) IN (%s, %s) "
                         "UNION SELECT 1 FROM document_fields WHERE field_kind IN ('tct','oct','e_title') "
-                        "AND upper(value_norm) LIKE %s LIMIT 1", (tnum, "%" + tnum.lstrip("T-") + "%"))
+                        "AND upper(value_norm) LIKE %s LIMIT 1", ("T-" + core, core, "%" + core + "%"))
             return cur.fetchone() is not None
         cur.execute("SELECT 1 FROM fact_fields WHERE field_kind = ANY(%s) "
                     "AND (upper(value_norm)=%s OR upper(value_norm) LIKE %s) "
