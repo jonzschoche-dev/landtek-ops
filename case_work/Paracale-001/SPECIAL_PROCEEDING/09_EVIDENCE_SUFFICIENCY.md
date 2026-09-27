@@ -1,0 +1,68 @@
+# EVIDENCE SUFFICIENCY — is there enough to file in RTC Daet, and enough to get the interim order?
+
+> **Rev. 1, 2026-09-27.** Jonathan: "we also have to make sure that there is enough evidence to support filing this in RTC Daet." This is the gate. Every requirement the court will test, what we hold for it, what is missing, how much the gap weighs, and what closes it. Grades: **[V]** document in hand and read · **[V-ref]** document exists on Drive/corpus, read in text, not yet bound · **[O]** Allan's account only · **⛔** nothing. Weight: **BLOCKS FILING** (do not file without it) · **BLOCKS THE ORDER** (can file, but the Rule 80 order will not issue without it) · **HEARING** (cured before or at the hearing on letters).
+
+## 1. Verdict
+
+**Not yet enough to file. Enough to file within two to three weeks, and enough for the interim order once filed.** Three things block filing today, none of them a matter of argument: the two PSA death certificates (venue), the assessed values on paper (jurisdiction and docket fee), and a Schedule B with at least the heirs we already know by name (notice). One drafting correction is also required before filing and is made in rev. 11: the petition must say that both pleaded properties were **adjudicated among the heirs by the 1992 compromise partition in Branch 41, Daet**, because the Manila judgment we attach as Annex C says so in its first paragraph, and an oppositor will say we hid it. Everything else is in hand or is a hearing-stage item.
+
+## 2. The three things the court tests before anything else
+
+| # | Requirement | Rule | What we hold | Gap | Weight | Action |
+|---|---|---|---|---|---|---|
+| 1 | **Venue: decedents resided in Camarines Norte at death** | Rule 73 §1 (residence at time of death; not jurisdictional but an oppositor may raise it; the court first taking cognizance excludes all others) | T-2194 (1958): "resident of the Municipality of Paracale" [V]; RD Manila e-CTC (address of record): "Paracale, Camarines Norte, Phils." [V]; **the family's own partition suit was brought in RTC Camarines Norte, Branch 41 (CC 5625/5626, 1991–92)** [V]; RTC Manila in 13-131220 treated Branch 41 Daet as "the intestate court" of Beatriz's estate [V-ref]; Allan [O] | **No death certificate of either parent.** Nothing yet proves where they actually lived when they died in 1984 and 1985. They also owned the Manila building, and Allan's note says both died of cancer; if either certificate shows a Manila residence, venue is arguable | **BLOCKS FILING** | PSA certificates (Annexes A, A-1). If a certificate shows Manila, stop and re-plan venue with counsel before filing. **Ask Allan now where each parent was living and where each died.** |
+| 2 | **Jurisdiction: gross value of the estate above PhP 2,000,000** (RTC, not MTC) | B.P. 129 §19(4) as amended by R.A. 11576 | Manila property: assessed value land **PhP 1,209,600** (ARP AD-14759-00324, market PhP 3,024,000, 2016) + building **PhP 352,800** (ARP AD-14759-00219, market PhP 1,008,000, 2014) = **PhP 1,562,400 assessed** [V-ref, Drive tax-dec images]; **licensed appraisal 8 Mar 2023: market value PhP 23,000,000** (Edmundo T. Perez, Jr., AFN-0308-2023) [V-ref]; T-2194: Paracale assessor's listing, 13.3690 ha coco/pasture, market value about PhP 744,500 [V-ref] | The petition said only "exceeds the jurisdictional amount." Rev. 11 states the figures. Certified current tax declarations are not yet in hand (the Manila ones are 2014/2016 certified copies requested by Ibañez; the Paracale one is a listing, not a declaration) | **BLOCKS FILING** (the clerk assesses the fee on paper; the RTC must see a value above PhP 2M on the face of the petition) | Certified current tax declarations: Manila (land and building) and Paracale (T-2194). Bind the 2023 appraisal behind Annex G. |
+| 3 | **Notice: heirs named with ages and residences "so far as known"** | Rule 79 §2(b); Rule 76 §§3–4 | Names of all ten children and their dates of death where known [V doc 509, partition, LCR cert]; Vicente III and Elena with address [V]; living siblings' addresses [V SPAs]; Radj's address [V] but not named by operator decision; Loida Dasco (Cipriana's daughter), Emmanuel and Alexander Inocalla, Remedios Feliciano (Francisco's branch) [V] | **Schedule B does not exist as a document.** Ages and most second-generation names and addresses are unknown | **BLOCKS FILING** in practice: a petition with no Schedule B invites an order to complete it before the court sets the hearing, and the interim order will not issue on a petition the court has sent back | Build Schedule B now with what is known, marked "so far as known to petitioner", branch by branch; supplement later on leave. Known rows first, blanks stated as unknown, never invented. |
+
+## 3. What the petition must state and prove (Rule 79 §2)
+
+| Requirement | What we hold | Gap | Weight | Action |
+|---|---|---|---|---|
+| Deaths of both decedents, dates | RTC Manila decision of 3 Aug 2006 in CC 98-88750: "Vicente Inocalla, Sr. who died on November 26, 1984 and Beatriz Inocalla who subsequently died on August 12, 1985" [V-ref]; 13-131220 decision; 1992 partition ("deceased") [V] | PSA certificates | BLOCKS FILING (same paper as venue) | Annexes A, A-1 |
+| Intestacy | Allan's affidavit; no will ever surfaced in 41 years of litigation among the heirs [O] | — | none | — |
+| Allan's filiation and standing | Named as a child and party in the 1992 partition [V]; "children of the late spouses" in 13-131220 [V-ref]; the SPAs recite it [V] | PSA birth certificate | HEARING (secondary evidence suffices to file) | Annex E |
+| Property: identity | T-2194 RD CamNorte CTC 11 Jul 2024 [V]; Manila e-CTC 16 Apr 2026 [V] | T-2194 page 5 of 5 | HEARING | scan page 5 |
+| Property: "probable value and character" | see §2 row 2 | certified tax declarations | BLOCKS FILING | as above |
+| Creditors | BIR estate tax (amount undetermined); RPT arrears "to the extent any" | Allan's inquiry of his siblings not yet made | HEARING | Allan asks each sibling; note the answers |
+| **The 1992 partition and what it did** | Compromise Agreement, 6 pp, filed CC 5625/5626, Br. 41, approved 28 Jan 1992 [V]: **Parcel 12, TCT T-2194, 13.3690 ha, "in the name of Vicente Inocalla married to Beatriz Villafria, is awarded to Senen"; omitted property (1), the Manila lot, TCT 44055, "awarded to Francisco, Casper, Heirs of Melvyn, Cipriana, Marilou, Herbert, Vicente Jr., Allan, Jesus and Senen ... equally"; (2) the ten-door apartment "divided among themselves" door by door** | The petition (rev. 10) said only that neither property was "transferred out of the decedents' names under" the partition. True, but it did not say both were adjudicated by it. Annex C (the 13-131220 decision) opens with that fact | **BLOCKS FILING as drafted** — candor; fixed in rev. 11 ¶ 6 | Rev. 11 pleads the adjudication and why administration is still needed (§5 below) |
+
+## 4. What the Rule 80 order needs (delay + need for preservation + a fit appointee)
+
+| Ground | What we hold | Gap | Weight | Action |
+|---|---|---|---|---|
+| Delay in letters | Structural: publication + notice to 35+ heirs, some abroad; opposition expected | — | none | — |
+| Building: title restored, estates receive nothing | e-CTC with Entry 2026004663 reciting the judgment and finality [V]; Barangay 759 summons and certification to file action (occupation by Vicente III and Elena) [V]; rents not remitted [O] | Rents: Allan's word only | order can issue on the affidavit; the rents point is corroborated by the barangay case for ejectment | none before filing; at the hearing, a tenant's statement or receipts if any |
+| T-2194: levy and scheduled sale | Sheriff's Notice of Sale 7 Apr 2014, CC 98-88750 [V, now bound]; Omnibus Resolution 19 May 2014 [V, now bound] | result of the 2014 sale unknown | order can issue; result is a hearing item | RD complete record / page 5 |
+| T-2194: tenancy case, estates not parties | SC petition text (G.R. 274321) [V-ref, bound as text]; CA decision 19 Oct 2023 | CA decision itself not in hand; SC petition not the filed copy | order can issue on the petition's own recital; certified CA decision strengthens | certified CA decision (CA Manila or counsel Mata) |
+| Killings | LCR death certificate 2017-191 [V, bound]; PNP Jose Panganiban blotter certification (NBI bundle p. 18) [V-ref]; NBI transmittal 12 Sep 2023 pp. 1–3 [V, bound as images] | Senen's death certificate; PNP certification not extracted; whether an Information was filed | order does not depend on these; they go to weight | PSA cert of Senen; Allan's paper copy of the PNP certification; ask the Provincial Prosecutor |
+| Fitness: age, residence, no conviction | affidavit; Paracale residence [V SPAs] | NBI clearance | HEARING, but get it now — it is two weeks | NBI clearance |
+| **Fitness: integrity** | — | **The 3 Aug 2006 decision in CC 98-88750 found Allan "guilty of fraud" (Art. 1339 CC, failure to disclose) for the 1978 deed and annulled his title and mortgage.** A civil finding, not a conviction; not pleaded (operator decision). Vicente III and Elena, who succeeded the 88750 plaintiffs, will raise it against Rule 78 §1(c) "want of integrity" | **does not block filing; it is the opposition's best point at the Rule 80 hearing** | Answer in hand: the same siblings who sued in 13-131220 gave Allan their SPAs in 2024–2025 [V]; the family has entrusted him with these very properties since; the office is custodial, bonded and supervised; the order of preference does not bind the choice of a special administrator. **Counsel decides whether to pre-empt it in one sentence or wait for the opposition.** |
+| Bond | — | surety quotation | BLOCKS THE ORDER in practice (oath and letters wait on the bond) | quotation from an accredited surety before the hearing, on the assessed values |
+
+## 5. The "already partitioned" objection, and the answer
+
+The strongest legal objection is not evidentiary: *the estate was judicially partitioned in 1992; both properties were adjudicated; there is nothing to administer; the remedy is to execute Civil Case 5625, not to appoint an administrator.* The answer, all of it from the record:
+
+1. **The partition was partial.** By its own terms it covered listed parcels and "omitted" items; it did not liquidate the conjugal partnership, did not pay the estate tax, and did not reach T-3424, T-4185 or the tax-declared parcels except as listed (Rule 73 §2; Annex D).
+2. **No award was ever registered.** Both titles stand in the decedents' names in 2024 and 2026 [V]. No certificate can move without an estate-tax clearance, which was never obtained.
+3. **The judgment can no longer be executed.** A judicially approved compromise is immediately final and executory (Art. 2037 CC). Execution by motion lapsed in 1997 and by independent action in 2002 (Rule 39 §6). What remains is a final adjudication of shares that can only be given effect through a settlement proceeding and a project of partition in conformity with it. This petition says it proceeds "with due regard to the final partition judgment" (¶ 3) — rev. 11 says so expressly in ¶ 6.
+4. **The awardees are dead in part.** Senen (T-2194) died in 2021; six of the ten children have died. Their awards now pass through their own estates, which is exactly what an administration proceeding sorts out and a Rule 39 execution cannot.
+5. **Rule 80 is about preservation in the meantime.** Whatever the ultimate distribution, the property is being lost now, to everyone.
+
+Counsel's call recorded: whether to plead point 3 in the petition (rev. 11 does, in one clause) or hold it for the opposition.
+
+## 6. Things checked and found in order
+
+- **Certification against forum shopping** — present (Rule 7 §5), sworn with the verification. Rev. 11 makes it name the three related proceedings expressly: CC 5625/5626 (terminated), CC 13-131220 (execution), the DARAB/CA/SC tenancy case (Allan not a party). CC 98-88750 is terminated and not on the same issues; not listed (operator decision; counsel may add it).
+- **No pending estate proceeding elsewhere.** The only prior proceeding touching the estates is CC 5625/5626 in Branch 41, Daet, a Rule 69 partition suit among the heirs, terminated. The RTC Manila called it "SP No. 5625, the intestate court"; the record shows a civil case for judicial partition. Either way it was in RTC Camarines Norte — which supports Daet as the court, and counsel may ask that the new petition be assigned to or consolidated with Branch 41.
+- **Form** — A.M. 11-9-4-SC paper and type; verification; annex tabs; proposed order.
+
+## 7. Filing checklist (the gate)
+
+**Before filing — must have:** PSA death certificates of both parents; Allan's answer on where each parent lived and died; certified current tax declarations (Manila land and building; Paracale T-2194); Schedule B with the known rows; rev. 11 ¶ 6 as corrected; counsel engaged and adopting the papers.
+
+**Before the Rule 80 hearing — should have:** NBI clearance; surety quotation; Senen's PSA death certificate; certified CA decision of 19 Oct 2023; the PNP certification page; the Provincial Prosecutor's answer on the NBI transmittal; T-2194 page 5.
+
+**Hearing on letters:** Allan's PSA birth certificate; Radj's birth record or adoption decree, if any; full Schedule B; the rest of the inventory.
+
+*Every document referred to as [V] is bound in the binder or in `filing/out/annex/`; every [V-ref] is identified by Drive id in the source note of file 06 or in the dossier §8-B.*
