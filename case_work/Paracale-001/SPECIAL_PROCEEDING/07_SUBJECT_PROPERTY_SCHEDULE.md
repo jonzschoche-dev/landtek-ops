@@ -48,7 +48,7 @@ Compromise/Partition Agreement executed 24 January 1992; approved by the Court 2
 |---|---|---|---|---|
 | T-3897, Lot 1 Psu-152027 | Vicente Inocalla | 23.0935 | A-1 | Estate res; award unregistered |
 | T-5656, Lot 2-B Psd-56979 | Vicente Inocalla, Sr. | 19.7727 | A-3 | Estate res; award unregistered |
-| T-2194, H-44920, Batobalani, Paracale | Vicente Inocalla m. Beatriz Villafria [V RD CamNorte CTC 11 Jul 2024, pp. 1–4 of 5] | 13.3690 | Senen's award [V sheriff's notice 7 Apr 2014] | Estate res on the title; award unregistered; 2014 levy on Senen's awardee interest (result unknown — CTC page 5 not scanned); DARAB tenancy of Mauro Bombita Sr. over ~2,000 sq m, CA affirmed 19 Oct 2023, SC G.R. 274321 pending (Radj for Senen); DARCO 2008 CARP exclusion as mineral land |
+| T-2194, H-44920, Batobalani, Paracale | Vicente Inocalla m. Beatriz Villafria [V RD CamNorte CTC 11 Jul 2024, pp. 1–4 of 5] | 13.3690 | Senen's award [V sheriff's notice 7 Apr 2014] | Estate res on the title; award unregistered; 2014 levy on Senen's awardee interest (result unknown — CTC page 5 not scanned); DARAB tenancy of Mauro Bombita Sr. over ~2,000 sq m, CA affirmed 19 Oct 2023, SC G.R. 274321 pending (Radj Gymson Inocalla substituted for Senen as "sole heir", claims T-2194 "by succession" — heirship disputed by the family, 2026-09-27); DARCO 2008 CARP exclusion as mineral land |
 | ARP 021-0312, Lot 6 Psu-143364 | Vicente Inocalla (tax declaration only) | 18.0003 | — | Estate res, untitled |
 | T-3424, Lot 1 Psu-152156 | Beatriz Villafria (Marilou & Allan) | 22.5178 | — | Beatriz's estate; not partitioned |
 | T-4185, Lot 3 Psu-143364 | Beatriz Villafria (Herbert) | 11.3042 | — | Beatriz's estate; not partitioned |

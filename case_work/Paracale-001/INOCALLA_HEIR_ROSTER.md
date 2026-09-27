@@ -10,7 +10,7 @@
 
 1. ✅ **Melvin — RESOLVED: DECEASED by Jan 1992 (VERIFIED, primary — Partition signature page, doc 671 p.5, frontier-vision re-read 2026-07-06).** The execution page shows **"Atty. Edwin Forrer representing and/or attorney-in-fact of the Heirs of Melvyn Inocalla"** — every other sibling signed personally. So the "MIA Australia" note is wrong: Melvin predeceased the 1992 partition. **His 3 children are the "Heirs of Melvyn" and must be named/served** (their 1992 AIF was Atty. Edwin Forrer — a starting point to trace them).
 2. **The "25 hectares controlled by ACE" — whose land?** The summary lists it in **Francisco's** row, but Ace is **Vicente Jr.'s** son. → Clarify: is the occupied 25 ha **Francisco's branch land** or **Vicente Jr.'s** (e.g., patent lot P-1516)? This decides which sub-estate the recovery runs through.
-3. ✅ **Senen — RESOLVED 2026-09-26: she DID leave a child. Radj Gymson Inocalla is her "sole heir and surviving child" [V — Petition for Review, SC G.R. No. 274321 (CA-G.R. SP 167314), *Senen V. Inocalla substituted by … Radj Gymson Inocalla v. Bombita*, Atty. Sherwin O. Mata, Jul 2024; Radj of Purok I, Batobalani, Paracale].** The "died without issue" line (family summary / Final SPA recital) is wrong and is withdrawn everywhere. Senen's share — including her 1992 award of **T-2194** (sheriff's notice 7 Apr 2014: levy on her awardee interest) and the two DBP lots earmarked to her — passes to Radj by representation (Arts. 972, 981 CC). He is an heir to name and serve; the CENOMAR is no longer needed. Still to get: Senen's PSA death certificate; Radj's age and full address for Schedule B.
+3. ⚠ **Senen — CONTESTED HEIRSHIP (2026-09-27).** Two accounts collide. **Record:** Radj Gymson Inocalla was substituted for Senen as her "sole heir and surviving child" in DARAB → CA-G.R. SP 167314 (the CA caption says so) → SC G.R. No. 274321 (Jul 2024, Atty. Sherwin O. Mata; verified by Radj, of Purok I, Batobalani, Paracale), and there pleads being "owner by succession" of the 13 ha at Capacuan (Batobalani) = **T-2194**; Radj also signed the 2024 Omni SPA "representing Senen (deceased)". **Family (Jonathan, 2026-09-27):** Senen had no children; Radj is "not a real" child. **Law:** only a birth record naming Senen as parent, an adoption decree (court or NACC, R.A. 11642), or acknowledgment makes Radj her heir; orientation proves nothing either way. **None of that paper is in the file.** Petition ¶4 pleads "no child born or adopted known to petitioner"; ¶5 names Radj for notice as a claimant, undetermined. **To get:** Radj's PSA birth certificate (parents named?); RTC/NACC no-adoption certification; Senen's PSA death certificate (informant); the CA substitution record. If Radj's birth record names Senen, it is prima facie filiation, attackable only by direct action (and R.A. 11222 lets a simulated birth be cured by adoption until 2029) — plan for that, not around it.
 
 ---
 
@@ -50,11 +50,12 @@
 | **Remedios Inocalla Feliciano** [V] | ( ? ) | ( ? ) | ( ? ) | named rep in Omni SPA (doc 647) |
 | Francisco child 4–10 ( ? ×7 ) | | | | ⚠ confirm the "25 ha / Ace" note (#2) |
 
-**SENEN "Betty" V. Inocalla** († shot Feb 2021) — **survived by ONE child** (#3 resolved 2026-09-26). Her 2017 mining posture: President of the Capacuan Small-Scale Miners Association, with NIBDC's consent to a permit application inside T-2194 (Drive affidavit of consent, 2017).
-| Heir | Age | Address | Consent | Notes |
+**SENEN "Betty" V. Inocalla** († shot Feb 2021, unmarried) — **no child per the family; ONE claimant on the record** (#3, contested). Her 2017 mining posture: President of the Capacuan Small-Scale Miners Association, with NIBDC's consent to a permit application inside T-2194 (Drive affidavit of consent, 2017).
+| Person | Age | Address | Position | Notes |
 |---|---|---|---|---|
-| **Radj Gymson Inocalla** [V] | ( ? ) | Purok I, Batobalani, Paracale [V SC petition] | signed the Omni SPA "representing Senen (deceased)" (doc 647) | sole heir and surviving child of Senen [V G.R. 274321]; petitioner in the Bombita tenancy case over part of T-2194; takes Senen's T-2194 award and DBP T-20754/T-20755 earmarks |
-| Senen's PSA death certificate | ⛔ to obtain | — | — | for Annex B |
+| **Radj Gymson Inocalla** [V] | ( ? ) | Purok I, Batobalani, Paracale [V SC petition] | **claimant, disputed** — named in ¶5 for notice only | substituted for Senen as "sole heir and surviving child" (CA SP 167314; SC G.R. 274321); claims T-2194 "by succession"; signed the Omni SPA "representing Senen (deceased)" (doc 647); basis of filiation unknown — birth record? adoption? — get the paper |
+| Senen's PSA death certificate | ⛔ to obtain | — | — | for Annex B; read the informant and stated relationship |
+| Radj's PSA birth certificate; RTC/NACC no-adoption certification | ⛔ to obtain | — | — | decides #3 |
 
 **VICENTE V. Inocalla, Jr.** († assassinated 2017) — 5 children (mother **Corazon de Leon**). **ADVERSE branch.**
 | Heir | Age | Address | Consent | Notes |
@@ -75,7 +76,7 @@
 
 ## ROLL-UP (what the petition will state)
 - **Living-sibling consent to Allan: 3 of the relevant living siblings in hand** (Jesus, Marilou, Herbert). Melvin: unresolved.
-- **Deceased-branch heirs (must be named/served; consent pursued):** Casper ×~5, Cipriana ×7, Francisco ×10, Vicente Jr. ×5 (adverse), **Senen ×1 (Radj Gymson Inocalla)**, + Melvin ×3, + Ereneo Agon branch.
+- **Deceased-branch heirs (must be named/served; consent pursued):** Casper ×~5, Cipriana ×7, Francisco ×10, Vicente Jr. ×5 (adverse), **Senen: no heir per the family, one disputed claimant (Radj Gymson Inocalla) named for notice**, + Melvin ×3, + Ereneo Agon branch.
 - **Estimated total heirs to name: ~35–40 individuals.** This is the roster the petition needs — **the single biggest task to draftable (Directive Phase 1).**
 
 ---

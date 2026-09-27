@@ -140,7 +140,7 @@ The heirs' **P-series patent titles** (P-1615/1616/1617/1516) are original State
 | **"Ereneo Agon"** (branch) | — | Heirs of Ereneo Agon | ⚠ **NEW co-owner branch** (Final SPA + adjudicated TCT 885, 23.76 ha). Not a sibling — identify the relationship (in-law? earlier co-heir?). Must be named. |
 
 **What this resolves & what it flips:**
-- ~~**The heirless death is SENEN.**~~ **Withdrawn 2026-09-26:** Senen is survived by her son **Radj Gymson Inocalla** ("sole heir and surviving child", SC G.R. 274321). Her share, the T-2194 award and the DBP earmarks pass to him. No CENOMAR needed; PSA death cert only.
+- **Senen's heirship is CONTESTED (2026-09-27).** The family says she had no children; but **Radj Gymson Inocalla** was substituted for her as "sole heir and surviving child" in CA SP 167314 / SC G.R. 274321 and claims T-2194 by succession. Petition names Radj for notice only. Decided by Radj's birth/adoption paper. See roster #3.
 - **Ace claims *through* Vicente Jr., who has 5 children** — so the fight is Ace's specific filiation/legitimacy, not whether the branch has heirs. "25 hectares controlled by ACE" = active adverse possession to break.
 - **Consent map:** SPAs in hand or indicated for Jesus, Marilou, Herbert, + reps for Senen (Radj Gymson) and Francisco (Remedios). **Gaps: Cipriana's branch (7 heirs, no SPA), Casper's branch (wife+4), Vicente Jr.'s branch (contested via Ace), Melvin's branch, Ereneo Agon's branch.** A clean petition needs every branch named and (ideally) consenting.
 
