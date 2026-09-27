@@ -1,6 +1,6 @@
 # COVER NOTE TO ALLAN — THE GAME PLAN
 
-> **Rev. 1, 2026-09-27.** Plain-language cover note that travels with the bound petition (rev. 10). Written for Allan; labelled as LandTek's strategy, to be confirmed and refined by his chosen counsel. Render: `python3 scripts/render_pleading_pdf.py case_work/Paracale-001/SPECIAL_PROCEEDING/filing/08_cover_note.job.json`
+> **Rev. 2, 2026-09-27.** Conformed to petition rev. 12 (narrowest): §§ 3–4 and 6–9 revised. Plain-language cover note that travels with the bound petition. Written for Allan; labelled as LandTek's strategy, to be confirmed and refined by his chosen counsel. Render: `python3 scripts/render_pleading_pdf.py case_work/Paracale-001/SPECIAL_PROCEEDING/filing/08_cover_note.job.json`
 
 <!-- caption:none -->
 
@@ -33,25 +33,25 @@ We plead it that way on purpose. It is the least the court can give, it harms no
 
 ### 3. What is in the petition, and what is deliberately not
 
-**In.** Two properties only: the 13.37-hectare parcel at Batobalani, Paracale under TCT T-2194, still in your father's name on the July 2024 certified copy; and the Vito Cruz building in Manila, restored to your mother's name on 16 April 2026. Your surviving siblings' powers of attorney to you. The 1992 partition, described as never carried into the titles. The reasons the court should act now (section 4 below).
+**In.** Two properties only: the 13.37-hectare parcel at Batobalani, Paracale under TCT T-2194, still in your father's name on the July 2024 certified copy; and the Vito Cruz building in Manila, restored to your mother's name on 16 April 2026. Your surviving siblings' powers of attorney to you. The 1992 partition, stated honestly: it adjudicated both properties, T-2194 to Senen and the building to all ten of you, and none of it was ever carried into the titles or taxed. The values from the tax declarations, which put the estate above the two-million-peso line for the Regional Trial Court. The reasons the court should act now (section 4 below).
 
-**Out, on purpose.** Consents from your siblings (not needed for this order). The old Manila case from 1998 (not needed; it will be raised by the other side if at all, and there is an answer). The full list of family property — the four DBP lots, the mineral claims, the tax-declared parcels, the Milaor ricefield, the Labo lot. The mining, beyond one line. The person who claims to be Senen's child is **not named**; that claim is met at the hearing, where it has to be proved with a birth record or an adoption decree.
+**Out, on purpose.** Consents from your siblings (not needed for this order). The old Manila case from 1998 (not needed; it will be raised by the other side if at all, and there is an answer). The full list of family property — the four DBP lots, the mineral claims, the tax-declared parcels, the Milaor ricefield, the Labo lot. The mining. The Bombitas' tenancy case and the two killings (section 4 explains why). The person who claims to be Senen's child is **not named**; that claim is met at the hearing, where it has to be proved with a birth record or an adoption decree.
 
 **Why so narrow.** The docket fee is assessed on the value the petition states, and the petition already promises to pay the difference when the inventory comes in. More importantly, every extra fact is a handle for the other side to grab. We give them nothing to grab but public records.
 
 **One thing to understand clearly.** Narrow now does not mean hidden later. Within three months of your appointment you must file a sworn **inventory of everything** your parents left, including the property we did not plead and including property others claim. Leaving something out of the inventory is the one thing that can get a special administrator removed. The full list already exists in our file for that day.
 
-### 4. Why the court should act now — the three grounds
+### 4. Why the court should act now — what the petition says, and what it holds back
 
-The petition says the estates are losing now, not someday, and it says it from records only:
+The petition says the estates are losing now, not someday, and it says it from registry and court records only:
 
 - **The building.** Won back by final judgment, title restored in April, and the estates still receive nothing because the people who claim through your late brother Vicente Jr. hold it and collect the rents. Only someone authorized to sue for the estates can start the case to recover it.
-- **T-2194.** In your father's name, yet levied in 2014 for one heir's judgment debt; and a tenancy case by the Bombitas over part of it has run for ten years — Provincial Adjudicator, DARAB, Court of Appeals, now the Supreme Court — with your sister Senen litigating alone, in her own name. The estate that actually owns the parcel was never a party and has never been heard.
-- **The killings.** Vicente Jr. was shot dead at his home in Sta. Rosa Sur on 11 September 2017. Senen was shot dead in her car at Batobalani on 12 February 2021. In September 2023 the NBI sent its investigation of Senen's death to the Provincial Prosecutor for murder against Eric Bombita, who the NBI says is married to Elena, one of the two people holding the building, and another man. The NBI's own words are that the case "emanates from a land dispute."
+- **T-2194.** In your father's name, yet levied in 2014 for one heir's judgment debt, and nobody with authority to find out what became of that sale or to hold the parcel for the estates.
+- **No one holds authority.** For forty years nobody has had authority from any court over these estates. Everything done with the property has been done by individuals in their own names. The court can end that with one bonded custodian answerable to it. That decides nothing about who is an heir or who owns what. It only means the estates stop being ownerless in fact.
 
-Then the argument: the cause of all of it is that nobody has had lawful authority over these estates for forty years. The court can end that today with one bonded custodian answerable to it. That decides nothing about who is an heir, who is a tenant, or who did what. It only means the estates stop being ownerless in fact.
+**What we deliberately hold back, and why.** The Bombitas' tenancy case over part of T-2194, and the killings of Vicente Jr. and Senen, are in our file, documented, and were drafted into an earlier version. They are **out** of the filing on purpose. A judge grants a special administrator on three things: delay, property exposed with no one to act, and a fit person. The tenancy case and the killings add nothing to those three, and they give the Bombitas, Vicente III and Elena a reason to intervene and fight *before* the order issues. They stay ready for the hearing on letters, and for the day someone opposes.
 
-**The line we hold.** The petition accuses no one of anything. It cites the police blotter, the death certificate and the NBI's transmittal and says in terms that guilt is for the prosecutor and the criminal courts. Do not go beyond that line in anything you say, sign or post. The moment the petition reads as an accusation, it becomes the fight instead of the bridge.
+**The line we hold.** The petition accuses no one of anything, and neither may you. Do not go beyond the papers in anything you say, sign or post. The moment this case reads as an accusation, it becomes the fight instead of the bridge.
 
 ### 5. What happens after filing
 
@@ -74,7 +74,7 @@ Paper, in this order. The binder has a tab sheet for each one saying exactly whe
 4. **The schedule of heirs** (Annex B): every heir across the ten branches with name, age and address, including the surviving spouses of your late brothers and sisters. Sit with the family and fill it. Ask each living sibling whether they know of any debt of the estates; the petition says you inquired.
 5. **Page 5 of the T-2194 certified copy** (Annex G-1). You hold the paper; scan the last page or pull a fresh copy at the Registry.
 6. **The Daet trip:** assessed values of both properties from the assessors (Manila and Paracale), the certified copies of the 1992 partition, the approving Order and the Certificate of Finality from Branch 41 (Annex D), and the certified Court of Appeals decision of 19 October 2023 in Senen's case (Annex H).
-7. **Ask the Provincial Prosecutor's Office in Daet** whether an information was ever filed on the NBI's September 2023 transmittal. Your affidavit currently says you do not know. If one was filed, we add the case number; if not, it stays as written.
+7. **Tell us where each of your parents was living when they died, and where each died.** The court sits where they resided at death. Their death certificates will say; we need to know before we file, not after.
 8. **Read your affidavit line by line** before you swear it. It is written in your voice from what you have told us. Where it says something you did not see or do not know, strike it. Do not sign to anything you cannot say from the witness stand.
 
 ### 7. What you must not do while this is pending
@@ -94,7 +94,7 @@ A mining permit is a separate matter for the Mines and Geosciences Bureau and th
 ### 9. Calls that belong to your lawyer
 
 - Daet or Labo station for a Paracale decedent.
-- Whether to keep the killings paragraph in full, or cut it to its first and last sentences if the judge is likely to read it as inflammatory.
+- Whether to restore, in whole or in part, the held paragraphs on the tenancy case and the killings, which are drafted and sourced in our file.
 - Whether to name the person claiming through Senen for notice, or leave the claim to the hearing as we have.
 - Monthly or quarterly reports to offer.
 - The bond amount to propose, and the surety.
