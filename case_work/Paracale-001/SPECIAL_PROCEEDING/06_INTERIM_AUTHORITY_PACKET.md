@@ -147,6 +147,8 @@ Doc. No. ____; Page No. ____; Book No. ____; Series of 2026.
 
 ## DRAFTER'S SOURCE NOTE (not rendered)
 
+**2026-09-27, considered and withdrawn the same hour — "Manila out, T-3897 and T-5656 in."** Jonathan first asked to drop the Manila building because its assessed value drives the Rule 141 §7(d) docket fee, and to plead the two other titled lots in the decedent's name instead; a rev. 9 was cut on that basis and then set aside on his "let's just focus on 2194 and Vito Cruz". The filing stays at rev. 8-B: T-2194 and the building. Recorded so the fee point is not lost: the docket fee is assessed on the value alleged; ¶ 6 already pays it on the assessed values in Annex G and undertakes the deficiency on inventory. If the fee is ever the reason to narrow, the honest route is the one ¶ 6 already takes, not omission — the Rule 83 inventory must list every known asset within three months of letters in any case.
+
 **Rev. 8 (2026-09-26) — the title check on T-2194 (Jonathan: "check the title and see if it's in her actual name or not").** Read from the Registry of Deeds of Camarines Norte certified copy of TCT No. T-2194, Drive `Scan Mar 23, 2026 at 5.56 AM.pdf` (id `1fIIPHX3rZgl_XtQ5E0WUgvlnTF0LjnpO`), LRA CTC form, Ref. No. 2024003960, OR 1031911034 of 10 Jul 2024, printed 11 Jul 2024 10:41, "Requested By: ALLAN INOCALLA", PhP 2,028.02, "consists of 5 page(s)" — **the scan holds pages 1–4 of 5; page 5 is not in the file**:
 
 | Item | What the certified copy says | Grade |
