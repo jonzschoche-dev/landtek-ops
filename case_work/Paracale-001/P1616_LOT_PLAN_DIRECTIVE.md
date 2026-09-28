@@ -526,3 +526,17 @@ feasible zone and implied-BLBM zone as translucent rectangles. Accuracy ±~0.8 k
   unlocks are (a) Jonathan's photo of the T-4185 technical-description page (2024 RD CTC in
   hand, Ref. 2024003960) or (b) the SMD certified plan.** No new SMD mail overnight (only the
   weekly digest). No further OCR retries scheduled — the 402s won't self-heal.
+
+- **2026-09-28 — Weekly check: SMD ANSWERED (Sept 24) — PERSONAL PICKUP ONLY, Window 3 Legazpi.**
+  Timeline: Jonathan sent the resend-request (Sept 22) and the sister-plan supplement
+  (Sept 24, 01:13); SMD replied 14 minutes later (msg `1a0d0f28c3cd664d`, cc jonzschoche@ +
+  shiraction2@): **no e-payment and no email release** — the requested documents must be
+  **picked up personally at DENR V – Technical Services, Surveys and Mapping Division, Old
+  Albay, Sagpon, Legazpi City — Land Records Section (WINDOW 3), Monday–Thursday 7:00 AM–6:00
+  PM.** The documents are ready at the window; payment happens there. FINAL GATE = a person
+  at Window 3 with: (1) Allan's Sept 3 authorization naming the claimer (or Allan/family in
+  person), (2) valid ID, (3) cash for fees, (4) the Ref. Code SMD-SCS-INC-26-172, and (5) the
+  sister-plan supplement printed/shown so Psu-143364 Amd. + Psu-143363/Amd. get assessed in
+  the same transaction. Candidates: Allan or Shishir (both cc'd on SMD's reply; Paracale→
+  Legazpi ≈ 4–5 h), or any person they authorize. No email action needed; routine stays
+  armed watch-only until the documents are in hand.
