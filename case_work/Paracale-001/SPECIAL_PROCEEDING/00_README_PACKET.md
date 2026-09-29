@@ -26,7 +26,7 @@
 
 **Rough clock, uncontested:** steps 2–5 run in parallel, two to three weeks; step 6 a few days; the hearing per the court's calendar, two to six weeks after filing. **Six to ten weeks to an order** if nothing is contested. Estimates, not promises.
 
-**Two calls that are counsel's:** Daet vs Labo station for a Paracale decedent; monthly vs quarterly reporting to offer at the hearing.
+**Two calls that are counsel's:** Daet vs Labo station for a Paracale decedent (**one phone call to the OCC settles it — see file 09 §5-A; the official territorial list could not be fetched from here and online directories disagree**); monthly vs quarterly reporting to offer at the hearing. **And one fact that decides the province itself:** where each parent was actually living, and died, in 1984 and 1985 — ask Allan now; the PSA certificates confirm it.
 
 ---
 
