@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+  <name>Capacuan MB block (5.1816 ha) - inside TCT T-2194 - Gracesen plant land</name>
+  <description>Corners from Brgy. Capacuan Kapasyahan 18 s-2021 / 64 s-2024 (SMPF block) and the CSSMA 9 Jun 2026 MB refiling. Datum not stated on source - PENDING VERIFICATION by a geodetic engineer. Not the T-2194 title boundary.</description>
+  <Style id="blk"><LineStyle><color>ff0000ff</color><width>3</width></LineStyle><PolyStyle><color>330000ff</color></PolyStyle></Style>
+  <Placemark>
+    <name>MB block 5.1816 ha (SMPF)</name>
+    <styleUrl>#blk</styleUrl>
+    <Polygon><outerBoundaryIs><LinearRing><coordinates>
+      122.708333,14.252083,0
+      122.708333,14.254167,0
+      122.710417,14.254167,0
+      122.710417,14.252083,0
+      122.708333,14.252083,0
+    </coordinates></LinearRing></outerBoundaryIs></Polygon>
+  </Placemark>
+  <Placemark><name>Corner 1 (14 15 07.5N, 122 42 30.0E)</name><Point><coordinates>122.708333,14.252083,0</coordinates></Point></Placemark>
+  <Placemark><name>Corner 2 (14 15 15.0N, 122 42 30.0E)</name><Point><coordinates>122.708333,14.254167,0</coordinates></Point></Placemark>
+  <Placemark><name>Corner 3 (14 15 15.0N, 122 42 37.5E)</name><Point><coordinates>122.710417,14.254167,0</coordinates></Point></Placemark>
+  <Placemark><name>Corner 4 (14 15 07.5N, 122 42 37.5E)</name><Point><coordinates>122.710417,14.252083,0</coordinates></Point></Placemark>
+  <Placemark><name>Block centre</name><Point><coordinates>122.709375,14.253125,0</coordinates></Point></Placemark>
+</Document>
+</kml>
