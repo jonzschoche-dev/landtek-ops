@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
 <Document>
-  <name>Capacuan MB block 5.1816 ha (PRS92)</name>
+  <name>Capacuan - Minahang Bayan 82.9053 ha + processing plant 5.1816 ha (PRS92)</name>
   <description>CSSMA Minahang Bayan block, Purok 4, Brgy. Capacuan, Paracale. Source: Brgy. Capacuan Kapasyahan 18 s-2021 / 64 s-2024; CSSMA PMRB filing 10 May 2021; MB refiling 9 Jun 2026.
 As filed (PRS92): C1 14 15 07.50 N, 122 42 30.00 E | C2 14 15 15.00 N, 122 42 30.00 E | C3 14 15 15.00 N, 122 42 37.50 E | C4 14 15 07.50 N, 122 42 37.50 E.
 WGS84 (GPS/Google Earth): C1 14.250640, 122.709698 | C2 14.252723, 122.709698 | C3 14.252723, 122.711781 | C4 14.250640, 122.711781 | Centre 14.251681, 122.710740.
 Lies entirely inside TCT T-2194.</description>
   <Style id="blk"><LineStyle><color>ff0000ff</color><width>3</width></LineStyle><PolyStyle><color>440000ff</color></PolyStyle></Style>
-  <Placemark>
-    <name>MB block 5.1816 ha</name>
+  <Placemark><name>Minahang Bayan area 82.9053 ha (PRS92)</name><description>CSSMA Minahang Bayan area - one meridional block (30 x 30 sec). As filed (PRS92): C1 14 15 00 N, 122 42 30 E | C2 14 15 30 N, 122 42 30 E | C3 14 15 30 N, 122 43 00 E | C4 14 15 00 N, 122 43 00 E. WGS84: C1 14.248556, 122.709698 | C2 14.256889, 122.709698 | C3 14.256889, 122.718031 | C4 14.248557, 122.718031 | Centre 14.252723, 122.713865. Source: Amended Sketch Plan of MB Application, GE Jose T. Abareta, received MGB-V 11 Oct 2017. Role per operator (Jonathan, 2026-10-02): Minahang Bayan.</description><Style><LineStyle><color>ffff00ff</color><width>3</width></LineStyle><PolyStyle><color>11ff00ff</color></PolyStyle></Style><Polygon><outerBoundaryIs><LinearRing><coordinates>122.709698,14.248556,0 122.709698,14.256889,0 122.718031,14.256889,0 122.718031,14.248557,0 122.709698,14.248556,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark>
+    <name>Processing plant block 5.1816 ha (PRS92)</name>
     <styleUrl>#blk</styleUrl>
     <Polygon><outerBoundaryIs><LinearRing><coordinates>
       122.709698,14.250640,0
