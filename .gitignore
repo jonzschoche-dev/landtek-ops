@@ -172,3 +172,10 @@ gis/datasets/
 gis/maps/
 gis/_superseded_*/
 *.gpkg
+
+# VPS runtime data (2026-10-03 cleanup) — document store, OCR inbox, coordinate drops and
+# agent notifications are produced at runtime; canonical copies live in Drive + the corpus.
+files/
+arta_inbox/
+incoming_coords/
+notifications/
