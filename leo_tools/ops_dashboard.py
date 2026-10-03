@@ -61,6 +61,7 @@ def _esc(s):
 
 def _layout(title: str, body: str, active: str = "home") -> str:
     nav = [
+        ("console", "/console/", "Console"),
         ("home", "/", "Home"),
         ("cases", "/cases", "Cases"),
         ("clients", "/clients", "Clients"),
