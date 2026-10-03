@@ -77,6 +77,13 @@ except Exception as _e:
     print(f"WARN: ops console (/ops/console/) not registered: {_e}", file=_sys.stderr)
 
 try:
+    from console_ask import bp as _console_ask_bp
+    app.register_blueprint(_console_ask_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: console ask (/ops/console/ask/) not registered: {_e}", file=_sys.stderr)
+
+try:
     from client_portal import bp as _portal_bp
     app.register_blueprint(_portal_bp)
 except Exception as _e:
