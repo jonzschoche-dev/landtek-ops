@@ -162,6 +162,17 @@ def extract(file_bytes, mime, name):
             if len(vis) > len(ocr):
                 return vis, "gemini-vision"
             return ocr, "docai-thin"
+        if (mime or "").startswith("text/") or name.lower().endswith(
+                (".md", ".markdown", ".txt", ".csv", ".tsv", ".json", ".log", ".xml", ".yaml", ".yml")):
+            # Plain-text family: nothing to OCR, the bytes ARE the text. Without this branch these
+            # land catalog-only (0 chars, unembedded) and are invisible to RAG — the OCR ladder can
+            # never rescue them because there is no image to re-read.
+            for enc in ("utf-8", "utf-8-sig", "latin-1"):
+                try:
+                    return file_bytes.decode(enc), "plaintext"
+                except UnicodeDecodeError:
+                    continue
+            return file_bytes.decode("utf-8", errors="replace"), "plaintext"
     except Exception as e:
         log(f"    extract error ({name}): {type(e).__name__}: {str(e)[:120]}")
         return "", "failed"
@@ -208,8 +219,11 @@ def embed_and_upsert(doc_id, content_hash, name, drive_id, case_file, source, te
 
 def insert_doc(cur, *, case_file, source, name, mime, text, engine, content_hash, drive_id, sub, folder_root, chunk_count):
     is_docx = mime == DOCX_MIME or name.lower().endswith(".docx")
-    exec_status = "draft" if is_docx else "received"
-    doc_type = ("Working Draft" if is_docx else
+    # Markdown is an authoring format — a working note, never a received instrument. Treat it like
+    # .docx so it can't be cited as evidence-grade (see memory: evidence-grade = received not draft).
+    is_authoring = is_docx or (mime or "") == "text/markdown" or name.lower().endswith((".md", ".markdown"))
+    exec_status = "draft" if is_authoring else "received"
+    doc_type = ("Working Draft" if is_authoring else
                 "Document (photographed)" if sub == "photos" else "Document")
     meta = {"source": "drive_folder_sweep", "drive_folder_root": folder_root, "sub": sub,
             "ocr_engine": engine, "original_name": name,

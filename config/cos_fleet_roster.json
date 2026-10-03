@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "updated": "2026-09-26",
+  "description": "Living seed for Layer A (Grok Bot CoS seats). Human-editable. Upserted into agent_registry by scripts/cos_bridge.py --sync. Layer B (Claude subagents) is scanned from .claude/agents/*.md at sync time. Runtime layers (systemd/cron/catalog) stay owned by scripts/fleet_registry.py.",
+  "layer_notes": {
+    "grok_bot": "Grok Bot chat seats (CoS can message). agent_key prefix grok:. Owned by cos_bridge.",
+    "claude_subagent": "Claude Code subagents under .claude/agents/. agent_key prefix claude:. Owned by cos_bridge.",
+    "systemd": "VPS landtek-*.timer units. Owned by fleet_registry.",
+    "cron": "VPS crontab scripts. Owned by fleet_registry.",
+    "cron-child": "refresh_all.py children. Owned by fleet_registry.",
+    "catalog-only": "agents.py on-demand tools with no runtime heartbeat. Owned by fleet_registry."
+  },
+  "seats": [
+    {
+      "agent_key": "grok:cos",
+      "display_name": "Chief of Staff",
+      "role": "LandTek administrator \u2014 goals\u2192fronts\u2192clocks\u2192results; owns the company loop",
+      "owner": "governance",
+      "tier": "T0",
+      "external_id": "51390211-dd22-4b80-84db-82009924fe2c",
+      "note": "Grok Bot UUID 51390211-dd22-4b80-84db-82009924fe2c; charter agent_specs/006_master_chief_of_staff.md"
+    },
+    {
+      "agent_key": "grok:26-360",
+      "display_name": "Civil Case 26-360 MTC Mercedes",
+      "role": "War-room desk for Zschoche v. Balane (CV-26360) \u2014 evidence, SJ, Aug-12 prep",
+      "owner": "legal-strategy",
+      "tier": "T0",
+      "external_id": "c51e50a8-b52e-4ecd-aafb-3ba5eb7de39c",
+      "note": "Grok Bot UUID c51e50a8-b52e-4ecd-aafb-3ba5eb7de39c"
+    },
+    {
+      "agent_key": "grok:1321",
+      "display_name": "ARTA CTN SL-2026-0209-1321",
+      "role": "ARTA complaint track SL-2026-0209-1321 (Assessor / agency accountability)",
+      "owner": "forums",
+      "tier": "T0",
+      "external_id": "9ec27d0c-cce1-4410-894c-ecb29555e5bb",
+      "note": "Grok Bot UUID 9ec27d0c-cce1-4410-894c-ecb29555e5bb"
+    },
+    {
+      "agent_key": "grok:1378",
+      "display_name": "ARTA CTN SL-2026-0218-1378",
+      "role": "ARTA complaint track SL-2026-0218-1378 (appeal window / consequence spine)",
+      "owner": "forums",
+      "tier": "T0",
+      "external_id": "796f1849-7c61-4707-8354-948ad154e949",
+      "note": "Grok Bot UUID 796f1849-7c61-4707-8354-948ad154e949; 1378 BOT"
+    },
+    {
+      "agent_key": "grok:op",
+      "display_name": "OP supervisory-review spine",
+      "role": "Office of the President supervisory-review track over agency inaction",
+      "owner": "forums",
+      "tier": "T0",
+      "external_id": "afb5b1ca-9ffb-472d-987b-8bd971a0378c",
+      "note": "Grok Bot UUID afb5b1ca-9ffb-472d-987b-8bd971a0378c; OP BOT"
+    },
+    {
+      "agent_key": "grok:guardianship",
+      "display_name": "Spec. Proc. 2680 RTC Br 41 Daet",
+      "role": "Guardianship Spec. Proc. 2680 \u2014 authority gate for CV-26360",
+      "owner": "legal-strategy",
+      "tier": "T0",
+      "external_id": "987e23b8-2192-493e-b94d-1661e3c2cea5",
+      "note": "Grok Bot UUID 987e23b8-2192-493e-b94d-1661e3c2cea5"
+    },
+    {
+      "agent_key": "grok:mlgoo",
+      "display_name": "DILG/MLGOO Mercedes",
+      "role": "DILG / MLGOO Mercedes LGU accountability and drip coordination",
+      "owner": "forums",
+      "tier": "T0",
+      "external_id": "6dd731dc-5963-47be-b063-6ec9534ebe3d",
+      "note": "Grok Bot UUID 6dd731dc-5963-47be-b063-6ec9534ebe3d"
+    },
+    {
+      "agent_key": "grok:provincial",
+      "display_name": "Provincial oversight",
+      "role": "Provincial oversight desk \u2014 Camarines Norte agency / LGU escalation",
+      "owner": "governance",
+      "tier": "T0",
+      "external_id": "28785974-9aa0-43a8-b137-9b9df6865d0b",
+      "note": "Grok Bot UUID 28785974-9aa0-43a8-b137-9b9df6865d0b"
+    },
+    {
+      "agent_key": "grok:inocalla",
+      "display_name": "Paracale-001 / Allan Inocalla",
+      "role": "Paracale-001 client desk \u2014 estate, CARP, AVI, tenancy (Allan as client)",
+      "owner": "client-mgmt",
+      "tier": "T0",
+      "external_id": "b1f19ae5-2b88-41db-9698-7edc8654e613",
+      "note": "Grok Bot UUID b1f19ae5-2b88-41db-9698-7edc8654e613"
+    },
+    {
+      "agent_key": "grok:formation",
+      "display_name": "LandTek Path C company standup",
+      "role": "LANDTEK-CORP / ESPARC Path C formation \u2014 SEC, BIR, DTI, LGU registrations",
+      "owner": "product",
+      "tier": "T0",
+      "external_id": "34930f30-4b9e-40b1-a23e-16dabe2229be",
+      "note": "Grok Bot UUID 34930f30-4b9e-40b1-a23e-16dabe2229be; LandTek Formation"
+    },
+    {
+      "agent_key": "grok:stack-inspector",
+      "display_name": "Stack architecture hygiene",
+      "role": "Stack architecture hygiene \u2014 Principle 10 owners, dead bots, deploy health",
+      "owner": "governance",
+      "tier": "T0",
+      "external_id": "52914058-0585-4638-b7b6-ad37a25ff98b",
+      "note": "Grok Bot UUID 52914058-0585-4638-b7b6-ad37a25ff98b; Stack Inspector"
+    },
+    {
+      "agent_key": "grok:floor",
+      "display_name": "LandTek Floor coordination",
+      "role": "LandTek Floor coordination \u2014 day-to-day ops handoffs across desks",
+      "owner": "governance",
+      "tier": "T0",
+      "external_id": "74bfb675-7f3c-4337-ba4e-5269547de2a2",
+      "note": "Grok Bot UUID 74bfb675-7f3c-4337-ba4e-5269547de2a2; LandTek Floor"
+    }
+  ]
+}
