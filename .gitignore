@@ -150,3 +150,25 @@ tmp/
 # stays tracked — .gitignore never untracks an existing file.
 *.bak
 *.pre[0-9]*
+
+# Case-work binaries + working copies (2026-10-03 cleanup). Canonical copies of scans,
+# photos and waybills live in Drive and the corpus (`documents`); git holds the TEXT —
+# drafts, briefs, build scripts. PDFs are already ignored globally above.
+# See [[feedback-drive-canonical-storage]].
+case_work/**/*.jpg
+case_work/**/*.jpeg
+case_work/**/*.png
+case_work/**/*.jsonl
+case_work/**/source/
+case_work/**/annex_src/
+case_work/**/PRINT_*/
+case_work/**/__pycache__/
+case_work/**/_bak_*/
+case_work/**/_tmp_*
+
+# GIS heavy data — README / MANIFEST / schema / sql / tools code stay tracked;
+# datasets, rendered maps, geopackages and superseded tie-point sets do not.
+gis/datasets/
+gis/maps/
+gis/_superseded_*/
+*.gpkg

@@ -223,7 +223,7 @@ EOF
         fi
       else
         # Mac side: tests run against VPS DB state via SSH.
-        if ! ssh -o ConnectTimeout=10 root@100.85.203.58 \
+        if ! ssh -o ConnectTimeout=10 -o BatchMode=yes landtek \
             "cd /root/landtek && python3 truth_tests/run_all.py" ; then
           err "truth_tests FAILED on VPS — deploy blocked."
           err "Skip with: LANDTEK_SKIP_TRUTH_TESTS=1 $0 deploy ..."
@@ -258,7 +258,9 @@ EOF
     hdr "Commit"
     git commit -m "deploy_${nn}: ${desc}
 
-Auto-tagged by landtek_git_routine.sh on ${SIDE}."
+Auto-tagged by landtek_git_routine.sh on ${SIDE}.${LANDTEK_TRAILER:+
+
+${LANDTEK_TRAILER}}"
     echo ""
 
     hdr "Push"
@@ -290,7 +292,7 @@ Auto-tagged by landtek_git_routine.sh on ${SIDE} (renumbered from deploy_${nn} a
     # + reset (runtime current, lineage diverging — WARN LOUDLY so it gets reconciled).
     if [ "$SIDE" != "VPS" ]; then
       hdr "Sync VPS code"
-      if ssh -o ConnectTimeout=20 root@100.85.203.58 \
+      if ssh -o ConnectTimeout=20 -o BatchMode=yes landtek \
            "cd /root/landtek && git fetch origin main -q && \
             if [ -z \"\$(git status --porcelain | grep -v '^??')\" ]; then \
               git merge --ff-only origin/main -q && echo FF_SYNCED; \
