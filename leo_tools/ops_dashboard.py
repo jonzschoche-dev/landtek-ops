@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 
 import psycopg2
 import psycopg2.extras
-from flask import Blueprint, abort, request
+from flask import Blueprint, abort, redirect, request
 
 PG_DSN = os.getenv("LEO_TOOLS_PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 
@@ -62,7 +62,7 @@ def _esc(s):
 def _layout(title: str, body: str, active: str = "home") -> str:
     nav = [
         ("console", "/console/", "Console"),
-        ("home", "/", "Home"),
+        ("home", "/briefing", "Briefing"),
         ("cases", "/cases", "Cases"),
         ("clients", "/clients", "Clients"),
         ("participants", "/participants", "People"),
@@ -73,12 +73,10 @@ def _layout(title: str, body: str, active: str = "home") -> str:
         ("ingestion", "/ingestion", "Ingestion"),
         ("history", "/history", "History"),
         ("health", "/health", "Health"),
-        ("trajectory", "/trajectory", "Trajectory"),
         ("awareness", "/awareness", "Awareness"),
         ("dependability", "/dependability", "Dependability"),
         ("parcels", "/parcels", "Parcels"),
         ("readiness", "/readiness", "Titles"),
-        ("surfaces", "/surfaces", "Surfaces"),
         ("spend", "/spend", "Spend"),
         ("files", "/files/", "Files"),
         ("rate", "/rate", "Rate Leo"),
@@ -397,6 +395,13 @@ def _bar(pct: int) -> str:
 
 
 @bp.route("/trajectory")
+def trajectory_retired():
+    """RETIRED 2026-10-03 — counted down to the passed Aug-12 north star (read −53 days).
+    Superseded by the live §0 scorecard on the Console. Old content: /ops/retired/trajectory."""
+    return redirect("/ops/console/")
+
+
+@bp.route("/retired/trajectory")
 def trajectory():
     """Mission control: every pillar's status, the cold-infra build progress, the gates
     between here and a flawless ship, and live health — one screen for 'where are we?'"""
@@ -1169,6 +1174,13 @@ def cases():
 
 
 @bp.route("/")
+def landing():
+    """/ops/ lands on the Console (2026-10-03): the one place to test the product + stack.
+    The previous home (morning briefing) now lives at /ops/briefing."""
+    return redirect("/ops/console/")
+
+
+@bp.route("/briefing")
 def home():
     conn = _db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1567,7 +1579,7 @@ def home():
   <table><tr><th>When</th><th>Kind</th><th>Sender</th><th>Question</th><th>Reply</th><th>★</th></tr>{act_rows}</table>
 </div>
 """
-    return _layout("Home", body, active="home")
+    return _layout("Briefing", body, active="home")
 
 
 @bp.route("/clients")
