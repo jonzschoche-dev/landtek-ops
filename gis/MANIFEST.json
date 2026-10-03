@@ -1,0 +1,111 @@
+{
+  "corpus": "landtek-gis",
+  "generated": "2026-09-21",
+  "datasets": [
+    {
+      "id": "ph-tiepoints-camarines-norte",
+      "title": "DENR-LMB survey tie points - Camarines Norte",
+      "version": "1.0.0",
+      "path": "datasets/ph-tiepoints-camarines-norte",
+      "record_count": 1076,
+      "provenance_level": "inferred_strong",
+      "legal_status": "Reference only - not a certified monument description",
+      "source": {
+        "authority": "DENR Land Management Bureau",
+        "service": "DENR/NAMRIA Geoportal Lot Plotter",
+        "endpoints": [
+          "/lp/gettp/{province}/{municipality}",
+          "/lp/gettpvalue/{id}"
+        ],
+        "url": "https://geoportal.gov.ph/gpapps/lotplotter/",
+        "retrieved": "2026-09-21"
+      },
+      "spatial": {
+        "published_crs": "EPSG:4683 (PRS92 geographic)",
+        "published_grid_crs": "EPSG:3124 (PRS92 / Philippines zone IV)",
+        "derived_crs": "EPSG:4326 (WGS84, for imagery overlay)",
+        "datum_note": "Published lat/lon are PRS92, NOT WGS84. Untransformed plotting on WGS84 imagery is displaced ~217 m on azimuth ~137 deg.",
+        "extent_wgs84": {
+          "min_lon": 122.320191,
+          "min_lat": 13.86907299,
+          "max_lon": 123.18036954,
+          "max_lat": 14.47224627
+        }
+      },
+      "coverage": {
+        "by_lgu": {
+          "(unresolved)": 2,
+          "Basud": 9,
+          "Capalonga": 48,
+          "Daet": 47,
+          "Jose Panganiban": 35,
+          "Labo": 493,
+          "Mercedes": 35,
+          "Paracale": 91,
+          "San Lorenzo Ruiz": 50,
+          "San Vicente": 68,
+          "Santa Elena": 40,
+          "Talisay": 135,
+          "Vinzons": 23
+        },
+        "by_monument_type": {
+          "BBM": 356,
+          "BLLM": 247,
+          "P": 243,
+          "MBM": 99,
+          "PRS92": 58,
+          "BLBM": 53,
+          "TRIG": 12,
+          "BDRY": 3,
+          "PBM": 3,
+          "FZM": 1,
+          "PPM": 1
+        }
+      },
+      "schema": "schema/tiepoints.schema.json",
+      "files": {
+        "primary": "datasets/ph-tiepoints-camarines-norte/data/cn_tiepoints.gpkg",
+        "tabular": "datasets/ph-tiepoints-camarines-norte/exports/cn_tiepoints.csv",
+        "google_earth": "datasets/ph-tiepoints-camarines-norte/exports/cn_tiepoints.kmz",
+        "qgis_project": "datasets/ph-tiepoints-camarines-norte/project/cn_tiepoints.qgz",
+        "raw_source": "datasets/ph-tiepoints-camarines-norte/source/raw_harvest_2026-09-21.csv"
+      },
+      "checksums": "datasets/ph-tiepoints-camarines-norte/CHECKSUMS.sha256",
+      "rebuild": [
+        "tools/harvest_tiepoints.py",
+        "tools/build_dataset.py",
+        "tools/make_qgis_project.py",
+        "tools/make_kmz.py",
+        "tools/verify_dataset.py"
+      ],
+      "postgres_loader": "sql/001_gis_tiepoints.sql"
+    }
+  ],
+  "maps": [
+    {
+      "id": "cn-tiepoints-atlas",
+      "title": "Camarines Norte survey tie point atlas",
+      "version": "1.0.0",
+      "path": "maps/cn_tiepoints_atlas_v1.0.0.pdf",
+      "pages": 38,
+      "contents": [
+        "Sheet 1: province overview 1:100,000 (1350 x 840 mm)",
+        "Sheets 2-13: one per LGU, every monument labelled (A1; A0 for Labo, Mercedes, Vinzons)",
+        "Appendix A: reading the atlas",
+        "Appendix B: boundary QA - 64 flagged positions",
+        "Appendix C: 13 records without coordinates",
+        "Appendix D: survey project index (28 projects)",
+        "Appendix E: geodetic control, PAGeNet CORS, reference systems, PRS92->WGS84 parameters",
+        "Appendix F: gazetteer - PTM, WGS84, UTM 51N, nearest PRS92 for every monument",
+        "Appendix G: sources, verified contacts, next steps"
+      ],
+      "grids": {
+        "map_grid": "EPSG:3124 PTM Zone IV",
+        "graticule": "EPSG:4326 WGS84"
+      },
+      "source_dataset": "ph-tiepoints-camarines-norte@1.0.0",
+      "rebuild": "tools/atlas/run_all.sh",
+      "provenance_level": "inferred_strong"
+    }
+  ]
+}

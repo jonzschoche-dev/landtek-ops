@@ -43,7 +43,7 @@ form_conditions = [
     ("I, <b>ALLAN VILLAFRIA INOCALLA</b>, the person executing this application, hereby depose and say: That I have read or have caused the "
      "foregoing application to be read to me, that I thoroughly understand the same, and that each and every statement in said application "
      "is true and correct."),
-    "", "", "BY:  <b>ALLAN VILLAFRIA INOCALLA</b>", "Applicant / Proprietor · TIN 200-011-253 · ID: ______________________ No. ______________", "",
+    "", "", "BY:  <b>ALLAN VILLAFRIA INOCALLA</b>", "Applicant / Proprietor · TIN 200-031-253 · ID: ______________________ No. ______________", "",
     "<b>ACKNOWLEDGEMENT</b>",
     "Republic of the Philippines )   Province of Camarines Norte )   ______________________ ) S.S.",
     ("SUBSCRIBED AND SWORN to before me at the place aforesaid, this ____ day of ____________ 2026, the affiant exhibiting to me his "
@@ -82,7 +82,7 @@ sworn = [
      "Record, or in the alternative a Certificate of Exemption therefrom, in connection with my application for a Mineral Processing Permit "
      "with MGB Regional Office No. V, and to attest to the truth of the foregoing."),
     "IN WITNESS WHEREOF, I have hereunto set my hand this ____ day of ____________ 2026 at ______________, Camarines Norte.",
-    "", "", "", "<b>ALLAN VILLAFRIA INOCALLA</b>", "Affiant · TIN 200-011-253 · ID: ______________________ No. ______________", "",
+    "", "", "", "<b>ALLAN VILLAFRIA INOCALLA</b>", "Affiant · TIN 200-031-253 · ID: ______________________ No. ______________", "",
     ("SUBSCRIBED AND SWORN to before me this ____ day of ____________ 2026 at ______________, Camarines Norte, affiant exhibiting to me his "
      "______________________ No. ______________ issued on __________ at __________."),
     "", "", "NOTARY PUBLIC", "Doc. No. ____; Page No. ____; Book No. ____; Series of 2026.",
@@ -91,7 +91,7 @@ sworn = [
 # ---------- PAGE 3: cover letter to MGB RO-V ----------
 cover = [
     f"<b>{BN}</b>", "Allan V. Inocalla, Proprietor", f"Plant site: {SITE} · Mailing: Purok 4, Brgy. Capacuan, Paracale, Camarines Norte 4605",
-    "Mobile 0917 155 4782 · shiraction2@gmail.com · TIN 200-011-253", "",
+    "Mobile 0917 155 4782 · shiraction2@gmail.com · TIN 200-031-253", "",
     "____ September 2026", "",
     "<b>ENGR. GUILLERMO A. MOLINA JR. IV</b>", "Regional Director", "Mines and Geosciences Bureau, Regional Office No. V", "Rawis, Legazpi City", "",
     "Attention: Chief, Mine Safety, Environment and Social Development Division (MSESDD) / Mine Environmental Management Section", "",

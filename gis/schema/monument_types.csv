@@ -1,0 +1,12 @@
+mon_type,label,count,notes
+PRS92,PRS92 geodetic control point,58,CMN-series PRS92 geodetic control point. Use for GNSS ties.
+BLLM,Bureau of Lands Location Monument,247,Primary location monument for a Pls/Cad project. Technical descriptions usually tie here.
+BBM,Barrio Boundary Monument,356,Barrio boundary monument within a subdivision/cadastral project.
+BLBM,Bureau of Lands Barrio Monument,53,Barrio-level location monument. Distinct class from BLLM - do not conflate.
+BDRY,Boundary monument (inter-municipal / provincial),3,Named inter-municipal or inter-provincial boundary monument; no project number.
+TRIG,Triangulation station,12,"Triangulation station, mostly US C.&G.S. era."
+MBM,Municipal Boundary Monument,99,Municipal boundary monument.
+PBM,Provincial Boundary Monument,3,Provincial boundary monument.
+FZM,Forest Zone Monument,1,Forest zone monument.
+P,Numbered cadastral point (Cad survey),243,Numbered cadastral point. Labo Cad-176 only in this release.
+PPM,PPM - US Army 29th Engineer survey monument,1,US Army 29th Engineer Corps survey monument (1940s).

@@ -43,6 +43,7 @@ SB Councilor Princess Balane-Torralba is his younger sister [doc 973 ¶3].
 | 17 Jun 2026 | Follow-up e-mail in the NSR thread (ARTA's Resolution records *this* as the receipt date of the Supplemental) | [gm 90572] |
 | 9 Sep 2026 | **Resolution** (prep. Atty. L.C. Padilla; Del Rosario, Chief Litigation; endorsed Dir. Ferrolino-Enad; action box DDG-Legal) | [doc 14205] |
 | 15 Sep 2026 | Resolution + annexes (51 pp) received by e-mail | [gm 133013] |
+| 27 Sep 2026 | **Manifestation served on ARTA** by e-mail, reply-all in the [RESOLUTION] thread from jonzschoche@gmail.com; cc Municipality, LGU helpdesk, MEO (meo_mercedescn@yahoo.com). Signed packet, 33 pp, dated 27 Sep; ¶11 says the OP petition *is being filed* on or before 30 Sep. Hard copy by courier to follow | operator-confirmed 28 Sep; corpus copy PENDING (jonzschoche mirror down since 22 Sep — token expired) |
 
 ## 2. Disposition (doc 14205, pp. 3–9)
 
@@ -83,6 +84,7 @@ SB Councilor Princess Balane-Torralba is his younger sister [doc 973 ¶3].
 | 596 | 7 Oct 2025 building-permit clarification letter to Balane | 0690/0792 precursor (background to 1378) | HELD: Jonathan to confirm |
 
 **Built 16 Sep 2026:**
+- **OP filing packet (bound 28 Sep 2026, slim edition)** — `appeal_packet/ARTA_1378_OP_Petition_PACKET_8.5x13.pdf` (57 pp, 17.3 MB, for print) and `..._EMAIL.pdf` (7.6 MB, for the same-day e-mail to mro@op.gov.ph). Petition 9 pp + index + Annexes A–J, no dividers. Annex A = Resolution pp. 1–10 + its Annex D (counter-affidavit, file pp. 32–34) + Annex G (MEO charter, file pp. 43–51); H-1 = charter pp. 166–169; F listed, not bound (no fee tendered); G = Affidavit of Service form. Rebuild: `python3 build.py && python3 build_packet.py`. Due at the OP by **30 Sep 2026**; verification needs wet ink + notary.
 - **OP filing** — `appeal_packet/ARTA_1378_OP_Petition_Supervisory_Review_8.5x13.pdf` (7 pp): Petition for Supervisory Review and Corrective Action, with Notice of Appeal in the alternative, PARTIAL (item A.1 + §21(b)); appeal fee offered if A.O. 22 is deemed applicable; consolidation with 050526-MRO-234187 prayed. Source `OP_PETITION_SUPERVISORY_1378_draft.md`. DRAFT — unsigned, annexes not yet bound.
 - **Manifestation packet** — `manifestation_packet/ARTA_1378_Manifestation_Packet_8.5x13.pdf` (28 pp: manifestation 3 + index 1 + Annexes "1"–"5" 24), rebuilt by `manifestation_packet/build.py` from the draft markdown. DRAFT — unsigned, not filed, not in Drive.
 - **Charter extracts ingested** — doc **14284** (Assessor pp. 166–177, from ARTA's own annex in 1321) and doc **14285** (Municipal Engineering Office pp. 242–250, from ARTA's Annex "G" in 1378); plus doc **14283** (1321 Resolution pertinent pages). Drive-canonical in `Legal/Citizens Charter - Mercedes/`.

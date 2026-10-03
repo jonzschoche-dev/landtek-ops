@@ -15,6 +15,7 @@ Run from this directory:  python3 build.py
 import io
 import os
 import re
+import sys
 
 from pypdf import PdfReader, PdfWriter, PageObject, Transformation
 from reportlab.lib.colors import Color, black
@@ -24,9 +25,11 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas as pdfcanvas
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+SIGNED = "--signed" in sys.argv          # draw Jonathan's signature asset (deploy_1010) above each signature block
+SIG_PNG = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(HERE))), "assets", "signature", "jpz_signature.png")
 SRC = os.path.join(HERE, "source")
 MD = os.path.join(os.path.dirname(HERE), "ARTA_1378_MANIFESTATION_INCOMPLETE_RESOLUTION_draft.md")
 FOLIO = (8.5 * 72, 13.0 * 72)
@@ -154,7 +157,18 @@ def body_story():
             story.append(Spacer(1, 6))
             story.append(Paragraph(md_to_rl(text), S["encl"]))
         elif text.startswith("**JONATHAN PAUL ZSCHOCHE**"):
-            story.append(Spacer(1, 40))
+            if SIGNED:
+                if not os.path.exists(SIG_PNG):
+                    sys.exit(f"signature asset missing: {SIG_PNG}")
+                from PIL import Image as _PI
+                w, h = _PI.open(SIG_PNG).size
+                sw = 1.9 * inch
+                img = Image(SIG_PNG, width=sw, height=sw * h / w)
+                img.hAlign = "LEFT"
+                story.append(Spacer(1, 4))
+                story.append(img)
+            else:
+                story.append(Spacer(1, 40))
             for part in SIG_BLOCK:
                 story.append(Paragraph(md_to_rl(part), S["sig"]))
             story.append(Spacer(1, 10))
@@ -362,7 +376,7 @@ def main():
         for p in pages:
             out.add_page(stamp(p, lbl, short))
 
-    dest = os.path.join(HERE, "ARTA_1378_Manifestation_Packet_8.5x13.pdf")
+    dest = os.path.join(HERE, "ARTA_1378_Manifestation_Packet_8.5x13" + ("_SIGNED" if SIGNED else "") + ".pdf")
     with open(dest, "wb") as fh:
         out.write(fh)
     r = PdfReader(dest)

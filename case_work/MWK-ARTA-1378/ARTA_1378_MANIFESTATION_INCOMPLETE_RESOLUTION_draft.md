@@ -1,4 +1,4 @@
-> **DRAFT — NOT FOR FILING UNTIL JONATHAN APPROVES.** Revision 2, 16 Sep 2026: adopts Jonathan's structure; quotes conformed to the record; record corrections, the not-an-MR line, the candor paragraph and the notice of filing restored. Internal notes at the end. `[VERIFY]` / `[FILL]` to be cleared before signing.
+> **DRAFT — NOT FOR FILING UNTIL JONATHAN APPROVES.** Revision 4, 27 Sep 2026 (faces re-stamped 29 Sep; signed with the deploy_1010 asset). Revision 3, 23 Sep 2026 (faces re-stamped 25 Sep). Revision 2, 16 Sep 2026: adopts Jonathan's structure; quotes conformed to the record; record corrections, the not-an-MR line, the candor paragraph and the notice of filing restored. Internal notes at the end. `[VERIFY]` / `[FILL]` to be cleared before signing.
 
 REPUBLIC OF THE PHILIPPINES
 OFFICE OF THE PRESIDENT
@@ -43,7 +43,7 @@ COMPLAINANT, self-represented, respectfully submits this Manifestation to the Ho
   **(b)** The Resolution states that *"ARTA SLRFO received no response"* from the CART (p. 2). The Committee adopted **CART Resolution No. 05, s. 2026 on 6 April 2026**, transmitted under a Referral Report signed by the Municipal Mayor as CART Chairperson on **16 April 2026** (Annex "1"); the Southern Luzon Regional Field Office endorsed the Sworn Complaint-Affidavit to the Litigation Division by e-mail of the same date (Annex "2").
   **(c)** The Resolution records the Supplemental Affidavit with Manifestation as received on **17 June 2026** (p. 2). It was transmitted to litigationdivision@arta.gov.ph on **8 June 2026 at 12:52 p.m.**, with the signed PDF attached (Annex "3"); the communication of 17 June 2026 was a follow-up.
 
-**11. Candor.** Complainant informs the Authority that he filed with the Office of the President on 17 September 2026, within the period under A.O. No. 22, s. 2011, a **Petition for Supervisory Review and Corrective Action, with Notice of Appeal in the alternative**, limited to **Recommendation No. 1 only**. **Recommendation No. 2 is not assailed**, and Complainant has asked that it proceed unaffected. This Manifestation seeks nothing inconsistent with that filing, and Complainant undertakes to manifest promptly to that Office any action the Authority may take on the matters raised here.
+**11. Candor.** Complainant informs the Authority that he is filing with the Office of the President, on or before 30 September 2026 and within the period under A.O. No. 22, s. 2011, a **Petition for Supervisory Review and Corrective Action, with Notice of Appeal in the alternative**, limited to **Recommendation No. 1 only**. **Recommendation No. 2 is not assailed**, and Complainant has asked that it proceed unaffected. This Manifestation seeks nothing inconsistent with that filing, and Complainant undertakes to manifest promptly to that Office any action the Authority may take on the matters raised here.
 
 ## PRAYER
 
@@ -56,7 +56,7 @@ COMPLAINANT, self-represented, respectfully submits this Manifestation to the Ho
 
 Other reliefs just and equitable are likewise prayed for.
 
-Mercedes, Camarines Norte for Diliman, Quezon City, 18 September 2026.
+Mercedes, Camarines Norte for Diliman, Quezon City, 27 September 2026.
 
 **JONATHAN PAUL ZSCHOCHE**
 Complainant
@@ -75,7 +75,7 @@ Municipal Engineering Office, Mercedes, Camarines Norte
 
 GREETINGS:
 
-Please take notice that Complainant has filed the foregoing Manifestation with the Anti-Red Tape Authority on 18 September 2026 by electronic transmission and by courier.
+Please take notice that Complainant has filed the foregoing Manifestation with the Anti-Red Tape Authority on 27 September 2026 by electronic transmission and by courier.
 
 **JONATHAN PAUL ZSCHOCHE**
 Complainant
@@ -90,7 +90,7 @@ Complainant
 >
 > **3. Trade-off, unchanged.** ¶¶6–7 invite the Authority to supply the §21(b) reasoning whose absence is Ground C of the OP appeal. Accept knowingly; the §21(b) textual argument is worth more than the silence.
 >
-> **4. Sequence and dates — now on the face of the documents.** OP Petition dated and lodged **17 September 2026**; this Manifestation dated and served **18 September 2026**, and ¶11 states the OP filing in the past tense. **If the signing or shipping date slips, change both faces together and keep the Manifestation's date on or after the OP's** — otherwise ¶11 is false on its face. Dates to change here: the dateline (¶ after the Prayer), the Notice of Filing, and ¶11; in the OP draft: the face date and the affiant's date in the verification (the jurat date stays blank for the notary). Nothing here tolls the 30 September deadline: A.O. 22 §1 extends the period only for an MR "duly filed in accordance with the governing law" of the agency, and Rule IV §8 forbids one.
+> **4. Sequence and dates — now on the face of the documents.** Both faces now read **29 September 2026** (re-stamped 27 Sep: Jonathan confirmed the OP petition had NOT gone out on the 25th and ships by the 29th; the 17/18 and 25 Sep dates all lapsed). ¶11 states the OP filing in the past tense, so on the day itself **lodge the OP package with the courier first, then send this Manifestation** — same-day is fine, sequence is not. **If the signing or shipping date slips, change both faces together and keep the Manifestation's date on or after the OP's** — otherwise ¶11 is false on its face. Dates to change here: the dateline (¶ after the Prayer), the Notice of Filing, and ¶11; in the OP draft: the face date and the affiant's date in the verification (the jurat date stays blank for the notary). Nothing here tolls the 30 September deadline: A.O. 22 §1 extends the period only for an MR "duly filed in accordance with the governing law" of the agency, and Rule IV §8 forbids one.
 >
 > **4-A. Annex labelling.** The Assessor Charter pages carry the Authority's own printed ANNEX "3" from CTN SL-2026-0209-1321. The source is not altered. Instead: a divider page precedes each annex, the index flags the inherited marking, and every page of Annex "4" carries our boxed ANNEX "4" stamp plus a footline reading *ANNEX "4" of this Manifestation*. Annexes "1" and "5" carry no inherited marks.
 >

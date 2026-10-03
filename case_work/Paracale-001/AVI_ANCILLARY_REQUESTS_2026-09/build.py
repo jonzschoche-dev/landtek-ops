@@ -13,7 +13,7 @@ DTI = "DTI Business Name No. 8480852 (Regional – Region V), valid 11 September
 SITE = "Lot 4, Psu-143364, Original Certificate of Title No. P-1616 (Registry of Deeds for Camarines Norte), Barangay Santa Rosa Sur, Jose Panganiban, Camarines Norte 4606"
 HEAD = [("b", BN), ("n", "Allan V. Inocalla, Proprietor"),
         ("n", "Residence: Purok 4, Barangay Capacuan, Paracale, Camarines Norte 4605 · Plant site: " + SITE),
-        ("n", "Mobile 0917 155 4782  ·  shiraction2@gmail.com  ·  TIN 200-011-253")]
+        ("n", "Mobile 0917 155 4782  ·  shiraction2@gmail.com  ·  TIN 200-031-253")]
 SIGN = ["Respectfully yours,", "", "", "", "<b>ALLAN V. INOCALLA</b>", f"Proprietor, {BN}", ""]
 RCV = "Received by: ______________________  Position: ______________  Date/Time: ______________"
 
@@ -143,7 +143,7 @@ DOCS.append({"title": "7 · Authorization Letter (Allan V. Inocalla → represen
              "3. Sign receipts and acknowledgments for documents released to me by the above offices.",
              ("This authorization does not include the power to sign the applications, sworn statements or permits themselves, which I will sign "
               "personally, nor to sell, lease or encumber any property. It is valid from 14 September 2026 until 31 December 2026 unless sooner revoked in writing."),
-             "", "", "", "<b>ALLAN VILLAFRIA INOCALLA</b>", "Principal · TIN 200-011-253 · ID: ______________________ No. ______________", "", "",
+             "", "", "", "<b>ALLAN VILLAFRIA INOCALLA</b>", "Principal · TIN 200-031-253 · ID: ______________________ No. ______________", "", "",
              "______________________________", "Representative (signature over printed name) · ID: ______________________ No. ______________",
              "", "(Attach photocopies of both IDs. Have it notarized if the receiving office requires a notarized SPA; a notarized Special Power of Attorney is needed for any act of signing on the principal's behalf.)"]})
 
@@ -168,7 +168,7 @@ DOCS.append({"title": "8 · Sworn Declaration of Capitalization (for the Mayor's
              "4. That the business area to be used is five thousand (5,000) square meters, a portion of Lot 4, and the number of employees at start is three (3), to be hired preferentially from Barangay Santa Rosa Sur;",
              "5. That I execute this declaration to attest to the truth of the foregoing for the purpose of the assessment of business taxes and fees, and for whatever legal purpose it may serve.",
              "IN WITNESS WHEREOF, I have hereunto set my hand this 14th day of September 2026 at Jose Panganiban, Camarines Norte.",
-             "", "", "", "<b>ALLAN VILLAFRIA INOCALLA</b>", "Affiant · TIN 200-011-253 · ID: ______________________ No. ______________", "",
+             "", "", "", "<b>ALLAN VILLAFRIA INOCALLA</b>", "Affiant · TIN 200-031-253 · ID: ______________________ No. ______________", "",
              ("SUBSCRIBED AND SWORN to before me this 14th day of September 2026 at ______________, Camarines Norte, affiant exhibiting to me "
               "his ______________________ No. ______________ issued on __________ at __________."),
              "", "", "NOTARY PUBLIC", "Doc. No. ____; Page No. ____; Book No. ____; Series of 2026."]})

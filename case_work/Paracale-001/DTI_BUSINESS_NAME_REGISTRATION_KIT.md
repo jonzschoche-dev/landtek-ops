@@ -47,7 +47,7 @@
 | Business address | **Lot 4, Psu-143364 (OCT P-1616), Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte 4606** — barangay per Jonathan 2026-09-11; municipality corrected to **Jose Panganiban** by Jonathan 2026-09-12 (Santa Rosa Norte/Sur are Jose Panganiban barangays; the earlier "Paracale" was a desk error) | title: doc 639 (LRA certified copy) / doc 633 (owner's duplicate); barangay + municipality per Jonathan | ✔ Allan's own title. Put the house/purok no. from the tax declaration if the form demands one. See §3a. |
 | Email (verification code lands here) | shiraction2@gmail.com | Gmail sender record | ✔ must be reachable during filing |
 | Mobile | **0917 155 4782** | confirmed by Jonathan 2026-09-11 (matches the garbled "…155 47…" on the DANB form, doc 4454) | ✔ — the 0991 529 5659 on the DENR stub is someone else's / secondary |
-| TIN | **200-011-253** (branch code 000) | confirmed by Jonathan 2026-09-11; leading digits agree with the BDO form OCR (doc 1581) | ✔ |
+| TIN | **200-031-253** (branch code 000) | **corrected 2026-09-18** — read off Allan's card while filling BIR Form 1901; supersedes the 200-011-253 recorded 2026-09-11, which was wrong in the middle group and had propagated to 11 AVI documents | ✔ |
 | Valid government ID | needed for the upload/verification step | — | passport / driver's licence / UMID / senior citizen ID |
 | Business scope (PSIC) | Manufacturing → manufacture of basic precious metals / processing of gold ore & tailings (small-scale) | — | pick the closest PSIC line the form offers; the descriptor "Gold Processing" must sit under it |
 | Payment | GCash / Maya / LandBank Link.Biz / Visa-Master-JCB; must pay **within 7 calendar days** of application | BNRS guide + flyer | fund the wallet first |
@@ -85,7 +85,7 @@ Sequenced the way the agencies actually gate each other. Each line is a document
 | 9 | **Permit to Operate** — air (RA 8749) for mills/blowers/generator | EMB-V | 5 | precedent: 2017 PTO application (doc 1285) |
 | 10 | **Hazardous Waste Generator ID** (RA 6969) and **CCO registration** — only if cyanide or mercury is in the process | EMB-V | 5 | not needed for a gravity-only circuit; needed the moment a leach tank is planned |
 | 11 | **Mayor's / Business Permit** for the Santa Rosa Sur site (+ Sanitary Permit, BFP Fire Safety Inspection Certificate) | Jose Panganiban BPLO / RHU / BFP | 0, 3, 5, 7 | precedent (Paracale): Mayor's Permit No. 148, Sanitary Permit 12 Jan 2017 |
-| 12 | **BIR** Form 1901 → COR 2303, books, invoices | RDO covering Jose Panganiban (RDO 64, Talisay, Cam. Norte — confirm) | 0, 11 | TIN 200-011-253 |
+| 12 | **BIR** Form 1901 → COR 2303, books, invoices | RDO covering Jose Panganiban (RDO 64, Talisay, Cam. Norte — confirm) | 0, 11 | TIN 200-031-253 |
 | 13 | **CANORECO** power service for the site | CANORECO (Jose Panganiban service area) | 7 | see CANORECO_LINE_TAPPING_INTAKE.md — the same rules on extension cost apply here |
 | 14 | **DOLE Rule 1020 registration; SSS / PhilHealth / Pag-IBIG** employer numbers | DOLE CN field office / agencies | first hire | ties to C-20 manpower cost basis |
 
@@ -120,7 +120,7 @@ A DTI certificate "merely provides the business a legal identity"; to operate yo
 ## 6. Open items for Jonathan / Allan
 
 1. **Run the exact-match availability search** for AVI GOLD PROCESSING (CAPTCHA-gated; pre-filled in the browser pane). Confirm Regional vs National scope.
-2. All owner fields settled (name, DOB 12 Jan 1955, address, email, mobile 0917 155 4782, TIN 200-011-253). Allan needs only a valid ID and a funded e-wallet/card at filing.
+2. All owner fields settled (name, DOB 12 Jan 1955, address, email, mobile 0917 155 4782, TIN 200-031-253). Allan needs only a valid ID and a funded e-wallet/card at filing.
 3. **Process decision for the ECC file** — gravity-only (mercury-free) or cyanide leaching? It sets the size of the EMB file (§3b steps 5, 10) and whether CCO/HazWaste registrations are needed. Also: does LAB X move here from Casalugan?
 4. **The claim stub under the flyer** — what was filed at DENR/EMB Region V that day (FS No. 5Av2 form, "will undergo manual…", Legazpi City)? If it is the plant's Permit-to-Operate/WDP renewal, get the stub photographed alone and ingested; the 2016–2017 air/water permits are the stalest items in the Gracesen stack.
 5. **SEC vs sole-prop** for LAB X ownership (§2 caveat) — decision, not urgent this week.

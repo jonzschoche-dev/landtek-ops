@@ -78,7 +78,7 @@ letter_body = [
     "Respectfully yours,", "", "", "",
     "<b>ALLAN V. INOCALLA</b>",
     f"Proprietor, {BN}",
-    "TIN 200-011-253",
+    "TIN 200-031-253",
     "",
     "Enclosures: (1) Draft Barangay Resolution; (2) DTI Certificate of Business Name Registration No. 8480852 and official receipt; "
     "(3) Certified true copy of OCT No. P-1616 (Lot 4, Psu-143364) and Tax Declaration; "

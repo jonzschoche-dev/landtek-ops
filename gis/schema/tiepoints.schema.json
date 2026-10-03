@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://landtek.local/schema/tiepoints-1.0.0.json",
+  "title": "LandTek survey tie point",
+  "description": "One DENR-LMB survey tie point. Coordinates are reference grade (provenance_level 'inferred_strong'), never a certified monument description.",
+  "type": "object",
+  "required": [
+    "gp_id",
+    "pointref",
+    "mon_type",
+    "prs92_lat",
+    "prs92_lon",
+    "ptm_east",
+    "ptm_north"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "gp_id": {
+      "type": [
+        "null",
+        "integer"
+      ],
+      "description": "Geoportal Lot Plotter record id. Stable primary key upstream."
+    },
+    "pointref": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Monument reference exactly as published. Never edited."
+    },
+    "lgu": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Canonical LGU name. Empty where the source locality is not an LGU."
+    },
+    "psgc_code": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "PSA PSGC code for the LGU. Empty where unresolved."
+    },
+    "source_locality": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Locality string as the source published it."
+    },
+    "municipality": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Title-cased source locality. Display convenience only."
+    },
+    "province": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Always 'Camarines Norte' in this release."
+    },
+    "province_psgc": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "PSA PSGC code for the province."
+    },
+    "mon_type": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Controlled vocabulary - see schema/monument_types.csv."
+    },
+    "mon_type_label": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Human-readable expansion of mon_type."
+    },
+    "mon_no": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Monument number or name, parsed from pointref."
+    },
+    "survey_project": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Pls/Cad/Cadm project, normalised to Xxx-NNN[-L]. Empty where none."
+    },
+    "barrio": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Barrio name parsed from 'Bo. of X'. Source spelling preserved."
+    },
+    "variant": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Relocation qualifier, e.g. 'Relocated 1935 New'."
+    },
+    "prs92_lat": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Latitude as published. PRS92 geographic, EPSG:4683."
+    },
+    "prs92_lon": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Longitude as published. PRS92 geographic, EPSG:4683."
+    },
+    "wgs84_lat": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Latitude transformed to WGS84, EPSG:4326. Use for imagery."
+    },
+    "wgs84_lon": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Longitude transformed to WGS84, EPSG:4326. Use for imagery."
+    },
+    "ptm_zone": {
+      "type": [
+        "null",
+        "integer"
+      ],
+      "description": "Philippine Transverse Mercator zone. 4 throughout this release."
+    },
+    "ptm_east": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Easting as published, EPSG:3124. Passed through, never recomputed."
+    },
+    "ptm_north": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Northing as published, EPSG:3124. Passed through, never recomputed."
+    },
+    "ptm_check_resid_m": {
+      "type": [
+        "null",
+        "number"
+      ],
+      "description": "Distance between recomputed and published grid position. QA field."
+    },
+    "source": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Provenance string."
+    },
+    "retrieved": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "ISO date of harvest."
+    },
+    "dataset_version": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Semantic version of this dataset release."
+    },
+    "legal_status": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "Standing caveat carried on every record."
+    }
+  }
+}

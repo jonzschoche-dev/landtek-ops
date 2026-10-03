@@ -1,6 +1,6 @@
 > **DRAFT — NOT FOR FILING UNTIL JONATHAN APPROVES.** Revision 2, 16 Sep 2026: recast as a **Petition for Supervisory Review** with a Notice of Appeal in the alternative and the appeal fee offered if this Office deems A.O. 22 applicable — the form used in the 5 May, 4 Jun, 23 Jul and 8 Sep filings in this proceeding. Deadline: **30 September 2026**. Internal notes at the end. `[VERIFY]` / `[FILL]` must be cleared before signing.
 
-17 September 2026
+29 September 2026
 
 **SECRETARY RALPH G. RECTO**
 Executive Secretary
@@ -16,6 +16,22 @@ Dear Secretary Recto:
 Petitioner Jonathan Paul Zschoche, Attorney-in-Fact for Patricia Keesey Zschoche, heir in the Estate of Mary Worrick Keesey, respectfully seeks supervisory review and corrective action over **Recommendation No. 1 (CLOSURE)** of the Resolution of the Anti-Red Tape Authority dated **09 September 2026** in CTN SL-2026-0218-1378 (Annex "A"), received by electronic mail from the ARTA Litigation Division on **15 September 2026** (Annex "A-1"). A Notice of Appeal is filed simultaneously, in the alternative and without prejudice to the supervisory character of this Petition. This filing is made within fifteen (15) days of receipt.
 
 **The single question presented is documentary and institutional: may one Authority, in one Municipality and on one complainant, hold on 25 August 2026 that a request for certified copies of records IS a "government service" under Section 4(f) — and hold fifteen days later that it is not?**
+
+## THE CONTEXT: WHAT IS BEING DONE, AND WHY IT MATTERS
+
+**The land and the question.** Petitioner's principal is an heir of the late Mary Worrick Keesey, whose estate holds titled land in the Poblacion of Mercedes, Camarines Norte, under Transfer Certificate of Title No. T-4497 and the titles derived from it. Since October 2025 the heirs have asked the Municipal Engineer, who is the Building Official, for the one thing any landowner is entitled to know about his own land: whether building permits were issued for the structures standing on it. That answer sits in a register the office keeps in the ordinary course. It requires no judgment, only a look.
+
+**What was done instead.**
+
+- In October 2025 the Municipal Engineer refused even to receive the written request, and demanded a Special Power of Attorney as the price of receipt (Resolution of 07 April 2026, CTN SL-2025-1008-0690/-1104-0792, already before this Office).
+- When the request was renewed on 24 January 2026, his written reply of 5 February 2026 conditioned all action on an apostilled Special Power of Attorney, and told Petitioner that he was *"hopefully not an overstaying foreigner"* who had not violated any law *"that could be the subject of a deportation proceedings, of course, after serving prison time and payment of appropriate damages"* (Annex "C").
+- That letter was written **the day after** the heirs filed Civil Case No. 26-360 in the Municipal Trial Court of Mercedes over part of the same titled land — a case in which **Engr. Erwin Balane is himself a named defendant**, together with Spouses Efren and Gloria Balane and Spouses Jomil Torralba and Princess Balane Torralba (Annex "J", the Court's Notice of Pre-Trial). He has admitted under oath that Councilor Princess Balane-Torralba of the Sangguniang Bayan is his younger sister (Annex "A", Annex "D" thereof). **The official who keeps the permit register for the heirs' land is their adversary in the lawsuit over it.**
+- The Municipality's Committee on Anti-Red Tape — the body the law designates to *resolve* red-tape complaints — met on 6 April 2026 in Petitioner's absence, his written request that morning to attend by video not having been accommodated. It recommended closure and resolved further that the Municipality *"shall not release, provide, or act upon the requested documents of Mr. Jonathan Zschoche unless and until he sufficiently establishes and submits proof of his legal personality or authority"* (Annex "E"). Among those who adopted that resolution was **Mr. Antonio B. Teope** — the occupant of the very structure whose permit status had been asked (Annex "E", attendance and signatories).
+- The same Municipality is the subject of the other dockets already consolidated in this proceeding — its Mayor, its Treasurer, its Sangguniang Bayan and its Assessor — each closed by the Authority at the threshold.
+
+**Ministerial offices acting as players on the field.** The acts asked of these offices are ministerial. The law commands that every officer *"shall accept written applications, requests, and/or documents"* (R.A. No. 11032, Sec. 9(a)(1)); that any deficiency notice *"shall be limited to those enumerated in the Citizen's Charter"* (Sec. 9(a)(2)); and that a disapproval be *"fully explained in writing"* (Sec. 9(c)). A Building Official stating what his own register shows performs an act *"which the law specifically enjoins as a duty resulting from an office"* (Rules of Court, Rule 65, Sec. 3). An office discharging such a duty has no stake in the answer. Here the offices have acted as interested parties: the keeper of the register is a litigant against the persons asking; the committee that judged the complaint seated the occupant of the structure in question; and that committee adopted a standing rule to refuse the complainant everything. Each discretion invoked along the way — an apostilled power of attorney, a test of "legal personality," a closure for want of a chartered service — is a discretion no law confers on these offices. The referee has taken the field.
+
+**Why it matters beyond one family.** R.A. No. 11032 declares the policy of the State *"to promote integrity, accountability, proper management of public affairs and public property as well as to establish effective practices, aimed at efficient turnaround of the delivery of government services and the prevention of graft and corruption in government"* (Sec. 2). Public registers — titles, tax declarations, building permits — are what make land usable as an economic asset: to sell it, borrow against it, develop it, insure it, or pay the correct tax on it. When a municipal office may decline to say what its own register holds, and may make the answer depend on who is asking and on whether the office-holder stands on the other side of a lawsuit, then every landowner in that municipality holds land at the office's pleasure. That is precisely the red tape the law was enacted to end, and it falls hardest on ordinary Filipino landowners, who cannot litigate for years to learn what a public office already knows. If the construction applied below stands, it becomes a template for every office in the country: the less an office publishes in its Citizen's Charter, the less it must do.
 
 # PETITION FOR SUPERVISORY REVIEW AND CORRECTIVE ACTION
 ## (with Notice of Appeal in the alternative — partial)
@@ -54,9 +70,9 @@ Petitioner does **not** press the broader parts of his request (the historical p
 ## II. ANTECEDENTS
 
 1. On **24 January 2026** Petitioner, as attorney-in-fact of a registered co-owner of the land, applied in writing to Engr. Erwin H. Balane, Building Official of Mercedes. Item A.1 sought a Certificate of No Record for the structure occupied by Mr. Antonio B. Teope in Barangay 1. He offered to shoulder the reasonable costs of reproduction. The office received the application by e-mail and in hard copy on **26 January 2026** (Annex "B").
-2. On **5 February 2026** Engr. Balane replied that he would release nothing unless Petitioner presented "a duly issued, authenticated or apostilled Special Power of Attorney." The same letter told Petitioner that he was "hopefully not an overstaying foreigner" who had not violated any law "that could be the subject of a deportation proceedings, of course, after serving prison time and payment of appropriate damages" (Annex "C"). No requirement of an SPA for any Municipal Engineering Office service appears in the Citizen's Charter relied on by the Authority (Annex "A", Annex "G" thereof). As Petitioner showed below, the apostilled SPA was moreover already in the respondent's possession: it forms part of the record of CTN SL-2025-1008-0690/-1104-0792, in which he is the respondent (Supplemental Affidavit and Manifestation ¶10, Annex "A", Annex "F" thereof).
+2. On **5 February 2026** Engr. Balane replied that he would release nothing unless Petitioner presented "a duly issued, authenticated or apostilled Special Power of Attorney." The same letter told Petitioner that he was "hopefully not an overstaying foreigner" who had not violated any law "that could be the subject of a deportation proceedings, of course, after serving prison time and payment of appropriate damages" (Annex "C"). No requirement of an SPA for any Municipal Engineering Office service appears in the Citizen's Charter relied on by the Authority (Annex "A", Annex "G" thereof). As Petitioner showed below, the apostilled SPA was moreover already in the respondent's possession: it forms part of the record of CTN SL-2025-1008-0690/-1104-0792, in which he is the respondent (Supplemental Affidavit and Manifestation of 8 June 2026, ¶10, which forms Annex "F" of the Resolution in the Authority's record).
 3. The complaint was referred to the Municipality's Committee on Anti-Red Tape. On 6 April 2026 the Committee adopted CART Resolution No. 05, s. 2026, which recommended closure. It further resolved that the Municipality "shall not release, provide, or act upon the requested documents of Mr. Jonathan Zschoche unless and until he sufficiently establishes and submits proof of his legal personality or authority" (Annex "E").
-4. Petitioner filed his Sworn Complaint-Affidavit (8 April 2026). The respondent's Counter-Affidavit (21 May 2026) raised only procedural objections. After a Notice of Submission for Resolution (4 June 2026), Petitioner filed a Supplemental Affidavit and Manifestation (8 June 2026) (Annex "A", Annexes B–F thereof).
+4. Petitioner filed his Sworn Complaint-Affidavit (8 April 2026). The respondent's Counter-Affidavit (21 May 2026) raised only procedural objections. After a Notice of Submission for Resolution (4 June 2026), Petitioner filed a Supplemental Affidavit and Manifestation (8 June 2026). The Resolution itself recites each of these steps (Annex "A", pp. 1–2, and notes 6–10).
 5. The Resolution of **09 September 2026**:
    - rejected the SPA and forum-shopping objections;
    - found no prima facie violation because the request was not a "government service" under Section 4(f);
@@ -107,7 +123,7 @@ These points are not individually decisive, but they show the record was not ful
 
 - The Resolution states that the Authority referred the complaint to the Committee on Anti-Red Tape on "13 February 2026," before the complaint was filed. Its own Annex A-1 is dated **23 February 2026**.
 - It states that "ARTA SLRFO received no response." In fact the Committee adopted CART Resolution No. 05 on 6 April 2026 and transmitted a Referral Report on 16 April 2026. That Resolution adopted a standing policy of non-release to Petitioner (Annex "E"). None of this is mentioned.
-- It records the Supplemental Affidavit as received on 17 June 2026. It was transmitted to the Litigation Division by e-mail on **8 June 2026** (Annex "A", Annex "F" thereof; transmittal e-mail on file).
+- It records the Supplemental Affidavit as received on 17 June 2026. It was transmitted to the Litigation Division by e-mail on **8 June 2026**; the Resolution's own note 10 describes it as the Supplemental "dated 08 June 2026" (Annex "A", p. 2).
 
 ## IV. RELIEF
 
@@ -116,8 +132,9 @@ Petitioner respectfully prays that this Office:
 1. **TAKE COGNIZANCE** of this Petition as one for supervisory review and corrective action, or, in the alternative, give due course to the Notice of Appeal; and **SET ASIDE** Recommendation No. 1 of the Resolution dated 09 September 2026 in CTN SL-2026-0218-1378, insofar as it closes the complaint as to (a) the application for a Certificate of No Record (item A.1) and (b) Section 21(b);
 2. **FIND** prima facie evidence of violation of Section 21(e) and/or Section 21(b) of R.A. No. 11032 as to item A.1; or, alternatively, **REMAND** the complaint to the Authority with instructions to evaluate item A.1 as an application for issuance of a certification, and to render a reasoned disposition of the Section 21(b) count;
 3. **DECLARE** that Recommendation No. 2 (referral to the Civil Service Commission, Regional Office V) is not assailed here and is not stayed, and that it proceed without awaiting the disposition of this Petition;
-4. **CONSOLIDATE** this Petition with the proceeding pending before this Office under Transmittal Ref. 050526-MRO-234187, which involves the same respondent, the same office and the same certification question (Petition of 5 May 2026, §V.A), and **ADVISE** Petitioner of the docket number once assigned, and of the mode of payment should the fee under A.O. No. 22 be required; and
-5. Grant such other relief as is just.
+4. **CONSOLIDATE** this Petition with the proceeding pending before this Office under Transmittal Ref. 050526-MRO-234187, which involves the same respondent, the same office and the same certification question (Petition of 5 May 2026, §V.A), and **ADVISE** Petitioner of the docket number once assigned, and of the mode of payment should the fee under A.O. No. 22 be required;
+5. **NOTE** the conduct set out under *The Context* above, and take or direct such supervisory action in respect of the Municipality of Mercedes as this Office deems proper in the exercise of the President's general supervision over local governments (Constitution, Art. X, Sec. 4); and
+6. Grant such other relief as is just.
 
 Respectfully submitted.
 
@@ -128,7 +145,7 @@ Dasmariñas Street, Barangay 8, Daet, Camarines Norte
 jonzschoche@gmail.com · 0966-698-1448
 
 **Annexes:**
-- **"A"** — ARTA Resolution dated 09 September 2026, CTN SL-2026-0218-1378, with its Annexes A–G (51 pp.)
+- **"A"** — ARTA Resolution dated 09 September 2026, CTN SL-2026-0218-1378 (10 pp.), with its Annex "D" (Respondent's Counter-Affidavit of 21 May 2026) and Annex "G" (Citizen's Charter, Municipal Engineering Office, pp. 242–250); its remaining annexes are omitted, being part of the Authority's own record
 - **"A-1"** — ARTA Litigation Division transmittal e-mail, 15 September 2026
 - **"B"** — Petitioner's request of 24 January 2026 and transmittal e-mail of 26 January 2026
 - **"C"** — Respondent's letter received 5 February 2026 (dated on its face "February 5, 2025")
@@ -137,8 +154,9 @@ jonzschoche@gmail.com · 0966-698-1448
 - **"F"** — Official Receipt for the appeal fee, should this Office require one (to be filed upon notice)
 - **"G"** — Affidavit of Service, with registry/courier receipts and e-mail transmittal
 - **"H"** — ARTA Resolution dated 25 August 2026 in CTN SL-2026-0209-1321, pertinent pages (caption; pp. 5–7 findings; pp. 10–11 recommendation and action)
-- **"H-1"** — Citizen's Charter of the Municipality of Mercedes, Municipal Assessor's Office section (pp. 166–177), as annexed by the Authority in CTN SL-2026-0209-1321
+- **"H-1"** — Citizen's Charter of the Municipality of Mercedes, Municipal Assessor's Office section, pp. 166–169 (list of services; certified-copy issuance; Certification of No Improvement, No Property Holdings and Aggregate Landholdings), as annexed by the Authority in CTN SL-2026-0209-1321
 - **"I"** — Letter of the Chief, ARTA Litigation Division, 27 April 2026 (no motion for reconsideration; findings "merely recommendatory"), issued in CTN SL-2025-1008-0690 / SL-2025-1104-0792
+- **"J"** — Notice of Pre-Trial Conference, Municipal Trial Court of Mercedes, Civil Case No. 26-360 (caption naming Engr. Erwin Balane among the defendants)
 
 ---
 
@@ -156,7 +174,7 @@ I, **JONATHAN PAUL ZSCHOCHE**, of legal age, American citizen, with service addr
    - **(e)** Civil Case No. 26-360, Municipal Trial Court of Mercedes, an action concerning title to and possession of the heirs' land, which does not involve the acts complained of before the Authority.
 4. Save for the proceedings disclosed above, I have not commenced any other action involving the same causes of action in any court, tribunal, or quasi-judicial agency; to the best of my knowledge no such action is pending; and should I learn of any such action, I undertake to inform this Honorable Office within five (5) calendar days.
 
-IN WITNESS WHEREOF, I have hereunto set my hand this 17th day of September 2026 at ______________________________.
+IN WITNESS WHEREOF, I have hereunto set my hand this 29th day of September 2026 at ______________________________.
 
 **JONATHAN PAUL ZSCHOCHE**
 Affiant

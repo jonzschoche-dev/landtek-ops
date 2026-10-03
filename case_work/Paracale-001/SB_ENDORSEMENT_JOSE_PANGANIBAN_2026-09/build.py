@@ -71,7 +71,7 @@ body = [
     ("Enclosed are the Resolution of the Sangguniang Barangay of Santa Rosa Sur endorsing the project, a draft Resolution for the "
      "Sanggunian's consideration, and the supporting documents listed below. I am available to appear before the Committee on "
      "Environment and Natural Resources or at a public consultation at the Sanggunian's convenience."),
-    "Respectfully yours,", "", "", "", "<b>ALLAN V. INOCALLA</b>", f"Proprietor, {BN}", "TIN 200-011-253", "",
+    "Respectfully yours,", "", "", "", "<b>ALLAN V. INOCALLA</b>", f"Proprietor, {BN}", "TIN 200-031-253", "",
     ("Enclosures: (1) Draft Sangguniang Bayan Resolution; (2) Sangguniang Barangay Santa Rosa Sur Resolution No. ____ s-2026 "
      "endorsing the project and Barangay Business Clearance; (3) DTI Certificate of Business Name Registration No. 8480852 and "
      "official receipt; (4) Certified true copy of OCT No. P-1616 and Tax Declaration No. ______; (5) Sketch plan / site "

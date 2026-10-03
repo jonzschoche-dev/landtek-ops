@@ -80,7 +80,7 @@ consent = [
            "undertaking; and")),
     ("j", "5. That I execute this affidavit to attest to the truth of the foregoing and for submission to the Provincial Mining Regulatory Board of Camarines Norte, the Mines and Geosciences Bureau and the Municipality of Jose Panganiban."),
     ("j", "IN WITNESS WHEREOF, I have hereunto set my hand this ____ day of ____________ 2026 at ______________, Camarines Norte."),
-    ("n", ""), ("n", ""), ("n", ""), ("n", "<b>ALLAN VILLAFRIA INOCALLA</b>"), ("n", "Affiant / Landowner · TIN 200-011-253 · ID: ______________________ No. ______________"), ("n", ""),
+    ("n", ""), ("n", ""), ("n", ""), ("n", "<b>ALLAN VILLAFRIA INOCALLA</b>"), ("n", "Affiant / Landowner · TIN 200-031-253 · ID: ______________________ No. ______________"), ("n", ""),
     ("j", ("SUBSCRIBED AND SWORN to before me this ____ day of ____________ 2026 at ______________, Camarines Norte, affiant exhibiting to me his "
            "______________________ No. ______________ issued on __________ at __________.")),
     ("n", ""), ("n", ""), ("n", "NOTARY PUBLIC"), ("n", "Doc. No. ____; Page No. ____; Book No. ____; Series of 2026."),

@@ -59,7 +59,7 @@ The LGU cannot lawfully demand the ECC or the MGB permit **as a condition of acc
 | Type of application | **New** |
 | Mode of payment | Annual (or quarterly if JP's revenue code allows) |
 | Business name (DTI) | **AVI GOLD PROCESSING PLANT** — DTI BN No. 8480852, date 11 Sep 2026 |
-| Owner / taxpayer | ALLAN VILLAFRIA INOCALLA · TIN 200-011-253 · Filipino · born 12 Jan 1955, Paracale · separated |
+| Owner / taxpayer | ALLAN VILLAFRIA INOCALLA · TIN 200-031-253 · Filipino · born 12 Jan 1955, Paracale · separated |
 | Owner's address | Purok 4, Brgy. Capacuan, Paracale, Camarines Norte 4605 (residence) |
 | Business address | Lot 4, Psu-143364 (OCT P-1616), Purok ___, **Brgy. Santa Rosa Sur, Jose Panganiban, Camarines Norte 4606** |
 | Contact | 0917 155 4782 · shiraction2@gmail.com |
@@ -96,7 +96,7 @@ The LGU cannot lawfully demand the ECC or the MGB permit **as a condition of acc
 > I request assessment of the applicable business tax and fees and undertake to comply with the zoning, sanitary, fire-safety and other regulatory requirements of the Municipality.
 >
 > Respectfully,
-> **ALLAN V. INOCALLA**, Proprietor, AVI Gold Processing Plant · TIN 200-011-253
+> **ALLAN V. INOCALLA**, Proprietor, AVI Gold Processing Plant · TIN 200-031-253
 
 ## 6. Fees — what to budget (JP figures unknown; Paracale precedent shown)
 
