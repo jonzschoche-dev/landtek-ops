@@ -644,6 +644,13 @@ def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=N
             pack, _ferr = tf.fetch_title_pack(cur, client_code, message)
             if pack:
                 return _emit(pack, "title_fetch", "title_fetch")
+        # Title CARD (2026-10-03): who holds / owns / status of / about a SPECIFIC title → the
+        # client-scoped title_brief card. Must run before the composer (which answered client-wide
+        # status) and the inquiry stack (which misread "registered owner of title …" as an entity).
+        if tf.wants_title_card(message):
+            card = tf.fetch_title_card(cur, client_code, message)
+            if card:
+                return _emit(card, "title_card", "title_card")
     except Exception as e:
         print(f"[leo_service] title_fetch route: {type(e).__name__}: {e}", flush=True)
 

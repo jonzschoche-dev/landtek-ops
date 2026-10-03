@@ -369,7 +369,7 @@ def _compose_deadlines(cur, matter, client_code, role, params):
     seen = set()
 
     # Home 1 — the structured SoR column
-    cur.execute("""SELECT matter_code, next_deadline FROM matters
+    cur.execute("""SELECT matter_code, next_deadline, current_stage, next_event FROM matters
                    WHERE next_deadline IS NOT NULL
                      AND (%s::text IS NULL OR matter_code = %s)
                      AND (%s::text IS NULL OR client_code = %s)
@@ -379,6 +379,16 @@ def _compose_deadlines(cur, matter, client_code, role, params):
         key = (r["matter_code"], r["next_deadline"])
         seen.add(key)
         label = f"{r['matter_code']}: {r['next_deadline'].isoformat()}"
+        # Say WHAT the date is (2026-10-03): a bare "MWK-CV26360: 2026-10-14" never answered "when
+        # is the next hearing?". The step text goes through the client projection so no internal
+        # token (gmail#, CTN, §, raw tags) reaches a reply; a generic/empty step is omitted.
+        try:
+            import client_ontology as _co
+            step = _co.client_next_step(r.get("current_stage"), r.get("next_event"))
+            if step and step != _co._NEXTSTEP_GENERIC:
+                label += " — " + (step if len(step) <= 110 else step[:107].rsplit(" ", 1)[0] + "…")
+        except Exception:
+            pass
         if r["next_deadline"] < today:
             label += " [OVERDUE/stale — confirm done or re-date]"  # A57 overdue-confirm, never silent
         claims.append(_claim(r["next_deadline"].isoformat(), label,
@@ -436,11 +446,16 @@ def _compose_deadlines(cur, matter, client_code, role, params):
                          detail=f"{undated} active matter(s) carry no forward date",
                          unblocks="source-cited dates (A68) or explicit dateless classification"))
 
-    claims.sort(key=lambda c: c["value"])
+    # NEXT-first (2026-10-03): upcoming dates lead, soonest first; past-dated items follow, still
+    # listed and flagged (A57: never silent). Pure date-ascending put months-old overdue items ahead
+    # of the actual next hearing, so "when is the next hearing?" was answered with stale dates.
+    today_iso = datetime.now(timezone.utc).date().isoformat()
+    claims.sort(key=lambda c: (c["value"] < today_iso, c["value"]))
+    n_up = sum(1 for c in claims if c["value"] >= today_iso)
     status = "hit" if claims else "miss"
     if status == "hit" and any(g["kind"] in ("needs_date", "surface_stale") for g in gaps):
         status = "partial"
-    frame = {"headline": f"{len(claims)} dated item(s), {undated} undated",
+    frame = {"headline": f"{n_up} upcoming, {len(claims) - n_up} past their date, {undated} undated",
              "lines": [c["text"] for c in claims[:12]]}
     return _envelope("deadlines", params, client_code, role, status, claims, dissent, gaps, frame)
 

@@ -537,3 +537,103 @@ def fetch_title_history(
         if primary_doc:
             text += f"\n{PUBLIC_FILE}/{primary_doc}"
     return text.strip(), None
+
+
+# ─── Title CARD route (2026-10-03) ───────────────────────────────────────────────────────────
+# A question about ONE specific title that is neither a history/chain ask nor a fetch-the-document
+# ask — "who holds / who owns / status of / tell me about TCT …" — answers from the materialized
+# title_brief card: registered owner, area, status, sources.
+# Before this route those asks fell through: the composer answered with a CLIENT-WIDE status list,
+# and the inquiry stack read "the registered owner of title …" as an ENTITY NAME and attached
+# another party's profile WITH citations — a confident false answer (found by /ops/console).
+# Exact title match only (a fuzzy ILIKE also hits OCR-junk cards such as 079-20210021268) and
+# client-scoped (A5): a title on another client's books is "not in your records" — never shown.
+
+_CARD_ID_RES = (
+    re.compile(r"(?i)\b(?:tct|oct|title)\s*(?:no\.?|number|#)?\s*[:\-]?\s*((?:T-?)?[0-9][0-9A-Za-z./-]{2,})"),
+    re.compile(r"\b(T-[0-9]{4,6})\b"),
+    re.compile(r"(?<![0-9A-Za-z-])(?:T-)?([0-9]{3}-[0-9]{10})(?![0-9])"),
+)
+
+
+def _card_title_ids(text: str) -> list:
+    """Title identifiers the ask EXPLICITLY names, normalized to their core (no 'T-' prefix)."""
+    out = []
+    for rx in _CARD_ID_RES:
+        for m in rx.finditer(text or ""):
+            v = m.group(1).strip(" .,-/").upper()
+            if v.startswith("T-"):
+                v = v[2:]
+            elif v.startswith("T") and v[1:2].isdigit():
+                v = v[1:]
+            if v and v not in out:
+                out.append(v)
+    return out
+
+
+def wants_title_card(text: str) -> bool:
+    """A specific-title ask that is not history/chain and not fetch-the-document."""
+    if not _card_title_ids(text):
+        return False
+    return not wants_title_history(text) and not wants_title_fetch(text)
+
+
+def fetch_title_card(cur, client_code: Optional[str], text: str) -> Optional[str]:
+    """One-line, ≤280 answer from the title_brief card, client-scoped. None = no card (let the
+    other routes / the identifier gate answer)."""
+    ids = _card_title_ids(text)
+    if not ids or not client_code:
+        return None
+    keys = []
+    for c in ids:
+        keys += [c, "T-" + c]
+    try:
+        cur.execute(
+            """
+            SELECT display_no, title_kind, registrant_name, area_sqm, location,
+                   COALESCE(NULLIF(lifecycle_status, ''), status) AS st,
+                   related_matters, n_source_docs, clarity_status, missing_fields,
+                   needs_human_review, client_code
+              FROM title_brief
+             WHERE upper(title_key) = ANY(%s) OR upper(display_no) = ANY(%s)
+             ORDER BY (client_code = %s) DESC, n_facts_verified DESC NULLS LAST
+             LIMIT 1
+            """,
+            (keys, keys, client_code),
+        )
+        row = cur.fetchone()
+    except Exception:
+        return None
+    if not row:
+        return None
+    if _g(row, "client_code", 11) != client_code:
+        return "I don't have that title in your records."
+
+    no = _g(row, "display_no", 0)
+    owner = (_g(row, "registrant_name", 2) or "").strip()
+    area = _g(row, "area_sqm", 3)
+    loc = (_g(row, "location", 4) or "").strip()
+    st = (_g(row, "st", 5) or "").strip()
+    rel = _g(row, "related_matters", 6) or []
+    nsrc = _g(row, "n_source_docs", 7) or 0
+    clarity = _g(row, "clarity_status", 8)
+    missing = _g(row, "missing_fields", 9)
+    review = _g(row, "needs_human_review", 10)
+
+    facts = [f"registered owner {owner}" if owner
+             else "registered owner not yet confirmed in the record"]
+    if area:
+        facts.append(f"{float(area):,.0f} sqm")
+    if loc:
+        facts.append(loc)
+    if st:
+        facts.append(f"status {st}")
+    text = f"TCT {no}: " + ", ".join(facts) + "."
+    if rel:
+        text += f" Linked to {len(rel)} matter(s)."
+    if nsrc:
+        text += f" Based on {nsrc} source document(s)."
+    if clarity != "clear" or review:
+        miss = ", ".join(missing) if isinstance(missing, (list, tuple)) else (missing or "")
+        text += " Record incomplete" + (f" (missing: {miss})" if miss else "") + " — not yet confirmed."
+    return text[:280]

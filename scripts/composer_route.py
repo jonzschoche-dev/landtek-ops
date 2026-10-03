@@ -89,6 +89,47 @@ def _extract_topic(message: str):
     return topic or None
 
 
+_DOCKET_NUM_RE = re.compile(r"\b(\d{2})\s*-\s*(\d{3})\b|\b(\d{4,5})\b")
+_ASK_WORDS = {"when", "what", "where", "which", "who", "whose", "next", "hearing", "hearings",
+              "case", "cases", "deadline", "deadlines", "filing", "schedule", "upcoming", "kailan",
+              "please", "tell", "show", "give", "court", "trial", "date", "dates", "matter"}
+
+
+def _resolve_matters(cur, client_code, msg):
+    """Matters the ask NAMES, always scoped to this client (A5): explicit code > docket number >
+    party name in the matter title. [] = the ask names no matter (answer client-wide)."""
+    base = ("SELECT matter_code FROM matters WHERE client_code = %s AND matter_code NOT LIKE 'AUTO-%%' "
+            "AND COALESCE(status,'') NOT IN ('closed','archived') AND ")
+
+    def _q(sql, params):
+        try:
+            cur.execute(sql, params)
+            return [r["matter_code"] if isinstance(r, dict) else r[0] for r in cur.fetchall()]
+        except Exception:
+            return []
+
+    codes = [m.group(0).upper() for m in
+             re.finditer(r"\b(MWK|PARACALE|PAR|NIBDC|LANDTEK)-[A-Z0-9-]{2,}\b", msg, re.I)]
+    if codes:
+        return _q(base + "upper(matter_code) = ANY(%s)", (client_code, codes))
+    nums = []
+    for m in _DOCKET_NUM_RE.finditer(msg):
+        n = (m.group(1) + m.group(2)) if m.group(1) else m.group(3)
+        if n and not (len(n) == 4 and n[:2] in ("19", "20")):     # a year is not a docket
+            nums.append(n)
+    if nums:
+        hits = _q(base + "regexp_replace(matter_code, '\\D', '', 'g') = ANY(%s)", (client_code, nums))
+        if hits:
+            return hits
+    found = []
+    for w in re.findall(r"[A-Za-z][A-Za-z'-]{3,}", msg):
+        if w[0].isupper() and w.lower() not in _ASK_WORDS:
+            for h in _q(base + "title ILIKE %s", (client_code, f"%{w}%")):
+                if h not in found:
+                    found.append(h)
+    return found[:3]
+
+
 def try_composer_route(cur, client_code, message, channel=None, channel_user_id=None):
     """Return {"text","via","purpose"} when the composer owns this ask-shape, else None.
 
@@ -117,6 +158,21 @@ def try_composer_route(cur, client_code, message, channel=None, channel_user_id=
                     "purpose": "composer_client_status"}
 
     if _DEADLINE_RE.search(msg):
+        # A named matter is answered for THAT matter (2026-10-03): "next hearing in the Balane case"
+        # used to return the client-wide list, whose first lines were other matters' stale dates.
+        scoped = _resolve_matters(cur, client_code, msg)
+        if scoped:
+            outs = []
+            for mc in scoped:
+                env = compose_answer("deadlines", client_code=client_code, caller=caller, matter=mc)
+                if env["status"] == "hold":
+                    continue
+                lines = [ln for ln in ((env.get("frame") or {}).get("lines") or [])
+                         if not ln.startswith("[gap]")]
+                outs.append(lines[0] if lines else f"{mc}: no forward date is set yet")
+            if outs:
+                return {"text": _clip(". ".join(o.rstrip(".") for o in outs) + "."),
+                        "via": "composer:deadlines:matter", "purpose": "composer_deadlines"}
         env = compose_answer("deadlines", client_code=client_code, caller=caller)
         if env["status"] == "hold":
             return None                      # scope refusals fall to the stack's own gates
