@@ -91,6 +91,23 @@ metabolic window is a permitted implementation optimization; skipping propagatio
 - **P3 — contradiction detection:** wire step-3 checks to `contradictions` with owners (graduates A65 too).
 - **P4 — tuning ledger + calibration:** the observability surface; only then may outputs go live per path.
 
+## 5b. Fleet / CoS roster as a perturbation (2026-09-26)
+
+`agent_registry` enumerates desks (Grok Bot seats + Claude subagents via `scripts/cos_bridge.py`;
+systemd/cron/catalog via `fleet_registry.py`). A roster change is a **graph perturbation** too —
+every CoS action should affect the stack (equilibrium), not chat-only memory.
+
+Hook (shadow, reuse existing ledgers — no second brain):
+- `python3 scripts/cos_bridge.py --sync --pulse` upserts seats, then writes
+  `propagation_log` with `seed_type='fleet'` (deploy_881) and a note row in
+  `equilibrium_coverage_log` (deploy_934).
+- Importable stub: `from cos_bridge import on_fleet_change`.
+- Real CoS moves (assign bot, pause Discovery, approve outward) still enqueue
+  **`work_orders`** and cue related subjects; the pulse ledgers the change so A76 can see it.
+
+Full ego-network `equilibrium_propagate` stays for client-scoped seeds (fact/matter/chat).
+Fleet events are company-level and stay SHADOW until a later path wires them to recipients.
+
 ## 6. What the ontology does NOT define (execution lanes)
 
 The store's DDL, the propagation code and its hop-depth defaults, weight values, queue mechanics, and

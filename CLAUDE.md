@@ -8,9 +8,11 @@ sessions back to a May-2026 reality (the old DIRECTIVE.md "48-hour playbook, May
 worst offender). On 2026-06-12 the 9 prior planning docs were consolidated into `MASTER_PLAN.md`
 and moved to `archive/planning-2026-06/`.
 
-**North star (as of 2026-06-12): Aug 12, 2026 — Jonathan testifies as Patricia's witness** in Civil
-Case 26-360 (MTC Mercedes, Summary Procedure); live Summary-Judgment motion + Balane judicial-
-affidavit fight. (NOT the old "Aug 1 pre-trial"; pre-trial was May 13, passed.) See `MASTER_PLAN.md` §1.
+**Governing directive (as of 2026-09-26): `MASTER_PLAN.md` §0 — the Chief of Staff Directive.** LandTek is a
+full-service management company (property/estate · business · legal as core expertise) whose core function
+is **administration**: client goals → fronts → dated next moves → the drip (clock from proof of receipt) →
+results, marching every front every week. Read §0 first; where older sections conflict, §0 wins. The old
+"Aug 12 testimony" north star (MASTER_PLAN §1) has **passed and is stale** — its outcome is not yet recorded.
 
 ---
 
