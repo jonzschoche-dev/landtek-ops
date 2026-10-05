@@ -96,12 +96,12 @@ def table_page(title, subtitle, rows, widths, note=None):
 
 
 # Signed pages scanned back in: {letter md: {page index: (scan file, text that must open that page)}}
-SIGNED = {"01_DENR_R5_Reply_Astor.md": {1: ("DENR_letter_p2_SIGNED.pdf", "1954:")}}
+SIGNED = {}  # DENR p2 wet-signed scan (source/DENR_letter_p2_SIGNED.pdf) superseded by e-signature, 2026-10-05
 
 
 # Letters e-signed with Jonathan's signature image (assets/signature/jpz_signature.png), at his direction 2026-10-05
 SIG_IMG = os.path.join(os.path.dirname(os.path.dirname(MWK)), "assets", "signature", "jpz_signature.png")
-ESIGN = {"02_Assessor_Records_Demand_Abla.md"}
+ESIGN = {"01_DENR_R5_Reply_Astor.md", "02_Assessor_Records_Demand_Abla.md"}
 
 
 def esign(pdf_path):
