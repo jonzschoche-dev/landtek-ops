@@ -106,12 +106,30 @@ wrong / duplicated technical description. **Do not trust the Leaño location unt
 **(a) T-4497 over the PNP Special Patent (OCT 2018000090, Lot 402-B, Csd-05-019916-D).**
 - **Not geometrically measurable yet — the patent's own metes-and-bounds are absent from the corpus.** No
   overlap sqm can be honestly stated.
-- **But the overlap is circumstantially strong (doc 1070, DENR PENRO LMS-25-550, 26 Nov 2025):** DENR's own
-  projection places **Keesey Lot 2-A (T-32911, 8,706 sqm) over Cad-118-D Lots 401 (5,015) + 403 (2,187) +
-  405 (1,503)**. Cad Lot **402** sits **interleaved between 401 and 403** — i.e., the PNP's Lot **402-B is
-  embedded inside the Keesey Lot 2-A cadastral footprint.** That is the spine's "already-titled → patent
-  void" theory, shown spatially by the government's own map. **→ To quantify: obtain the Csd-05-019916-D plan
-  + OCT 2018000090 file, plot both, measure.**
+- **CORRECTED 2026-10-05: Lot 402 lies OUTSIDE Lot 2-A on DENR's own projection.** The earlier wording
+  here ("402-B is embedded inside the Keesey Lot 2-A cadastral footprint") was wrong. It is superseded.
+  - On the projection sketch (doc 1070, LMS-25-550 p. 3, visually checked), the green Lot 2-A outline's east
+    line runs along the 401/402 line.
+  - Cad Lot 402 (hand-split A north / B south) lies **east of Lot 2-A**, between it and the "Barangay Road".
+  - The PNP's own tax declaration (doc 150) agrees: Lot 402-B is bounded E by a 10 m Barangay Road and
+    S/W/N by Lot 402-A.
+  - Lot 2-A = Cad Lots 401 (5,015) + 403 (2,187) + 405 (1,503) = 8,705 ≈ 8,706.
+  - **Do not plead "patent inside T-32911"** (Jonathan, 2026-10-05: cannot assert it lies within Lot 2-A).
+- **The live theory is the land EAST of Lot 2-A** (see `BRGY5_TAXDEC_RECONCILIATION_2026-10.md` and
+  `DENR_ASSESSOR_PACKET_2026-10/`).
+  - The alleged 1953 deed (docs 279/291) describes only 8,951.22 sqm, bounded **"East by property of Mary
+    Worrick-Kessy"**. It gives T-111's east neighbour as "Rafael Carranceja (now Mary Worrick Keesey)".
+  - Mary declared the ground east of the municipal site to the School Site from 1950 (TD 1693 → 1697 →
+    1698, W "Mun. Govt. Site", E School Site).
+  - The 1980 road deed takes Doña Marciana Moreno St (W Municipal Govt, E School Site) as "portion of TCT
+    No. 4497".
+  - 3,675.72 sqm left her declaration in 1954 (TD 1699, "Deed of Donation") with no instrument describing
+    it. Lots 402-A and 402-B were later declared to the Municipality (2022, "DENR certification") and to the
+    PNP (2018, after the 2017 patent), both after her death (17 Mar 1988).
+  - The identity of the cadastre's "Barangay Road" with Doña Marciana Moreno St is a boundary match;
+    confirm it on the ground.
+  - **→ To quantify: obtain the Csd-05-019916-D plan + LDC, the patent file, and the tax map of section
+    025-07-005-01; plot and measure.**
 
 **(b) The 6,219 sqm Municipal-Hall block.** A portion of Lot 2 between **Don Estaneslao Moreno St (W)** and
 **Doña Marciana Moreno St (E)**, fronting the **Provincial Road (S)** — the western/Barangay-5 edge, adjacent
@@ -122,7 +140,7 @@ ingested**). No discrete technical description exists to plot it. **→ Digitize
 "inadvertently indicated" the lot as **Psd-229480 (a different province's plan)** when correct is
 **Psd-221861** (doc 1070/739). **For Lot 2-A the AREA divergence is ~zero** — Cad Lots 401+403+405 = 8,705 ≈
 Psd-221861 Lot 2-A = 8,706, so the cadastre re-covers the same ground under a wrong label. **The consequential
-divergence is the eastern carve-out** (Lot 402-B to the PNP) and cannot be measured without (i) the patent
+divergence is the ground east of Lot 2-A** (Lot 402, incl. 402-B to the PNP; see (a) as corrected) and cannot be measured without (i) the patent
 courses and (ii) a clean senior-boundary polygon. The divergence is real in *designation and site
 attribution*, not (for 2-A) in *area*.
 
