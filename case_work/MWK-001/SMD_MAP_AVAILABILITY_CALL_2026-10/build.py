@@ -9,7 +9,7 @@ ss = getSampleStyleSheet()
 N = ParagraphStyle('N', parent=ss['Normal'], fontName='Helvetica', fontSize=9.6, leading=12.4, spaceAfter=3)
 S = ParagraphStyle('S', parent=N, fontSize=8.4, leading=10.4, spaceAfter=0)
 SAY = ParagraphStyle('SAY', parent=N, leftIndent=10, borderPadding=(5, 6, 5, 6), backColor=colors.HexColor('#EEF3F8'),
-                     borderColor=colors.HexColor('#B9CCE0'), borderWidth=0.6, spaceBefore=3, spaceAfter=7)
+                     borderColor=colors.HexColor('#B9CCE0'), borderWidth=0.6, spaceBefore=9, spaceAfter=9)
 H1 = ParagraphStyle('H1', parent=N, fontName='Helvetica-Bold', fontSize=14.5, leading=18, spaceAfter=2)
 H2 = ParagraphStyle('H2', parent=N, fontName='Helvetica-Bold', fontSize=11, leading=14, spaceBefore=9, spaceAfter=3,
                     textColor=colors.HexColor('#1F3A5A'))
