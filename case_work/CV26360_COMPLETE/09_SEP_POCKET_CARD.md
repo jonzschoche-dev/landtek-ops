@@ -7,7 +7,7 @@
 > Mrs. Balane was never in the class Cesar could sell to — she held no Ben Llamanzares Contract-to-Sell, and we were never consulted.
 
 ## Date order — every time
-**Revoked 2005 · published 2020 · annotated 2021.** Never imply 2005 publication.
+**Revoked 2005 · published 2020 · revocation never annotated; Cesar's 1992 SPA annotated on T-52540 since 21 Jun 1996 and re-annotated 2021 (corrected 11 Oct 2026 from Exhibit B. Complaint ¶50's "only in 2021" is wrong).** Never imply 2005 publication.
 
 ## JA errata — concede, cite, stop
 - Sale date: purposes (g)/(h) say **26 Sep 2019**. Deed and Q35 are **September 2016**.

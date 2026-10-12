@@ -26,7 +26,7 @@ Caption on your JA and on the 6 Feb order: *Accion Reivindicatoria, Recovery of 
 
 > Mrs. Balane was never in the class Cesar could sell to — she held no Ben Llamanzares Contract-to-Sell, and we were never consulted.
 
-**Order, every time:** Revoked **2005** · published **2020** · annotated **2021**.
+**Order, every time:** Revoked **2005** · published **2020** · revocation never annotated; Cesar's 1992 SPA annotated on T-52540 since 21 Jun 1996 and re-annotated **2021** (corrected 11 Oct 2026 from Exhibit B. Complaint ¶50's "only in 2021" is wrong).
 
 ---
 
@@ -63,7 +63,7 @@ Concede Cesar could execute — **win on class** (no Llamanzares CTS). Do **not*
 
 **Errata already on this JA — concede instantly, do not defend:**
 
-- **Purposes (g)/(h)** say the sale was **26 September 2019**. Deed (doc **415** / Trial Brief **D1**) is **24 Sep 2016**. Card: say **September 2016**. (Spine also points to **Q35** in this same JA for 29 Sep 2016.)
+- **Purposes (g)/(h)** say the sale was **26 September 2019**. Deed (doc **415** / Trial Brief **D1**) is dated **29 Sep 2016**, matching JA **Q35/Q37**. *(Corrected 10 Oct 2026: the earlier "24 Sep" was an OCR misread; the page image shows the stamp "SEP 29 2016" on both the signature line and the acknowledgment.)*
 - **Q11–Q12** area **28,981** sqm. Complaint / title figure is **28,891**. Card: **28,891**.
 - **Q53** (spine): still swears SPA “explicitly limited to the **negotiation** of the sale which does not include the power to sell” — **retired**. Contradicted by **Q23** (SPA para 7: execute documents + receive proceeds) and deed **415**. If shown Q53: concede the wording, restate class.
 - **Q26** (spine) “informed him” of the 2005 revocation is conclusory. Salvador denies notice (**407** S32). Do **not** claim personal knowledge of notice to Cesar.
@@ -84,8 +84,8 @@ Only what the tree actually cites. Testimonial ≠ primary instrument.
 5. **T-52540** — Lot **2-X-6-I-4-C**, **2,587** sqm, Brgy. San Roque, Mercedes; stood in **Geraldine K. Hoppe**’s name. This JA Exhibit **B**. CTC doc **272**.
 6. **23 Nov 2021:** T-52540 cancelled; **T-079-2021002126** issued to Gloria H. Balane. This JA Exhibit **C**. Face of **410** recites predecessor **“T-52540 (TOTALLY CANCELLED) by virtue hereof.”** Sibling **…2127** is not this prayer. **Do not say …2127.**
 7. **16 Mar 1992 SPA** (clean CTC **246**) is **class-limited**. This JA purpose (e) / Q18. **Q23** (spine) reads para 7 — execute documents + receive proceeds. **Concede the execute clause; win on class.**
-8. **Sept 2016 Deed of Absolute Sale**, Cesar as AIF → Gloria Balane, ₱250,000, T-52540 / 2,587 sqm. Doc **415** / Trial Brief **D1**, dated **24 Sep 2016**. Recites the 16 Mar 1992 SPA. Confirmation 28 Mar 2017 = doc **233**.
-9. **Revoked 2005 · published 2020 · annotated 2021.** Say it in that order. Annotation 23 Nov 2021 (Complaint **424** ¶50, ¶59). Never imply 2005 publication.
+8. **Sept 2016 Deed of Absolute Sale**, Cesar as AIF → Gloria Balane, ₱250,000, T-52540 / 2,587 sqm. Doc **415** / Trial Brief **D1**, dated **29 Sep 2016** *(corrected 10 Oct 2026 from an OCR misread of "24")*. Recites the 16 Mar 1992 SPA. Confirmation 28 Mar 2017 = doc **233**.
+9. **Revoked 2005 · published 2020 · revocation never annotated; Cesar's 1992 SPA annotated on T-52540 since 21 Jun 1996 and re-annotated 2021 (corrected 11 Oct 2026 from Exhibit B. Complaint ¶50's "only in 2021" is wrong).** Say it in that order. Annotation 23 Nov 2021 (Complaint **424** ¶50, ¶59). Never imply 2005 publication.
 10. **Patricia** is a 1/3 co-owner with **Geraldine K. Hoppe** and **Marcia Ellen Keesey.** Your 7 Nov 2025 SPA is Exhibit **A** of this JA (standing).
 11. **Balane is outside the SPA class** (if her JA is in): Kenneth Asistin ₱16,500 “rights,” ₱50/mo **rent**, no Llamanzares CTS, never contacted the Keeseys (Gloria JA **1089** — **excluded**, use only if admitted). Defense receipts (doc **414**): earliest **20 Oct 2003**; none name Llamanzares.
 12. **1999 withdrawal:** Hoppe → Cesar letter 19 Feb 1999 — doc **1134**. Handwritten “1995” public-notice (docs **1132/1133**) is Gerry’s **unexecuted DRAFT**. **Do not put “1995” or a “new SPA” in your mouth.**
