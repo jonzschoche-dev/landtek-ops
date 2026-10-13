@@ -48,7 +48,7 @@ Cue files on this Mac:
 **Home line if cornered:**
 > Mrs. Balane was never in the class Cesar could sell to — she held no Ben Llamanzares Contract-to-Sell, and we were never consulted.
 
-**Date order, every time:** revoked **2005** · published **2020** · annotated **2021**.
+**Date order, every time:** revoked **15 Aug 2005** · published **Sep–Oct 2020** · **never annotated** · sale **registered 23 Nov 2021**. (Corrected 14 Oct 2026: the earlier "annotated 2021" was wrong; what was entered in 2021 was the sale and the partition, not the revocation.)
 
 **Own on impeachment (do not hide):** JA purposes (g)/(h) say 26 Sep **2019**; Q35 and the deed are Sep **2016**. Area: 28,981 vs 28,891. Concede, cite Q35/deed, stop. Soften “misappropriated” (Q25) to never remitted / accounting.
 

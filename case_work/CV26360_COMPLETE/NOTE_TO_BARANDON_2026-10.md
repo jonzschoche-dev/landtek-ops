@@ -24,7 +24,7 @@ Would you rather file the Manifestation before the hearing, or have me state the
 **4. A possible new exhibit: the 1993 Subdivision Agreement.** Executed 3 August 1993 before Notary Public Juanito S. Subia and registered on T-4497 on 20 August 1993, it lists the transferees Cesar was dealing with: de Arao, Onrubio, de Leon, King, Espinosa, Iligan, Vargara and Yasis. **Gloria Balane is not among them.** It's documentary proof of the authorized class, from Cesar's own instrument. Is it worth asking leave to add it by supplemental affidavit, or should we hold it for rebuttal?
 
 **5. Facts I could add if you want them on the record.**
-- I personally learned of the sale to Gloria in late 2022. The title had been annotated in 2021. This answers any claim that we slept on our rights.
+- I personally learned of the sale to Gloria in late 2022. The sale was registered on the title only on 23 November 2021. This answers any claim that we slept on our rights.
 - None of the co-owners ever received any part of the ₱250,000.
 
 **6. Documents I don't have.**

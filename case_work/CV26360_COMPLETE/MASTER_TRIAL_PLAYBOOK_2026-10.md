@@ -44,7 +44,9 @@ Judge Cu decides by **statute, section and exhibit**, in short English paragraph
 
 ---
 
-## 2. THE MASTER TIMELINE OF FRAUD
+## 2. THE MASTER TIMELINE
+
+*(Internal working title. This document does not go to the witness stand; the standing exclusions in §6.4 govern what is said in court.)*
 
 Every entry is a documented fact. **[IN]** = already in the record. **[OFFER]** = held, to be offered or certified. **[COND]** = usable only if Gloria's excluded affidavit is admitted. **[VERIFY]** = a digit or name to confirm on the original.
 
@@ -72,16 +74,16 @@ Every entry is a documented fact. **[IN]** = already in the record. **[OFFER]** 
 |---|---|---|
 | **27 Sep 2016** | Cesar swears before **Atty. Belen** that the owner's duplicate of T-52540 is **lost** (Doc. 560/Pg. 112/Bk. XI/2016). Two days before the deed. The red flag the Court named in *Vallido v. Pono* (seller without the owner's duplicate). | Exh. B entry — Annex C, p. 3; Annex F, p. 5 **[IN]** |
 | **29 Sep 2016** | **THE DEED.** Cesar, "as Attorney-in-Fact," sells 2,587 sqm to Gloria for **₱250,000**, reciting the price "**to me in hand paid** by and receipt whereof is hereby acknowledged." Gloria does not sign; the two witnesses are unnamed. Notary **Donald E. Asis**, Doc. 304/Pg. 61/Bk. CXVI/2016. | Exh. H / Def. Exh. 6 — Annex E, p. 1 **[IN]** |
-| **30 Sep 2016 – Feb 2017** | **The price was not in hand.** Their own receipts: 30 Sep ₱60,000; 7 Oct ₱10,000; 18 Nov ₱50,000; 27 Nov ₱20,000; 1 Dec ₱40,000; Dec ₱30,000; 7 Jan 2017 ₱2,000; 30 Jan ₱3,000; **Feb 2017, Receipt No. 0228, "Full payment for lot in San Roque."** Serial numbers run backwards against the dates (No. 0219 of 18 Nov after No. 0222 of 30 Sep; No. 0226 of 30 Jan after No. 0227 of 7 Jan). | Annex D, pp. 29–32 **[IN]** |
+| **30 Sep 2016 – Feb 2017** | **The price was not in hand.** Their own receipts: 30 Sep ₱60,000; 7 Oct ₱10,000; 18 Nov ₱40,000 (No. 0219, "Forty Thousand Pesos"); 27 Nov ₱20,000; 1 Dec ₱40,000; Dec ₱30,000; 7 Jan 2017 ₱2,000; 30 Jan ₱3,000; **Feb 2017, Receipt No. 0228, "Full payment for lot in San Roque."** Serial numbers run backwards against the dates (No. 0219 of 18 Nov after No. 0222 of 30 Sep; No. 0226 of 30 Jan after No. 0227 of 7 Jan). | Annex D, pp. 29–32 **[IN]** |
 | **10 Oct 2016** | Registry enters, under **one entry number and timestamp** (2016002312, 01:43:44 PM), the loss affidavit and the **1991 SPA** (administration only, Makati, Atty. Agcaoili). | Annex C, p. 3; Annex F, pp. 5–6 **[IN]** |
 | **20 Oct 2016** | **Spec. Proc. No. 2156, RTC Br. 41.** Cesar petitions for new duplicates of **seven titles**, T-52540 and the **cancelled-since-1999 T-38838** among them, styling himself "Attorney-in-Fact, Representative and **Administrator**" eleven years after revocation; swears the titles sat "in a filing cabinet at his house"; **does not mention the sale made three weeks earlier.** Counsel: Atty. Belen. Notice: Prosecutor, Registry, posting; **none shown to the owners** (page 2 of the Nov 2016 order missing). | Annex F, pp. 1–10 **[OFFER]** |
 | **Jan 2017** | Under oath Cesar says the owners knew of the case and were "making follow ups," that he was "authorized by the registered owner," that he would receive the new duplicates, and, asked who was in actual possession: **"I."** | Annex F, pp. 12–14 **[OFFER]** |
 | **30 Jan 2017 / 13 Mar 2017 / 16 Mar 2017** | Order (Judge Dating) directing new duplicates for all seven titles; certificate of finality; new duplicate of T-52540 entered (Entry 2017000693). | Annex F, pp. 15–17; Annex C, p. 3; Annex K, p. 2 **[IN as Exh. B-1]** |
 | **15 Mar 2017** | **The Partition-Subdivision Agreement** (Doc. **402**/Pg. 81/Bk. CXXII, Asis) splitting T-52540 into Lot C-1 (Gloria, 2,587 sqm) and Lot C-2 (owners, 26,304 sqm) "in accordance with subdivision plan (LRA) **PSD-E2020005406**" — a plan **surveyed 8 Sep 2020 and approved 6 Apr 2021.** The instrument itself is in **no file we hold**; the Registry's certified file for its entry contains only the plan. Cesar was alive and is the only person who could have purported to sign for the owners. | Exh. B entry 2021003236 — Annex C, p. 4; Annex L **[IN as entry; instrument to subpoena]** |
-| **28 Mar 2017** | **Deed of Confirmation**: Cesar alone, "authorized representative of the registered owners," confirms his own sale of land "registered in the name of GERALDINE K. HOPPE, PATRICIA K. ZSCHOCHE & MARCIA ELLEN KESSEY." Doc. **115**/Pg. 23/Bk. CXXII. **Doc. 115 of 28 March sits 287 entries *before* Doc. 402 of 15 March in the same book.** One of the two dates is false. | Annex G, p. 1 **[OFFER, RD Ref. 2022006350]** |
+| **28 Mar 2017** | **Deed of Confirmation**: Cesar alone, "authorized representative of the registered owners," confirms his own sale of land "registered in the name of GERALDINE K. HOPPE, PATRICIA K. ZSCHOCHE & MARCIA ELLEN KESSEY." Doc. **115**/Pg. 23/Bk. CXXII. **Doc. 115 of 28 March sits 287 entries *before* Doc. 402 of 15 March in the same book.** At least one of the two face dates is not the date of entry [INFERRED; the register decides]. | Annex G, p. 1 **[OFFER, RD Ref. 2022006350]** |
 | **21 Jun 2017** | **Cesar dies.** Everything after this was done by others in his name. | PSA certificate to obtain |
 
-### Phase 3 — The Cover-Up and the Notices (2019 to November 2021): good faith had to last to registration, and it did not
+### Phase 3 — Notices before registration (2019 to November 2021): good faith had to last to registration, and it did not
 
 | Date | Event | Source |
 |---|---|---|
