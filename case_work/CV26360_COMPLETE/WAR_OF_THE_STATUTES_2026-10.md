@@ -37,7 +37,7 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 
 **Our reply in one sentence.** "This is the direct proceeding §48 requires; the only certificate attacked is the one named in the caption."
 
-**Expected result.** Jurisdiction found (the assessed value on ARP 00256, "Previous Assessed Value 200,750.00," is under the threshold; counsel to confirm the current figure); §48 not engaged.
+**Expected result.** Jurisdiction found: ARP No. GR-2023-II-07-001-00256 (Exh. D) states the current assessed value as **₱257,670.00** (market value ₱4,294,420 at a 6% assessment level, tax effectivity 2024; the "Previous Assessed Value" line shows ₱200,750), under the ₱400,000 threshold. §48 not engaged.
 
 ---
 
@@ -105,6 +105,8 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 
 **What she keys in on.** Art. 1921's words "specified persons." The SPA names them: Llamanzares contract holders and payors to Llamanzares. If the buyer is not one, Art. 1921 gives her nothing and the revocation is beside the point because the sale was never inside the agency. §64's "shall be registered" is a direction to register, not a condition of validity (*Republic v. Ciruelas*, G.R. 239505: registration under §64 is not "a prerequisite to its validity"); and §64 only matters for a sale within the power. §52 answers §64: what was registered, in 1996, was the SPA itself, limits included.
 
+**Two cases to cite sparingly, because they cut both ways.** *Central Surety v. Hodges* applied Art. 1922 against the principal where the agent dealt "with the public in general"; Ramos will say Cesar, who sold to many buyers, had general powers. The answer is the SPA's own words: a named class, after consultation. *Republic v. Ciruelas* holds that §64 registration is not a prerequisite to an SPA's validity; Ramos will turn that into "nor is the non-registration of the revocation fatal to our reliance." The answer is §52: what charged her was the registered instrument with its limits, whatever was registered later.
+
 **The sequence to keep.** First: outside the class, so revocation irrelevant. Second, in the alternative: the 2020 publication is a fact bearing on good faith before registration (section 6), not an Art. 1922 effect. Never both ways.
 
 **Expected result.** Art. 1921 not engaged; §64 not a defense to a sale outside the power.
@@ -117,7 +119,7 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 |---|---|---|
 | **Art. 527** | "Good faith is always presumed, and upon him who alleges bad faith on the part of a possessor rests the burden of proof." | Defense |
 | **Art. 526** | "He is deemed a possessor in good faith who is not aware that there exists in his title or mode of acquisition any flaw which invalidates it. He is deemed a possessor in bad faith who possesses in any case contrary to the foregoing." | Ours |
-| **Art. 528** | "Possession acquired in good faith does not lose this character except in the case and from the moment facts exist showing that the possessor is not unaware that he possesses the thing improperly or wrongfully." | Ours |
+| **Art. 528** | "Possession acquired in good faith does not lose this character except in the case and from the moment facts exist which show that the possessor is not unaware that he possesses the thing improperly or wrongfully." | Ours |
 | **PD 1529 §51** | "The act of registration shall be the operative act to convey or affect the land insofar as third persons are concerned." | Ours |
 | **PD 1529 §53** | "In all cases of registration procured by fraud, the owner may pursue all his legal and equitable remedies against the parties to such fraud without prejudice, however, to the rights of any innocent holder for value of a certificate of title." And: "any subsequent registration procured by the presentation of a forged duplicate certificate of title, or a forged deed or other instrument, shall be null and void." | Both. Defense: "innocent holder for value." Ours: "innocent" is defined by Art. 526, and the Supreme Court puts the burden of that status on the one who claims it (*Bucton*, G.R. 188395; *Duenas*, G.R. 209463, En Banc). |
 
@@ -151,7 +153,7 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 | **Art. 546** | "Necessary expenses shall be refunded to every possessor; but only the possessor **in good faith** may retain the thing until he has been reimbursed therefor. Useful expenses shall be refunded only to the possessor **in good faith** with the same right of retention …" | Both |
 | **Art. 548** | "Expenses for pure luxury or mere pleasure shall not be refunded to the possessor in good faith …" | Defense |
 | **Art. 449** | "He who builds, plants or sows in bad faith on the land of another, loses what is built, planted or sown without right to indemnity." | Ours |
-| **Art. 450** | "The owner of the land on which anything has been built, planted or sown in bad faith may demand the demolition of the work … at the expense of the builder …" | Ours |
+| **Art. 450** | "The owner of the land on which anything has been built, planted or sown in bad faith may demand the demolition of the work … at the expense of the person who built, planted or sowed …" | Ours |
 | **Art. 451** | "In the cases of the two preceding articles, the landowner is entitled to damages from the builder, planter or sower." | Ours |
 | **Art. 452** | "The builder, planter or sower in bad faith is entitled to reimbursement for the necessary expenses of preservation of the land." | Ours (it fixes the only thing a bad-faith builder gets) |
 | **Art. 1678** | A lessee who makes "in good faith, useful improvements which are suitable to the use for which the lease is intended" is entitled, on termination, to have the lessor "pay the lessee one-half of the value of the improvements at that time"; if the lessor refuses, "the lessee may remove the improvements." *(paraphrased with quoted phrases)* | Ours, for everything built while renting (*Parilla v. Pilar*, G.R. 167680: Art. 448 "does not apply where one's only interest is that of a lessee under a rental contract") |
@@ -176,7 +178,9 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 
 **What she keys in on.** Art. 544's "good faith" (again Art. 526) and "legally interrupted"; Art. 2232's "fraudulent." She will not write "fraudulent" on an impression. She will write it if five dated documents leave no other word: the deed's "in hand paid" of 29 Sep 2016 against receipts to Feb 2017; the petition of 20 Oct 2016 by a revoked agent calling himself "Administrator," listing a title cancelled in 1999 and hiding the sale; the partition dated 15 Mar 2017 under a plan surveyed 8 Sep 2020; the engineer's certificate of 8 Sep 2020 that the survey was made "with the full knowledge and consent of the owner(s)" when the only agent was dead; the sworn "my property" of 15 Sep 2021 over land titled to three others. The Answer's own ¶27 ("certain rooms on the property were occasionally rented out after 2016") supplies the fruits; Exh. J supplies the interruption date (22 Aug 2025).
 
-**Expected result.** Accounting of fruits from the demand (and, on a bad-faith-from-the-deed finding, from the deed); exemplary damages and fees if the five documents are in and tied to Art. 2232's words; the *Duenas* figures (₱200,000 / ₱100,000) as the template.
+**The predicate she will check first.** Art. 2234: "While the amount of the exemplary damages need not be proved, the plaintiff must show that he is entitled to moral, temperate or compensatory damages before the court may consider the question of whether or not exemplary damages should be awarded." So the judgment must first award compensatory damages (the fruits, or reasonable compensation for use and occupation from 22 Aug 2025) or temperate damages ("when the court finds that some pecuniary loss has been suffered but its amount can not, from the nature of the case, be proved with certainty," Art. 2224; "reasonable under the circumstances," Art. 2225), and only then exemplary damages. A prayer that asks for exemplary damages with no compensatory or temperate award beside it fails on the text.
+
+**Expected result.** Accounting of fruits from the demand (and, on a bad-faith-from-the-deed finding, from the deed), with a temperate or compensatory award as the Art. 2234 predicate; exemplary damages and fees if the five documents are in and tied to Art. 2232's words; the *Duenas* figures (₱200,000 / ₱100,000) as the template.
 
 ---
 
@@ -200,7 +204,7 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 |---|---|---|
 | **Judicial Affidavit Rule §§2, 10** (file and serve five days before the hearing; late filing waived; one late submission allowed for a valid reason, with a fine) | "Liberally applying the rules of procedure … No further liberality shall be accorded" (11 Mar 2026) | One motion for leave, one paragraph, fine tendered; the supplemental affidavit or nothing |
 | **Rule 18 §7** (pre-trial order controls "unless modified before trial to prevent manifest injustice") | She announced the governing rules unprompted (6 Feb 2026) | Read the 13 May order now; move to modify before 14 Oct if the partition and improvement issues are not in it |
-| **Rule 30 §5(c)** ("rebutting evidence only") | "final and intransferable unless the ground for resetting is allowed under the rules" (4 Sep 2026) | Everything that is not rebuttal goes in by 9 Dec; rest subject to rebuttal |
+| **Rule 30 §5(f)** ("rebutting evidence only") | "final and intransferable unless the ground for resetting is allowed under the rules" (4 Sep 2026) | Everything that is not rebuttal goes in by 9 Dec; rest subject to rebuttal |
 | **Rule 21 §§1 to 4** (subpoena duces tecum must describe the documents with reasonable particularity and show relevancy) | "Noting both counsels timely compliance" | The ten-custodian request (memo Annex 3), returnable 2 Dec |
 | **Rule 132 §13** (impeachment by prior inconsistent statement: show the writing, fix time and place, let the witness explain) | Her 6 Jan 2021 order reverses her own warrants on a rule, not on an impression | Foundation for Salvador's 25 Nov 2025 letter laid on cross, or it is never used |
 | **Rule 132 §40** (tender of excluded evidence) | The exclusion of Gloria's affidavit at pre-trial | Prepared both ways; her admissions help us more than her denials hurt |
