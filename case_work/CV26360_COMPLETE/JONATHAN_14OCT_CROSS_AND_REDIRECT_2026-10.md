@@ -75,7 +75,7 @@ Format: **the question he will ask** → *the answer* → the exhibit. Where the
 
 | He will ask | Answer | Exhibit |
 |---|---|---|
-| You introduced yourself in Mercedes as "Jayjay Moreno." Why a false name? | Say what is true, once, in one sentence, as agreed with counsel beforehand (for example: *"Moreno is a name I have used; I did not hide who I am from this court or from the defendants once this matter began."*). Do not improvise. **Settle the line with counsel before the hearing.** | — |
+| You introduced yourself in Mercedes as "Jayjay Moreno." Why a false name? | **No defense paper accuses you of using a false name.** Princess's affidavit (S14) says only that when you sheltered from the rain at Apuao Grande in 2022 she "knew [you] only by the name Jayjay Moreno"; S15 then says she was not the right person to talk to because her parents bought. The Answer, the Manifestation and the Comment-Opposition say nothing about it. Moreno is your family's name on your grandmother's side (the "Moreno-Worrick-Keesey family"; Doña Marciana Moreno Street), and you sign official letters that way: your 22 May 2025 letter to the Mayor is signed "Jonathan 'JJ Ildefonso Moreno' Zschoche." If asked: *"Moreno is my family name. I use it. I sign letters to the Mayor as Jonathan 'JJ Ildefonso Moreno' Zschoche. I have never hidden that I am my mother's attorney-in-fact."* One sentence, then stop. | Princess JA S14–S15; letter of 22 May 2025 |
 | You are a foreigner and cannot own land here. | *"I am my mother's attorney-in-fact. The owners are my mother and her sisters."* | Exh. A |
 | You filed complaints against the defendants with ARTA, the Ombudsman, the CSC. You are harassing this family. | *"I asked government offices for records and for action on records requests. What those offices did with my requests is their act."* Stop. Do not list dockets. | — |
 | You wrote to Salvador dela Fuente. | *"Yes."* Nothing about the reply unless counsel has decided to use it. | — |
@@ -111,7 +111,7 @@ Re-direct is limited to explaining or supplementing answers given on cross (Rule
 | The signature (B5) | "Whatever the signature, who had authority to sell this portion to Mrs. Balane?" | "No one. Not under paragraph 7, and not after 15 August 2005." |
 | "In hand paid" (B5) | "According to their own Exhibit 5, when was the last payment on the price?" | "February 2017, receipt marked 'Full payment.'" |
 | The duplicate (B5) | "Who, according to Exhibit B, swore the duplicate was lost, and when?" | "Cesar de la Fuente, 27 September 2016, two days before the deed." |
-| "Moreno" (B6) | "Have you ever concealed from the defendants or this court that you act for your mother?" | "No. My authority is Exhibit A, and I have written to the defendants' side in my own name." (Only if the agreed line on direct supports it.) |
+| "Moreno" (B6) | "What is Moreno?" | "My family's name on my grandmother's side. I sign letters that way, including to the Mayor of Mercedes. My authority to act for my mother is Exhibit A." |
 | Foreigner (B6) | "Who owns the land in this case?" | "My mother and her two sisters, Exhibit B." |
 | Harassment (B6) | "Did you write to any government office for any purpose other than records or action on records?" | "No." |
 | The Salvador letter (B6) | Only if counsel has decided to use it: "Did you receive a reply?" | "Yes, a signed letter dated 25 November 2025." (Then it is marked for identification; its contents wait for Salvador's cross.) |
