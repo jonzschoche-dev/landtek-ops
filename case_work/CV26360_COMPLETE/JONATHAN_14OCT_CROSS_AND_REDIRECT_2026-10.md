@@ -41,6 +41,7 @@ Format: **the question he will ask** → *the answer* → the exhibit. Where the
 | Was the revocation ever communicated to Cesar? Annotated? Published before 2016? | *"I have no personal knowledge of what Cesar was told. It was not annotated. It was published in 2020, Exhibit G."* | Exh. G |
 | Publication in 2020 cannot undo a 2016 sale. | *"The sale was registered on 23 November 2021. The publication was in September and October 2020."* Then stop; the law is for counsel. | Exh. B p. 6; Exh. G |
 | The 2005 instrument appointed Ida Buenaventura. Was she in charge after 2005? Your own affidavit calls it "a new Special Power of Attorney." | *"Exhibit F is dated 15 August 2005. It disowned every other power of attorney. I am not here about what she did."* Nothing more about Ida. | Exh. F; JA Q26 |
+| Exhibit F, paragraph 4, gives the new attorney-in-fact power to recover properties "unlawfully or fraudulently sold." So your family was already alleging fraud in 2005? | *"That is the standard wording of the instrument appointing the new attorney-in-fact. It names no one."* Do not repeat the word. | Exh. F p. 2 |
 | Cesar sold to Mariquita Era in April 2005 under the same SPA and it was registered. The family never objected. | *"April 2005 was before 15 August 2005. I cannot speak to a sale I was not part of."* | Exh. B p. 3 |
 
 ### B3. Knowledge, delay, laches
