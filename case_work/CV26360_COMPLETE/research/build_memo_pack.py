@@ -42,23 +42,21 @@ def allpages(path):
 
 
 ANNEXES = [
- dict(id="A", title="Request for subpoenas, ten custodians", action="Action 1 · file by 21 October", parts=[
-   ("Draft request for subpoenas, returnable 2 Dec 2026", os.path.join(ROOT, "SUBPOENA_REQUEST_2026-10", "SUBPOENA_REQUEST_2026-10.pdf"), None),
-   ("Exh. B, page 6: Entry 2021003236, the partition (Doc. 402/Pg. 81/Bk. CXXII/2017)", EX("Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf"), [6]),
-   ("Registry file Ref. 2025001098: the deed of 29 Sep 2016, naming no title", RD_SALE, [11]),
-   ("Registry file: Cesar's Deed of Confirmation of 28 Mar 2017", RD_SALE, [16]),
-   ("Registry file: Gloria's SPA to Elevado of 15 Sep 2021, \"my property\"", RD_SALE, [20]),
+ dict(id="A", title="How this unfolds: the record, the lock-in, the trap", action="The strategy · read first", parts=[
+   ("Trap map: why the rules allow it; our case-in-chief; the stages; quiet gathering; the traps claim by claim; risks", html(os.path.join(PACK, "05_TRAP_MAP.html")), None),
  ]),
- dict(id="B", title="Completing Exhibits E and H; the 1991 SPA", action="Action 2 · certified copies by 20 October; marking 2 December", parts=[
+ dict(id="B", title="Quiet gathering: my written requests", action="Action 1 · now to 27 November", parts=[
+   ("My requests to the Registry of Deeds and the Clerk of Court (partition agreement, notarial registers)", os.path.join(ROOT, "RD_OCC_REQUESTS_2026-10", "RD_OCC_REQUESTS_2026-10.pdf"), None),
+ ]),
+ dict(id="C", title="Completing Exhibits E and H; the 1991 SPA", action="Action 2 · at the 9 December offer", parts=[
    ("Exh. E as filed (two pages of the 1992 SPA)", EX("Exhibit E - Complaint - Civil Case No. 26-360.pdf"), None),
    ("Def. Exh. 7: the 1992 SPA complete, as the defense filed it", DEF7, None),
    ("Exh. H as filed (page 1 of 2)", EX("Exhibit H - Complaint - Civil Case No. 26-360.pdf"), None),
-   ("Registry file: the deed's page 2, with the eCAR (the missing page of Exh. H)", RD_SALE, [12]),
+   ("Registry file Ref. 2025001098: the deed's page 2, with the eCAR (the missing page of Exh. H)", RD_SALE, [12]),
    ("Registry file pages 2 to 4: the 1991 SPA, administration only (Doc. 260/Pg. 53/Bk. I/1991, Makati)", RD_SALE, [2, 3, 4]),
    ("Exh. B, page 5: the 1991 SPA annotated on T-52540 on 10 Oct 2016", EX("Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf"), [5]),
-   ("My written requests to the Registry and the Clerk of Court", os.path.join(ROOT, "RD_OCC_REQUESTS_2026-10", "RD_OCC_REQUESTS_2026-10.pdf"), None),
  ]),
- dict(id="C", title="Patricia Keesey Zschoche: rebuttal affidavit and her documents", action="Action 3 · her answers by 31 October", parts=[
+ dict(id="D", title="Patricia Keesey Zschoche: rebuttal affidavit and her documents", action="Action 3 · her answers by 31 October", parts=[
    ("Filled draft judicial affidavit, with counsel's notes", html(os.path.join(ROOT, "PATRICIA_JUDICIAL_AFFIDAVIT_FILLED_DRAFT_2026-10-15.html")), None),
    ("Exh. F: the revocation of 15 Aug 2005", EX("Exhibit F - Complaint - Civil Case No. 26-360.pdf"), None),
    ("Exh. G: the Bicol Post notice, Sep to Oct 2020", EX("Exhibit G to G-1 - Complaint - Civil Case No. 26-360.pdf"), None),
@@ -67,13 +65,13 @@ ANNEXES = [
    ("Agcaoili & Associates letter of 15 Aug 2019 (proposed Exh. O-2)", os.path.join(TI, "Reply to JDavis CGrippo re CDelaFuente 15Aug2019.pdf"), None),
    ("Exh. A: her SPA to Jonathan, apostilled 12 Nov 2025", EX("Exhibit A - Complaint - Civil Case No. 26-360.pdf"), None),
  ]),
- dict(id="D", title="Briefing: how we win, the demurrer, the 9 December offer", action="Action 4 · 9 December", parts=[
+ dict(id="E", title="Briefing: how we win, the demurrer, the 9 December offer", action="Action 4 · 9 December", parts=[
    ("Briefing memo: priorities, the facts that decide it, what we do not argue, Judge Cu", html(os.path.join(PACK, "00_COVER_MEMO.html")), None),
    ("Proof plan: each element proved without Jonathan; admissibility; the T-52540 point; doors for rebuttal; calendar", html(os.path.join(ROOT, "OVERWHELM_PLAN_2026-10-14.html")), None),
    ("Focus sheet: the case on one page, Ramos's lines and the answers, statute spine, calendar", html(os.path.join(ROOT, "COUNSEL_FOCUS_SHEET_2026-10-14.html")), None),
  ]),
- dict(id="E", title="Cross-examination checklist, with the documents to show", action="Action 5 · 13 January to 10 March 2027", parts=[
-   ("Checklist: Salvador, Princess, Erwin, Gloria; fact, question, document", html(os.path.join(PACK, "04_CROSS_CHECKLIST.html")), None),
+ dict(id="F", title="Lock-in on cross: checklist and the papers to show", action="Action 5 · 13 January to 10 March 2027", parts=[
+   ("Checklist: Salvador, Princess, Erwin, Gloria; fact, question, what to show and what to hold", html(os.path.join(PACK, "04_CROSS_CHECKLIST.html")), None),
    ("Def. Exh. 5: survey receipt of 29 Dec 2006, \"owned by the Heirs\"", DEF5, [1]),
    ("Def. Exh. 5: first receipt, Oct 2003, signed \"Von dela Fuente\"", DEF5, [2]),
    ("Def. Exh. 5: \"Down payment\" receipt of 6 Jan 2005", DEF5, [3]),
@@ -84,7 +82,14 @@ ANNEXES = [
    ("Def. Exh. 7, page 1: Registry copy obtained for Gloria in August 2021", DEF7, [1]),
    ("Exh. C, page 2: survey 8 Sep 2020, approved 6 Apr 2021", EX("Exhibit C to C-1 - Complaint - Civil Case No. 26-360.pdf"), [2]),
  ]),
- dict(id="F", title="War of the Statutes (reference)", action="Reference", parts=[
+ dict(id="G", title="Rebuttal: the records held back, and the subpoena request to rework", action="Action 6 · after 10 March 2027", parts=[
+   ("Registry file: Gloria's SPA to Elevado of 15 Sep 2021, \"my property\" (her admission)", RD_SALE, [20]),
+   ("Registry file: Cesar's Deed of Confirmation of 28 Mar 2017 (the agent confirming himself)", RD_SALE, [16]),
+   ("Exh. B, page 6: Entry 2021003236, the partition dated 15 Mar 2017 (Doc. 402/Pg. 81/Bk. CXXII)", EX("Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf"), [6]),
+   ("T-4497, page 13: Cesar's 1993 Subdivision Agreement entry naming his buyers; no Balane",  os.path.join(BASE, "src", "T4497_CTC_doc25.pdf"), [13]),
+   ("Draft subpoena request: to be reworked for rebuttal, filed after the defense rests", os.path.join(ROOT, "SUBPOENA_REQUEST_2026-10", "SUBPOENA_REQUEST_2026-10.pdf"), None),
+ ]),
+ dict(id="H", title="War of the Statutes (reference)", action="Reference", parts=[
    ("War of the Statutes", os.path.join(ROOT, "WAR_OF_THE_STATUTES_2026-10.pdf"), None),
  ]),
 ]
