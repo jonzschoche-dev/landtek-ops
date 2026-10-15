@@ -1,9 +1,6 @@
-"""Bind the memorandum pack for Atty. Barandon, in order of priority.
-
-Cover memo -> Tab 1 Request for Admission -> Tab 2 Motion for Production -> Tab 3 Subpoena request
--> Tab 4 Focus sheet -> Tab 5 Proof plan (overwhelm plan without its Part 6, which is Tab 1)
--> Tab 6 Patricia rebuttal affidavit draft -> Tab 7 War of the Statutes.
-Every page carries a footer: pack name, tab, page within tab. 8.5 x 13.
+"""Bind the memorandum pack for Atty. Barandon: a 14-pt action cover, then one annex per action
+(the draft first, then the supporting pages), each with a divider listing its contents and every page
+stamped with its annex, page and source. 8.5 x 13.
 
 Run:  python3 research/build_memo_pack.py
 """
@@ -11,86 +8,163 @@ import fitz, subprocess, os
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(BASE)
+LT = os.path.dirname(os.path.dirname(ROOT))
+DL = os.path.join(LT, "drive_local")
+TI = os.path.join(DL, "01 - Clients", "Heirs of Mary Worrick Keesey- LTC-002", "Evidence", "Transfer Investigation")
 PACK = os.path.join(ROOT, "MEMO_PACK_2026-10-15")
 W, H = 612, 936
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
+RD_SALE = os.path.join(TI, "Balane Supporting Docs.partition.titles.pdf")   # certified Registry file Ref. 2025001098
+ANSWER = os.path.join(DL, "Answer with Special and Affirmative Defenses and Compulsory Counterclaim.pdf")
+DEF5 = os.path.join(DL, "Exhibit 5 - Receipts.pdf")
+DEF7 = os.path.join(DL, "Exhibit 7 - Special Power of Attorney dated March 16, 1992.pdf")
+EX = lambda n: os.path.join(DL, n)
 
-def html2pdf(html):
-    out = os.path.join(BASE, "_pack_" + os.path.basename(html).replace(".html", ".pdf"))
+
+def html(path):
+    out = os.path.join(BASE, "_pack_" + os.path.basename(path).replace(".html", ".pdf"))
     subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-pdf-header-footer",
-                    f"--print-to-pdf={out}", "file://" + html], check=True, capture_output=True)
-    return fitz.open(out)
-
-
-def without_part6(doc):
-    """Drop the pages from the one that starts Part 6 (the request-for-admission draft) to the end."""
-    keep = doc.page_count
-    for i, p in enumerate(doc):
-        if "Part 6. Draft for counsel" in p.get_text():
-            keep = i
-            break
-    out = fitz.open()
-    out.insert_pdf(doc, from_page=0, to_page=keep - 1)
+                    f"--print-to-pdf={out}", "file://" + path], check=True, capture_output=True)
     return out
 
 
-TABS = [
-    (1, "Request for Admission (Rule 26)", "PRIORITY 1 · File by 21 October",
-     "Eighteen items, each deemed admitted unless denied under oath within fifteen days. Draft for counsel's signature.",
-     lambda: html2pdf(os.path.join(PACK, "02_REQUEST_FOR_ADMISSION.html"))),
-    (2, "Motion for Production and Inspection (Rule 27)", "PRIORITY 1 · File by 21 October",
-     "Llamanzares papers they claim, the receipt books, the room-rental records, the improvement costs and permits, the owner's duplicate of TCT 079-2021002127. Draft for counsel's signature.",
-     lambda: html2pdf(os.path.join(PACK, "03_MOTION_FOR_PRODUCTION.html"))),
-    (3, "Request for subpoenas, ten custodians", "PRIORITY 1 · File by 21 October",
-     "Returnable 2 December 2026. Draft for counsel's signature.",
-     lambda: fitz.open(os.path.join(ROOT, "SUBPOENA_REQUEST_2026-10", "SUBPOENA_REQUEST_2026-10.pdf"))),
-    (4, "Focus sheet", "PRIORITY 2 · How we win",
-     "The case in one line, the order of argument, decisions, the statute spine with exhibit pages, Ramos's lines and the answers, the calendar.",
-     lambda: html2pdf(os.path.join(ROOT, "COUNSEL_FOCUS_SHEET_2026-10-14.html"))),
-    (5, "Proof plan", "PRIORITY 2 · How we win",
-     "The demurrer; each element proved twice without Jonathan; what each piece of proof can and cannot do; the T-52540 point; the doors for rebuttal; the calendar to 2027.",
-     lambda: without_part6(html2pdf(os.path.join(ROOT, "OVERWHELM_PLAN_2026-10-14.html")))),
-    (6, "Draft judicial affidavit of Patricia Keesey Zschoche (rebuttal)", "PRIORITY 3 · Rebuttal",
-     "Forty-three questions with draft answers from her own sworn papers and Jonathan's account, marked [CONFIRM] where she must confirm; she rewrites any answer in her own words before signing; counsel's notes on separate pages.",
-     lambda: html2pdf(os.path.join(ROOT, "PATRICIA_JUDICIAL_AFFIDAVIT_FILLED_DRAFT_2026-10-15.html"))),
-    (7, "War of the Statutes", "REFERENCE",
-     "Each provision both sides will cite, with the exhibit that fits it and the expected result.",
-     lambda: fitz.open(os.path.join(ROOT, "WAR_OF_THE_STATUTES_2026-10.pdf"))),
+def without_part6(pdf_path):
+    d = fitz.open(pdf_path)
+    keep = next((i for i, p in enumerate(d) if "Part 6. Draft for counsel" in p.get_text()), d.page_count)
+    out = os.path.join(BASE, "_pack_plan_no_part6.pdf")
+    o = fitz.open(); o.insert_pdf(d, from_page=0, to_page=keep - 1); o.save(out)
+    return out
+
+
+def allpages(path):
+    return list(range(1, fitz.open(path).page_count + 1))
+
+
+ANNEXES = [
+ dict(id="A", title="Request for Admission (Rule 26)", action="Action 1 · serve by 21 October", parts=[
+   ("Draft Request for Admission", html(os.path.join(PACK, "02_REQUEST_FOR_ADMISSION.html")), None),
+   ("Answer, Annex \"1\": Gloria's SPA of 28 May 2020 (item 1)", EX("Annex 1 - Special Power of Attorney .pdf"), [1, 2, 3]),
+   ("Registry file Ref. 2025001098: Gloria's SPA to Elevado, \"my property\" (item 2; its Annex \"A\")", RD_SALE, [20]),
+   ("Def. Exh. 5: survey receipt of 29 Dec 2006 (item 3; Annex \"B\")", DEF5, [1]),
+   ("Def. Exh. 5: \"Down payment\" receipt of 6 Jan 2005 (item 4; Annex \"C\")", DEF5, [3]),
+   ("Def. Exh. 5: Receipt No. 0228, \"Full payment\", Feb 2017 (items 5, 10; Annex \"D\")", DEF5, [33]),
+   ("Answer, page 5: renters paying monthly rent (item 8)", ANSWER, [5]),
+   ("Registry file: the deed of 29 Sep 2016, naming no title (items 10, 17)", RD_SALE, [11]),
+   ("Exh. C, page 2: survey 8 Sep 2020, approved 6 Apr 2021 (item 12)", EX("Exhibit C to C-1 - Complaint - Civil Case No. 26-360.pdf"), [2]),
+   ("Def. Exh. 7, page 1: Registry copy obtained for Gloria in August 2021 (item 13)", DEF7, [1]),
+   ("Registry file: Cesar's Deed of Confirmation of 28 Mar 2017 (item 18)", RD_SALE, [16]),
+ ]),
+ dict(id="B", title="Motion for Production and Inspection (Rule 27)", action="Action 2 · file by 21 October", parts=[
+   ("Draft Motion for Production", html(os.path.join(PACK, "03_MOTION_FOR_PRODUCTION.html")), None),
+   ("Answer, pages 4 to 7: rooms rented (¶27), down payment \"recognized and later credited\" (¶40), improvements and retention (¶49)", ANSWER, [4, 5, 6, 7]),
+   ("Erwin H. Balane's judicial affidavit: \"first with Ben Llamanzares\"", EX("CV26360 - Trial Brief for Atty. Botor (2026-08-30)/C5 - Judicial Affidavit - Engr. Erwin H. Balane (defense).pdf"), [1]),
+ ]),
+ dict(id="C", title="Request for subpoenas, ten custodians", action="Action 3 · file by 21 October", parts=[
+   ("Draft request for subpoenas, returnable 2 Dec 2026", os.path.join(ROOT, "SUBPOENA_REQUEST_2026-10", "SUBPOENA_REQUEST_2026-10.pdf"), None),
+   ("Exh. B, page 6: Entry 2021003236, the partition (Doc. 402/Pg. 81/Bk. CXXII/2017)", EX("Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf"), [6]),
+ ]),
+ dict(id="D", title="Completing Exhibits E and H; the 1991 SPA", action="Action 4 · by 20 October", parts=[
+   ("Exh. E as filed (two pages of the 1992 SPA)", EX("Exhibit E - Complaint - Civil Case No. 26-360.pdf"), None),
+   ("Def. Exh. 7: the 1992 SPA complete, as the defense filed it", DEF7, None),
+   ("Exh. H as filed (page 1 of 2)", EX("Exhibit H - Complaint - Civil Case No. 26-360.pdf"), None),
+   ("Registry file: the deed's page 2, with the eCAR (the missing page of Exh. H)", RD_SALE, [12]),
+   ("Registry file pages 2 to 4: the 1991 SPA, administration only (Doc. 260/Pg. 53/Bk. I/1991, Makati)", RD_SALE, [2, 3, 4]),
+   ("Exh. B, page 5: the 1991 SPA annotated on T-52540 on 10 Oct 2016", EX("Exhibit B to B-4 - Complaint - Civil Case No. 26-360.pdf"), [5]),
+   ("My written requests to the Registry and the Clerk of Court", os.path.join(ROOT, "RD_OCC_REQUESTS_2026-10", "RD_OCC_REQUESTS_2026-10.pdf"), None),
+ ]),
+ dict(id="E", title="Patricia Keesey Zschoche: rebuttal affidavit and her documents", action="Action 5 · her answers by 31 October", parts=[
+   ("Filled draft judicial affidavit, with counsel's notes", html(os.path.join(ROOT, "PATRICIA_JUDICIAL_AFFIDAVIT_FILLED_DRAFT_2026-10-15.html")), None),
+   ("Exh. F: the revocation of 15 Aug 2005", EX("Exhibit F - Complaint - Civil Case No. 26-360.pdf"), None),
+   ("Exh. G: the Bicol Post notice, Sep to Oct 2020", EX("Exhibit G to G-1 - Complaint - Civil Case No. 26-360.pdf"), None),
+   ("Exh. I, pages 1 to 2: her Affidavit of Adverse Claim, Feb 2023", EX("Exhibit I - Complaint - Civil Case No. 26-360.pdf"), [1, 2]),
+   ("Her Affidavit of Loss, Feb 2023 (proposed Exh. O-1)", os.path.join(TI, "AFFIDAVIT OF LOSS P.Zschoche 22Feb2023.pdf"), None),
+   ("Agcaoili & Associates letter of 15 Aug 2019 (proposed Exh. O-2)", os.path.join(TI, "Reply to JDavis CGrippo re CDelaFuente 15Aug2019.pdf"), None),
+   ("Exh. A: her SPA to Jonathan, apostilled 12 Nov 2025", EX("Exhibit A - Complaint - Civil Case No. 26-360.pdf"), None),
+ ]),
+ dict(id="F", title="A peso figure for the use of the lot", action="Action 6 · by 4 November", parts=[
+   ("Exh. D: Gloria's tax declaration (assessed value P257,670; market value P4,294,420)", EX("Exhibit D to D-1 - Complaint - Civil Case No. 26-360.pdf"), None),
+   ("Answer, page 4: rooms rented (¶27)", ANSWER, [4]),
+ ]),
+ dict(id="G", title="Briefing: how we win, the demurrer, the doors for rebuttal", action="Actions 7 and 8 · 9 December; January to March 2027", parts=[
+   ("Briefing memo: priorities, the facts that decide it, what we do not argue, Judge Cu", html(os.path.join(PACK, "00_COVER_MEMO.html")), None),
+   ("Proof plan: each element proved without Jonathan; admissibility; the T-52540 point; doors for rebuttal (Part 2C); calendar", without_part6(html(os.path.join(ROOT, "OVERWHELM_PLAN_2026-10-14.html"))), None),
+   ("Focus sheet: the case on one page, Ramos's lines and the answers, statute spine, calendar", html(os.path.join(ROOT, "COUNSEL_FOCUS_SHEET_2026-10-14.html")), None),
+ ]),
+ dict(id="H", title="War of the Statutes (reference)", action="Reference", parts=[
+   ("War of the Statutes", os.path.join(ROOT, "WAR_OF_THE_STATUTES_2026-10.pdf"), None),
+ ]),
 ]
 
+
+def clean(s):
+    return (s.replace("–", "-").replace("—", "-").replace("₱", "P").replace("“", '"').replace("”", '"')
+             .replace("‘", "'").replace("’", "'").replace("…", "...").replace("§", "s.").replace("¶", "par."))
+
+
 out = fitz.open()
-cover = html2pdf(os.path.join(PACK, "00_COVER_MEMO.html"))
+cover = fitz.open(html(os.path.join(PACK, "00_ACTION_COVER.html")))
 out.insert_pdf(cover)
 for i in range(cover.page_count):
     pg = out[i]
-    pg.draw_rect(fitz.Rect(0, H - 26, W, H), color=(1, 1, 1), fill=(1, 1, 1))
-    pg.insert_text((54, H - 12), f"Memorandum pack, Civil Case No. 26-360  ·  Cover memo  ·  p. {i + 1} of {cover.page_count}  ·  15 October 2026",
+    pg.insert_text((54, H - 14), f"Memorandum pack, Civil Case No. 26-360  ·  Actions for counsel  ·  p. {i + 1} of {cover.page_count}",
                    fontsize=7.2, fontname="helv", color=(.3, .3, .3))
-toc = [[1, "Cover memo: priorities after 14 October", 1]]
+toc = [[1, "Actions for counsel (cover)", 1]]
 
-for n, title, pri, why, loader in TABS:
+
+def normalize(src, idx):
+    sp = src[idx]
+    r = sp.rect
+    sw, sh = (r.height, r.width) if sp.rotation in (90, 270) else (r.width, r.height)
+    np_ = out.new_page(width=W, height=H)
+    top, bot = 18, 34
+    s = min((W - 24) / sw, (H - top - bot) / sh)
+    tw, th = sw * s, sh * s
+    x0 = (W - tw) / 2
+    y0 = top + (H - top - bot - th) / 2
+    np_.show_pdf_page(fitz.Rect(x0, y0, x0 + tw, y0 + th), src, idx, rotate=0)
+    return np_
+
+
+for a in ANNEXES:
+    parts = [(lbl, path, pages if pages else allpages(path)) for lbl, path, pages in a["parts"]]
+    total = sum(len(p[2]) for p in parts)
     d = out.new_page(width=W, height=H)
     start = out.page_count
-    d.insert_text((54, 120), pri, fontsize=10, fontname="hebo", color=(.35, .35, .35))
-    d.insert_text((54, 160), f"TAB {n}", fontsize=34, fontname="tibo")
-    d.draw_rect(fitz.Rect(54, 172, W - 54, 176), color=(0, 0, 0), fill=(0, 0, 0))
-    d.insert_textbox(fitz.Rect(54, 192, W - 54, 260), title, fontsize=17, fontname="tibo")
-    d.insert_textbox(fitz.Rect(54, 262, W - 54, 400), why, fontsize=12.5, fontname="tiro")
-    src = loader()
-    first = out.page_count
-    out.insert_pdf(src)
-    total = src.page_count
-    for k in range(total):
-        pg = out[first + k]
-        pg.draw_rect(fitz.Rect(0, H - 26, W, H), color=(1, 1, 1), fill=(1, 1, 1))
-        pg.insert_text((54, H - 12), f"Memorandum pack, Civil Case No. 26-360  ·  Tab {n}: {title[:60]}  ·  p. {k + 1} of {total}",
-                       fontsize=7.2, fontname="helv", color=(.3, .3, .3))
-    toc.append([1, f"Tab {n}: {title}", start])
+    d.insert_text((54, 110), clean(a["action"]).upper(), fontsize=10, fontname="hebo", color=(.35, .35, .35))
+    d.insert_text((54, 152), f"ANNEX {a['id']}", fontsize=34, fontname="tibo")
+    d.draw_rect(fitz.Rect(54, 164, W - 54, 168), color=(0, 0, 0), fill=(0, 0, 0))
+    d.insert_textbox(fitz.Rect(54, 182, W - 54, 250), clean(a["title"]), fontsize=17, fontname="tibo")
+    y = 262
+    d.insert_text((54, y), "CONTENTS", fontsize=9, fontname="hebo", color=(.35, .35, .35))
+    y += 16
+    k = 1
+    for lbl, path, pages in parts:
+        rng = f"{k}" if len(pages) == 1 else f"{k}-{k + len(pages) - 1}"
+        line = f"pp. {rng}   {clean(lbl)}"
+        h = 18 if len(line) < 78 else (34 if len(line) < 156 else 50)
+        d.insert_textbox(fitz.Rect(54, y, W - 54, y + h + 4), line, fontsize=12, fontname="tiro")
+        y += h + 4
+        k += len(pages)
+    d.insert_text((54, H - 14), f"Annex {a['id']} divider  ·  Memorandum pack, Civil Case No. 26-360  ·  15 October 2026",
+                  fontsize=7.2, fontname="helv", color=(.3, .3, .3))
+    k = 1
+    for lbl, path, pages in parts:
+        src = fitz.open(path)
+        for pnum in pages:
+            if not 1 <= pnum <= src.page_count:
+                raise SystemExit(f"Annex {a['id']}: page {pnum} out of range in {path}")
+            np_ = normalize(src, pnum - 1)
+            np_.draw_rect(fitz.Rect(0, H - 28, W, H), color=(1, 1, 1), fill=(1, 1, 1))
+            np_.insert_text((54, H - 13), clean(f"ANNEX {a['id']}  ·  p. {k} of {total}  ·  {lbl[:70]}, p. {pnum}  ·  Civil Case No. 26-360"),
+                            fontsize=7, fontname="helv", color=(.25, .25, .25))
+            k += 1
+    toc.append([1, f"Annex {a['id']}: {a['title']}", start])
 
 out.set_toc(toc)
-out.set_metadata({"title": "Civil Case No. 26-360: memorandum pack for counsel, 15 October 2026", "author": "", "subject": "for counsel; not filed"})
+out.set_metadata({"title": "Civil Case No. 26-360: actions for counsel, with annexes, 15 October 2026", "author": "", "subject": "for counsel; not filed"})
 dest = os.path.join(ROOT, "MEMO_PACK_BARANDON_2026-10-15.pdf")
+out.rewrite_images(dpi_threshold=160, dpi_target=140, quality=62, lossy=True, lossless=True)
 out.save(dest, garbage=4, deflate=True)
 print(out.page_count, "pp", {(round(p.rect.width), round(p.rect.height)) for p in out}, os.path.getsize(dest) // 1024, "KB")
 for t in toc:
