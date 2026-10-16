@@ -42,9 +42,8 @@ def allpages(path):
 
 
 ANNEXES = [
- dict(id="A", title="The strategy: our trap, and their path to victory", action="Read first · Actions 1 and 2", parts=[
-   ("Part 1. Trap map: why the rules allow it; our case-in-chief; the stages; quiet gathering; the traps claim by claim; risks", html(os.path.join(PACK, "05_TRAP_MAP.html")), None),
-   ("Part 2. The Balanes' path to victory, stage by stage, and the quiet moves that close it", html(os.path.join(PACK, "06_DEFENSE_TRAJECTORY.html")), None),
+ dict(id="A", title="The strategy: the record, the lock-in, the trap", action="Read first", parts=[
+   ("Trap map: why the rules allow it; our case-in-chief; the stages; quiet gathering; the traps claim by claim; risks", html(os.path.join(PACK, "05_TRAP_MAP.html")), None),
  ]),
  dict(id="B", title="Quiet gathering: my written requests", action="Action 1 · now to 27 November", parts=[
    ("My requests to the Registry of Deeds and the Clerk of Court (partition agreement, notarial registers)", os.path.join(ROOT, "RD_OCC_REQUESTS_2026-10", "RD_OCC_REQUESTS_2026-10.pdf"), None),
