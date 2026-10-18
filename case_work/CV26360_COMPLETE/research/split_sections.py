@@ -9,6 +9,7 @@ from html2md import html_to_md
 BASE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(BASE)
 OUT = os.path.join(ROOT, "SECTIONS")
 PACK = os.path.join(ROOT, "MEMO_PACK_2026-10-15")
+CF = os.path.join(ROOT, "CASE_FILE")
 
 # (folder, title, source, kind)  kind: html | md
 DOCS = [
@@ -31,6 +32,22 @@ DOCS = [
  ("17_DRAFTS_HELD_PRODUCTION", "Draft motion for production (Rule 27), HELD in reserve, not filed", os.path.join(PACK, "03_MOTION_FOR_PRODUCTION.html"), "html"),
  ("18_DRAFTS_SUBPOENA_REQUEST", "Draft request for subpoenas (ten custodians), for rebuttal", os.path.join(ROOT, "SUBPOENA_REQUEST_2026-10", "SUBPOENA_REQUEST_2026-10.html"), "html"),
  ("19_DRAFTS_RD_OCC_REQUESTS", "Records requests to the Registry of Deeds and the Clerk of Court", os.path.join(ROOT, "RD_OCC_REQUESTS_2026-10", "RD_OCC_REQUESTS_2026-10.html"), "html"),
+ # ---- Grok desk (CASE_FILE/): Grok's files; Claude does not edit them; HELD = internal, never into a counsel pack ----
+ ("20_GROK_PARTY_DOSSIER", "[Grok desk] Party dossier: defense counsel and defendants", os.path.join(CF, "PARTIES", "PARTY_DOSSIER_2026-10-17.md"), "md"),
+ ("21_GROK_HELD_PARTY_EXPOSURE_ANNEX", "[Grok desk, INTERNAL HELD: not for counsel pack, not for filing] Party exposure annex", os.path.join(CF, "PARTIES", "PARTY_EXPOSURE_ANNEX_HELD_2026-10-17.md"), "md"),
+ ("22_GROK_RECEIPTS_EXAMINATION", "[Grok desk] Def. Exh. 5 receipts: scan-level examination record (111 slips; CSV and signature panel alongside)", os.path.join(CF, "PARTIES", "RECEIPTS_EXAMINATION_2026-10-18.md"), "md"),
+ ("23_GROK_RECEIPTS_AUDIT_LAW", "[Grok desk] Auditing Def. Exh. 5: Philippine law and practice", os.path.join(CF, "PARTIES", "RECEIPTS_AUDIT_LAW_2026-10-18.md"), "md"),
+ ("24_GROK_INK_DATING_PLAN", "[Grok desk] Ink-dating plan for Def. Exh. 5 (timing decision for counsel)", os.path.join(CF, "PARTIES", "INK_DATING_PLAN_2026-10-18.md"), "md"),
+ ("25_GROK_RECEIPTS_FORENSIC_FRAMEWORK", "[Grok desk] Forensic framework for the payment trail and subpoena map", os.path.join(CF, "PARTIES", "RECEIPTS_FORENSIC_FRAMEWORK_2026-10-18.md"), "md"),
+ ("26_GROK_HELD_DRAFT_MOTION_PRODUCTION_EXH5", "[Grok desk, HELD draft] Motion for production and examination of Def. Exh. 5 (parallel to Claude's held Rule 27 draft, 17_)", os.path.join(CF, "PARTIES", "DRAFT_MOTION_PRODUCTION_EXAMINATION_DEF_EXH5_2026-10-18.md"), "md"),
+ ("27_GROK_HELD_DRAFT_SUBPOENA_BOOKLETS", "[Grok desk, HELD draft] Subpoena duces tecum for the receipt booklets and stubs (parallel to Claude's subpoena request, 18_)", os.path.join(CF, "PARTIES", "DRAFT_SUBPOENA_DUCES_TECUM_BOOKLETS_DEF_EXH5_2026-10-18.md"), "md"),
+ ("28_GROK_CONSULTATION_GAP_PLAN", "[Other desk] Consultation gap plan (SPA par. 7 'after prior consultation')", os.path.join(CF, "08_GAPS_TO_OBTAIN", "CONSULTATION_GAP_PLAN.md"), "md"),
+ ("29_GROK_CONSULTATION_MEANING", "[Other desk] What 'prior consultation' means", os.path.join(CF, "08_GAPS_TO_OBTAIN", "CONSULTATION_MEANING.md"), "md"),
+ ("30_GROK_SPA_CLAUSE_DISSECTION", "[Other desk] Clause-by-clause dissection of the 1992 SPA", os.path.join(CF, "08_GAPS_TO_OBTAIN", "SPA_CLAUSE_DISSECTION.md"), "md"),
+ ("31_GROK_SPA_LANGUAGE_JURISPRUDENCE", "[Other desk] SPA language jurisprudence", os.path.join(CF, "08_GAPS_TO_OBTAIN", "SPA_LANGUAGE_JURISPRUDENCE.md"), "md"),
+ ("32_GROK_T52540_SPA_SCOPE", "[Other desk] T-52540 against the SPA's property description", os.path.join(CF, "08_GAPS_TO_OBTAIN", "T52540_SPA_SCOPE.md"), "md"),
+ ("33_GROK_EXERCISES_REVIEW", "[Grok desk] Review of Claude's exercises (with the Cesar signature comparison PDF alongside)", os.path.join(CF, "GROK_REVIEW", "CLAUDE_EXERCISES_REVIEW.md"), "md"),
+ ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 
 
@@ -105,7 +122,8 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 - `research/build_cross_binders.py` — the five cross binders.
 - `research/TRACK_A..E_*.md` — the research tracks (knowledge, papering, notice, jurisprudence, Judge Cu).
 - `GROK_REVIEW/` — the second-chair review rounds and our responses.
-- `CASE_FILE/` — the other desk's case file (untracked; consultation gap plan, SPA dissection, T-52540 scope).
+- `CASE_FILE/` — the Grok desk's case file. Its documents are split under SECTIONS/20_ to 34_ with the tag [Grok desk] or [Other desk]; Claude does not edit them (proposals go through `case_work/CLAUDE_GROK_HANDOFF/`). Anything tagged **HELD** is internal only: never into a counsel pack, never filed.
+- `case_work/CLAUDE_GROK_HANDOFF/` — the Claude-Grok channel: dated notes, the work index, the protocol README.
 - `drive_local/CV26360 - GROK PACK (2026-10-14)/` — copies for the second chair.
 
 ## Standing rules (short form)

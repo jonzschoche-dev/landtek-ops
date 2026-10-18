@@ -1,5 +1,5 @@
 # How this unfolds: the record, the lock-in, the trap
-Source: `MEMO_PACK_2026-10-15/05_TRAP_MAP.html` (modified 2026-10-16). One file per section:
+Source: `MEMO_PACK_2026-10-15/05_TRAP_MAP.html` (modified 2026-10-18). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [1. Why the rules allow it](01_1_Why_the_rules_allow_it.md)

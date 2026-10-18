@@ -1,5 +1,5 @@
 # Counsel focus sheet: the case in one line, decisions, statute spine, calendar
-Source: `COUNSEL_FOCUS_SHEET_2026-10-14.html` (modified 2026-10-15). One file per section:
+Source: `COUNSEL_FOCUS_SHEET_2026-10-14.html` (modified 2026-10-18). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [1. Decisions needed from counsel this week](01_1_Decisions_needed_from_counsel_this_week.md)

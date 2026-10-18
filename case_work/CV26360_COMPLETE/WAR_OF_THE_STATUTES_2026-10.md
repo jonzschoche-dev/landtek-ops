@@ -76,7 +76,9 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 
 ---
 
-## 4. Void or merely unenforceable? Art. 1874 against Art. 1403(1)
+## 4. Void or merely unenforceable? Art. 1898 (with Art. 1874) against Art. 1403(1)
+
+> **Caution (18 Oct 2026, second-chair review).** Art. 1874 voids a sale made through an agent whose authority is *not* in writing. Here the authority is in writing (Exh. E), and the sale is outside its terms. The operative provision is therefore **Art. 1898**: a contract the agent makes "exceeding the scope of his authority" which the principal does not ratify "shall be void if the party with whom the agent contracted is aware of the limits of the powers granted by the principal." Awareness is supplied by the 1996 annotation (PD 1529 §52) and by the buyer's own pull of the full instrument in August 2021 (Def. Exh. 7). Art. 1874 is cited for the rule that the authority must be in writing, and for the reasoning in *Cosmic Lumber* and *Unchuan* that a sale outside the written power is a sale without written authority for that sale. Lead with Art. 1898.
 
 | | Text | Who cites it |
 |---|---|---|

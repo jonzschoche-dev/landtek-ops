@@ -27,6 +27,21 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [17_DRAFTS_HELD_PRODUCTION](SECTIONS/17_DRAFTS_HELD_PRODUCTION/README.md) | Draft motion for production (Rule 27), HELD in reserve, not filed | 1 sections | `MEMO_PACK_2026-10-15/03_MOTION_FOR_PRODUCTION.html` |
 | [18_DRAFTS_SUBPOENA_REQUEST](SECTIONS/18_DRAFTS_SUBPOENA_REQUEST/README.md) | Draft request for subpoenas (ten custodians), for rebuttal | 2 sections | `SUBPOENA_REQUEST_2026-10/SUBPOENA_REQUEST_2026-10.html` |
 | [19_DRAFTS_RD_OCC_REQUESTS](SECTIONS/19_DRAFTS_RD_OCC_REQUESTS/README.md) | Records requests to the Registry of Deeds and the Clerk of Court | 1 sections | `RD_OCC_REQUESTS_2026-10/RD_OCC_REQUESTS_2026-10.html` |
+| [20_GROK_PARTY_DOSSIER](SECTIONS/20_GROK_PARTY_DOSSIER/README.md) | [Grok desk] Party dossier: defense counsel and defendants | 11 sections | `CASE_FILE/PARTIES/PARTY_DOSSIER_2026-10-17.md` |
+| [21_GROK_HELD_PARTY_EXPOSURE_ANNEX](SECTIONS/21_GROK_HELD_PARTY_EXPOSURE_ANNEX/README.md) | [Grok desk, INTERNAL HELD: not for counsel pack, not for filing] Party exposure annex | 8 sections | `CASE_FILE/PARTIES/PARTY_EXPOSURE_ANNEX_HELD_2026-10-17.md` |
+| [22_GROK_RECEIPTS_EXAMINATION](SECTIONS/22_GROK_RECEIPTS_EXAMINATION/README.md) | [Grok desk] Def. Exh. 5 receipts: scan-level examination record (111 slips; CSV and signature panel alongside) | 18 sections | `CASE_FILE/PARTIES/RECEIPTS_EXAMINATION_2026-10-18.md` |
+| [23_GROK_RECEIPTS_AUDIT_LAW](SECTIONS/23_GROK_RECEIPTS_AUDIT_LAW/README.md) | [Grok desk] Auditing Def. Exh. 5: Philippine law and practice | 8 sections | `CASE_FILE/PARTIES/RECEIPTS_AUDIT_LAW_2026-10-18.md` |
+| [24_GROK_INK_DATING_PLAN](SECTIONS/24_GROK_INK_DATING_PLAN/README.md) | [Grok desk] Ink-dating plan for Def. Exh. 5 (timing decision for counsel) | 9 sections | `CASE_FILE/PARTIES/INK_DATING_PLAN_2026-10-18.md` |
+| [25_GROK_RECEIPTS_FORENSIC_FRAMEWORK](SECTIONS/25_GROK_RECEIPTS_FORENSIC_FRAMEWORK/README.md) | [Grok desk] Forensic framework for the payment trail and subpoena map | 9 sections | `CASE_FILE/PARTIES/RECEIPTS_FORENSIC_FRAMEWORK_2026-10-18.md` |
+| [26_GROK_HELD_DRAFT_MOTION_PRODUCTION_EXH5](SECTIONS/26_GROK_HELD_DRAFT_MOTION_PRODUCTION_EXH5/README.md) | [Grok desk, HELD draft] Motion for production and examination of Def. Exh. 5 (parallel to Claude's held Rule 27 draft, 17_) | 8 sections | `CASE_FILE/PARTIES/DRAFT_MOTION_PRODUCTION_EXAMINATION_DEF_EXH5_2026-10-18.md` |
+| [27_GROK_HELD_DRAFT_SUBPOENA_BOOKLETS](SECTIONS/27_GROK_HELD_DRAFT_SUBPOENA_BOOKLETS/README.md) | [Grok desk, HELD draft] Subpoena duces tecum for the receipt booklets and stubs (parallel to Claude's subpoena request, 18_) | 6 sections | `CASE_FILE/PARTIES/DRAFT_SUBPOENA_DUCES_TECUM_BOOKLETS_DEF_EXH5_2026-10-18.md` |
+| [28_GROK_CONSULTATION_GAP_PLAN](SECTIONS/28_GROK_CONSULTATION_GAP_PLAN/README.md) | [Other desk] Consultation gap plan (SPA par. 7 'after prior consultation') | 7 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/CONSULTATION_GAP_PLAN.md` |
+| [29_GROK_CONSULTATION_MEANING](SECTIONS/29_GROK_CONSULTATION_MEANING/README.md) | [Other desk] What 'prior consultation' means | 8 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/CONSULTATION_MEANING.md` |
+| [30_GROK_SPA_CLAUSE_DISSECTION](SECTIONS/30_GROK_SPA_CLAUSE_DISSECTION/README.md) | [Other desk] Clause-by-clause dissection of the 1992 SPA | 6 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/SPA_CLAUSE_DISSECTION.md` |
+| [31_GROK_SPA_LANGUAGE_JURISPRUDENCE](SECTIONS/31_GROK_SPA_LANGUAGE_JURISPRUDENCE/README.md) | [Other desk] SPA language jurisprudence | 6 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/SPA_LANGUAGE_JURISPRUDENCE.md` |
+| [32_GROK_T52540_SPA_SCOPE](SECTIONS/32_GROK_T52540_SPA_SCOPE/README.md) | [Other desk] T-52540 against the SPA's property description | 8 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/T52540_SPA_SCOPE.md` |
+| [33_GROK_EXERCISES_REVIEW](SECTIONS/33_GROK_EXERCISES_REVIEW/README.md) | [Grok desk] Review of Claude's exercises (with the Cesar signature comparison PDF alongside) | 6 sections | `CASE_FILE/GROK_REVIEW/CLAUDE_EXERCISES_REVIEW.md` |
+| [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders
 
@@ -38,7 +53,8 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 - `research/build_cross_binders.py` — the five cross binders.
 - `research/TRACK_A..E_*.md` — the research tracks (knowledge, papering, notice, jurisprudence, Judge Cu).
 - `GROK_REVIEW/` — the second-chair review rounds and our responses.
-- `CASE_FILE/` — the other desk's case file (untracked; consultation gap plan, SPA dissection, T-52540 scope).
+- `CASE_FILE/` — the Grok desk's case file. Its documents are split under SECTIONS/20_ to 34_ with the tag [Grok desk] or [Other desk]; Claude does not edit them (proposals go through `case_work/CLAUDE_GROK_HANDOFF/`). Anything tagged **HELD** is internal only: never into a counsel pack, never filed.
+- `case_work/CLAUDE_GROK_HANDOFF/` — the Claude-Grok channel: dated notes, the work index, the protocol README.
 - `drive_local/CV26360 - GROK PACK (2026-10-14)/` — copies for the second chair.
 
 ## Standing rules (short form)

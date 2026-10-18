@@ -13,6 +13,8 @@
 
 - Day digits read from the images and open to a second reading: 2003-10-25 (could be 20); 2008-01-25; 2008-10-17; 2012-01-01; 2014-12-04; 2016-03-07; 2016-12-14; 2017-02-14. None affects a finding.
 
+- **Reconciliation with the second chair's examination record** (CASE_FILE/PARTIES/RECEIPTS_EXAMINATION_2026-10-18): same 111 slips. Its total is ₱602,950 against this ledger's ₱602,750; the whole difference is receipt 0134 (10 Apr 2016), read there as ₱700 and here as ₱500: the figure is "√00" in a hand whose 5 is written as a check mark (compare 0219, words "Fifty," figure "√0,000"). Day digits re-read at 300 dpi and confirmed as in this ledger: 30 May 2005, 4 Apr 2005, 2 Aug 2005, 3 Sep 2006, 17 Feb 2007, 4 Aug 2007, 30 Apr 2009, 30 Dec 2010, 7 Mar 2016. Still open to a second reading: 12 May 2005, 27 May 2006, 4 Dec 2014, 14 Feb 2017. The surveyor's receipt is No. 0460 (read 0160 there). None of these changes a finding.
+
 - The BIR column headings on the eCAR (p. 12) place "EXEMPT" under capital gains tax and the ₱287,866.73 under the withholding column; the reading is from the certified copy and should be confirmed from the BIR docket (P5).
 
 - The fraud examination method and PSA 240 are stated in substance; the Tax Code sections are quoted (Appendix B); the Rules on Evidence provisions on originals, business entries and private documents were not fetched this session and are to be quoted by counsel.

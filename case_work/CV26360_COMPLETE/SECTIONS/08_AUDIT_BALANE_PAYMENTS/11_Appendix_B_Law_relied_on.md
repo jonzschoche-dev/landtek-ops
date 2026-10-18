@@ -13,6 +13,8 @@
 
 Bearing: the estate receipts are registered official receipts of a taxpayer "engaged in business," printed under an authority obtained in 1998 and serially numbered; their duplicates must exist; the printer must have a logbook naming who ordered them. All of that is independent evidence the defense has not produced.
 
+**_Culaba v. Court of Appeals_, G.R. No. 125862, 15 April 2004** (read on lawphil): payments made to a man in the creditor's uniform who "issued SMC liquidation receipts which looked genuine" did not discharge the debt, because the payer "did not ascertain the identity and authority of the said supervisor"; "A person dealing with an agent is put upon inquiry and must discover upon his peril the authority of the agent"; "Persons dealing with an assumed agent are bound at their peril to ascertain not only the fact of agency but also the nature and extent" of the authority. Bearing: receipts from a collector whose authority the payer never verified are not payment to the principal, however genuine the forms look.
+
 **Exhibit E (the 1992 SPA), paragraph 5:** the estate and transfer taxes due on the estate "has been paid in full to the Bureau of Internal Revenue … on December 4, 1991." Salvador's "estate tax" explanation for part of the Balane money (S24) is tested against this recital.
 
 **Civil Code, Article 2234** and the damages predicate are as set out in the memorandum pack; not repeated here.

@@ -1,5 +1,5 @@
 # Briefing memorandum to Atty. Barandon (15 Oct 2026)
-Source: `MEMO_PACK_2026-10-15/00_COVER_MEMO.html` (modified 2026-10-15). One file per section:
+Source: `MEMO_PACK_2026-10-15/00_COVER_MEMO.html` (modified 2026-10-18). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [Now to 9 December: gather quietly, file nothing new](01_Now_to_9_December_gather_quietly_file_nothing_new.md)

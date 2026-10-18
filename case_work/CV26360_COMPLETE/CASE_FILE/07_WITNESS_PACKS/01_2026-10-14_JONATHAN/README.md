@@ -1,0 +1,16 @@
+# WITNESS PACK: 14 Oct 2026, 1:30 PM. Jonathan Paul Zschoche (Exh. K)
+- **Carry only the FINAL STAND CARD** in `../14_OCT/14_OCT_FINAL_STAND_CARD.md` (07:18). It supersedes the pocket card below. Cross-and-redirect notes refreshed 08:12 to the CW-root version (adds the Exh. F p. 2 ¶4 row).
+- **JA status:**
+  - Exh. K was sworn 23 Jan 2026 and annexed to the Complaint, so it is on file. The JAR §2 five-day mark (9 Oct) has passed.
+  - Any supplement (Q60–66 / errata) is late and needs leave under JAR §10(a): allowed only once, valid reason, ₱1,000–5,000 fine [CONDITIONAL] (T4 C3).
+- **In this pack:**
+  - The pocket card, CORRECTED. The "annotated 2021" line is struck; the revocation was never annotated (Phase 1).
+  - The cross-and-redirect notes (md/pdf), with the Phase 1 corrections as a separate file.
+  - Exh. K (copy).
+  - The 4 Sep 2026 order.
+- **Watch:**
+  - Receipt No. 0219 = ₱40,000, not ₱50,000 (T2).
+  - T-52540 came from T-49061(?) per Exh. B p. 1 [OCR-UNCERTAIN].
+  - Salvador is Cesar's son (Annex Z p. 1).
+  - First receipt is dated 25 Oct 2003.
+- **Draft only:** the errata manifestation. It is in `_ARCHIVE_EXCLUDED/superseded`, and no filed copy exists.

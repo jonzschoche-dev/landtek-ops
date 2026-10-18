@@ -1,5 +1,5 @@
 # The overwhelm / proof plan: demurrer, elements proved twice, rebuttal doors
-Source: `OVERWHELM_PLAN_2026-10-14.html` (modified 2026-10-15). One file per section:
+Source: `OVERWHELM_PLAN_2026-10-14.html` (modified 2026-10-18). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [1. What Ramos will build from Jonathan's testimony, and what takes it away](01_1_What_Ramos_will_build_from_Jonathan_s_testimony_and_what_t.md)
