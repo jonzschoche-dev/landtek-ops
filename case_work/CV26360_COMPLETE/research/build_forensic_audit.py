@@ -166,17 +166,13 @@ HTML = f"""<!DOCTYPE html>
 <li><b>Its stated custody runs to the plaintiff's own former counsel.</b> That is dangerous in both directions. If it is at the Agcaoili office and shows rent, it ends the class claim. If it cannot be found, the defense will argue suppression. The audit therefore locates it first, before anyone asks for it in court.</li>
 <li><b>Cesar's own books are the second ledger.</b> Salvador says he handed every payment to his father (S23). A collector who issued numbered official receipts in a registered taxpayer's name had a cash book or at least the duplicate leaves. The Tax Code requires receipts "prepared at least in duplicate" (Appendix B). The duplicates, the unused leaves and the other 25 booklets of the 1998 printing are the audit trail of every peso and of every other buyer.</li>
 </ul>
-<h3>6A. If a ledger surfaces: it must be a Llamanzares-era book, and Von cannot be in it</h3>
-<p>The book the defense describes is Manuel Violeta's, kept for Ben Llamanzares before Cesar took over. To help the defense at all, its entries must show a down payment to Llamanzares, made before Cesar's SPA of 16 March 1992, because that is what paragraph 7 requires ("down-payments or partial payments therefor to the latter"). That fixes what the book must look like, and it sets a trap for any book that is produced:</p>
+<h3>6A. If a ledger surfaces: what it must be</h3>
 <ul>
-<li><b>Salvador cannot appear in a Llamanzares-era book.</b> His own affidavit dates his first dealing with Llamanzares to "noong bandang 1992," when he and his father went to Llamanzares's house to collect the papers (S14 to S15). His earliest signature in the record is 25 October 2003 (Exh. 5, p. 2). A "Von dela Fuente" signature or initial on any 1980s entry proves the entry was written after the fact.</li>
-<li><b>A Von signature on a turnover or closing note dates custody, not the entries.</b> It would put the book in Cesar's household, in Salvador's hands, which contradicts Gloria's account that it went to the Agcaoili office (S24) and makes Salvador its last known custodian.</li>
-<li><b>His age is the second anchor.</b> His affidavit gives no age ("nasa hustong gulang"); his PSA birth certificate fixes how old he was in the 1980s.</li>
-<li><b>The comparison set already exists.</b> Exh. 5 holds four written-name "Von dela Fuente" signatures (2003 to 2005) and about 106 stylized ones (2004 to 2017), all dated. Any signature in a produced book is compared with them, by a questioned-document examiner if it matters.</li>
-<li><b>Lock him in before any book appears.</b> On cross: "Did you ever see Manuel Violeta's columnar book? Did you ever write or sign in it? When did you last see it? Where is it now?" A later book must fit his sworn answers.</li>
-<li><b>Paper, ink and hand.</b> A columnar book kept in the 1980s shows its age and Violeta's hand throughout; later entries do not. The examiner's work (P9) extends to the book if it is produced.</li>
+<li><b>Llamanzares-era, in Violeta's hand.</b> To help the defense it must show a down payment to Llamanzares before Cesar's SPA of 16 March 1992, because that is what paragraph 7 requires ("down-payments or partial payments therefor to the latter"). Entries in any later hand, or any later ink or paper, are not that.</li>
+<li><b>Salvador cannot vouch for it.</b> He had no knowledge of the property in the Llamanzares years; his own affidavit dates his first contact to "noong bandang 1992," when he and his father went to collect Llamanzares's papers (S14 to S15). He can speak only to what was handed over then, and to where it went.</li>
+<li><b>Custody is the open question.</b> Gloria's account is that the book went to Cesar and then to the Agcaoili office (S24). P1 asks the Agcaoili office; on cross, Salvador is asked what papers were collected from Llamanzares in 1992, whether a columnar book was among them, and where it is now.</li>
 </ul>
-<p><b>Procedures:</b> P1, P2, P8 and P16 below.</p>
+<p><b>Procedures:</b> P1, P2 and P8 below.</p>
 
 <h2>7. Procedures, in the order they are run</h2>
 <p class="small">Each procedure names the record, where it is, who asks, the alert risk to the defense, and the hypothesis it serves. "Quiet" means obtained now in Jonathan's own name or through the family, with no court filing; "rebuttal" means by subpoena after the defense rests, as the trap route requires.</p>
@@ -196,7 +192,6 @@ HTML = f"""<!DOCTYPE html>
 <tr><td>P12</td><td>Spec. Proc. 2156 record (Cesar's October 2016 petition): what he swore about the land, its income and his custody, three weeks after the deed</td><td>RTC Branch 41; quiet certified copy</td><td>Low</td><td>H1, H2</td></tr>
 <tr><td>P13</td><td>The surveyor's file: Villafuerte's receipt 0460 and job record for the 2006 "subdivision survey"; whether a plan was ever filed from it</td><td>Villafuerte Eng'g &amp; Surveying Office, Daet; quiet</td><td>Low</td><td>Partition timeline; "owned by the Heirs" in 2006</td></tr>
 <tr><td>P14</td><td>Room rentals since 22 Aug 2025: on cross of Princess and Erwin, the number of rooms, the monthly rate, who collects. Gloria's own affidavit concedes "limited and intermittent" room rentals (purpose 8)</td><td>Defense witnesses on cross</td><td>Defense stage</td><td>Damages figure (Art. 2234)</td></tr>
-<tr><td>P16</td><td>Salvador's PSA birth certificate; the four "Von dela Fuente" written signatures and a dated set of the stylized signatures assembled from Exh. 5 as the comparison specimens; the lock-in questions on the ledger scripted for his cross</td><td>PSA (quiet); the exhibit; counsel</td><td>None</td><td>H3, H5; any ledger or paper later produced with his signature</td></tr>
 <tr><td>P15</td><td>Reconstruct the collector's full customer list from serial gaps: every missing number between 0019 and 0228 was issued to someone. Cross Salvador on who, and compare with Cesar's 1993 list of buyers on T-4497 (Annex AA)</td><td>Ledger (Appendix A); Salvador on cross</td><td>Defense stage</td><td>H3, H5; the class as it actually operated</td></tr>
 </table>
 
