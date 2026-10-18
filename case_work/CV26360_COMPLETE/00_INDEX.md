@@ -41,6 +41,11 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [31_GROK_SPA_LANGUAGE_JURISPRUDENCE](SECTIONS/31_GROK_SPA_LANGUAGE_JURISPRUDENCE/README.md) | [Other desk] SPA language jurisprudence | 6 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/SPA_LANGUAGE_JURISPRUDENCE.md` |
 | [32_GROK_T52540_SPA_SCOPE](SECTIONS/32_GROK_T52540_SPA_SCOPE/README.md) | [Other desk] T-52540 against the SPA's property description | 8 sections | `CASE_FILE/08_GAPS_TO_OBTAIN/T52540_SPA_SCOPE.md` |
 | [33_GROK_EXERCISES_REVIEW](SECTIONS/33_GROK_EXERCISES_REVIEW/README.md) | [Grok desk] Review of Claude's exercises (with the Cesar signature comparison PDF alongside) | 6 sections | `CASE_FILE/GROK_REVIEW/CLAUDE_EXERCISES_REVIEW.md` |
+| [35_FEED_PLAN_BARANDON](SECTIONS/35_FEED_PLAN_BARANDON/README.md) | Feeding Atty. Barandon: one page, one topic, one decision at a time (plan and sequence) | 3 sections | `BARANDON_FEED/00_FEED_PLAN_2026-10-18.html` |
+| [36_FEED_NOTE_1_WHERE_WE_ARE](SECTIONS/36_FEED_NOTE_1_WHERE_WE_ARE/README.md) | Note 1 to counsel: where we are after 14 October (draft, not sent) | 1 sections | `BARANDON_FEED/01_WHERE_WE_ARE_2026-10-18.html` |
+| [37_FEED_NOTE_2_SUMMARY_JUDGMENT](SECTIONS/37_FEED_NOTE_2_SUMMARY_JUDGMENT/README.md) | Note 2 to counsel: the summary judgment motion, on paper (draft, not sent) | 1 sections | `BARANDON_FEED/02_SUMMARY_JUDGMENT_2026-10-18.html` |
+| [38_FEED_NOTE_3_PATRICIA](SECTIONS/38_FEED_NOTE_3_PATRICIA/README.md) | Note 3 to counsel: my mother testifies on rebuttal (draft, not sent) | 1 sections | `BARANDON_FEED/03_PATRICIA_REBUTTAL_2026-10-18.html` |
+| [39_DRAFT_MOTION_TO_RESOLVE_SJ](SECTIONS/39_DRAFT_MOTION_TO_RESOLVE_SJ/README.md) | Draft Motion to Resolve the Motion to Render Summary Judgment, with Rule 35 s.4 alternative prayer and Annex A (the narrative: 16 facts), for counsel's signature | 1 sections | `BARANDON_FEED/DRAFT_MOTION_TO_RESOLVE_SJ_2026-10-18.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders

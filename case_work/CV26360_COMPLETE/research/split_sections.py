@@ -47,6 +47,11 @@ DOCS = [
  ("31_GROK_SPA_LANGUAGE_JURISPRUDENCE", "[Other desk] SPA language jurisprudence", os.path.join(CF, "08_GAPS_TO_OBTAIN", "SPA_LANGUAGE_JURISPRUDENCE.md"), "md"),
  ("32_GROK_T52540_SPA_SCOPE", "[Other desk] T-52540 against the SPA's property description", os.path.join(CF, "08_GAPS_TO_OBTAIN", "T52540_SPA_SCOPE.md"), "md"),
  ("33_GROK_EXERCISES_REVIEW", "[Grok desk] Review of Claude's exercises (with the Cesar signature comparison PDF alongside)", os.path.join(CF, "GROK_REVIEW", "CLAUDE_EXERCISES_REVIEW.md"), "md"),
+ ("35_FEED_PLAN_BARANDON", "Feeding Atty. Barandon: one page, one topic, one decision at a time (plan and sequence)", os.path.join(ROOT, "BARANDON_FEED", "00_FEED_PLAN_2026-10-18.html"), "html"),
+ ("36_FEED_NOTE_1_WHERE_WE_ARE", "Note 1 to counsel: where we are after 14 October (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "01_WHERE_WE_ARE_2026-10-18.html"), "html"),
+ ("37_FEED_NOTE_2_SUMMARY_JUDGMENT", "Note 2 to counsel: the summary judgment motion, on paper (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "02_SUMMARY_JUDGMENT_2026-10-18.html"), "html"),
+ ("38_FEED_NOTE_3_PATRICIA", "Note 3 to counsel: my mother testifies on rebuttal (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "03_PATRICIA_REBUTTAL_2026-10-18.html"), "html"),
+ ("39_DRAFT_MOTION_TO_RESOLVE_SJ", "Draft Motion to Resolve the Motion to Render Summary Judgment, with Rule 35 s.4 alternative prayer and Annex A (the narrative: 16 facts), for counsel's signature", os.path.join(ROOT, "BARANDON_FEED", "DRAFT_MOTION_TO_RESOLVE_SJ_2026-10-18.html"), "html"),
  ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 
