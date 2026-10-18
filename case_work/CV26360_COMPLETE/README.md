@@ -1,4 +1,15 @@
 # CV26360 COMPLETE CASE FILE
+
+> **START HERE (October 2026, trial stage).** The live working documents are in this folder's root:
+> - `AUDIT_BALANE_PAYMENTS_2026-10-18.md` — **forensic accounting audit of the Balane payments** (receipt-by-receipt ledger of Def. Exh. 5, exceptions, reconciliations, the Violeta ledger, procedures). Same content as `FORENSIC_AUDIT_BALANE_PAYMENTS_2026-10-18.pdf`; ledger data in `research/balane_receipts_ledger.py/.csv`.
+> - `MEMO_PACK_BARANDON_2026-10-15.pdf` — the counsel pack (action cover + Annexes A–H; trap map in Annex A); sources in `MEMO_PACK_2026-10-15/`.
+> - `BALANE_TRAJECTORY_2026-10-16.md/.html/.pdf` — the Balanes' path to victory (red team), incl. the manufactured-case layer.
+> - `OVERWHELM_PLAN_2026-10-14`, `COUNSEL_FOCUS_SHEET_2026-10-14`, `MASTER_TRIAL_PLAYBOOK_2026-10`, `WAR_OF_THE_STATUTES_2026-10` — strategy, focus, playbook, statutes.
+> - `PATRICIA_JUDICIAL_AFFIDAVIT_FILLED_DRAFT_2026-10-15` — rebuttal affidavit draft; `BRING_TO_COURT_BUNDLE_2026-10` — documents outside the record carried to each hearing.
+> - Grok pack copies: `drive_local/CV26360 - GROK PACK (2026-10-14)/`.
+>
+> The directory plan below is the original (pre-trial) layout and is partly historical.
+
 ## Heirs of Mary Worrick Keesey v. De La Fuente Estate & 20+ Transferees
 
 **Matter:** MWK-001 — accion reivindicatoria for recovery of 35-40 derivative parcels under T-4497 (fraudulently transferred via unauthorized SPA)
