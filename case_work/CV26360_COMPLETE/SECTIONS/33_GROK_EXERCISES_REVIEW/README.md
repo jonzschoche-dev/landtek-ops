@@ -1,5 +1,5 @@
 # [Grok desk] Review of Claude's exercises (with the Cesar signature comparison PDF alongside)
-Source: `CASE_FILE/GROK_REVIEW/CLAUDE_EXERCISES_REVIEW.md` (modified 2026-10-16). One file per section:
+Source: `CASE_FILE/GROK_REVIEW/CLAUDE_EXERCISES_REVIEW.md` (modified 2026-10-18). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [What was reviewed](01_What_was_reviewed.md)

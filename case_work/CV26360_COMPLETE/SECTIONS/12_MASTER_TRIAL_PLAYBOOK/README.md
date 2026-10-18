@@ -1,5 +1,5 @@
 # Master trial playbook (6 parts)
-Source: `MASTER_TRIAL_PLAYBOOK_2026-10.md` (modified 2026-10-14). One file per section:
+Source: `MASTER_TRIAL_PLAYBOOK_2026-10.md` (modified 2026-10-18). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [*Zschoche v. Balane, et al.* — Civil Case No. 26-360, Municipal Trial Court, Mercedes, Camarines Norte](01_Zschoche_v_Balane_et_al_Civil_Case_No_26_360_Municipal_Trial.md)
