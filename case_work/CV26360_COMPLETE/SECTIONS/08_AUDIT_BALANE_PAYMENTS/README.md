@@ -1,0 +1,15 @@
+# Forensic accounting audit of the Balane payments (Def. Exh. 5)
+Source: `FORENSIC_AUDIT_BALANE_PAYMENTS_2026-10-18.html` (modified 2026-10-18). One file per section:
+
+- [Preamble and summary](00_Preamble_and_summary.md)
+- [1. First principles: how a fraud examination of payments is run](01_1_First_principles_how_a_fraud_examination_of_payments_is_ru.md)
+- [2. Hypotheses to test](02_2_Hypotheses_to_test.md)
+- [3. The population: what was counted](03_3_The_population_what_was_counted.md)
+- [4. Document tests and the exceptions found](04_4_Document_tests_and_the_exceptions_found.md)
+- [5. Reconciliations](05_5_Reconciliations.md)
+- [6. The ledger book they say exists](06_6_The_ledger_book_they_say_exists.md)
+- [7. Procedures, in the order they are run](07_7_Procedures_in_the_order_they_are_run.md)
+- [8. What this gives counsel](08_8_What_this_gives_counsel.md)
+- [9. Corrections and verification flags](09_9_Corrections_and_verification_flags.md)
+- [Appendix A. The ledger, receipt by receipt (Def. Exh. 5)](10_Appendix_A_The_ledger_receipt_by_receipt_Def_Exh_5.md)
+- [Appendix B. Law relied on](11_Appendix_B_Law_relied_on.md)

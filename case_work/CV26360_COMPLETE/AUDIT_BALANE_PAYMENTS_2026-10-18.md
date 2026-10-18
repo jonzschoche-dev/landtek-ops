@@ -3,6 +3,8 @@
 
 Civil Case No. 26-360, Zschoche v. Balane · prepared 18 October 2026 for Jonathan and counsel · internal, not for filing · every figure below is read from a page image and cited to it; nothing is taken from the defense's summaries.
 
+> 
+
 **What the money says, in one paragraph.** The defendants' own receipts (Def. Exh. 5) show 110 payments totalling ₱602,750 to Cesar de la Fuente's side between October 2003 and February 2017. Their deed recites a price of ₱250,000 "in hand paid" on 29 September 2016. The receipts cannot be squared with that price on any reading: ₱219,000 was receipted after the deed, ending in a "Full payment" slip of February 2017; ₱382,650 was receipted from November 2014 onward, which already exceeds the price by ₱132,650; and if the 89 monthly slips of ₱2,000 or less (₱169,500) were price instalments, as the defense says, the overpayment grows to ₱352,750. Not one peso is shown reaching an owner. The money that can be traced went to taxes, penalties and fees in 2016 and 2020 (about ₱406,831), most of it penalties for a deed registered four years late. The population is complete enough to audit, and the anomalies in it are the kind a fraud examiner tests first: receipts out of serial order, a price recital contradicted by the payer's own receipts, and a ledger that the defense says exists but has never produced.
 
 ## 1. First principles: how a fraud examination of payments is run
@@ -27,23 +29,15 @@ A forensic accountant does not start from the story. The method, in the order it
 
 ## 2. Hypotheses to test
 
-****
-****
-****
-****
-****
-****
-****
-
 | # | Hypothesis | Status after this review of the papers in hand |
 |---|---|---|
-| H1 | The ₱250,000 price was not paid before the deed of 29 September 2016; the recital "in hand paid" was false when signed. | Supported by their own receipts. ₱219,000 receipted after the deed; "Full payment" on 14 February 2017 (p. 33). |
-| H2 | No payment reached any registered owner; everything went to Cesar, Salvador, taxes or fees. | Consistent with every record. No owner signature, bank record or remittance exists; Salvador swears the money went to his father, part of it to taxes (S23 to S25). Patricia's denial is first-hand; the rest is to be proved from Cesar's books and bank records (Part 7). |
-| H3 | There was no down payment to Llamanzares in the 1980s; the earliest payment is October 2003, the only "Down payment" is January 2005. | Supported. No receipt, stub or ledger before 2003 (pp. 2 to 3). The defense itself says the 1980s payment has no receipt and sits in a ledger it does not hold (Part 6). |
-| H4 | The ₱2,000 monthly payments were rent, not instalments on a price. | Supported on the face of the documents. Fifteen estate receipts name the month paid for; 89 slips are ₱2,000 or less at monthly intervals for eleven years; no slip shows a balance; the ₱250,000 was separately paid in 2016 to 2017. |
-| H5 | The receipts were not all written when the payments were made. | Indicated, not proved. Serial numbers run against dates in 2014, 2016 and 2017; 80 serials (0137 to 0216) are absent between May and August 2016; one "Start 10k" note in another hand. Needs the stubs and a document examiner (Part 7). |
-| H6 | The "Heirs of Mary W. Keesey Estate" was registered with the BIR as a taxpayer issuing official receipts by the agent, without the owners' knowledge. | Indicated. TIN 160-902-582 and printing authority 451-1998 appear on every estate receipt; the 2020 tax certificate treats the sale under withholding tax rather than capital gains tax. Who registered the TIN is a BIR record (Part 7). |
-| H7 | The true consideration exceeded ₱250,000, or the deed price was set below what was actually paid. | Open. ₱382,650 from November 2014 and ₱332,650 in 2016 to 2017 exceed the price. Salvador's explanation (part went to real property tax and "estate tax") is tested in Part 5; the estate tax had been paid in full in 1991 (Exh. E ¶5). |
+| H1 | The ₱250,000 price was not paid before the deed of 29 September 2016; the recital "in hand paid" was false when signed. | **Supported by their own receipts.** ₱219,000 receipted after the deed; "Full payment" on 14 February 2017 (p. 33). |
+| H2 | No payment reached any registered owner; everything went to Cesar, Salvador, taxes or fees. | **Consistent with every record.** No owner signature, bank record or remittance exists; Salvador swears the money went to his father, part of it to taxes (S23 to S25). Patricia's denial is first-hand; the rest is to be proved from Cesar's books and bank records (Part 7). |
+| H3 | There was no down payment to Llamanzares in the 1980s; the earliest payment is October 2003, the only "Down payment" is January 2005. | **Supported.** No receipt, stub or ledger before 2003 (pp. 2 to 3). The defense itself says the 1980s payment has no receipt and sits in a ledger it does not hold (Part 6). |
+| H4 | The ₱2,000 monthly payments were rent, not instalments on a price. | **Supported on the face of the documents.** Fifteen estate receipts name the month paid for; 89 slips are ₱2,000 or less at monthly intervals for eleven years; no slip shows a balance; the ₱250,000 was separately paid in 2016 to 2017. |
+| H5 | The receipts were not all written when the payments were made. | **Indicated, not proved.** Serial numbers run against dates in 2014, 2016 and 2017; 80 serials (0137 to 0216) are absent between May and August 2016; one "Start 10k" note in another hand. Needs the stubs and a document examiner (Part 7). |
+| H6 | The "Heirs of Mary W. Keesey Estate" was registered with the BIR as a taxpayer issuing official receipts by the agent, without the owners' knowledge. | **Indicated.** TIN 160-902-582 and printing authority 451-1998 appear on every estate receipt; the 2020 tax certificate treats the sale under withholding tax rather than capital gains tax. Who registered the TIN is a BIR record (Part 7). |
+| H7 | The true consideration exceeded ₱250,000, or the deed price was set below what was actually paid. | **Open.** ₱382,650 from November 2014 and ₱332,650 in 2016 to 2017 exceed the price. Salvador's explanation (part went to real property tax and "estate tax") is tested in Part 5; the estate tax had been paid in full in 1991 (Exh. E ¶5). |
 
 ## 3. The population: what was counted
 
