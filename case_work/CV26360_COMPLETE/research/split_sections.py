@@ -57,6 +57,7 @@ DOCS = [
  ("42_FEED_NOTE_5_KING_CASES_NOTICE", "Note 5 to counsel: what Mrs. King's cases prove: ownership never decided; Bicol Post served on the Balane side's lawyer 9 Jul 2021 (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "05_KING_CASES_NOTICE_2026-10-19.html"), "html"),
  ("43_RESEARCH_KING_CASES_DIG", "The King cases: what else they hold (Princess blotter 2763; Jomil 2020 counter-affidavit; prosecutor ruling mailed 23 Sep 2020; Feb 2020 lawyer letter; possession since 2016 vs 1975; records to request)", os.path.join(ROOT, "KING_CASES_DIG_2026-10-19.html"), "html"),
  ("44_FEED_NOTE_6_PRINCESS_JOMIL", "Note 6 to counsel: Princess and Jomil in their own words (blotter 2763; 2020 counter-affidavit; mailed ruling; bail; 8563) (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "06_PRINCESS_AND_JOMIL_2026-10-19.html"), "html"),
+ ("45_WITNESSES_IN_THE_COURTS_FORM", "The witnesses in the court's own form: each witness mapped to her ten questions, the article words, and the Considering-that line it earns", os.path.join(ROOT, "WITNESSES_IN_THE_COURTS_FORM_2026-10-19.html"), "html"),
  ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 

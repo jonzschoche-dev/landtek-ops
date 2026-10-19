@@ -36,6 +36,8 @@ Internal only. Grok logs Claude deploys here so the desks stay in sync. Do not t
 
 | 2026-10-19 16:10 | CV26360_COMPLETE/BARANDON_FEED/06_PRINCESS_AND_JOMIL_2026-10-19.html/.pdf (new); 00_FEED_PLAN (spoonful 1c); SECTIONS/44_ | CV26360 | Note 6 to counsel (draft, not sent): Princess blotter 2763 'May usapin pa yan' (19 May 2020); Jomil 2020 counter-affidavit, ruling mailed 23 Sep 2020, P180,000 bail, 9 Jul 2021 receipt of Bicol Post notices; asks: request prosecutor file + blotter now; cross in January or rebuttal only; by 28 Oct | — |
 
+| 2026-10-19 17:00 | CV26360_COMPLETE/WITNESSES_IN_THE_COURTS_FORM_2026-10-19.html/.pdf (new; SECTIONS/45_) | CV26360 | Each witness (Salvador, Princess, Jomil, Erwin, Gloria; Patricia, King, De Leon, de los Reyes, Jonathan) mapped to the ten questions of the War of the Statutes, the article words, and the 'Considering that' line it earns in the court's form. Findings: Q1/2/4/5/7 are documents-only; Q3 decided by their own rent testimony (Answer ¶40, Salvador S19, Princess S7; Salvador S14–15 class proof is hearsay of Llamanzares); Art. 1898 awareness from Answer ¶44(h) 'Gloria checked the SPA'; Q6 from Princess blotter 2763, Jomil 2020 record, King 8563 receipt | — |
+
 ## Grok hunt log (daily, weekdays)
 
 | Run (Asia/Manila) | Window searched | New/changed Claude files | Matter | Grok action |
