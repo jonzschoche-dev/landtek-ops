@@ -39,3 +39,17 @@ Source: the review Jonathan ran on `CV26360_COMPLETE/GEMINI_PACK_2026-10-19/` (b
 ## Net effect
 
 Gemini's review confirms the core (Art. 1898 on the annotated limits, imprescriptibility, receipts at face value) and adds one useful correction: the JA Rule §10(c) cure for the jurat. It overstates the agent's-death and *Cabrera* points, misattributes *Lara's Gift*, and recommends parallel filings that would hurt us. No change to the documents-only case.
+
+## Addendum: sections 1 to 4.1 (pasted later the same day)
+
+| # | Gemini point | Check | Result |
+|---|---|---|---|
+| S1 | MTC jurisdiction: R.A. 11576 sets ₱400,000 assessed value for real actions; ₱257,670 here | R.A. 11576 read on lawphil: RTC has real actions "where the assessed value exceeds Four hundred thousand pesos (P400,000.00)" | ACCEPTED. |
+| S2 | Direct, not collateral, attack (PD 1529 §48) | Matches War of the Statutes §1 | ACCEPTED. |
+| S3 | "Read as a whole" answered by Art. **1373** | Civil Code read on lawphil: Art. 1373 is "most adequate to render it effectual"; the "interpreted together" rule is **Art. 1374** | CORRECTED: cite Art. 1374 (with 1373 secondarily). |
+| S4 | "The burden of proof shifts to the defendants" | Rule 131 §1: "Burden of proof never shifts. Burden of evidence … may shift." | CORRECTED: class membership is their affirmative defence; the burden of evidence passes to them once the Answer's rent admission and their receipts are in. |
+| S5 | No receipt for the 1980s payment means "under the Original Document Rule" the claim is legally inadequate | Rule 130 §3 applies when the contents of a document are in issue; payment may be proved by testimony | REJECTED. And it exposes a point we had understated: if Gloria's excluded affidavit is admitted, her account of three ₱1,000 payments to Violeta is first-hand, not hearsay. Changed: DOCUMENTS_ONLY_CASE Part 3 ("Where the gap could reopen") and WITNESSES_IN_THE_COURTS_FORM box item 2. Keeping her affidavit excluded and asking the Agcaoili office about the book first both matter more than we had said. |
+| S6 | "Prior consultation" given weight via *Province of Rizal v. Executive Secretary* and *Bangus Fry Fisherfolk v. Lanzanas* | Both are statutory LGU-consultation cases; not opened today | NOT ADOPTED as authority for a private SPA's term; at most analogy. Patricia's first-hand testimony carries the point. |
+| S7 | Consultation as a suspensive condition under Art. 1181, so authority "never vested" | Art. 1181 text read (conditional obligations) | NOT ADOPTED: unnecessary and a stretch; Art. 1898 does the work. |
+| S8 | *Bautista-Spille v. Nicorp*, strict construction | G.R. 214057 is in our War of the Statutes; the lawphil URL tried today did not resolve | Unchanged: one sentence at most, as already planned. |
+| S9 | "No letters or emails exist to prove the co-owners were informed" | Absence of paper is not proof; Salvador S31 says Cesar dealt with the Agcaoili office | CORRECTED: non-consultation is proved first-hand by Patricia on rebuttal; the defence may say consultation went through the Agcaoili office, which the 15 Aug 2019 Agcaoili letter answers. |
