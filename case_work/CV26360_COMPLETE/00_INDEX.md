@@ -50,6 +50,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [41_FEED_NOTE_4_NEIGHBOURS_JURAT_ORDER](SECTIONS/41_FEED_NOTE_4_NEIGHBOURS_JURAT_ORDER/README.md) | Note 4 to counsel: the neighbours, who goes first and the notarial stamp (draft, not sent) | 1 sections | `BARANDON_FEED/04_NEIGHBOURS_JURAT_AND_ORDER_2026-10-19.html` |
 | [42_FEED_NOTE_5_KING_CASES_NOTICE](SECTIONS/42_FEED_NOTE_5_KING_CASES_NOTICE/README.md) | Note 5 to counsel: what Mrs. King's cases prove: ownership never decided; Bicol Post served on the Balane side's lawyer 9 Jul 2021 (draft, not sent) | 1 sections | `BARANDON_FEED/05_KING_CASES_NOTICE_2026-10-19.html` |
 | [43_RESEARCH_KING_CASES_DIG](SECTIONS/43_RESEARCH_KING_CASES_DIG/README.md) | The King cases: what else they hold (Princess blotter 2763; Jomil 2020 counter-affidavit; prosecutor ruling mailed 23 Sep 2020; Feb 2020 lawyer letter; possession since 2016 vs 1975; records to request) | 5 sections | `KING_CASES_DIG_2026-10-19.html` |
+| [44_FEED_NOTE_6_PRINCESS_JOMIL](SECTIONS/44_FEED_NOTE_6_PRINCESS_JOMIL/README.md) | Note 6 to counsel: Princess and Jomil in their own words (blotter 2763; 2020 counter-affidavit; mailed ruling; bail; 8563) (draft, not sent) | 1 sections | `BARANDON_FEED/06_PRINCESS_AND_JOMIL_2026-10-19.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders

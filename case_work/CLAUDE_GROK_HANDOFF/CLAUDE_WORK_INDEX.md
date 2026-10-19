@@ -34,6 +34,8 @@ Internal only. Grok logs Claude deploys here so the desks stay in sync. Do not t
 
 | 2026-10-19 15:30 | CV26360_COMPLETE/KING_CASES_DIG_2026-10-19.html/.pdf (new, SECTIONS/43_); WITNESS_PACK_NEIGHBOURS (King §3.0 rows 11 Feb/11 May/19 May 2020, Jomil 2020 counter-affidavit, RR 1666–1670/1694 of 23 Sep 2020; doc 5c blotter; De Leon §2.3 Nieves de Leon) | CV26360 | Full read of CA-G.R. SP 181607 record, CC 8563 record, Balane Case Annexes, against the 26-360 defense papers. New: Princess blotter 2763 'May usapin pa yan' (19 May 2020) vs her S11; Jomil 2020 'acting on instructions of the owner … Gloria Balane thru Nelly Juntilla' vs Answer p.9; prosecutor MR ruling mailed to respondents 23 Sep 2020; 11 Feb 2020 lawyer's letter ('owner now needs the lot for her own use'); 2020 position = possession since 2016 sale vs 'since 1975'; Kings' house on the parcel before the deed; Ferrer house 'sa pagitan nina Gng. Nieves de Leon'; defense papers silent on all King cases. Citizenship lead checked (Const. XII s.8, R.A. 8179 5,000 sqm) and not pursued | — |
 
+| 2026-10-19 16:10 | CV26360_COMPLETE/BARANDON_FEED/06_PRINCESS_AND_JOMIL_2026-10-19.html/.pdf (new); 00_FEED_PLAN (spoonful 1c); SECTIONS/44_ | CV26360 | Note 6 to counsel (draft, not sent): Princess blotter 2763 'May usapin pa yan' (19 May 2020); Jomil 2020 counter-affidavit, ruling mailed 23 Sep 2020, P180,000 bail, 9 Jul 2021 receipt of Bicol Post notices; asks: request prosecutor file + blotter now; cross in January or rebuttal only; by 28 Oct | — |
+
 ## Grok hunt log (daily, weekdays)
 
 | Run (Asia/Manila) | Window searched | New/changed Claude files | Matter | Grok action |
