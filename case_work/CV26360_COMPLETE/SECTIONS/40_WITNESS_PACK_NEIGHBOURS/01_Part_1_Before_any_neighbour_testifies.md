@@ -15,15 +15,17 @@
 
 **What we ask.** One sentence from counsel: the number and dates of the notarial commission in force on 23 January 2026. If it exists, the file is corrected and nothing else is needed; the court looks to the commission, not to the stamp. [VERIFY: the 2004 Notarial Rules text was not fetched; the two-year commission period and the effect of a lapsed commission are stated from general knowledge only]
 
-**If there was no commission that day.**
+**If there was no commission that day: the rule that applies.** The jurat is a required content of a judicial affidavit: "(f) A jurat with the signature of the notary public who administers the oath or an officer who is authorized by law to administer the same" (JA Rule §3). For an affidavit that does not conform to §3, Section 10(c) governs: "The court shall not admit as evidence judicial affidavits that do not conform to the content requirements of Section 3 … The court may, however, allow only once the subsequent submission of the compliant replacement affidavits before the hearing or trial provided the delay is for a valid reason and would not unduly prejudice the opposing party and provided further, that public or private counsel responsible for their preparation and submission pays a fine of not less than P 1,000.00 nor more than P 5,000.00, at the discretion of the court." (Read on lawphil, A.M. No. 12-8-8-SC.)
 
-- Each neighbour re-swears the **same affidavit, same text, same exhibit letter**, before Atty. Andrade or another notary with a current commission. Nothing is added. It is filed and served as the re-sworn copy of the affidavit already on file.
+- **One replacement submission, all three together.** Section 10(c) allows the replacement "only once." Exhibits L, M and N are re-sworn on the same day, word for word, before a currently commissioned notary, and filed and served together in one submission, with the fine tendered, **before 4 November**. Done one at a time, the second and third may be barred.
 
-- Timing: at least five days before the witness's hearing. For 4 November that is **Friday 30 October**; for 11 November, **Friday 6 November**; for 2 December, **Friday 27 November**. Better: all three on the same day in the last week of October, so the question never arises again.
+- **This is a separate allowance from §10(a).** Section 10(a) is the once-only allowance for _late_ affidavits; §10(c) is the once-only allowance for _non-conforming_ ones. Using §10(c) for the neighbours does not spend the §10(a) allowance we keep for Patricia's rebuttal affidavit. [COUNSEL to confirm the court reads them as separate]
 
-- Expect Atty. Ramos to call the re-sworn copy a late affidavit. The answer is that it is the same affidavit, served with the Complaint in February, with its oath regularized; and in any event the witness swears to it again on the stand. [COUNSEL]
+- **The fine falls on the preparing counsel** under the rule's text. Jonathan covers it.
 
-- Fallback if nothing is done: when the witness is called, she affirms the affidavit under oath in open court before cross begins. Many courts accept this; this court's own view is not known. [COUNSEL]
+- Expect Atty. Ramos to oppose. The answer: the same affidavits served with the Complaint in February, their oath regularized before the first neighbour testifies; no new matter; no prejudice.
+
+- Fallback if nothing is done: the witness affirms the affidavit under oath in open court before cross. The text of §10(c) ("shall not admit") makes this weaker than the replacement route. [COUNSEL]
 
 **A second point on the jurats, low risk.** The examining lawyer also took the oath of his own witnesses. That is common practice and we do not expect it to be raised; it is noted here only so that it is not a surprise. [VERIFY rule text; not fetched]
 

@@ -22,7 +22,7 @@ Atty. Barandon,
 
 **What the draft asks for.** First, a ruling on the pending motion. Second, in the alternative, that the court ascertain under Rule 35, Section 4 the facts without substantial controversy, listed in Annex "A", as established, and confining the trial to the three questions that are genuinely contested: whether Mrs. Balane paid Llamanzares before 1992, notice and good faith up to registration, and the improvements and damages. It asks for no reset of any date.
 
-**What I need from you by 24 October:** (1) whether the pre-trial order resolved the motion; (2) if not, your view on filing the attached, with your changes; (3) a copy of the pre-trial order for my file.
+**What I need from you by 24 October:** (1) whether the pre-trial order resolved the motion; (2) if not, your view on filing the attached, with your changes; (3) a copy of the pre-trial order for my file, and whether it reserves to us the presentation of additional documents, including on rebuttal.
 
 With respect, 
 Jonathan Paul Zschoche
