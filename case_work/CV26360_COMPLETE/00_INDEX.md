@@ -1,6 +1,6 @@
 # Civil Case No. 26-360 (Zschoche v. Balane): index of the working documents
 
-Generated 2026-10-18 by `research/split_sections.py`. Every working document is split into one
+Generated 2026-10-19 by `research/split_sections.py`. Every working document is split into one
 Markdown file per section under `SECTIONS/`, so each piece of work can be found on its own. The sources (HTML/MD/PDF)
 remain where they were; edit a source and re-run the script. Nothing here is filed; counsel signs and files.
 
@@ -46,6 +46,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [37_FEED_NOTE_2_SUMMARY_JUDGMENT](SECTIONS/37_FEED_NOTE_2_SUMMARY_JUDGMENT/README.md) | Note 2 to counsel: the summary judgment motion, on paper (draft, not sent) | 1 sections | `BARANDON_FEED/02_SUMMARY_JUDGMENT_2026-10-18.html` |
 | [38_FEED_NOTE_3_PATRICIA](SECTIONS/38_FEED_NOTE_3_PATRICIA/README.md) | Note 3 to counsel: my mother testifies on rebuttal (draft, not sent) | 1 sections | `BARANDON_FEED/03_PATRICIA_REBUTTAL_2026-10-18.html` |
 | [39_DRAFT_MOTION_TO_RESOLVE_SJ](SECTIONS/39_DRAFT_MOTION_TO_RESOLVE_SJ/README.md) | Draft Motion to Resolve the Motion to Render Summary Judgment, with Rule 35 s.4 alternative prayer and Annex A (the narrative: 16 facts), for counsel's signature | 1 sections | `BARANDON_FEED/DRAFT_MOTION_TO_RESOLVE_SJ_2026-10-18.html` |
+| [40_WITNESS_PACK_NEIGHBOURS](SECTIONS/40_WITNESS_PACK_NEIGHBOURS/README.md) | Witness pack: the three neighbours (De Leon, King, de los Reyes): one thing each, lines to withdraw, cross, documents for counsel, the jurat commission question | 7 sections | `WITNESS_PACK_NEIGHBOURS_2026-10-19.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders

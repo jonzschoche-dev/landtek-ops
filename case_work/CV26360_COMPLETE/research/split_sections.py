@@ -52,6 +52,7 @@ DOCS = [
  ("37_FEED_NOTE_2_SUMMARY_JUDGMENT", "Note 2 to counsel: the summary judgment motion, on paper (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "02_SUMMARY_JUDGMENT_2026-10-18.html"), "html"),
  ("38_FEED_NOTE_3_PATRICIA", "Note 3 to counsel: my mother testifies on rebuttal (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "03_PATRICIA_REBUTTAL_2026-10-18.html"), "html"),
  ("39_DRAFT_MOTION_TO_RESOLVE_SJ", "Draft Motion to Resolve the Motion to Render Summary Judgment, with Rule 35 s.4 alternative prayer and Annex A (the narrative: 16 facts), for counsel's signature", os.path.join(ROOT, "BARANDON_FEED", "DRAFT_MOTION_TO_RESOLVE_SJ_2026-10-18.html"), "html"),
+ ("40_WITNESS_PACK_NEIGHBOURS", "Witness pack: the three neighbours (De Leon, King, de los Reyes): one thing each, lines to withdraw, cross, documents for counsel, the jurat commission question", os.path.join(ROOT, "WITNESS_PACK_NEIGHBOURS_2026-10-19.html"), "html"),
  ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 
