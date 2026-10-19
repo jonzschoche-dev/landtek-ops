@@ -47,6 +47,8 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [38_FEED_NOTE_3_PATRICIA](SECTIONS/38_FEED_NOTE_3_PATRICIA/README.md) | Note 3 to counsel: my mother testifies on rebuttal (draft, not sent) | 1 sections | `BARANDON_FEED/03_PATRICIA_REBUTTAL_2026-10-18.html` |
 | [39_DRAFT_MOTION_TO_RESOLVE_SJ](SECTIONS/39_DRAFT_MOTION_TO_RESOLVE_SJ/README.md) | Draft Motion to Resolve the Motion to Render Summary Judgment, with Rule 35 s.4 alternative prayer and Annex A (the narrative: 16 facts), for counsel's signature | 1 sections | `BARANDON_FEED/DRAFT_MOTION_TO_RESOLVE_SJ_2026-10-18.html` |
 | [40_WITNESS_PACK_NEIGHBOURS](SECTIONS/40_WITNESS_PACK_NEIGHBOURS/README.md) | Witness pack: the three neighbours (De Leon, King, de los Reyes): one thing each, lines to withdraw, cross, documents for counsel, the jurat commission question | 7 sections | `WITNESS_PACK_NEIGHBOURS_2026-10-19.html` |
+| [41_FEED_NOTE_4_NEIGHBOURS_JURAT_ORDER](SECTIONS/41_FEED_NOTE_4_NEIGHBOURS_JURAT_ORDER/README.md) | Note 4 to counsel: the neighbours, who goes first and the notarial stamp (draft, not sent) | 1 sections | `BARANDON_FEED/04_NEIGHBOURS_JURAT_AND_ORDER_2026-10-19.html` |
+| [42_FEED_NOTE_5_KING_CASES_NOTICE](SECTIONS/42_FEED_NOTE_5_KING_CASES_NOTICE/README.md) | Note 5 to counsel: what Mrs. King's cases prove: ownership never decided; Bicol Post served on the Balane side's lawyer 9 Jul 2021 (draft, not sent) | 1 sections | `BARANDON_FEED/05_KING_CASES_NOTICE_2026-10-19.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders

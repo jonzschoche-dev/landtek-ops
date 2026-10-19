@@ -11,9 +11,37 @@
 
 **Who she is.** 61, widow of Pepe R. King (former barangay captain and kagawad), Road 2, Purok 4, Brgy. San Roque. Built her house there in 1990 and has lived there since. Kumare of Efren and Gloria (wedding sponsors). PhilID marked Exhibit Q.
 
-**Her one thing.** **Who has occupied the Balane house since 1990, year by year**: Efren and Gloria, now Princess and Jomil. She is the long-standing neighbour who has watched the house from across the road for thirty-six years.
+**On direct, her one thing.** **Who has occupied the Balane house since 1990, year by year**: Efren and Gloria, now Princess and Jomil. She is the long-standing neighbour who has watched the house for thirty-six years.
 
-**What she is not for.** Anything before 1990; the Llamanzares contracts; consultation; the 2016 deed; and, on direct, her own criminal cases or her 2021 pleading. Those come in later as certified records, or not at all.
+**Her real weight: the cases between her and the Balane side.** They prove two things the defence denies. **(1) Ownership was never decided.** Every forum that touched the 2020 dispute said so and sent the parties to a civil court; no judge or prosecutor ever found Gloria the owner. **(2) The Balane side had the revocation in hand before registration.** Her Verified Answer in Civil Case 8563, with the Bicol Post notices annexed, was stamped received by their lawyer's office on 9 July 2021. Gloria's title issued on 23 November 2021. Their Answer here says Princess and Jomil will testify to "the absence of any notice of revocation or dispute prior to the later demand letter and complaint." These records answer that sworn claim.
+
+**What she is not for.** Anything before 1990; the Llamanzares contracts; consultation; the 2016 deed.
+
+### 3.0 What her cases prove, and how it comes in
+
+| When | What the record says | What it proves for us |
+|---|---|---|
+| Feb to May 2020 | Gloria's side, through a lawyer's letter of 11 February 2020, warned the Kings to stop building; in May 2020 Princess told the Kings' workers "May usapin pa yan." (Prosecutor's resolution of 16 Sep 2020; King's complaint-affidavit of 10 Nov 2020.) | The Balane side itself knew there was an open question on the land in early 2020. |
+| 28 May 2020 | Gloria, in Toronto, appoints Nelly Juntilla "To institute or file action regarding property in Purok 4, Barangay San Roque … and defend me from any action." (Their Answer, Annex 1.) | Juntilla acts for Gloria on this land from that date. Their own Answer is verified by Juntilla as Gloria's attorney-in-fact under this same power. |
+| 28 Jul 2020 | Provincial Prosecutor, joint resolution on Juntilla's robbery complaint and Mrs. King's grave coercion complaint: "this Office cannot pass upon the issue of ownership because it is only the court in a proper proceeding which can declare which party has a better right over the property … Parties hereto are advised to file appropriate civil action to establish who between them has the right over the property." | **Ownership not decided.** The parties, Juntilla for Gloria included, are told in writing that ownership is contested and belongs in a civil court. Sixteen months before registration. |
+| 16 Sep 2020 | Same office, on reconsideration: the parties are "advised to clear for themselves, who has a better right of possession, if not ownership, of the property in court proceedings." [VERIFY wording on the certified copy] | Same, repeated. |
+| 25 Sep, 2 Oct, 9 Oct 2020 | The Bicol Post publishes the notice of revocation (our Exh. G, G-1; their Answer ¶18 admits the publication). | Constructive notice from October 2020. |
+| 27 Nov 2020 to 6 Jan 2021 | Crim. Case 20-6030: warrants issue against Juntilla, Jomil Torralba and three guards; on 6 January 2021 the case is remanded to the prosecutor as prematurely filed and the warrants are recalled. Nothing is said about ownership. | Jomil, a defendant here, was himself in court over this land in 2020. "No dispute before 2025" cannot stand. |
+| 9 Jul 2021 | Civil Case 8563 (RTC Br. 41; Juntilla and Jomil v. King, damages): King's Verified Answer ¶2: "The Deed of Absolute Sale did not ipso facto vested ownership to Gloria Balane, especially in the absence of authority of Cesar Dela Fuente who was stripped of the same, way back in 2005. Copies of newspaper containing revocation of SPA of Dela Fuente is attached." Annexes 1 to 3-c are the three Bicol Post issues. Stamped "RECEIVED … AQUINO Law Office … 09 JUL 2021." Her judicial affidavit of 8 July 2021 in the same case marks the Bicol Post issues as exhibits. | **Actual notice to the Balane side's lawyer of the revocation and of the publication, 137 days before Gloria's title issued.** Atty. Raymundo Aquino appeared for Juntilla and Jomil in the criminal cases and in the perjury case. |
+| 17 May 2023 to 4 Dec 2025 | Perjury case brought by Jomil and Juntilla against King: convicted by MTC Daet (17 May 2023), acquitted by RTC Br. 41 (25 Sep 2023), certiorari dismissed by the Court of Appeals (17 Jul 2025), reconsideration denied (4 Dec 2025). The MTC decision and the CA decision both recite the prosecutor's ruling that ownership "must first be resolve[d] in an action with the proper court." | Two courts repeat that ownership was left undecided. Her acquittal answers the perjury attack on her credibility. |
+| 23 Nov 2021 | Gloria's TCT 079-2021002126 issues. | Good faith had to last until this date. It did not. |
+
+**How it comes in.** None of these records were pre-marked at pre-trial, and Mrs. King's affidavit does not mention them. So they are not offered through her on direct. There are two doors, and the defence opens both.
+
+- **On cross of King.** If Atty. Ramos puts the perjury case or the criminal cases to her to attack her credibility, re-direct may follow the subject he opened: what was decided about ownership ("Wala po. Sabi ng piskal, sa korte dapat pagpasyahan"), and what she attached to her 2021 Answer and to whom it was served. Counsel holds the certified copies to show her. [COUNSEL]
+
+- **On rebuttal.** Their Answer lists Princess for "the absence of any notice of revocation or dispute prior to the later demand letter and complaint" and Jomil for "the absence of any notice of dispute prior to the filing of the case." Once they swear to that, the certified records answer it directly: the prosecutor's resolutions, the 20-6030 orders, and the Civil Case 8563 Answer with its 9 July 2021 receipt stamp. Court records come in by certified copy. Jomil can also be confronted with them on cross. [COUNSEL]
+
+**The hinge is one point of law.** Whether notice to Juntilla, Gloria's attorney-in-fact for actions over this property, or to her lawyer, counts as notice to Gloria. That needs counsel's authority. [NEEDS COUNSEL VERIFICATION] Without it, the records still prove that the Balane household knew the ownership was contested and that the revocation had been published and served, which defeats "no notice of dispute" from Princess and Jomil.
+
+**Answer to their best use of the same records.** The prosecutor's resolutions also describe Juntilla's acts as "a form of an exercise of a lawful right" by "the landowner." Atty. Ramos may read that line. The answer is in the same resolution: the office said it "cannot pass upon the issue of ownership," and its "landowner" is the claim each side made, not a finding. No forum has ever found Gloria the owner.
+
+**One caution.** The 9 October 2020 Bicol Post page annexed to the 2021 Answer (Annex 3-c) also carries an unrelated notice that we do not want in this case. For the text of our notice, use our own Exhibit G-1; use the 2021 Answer for the receipt stamp and the list of annexes. Counsel decides before any certified copy of that page is offered.
 
 ### 3.1 What she proves first-hand (keep to these)
 
@@ -40,13 +68,24 @@ Without a new affidavit, the court may allow short clarifying questions on matte
 
 | Atty. Ramos | Her honest answer |
 |---|---|
-| "You were charged with perjury over this same land." | "I was charged. The case ended in my favour." (RTC Branch 41 acquitted her on 25 September 2023; the Court of Appeals dismissed the other side's petition on 17 July 2025 and denied reconsideration on 4 December 2025.) [VERIFY: certified copies not yet in hand] Then stop. |
-| "You filed a criminal case before this very court against Jomil Torralba and Nelly Juntilla, and it was thrown out." | "I filed a complaint. It was sent back to the prosecutor." Nothing about this judge's orders or the bonds. Stop. |
+| "You were charged with perjury over this same land." | "I was charged. The case ended in my favour." (RTC Branch 41 acquitted her on 25 September 2023; the Court of Appeals dismissed the other side's petition on 17 July 2025 and denied reconsideration on 4 December 2025.) [VERIFY: certified copies not yet in hand] Then stop. This opens re-direct (3.0). |
+| "You filed a criminal case before this very court against Jomil Torralba and Nelly Juntilla, and it was thrown out." | "I filed a complaint. It was sent back to the prosecutor." Nothing about this judge's orders or the bonds. Stop. This also opens re-direct. |
+| "The prosecutor himself called Gloria the landowner and said they had a lawful right to stop your construction." | "Sinabi rin po ng piskal na hindi niya mapagpapasyahan kung sino ang may-ari, at sa korte dapat dalhin." Then stop. Counsel has the resolution to show the line. |
 | "You bought land rights there yourself from Ruby Ferrer in 2015, not from the owners." | Depends on a fact counsel must know first: is the Ferrer house on the Keesey land? If not: "Ibang lote po iyon." If yes: "Bumili ako ng bahay at karapatan sa pag-okupa. Hindi ko inaangkin ang titulo." [ASK HER; VERIFY against the 18 May 2015 kasunduan and the plan] |
 | "You moved there in 1990. You know nothing of the 1970s or 1980s." | "Tama po. Mula 1990 ang nakita ko." |
 | "You cannot know what the defendants knew." | "Hindi ko po alam ang nasa isip nila. Ang alam ko ay ang nakita at narinig ko." Concede and stop. |
 | "You are kumare of the Balanes and now you testify against them." | "Kumare ko po sila. Sinasabi ko lang ang nakita ko." |
-| "In July 2021 you yourself pleaded that Cesar's authority was revoked. You got that from Jonathan." | Only if it is raised. "Inilakip ko sa sagot ko ang pahayagan na naglathala ng pagbawi." Then stop. Counsel decides beforehand whether to touch her 2021 Answer at all. |
+| "In July 2021 you yourself pleaded that Cesar's authority was revoked. You got that from Jonathan." | "Nakita ko po sa Bicol Post. Inilakip ko sa sagot ko, at natanggap iyon ng abogado nila noong Hulyo 2021." Then stop. This is the door to the receipt stamp; counsel shows her the certified copy on re-direct. |
+
+### 3.4a Re-direct, only if cross opened the cases
+
+1. "Sa mga kasong iyon, may nagpasya ba kung sino ang may-ari ng lupa?" → "Wala po. Sabi ng piskal, hindi niya iyon mapagpapasyahan at sa korte dapat dalhin." (Show the 28 Jul 2020 resolution.)
+
+2. "Ano ang inilakip mo sa iyong Sagot sa Civil Case 8563?" → "Ang tatlong labas ng Bicol Post tungkol sa pagbawi ng kapangyarihan ni Cesar." (Show the certified Answer, Annexes 1 to 3-c.)
+
+3. "Kanino ipinadala ang Sagot na iyon, at kailan?" → "Sa abogado nila Jomil at Nelly, si Atty. Aquino, noong Hulyo 2021." (Show the receipt stamp of 9 July 2021.)
+
+Each answer must be hers, from her own knowledge; counsel confirms each with her before the hearing. [ASK HER]
 
 ### 3.5 Documents for counsel to prepare or carry (King day)
 
@@ -55,9 +94,11 @@ Without a new affidavit, the court may allow short clarifying questions on matte
 | 1 | Exhibit L as filed (and the re-sworn copy if 1.1 requires it) | Her direct testimony | On file |
 | 2 | Exhibit Q: her PhilID, original | Identity and residence | She brings it |
 | 3 | Exhibit B and Exhibit C, page 2 | Location questions | In the record |
-| 4 | Certified copy of the RTC Branch 41 decision acquitting her (25 Sep 2023) and the two Court of Appeals resolutions (17 Jul 2025, 4 Dec 2025) | Counsel's hand only; re-direct if the perjury charge is put to her | [VERIFY; obtain quietly from the branch clerk and the CA by 28 Oct] |
-| 5 | Her Verified Answer in Civil Case 8563 (received 9 July 2021 by the law office acting for Juntilla and Torralba), with the newspaper notice of the 2005 revocation annexed | Not through her on direct. It is a certified court record, to be offered later as proof that the published revocation was served on the defendants' side before the 23 November 2021 registration | Copy in our file; certified copy to be requested from the Branch 41 clerk |
+| 4 | **Civil Case 8563, certified copies:** the complaint of Juntilla and Jomil (to show their counsel and whether they pleaded Gloria's deed), and King's Verified Answer with Annexes 1 to 3-c and the "RECEIVED … AQUINO Law Office … 09 JUL 2021" stamp | **The notice before registration.** Re-direct if cross opens the cases; otherwise rebuttal against Princess and Jomil | Our copy of the Answer is in hand; the complaint is not. Request both from the RTC Br. 41 clerk **by 21 Oct** |
+| 5 | **Provincial Prosecutor, certified copies:** joint resolution of 28 Jul 2020 and resolution on reconsideration of 16 Sep 2020 (NPS-V-09-INV-2020F-00383 and 2020G-00417), with Juntilla's counter-affidavit and the 11 Feb 2020 lawyer's letter attached to it | **Ownership never decided**; the Balane side told in writing to go to a civil court; who Gloria's lawyer was in February 2020 | Copies in our file come from the CA petition annexes. Request certified copies from the Provincial Prosecution Office **by 28 Oct** |
+| 5a | Crim. Case 20-6030, MTC Mercedes: warrant order of 27 Nov 2020 and order of 6 Jan 2021 | Jomil in court over this land in 2020; rebuttal against "no dispute" | Copies in our file; certified copies from this court's clerk **by 28 Oct** |
+| 5b | The perjury case: RTC Branch 41 judgment acquitting her (25 Sep 2023), the MTC Daet decision (17 May 2023, which recites the prosecutor's ownership ruling), and the two Court of Appeals resolutions (17 Jul 2025, 4 Dec 2025) | Re-direct if the perjury charge is put to her; the recital that ownership was left to a civil court | [VERIFY] Obtain from the branch clerks and the CA **by 28 Oct** |
 | 6 | The 18 May 2015 kasunduan with Ruby Ferrer, and the location of that house against the plan | Counsel's hand only: to know the true answer to the Ferrer question before it is asked | [ASK HER; VERIFY] |
 | 7 | Barangay San Roque blotter certifications of 20 May and 27 May 2020 (annexed to her own 2020 complaint-affidavit) | Counsel's hand only; re-direct if she is asked whether she reported the May 2020 incidents | Copies in our file; certified copies from the barangay |
 
-**Don't-says for King:** nothing about anyone's intentions or character; no "fake," "illegal," "land grabber"; no count of families on the land; nothing about what the owners or Cesar knew; nothing about this court's orders in Criminal Case 20-6030; nothing about the ₱180,000 bonds.
+**Don't-says for King:** nothing about anyone's intentions or character; no "fake," "illegal," "land grabber"; no count of families on the land; nothing about what the owners or Cesar knew; no description of this court's orders in Criminal Case 20-6030 beyond "it was sent back to the prosecutor"; nothing about the ₱180,000 bonds; no claim that anyone on the Balane side read the Bicol Post, only that her Answer with the pages attached was served on their lawyer.

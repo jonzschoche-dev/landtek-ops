@@ -31,7 +31,7 @@
 
 | Date | One plan | The other plan | Decision |
 |---|---|---|---|
-| Wed 4 Nov, 1:30 PM | Shirley De Leon (Exh. N) | Donata King (Exh. L) | Jonathan chose King first on 15 October, pending counsel. Our recommendation is De Leon first: no outside papers, no criminal cases to steer around, and her 2020 facts are the strongest neighbour evidence. [COUNSEL] |
+| Wed 4 Nov, 1:30 PM | Shirley De Leon (Exh. N) | Donata King (Exh. L) | Jonathan chose King first on 15 October, pending counsel. Our leaning is De Leon first: her day needs no outside papers, and it gives counsel the extra week to hold the certified King case records (Part 3.5) before King is crossed. [COUNSEL] |
 | Wed 11 Nov, 1:30 PM | Donata King | Shirley De Leon | |
 | Wed 2 Dec, 1:30 PM | Francia de los Reyes (Exh. M), or no third neighbour (see Part 4) | Decide by 20 November. | |
 | Wed 9 Dec | Formal offer of plaintiff's exhibits | Separate note. | |

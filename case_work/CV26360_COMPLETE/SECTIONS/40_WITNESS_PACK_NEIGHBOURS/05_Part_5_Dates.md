@@ -11,7 +11,9 @@
 |---|---|---|
 | This week | Counsel confirms the notarial commission in force on 23 January 2026 (Part 1.1) and the 4 November witness order (Part 1.2). | Counsel |
 | By Wed 28 Oct | Counsel asks De Leon the three questions in 2.3 and 2.4 (father's seller and year; the month of Gloria's visit; any blotter or photo) and asks King the Ferrer-house question (3.4). Nobody else speaks to the witnesses about their testimony. | Counsel |
-| By Wed 28 Oct | Certified copies requested quietly: King's acquittal and the two CA resolutions; the Civil Case 8563 Verified Answer; barangay blotter certifications (May 2020, and De Leon's if any). | Jonathan, by counter request; no contact with witnesses |
+| By Wed 21 Oct | Request the Civil Case 8563 certified copies (complaint; King's Verified Answer with annexes and the 9 July 2021 receipt stamp) from the RTC Br. 41 clerk. | Jonathan or counsel, by counter request |
+| By Wed 28 Oct | Certified copies requested quietly: the prosecutor's resolutions of 28 Jul and 16 Sep 2020 with Juntilla's counter-affidavit; the 20-6030 orders; King's acquittal, the MTC Daet decision and the two CA resolutions; barangay blotter certifications (May 2020, and De Leon's if any). | Jonathan, by counter request; no contact with witnesses |
+| If a judge said it in court | If any judge stated from the bench that ownership was not settled in the earlier cases, order the stenographic notes of that hearing so the statement can be quoted exactly. | Jonathan to say which hearing; counsel orders |
 | Fri 30 Oct | Last day to file and serve any re-sworn affidavit for the 4 November witness (five days before). Better: all three re-sworn together earlier that week, if 1.1 requires it. | Counsel |
 | Wed 4 Nov, 1:30 PM | First neighbour testifies. Folder per Part 1.3 and the witness's section. | Counsel; Jonathan present, silent |
 | Fri 6 Nov | Last day for any re-sworn affidavit for the 11 November witness. | Counsel |
