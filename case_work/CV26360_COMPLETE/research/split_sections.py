@@ -131,6 +131,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 - `research/build_memo_pack.py` — the counsel pack `MEMO_PACK_BARANDON_2026-10-15.pdf` (action cover + Annexes A-H).
 - `research/build_bring_bundle.py` — `BRING_TO_COURT_BUNDLE_2026-10.pdf` (17 tabs of documents outside the record).
 - `research/build_forensic_audit.py` — the audit PDF, HTML, and `AUDIT_BALANE_PAYMENTS_2026-10-18.md`.
+- `research/build_gemini_pack.py` — `GEMINI_PACK_2026-10-19/` (00_RESEARCH_BRIEF.md + 01_CASE_PACK.md/.html/.pdf): the scrubbed reviewer pack for an outside deep-research opinion; Jonathan uploads it himself.
 - `research/build_cross_binders.py` — the five cross binders.
 - `research/TRACK_A..E_*.md` — the research tracks (knowledge, papering, notice, jurisprudence, Judge Cu).
 - `GROK_REVIEW/` — the second-chair review rounds and our responses.
