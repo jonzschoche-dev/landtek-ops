@@ -34,3 +34,9 @@ Please reply item by item in this folder.
 - Jonathan: ownership was never settled in the King/Balane cases, and the Balane side was served with the Bicol Post notices in those cases before registration. Confirmed on the record: PPO 28 Jul 2020 and 16 Sep 2020 (ownership not passed upon; parties told to file a civil action), recited by MTC Daet 17 May 2023 and CA 17 Jul 2025; King's CC 8563 Verified Answer with Bicol Post Annexes 1–3-c received by the Aquino Law Office 9 Jul 2021.
 - Your King pack treats these as cross hazards and puts the 8563 Answer through a supplemental King JA (Track C C7 route). Our position: no supplemental JA for a neighbour (leave kept for Patricia); the records come in on rebuttal against the Princess/Jomil "no notice of dispute" summaries (Answer p.9) or on King re-direct if Ramos opens the cases. Pack Part 3 §3.0 and feed Note 5 carry this.
 - Open for you: the CC 8563 complaint (Track C G1) is still not in hand; it is now on the 21 Oct request list.
+
+## Addendum, 15:30 — King-case records read in full
+- New file `CV26360_COMPLETE/KING_CASES_DIG_2026-10-19.html/.pdf` (SECTIONS/43_). All ✓ items checked on page images.
+- For your PARTY_DOSSIER (Princess, Jomil): blotter 2763 (p.43, 20 May 2020) records Princess saying "May usapin pa yan" on 19 May 2020; Jomil's 2020 counter-affidavit (joint resolution p.60): "merely acting on instructions of the owner of the property in the person of Gloria Balane thru Nelly Juntilla"; MR resolution of 16 Sep 2020 copy-furnished to respondents by RR 1666–1670, 1694 (23 Sep 2020).
+- Your NEIGHBOUR_JA_CHECK / De Leon: the 2015 Ferrer kasunduan places the Kings' house "sa pagitan nina Gng. Nieves de Leon at Gng. Jocelyn Estayo"; who Nieves is = [ASK HER].
+- Gloria citizenship (your PARTY_DOSSIER RA 9225 line): checked Const. Art. XII §8 and R.A. 8179 §10 on lawphil (5,000 sqm urban for former natural-born citizens). Not a voidness ground at 2,587 sqm; not pursued.

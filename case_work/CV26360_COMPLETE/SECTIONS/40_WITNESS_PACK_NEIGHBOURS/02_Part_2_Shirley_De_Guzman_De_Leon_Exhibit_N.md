@@ -50,6 +50,8 @@ Her father "bought" the lot they live on more than fifty years ago. Atty. Ramos 
 
 - **If he bought from someone else entirely**: she stays a neighbour witness to 2020 and nothing more, and the line is left exactly as sworn ("my father bought it"), with no follow-up.
 
+**A second De Leon on the record.** The 18 May 2015 sale of the Ferrer house to the Kings places that house "sa pagitan nina Gng. Nieves de Leon at Gng. Jocelyn Estayo, sa harapan nito ay Mercedes to Daet Road" (Civil Case 8563 record, King's Exh. A). The Kings' house stood on the parcel Gloria bought. So a Nieves de Leon lived next to the parcel's road frontage in 2015. If Nieves is Shirley's mother or relative, Shirley's "katabi" lot is that one, and Antonio de Leon's titled Lot 2-X-4-D may be a different family lot. [ASK HER: who is Nieves de Leon; which lot is her house on]
+
 On the stand the honest answer is the short one: "Binili ng tatay ko kay ____ noong ____." Nothing is added about the owners, the agent or paragraph 7; counsel argues that in the memorandum.
 
 ### 2.4 Cross she will face, and the honest answer
