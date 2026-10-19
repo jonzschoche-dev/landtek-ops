@@ -71,7 +71,7 @@ def lapse_stages_consequence_never_letter(cur):
         tc.execute("""UPDATE office_obligation SET state='served_running', served_at=%s,
                             service_proof='TEST received-stamp', service_proof_doc_id=%s, due_at=%s
                       WHERE officer='Abla' RETURNING id""",
-                   (date.today() - timedelta(days=20), _any_mwk_doc(tc), date.today() - timedelta(days=5)))
+                   (date.today() - timedelta(days=30), _any_mwk_doc(tc), date.today() - timedelta(days=5)))  # ≥15 working days (v2 C4 floor)
         oid = tc.fetchone()["id"]
         tc.execute("SELECT count(*) n FROM work_orders WHERE created_by='drip'")
         before = tc.fetchone()["n"]
@@ -296,7 +296,7 @@ def lapse_advances_one_rung_only(cur):
         tc.execute("""UPDATE office_obligation SET state='served_running', served_at=%s,
                             service_proof='TEST', service_proof_doc_id=%s, due_at=%s
                       WHERE officer='Abla' RETURNING id""",
-                   (date.today() - timedelta(days=20), _any_mwk_doc(tc), date.today() - timedelta(days=5)))
+                   (date.today() - timedelta(days=30), _any_mwk_doc(tc), date.today() - timedelta(days=5)))  # ≥15 working days (v2 C4 floor)
         oid = tc.fetchone()["id"]
         tc.execute("SELECT count(*) n FROM escalation_rung WHERE obligation_id=%s", (oid,))
         if tc.fetchone()["n"] < 2:
@@ -338,8 +338,38 @@ def gated_officers_have_no_ladder(cur):
         conn.rollback(); conn.close()
 
 
+def escalation_floor_15_working_days(cur):
+    """v2 C4 (Jonathan GO 2026-10-20; Legal 00:15): no rung leaves 'pending' before 15 working days from PROVEN
+    receipt, and a running clock needs served_at + a proof doc (C1). Both enforced by the DB, not by memory."""
+    conn, tc = _rb()
+    try:
+        tc.execute("""UPDATE office_obligation SET state='served_running', served_at=%s,
+                            service_proof='TEST', service_proof_doc_id=%s
+                      WHERE officer='Abla' RETURNING id""",
+                   (date.today() - timedelta(days=3), _any_mwk_doc(tc)))
+        oid = tc.fetchone()["id"]
+        tc.execute("SAVEPOINT f")
+        try:
+            tc.execute("UPDATE escalation_rung SET state='staged' WHERE obligation_id=%s AND seq=1", (oid,))
+        except Exception:
+            tc.execute("ROLLBACK TO SAVEPOINT f")
+        else:
+            raise TruthFailure("DB staged a rung 3 days after receipt — 15-working-day floor trigger missing.")
+        tc.execute("SAVEPOINT g")
+        try:
+            tc.execute("UPDATE office_obligation SET state='served_running', served_at=NULL, service_proof_doc_id=NULL "
+                       "WHERE officer<>'Abla' AND id=(SELECT min(id) FROM office_obligation WHERE officer<>'Abla')")
+        except Exception:
+            tc.execute("ROLLBACK TO SAVEPOINT g")
+        else:
+            raise TruthFailure("DB accepted a running clock with no served_at/proof — drip_running_clock_needs_proof missing.")
+    finally:
+        conn.rollback(); conn.close()
+
+
 TESTS = [
     ("drip.lapse_advances_one_rung_only", lapse_advances_one_rung_only),
+    ("drip.escalation_floor_15_working_days", escalation_floor_15_working_days),
     ("drip.gated_officers_have_no_ladder", gated_officers_have_no_ladder),
     ("drip.edition_letter_is_always_one_page", edition_letter_is_always_one_page),
     ("drip.feeds_calendar_pulse", feeds_calendar_pulse),
