@@ -53,6 +53,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [44_FEED_NOTE_6_PRINCESS_JOMIL](SECTIONS/44_FEED_NOTE_6_PRINCESS_JOMIL/README.md) | Note 6 to counsel: Princess and Jomil in their own words (blotter 2763; 2020 counter-affidavit; mailed ruling; bail; 8563) (draft, not sent) | 1 sections | `BARANDON_FEED/06_PRINCESS_AND_JOMIL_2026-10-19.html` |
 | [45_WITNESSES_IN_THE_COURTS_FORM](SECTIONS/45_WITNESSES_IN_THE_COURTS_FORM/README.md) | The witnesses in the court's own form: each witness mapped to her ten questions, the article words, and the Considering-that line it earns | 5 sections | `WITNESSES_IN_THE_COURTS_FORM_2026-10-19.html` |
 | [46_DOCUMENTS_ONLY_CASE](SECTIONS/46_DOCUMENTS_ONLY_CASE/README.md) | The documents-only case: Art. 1898 proved element by element on paper (their Answer, their Exh. 5, Exh. B/E/F/H), the one gap (pleaded 1980s payment) and three paper moves to close it | 5 sections | `DOCUMENTS_ONLY_CASE_2026-10-19.html` |
+| [47_RED_TEAM_BALANE_DIRECTIVE](SECTIONS/47_RED_TEAM_BALANE_DIRECTIVE/README.md) | Red team: the directive the Balane household would give Atty. Ramos (our model), with the annex of our standing answers | 9 sections | `RED_TEAM_BALANE_DIRECTIVE_2026-10-19.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders

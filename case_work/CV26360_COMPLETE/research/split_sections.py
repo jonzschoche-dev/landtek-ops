@@ -59,6 +59,7 @@ DOCS = [
  ("44_FEED_NOTE_6_PRINCESS_JOMIL", "Note 6 to counsel: Princess and Jomil in their own words (blotter 2763; 2020 counter-affidavit; mailed ruling; bail; 8563) (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "06_PRINCESS_AND_JOMIL_2026-10-19.html"), "html"),
  ("45_WITNESSES_IN_THE_COURTS_FORM", "The witnesses in the court's own form: each witness mapped to her ten questions, the article words, and the Considering-that line it earns", os.path.join(ROOT, "WITNESSES_IN_THE_COURTS_FORM_2026-10-19.html"), "html"),
  ("46_DOCUMENTS_ONLY_CASE", "The documents-only case: Art. 1898 proved element by element on paper (their Answer, their Exh. 5, Exh. B/E/F/H), the one gap (pleaded 1980s payment) and three paper moves to close it", os.path.join(ROOT, "DOCUMENTS_ONLY_CASE_2026-10-19.html"), "html"),
+ ("47_RED_TEAM_BALANE_DIRECTIVE", "Red team: the directive the Balane household would give Atty. Ramos (our model), with the annex of our standing answers", os.path.join(ROOT, "RED_TEAM_BALANE_DIRECTIVE_2026-10-19.html"), "html"),
  ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 
