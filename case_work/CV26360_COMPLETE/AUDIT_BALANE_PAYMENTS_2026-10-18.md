@@ -142,7 +142,7 @@ The Balanes' total outlay on the papers in hand is therefore about ₱995,371 be
 
 - **If the book exists, it is a rent ledger.** A columnar book kept by the administrator's collector records what tenants paid. The entry the defense needs would have to say "down payment," not "rent." Whoever holds it, its entries for the Balanes are either absent or are the strongest proof that they paid rent.
 
-- **Its stated custody runs to the plaintiff's own former counsel.** That is dangerous in both directions. If it is at the Agcaoili office and shows rent, it ends the class claim. If it cannot be found, the defense will argue suppression. The audit therefore locates it first, before anyone asks for it in court.
+- **Its stated custody does not hold.** Gloria's chain (Violeta to Cesar to the Agcaoili office) rests on what Cesar told her (S24). Jonathan confirms the Agcaoili office knows nothing of any such book (19 Oct 2026). On her own account, then, the last holder was Cesar, and through him Salvador, who says he collected Llamanzares's papers in 1992 (S15). The book, if it exists, is on their side; a failure to produce it is theirs (Rule 131, §3[e]).
 
 - **Cesar's own books are the second ledger.** Salvador says he handed every payment to his father (S23). A collector who issued numbered official receipts in a registered taxpayer's name had a cash book or at least the duplicate leaves. The Tax Code requires receipts "prepared at least in duplicate" (Appendix B). The duplicates, the unused leaves and the other 25 booklets of the 1998 printing are the audit trail of every peso and of every other buyer.
 
@@ -152,7 +152,7 @@ The Balanes' total outlay on the papers in hand is therefore about ₱995,371 be
 
 - **Salvador cannot vouch for it.** He had no knowledge of the property in the Llamanzares years; his own affidavit dates his first contact to "noong bandang 1992," when he and his father went to collect Llamanzares's papers (S14 to S15). He can speak only to what was handed over then, and to where it went.
 
-- **Custody is the open question.** Gloria's account is that the book went to Cesar and then to the Agcaoili office (S24). P1 asks the Agcaoili office; on cross, Salvador is asked what papers were collected from Llamanzares in 1992, whether a columnar book was among them, and where it is now.
+- **Custody points to the agent's side.** The Agcaoili office knows nothing of the book (Jonathan, 19 Oct 2026). On cross, Salvador is asked what papers were collected from Llamanzares in 1992, whether a columnar book was among them, and where it is now; a subpoena for him to bring it puts the question before the court.
 
 **Procedures:** P1, P2 and P8 below.
 
@@ -162,7 +162,7 @@ Each procedure names the record, where it is, who asks, the alert risk to the de
 
 | # | Procedure | Source and who asks | Alert | Serves |
 |---|---|---|---|---|
-| P1 | Find the "brown columnar book." Ask Atty. Agcaoili-Orena's office, in writing, whether any ledger, cash book or papers of Manuel Violeta or Cesar de la Fuente were ever turned over to it, and what they show for the Balanes | Agcaoili & Associates; Patricia and Jonathan | None | H3, H4; closes the suppression argument before it is made |
+| P1 | The "brown columnar book." The Agcaoili office knows nothing of it (Jonathan, 19 Oct 2026). Route: Salvador, on cross and by a subpoena to bring the Llamanzares papers collected in 1992 and any Violeta book. Optional: a one-line written confirmation from the Agcaoili office that no Violeta or Cesar ledger was ever received, held against a suppression argument | Salvador (subpoena, rebuttal timing); Agcaoili & Associates (optional confirmation) | Low | H3, H4; puts the book on the side that claims it |
 | P2 | Fix Violeta and Llamanzares: dates of death (PSA), years of service, and any family member holding records | PSA; the family; Mercedes civil registrar | None | H3; anchors against any late "ledger" witness |
 | P3 | Treasurer's official receipts for the lot's real property tax, 2012 to 2021: the payor named on each OR (0033800 of 31 Mar 2016; 0032388; 8672529; 0532865; 0046725; 0048923) | Municipal Treasurer, Mercedes; Jonathan as owner's attorney-in-fact (the Treasurer's office is an ARTA respondent's office) | Moderate; defer to rebuttal if the office is hostile | H2, H7; tests Salvador's "amelyar" explanation and Answer ¶44(i) |
 | P4 | BIR registration of TIN 160-902-582: who registered "Heirs of Mary W. Keesey Estate," when, under what authority; the Authority to Print 451-1998 and the printer's logbook at 4C's Press, Daet | BIR RDO 64, Talisay; 4C's Press. Rebuttal subpoena; the printer's logbook may be asked for quietly | Low (printer); subpoena (BIR) | H6; shows the agent registered the estate as a business without the owners |

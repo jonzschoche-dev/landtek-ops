@@ -53,3 +53,7 @@ Gemini's review confirms the core (Art. 1898 on the annotated limits, imprescrip
 | S7 | Consultation as a suspensive condition under Art. 1181, so authority "never vested" | Art. 1181 text read (conditional obligations) | NOT ADOPTED: unnecessary and a stretch; Art. 1898 does the work. |
 | S8 | *Bautista-Spille v. Nicorp*, strict construction | G.R. 214057 is in our War of the Statutes; the lawphil URL tried today did not resolve | Unchanged: one sentence at most, as already planned. |
 | S9 | "No letters or emails exist to prove the co-owners were informed" | Absence of paper is not proof; Salvador S31 says Cesar dealt with the Agcaoili office | CORRECTED: non-consultation is proved first-hand by Patricia on rebuttal; the defence may say consultation went through the Agcaoili office, which the 15 Aug 2019 Agcaoili letter answers. |
+
+## Update, same day: the Violeta book and the Agcaoili office
+
+Jonathan: "agcaoilis know nothing about this." Recorded as his statement of fact. Gloria's custody chain for the "brown columnar book" (Violeta to Cesar to the Agcaoili office, S24, "ayon kay Cesar") therefore ends with Cesar and Salvador. Changed: audit §6 and P1 (route is Salvador, by cross and subpoena; an Agcaoili confirmation is optional insurance only); DOCUMENTS_ONLY_CASE Part 3; RED_TEAM directive annex. Supersedes the "ask the Agcaoili office first" line above (S5) and in the red-team directive.
