@@ -8,7 +8,7 @@ from reportlab.lib.colors import Color, black
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER
 from PIL import Image
@@ -93,6 +93,10 @@ def render_md(md_path, out_path, footer, letter_mode=False):
             continue
         if raw.startswith("### "):
             story.append(Paragraph(md_to_rl(raw[4:]), S["h3"]))
+            i += 1
+            continue
+        if raw.strip() == "\\newpage":
+            story.append(PageBreak())
             i += 1
             continue
         if raw.strip() == "---":
