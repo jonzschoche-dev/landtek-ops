@@ -1,10 +1,10 @@
 **STOP 4**
 
-**BARANGAY I (UNO), POBLACION**
+**OFFICE OF THE CLERK OF COURT, RTC — NOTARIAL SECTION**
 
-Barangay Hall, Mercedes
+Hall of Justice, Daet
 
-Document: Request for barangay records (with Annex B parcel list)
+Document: Request for certified copies of notarial records (Asis, Belen, Subia)
 
 Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
 
@@ -12,7 +12,7 @@ Received by (name): ____________________________
 
 Date and time: ____________________________
 
-Barangay e-mail / Facebook: ____________________
+Office e-mail: ____________________________ (we have rtc1daeocc@judiciary.gov.ph)
 
 Office phone: ____________________________
 

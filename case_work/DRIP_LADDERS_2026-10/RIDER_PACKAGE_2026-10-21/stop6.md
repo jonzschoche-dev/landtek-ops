@@ -1,6 +1,6 @@
 **STOP 6**
 
-**BARANGAY SAN ROQUE**
+**BARANGAY III, POBLACION**
 
 Barangay Hall, Mercedes
 

@@ -1,10 +1,10 @@
 **STOP 3**
 
-**OFFICE OF THE CLERK OF COURT, RTC — NOTARIAL SECTION**
+**BFAR PROVINCIAL FISHERY OFFICE, CAMARINES NORTE**
 
-Hall of Justice, Daet
+Location: ask at the Provincial Agriculture Office, Capitol: ____________________
 
-Document: Request for certified copies of notarial records (Asis, Belen, Subia)
+Document: Inquiry on any BFAR project on Lot 2-A (TCT No. T-32911), addressed to the BFAR Regional Director through the Provincial Fishery Officer
 
 Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
 
@@ -12,7 +12,7 @@ Received by (name): ____________________________
 
 Date and time: ____________________________
 
-Office e-mail: ____________________________ (we have rtc1daeocc@judiciary.gov.ph)
+Office e-mail: ____________________________
 
 Office phone: ____________________________
 

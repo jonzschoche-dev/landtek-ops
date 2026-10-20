@@ -32,12 +32,16 @@ STOP 1 — Registry of Deeds, Camarines Norte (Phase 1, Beige St., Metropark Vil
 
 STOP 2 — Provincial Capitol, Daet: Office of the Secretary to the Sangguniang Panlalawigan.
 
-STOP 3 — Hall of Justice, Daet: Office of the Clerk of Court, RTC — Notarial Section.
+STOP 3 — BFAR Provincial Fishery Office, Camarines Norte. **Ask at the Capitol (Provincial Agriculture Office) where BFAR's provincial office is in Daet**, and deliver there. If it cannot be found, bring the set back.
 
-STOP 4 — Barangay Hall, Barangay I (Uno), Poblacion, Mercedes.
+STOP 4 — Hall of Justice, Daet: Office of the Clerk of Court, RTC — Notarial Section.
 
-STOP 5 — Barangay Hall, Barangay III, Poblacion, Mercedes.
+STOP 5 — Barangay Hall, Barangay I (Uno), Poblacion, Mercedes.
 
-STOP 6 — Barangay Hall, Barangay San Roque, Mercedes.
+STOP 6 — Barangay Hall, Barangay III, Poblacion, Mercedes.
+
+STOP 7 — Barangay Hall, Barangay V, Poblacion, Mercedes.
+
+STOP 8 — Barangay Hall, Barangay San Roque, Mercedes.
 
 Jonathan: 0966-698-1448

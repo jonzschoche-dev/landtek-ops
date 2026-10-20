@@ -1,6 +1,6 @@
 **STOP 5**
 
-**BARANGAY III, POBLACION**
+**BARANGAY I (UNO), POBLACION**
 
 Barangay Hall, Mercedes
 
