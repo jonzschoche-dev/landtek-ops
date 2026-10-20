@@ -17,8 +17,10 @@
 8. **Money stays internal.** Each official's dereliction is priced in `loss_line` and logged every cycle. Costs are stated outward only as sworn neutral fact at R2 (Jonathan's affidavit, remote e-notarized under A.M. No. 24-10-14-SC), and only on go.
 9. **Counsel lanes.** CV 26-360 defendants (Engr. Balane, Torralba, the Balanes) go through Atty. Barandon only. Teope is held for a posture check. SP 2680 goes through Atty. Botor in court. Records letters to courts stay strictly clerical.
 10. **Truth.** Every fact in a letter must trace to a document (doc or gmail id). Inferences are never stated as fact. When a figure is cited, cite the right source (₱5,124,922.47 = doc 377, not doc 376).
+11. **Feedback ledger first.** Before drafting or considering any drip, read `case_work/MWK-001/DRIP_FEEDBACK_LEDGER.md` (live in the corpus): every past critique from Jonathan, for that office and ladder and in general.
 
-## 2. Live ladders: what each one is steering toward (step 1 and the path)
+
+## 2. Live ladders (regenerated 20 Oct 2026 15:57 PHT from `step_plan`)
 
 ### BLGF-REVIEW · MWK-ARTA-1210
 - **1. routine_ask** → RD Jessie B. Doctolero, BLGF RO V: Status of the re-evaluation of our 15 Aug resubmission, which his office acknowledged 17 Aug as referred to the concerned personnel (and the action officer's name)  
@@ -85,8 +87,8 @@
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 
 ### CV26360-PROV-ASSESSOR · MWK-CV26360
-- **1. routine_ask** → Hon. Maximo P. Magana, Jr., REA, Provincial Assessor, Camarines Norte: Certified history of declarations under PIN 025-07-001-01-047 from 2014 to date (ARP no., declared owner, effectivity)  
-  *serves:* Legal: who moved the declaration to Gloria and when (P7 item 9; FW rank 11); declaration ARP 00256 is a pleaded object of cancellation (legal) · *send:* per history · *state:* planned
+- **1. routine_ask** → Hon. Maximo P. Magana, Jr., REA, Provincial Assessor, Camarines Norte: Certified copies (or a certified list) of tax declarations of IMPROVEMENTS (buildings/structures) on PIN 025-07-001-01-047, 2014 to date: ARP no., declared owner, kind, effectivity; or a note none declared  
+  *serves:* Legal: who moved the declaration to Gloria and when (P7 item 9; FW rank 11); declaration ARP 00256 is a pleaded object of cancellation (legal) · *send:* per history · *state:* skipped
 - **2. routine_ask** → Provincial Assessor Magana: Certified copy of the 21 Sep 2021 request and supporting papers that produced the change of declared owner  
   *serves:* Legal: who asked for the 2021 transfer (legal) · *send:* per history · *state:* planned
 - **3. routine_ask** → Provincial Assessor Magana: Certified copies of ARPs GR-2014-HH-07-001-00246, -00247, -00274, -00276  
@@ -180,9 +182,9 @@
 - **5. strategic_rung** → Per the 5 Oct letter's pre-stated next step (Provincial Assessor supervision; then the accountability forum): Supervisory request with the step 1-4 record  
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 
-### LGU-ABLA-SERVICE · MWK-ARTA-1321
+### LGU-ABLA-SERVICE · MWK-ARTA-1321  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Assessor Gemma P. Abla, REA: Item 4 of her own 16 Jun 2025 list only: the tax map of section 025-07-005-01, Barangay 5 (Poblacion). Plain copy; we pay page charges on release  
-  *serves:* Legal: fixes the municipal-site footprint against T-32911 (the parcel-identity gap in memory) and shows capability on the paid service; also satisfies item (e) of the 5 Oct letter (legal) · *send:* per history · *state:* drafted
+  *serves:* Legal: fixes the municipal-site footprint against T-32911 (the parcel-identity gap in memory) and shows capability on the paid service; also satisfies item (e) of the 5 Oct letter (legal) · *send:* per history · *state:* skipped
 - **2. courtesy_edition** → Assessor Gemma P. Abla, REA: Same item, referring to step 1 by date  
   *serves:* Legal: unanswered paid service, dated from proof of receipt (legal) · *send:* per history · *state:* planned
 - **3. routine_ask** → Provincial Assessor Maximo D. Magana Jr.: A certified copy of the tax map of section 025-07-005-01 from the provincial set, at our expense  
@@ -190,7 +192,7 @@
 - **4. strategic_rung** → CSC-RO V (complaint vs Abla) per SMALL_PLAYERS target 2: File CSC_COMPLAINT_ABLA_draft with the step 1-3 receipts; the forum-shopping certification discloses OP 1321  
   *serves:* Legal: administrative count on a paid, unrendered service (legal) · *send:* per history · *state:* planned
 
-### LGU-BALANE-OBO · MWK-ARTA-1378  · ⚠ COUNSEL ROUTE: no outward letter without counsel
+### LGU-BALANE-OBO · MWK-ARTA-1378  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Engr. Erwin H. Balane (Municipal Engineer / Building Official): Barandon route: whether the OBO permit file for the Teope structure and the Balane/Torralba structure goes by letter or by a CV 26-360 subpoena duces tecum  
   *serves:* Legal: the open gap is the OBO permit file, not the LRA plan (legal) · *send:* per history · *state:* planned
 - **2. routine_ask** → Per Barandon: The permit record element (by letter or subpoena)  
@@ -235,8 +237,8 @@
   *serves:* Legal: the ripe administrative count (protest decision lapse), filed only on the record steps 1-4 built (legal) · *send:* per history · *state:* planned
 
 ### LGU-MAYOR-FISHERIES · MWK-LGU-RECOVERY
-- **1. routine_ask** → Mayor Alexander L. Pajarillo: Only which office/agency is carrying out the construction at the fisheries building beside the municipal hall, and the project name  
-  *serves:* Legal: identifies the builder on T-32911 Lot 2-A (DENR-PENRO LMS-25-550 placement) before anything is said about consent (legal) · *send:* per history · *state:* planned
+- **1. routine_ask** → Mayor Alexander L. Pajarillo: Copy of any building permit for the construction now in progress on the T-32911 land, or a note none was issued; plus Ms. Zschoche's own non-consent for the record (Drip 01, v2)  
+  *serves:* Legal: identifies the builder on T-32911 Lot 2-A (DENR-PENRO LMS-25-550 placement) before anything is said about consent (legal) · *send:* paper · *state:* drafted
 - **2. routine_ask** → Implementing office named in step 1: The project's building permit number and date, or a note that none was needed  
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 - **3. courtesy_edition** → Mayor Alexander L. Pajarillo: Refer to step 1 by date  
@@ -282,7 +284,7 @@
 - **4. strategic_rung** → Donee-performance request (deed street-name stipulation) to the SB: Request that the SB act on the stipulated names, quoting its own record  
   *serves:* Legal: specific-performance record for counsel; revocation stays counsel's call (prescription risk, ROAD_LOT deep dive s.5) (legal) · *send:* per history · *state:* planned
 
-### LGU-TEOPE-OCCUPANCY · MWK-TCT4497  · ⚠ COUNSEL ROUTE: no outward letter without counsel
+### LGU-TEOPE-OCCUPANCY · MWK-TCT4497  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Assessor (records), [Barandon posture check first]: Whether any improvement on the T-48336 land in Brgy 1 is declared, and in whose name (certification)  
   *serves:* Legal: who claims the structure; Financial: base for any later lease/purchase talk (both) · *send:* per history · *state:* planned
 - **2. routine_ask** → Treasurer (records): RPT payment record on that improvement, if declared  
@@ -292,7 +294,7 @@
 - **4. strategic_rung** → Mr. Antonio B. Teope: DEMAND_TEOPE_FINAL_2026-08-26 (show right / vacate / regularize / purchase + Schedule)  
   *serves:* Both (both) · *send:* per history · *state:* planned
 
-### LGU-TORRALBA-SB · MWK-OMB-IC-OC-JUL-26-1214  · ⚠ COUNSEL ROUTE: no outward letter without counsel
+### LGU-TORRALBA-SB · MWK-OMB-IC-OC-JUL-26-1214  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Councilor Princess B. Torralba: Barandon route: no outward ask; counsel decides whether any SB-member records ask (e.g. her 4 Feb 2026 RA 1059 objection) may go  
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 - **2. routine_ask** → Office of the Deputy Ombudsman for Luzon (CREMEB): Status of IC-OC-JUL-26-1214 (confirm it is the ARTA 1212 referral)  
@@ -308,7 +310,7 @@
 - **3. routine_ask** → National Archives of the Philippines (notarial records): Same entry, if the OCC says older registers went to the Archives (route)  
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 
-### OMB-1214 · MWK-OMB-IC-OC-JUL-26-1214  · ⚠ COUNSEL ROUTE: no outward letter without counsel
+### OMB-1214 · MWK-OMB-IC-OC-JUL-26-1214  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Deputy Ombudsman for Luzon, attn OIC CREMEB (Atty. Expedito O. Allado Jr.): Status of IC-OC-JUL-26-1214 and whether the ARTA endorsement received 29 Jul 2026 (1212 Resolution) forms part of it  
   *serves:* Legal: MWK-OMB-1214 / MWK-ARTA-1212 success criteria (legal) · *send:* per history · *state:* planned
 - **2. courtesy_edition** → CREMEB (via Barandon): Same, by date  
@@ -332,7 +334,7 @@
 
 ### PROV-ASSESSOR-TAXMAP · MWK-LGU-RECOVERY
 - **1. routine_ask** → Provincial Assessor Maximo P. Magana, Jr.: A copy of the Barangay 5 tax map sheet(s) on which the estate parcels appear (builds on his own 1 Jul words about the tax-mapping records and his Memo 2024-01, which releases tax maps without authority conditions)  
-  *serves:* Legal: parcel identity of Lot 2-A / Lots 401-403-405 on the Province map (hall-site and Lot 402 tracks); Financial: base for the improvements/assessment check (escaped improvements on estate land) (both) · *send:* per history · *state:* planned
+  *serves:* Legal: parcel identity of Lot 2-A / Lots 401-403-405 on the Province map (hall-site and Lot 402 tracks); Financial: base for the improvements/assessment check (escaped improvements on estate land) (both) · *send:* jonzschoche@gmail.com · *state:* drafted
 - **2. courtesy_edition** → Provincial Assessor Magana: Same, referring to the step-1 letter by its date  
   *serves:* Legal: an open, unrefused records ask at the supervising assessor (legal) · *send:* per history · *state:* planned
 - **3. routine_ask** → Provincial Assessor Magana: Narrowed improvements ask: for ONE parcel only (the Brgy 5 parcel he researched), whether any improvement is declared on it and in whose name  

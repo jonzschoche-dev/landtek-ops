@@ -21,6 +21,7 @@ import glob
 import json
 import os
 import re
+import subprocess
 import sys
 
 import psycopg2
@@ -237,6 +238,14 @@ def main():
         print("queued:", added or "—", "| needs drafting / lint:", wanted or "—")
     if a.next:
         show_next(cur)
+    if a.comment or a.revised:
+        # LIVE corpus: every critique lands in the feedback ledger + steering guide right away (degrade, don't crash)
+        try:
+            c.commit()
+            subprocess.run([sys.executable, os.path.join(REPO, "scripts", "drip_feedback_ledger.py")],
+                           capture_output=True, text=True, timeout=120, env={**os.environ, "PG_DSN": DSN})
+        except Exception as e:
+            print("ledger refresh skipped:", e, file=sys.stderr)
     if a.status:
         cur.execute("SELECT status, count(*) FROM drip_instrument GROUP BY 1 ORDER BY 1")
         for r in cur.fetchall():

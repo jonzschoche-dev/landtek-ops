@@ -224,6 +224,17 @@ Jonathan's comment. Tool: `scripts/drip_draft_queue.py`.
   explicit step. Nothing is ever sent by the system.
 - **Every action refills the queue,** so movement is continuous. Counsel-gated ladders never enter the queue.
 
+### X18 FEEDBACK LEDGER FIRST: the live corpus (Jonathan, 20 Oct 2026: "my feedback should be somewhere in the corpus for next time … we need a LIVE corpus")
+Every critique Jonathan gives (in chat, in a drip comment or at the desk) is recorded in `drip_feedback` in his own
+words, with the lesson it becomes and where it is enforced:
+- `scripts/drip_feedback_ledger.py --add …` for chat rulings;
+- drip comments flow in automatically.
+
+`scripts/drip_feedback_ledger.py` regenerates **DRIP_FEEDBACK_LEDGER** and the **steering guide** from the database and
+upserts both into the corpus (`documents`, internal/not_for_trial). It runs after every comment or revision, and hourly
+from cron on the VPS. **Before drafting, revising or considering any drip, read the ledger** for that office and ladder,
+plus the global rules. A draft that repeats a ledgered mistake is a regression.
+
 ### X17 POSTURE: never write directly to someone we are prosecuting on that subject (Jonathan, 20 Oct: "I've already attacked her through ARTA")
 Before any letter, `scripts/drip_draft_queue.py` checks `matter_track`/`track_party` (live since 20 Oct): is the
 addressee a respondent or duty-holder in a **live** proceeding we brought (complaint, appeal, referral, judicial;

@@ -41,6 +41,28 @@ DOCS = [
 ]
 
 
+def upsert(cur, path, cf, mc, title, text):
+    """Insert/update one internal strategy row by file_path (idempotent). Returns (id, action)."""
+    h = hashlib.sha256(text.encode()).hexdigest()
+    cur.execute("SELECT id, sha256 FROM documents WHERE file_path=%s AND ingest_source='strategy_desk'", (path,))
+    row = cur.fetchone()
+    if row and row["sha256"] == h:
+        return row["id"], "unchanged"
+    vals = dict(case_file=cf, matter_code=mc, file_name=os.path.basename(path), file_path=path,
+                document_title=title, extracted_text=text, text_length=len(text), sha256=h, content_hash=h,
+                document_date=date.today(), ingest_source="strategy_desk", ingest_status="ingested",
+                status="ingested", classification="internal_strategy", doc_role="background",
+                exhibit_tier="not_for_trial", processing_mode="lean", master_form="digital",
+                analyst_memo=psycopg2.extras.Json({"note": "INTERNAL STRATEGY: steer communications by it; never an exhibit, never quoted outward."}))
+    if row:
+        sets = ", ".join(f"{k}=%({k})s" for k in vals)
+        cur.execute(f"UPDATE documents SET {sets}, updated_at=now(), chunk_count=NULL WHERE id=%(id)s", {**vals, "id": row["id"]})
+        return row["id"], "updated"
+    cols = ", ".join(vals)
+    cur.execute(f"INSERT INTO documents ({cols}) VALUES ({', '.join('%(' + k + ')s' for k in vals)}) RETURNING id", vals)
+    return cur.fetchone()["id"], "inserted"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
