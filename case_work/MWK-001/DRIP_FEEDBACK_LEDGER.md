@@ -1,9 +1,18 @@
 # DRIP FEEDBACK LEDGER (internal, never outward)
 
-*Live, regenerated 20 Oct 2026 15:57 PHT from `drip_feedback`. Read this before drafting, revising or even considering a drip. Jonathan's own words are quoted; the lesson is the rule the stack now follows; 'enforced by' says where.*
+*Live, regenerated 20 Oct 2026 16:34 PHT from `drip_feedback`. Read this before drafting, revising or even considering a drip. Jonathan's own words are quoted; the lesson is the rule the stack now follows; 'enforced by' says where.*
+
+## The Charter (governs everything below)
+
+- 20 Oct 2026 16:34 · **DRIP_CHARTER** · Jonathan: “Adopt it”  
+  **Lesson:** The Drip Charter (Q1–Q12, 20 Oct 2026) is adopted as the drip's governing document; it outranks the steering guide, spec and templates.  
+  *Enforced by:* drip_card.py line 0 CHARTER; 005 spec header; steering guide §0
 
 ## Rules for every drip
 
+- 20 Oct 2026 16:06 · Jonathan: “theres no counsel theres just us”  
+  **Lesson:** Outside court filings that need a signature, LandTek is the legal desk. Verify the law ourselves from the law corpus (legal_chunks, jurisprudence) and decide. Never write 'counsel should confirm'; mark [VERIFY] only where the corpus lacks the text, and close that gap ourselves.  
+  *Enforced by:* memory feedback-dont-gate-on-counsel; this ledger
 - 20 Oct 2026 15:10 · Jonathan: “just run the drip here for now on one by one … my feedback should be somewhere in the corpus … we need a LIVE corpus”  
   **Lesson:** Every critique goes into this ledger; the ledger and the steering guide regenerate and re-ingest automatically; read the ledger before drafting or considering any drip.  
   *Enforced by:* drip_feedback table; scripts/drip_feedback_ledger.py; 005 X18
@@ -43,6 +52,12 @@
 
 ## By ladder
 
+- 20 Oct 2026 16:15 · **LGU-MACALE-RPT** · Jonathan: “theres more than 13”  
+  **Lesson:** Work from the FULL list, never from one statement's subset: the 2026 bill (doc 1616) has 22 ARPs (₱198,646.78 for 2026: advance ₱30,640.08 + Dec 2025 ₱112,496.64 + Apr 2026 ₱41,118.56, balance ₱14,391.50). The corpus schedule has 29 parcels in the heirs' names (ESTATE_DECLARED_PARCELS_2026-09).  
+  *Enforced by:* doc 1616; ESTATE_DECLARED_PARCELS_2026-09.md; this ledger
+- 20 Oct 2026 16:04 · **LGU-MACALE-RPT** · Jonathan: “its not clear if I ever identified what Im protesting ?”  
+  **Lesson:** A §252 protest is about tax already PAID. It must name the ARP, the OR and the amount paid under protest, and the grounds, and go to the PROVINCIAL Treasurer (for a municipality outside Metro Manila) within 30 days of payment. The 13 Jul letter disputes the UNPAID ₱14,391.50 and so is a supervisory request, not a §252 protest. Macale has no §252 decision duty, and the '60-day lapse ~11 Sep' and 'LBAA window ~14 Nov' claims are withdrawn.  
+  *Enforced by:* LGC §252(a) (legal_chunks RA 7160 chunk 207); step note LGU-MACALE-RPT; DRIP_BLGF_ACK_DRAFT escalation A corrected
 - 20 Oct 2026 14:20 · **CV26360-PROV-ASSESSOR** · Jonathan: “the declarations we are looking for is for imporvements”  
   **Lesson:** Name the exact record type; for structures that means declarations of improvements (buildings), not land history.  
   *Enforced by:* step note; this ledger

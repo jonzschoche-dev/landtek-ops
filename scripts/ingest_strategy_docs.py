@@ -22,6 +22,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # (repo path, case_file, matter_code, title) — client-scoped (A5): MWK docs only under MWK-001
 DOCS = [
+    ("case_work/MWK-001/DRIP_CHARTER.md", "MWK-001", "MWK-001",
+     "MWK DRIP CHARTER (ADOPTED 20 Oct 2026): governs every drip; outranks guide/spec/templates (internal)"),
     ("case_work/MWK-001/DRIP_STEERING_GUIDE_MWK.md", "MWK-001", "MWK-001",
      "MWK DRIP STEERING GUIDE: how every communication to an office is steered (internal)"),
     ("agent_specs/005_drip.md", "MWK-001", "MWK-001",

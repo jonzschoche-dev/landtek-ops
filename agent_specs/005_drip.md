@@ -9,6 +9,8 @@ drain; this spec owns the name "drip" for correspondence from here on.*
 
 ---
 
+> **GOVERNED BY THE DRIP CHARTER** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan 20 Oct 2026). Where this spec and the Charter differ, the Charter wins. Every draft passes pre-draft gate line 0 CHARTER (`scripts/drip_card.py`). Per-matter protocol: read the file on its merits → one-page brief to Jonathan → record plan, milestones and campaigns built from his comments. No letters launch for a matter before its brief.
+
 ## v2 ALGORITHM: the drip as the stack's fabric (redraft 2026-10-19 · **APPROVED by Jonathan 2026-10-20 07:40 PHT with Grok's CHANGEs** · drip_sweep stays SHADOW)
 
 *Why v2: after five weeks live the engine is sound but starved. It has 8 rows, all MWK-001, and **0 served**,

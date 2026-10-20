@@ -2,6 +2,9 @@
 
 *Generated 2026-10-20 from the live `step_plan` + `agent_specs/005_drip.md` §v2. Steers every communication to an office on the Keesey estate matters. Regenerate after ladder changes. Goals listed as proposed remain PROPOSED until Jonathan sets them.*
 
+## 0. The Charter governs
+The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan on 20 Oct 2026) outranks this guide; where they differ, the Charter wins. It holds the client goal (Art. 487: defend the undivided property, make money, inspire good governance, investment-ready), the capacity line, the partner stance, up-the-chain escalation, the recipient web, approvals, cadence, success measures, the per-matter protocol (read the file, brief first, then the record plan) and the four nevers.
+
 ## 1. The doctrine in one page
 1. **Anchor.** Every communication serves a matter goal: CV 6839 money (₱5,124,922.47 principal, about ₱21.6M with interest per doc 377), T-4497 chain recovery (CV 26-360, SP 2680), LGU compound pay-or-buy (₱59,521.00/mo on the LGU's own valuations, docs 528/152/1070), and the accountability record on officials. No goal, no letter.
 2. **Sleep.** The drip is not combative; it puts the office to sleep while the record builds. Routine letters (first ask, editions, R1):
@@ -19,8 +22,7 @@
 10. **Truth.** Every fact in a letter must trace to a document (doc or gmail id). Inferences are never stated as fact. When a figure is cited, cite the right source (₱5,124,922.47 = doc 377, not doc 376).
 11. **Feedback ledger first.** Before drafting or considering any drip, read `case_work/MWK-001/DRIP_FEEDBACK_LEDGER.md` (live in the corpus): every past critique from Jonathan, for that office and ladder and in general.
 
-
-## 2. Live ladders (regenerated 20 Oct 2026 15:57 PHT from `step_plan`)
+## 2. Live ladders (regenerated 20 Oct 2026 16:34 PHT from `step_plan`)
 
 ### BLGF-REVIEW · MWK-ARTA-1210
 - **1. routine_ask** → RD Jessie B. Doctolero, BLGF RO V: Status of the re-evaluation of our 15 Aug resubmission, which his office acknowledged 17 Aug as referred to the concerned personnel (and the action officer's name)  
@@ -226,7 +228,7 @@
 
 ### LGU-MACALE-RPT · MWK-ARTA-1210
 - **1. routine_ask** → Treasurer Loida E. Macale: Whether a written decision on the 13 Jul 2026 protest (ARP 001-00249) has issued to the estate; a copy, or a note that none has and when one may be expected. Anchored on her own 7 Jul 2026 e-mail.  
-  *serves:* Legal: the 60-day decision period ran out ~11 Sep 2026; her own 'none issued' fixes it on record and opens the next tax-remedy window. Financial: path to refund/credit (both) · *send:* jonzschoche@gmail.com · *state:* drafted
+  *serves:* Legal: the 60-day decision period ran out ~11 Sep 2026; her own 'none issued' fixes it on record and opens the next tax-remedy window. Financial: path to refund/credit (both) · *send:* jonzschoche@gmail.com · *state:* skipped
 - **2. courtesy_edition** → Treasurer Loida E. Macale: Same ask, referring to the step-1 letter by its date  
   *serves:* Legal: unanswered request on a protest decision, dated from proof of receipt (legal) · *send:* per history · *state:* planned
 - **3. financial_act** → Treasurer's office (cashier): Pay the short tax on ARP 001-00249 with a one-line note 'paid under protest, see our letter of 13 July 2026'; ask that the O.R. be annotated  

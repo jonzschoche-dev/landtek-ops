@@ -50,7 +50,7 @@ def ledger_text(cur):
     out = [f"# DRIP FEEDBACK LEDGER (internal, never outward)\n",
            f"*Live, regenerated {now} from `drip_feedback`. Read this before drafting, revising or even considering a drip. "
            "Jonathan's own words are quoted; the lesson is the rule the stack now follows; 'enforced by' says where.*\n"]
-    groups = collections.OrderedDict([("global", "Rules for every drip"), ("office", "By office / official"),
+    groups = collections.OrderedDict([("charter", "The Charter (governs everything below)"), ("global", "Rules for every drip"), ("office", "By office / official"),
                                       ("ladder", "By ladder"), ("instrument", "On specific drafts")])
     for key, title in groups.items():
         g = [r for r in rows if r["scope"] == key]
@@ -70,6 +70,14 @@ def guide_text(cur):
     base = open(os.path.join(REPO, GUIDE), encoding="utf-8").read()
     head = base.split("## 2.")[0].rstrip()
     tail = "## 3." + base.split("## 3.", 1)[1] if "## 3." in base else ""
+    if "DRIP_CHARTER" not in head:
+        head = head.replace("## 1. The doctrine in one page",
+                            "## 0. The Charter governs\nThe **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan on 20 Oct 2026) "
+                            "outranks this guide; where they differ, the Charter wins. It holds the client goal (Art. 487: defend "
+                            "the undivided property, make money, inspire good governance, investment-ready), the capacity line, "
+                            "the partner stance, up-the-chain escalation, the recipient web, approvals, cadence, success "
+                            "measures, the per-matter protocol (read the file, brief first, then the record plan) and the four "
+                            "nevers.\n\n## 1. The doctrine in one page", 1)
     if "DRIP_FEEDBACK_LEDGER" not in head:
         head += ("\n11. **Feedback ledger first.** Before drafting or considering any drip, read "
                  "`case_work/MWK-001/DRIP_FEEDBACK_LEDGER.md` (live in the corpus): every past critique from Jonathan, "
