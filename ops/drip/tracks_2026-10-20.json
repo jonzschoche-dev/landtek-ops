@@ -1,0 +1,2952 @@
+{
+ "generated": "2026-10-20",
+ "scope_note": "READ-ONLY inventory; nothing written to DB, nothing sent. Client separation A5: Molina appears once per client. [?] = inference. next_date [TO SET] unless an order/rule/calendar row supports it.",
+ "tracks": [
+  {
+   "track_code": "CV26360",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-CV26360",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "Municipal Trial Court, Mercedes, Camarines Norte (Judge Lourdes Clarissa Donnatilla K. Cu)",
+   "docket_or_ref": "Civil Case No. 26-360",
+   "respondents_or_officials": [
+    "Gloria H. Balane et al. (defendants)",
+    "Engr. Erwin H. Balane (defendant; also Municipal Engineer, Mercedes)",
+    "Princess B. Torralba (co-defendant; also Councilor, Mercedes)"
+   ],
+   "our_role": "plaintiff",
+   "true_status": "Plaintiff's case-in-chief under way; Jonathan testified 14 Oct 2026 (Exh. K); next plaintiff settings 4 Nov, 11 Nov, 2 Dec, 9 Dec 2026 (formal offer); defense Jan-Mar 2027.",
+   "status_as_of": "2026-10-19",
+   "status_source": "doc 17528 (4 Sep 2026 Order); case_work/CV26360_COMPLETE/STATUS.md (19 Oct)",
+   "db_status": "active / trial_plaintiff_evidence_set; forum \"RTC Branch 64\"; docket \"CV-2026-360\"; next_deadline 2026-10-14",
+   "db_mismatch": true,
+   "opened": "[?] complaint filed early 2026 (DB date_opened 2026-01-01 is a placeholder); MTC Order 12 Mar 2026 cited in OP petition Attachment 15",
+   "last_event": {
+    "date": "2026-10-14",
+    "what": "Plaintiff hearing; Jonathan testified",
+    "source": "CV26360_COMPLETE/STATUS.md"
+   },
+   "next_move": "Counsel decisions (a)-(g) by 21 Oct; witness (De Leon recommended) on 4 Nov; subpoena/RD-OCC requests ~21 Oct; jurisdiction check of ARP 00256 assessed value vs MTC ceiling before 4 Nov.",
+   "next_date": "2026-11-04 (doc 17528, 1:30 PM)",
+   "pressure": [
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "defendant in the court case; his CV-26360 status gates every administrative move against him (counsel route)"
+    },
+    {
+     "official": "Princess B. Torralba",
+     "what": "co-defendant; gates OMB-1214 moves through counsel"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-DLF-VOID",
+    "MWK-ESTATE",
+    "MWK-TCT4497"
+   ],
+   "counsel_gate": "Atty. Bonifacio T. Barandon, Jr. (lead; signs and appears)",
+   "notes": "DB forum/docket wrong (RTC Br 64 / CV-2026-360) vs doc 17528 (MTC Mercedes, CC 26-360). Balane title is 079-2021002126 (memory), keystones#1 says ...127. Case Gmail blocked since 25 Sep."
+  },
+  {
+   "track_code": "SP2680",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-GUARDIANSHIP",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Branch 41, Daet (Judge Arniel A. Dating)",
+   "docket_or_ref": "Spec. Proc. No. 2680",
+   "respondents_or_officials": [
+    "OSG / public prosecutor (oppositor role at hearing)",
+    "Geraldine Hoppe (objector, private)"
+   ],
+   "our_role": "petitioner",
+   "true_status": "Hearing of 19 Oct 2026 cancelled (judge ill); reset to 11 Nov 2026 morning per Jonathan, no written resetting order seen. OSG cross of Jonathan pending. Bond (Rule 94) open; dismissal risk if not posted.",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/SP2680/STATUS.md; doc 1199 (22 Jun 2026 Order)",
+   "db_status": "active / petition_filed_hearing_set; forum \"RTC Daet (Branch TBC)\"; no docket; next_deadline 2026-07-27",
+   "db_mismatch": true,
+   "opened": "2026-04-08 (DB date_opened; petition filed) [verify against stamped petition]",
+   "last_event": {
+    "date": "2026-10-19",
+    "what": "Hearing cancelled, judge ill",
+    "source": "SP2680/STATUS.md (Jonathan via CoS)"
+   },
+   "next_move": "Get written resetting order + exact time; Patricia support letter; bond amount + surety quote; certified copy of Hoppe letter; Botor statement of account.",
+   "next_date": "2026-11-11 [VERIFY: oral, no written order]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-CV6839",
+    "MWK-ESTATE"
+   ],
+   "counsel_gate": "Atty. Adan Marcelo B. Botor (ABLAW)",
+   "notes": "DB lacks docket and branch. Petition still recites age/incapacity wording that Hoppe 15 Jul email undercuts."
+  },
+  {
+   "track_code": "CV6839",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-CV6839",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Branch 40, Daet, sitting as Special Agrarian Court",
+   "docket_or_ref": "Civil Case No. 6839",
+   "respondents_or_officials": [
+    "Land Bank of the Philippines (payor)",
+    "DAR"
+   ],
+   "our_role": "plaintiff",
+   "true_status": "Just-compensation judgment on record (verified unpaid P5,124,922.47, doc 376); execution not moved; representative Cesar de la Fuente deceased, substitution (Rule 3 s.16) not done.",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/CV6839_WRIT_COLLECTION_PATH.md; docs 345, 376; DAILY_ACTION_PLAN_2026-10-19 #9",
+   "db_status": "stalled_after_administrator_death / just_compensation_halted_pending_substitution; next_deadline 2026-07-28",
+   "db_mismatch": true,
+   "opened": "1998-01-15 (DB)",
+   "last_event": {
+    "date": "2026-09-16",
+    "what": "Botor query on substitution/execution drafted, not sent",
+    "source": "case_work/MWK-CV6839/BOTOR_QUERY_substitute_admin_2026-09.md"
+   },
+   "next_move": "Pull live docket (entry of judgment, any execution motion); decide on sending Botor query.",
+   "next_date": "[TO SET] (outer bound Rule 39 s.6, 5 years from entry of judgment; entry date not in hand)",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-ESTATE"
+   ],
+   "counsel_gate": "Botor engaged but not appearing; DB lead_counsel vs stage_notes conflict",
+   "notes": "Money figures conflict (P20M keystone vs P48.25M appraisal vs P5.12M verified unpaid)."
+  },
+  {
+   "track_code": "CV6922-OBS",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-PARALLEL-CV6922",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Camarines Norte",
+   "docket_or_ref": "Civil Case No. 6922",
+   "respondents_or_officials": [
+    "DAR (defendant)"
+   ],
+   "our_role": null,
+   "true_status": "OBSERVATION ONLY: Heirs of Amado V. Pajarillo v. DAR, mentioned in 1999 pretrial brief (doc 351). We are not a party. Possible Pajarillo-family link [?].",
+   "status_as_of": "1999 (doc 351)",
+   "status_source": "matters.stage_notes MWK-PARALLEL-CV6922; doc 351",
+   "db_status": "pending_context / observation_only",
+   "db_mismatch": false,
+   "opened": "[?]",
+   "last_event": {
+    "date": "1999",
+    "what": "Mentioned in amended pretrial brief",
+    "source": "doc 351"
+   },
+   "next_move": "Jonathan context only.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-CV6839"
+   ],
+   "counsel_gate": null,
+   "notes": "Not a track we run."
+  },
+  {
+   "track_code": "CRIM9221-OBS",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-PARALLEL-CRIM9221",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Camarines Norte",
+   "docket_or_ref": "Criminal Case No. 9221",
+   "respondents_or_officials": [
+    "Eduardo Ibana (accused)"
+   ],
+   "our_role": null,
+   "true_status": "OBSERVATION ONLY: People v. Ibana, mentioned in 1999 pretrial brief (doc 351); subject unknown.",
+   "status_as_of": "1999 (doc 351)",
+   "status_source": "matters.stage_notes",
+   "db_status": "pending_context / observation_only",
+   "db_mismatch": false,
+   "opened": "[?]",
+   "last_event": {
+    "date": "1999",
+    "what": "Mentioned in pretrial brief",
+    "source": "doc 351"
+   },
+   "next_move": "None.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-CV6839"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "RTC-DLF-RECOVERY",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-DLF-VOID",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Camarines Norte (proposed)",
+   "docket_or_ref": "none (not filed)",
+   "respondents_or_officials": [
+    "Estate of Cesar M. de la Fuente",
+    "Salvador 'Von' de la Fuente",
+    "all T-4497 derivative transferees"
+   ],
+   "our_role": "plaintiff",
+   "true_status": "NOT FILED. Estate-wide nullity/reconveyance/accounting action to be drafted after the 26-360 record closes (9 Dec 2026).",
+   "status_as_of": "2026-10-20",
+   "status_source": "mwk_core goals file (MWK-DLF-VOID); matters.stage_notes MWK-DLF-VOID",
+   "db_status": "active / investigation_active",
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Build record in 26-360; draft RTC complaint.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-CV26360",
+    "MWK-ESTATE"
+   ],
+   "counsel_gate": "counsel for RTC action [TO SET]",
+   "notes": null
+  },
+  {
+   "track_code": "RTC-LGU-RECOVERY",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-LGU-RECOVERY",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Camarines Norte (proposed)",
+   "docket_or_ref": "none (not filed)",
+   "respondents_or_officials": [
+    "Municipality of Mercedes",
+    "Mayor Alexander L. Pajarillo (as LGU head)"
+   ],
+   "our_role": "plaintiff",
+   "true_status": "NOT FILED. Void-donation (Art. 749) + recovery/compensation; DEMAND_LGU_COMPENSATION_DAMAGES_2026-09 is DRAFT-HELD; SC-OCA notice holstered until after 11 Nov.",
+   "status_as_of": "2026-10-20",
+   "status_source": "case_work/MWK-001/DEMAND_LGU_COMPENSATION_DAMAGES_2026-09.md; case_work/MWK-001/SC_OCA_NOTICE_MTC_PREMISES_draft.md",
+   "db_status": "active / 'evidence assembled; COA request filed-ready'",
+   "db_mismatch": true,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Obtain 2024 DV (PhilGEPS 5096794); decide demand service.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "Hall-parcel/T-32911 compensation lane = Atty. Botor; RTC counsel [TO SET]",
+   "notes": "DB stage says COA request \"filed-ready\" but the COA request was SENT 13 Jul 2026 (gmail 103664) - see COA-R5-AUDIT."
+  },
+  {
+   "track_code": "ARTA-0690-0792",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-0690 / MWK-ARTA-0792",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon (Litigation Division)",
+   "docket_or_ref": "CTN SL-2025-1008-0690 and CTN SL-2025-1104-0792",
+   "respondents_or_officials": [
+    "Engr. Erwin H. Balane (Municipal Engineer, Mercedes)"
+   ],
+   "our_role": "complainant",
+   "true_status": "ARTA Resolution 7 Apr 2026 (received 20 Apr): CLOSURE plus REFERRAL to CSC-RO V (R.A. 6713 s.5(a)); endorsed 30 Apr. Carried to OP by Petition 5 May 2026 (050526-MRO-234187).",
+   "status_as_of": "2026-05-05",
+   "status_source": "docs 719, 706, 1708; gmail 62; OP_FILINGS_DOCKET A1-A2, A10, B1",
+   "db_status": "closed / resolved_no_merit (both rows)",
+   "db_mismatch": true,
+   "opened": "2025-10-08 (0690); 2025-11-04 (0792)",
+   "last_event": {
+    "date": "2026-04-30",
+    "what": "ARTA Endorsement of Resolution to CSC-RO V",
+    "source": "gmail 62; doc 706"
+   },
+   "next_move": "None at ARTA (functus). Live legs: CSC-RO5-BALANE-0690 and OP-SPINE.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "referral to sanctioning forum (CSC-RO V)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION",
+    "MWK-CV26360"
+   ],
+   "counsel_gate": "Balane is a CV-26360 defendant: route via Barandon",
+   "notes": "AUTO-ARTA-0690 (SL-2025-1104-0690, OCR conflation) should merge here. DB \"resolved_no_merit\" omits the referral half."
+  },
+  {
+   "track_code": "ARTA-0747",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-0747",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon",
+   "docket_or_ref": "CTN SL-2025-1021-0747",
+   "respondents_or_officials": [
+    "Hon. Alexander L. Pajarillo (Municipal Mayor, Mercedes)"
+   ],
+   "our_role": "complainant",
+   "true_status": "ARTA Resolution 29 Apr 2026 (received 26 May): closure, no referral. Carried to OP as Second Manifestation (060426-MRO-240932), pending, no O.P. Case No.",
+   "status_as_of": "2026-06-04",
+   "status_source": "doc 967; doc 1189; OP_FILINGS_DOCKET A3, B3",
+   "db_status": "active / resolution_noc_op_appeal_window",
+   "db_mismatch": true,
+   "opened": "2025-10-21",
+   "last_event": {
+    "date": "2026-06-04",
+    "what": "Second Manifestation MRO-stamped",
+    "source": "doc 1189"
+   },
+   "next_move": "Watch OP (see OP-SPINE).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "non-performance on supervisory record (closure, not exoneration)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION",
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": "Calendar rows 13, 31 stale."
+  },
+  {
+   "track_code": "ARTA-1210",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1210",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon (LGU CART-disposed)",
+   "docket_or_ref": "CTN SL-2026-0128-1210",
+   "respondents_or_officials": [
+    "Hon. Alexander L. Pajarillo (Mayor)",
+    "Loida E. Macale (Municipal Treasurer)"
+   ],
+   "our_role": "complainant",
+   "true_status": "ARTA Resolution/NOC 13 May 2026 (notice 15 May): closure, no referral; closed through LGU CART with Macale sitting as member. Carried to OP as First Manifestation 29 May 2026 (no stamped copy anywhere).",
+   "status_as_of": "2026-05-29",
+   "status_source": "gmail 42; doc 624; doc 13943 (draft_unsigned); OP_FILINGS_DOCKET A4, B2",
+   "db_status": "active / complaint_filed_awaiting_response; next_deadline 2026-07-24",
+   "db_mismatch": true,
+   "opened": "2026-01-28",
+   "last_event": {
+    "date": "2026-05-29",
+    "what": "First Manifestation to OP",
+    "source": "doc 13943"
+   },
+   "next_move": "Watch OP. Macale counts move to CSC-SMALL-MACALE / OMB-SUPP-OACL270.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "exhaustion exhibit; CART self-disposal = conflict count"
+    },
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "CART chair closing complaint against himself"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION",
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": "Calendar rows 15, 25-30 stale duplicates."
+  },
+  {
+   "track_code": "ARTA-1212",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1212",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon",
+   "docket_or_ref": "CTN SL-2026-0128-1212",
+   "respondents_or_officials": [
+    "Hon. Jeana T. Yapyuco (Vice Mayor)",
+    "Hon. Francisco Noel Y. Ong (Councilor)",
+    "Hon. Princess B. Torralba (Councilor)",
+    "Sangguniang Bayan of Mercedes",
+    "Tony Teope (Assistant to the Municipal Mayor)"
+   ],
+   "our_role": "complainant",
+   "true_status": "ARTA Resolution 1 Jun 2026 (notice 8 Jul): closure + REFERRAL to Ombudsman of Torralba (R.A. 6713) and Teope (R.A. 3019 s.3(i)); endorsement received by OMB 29 Jul 2026; Order 4 Aug resolved our Manifestation. Carried to OP as Third Manifestation (072326-MRO-251125).",
+   "status_as_of": "2026-08-04",
+   "status_source": "docs 1614, 3754, 4227, 3001; gmail 112315, 114622",
+   "db_status": "active / endorsed_to_ombudsman_receipt_confirmed; next_deadline 2026-07-22",
+   "db_mismatch": true,
+   "opened": "[?] Jan 2026 (complaint 27 Jan per doc 1882)",
+   "last_event": {
+    "date": "2026-08-04",
+    "what": "ARTA Order resolving the Manifestation",
+    "source": "gmail 114622"
+   },
+   "next_move": "None at ARTA. Live legs: OMB-1214 and OP-SPINE.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Princess B. Torralba",
+     "what": "referral to sanctioning forum (Ombudsman)"
+    },
+    {
+     "official": "Tony Teope",
+     "what": "referral to sanctioning forum (Ombudsman, s.3(i))"
+    },
+    {
+     "official": "Jeana T. Yapyuco",
+     "what": "named respondent; closure only"
+    },
+    {
+     "official": "Francisco Noel Y. Ong",
+     "what": "named respondent; closure only"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OMB-IC-OC-JUL-26-1214",
+    "MWK-OP-PETITION"
+   ],
+   "counsel_gate": "Torralba is CV-26360 co-defendant: Barandon",
+   "notes": "DB stale deadline; calendar rows 24, 32-37 stale."
+  },
+  {
+   "track_code": "ARTA-1319",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1319",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA (Litigation Division)",
+   "docket_or_ref": "CTN SL-2026-0209-1319",
+   "respondents_or_officials": [
+    "Nestor Franz A. Fortuno (PENR Officer, DENR-PENRO Camarines Norte)",
+    "Engr. Leonora R. Remoto (DENR-PENRO Camarines Norte)"
+   ],
+   "our_role": "complainant",
+   "true_status": "CLOSED: Resolution 25 Aug 2026 (received 7 Sep), no prima facie s.21(e); PENRO Citizen's Charter endorsed for reengineering; property/FOI issues expressly not decided. OP window lapsed 22 Sep 2026; no appeal of record (recommendation: none).",
+   "status_as_of": "2026-09-22",
+   "status_source": "doc 8160; gmail 129698; case_work/MWK-001/ARTA_1319_RESOLUTION_STATE_2026-09-08.md",
+   "db_status": "active / resolution_received_closure_recommended; next_deadline 2026-09-22",
+   "db_mismatch": true,
+   "opened": "2026-02-09",
+   "last_event": {
+    "date": "2026-09-08",
+    "what": "Our reply email to ARTA on Resolution; record-integrity Manifestation drafted (send status unknown)",
+    "source": "gmail 130020"
+   },
+   "next_move": "Close in DB. Open DENR FOI request (Special Patent OCT 2018000090 file) and survey correction request if wanted (now partly covered by DENR-TS-OSS-1092).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Nestor Franz A. Fortuno",
+     "what": "Charter reengineering endorsement only; no referral"
+    },
+    {
+     "official": "Engr. Leonora R. Remoto",
+     "what": "named respondent; closure only"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-TCT4497"
+   ],
+   "counsel_gate": null,
+   "notes": "AUTO-ARTA-1221 is probably this docket mis-typed [?]."
+  },
+  {
+   "track_code": "ARTA-1221",
+   "client_code": "MWK-001",
+   "parent_matter_code": "AUTO-ARTA-1221",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon (auto-detected)",
+   "docket_or_ref": "CTN SL-2026-0209-1221 (as printed in an annex filename)",
+   "respondents_or_officials": [
+    "DENR-PENRO Camarines Norte (per filename)"
+   ],
+   "our_role": "complainant",
+   "true_status": "PROBABLE PHANTOM [?]: the only source is an annex filename \"[OSCA] Zschoche v. PENRO Camarines Norte (CTN SL-2026-0209-1221)\" in an LGU email (doc 6907). PENRO is the 1319 respondent and the date stem matches; no separate 1221 complaint, notice or resolution in the corpus.",
+   "status_as_of": "2026-10-20",
+   "status_source": "doc 6907 text; matters AUTO-ARTA-1221",
+   "db_status": "pending_triage / arta_case_auto_promoted",
+   "db_mismatch": true,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Jonathan to confirm there is no separate PENRO docket 1221; then merge into MWK-ARTA-1319.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-ARTA-1319"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "ARTA-1321",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1321",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon",
+   "docket_or_ref": "CTN SL-2026-0209-1321",
+   "respondents_or_officials": [
+    "Gemma P. Abla, REA (Municipal Assessor, Mercedes)"
+   ],
+   "our_role": "complainant",
+   "true_status": "CLOSED: Resolution 25 Aug 2026 (received 27 Aug), due-cause/impossibility. Our ARTA Manifestation 27 Aug (ack 2 Sep). Appealed to OP (see OP-1321).",
+   "status_as_of": "2026-09-02",
+   "status_source": "docs 6907/6908; gmail 123303, 125764; OP_FILINGS_DOCKET A6-A8",
+   "db_status": "active / complaint_filed_awaiting_response; next_deadline 2026-09-04",
+   "db_mismatch": true,
+   "opened": "2026-02-09",
+   "last_event": {
+    "date": "2026-09-02",
+    "what": "ARTA acknowledgment of our Manifestation",
+    "source": "gmail 125764"
+   },
+   "next_move": "None at ARTA. Live legs: OP-1321, CSC-SMALL-ABLA.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Gemma P. Abla",
+     "what": "ARTA resolution recites fee paid (O.R. 7383466) and delay \"substantially exceed[s]\" charter: exhibit for CSC/OMB"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION"
+   ],
+   "counsel_gate": null,
+   "notes": "AUTO-ARTA-1321 (SL-2026-0208-1321 typo) should merge here."
+  },
+  {
+   "track_code": "ARTA-1378",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1378",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon",
+   "docket_or_ref": "CTN SL-2026-0218-1378",
+   "respondents_or_officials": [
+    "Engr. Erwin H. Balane (Municipal Engineer / Building Official, Mercedes)"
+   ],
+   "our_role": "complainant",
+   "true_status": "CLOSED: Resolution 9 Sep 2026 (emailed 15 Sep), no prima facie s.21(e); Rec. 2 REFERRAL to CSC Region V for possible investigation of Balane. Our Manifestation e-mailed 27 Sep. Appealed to OP (see OP-1378).",
+   "status_as_of": "2026-09-27",
+   "status_source": "doc 14205; gmail 133013; case_work/MWK-ARTA-1378/STATUS.md",
+   "db_status": "active / resolution_received_closure_recommended",
+   "db_mismatch": true,
+   "opened": "2026-02-18 (complaint e-mailed 8 Apr per gmail 76)",
+   "last_event": {
+    "date": "2026-09-27",
+    "what": "ARTA Manifestation e-mailed",
+    "source": "MWK-ARTA-1378/STATUS.md (operator-confirmed)"
+   },
+   "next_move": "None at ARTA. Live legs: OP-1378, CSC-RO5-BALANE-1378.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "second referral to CSC-RO V"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION",
+    "MWK-CV26360"
+   ],
+   "counsel_gate": "Balane = CV-26360 defendant: Barandon",
+   "notes": "AUTO-ARTA-1378 (SL-2020-0218-1378 OCR) should merge here."
+  },
+  {
+   "track_code": "ARTA-1891",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1891",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "ARTA Southern Luzon",
+   "docket_or_ref": "CTN SL-2026-0423-1891",
+   "respondents_or_officials": [
+    "Committee on Anti-Red Tape (CART), Mercedes: Hon. Alexander L. Pajarillo (Chair)",
+    "Loida E. Macale (member)",
+    "Gemma P. Abla (member)",
+    "Margarita P. Fulo (Municipal Accountant, member)",
+    "Jayson M. Lo (Municipal Administrator) [named in our correspondence]",
+    "SB Member Jude Alven S. Hernandez [named in our correspondence]"
+   ],
+   "our_role": "complainant",
+   "true_status": "ARTA issued Notices of Referral 4 May 2026 to CSC (R.A. 6713) and DILG national CART (R.A. 11032 s.17(d)). ARTA leg spent; onward legs live (CSC-OACL-270, DILG-1891-REFERRAL).",
+   "status_as_of": "2026-05-04",
+   "status_source": "docs 688/689, 705, 701; gmail 60, 61",
+   "db_status": "active / csc_to_ombudsman_transmitted_receipt_unconfirmed",
+   "db_mismatch": false,
+   "opened": "2026-04-23",
+   "last_event": {
+    "date": "2026-05-04",
+    "what": "Notices of Referral to CSC and DILG",
+    "source": "gmail 60, 61"
+   },
+   "next_move": "See CSC-OACL-270 / DILG-1891-REFERRAL.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "referral to sanctioning forum (via CSC to OMB)"
+    },
+    {
+     "official": "Loida E. Macale",
+     "what": "CART member referred"
+    },
+    {
+     "official": "Gemma P. Abla",
+     "what": "CART member referred"
+    },
+    {
+     "official": "Margarita P. Fulo",
+     "what": "CART member referred"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY",
+    "MWK-OP-PETITION"
+   ],
+   "counsel_gate": null,
+   "notes": "Verified-fact gate on docs 708/709/711 not closed (VERIFICATION_PLAYBOOK_1891). Lo and Hernandez are named in DILG_PD_RELUCIO_FOLLOWUP, not in the ARTA referral text [?]."
+  },
+  {
+   "track_code": "ARTA-DG-FEEDBACK",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": false,
+   "kind": "supervisory",
+   "forum": "ARTA Office of the Director General (Sec. Ernesto V. Perez)",
+   "docket_or_ref": "none (letter 9 Jul 2026; email 12 Jul 2026)",
+   "respondents_or_officials": [
+    "Sec. Ernesto V. Perez (ARTA Director General)"
+   ],
+   "our_role": "requester",
+   "true_status": "ANSWERED: ARTA Formal Response on service-outcome data, 21 Jul 2026 (USec Abot), doc 5819; ARTA said it did not adjudicate merits. Spent.",
+   "status_as_of": "2026-07-21",
+   "status_source": "doc 5819; gmail 103600, 103966; case_work/MWK-ARTA-1212/Letter_to_DG_Perez_2026-07-09.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-07-09",
+   "last_event": {
+    "date": "2026-07-21",
+    "what": "ARTA formal response",
+    "source": "doc 5819"
+   },
+   "next_move": "None; use the \"no merits adjudication\" line as exhibit.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-OP-PETITION"
+   ],
+   "counsel_gate": null,
+   "notes": "Not a docket; listed for completeness (no matters row needed)."
+  },
+  {
+   "track_code": "OP-SPINE",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-OP-PETITION",
+   "needs_matter_row": false,
+   "kind": "appeal",
+   "forum": "Office of the President (Executive Secretary Ralph G. Recto; MRO / PACE, Malacanang)",
+   "docket_or_ref": "Transmittal 050526-MRO-234187 (also 060426-MRO-240932, 072326-MRO-251125); no O.P. Case No.",
+   "respondents_or_officials": [
+    "ARTA (resolutions under review)",
+    "Engr. Erwin H. Balane",
+    "Mayor Alexander L. Pajarillo",
+    "Loida E. Macale",
+    "Princess B. Torralba / Jeana T. Yapyuco / Francisco Noel Y. Ong"
+   ],
+   "our_role": "petitioner",
+   "true_status": "PENDING, no O.P. Case No. after 5.5 months. Filings: Petition 5 May (0690/0792, MRO-stamped doc 703), First Manifestation 29 May (1210, no stamped copy), Second 4 Jun (0747, doc 1189), Third ~23 Jul (1212, doc 3001). 1321 and 1378 petitions pray consolidation.",
+   "status_as_of": "2026-10-17",
+   "status_source": "case_work/MWK-001/OP_FILINGS_DOCKET_2026-09-14.md; memory project-op-spine-reconciled.md; case_work/MWK-001/STATUS.md",
+   "db_status": "active / five_filings_lodged_awaiting_op_action",
+   "db_mismatch": false,
+   "opened": "2026-05-05 (050526-MRO-234187)",
+   "last_event": {
+    "date": "2026-07-23",
+    "what": "Third Manifestation lodged (072326-MRO-251125)",
+    "source": "doc 3001"
+   },
+   "next_move": "Watch for O.P. Case No.; OP bot holds the A.O. 22 fee cure; archive gaps (B2 stamped copy, B3 files in ~/Downloads). Escalation basket HELD.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "supervisor informed (OP) of closures cited as exonerations"
+    },
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "supervisor informed"
+    },
+    {
+     "official": "Loida E. Macale",
+     "what": "supervisor informed"
+    },
+    {
+     "official": "Exec. Sec. Ralph G. Recto",
+     "what": "duty-holder: OP supervisory review"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-0690",
+    "MWK-ARTA-0747",
+    "MWK-ARTA-1210",
+    "MWK-ARTA-1212",
+    "MWK-ARTA-1321",
+    "MWK-ARTA-1378"
+   ],
+   "counsel_gate": null,
+   "notes": "Duplicate AUTO-MWK_OP_PETITION row in PENDING_TRIAGE. stage_notes empty. Case Gmail blocked since 25 Sep."
+  },
+  {
+   "track_code": "OP-1321",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1321",
+   "needs_matter_row": false,
+   "kind": "appeal",
+   "forum": "Office of the President (PACE / MRO, Malacanang)",
+   "docket_or_ref": "LBC 142061372862; consolidation into 050526-MRO-234187; no MRO ref / O.P. Case No.",
+   "respondents_or_officials": [
+    "Gemma P. Abla, REA (Municipal Assessor)",
+    "ARTA (Resolution 25 Aug 2026)"
+   ],
+   "our_role": "petitioner",
+   "true_status": "FILED & DELIVERED to MRO 14 Sep 2026 (LBC tracking, doc 14076). No receiving stamp or O.P. Case No. known; A.O. 22 fee not tendered (perfection risk). Only an unsigned copy (doc 8240) in corpus.",
+   "status_as_of": "2026-10-17",
+   "status_source": "case_work/MWK-001/STATUS.md; docs 8240, 13948, 14076",
+   "db_status": "(on MWK-ARTA-1321) complaint_filed_awaiting_response",
+   "db_mismatch": true,
+   "opened": "2026-09-11 (shipped; petition dated 8 Sep)",
+   "last_event": {
+    "date": "2026-09-14",
+    "what": "Delivered to MRO (Neil Javier)",
+    "source": "doc 14076"
+   },
+   "next_move": "Watch OP ack; on A.O. 22 pay-upon-notice demand, OP bot cure.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Gemma P. Abla",
+     "what": "supervisor informed; corrective action sought"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION",
+    "MWK-ARTA-1321"
+   ],
+   "counsel_gate": null,
+   "notes": "Must be disclosed in any CSC forum-shopping certification (CSC-SMALL-ABLA)."
+  },
+  {
+   "track_code": "OP-1378",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1378",
+   "needs_matter_row": false,
+   "kind": "appeal",
+   "forum": "Office of the President (Legal Office, Malacanang)",
+   "docket_or_ref": "LBC 142062946861; consolidation prayed into 050526-MRO-234187",
+   "respondents_or_officials": [
+    "Engr. Erwin H. Balane (Municipal Engineer)",
+    "ARTA (Resolution 9 Sep 2026)"
+   ],
+   "our_role": "petitioner",
+   "true_status": "DISPATCHED 29 Sep 2026; delivery, receiving stamp and O.P. Case No. UNKNOWN; fee not tendered; Annex G affidavit of service blank (service on ARTA and Balane undocumented).",
+   "status_as_of": "2026-10-17",
+   "status_source": "case_work/MWK-ARTA-1378/STATUS.md; doc 16382",
+   "db_status": "(on MWK-ARTA-1378) resolution_received_closure_recommended",
+   "db_mismatch": true,
+   "opened": "2026-09-29",
+   "last_event": {
+    "date": "2026-09-29",
+    "what": "LBC dispatch",
+    "source": "MWK-ARTA-1378/STATUS.md"
+   },
+   "next_move": "Jonathan: LBC POD; confirm service on ARTA and Balane.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "supervisor informed"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-OP-PETITION",
+    "MWK-ARTA-1378"
+   ],
+   "counsel_gate": "Balane = CV-26360 defendant",
+   "notes": "Para 28 still says \"the heirs filed Civil Case No. 26-360\" (capacity wording)."
+  },
+  {
+   "track_code": "CSC-RO5-BALANE-0690",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "referral",
+   "forum": "Civil Service Commission Regional Office V (Legazpi)",
+   "docket_or_ref": "ARTA Endorsement 30 Apr 2026 of CTNs 0690/0792 (to ro05@csc.gov.ph); no CSC docket number known",
+   "respondents_or_officials": [
+    "Engr. Erwin H. Balane (Municipal Engineer, Mercedes)"
+   ],
+   "our_role": "referred_party",
+   "true_status": "REFERRED, no CSC-RO V acknowledgment, docket or action in the corpus as of 20 Oct 2026 (about 5.5 months).",
+   "status_as_of": "2026-10-20",
+   "status_source": "docs 706, 719, 1708; gmail 62; ARTA_REFERRAL_INVENTORY rows 1-2",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-04-30",
+   "last_event": {
+    "date": "2026-04-30",
+    "what": "ARTA endorsement to CSC-RO V",
+    "source": "gmail 62"
+   },
+   "next_move": "Status check with CSC-RO V (Balane-referral status check was put ON HOLD 28 Aug pending guardianship, BLGF spine s.5-A); supplemental complaint only via Barandon.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "referral to sanctioning forum; open file a supplemental can ride"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-0690",
+    "MWK-ARTA-0792",
+    "MWK-CV26360"
+   ],
+   "counsel_gate": "Barandon (CV-26360 defendant)",
+   "notes": "MEO_205_ENFORCEMENT_REQUEST_2026-09_draft (Building Official P.D. 1096 duty) and office_obligation 7 (not built) sit behind this."
+  },
+  {
+   "track_code": "CSC-RO5-BALANE-1378",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "referral",
+   "forum": "Civil Service Commission Regional Office V",
+   "docket_or_ref": "ARTA Resolution 9 Sep 2026, CTN 1378, Recommendation 2",
+   "respondents_or_officials": [
+    "Engr. Erwin H. Balane"
+   ],
+   "our_role": "referred_party",
+   "true_status": "REFERRAL RECOMMENDED (threat letter, \"possible investigation\"); no evidence ARTA transmitted it or that CSC-RO V docketed it.",
+   "status_as_of": "2026-09-15",
+   "status_source": "doc 14205; gmail 133013",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-09-09",
+   "last_event": {
+    "date": "2026-09-15",
+    "what": "Resolution e-mailed",
+    "source": "gmail 133013"
+   },
+   "next_move": "Confirm ARTA transmittal to CSC-RO V; consider merging with CSC-RO5-BALANE-0690 file [?].",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "second referral to sanctioning forum"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1378"
+   ],
+   "counsel_gate": "Barandon",
+   "notes": "office_obligation 7 (Building Official duty, held_counsel_route)."
+  },
+  {
+   "track_code": "CSC-OACL-270",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1891",
+   "needs_matter_row": true,
+   "kind": "referral",
+   "forum": "CSC Office of the Assistant Commissioner for Legal -> Office of the Ombudsman (Public Assistance Bureau)",
+   "docket_or_ref": "CSC OAC-L Letter No. 270, s.2026 (23 Jun 2026); no OMB reference number known",
+   "respondents_or_officials": [
+    "Hon. Alexander L. Pajarillo (Mayor, CART Chair)",
+    "CART members (Macale, Abla, Fulo et al.)"
+   ],
+   "our_role": "referred_party",
+   "true_status": "CSC transmitted to OMB 24 Jun 2026 (Mayor elective = OMB jurisdiction). OMB receipt or case number NOT confirmed (about 4 months).",
+   "status_as_of": "2026-10-20",
+   "status_source": "docs 1195/1196; gmail 92366; memory project-mercedes-ombudsman-expenditure.md",
+   "db_status": "(on MWK-ARTA-1891) csc_to_ombudsman_transmitted_receipt_unconfirmed",
+   "db_mismatch": false,
+   "opened": "2026-06-23",
+   "last_event": {
+    "date": "2026-06-24",
+    "what": "CSC e-mail transmittal to pab@ombudsman.gov.ph",
+    "source": "gmail 92366"
+   },
+   "next_move": "Written status request to OMB PAB for the reference number; this is the supplement vehicle (see OMB-SUPP-OACL270).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "referral to sanctioning forum (OMB, elective)"
+    },
+    {
+     "official": "Loida E. Macale",
+     "what": "CART member before OMB"
+    },
+    {
+     "official": "Gemma P. Abla",
+     "what": "CART member before OMB"
+    },
+    {
+     "official": "Margarita P. Fulo",
+     "what": "CART member before OMB"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY",
+    "MWK-OP-PETITION"
+   ],
+   "counsel_gate": null,
+   "notes": "Two OMB anchors in play (this vs IC-OC-JUL-26-1214); choose one per respondent."
+  },
+  {
+   "track_code": "OMB-1214",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-OMB-IC-OC-JUL-26-1214",
+   "needs_matter_row": false,
+   "kind": "referral",
+   "forum": "Office of the Ombudsman, Central Records -> Deputy Ombudsman for Luzon (CREMEB)",
+   "docket_or_ref": "IC-OC-JUL-26-1214 (Zschoche et al. v. Princess B. Torralba et al.)",
+   "respondents_or_officials": [
+    "Hon. Princess B. Torralba (Councilor; R.A. 6713)",
+    "Tony Teope (Assistant to the Mayor; R.A. 3019 s.3(i))"
+   ],
+   "our_role": "referred_party",
+   "true_status": "DOCKETED; 1st Indorsement 24 Aug 2026 forwarding to Deputy Ombudsman for Luzon \"for appropriate action\". No Luzon-office order in corpus.",
+   "status_as_of": "2026-09-01",
+   "status_source": "doc 7697; gmail 125372; gmail 112315 (ARTA endorsement received by OMB 29 Jul)",
+   "db_status": "active / forwarded_to_luzon_for_appropriate_action",
+   "db_mismatch": false,
+   "opened": "2026-07-29 (ARTA endorsement received) / 2026-08-24 (indorsement)",
+   "last_event": {
+    "date": "2026-09-01",
+    "what": "Copy of 1st Indorsement e-mailed to Jonathan",
+    "source": "gmail 125372"
+   },
+   "next_move": "Confirm 1212 linkage in writing; courteous status request to CREMEB (not sent without go). Teope live lever = occupancy demand DEMAND_TEOPE_FINAL_2026-08-26 (office_obligation 5, draft_held).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Princess B. Torralba",
+     "what": "personal liability count pending before OMB"
+    },
+    {
+     "official": "Tony Teope",
+     "what": "personal liability count pending before OMB (s.3(i))"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1212",
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "Torralba = CV-26360 co-defendant: Barandon",
+   "notes": "SMALL_PLAYERS sheet mislabels doc 7697 as a \"DILG 1st Indorsement\". Docs 17633/17643 misfiled here (CV-26360 work product)."
+  },
+  {
+   "track_code": "OMB-SUPP-OACL270",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1891",
+   "needs_matter_row": true,
+   "kind": "complaint",
+   "forum": "Office of the Ombudsman (supplemental complaint-affidavit in re CSC OAC-L Letter No. 270 / CTN 1891)",
+   "docket_or_ref": "none (not filed)",
+   "respondents_or_officials": [
+    "Loida E. Macale (Treasurer): RIPE, Grave Misconduct/Conduct Prejudicial + R.A. 6713 s.5(a) (OR withheld ~3 months; delay-then-penalize; CART conflict)",
+    "Mayor Alexander L. Pajarillo: Grave Misconduct (CART), s.444(b)(1)(x) and s.444(b)(3)(vi) demands drafted (office_obligation 1, 2)",
+    "Gemma P. Abla: Grave Misconduct (CART)",
+    "Engr. Erwin H. Balane: s.3(f) HELD"
+   ],
+   "our_role": "complainant",
+   "true_status": "NOT FILED. Ripe/held counts identified; P0 gate = verify docs 708/709/711; filing human-gated. CSC offensive was put ON HOLD 28 Aug pending guardianship.",
+   "status_as_of": "2026-09-14",
+   "status_source": "memory project-mercedes-ombudsman-expenditure.md; office_obligation 1, 2; escalation_rung 9, 12; VERIFICATION_PLAYBOOK_1891.md; BLGF_RPT_ESCALATION_SPINE s.5-A",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Confirm OMB reference for OAC-L 270 first; verify playbook docs; Jonathan go.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "personal liability count ripe, pending filing"
+    },
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "personal liability counts building (ombudsman_candidates 1,2,9,10)"
+    },
+    {
+     "official": "Gemma P. Abla",
+     "what": "count building"
+    },
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "s.3(f) held"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY",
+    "MWK-ARTA-1891"
+   ],
+   "counsel_gate": "salary-grade/prescription NEEDS-COUNSEL; Balane via Barandon",
+   "notes": null
+  },
+  {
+   "track_code": "OMB-EXPENDITURE-2.88M",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-LGU-RECOVERY",
+   "needs_matter_row": true,
+   "kind": "complaint",
+   "forum": "Office of the Ombudsman (R.A. 3019 s.3(e))",
+   "docket_or_ref": "none (HELD)",
+   "respondents_or_officials": [
+    "Accountable officers on the 2024 DV for PhilGEPS 5096794 (P2,881,071.57 Jimmy P. Lo Complex rehab): Mayor (approval), Treasurer Loida E. Macale (funds available), Municipal Accountant Margarita P. Fulo [Palado=Fulo is inference], Budget Officer [unnamed]"
+   ],
+   "our_role": "complainant",
+   "true_status": "HELD. Pivotal to-obtain = 2024 Disbursement Voucher and signatories (requested via 13 Jul 2026 records request item A.1 and COA request). 1996 Res. 76-96 = knowledge evidence only (prescribed).",
+   "status_as_of": "2026-09-14",
+   "status_source": "memory project-mercedes-ombudsman-expenditure.md; doc 1248 (Notice of Award 25 Sep 2024); docs 389, 534 (Res. 76-96)",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Obtain the DV; then decide.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "s.3(e) count held (certified funds) [?]"
+    },
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "s.3(e) count held [?]"
+    },
+    {
+     "official": "Margarita P. Fulo",
+     "what": "s.3(e) count held; identity link inferred [?]"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "NEEDS-COUNSEL before filing",
+   "notes": "Never conflate Kristine Palado (heirs' courier) with Accountant Margarita A. Palado."
+  },
+  {
+   "track_code": "CSC-SMALL-OLAGUERA",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "complaint",
+   "forum": "CSC Regional Office V (Ombudsman concurrent alternate)",
+   "docket_or_ref": "none (drafted, not filed)",
+   "respondents_or_officials": [
+    "Khristine Mae M. Olaguera (Secretary to the Sangguniang Bayan, Mercedes)"
+   ],
+   "our_role": "complainant",
+   "true_status": "NOT FILED; ranked FILE FIRST. Case support CSC_CASE_GUERRERO_OLAGUERA.md (3 Aug) needs refresh with 1 Sep answer + 15 Dec 2025 comparator. Olaguera final-demand clock WITHDRAWN (office_obligation 6).",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/SMALL_PLAYERS_TARGET_SHEET_2026-10.md; case_work/MWK-001/CSC_CASE_GUERRERO_OLAGUERA.md; office_obligation 6",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": {
+    "date": "2026-09-01",
+    "what": "Olaguera reply to MLGOO: records \"being verified and consolidated\"",
+    "source": "DILG_TRACK_REGISTER row 23"
+   },
+   "next_move": "Refresh complaint-affidavit; Jonathan go. Do not file same day as others.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Khristine Mae M. Olaguera",
+     "what": "personal administrative liability count pending (250 days from request; 55 from DILG directive, as of 19 Oct)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "coterminous-vs-career status of SB Secretary = NEEDS-COUNSEL",
+   "notes": null
+  },
+  {
+   "track_code": "CSC-SMALL-ABLA",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1321",
+   "needs_matter_row": true,
+   "kind": "complaint",
+   "forum": "CSC Regional Office V (+ Ombudsman R.A. 3019 s.3(f) companion)",
+   "docket_or_ref": "none (drafted, not filed)",
+   "respondents_or_officials": [
+    "Gemma P. Abla, REA (Municipal Assessor)"
+   ],
+   "our_role": "complainant",
+   "true_status": "NOT FILED. CSC_COMPLAINT_ABLA_draft.md essentially complete; gate = disclose OP-1321 in forum-shopping certification. Demand DEMAND_Abla_CharteredService (office_obligation 3) draft_held. New 5 Oct 2026 Lot 402 records demand sent (see ASSESSOR-LOT402).",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/SMALL_PLAYERS_TARGET_SHEET_2026-10.md target 2; office_obligation 3; escalation_rung 1-3",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": {
+    "date": "2026-08-25",
+    "what": "ARTA Resolution recites P300 fee paid 20 Jun 2025, O.R. 7383466",
+    "source": "docs 6907/6908"
+   },
+   "next_move": "Second in sequence after Olaguera.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Gemma P. Abla",
+     "what": "personal administrative liability count pending (486 days since payment as of 19 Oct)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1321",
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "CSC-SMALL-MACALE",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-1210",
+   "needs_matter_row": true,
+   "kind": "complaint",
+   "forum": "CSC Regional Office V",
+   "docket_or_ref": "none (drafted elements only)",
+   "respondents_or_officials": [
+    "Loida E. Macale (Municipal Treasurer)"
+   ],
+   "our_role": "complainant",
+   "true_status": "NOT FILED. Third in sequence; needs the 13 Jul 2026 protest annexed. Memory says supplement OAC-L 270 rather than refile [overlap with OMB-SUPP-OACL270].",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/SMALL_PLAYERS_TARGET_SHEET_2026-10.md target 3",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Pull protest (doc 2929 / gmail 103665); decide CSC vs OMB supplement.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "personal administrative count pending; statutory lapse s.252(a) 11 Sep 2026"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1210"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "CSC-GUERRERO-HELD",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "CSC / DILG-internal / Ombudsman",
+   "docket_or_ref": "none (HELD, \"THIN - do NOT file\")",
+   "respondents_or_officials": [
+    "Vencer Krystian M. Guerrero (MLGOO / LGOO VI, DILG Mercedes)"
+   ],
+   "our_role": "complainant",
+   "true_status": "HELD and not ripe; MLGOO is now \"velvet glove, non-target\" per MLGOO desk (19 Oct).",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/CSC_CASE_GUERRERO_OLAGUERA.md; case_work/MWK-001/MLGOO/STATUS.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "None.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [],
+   "counsel_gate": null,
+   "notes": "Listed only because a draft count exists; contradicts current non-target posture."
+  },
+  {
+   "track_code": "DILG-1891-REFERRAL",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-ARTA-DILG",
+   "needs_matter_row": true,
+   "kind": "referral",
+   "forum": "DILG Central (national CART) -> DILG Region V -> DILG Camarines Norte",
+   "docket_or_ref": "ARTA NOR CTN SL-2026-0423-1891 (DILG); DILG DMS No. 2026-05-11-246",
+   "respondents_or_officials": [
+    "CART of Mercedes (Mayor Pajarillo, Chair)"
+   ],
+   "our_role": "referred_party",
+   "true_status": "REFERRED and forwarded down to the province (DILG R5 2 Jun \"//CN\"). On the ground the Mayor answered MLGOO on 1 Sep: \"no further administrative actions\" on CART/1891. No DILG disposition.",
+   "status_as_of": "2026-09-01",
+   "status_source": "gmail 50, 19952, 36489, 65194; DILG_TRACK_REGISTER rows 12, 19, 24",
+   "db_status": "merged (into MWK-ARTA-1891)",
+   "db_mismatch": true,
+   "opened": "2026-05-04",
+   "last_event": {
+    "date": "2026-09-01",
+    "what": "Mayor reply to MLGOO 2nd Indorsement on CART/1891 action: refused",
+    "source": "DILG_TRACK_REGISTER row 24 (split file 16)"
+   },
+   "next_move": "Carried inside DILG-MLGOO-SUPERVISION Schedule; PD/RD elevation.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "supervisor informed; written refusal on record (s.444(b)(1)(x))"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1891"
+   ],
+   "counsel_gate": null,
+   "notes": "DB row MWK-ARTA-DILG is merged, hiding a live leg."
+  },
+  {
+   "track_code": "DILG-MLGOO-SUPERVISION",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "DILG Mercedes field office (MLGOO, LGC s.25 general supervision); cc PD Camarines Norte and DILG RO V",
+   "docket_or_ref": "MLGOO 2nd Indorsements 25 Aug 2026 (to Mayor; to SB thru Olaguera); Supplemental Indorsement 26 Aug; drip edition calendar_events 38",
+   "respondents_or_officials": [
+    "Vencer Krystian M. Guerrero (MLGOO, supervising)",
+    "Mayor Alexander L. Pajarillo (directed)",
+    "Khristine Mae M. Olaguera (SB Secretary, directed)",
+    "Gemma P. Abla / Loida E. Macale / Engr. Erwin H. Balane (asked to be added in Reiteration Part III)"
+   ],
+   "our_role": "requester",
+   "true_status": "Directives of 25-26 Aug answered on paper 1 Sep, performed in nothing; MLGOO transmittal 4 Sep with no compliance assessment. Reiteration 2nd edition dated 19 Oct authorized for service; MLGOO desk reports Jonathan says SENT 19 Oct [O] but received-stamp date not recorded; ledger says awaiting signature + service. No clock until stamp.",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/DILG_TRACK_REGISTER.md rows 18-27; case_work/MWK-001/MLGOO/STATUS.md; case_work/MWK-001/DEMAND_CLOCK_LEDGER_2026-09.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-01-19 (MLGOO memo on SB inaction) / 2026-08-18 (supervision request, received 19 Aug)",
+   "last_event": {
+    "date": "2026-10-19",
+    "what": "Reiteration 2nd edition (Schedule of Default) authorized/served [service unconfirmed]",
+    "source": "MLGOO/STATUS.md"
+   },
+   "next_move": "Record received-stamp date (register row 27); next edition ~19 Nov.",
+   "next_date": "2026-10-25 (calendar_events 38, drip edition due) [conflicts with ~19 Nov next-edition plan]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "supervisor directive defied; written refusal = exhaustion exhibit"
+    },
+    {
+     "official": "Khristine Mae M. Olaguera",
+     "what": "supervisor directive unperformed; exhibit for CSC"
+    },
+    {
+     "official": "Vencer Krystian M. Guerrero",
+     "what": "duty-holder asked to renew directives with a date certain"
+    },
+    {
+     "official": "Gemma P. Abla",
+     "what": "supervisor informed (Part III)"
+    },
+    {
+     "official": "Loida E. Macale",
+     "what": "supervisor informed (Part III)"
+    },
+    {
+     "official": "Engr. Erwin H. Balane",
+     "what": "record facts recited only (Part III item 9) - keep/cut pending"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY",
+    "MWK-ARTA-1891"
+   ],
+   "counsel_gate": "Item 9 (Balane) Jonathan to confirm keep/cut",
+   "notes": "Register D.3: no matter code; recommend MWK-DILG-SUPERVISION. Status conflict between MLGOO STATUS (sent) and ledger (awaiting service)."
+  },
+  {
+   "track_code": "DILG-PD-RD",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "DILG Provincial Office Camarines Norte (PD) and DILG Regional Office V (RD)",
+   "docket_or_ref": "none",
+   "respondents_or_officials": [
+    "PD Melody E. Relucio (DILG Camarines Norte)",
+    "RD Atty. Arnaldo E. Escober, Jr., CESO III (DILG RO V)"
+   ],
+   "our_role": "requester",
+   "true_status": "PD Relucio 2 Sep letter (emailed 7 Sep): LGU given \"sufficient time\"; complaints referred back to LGU Mercedes. RD Escober: requests 22 Jul (SB records) unanswered on record. Both cc on Reiteration; elevation (BRANCH_B_ESCALATION_draft) held.",
+   "status_as_of": "2026-09-07",
+   "status_source": "gmail 129757, 107382-107386, 115/135; case_work/MWK-001/DILG_PD_RELUCIO_FOLLOWUP_2026-08-26.md; escalation_rung 8, 11",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-01-11 (Report of Administrative Inaction to PD) / 2026-02-17 (escalation; PD response 6 Mar)",
+   "last_event": {
+    "date": "2026-09-07",
+    "what": "PD \"Response to Follow-up Request\" e-mailed",
+    "source": "gmail 129757"
+   },
+   "next_move": "Escalation rung 2 only if MLGOO date-certain ask fails.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Melody E. Relucio",
+     "what": "duty-holder; referred back to LGU complained of"
+    },
+    {
+     "official": "Arnaldo E. Escober, Jr.",
+     "what": "duty-holder; elevation target"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PROVINCIAL-OVERSIGHT",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "Province of Camarines Norte: Governor (attn PLO), Provincial Assessor, Provincial Treasurer",
+   "docket_or_ref": "none (DRAFT-HELD)",
+   "respondents_or_officials": [
+    "Governor Padilla (Camarines Norte)",
+    "Provincial Assessor Maximo P. Magana, Jr., REA",
+    "Provincial Treasurer Dante E. Manlapaz"
+   ],
+   "our_role": "requester",
+   "true_status": "DRAFT-HELD, NOT SENT (rev. 27 Sep; items renumbered 19 Oct). Asked 27 Sep go/edit/hold, unanswered.",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/provincial/STATUS.md; case_work/MWK-001/DEMAND_PROVINCIAL_OVERSIGHT_2026-09.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Jonathan go/edit/hold; item 4 gated on Teope locus.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Governor Padilla",
+     "what": "supervisor would be informed (not yet)"
+    },
+    {
+     "official": "Maximo P. Magana, Jr.",
+     "what": "s.472 directive ask (not yet)"
+    },
+    {
+     "official": "Dante E. Manlapaz",
+     "what": "answer to 13 Jul protest ask (not yet)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "BFAR-FISHERIES",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "BFAR Regional Office V; Office of the Mayor, Mercedes",
+   "docket_or_ref": "none (DRAFT-HELD)",
+   "respondents_or_officials": [
+    "BFAR RO5 Regional Director [unnamed]",
+    "Mayor Alexander L. Pajarillo"
+   ],
+   "our_role": "requester",
+   "true_status": "DRAFT-HELD, NOT SENT (split out 19 Oct). Gate: observation date + photo annex.",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/DEMAND_FISHERIES_CONSTRUCTION_2026-10.md; provincial/STATUS.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Jonathan supplies date + photos.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Mayor Alexander L. Pajarillo",
+     "what": "stop-and-explain on construction (not yet served)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "DPWH-NBC",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "DPWH (Secretary; National Building Code enforcement, P.D. 1096)",
+   "docket_or_ref": "none (draft rev2)",
+   "respondents_or_officials": [
+    "Secretary, DPWH (duty-holder)",
+    "Mercedes Building Official (Engr. Erwin H. Balane) [implicated]"
+   ],
+   "our_role": "requester",
+   "true_status": "DRAFT (rev2), no service of record [?].",
+   "status_as_of": "2026-09",
+   "status_source": "case_work/MWK-001/DPWH_NBC_ENFORCEMENT_REQUEST_2026-09_rev2.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "[TO SET]",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "touches Balane: Barandon",
+   "notes": null
+  },
+  {
+   "track_code": "SC-OCA-NOTICE",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-LGU-RECOVERY",
+   "needs_matter_row": false,
+   "kind": "supervisory",
+   "forum": "Supreme Court, Office of the Court Administrator",
+   "docket_or_ref": "none (HOLSTERED)",
+   "respondents_or_officials": [
+    "Municipality of Mercedes (court premises on T-32911)"
+   ],
+   "our_role": "requester",
+   "true_status": "HOLSTERED 3 Sep 2026; escalation card only after 11 Nov 2026 if LGU negotiation stalls.",
+   "status_as_of": "2026-09-03",
+   "status_source": "case_work/MWK-001/SC_OCA_NOTICE_MTC_PREMISES_draft.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "None before 11 Nov.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "MTC Mercedes is the CV-26360 trial court: Barandon must clear",
+   "notes": null
+  },
+  {
+   "track_code": "TREAS-252-PROTEST",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "tax_remedy",
+   "forum": "Municipal Treasurer, Mercedes (LGC s.252); cc Provincial Government, BLGF RO V",
+   "docket_or_ref": "Formal Protest and Supervisory Request, CY 2026 RPT, ARP No. 001-00249, P14,391.50 (13 Jul 2026)",
+   "respondents_or_officials": [
+    "Loida E. Macale (Municipal Treasurer)"
+   ],
+   "our_role": "requester",
+   "true_status": "LAPSED: no written decision within 60 days (expired ~11 Sep 2026). Principal P41,118.56 paid under protest (ORs 0434682-84, 7 Jul). Macale answered the Provincial Treasurer (21 Jul) instead. Lapse notice NOTICE_Macale_252Lapse is DRAFT-HELD (office_obligation 4).",
+   "status_as_of": "2026-10-19",
+   "status_source": "gmail 103665; doc 2929; case_work/MWK-001/RECORDS_RELEASE_SCHEDULE_2026-09.md row C-3; SMALL_PLAYERS target 3; office_obligation 4",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-07-13",
+   "last_event": {
+    "date": "2026-07-21",
+    "what": "Macale letter to Prov. Treasurer Manlapaz (not to us)",
+    "source": "BLGF spine s.1-2; 2026-08-14 BLGF reply p.4"
+   },
+   "next_move": "Serve lapse notice or go straight to LBAA (counsel).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "statutory lapse of a mechanical duty (s.252(a)) = exhaustion exhibit + CSC count"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ESTATE",
+    "MWK-ARTA-1210"
+   ],
+   "counsel_gate": "Barandon to confirm characterization (BLGF spine s.4.6)",
+   "notes": "DATE CONFLICT: BLGF spine counts from a 7 Jul protest (lapse ~5 Sep); SMALL_PLAYERS sheet and Records schedule count from 13 Jul (lapse ~11 Sep). Matter separation: Mercedes RPT ARP 001-00249 (BLGF spine says keep segregated from T-4497 title work)."
+  },
+  {
+   "track_code": "LBAA-APPEAL",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "tax_remedy",
+   "forum": "Local Board of Assessment Appeals, Camarines Norte",
+   "docket_or_ref": "none (not filed)",
+   "respondents_or_officials": [
+    "Municipal Treasurer, Mercedes (Loida E. Macale)"
+   ],
+   "our_role": "petitioner",
+   "true_status": "NOT FILED; no record of any LBAA filing. BLGF_CO_SUPERVISORY_REVIEW_rev2 recites \"the appeal now proceeding from the Section 252 lapse\", which the record does not support.",
+   "status_as_of": "2026-10-20",
+   "status_source": "escalation_rung 6; case_work/MWK-001/BLGF_252_LAPSE_NOTICE_draft.md; BLGF_CO_SUPERVISORY_REVIEW_rev2.md line 45",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Counsel to fix the appeal window and forum (LBAA vs court for a tax-collection protest) and decide.",
+   "next_date": "[TO SET - NEEDS-COUNSEL: window runs from the s.252 lapse; if 60 days from ~11 Sep it is ~10 Nov 2026 [?]; if from ~5 Sep, ~4 Nov [?]]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "adjudicatory review of her charge (not yet)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ESTATE"
+   ],
+   "counsel_gate": "counsel (DEMAND_CLOCK_LEDGER: \"LBAA appeal (counsel)\")",
+   "notes": "Whether LBAA is the right forum for an interest/penalty collection protest (vs. assessment appeal) is a counsel question."
+  },
+  {
+   "track_code": "BLGF-RPT",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "BLGF Regional Office V (RD Jessie B. Doctolero); Provincial Treasurer (Dante E. Manlapaz); BLGF Central Office (ED Consolacion Q. Agcaoili)",
+   "docket_or_ref": "BLGF RO V letter 31 Jul 2026 (Doc. Control No. ...-2026-317); resubmission 15 Aug 2026",
+   "respondents_or_officials": [
+    "Loida E. Macale (subject)",
+    "RD Jessie B. Doctolero (duty-holder)",
+    "Prov. Treasurer Dante E. Manlapaz (duty-holder)",
+    "ED Consolacion Q. Agcaoili (BLGF-CO, duty-holder; letter drafted)"
+   ],
+   "our_role": "requester",
+   "true_status": "ADVERSE ruling 31 Jul (released 14 Aug) on an incomplete record (attachment corrupted). Re-evaluation requested 15 Aug, acknowledged 17 Aug, no action since. BLGF-CO supervisory review letter DRAFTED (rev2 \"___ September\"), not shown sent.",
+   "status_as_of": "2026-08-17",
+   "status_source": "doc 5362; gmail 118367, 118805, 119614; case_work/MWK-001/BLGF_RPT_ESCALATION_SPINE.md; case_work/MWK-001/BLGF_RESPONSE_AUDIT_13Jul_vs_31Jul.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-07-13",
+   "last_event": {
+    "date": "2026-08-17",
+    "what": "BLGF RO V acknowledged resubmission",
+    "source": "gmail 119614"
+   },
+   "next_move": "Decide BLGF-CO letter (escalation_rung 5); fold BLGF letter into OMB dossier as deflection exhibit.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Jessie B. Doctolero",
+     "what": "duty-holder; declined to direct (supervisory deflection exhibit)"
+    },
+    {
+     "official": "Dante E. Manlapaz",
+     "what": "duty-holder; asked Macale to explain"
+    },
+    {
+     "official": "Loida E. Macale",
+     "what": "subject of supervision request"
+    },
+    {
+     "official": "Consolacion Q. Agcaoili",
+     "what": "duty-holder (not yet seized)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1210",
+    "MWK-ESTATE"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "BLGF-ASSESSOR-SUPERVISION",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "supervisory",
+   "forum": "BLGF Regional Office V; Provincial Assessor (LGC s.472)",
+   "docket_or_ref": "Joint request 29 Jun 2026 + follow-up 13 Jul 2026 (to Prov. Assessor Magana and BLGF RO V)",
+   "respondents_or_officials": [
+    "Gemma P. Abla (subject)",
+    "Prov. Assessor Maximo P. Magana, Jr. (duty-holder)",
+    "RD Jessie B. Doctolero (duty-holder)"
+   ],
+   "our_role": "requester",
+   "true_status": "BLGF RO V WRITTEN DECLINATION 24 Aug 2026 (released 3 Sep): declines to direct the Municipal Assessor; \"not a finding that the records do not exist\" (doc 7700). Prov. Assessor committed 1 Jul to reply; records partially produced; MAGANA_SUPERVISION_REQUEST and JOINT_SUPERVISION_BLGF_MAGANA drafts HELD.",
+   "status_as_of": "2026-09-03",
+   "status_source": "doc 7700; gmail 95325, 97138, 98305, 126743; escalation_rung 1-2",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-06-29",
+   "last_event": {
+    "date": "2026-09-03",
+    "what": "BLGF RO V declination released",
+    "source": "gmail 126743; doc 7700"
+   },
+   "next_move": "Decide s.472 request to Magana (rung 1) and BLGF-CO (rung 2) before CSC (rung 3).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Gemma P. Abla",
+     "what": "subject of supervision; declination is an exhaustion exhibit"
+    },
+    {
+     "official": "Maximo P. Magana, Jr.",
+     "what": "duty-holder (s.472); comparator hero"
+    },
+    {
+     "official": "Jessie B. Doctolero",
+     "what": "duty-holder; declined"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-ARTA-1321"
+   ],
+   "counsel_gate": null,
+   "notes": "office_obligation 3 escalation ladder: Magana -> BLGF -> CSC-RO V."
+  },
+  {
+   "track_code": "COA-R5-AUDIT",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-LGU-RECOVERY",
+   "needs_matter_row": true,
+   "kind": "audit",
+   "forum": "Commission on Audit, Regional Office V (RD Basallaje)",
+   "docket_or_ref": "Request for audit investigation e-mailed 13 Jul 2026 to fmbasallaje@coa.gov.ph; no COA control/reference number",
+   "respondents_or_officials": [
+    "Municipality of Mercedes: Treasurer, Assessor, Engineer/Building Official, Accounting Office (PhilGEPS 5096794, P2,881,071.57)",
+    "COA RD Basallaje (duty-holder)"
+   ],
+   "our_role": "requester",
+   "true_status": "SENT 13 Jul 2026; no acknowledgment, reference number or reply in the corpus (99 days).",
+   "status_as_of": "2026-10-20",
+   "status_source": "gmail 103664; matters.current_stage MWK-LGU-RECOVERY",
+   "db_status": "(on MWK-LGU-RECOVERY) 'evidence assembled; COA request filed-ready'",
+   "db_mismatch": true,
+   "opened": "2026-07-13",
+   "last_event": {
+    "date": "2026-07-13",
+    "what": "Request e-mailed",
+    "source": "gmail 103664"
+   },
+   "next_move": "Status request asking for the COA control number; check case Gmail (blocked) for a reply.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Loida E. Macale",
+     "what": "audit of receipting/ledger (OR withheld 3 months)"
+    },
+    {
+     "official": "Basallaje (COA RO V)",
+     "what": "duty-holder asked to docket and assign ATL"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY",
+    "MWK-ESTATE"
+   ],
+   "counsel_gate": null,
+   "notes": "Case Gmail mirror stops 22 Sep; a COA reply could be unseen."
+  },
+  {
+   "track_code": "RD-LRA-TITLE-HISTORY",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-TCT4497",
+   "needs_matter_row": false,
+   "kind": "records_request",
+   "forum": "Registry of Deeds, Camarines Norte (Registrar Atty. Emmanuel Enriquez Tuy); LRA Administrator (escalation)",
+   "docket_or_ref": "DRAFT_RD_demand_letter_2026-07-18; office_obligation 8 (RD certification of no donation on T-32911); RD instruments request 6 Oct (held)",
+   "respondents_or_officials": [
+    "Atty. Emmanuel Enriquez Tuy (Registrar of Deeds, Camarines Norte)",
+    "LRA Administrator"
+   ],
+   "our_role": "requester",
+   "true_status": "NOT SENT: RD demand (18 Jul draft) pending 5 months; RD subdivision-instruments request held (6 Oct); no-donation certification instrument not drafted. CV-26360 RD/OCC certified-copy legwork separate (counsel).",
+   "status_as_of": "2026-10-06",
+   "status_source": "case_work/MWK-001/DRAFT_RD_demand_letter_2026-07-18.md; case_work/MWK-001/SUBDIVISION_PLANS_REQUEST_2026-10/TRANSMITTAL_LOG.md; office_obligation 8; escalation_rung 14-15",
+   "db_status": "active / demand_letter_pending_send; next_deadline 2026-05-18",
+   "db_mismatch": true,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Decide serve; narrow per 8 Sep process flag.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Emmanuel Enriquez Tuy",
+     "what": "records duty (P.D. 1529) once served"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-CV26360",
+    "MWK-DLF-VOID",
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": "annotation instrument choice = Barandon",
+   "notes": "stage_notes still names ARTA as the escalation path (stale)."
+  },
+  {
+   "track_code": "DENR-TS-OSS-1092",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "records_request",
+   "forum": "DENR Regional Office V, Technical Services (ARD Ronnel B. Astor) / Surveys & Mapping Division; cc R5 Legal, PENRO",
+   "docket_or_ref": "Ref. Code DENR-TS-OSS-2026-1092 (Lot 402, Csd-05-019916-D; Special Patent / OCT 2018000090)",
+   "respondents_or_officials": [
+    "OIC ARD Ronnel B. Astor (DENR R5)"
+   ],
+   "our_role": "requester",
+   "true_status": "Our 29 Jun request for interim suspension (Lot 2-A, Psd-221861; Lots 401/403/405) drew DENR R5 letter of 9 Sep (emailed 15 Sep). Our reply of 5 Oct asks within 15 days for land status, Special Patent review, withdrawal/explanation of 2022 certification, correction of Cad 1186-D. Awaiting acknowledgment; no clock until receipt.",
+   "status_as_of": "2026-10-19",
+   "status_source": "gmail 94971, 95450, 132992, 141100; case_work/MWK-001/DENR_ASSESSOR_PACKET_2026-10/ (TRANSMITTAL_LOG); DAILY_ACTION_PLAN #13",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-06-29",
+   "last_event": {
+    "date": "2026-10-05",
+    "what": "Reply with Annexes A-L e-mailed",
+    "source": "gmail 141100"
+   },
+   "next_move": "Chase acknowledgment; on lapse elevate to LMB Director and Office of the Secretary (pre-stated).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Ronnel B. Astor",
+     "what": "duty-holder; correction of own records sought"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY",
+    "MWK-TCT4497"
+   ],
+   "counsel_gate": null,
+   "notes": "Absorbs the FOI/survey-correction asks left over from ARTA-1319 [?]."
+  },
+  {
+   "track_code": "DENR-R5-PLANS",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-TCT4497",
+   "needs_matter_row": false,
+   "kind": "records_request",
+   "forum": "DENR Regional Office V (ARD Astor, Surveys & Mapping)",
+   "docket_or_ref": "Request 6 Oct 2026, Lot 2-X subdivision plans (Psd-05-008861 etc.)",
+   "respondents_or_officials": [
+    "OIC ARD Ronnel B. Astor"
+   ],
+   "our_role": "requester",
+   "true_status": "SENT 6 Oct 2026; no acknowledgment after 13 days (as of 19 Oct).",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/MWK-001/SUBDIVISION_PLANS_REQUEST_2026-10/TRANSMITTAL_LOG.md; DAILY_ACTION_PLAN #13",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-10-06",
+   "last_event": {
+    "date": "2026-10-06",
+    "what": "E-mailed",
+    "source": "TRANSMITTAL_LOG"
+   },
+   "next_move": "Chase receipt; on lapse elevate to RED + LMB RKMD.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Ronnel B. Astor",
+     "what": "records duty"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-CV26360",
+    "MWK-DLF-VOID"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "LRA-PLANS",
+   "client_code": "MWK-001",
+   "parent_matter_code": "MWK-TCT4497",
+   "needs_matter_row": false,
+   "kind": "records_request",
+   "forum": "Land Registration Authority (EPEB e-copy service / Central Records)",
+   "docket_or_ref": "none; courier letter 6 Oct NOT SENT",
+   "respondents_or_officials": [
+    "LRA Administrator"
+   ],
+   "our_role": "requester",
+   "true_status": "NOT SENT (Jonathan 6 Oct): instead order LRA e-copies online of (LRC) Psd-256008 and (LRA) PSD-E2020005406. Not yet ordered per DAILY_ACTION_PLAN #13.",
+   "status_as_of": "2026-10-19",
+   "status_source": "SUBDIVISION_PLANS_REQUEST_2026-10/TRANSMITTAL_LOG.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Order e-copies.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "MWK-CV26360"
+   ],
+   "counsel_gate": null,
+   "notes": "LMB RKMD RDMS No. 84960 (Jan 2026) told us Psd-12802 is LRA-approved."
+  },
+  {
+   "track_code": "ASSESSOR-LOT402",
+   "client_code": "MWK-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "records_request",
+   "forum": "Municipal Assessor, Mercedes (cc Provincial Assessor)",
+   "docket_or_ref": "Letter 5 Oct 2026: certified history of ARP GR-2014-HH-07-005-00054/-00236 and -00209/-00220, TD 1699",
+   "respondents_or_officials": [
+    "Gemma P. Abla (Municipal Assessor)",
+    "Maximo D. Magana, Jr. (Provincial Assessor, cc)"
+   ],
+   "our_role": "requester",
+   "true_status": "SENT 5 Oct 2026 by e-mail; awaiting acknowledgment; 15-day ask runs from proof of receipt (none yet).",
+   "status_as_of": "2026-10-06",
+   "status_source": "case_work/MWK-001/DENR_ASSESSOR_PACKET_2026-10/ transmittal log",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-10-05",
+   "last_event": {
+    "date": "2026-10-05",
+    "what": "E-mailed",
+    "source": "transmittal log"
+   },
+   "next_move": "On lapse: Provincial Assessor supervision, then Ombudsman (pre-stated).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Gemma P. Abla",
+     "what": "fresh ministerial records duty; fresh demand predicate for s.3(f)"
+    }
+   ],
+   "feeds_matters": [
+    "MWK-LGU-RECOVERY"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-CC13-131220-EXEC",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-VITO-CRUZ",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Manila Branch 15",
+   "docket_or_ref": "Civil Case No. 13-131220",
+   "respondents_or_officials": [
+    "Vito Cruz occupants / void-title holders"
+   ],
+   "our_role": "plaintiff",
+   "true_status": "Judgment final (31 Aug 2022); execution: Order 25 Nov 2025 (cancel void titles, reinstate TCT 44055); reinstatement reported done [O]; demands to vacate reportedly served ~Aug 2026 [O], no proof on file.",
+   "status_as_of": "2026-08-24",
+   "status_source": "case_work/Paracale-001/MANILA_EJECTMENT_BRIEF_OF_FACTS.md; memory project-inocalla-special-admin.md",
+   "db_status": "PAR-VITO-CRUZ active/judgment_won_pending_title_reconveyance; PAR-CV13-131220 out_of_scope",
+   "db_mismatch": true,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Proof of service of demands; RD CTC of reinstated TCT 44055; decide Rule 70 forum.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-VITO-CRUZ"
+   ],
+   "counsel_gate": "Atty. Sherwin Mata / Atty. Catherine Uy (execution only)",
+   "notes": "Two matter rows conflict (PAR-CV13-131220 \"declared unrelated\" vs record shows it IS the Vito Cruz case)."
+  },
+  {
+   "track_code": "PAR-BRGY759-CASE001",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-VITO-CRUZ",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "Barangay 759 (Lupon), Manila",
+   "docket_or_ref": "Barangay Case No. 001 (Complaint for Ejectment)",
+   "respondents_or_officials": [
+    "Ace and Elena (occupants)"
+   ],
+   "our_role": "complainant",
+   "true_status": "Summons 16 Jan 2026, conciliation set 23 Jan 2026; outcome / Certification to File Action not on record.",
+   "status_as_of": "2026-01-23",
+   "status_source": "case_work/Paracale-001/MANILA_EJECTMENT_BRIEF_OF_FACTS.md (lines 28-29)",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Obtain CFA or rely on s.408 non-resident exemption.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-VITO-CRUZ"
+   ],
+   "counsel_gate": null,
+   "notes": "Caption: Jesus V. Inocalla for himself and co-heirs."
+  },
+  {
+   "track_code": "PAR-ADMIN-CHUA",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-VITO-CRUZ",
+   "needs_matter_row": true,
+   "kind": "complaint",
+   "forum": "[?] not stated in record (administrative complaint vs a barangay captain)",
+   "docket_or_ref": "Administrative complaint filed 1 Dec 2025 (doc 646)",
+   "respondents_or_officials": [
+    "Barangay Captain Rowena T. Chua (Barangay 759, Manila)"
+   ],
+   "our_role": "complainant",
+   "true_status": "FILED 1 Dec 2025 by Allan for dereliction (refused to convene Lupon / issue CFA); barangay then set the Jan 2026 hearing. Disposition unknown.",
+   "status_as_of": "2025-12-01",
+   "status_source": "doc 646; case_work/Paracale-001/MANILA_EJECTMENT_BRIEF_OF_FACTS.md line 29",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "[TO SET] identify forum and status.",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Rowena T. Chua",
+     "what": "administrative complaint pending [?]"
+    }
+   ],
+   "feeds_matters": [
+    "PAR-VITO-CRUZ"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-CC98-88750",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-CASE-88750",
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Manila Branch 16",
+   "docket_or_ref": "Civil Case No. 98-88750",
+   "respondents_or_officials": [],
+   "our_role": "plaintiff",
+   "true_status": "CLOSED AGAINST CLIENT: annulment case lost (Decision 3 Aug 2006; Omnibus Resolution 14 May 2014); judgment executed (2014 auction). Records to pull only.",
+   "status_as_of": "2014-05-21",
+   "status_source": "docs 509, 630, 484, 500",
+   "db_status": "active / advisory_active_tracking (\"mineral rights dispute\")",
+   "db_mismatch": true,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Request certified execution records + T-2194 CTC.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-TCT1616"
+   ],
+   "counsel_gate": null,
+   "notes": "DB title/stage do not match the documents."
+  },
+  {
+   "track_code": "PAR-BOMBITA-TENANCY-OBS",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-CAPACUAN",
+   "needs_matter_row": true,
+   "kind": "judicial",
+   "forum": "PARAD -> DARAB -> CA (CA-G.R. SP 167314) -> SC (G.R. No. 274321)",
+   "docket_or_ref": "CA-G.R. SP 167314; G.R. No. 274321",
+   "respondents_or_officials": [
+    "Mauro Bombita Sr. and Jr. (prevailing tenants)"
+   ],
+   "our_role": null,
+   "true_status": "OBSERVATION: Senen Inocalla lost at PARAD (2017), DARAB (2019/2020), CA (2023/2024); SC G.R. 274321 opened 10 Jul 2024, whether a petition was filed and outcome UNKNOWN. Estate not a party (defective substitution issue).",
+   "status_as_of": "2024-07",
+   "status_source": "case_work/Paracale-001/BOMBITA_TENANCY_CASE_BUILD.md; doc 14085 (draft SC petition); case_work/Paracale-001/CARP_STATE_INOCALLA_2026-09-14.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "SC Judicial Records Office status of G.R. 274321.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-CAPACUAN"
+   ],
+   "counsel_gate": "counsel review before any estate move",
+   "notes": "Bombita family = NBI murder subjects; keep criminal record separate."
+  },
+  {
+   "track_code": "PAR-LBP-CARP-CLAIMS",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "records_request",
+   "forum": "Land Bank of the Philippines, AOC V (Legazpi)",
+   "docket_or_ref": "CARP claims 05-CA-99-1787 and 05-CA-99-1788",
+   "respondents_or_officials": [
+    "Land Bank AOC V"
+   ],
+   "our_role": "applicant",
+   "true_status": "Claim status UNKNOWN (2019 letter last contact); claim packet built 22 Sep 2026, not shown sent.",
+   "status_as_of": "2026-09-22",
+   "status_source": "case_work/Paracale-001/CARP_STATE_INOCALLA_2026-09-14.md line 213; case_work/Paracale-001/CARP_LANDBANK_CLAIM_PACKET_2026-09/",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Status request to LBP AOC V.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-CAPACUAN"
+   ],
+   "counsel_gate": null,
+   "notes": "Estate claim: needs administrator authority [?]."
+  },
+  {
+   "track_code": "PAR-PMRB-MB",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-CAPACUAN",
+   "needs_matter_row": false,
+   "kind": "permit",
+   "forum": "Provincial Mining Regulatory Board, Camarines Norte (chair: MGB-V RD Guillermo A. Molina, Jr.)",
+   "docket_or_ref": "CSSMA Minahang Bayan petition (submitted 10 May 2021; resubmitted 9 Jun 2026)",
+   "respondents_or_officials": [
+    "RD Guillermo A. Molina, Jr. (MGB-V, PMRB chair)"
+   ],
+   "our_role": "applicant",
+   "true_status": "PENDING; agency action unknown. Lot 4 area amendment drafted and HELD pending Jonathan Lot 4 decision. MGB-V told NIBDC (29 Jul) an EP applicant has notice rights only.",
+   "status_as_of": "2026-09-17",
+   "status_source": "docs 660, 4894; case_work/Paracale-001/PROPOSAL_PARACALE_GOLD_PROJECT_PERMIT_INTERFACE_2026-09.md line 50",
+   "db_status": "PAR-CAPACUAN 'Capacuan dispute' / pending_context",
+   "db_mismatch": true,
+   "opened": "2021-05-10",
+   "last_event": {
+    "date": "2026-06-09",
+    "what": "Resubmission to RD Molina / PMRB",
+    "source": "doc 4894"
+   },
+   "next_move": "Lot 4 decision; CSSMA authority package (internal target 15 Oct, STALE).",
+   "next_date": "[TO SET]",
+   "pressure": [
+    {
+     "official": "Guillermo A. Molina, Jr.",
+     "what": "duty-holder (PMRB chair) on pending petition"
+    }
+   ],
+   "feeds_matters": [
+    "PAR-CAPACUAN",
+    "PAR-TCT1616"
+   ],
+   "counsel_gate": null,
+   "notes": "CROSS-CLIENT CONFLICT FLAG: NIBDC (Jonathan holds mandate) opposed an MB over its EXPA area (NIBDC-MGB5-MB-OPPOSITION); whether that MB is CSSMA is [?]. Walled."
+  },
+  {
+   "track_code": "PAR-MGB-CO-ISSMP",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-CAPACUAN",
+   "needs_matter_row": true,
+   "kind": "permit",
+   "forum": "MGB Central Office (Director Herradez)",
+   "docket_or_ref": "Letter 21 Jun 2026: Interim Small-Scale Mining Permit, Inocalla Properties (~250 ha)",
+   "respondents_or_officials": [
+    "MGB Director Herradez"
+   ],
+   "our_role": "applicant",
+   "true_status": "FILED (our letter); agency action unknown.",
+   "status_as_of": "2026-06-21",
+   "status_source": "doc 1358; case_work/Paracale-001/AVI_MPP_APPLICATION_MGB5.md fact 6",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Status request [TO SET].",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-CAPACUAN"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-MGB5-MPP",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "permit",
+   "forum": "MGB Regional Office V (Regional Director; RA 7942 s.55)",
+   "docket_or_ref": "none (DRAFT-HELD)",
+   "respondents_or_officials": [],
+   "our_role": "applicant",
+   "true_status": "DRAFTED, NOT FILED (AVI Gold Processing Plant, Lot 4 OCT P-1616). NEEDS-COUNSEL on MPP vs MPL route; ECC is a gating document.",
+   "status_as_of": "2026-09-17",
+   "status_source": "case_work/Paracale-001/AVI_MPP_APPLICATION_MGB5.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Counsel route question; ECC first.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-TCT1616"
+   ],
+   "counsel_gate": "NEEDS-COUNSEL (s.2 route)",
+   "notes": null
+  },
+  {
+   "track_code": "PAR-EMB5-ECC",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "permit",
+   "forum": "EMB Regional Office V (ECC Online; RD Geri-Geronimo R. Sanez)",
+   "docket_or_ref": "none (DRAFT-HELD; Category B IEE Checklist)",
+   "respondents_or_officials": [],
+   "our_role": "applicant",
+   "true_status": "DRAFTED, NOT FILED (pack built 19 Sep). Close the Gracesen record first.",
+   "status_as_of": "2026-09-19",
+   "status_source": "case_work/Paracale-001/AVI_ECC_APPLICATION_EMB5.md; case_work/Paracale-001/AVI_ECC_APPLICATION_2026-09/",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Resolve Gracesen open item; file via ECC Online.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-TCT1616"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-EMB5-GRACESEN-NAF",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "permit",
+   "forum": "EMB Regional Office V (Legal)",
+   "docket_or_ref": "NAF-LEGAL-EIA-2017-17; ECC-RO5-1203-0045 (proponent changed to Allan V. Inocalla 25 May 2021)",
+   "respondents_or_officials": [],
+   "our_role": "referred_party",
+   "true_status": "OPEN LEGACY ITEM: 5 Jan 2017 notice (no PTO air source, no CMR since 2014); show-cause filed 20 Jan 2017; no closure document in corpus. Allan is now proponent of record (respondent side).",
+   "status_as_of": "2021-05-25",
+   "status_source": "docs 1289, 1304, 1284; case_work/Paracale-001/AVI_ECC_APPLICATION_EMB5.md facts 3-6",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Close-out letter (held) before AVI ECC.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-TCT1616"
+   ],
+   "counsel_gate": null,
+   "notes": "our_role is respondent-side; \"referred_party\" used as closest allowed value."
+  },
+  {
+   "track_code": "PAR-SMD-PSU143364",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-TCT1616",
+   "needs_matter_row": false,
+   "kind": "records_request",
+   "forum": "DENR R5 Surveys & Mapping Division; PENRO Camarines Norte",
+   "docket_or_ref": "Request 2 Sep 2026 for certified Psu-143364 (Lot 4, OCT P-1616) and BLBM No. 1; SMD Ref. Code (per subject)",
+   "respondents_or_officials": [
+    "DENR R5 SMD (records)"
+   ],
+   "our_role": "requester",
+   "true_status": "ACKNOWLEDGED (1 Sep/10 Sep/22 Sep receipts); fees and release under discussion 24 Sep; release not on record.",
+   "status_as_of": "2026-09-24",
+   "status_source": "gmail 125735, 131181, 136094, 136238, 136889",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": "2026-09-02",
+   "last_event": {
+    "date": "2026-09-24",
+    "what": "Fees and release exchange",
+    "source": "gmail 136889"
+   },
+   "next_move": "Pay fee / pick up (SMD call sheet, SMD_ALLAN_CALL_2026-10).",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-TCT1616",
+    "PAR-CAPACUAN"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-DTI-BN",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": false,
+   "kind": "registration",
+   "forum": "DTI Region V",
+   "docket_or_ref": "BN No. 8480852 \"AVI GOLD PROCESSING PLANT\"",
+   "respondents_or_officials": [],
+   "our_role": "applicant",
+   "true_status": "ISSUED 11 Sep 2026, valid to 11 Sep 2031. Complete.",
+   "status_as_of": "2026-09-11",
+   "status_source": "case_work/Paracale-001/AVI_MPP_APPLICATION_MGB5.md header",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "None.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-TCT1616"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-RULE80-SPECIAL-ADMIN",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": true,
+   "kind": "judicial",
+   "forum": "RTC Camarines Norte (Rule 80 special administration, intestate estate of Vicente Inocalla Sr.)",
+   "docket_or_ref": "none (not filed)",
+   "respondents_or_officials": [],
+   "our_role": "petitioner",
+   "true_status": "NOT FILED. Grounds brief held; estate counsel not engaged (ABLAW proposal lapsed); heir census incomplete; B-5625 partition record to reconcile.",
+   "status_as_of": "2026-10-17",
+   "status_source": "case_work/Paracale-001/STATUS.md",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Jonathan review; counsel restart.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-VITO-CRUZ",
+    "PAR-COMPLAINT-ACE",
+    "PAR-LBP-CARP-CLAIMS"
+   ],
+   "counsel_gate": "estate counsel required",
+   "notes": null
+  },
+  {
+   "track_code": "PAR-B5625-OBS",
+   "client_code": "Paracale-001",
+   "parent_matter_code": null,
+   "needs_matter_row": false,
+   "kind": "judicial",
+   "forum": "RTC Branch 41, Daet",
+   "docket_or_ref": "Civil Case B-5625 (vs \"5626\"; 1992 partition)",
+   "respondents_or_officials": [],
+   "our_role": null,
+   "true_status": "OBSERVATION: historical partition case; docket number and finality to reconcile; certified record needed.",
+   "status_as_of": "2026-10-17",
+   "status_source": "case_work/Paracale-001/STATUS.md filing blocker 3",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Pull certified record.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-RULE80-SPECIAL-ADMIN"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "PAR-MURDERS-OBS",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-INOCALLA-MURDERS",
+   "needs_matter_row": false,
+   "kind": "referral",
+   "forum": "NBI Naga District Office -> Office of the Provincial Prosecutor, Daet (Hon. Evillo C. Pormento)",
+   "docket_or_ref": "NBI transmittal 12 Sep 2023 (murder; complainant Grace Moreno)",
+   "respondents_or_officials": [
+    "Subjects per NBI letter (Eric Bombita; Gilbert/Gregorio Moya Carillo aka \"Aging\", et al.)"
+   ],
+   "our_role": null,
+   "true_status": "OBSERVATION / RECORD ONLY: no prosecutor resolution or court docket after 12 Sep 2023 in corpus. FLAG FOR JONATHAN; no strategy proposed.",
+   "status_as_of": "2023-09-12",
+   "status_source": "doc 652",
+   "db_status": "active (stage NULL)",
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "[TO SET - Jonathan]",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [],
+   "counsel_gate": null,
+   "notes": "Criminal; name variants unverified."
+  },
+  {
+   "track_code": "PAR-ACE-COMPLAINT",
+   "client_code": "Paracale-001",
+   "parent_matter_code": "PAR-COMPLAINT-ACE",
+   "needs_matter_row": false,
+   "kind": "complaint",
+   "forum": "[?] not on record",
+   "docket_or_ref": "doc 644 (Allan salaysay listing charges)",
+   "respondents_or_officials": [
+    "Ace (Vicente Jr. branch heir)"
+   ],
+   "our_role": "complainant",
+   "true_status": "UNKNOWN whether filed; civil damages framework pre-filing. Criminal counts overlap NBI record: FLAG FOR JONATHAN.",
+   "status_as_of": "2026-10-17",
+   "status_source": "doc 644; case_work/Paracale-001/ACE_DAMAGES_FRAMEWORK.md",
+   "db_status": "active / pre_filing_evidence_collection",
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "[TO SET]",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "PAR-VITO-CRUZ"
+   ],
+   "counsel_gate": null,
+   "notes": "doc 644 tagged PAR-CAPACUAN, not this matter."
+  },
+  {
+   "track_code": "NIBDC-MGB-EP",
+   "client_code": "NIBDC-001",
+   "parent_matter_code": "NIBDC-EXPA-000250",
+   "needs_matter_row": false,
+   "kind": "permit",
+   "forum": "MGB Central Office (Mining Tenements Management Division), DENR",
+   "docket_or_ref": "EXPA-000250-V (converted from APSA-000322-V); MGB-V endorsement MTES-2025-411 (10 Jul 2025)",
+   "respondents_or_officials": [
+    "MGB Central Office Director",
+    "RD Guillermo A. Molina, Jr. (MGB-V, endorsing office)"
+   ],
+   "our_role": "applicant",
+   "true_status": "ENDORSED by MGB-V for EP issuance 10 Jul 2025; no Central Office action in corpus since.",
+   "status_as_of": "2025-07-10",
+   "status_source": "doc 1163; memory project-nibdc-expa-endorsed-for-ep.md",
+   "db_status": "active (stage NULL); duplicate NIBDC-APSA-000322 still active",
+   "db_mismatch": true,
+   "opened": "[?]",
+   "last_event": {
+    "date": "2025-07-10",
+    "what": "MGB-V endorsement",
+    "source": "doc 1163"
+   },
+   "next_move": "Status request to MGB CO.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "NIBDC-EXPA-000250"
+   ],
+   "counsel_gate": null,
+   "notes": "Applicant = NIBDC (Maribel C. Villareal); Jonathan = authorized DD agent (doc 803). Merge APSA row."
+  },
+  {
+   "track_code": "NIBDC-MGB5-MB-OPPOSITION",
+   "client_code": "NIBDC-001",
+   "parent_matter_code": "NIBDC-APSA-000322",
+   "needs_matter_row": false,
+   "kind": "appeal",
+   "forum": "MGB Regional Office V",
+   "docket_or_ref": "NIBDC letter 7 Jul 2026; MGB-V reply Ref. 2026-07-15-4440 (29 Jul 2026, MTSS-2026-593)",
+   "respondents_or_officials": [
+    "RD Guillermo A. Molina, Jr. (MGB-V)"
+   ],
+   "our_role": "applicant",
+   "true_status": "REJECTED: MGB-V says an EP applicant has notice rights only, no consent/veto over an MB declaration. Letter exists only as operator photos (scan needed).",
+   "status_as_of": "2026-07-29",
+   "status_source": "case_work/NIBDC-001/INBOUND_MGB_2026-07-29_MB_NOTICE.md",
+   "db_status": "NIBDC-APSA-000322 active",
+   "db_mismatch": true,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Scan letter; NIBDC decides whether to contest within DENR [?].",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "NIBDC-EXPA-000250"
+   ],
+   "counsel_gate": null,
+   "notes": "CROSS-CLIENT CONFLICT FLAG with PAR-PMRB-MB; walled."
+  },
+  {
+   "track_code": "NIBDC-MGB-CO-CTC",
+   "client_code": "NIBDC-001",
+   "parent_matter_code": "NIBDC-EXPA-000250",
+   "needs_matter_row": false,
+   "kind": "records_request",
+   "forum": "MGB Central Office",
+   "docket_or_ref": "CTC request 24 Apr 2026; OR 3189213 (15 Jun 2026)",
+   "respondents_or_officials": [],
+   "our_role": "requester",
+   "true_status": "Fee paid 15 Jun 2026; release not confirmed in corpus.",
+   "status_as_of": "2026-06-15",
+   "status_source": "docs 798, 1162",
+   "db_status": null,
+   "db_mismatch": false,
+   "opened": null,
+   "last_event": null,
+   "next_move": "Confirm release.",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "NIBDC-EXPA-000250"
+   ],
+   "counsel_gate": null,
+   "notes": null
+  },
+  {
+   "track_code": "SEC-ESPARC-OPC",
+   "client_code": "LANDTEK-CORP",
+   "parent_matter_code": "LANDTEK-OPC-FORMATION",
+   "needs_matter_row": false,
+   "kind": "registration",
+   "forum": "SEC (Legazpi Extension Office; eSPARC / OneSEC)",
+   "docket_or_ref": "SEC260917-UOD7XXGI2MXEIGG",
+   "respondents_or_officials": [],
+   "our_role": "applicant",
+   "true_status": "SUBMITTED 17 Sep 2026; no approval or deficiency notice on record since 18 Sep live read; ~3 weeks past the ~28 Sep review target.",
+   "status_as_of": "2026-10-19",
+   "status_source": "case_work/LandTek-Corp/STATUS.md; DAILY_ACTION_PLAN #15",
+   "db_status": "active / esparc_submitted_pending_sec_review; next_deadline 2026-09-28",
+   "db_mismatch": true,
+   "opened": "2026-09-17",
+   "last_event": {
+    "date": "2026-09-18",
+    "what": "Live status read",
+    "source": "LandTek-Corp/STATUS.md"
+   },
+   "next_move": "Read live SEC status (OTP to landtekopc@gmail.com).",
+   "next_date": "[TO SET]",
+   "pressure": [],
+   "feeds_matters": [
+    "LANDTEK-OPC-FORMATION"
+   ],
+   "counsel_gate": null,
+   "notes": "Work orders 885, 886, 1005, 1031, 1046 duplicate the lapsed item."
+  }
+ ],
+ "officials": [
+  {
+   "official": "Loida E. Macale",
+   "office": "Municipal Treasurer, Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (DOF/BLGF-supervised; ombudsman_candidates)",
+   "tracks": [
+    "ARTA-1210",
+    "ARTA-1891",
+    "BLGF-RPT",
+    "COA-R5-AUDIT",
+    "CSC-OACL-270",
+    "CSC-SMALL-MACALE",
+    "DILG-MLGOO-SUPERVISION",
+    "LBAA-APPEAL",
+    "OMB-EXPENDITURE-2.88M",
+    "OMB-SUPP-OACL270",
+    "OP-SPINE",
+    "TREAS-252-PROTEST"
+   ],
+   "obligation_ids": [
+    4
+   ],
+   "ombudsman_candidate_ids": [
+    3,
+    16,
+    17,
+    37,
+    39
+   ],
+   "ripeness_summary": "RIPE (memory): Grave Misconduct / Conduct Prejudicial + R.A. 6713 s.5(a); s.252(a) lapse 11 Sep; small-players target 3; s.3(e) not ripe (no actual injury) except via 2024 DV cluster (HELD)",
+   "pressure_count": 12,
+   "sanctioning_forum": "CSC-RO V (admin); Ombudsman for s.3 counts / OAC-L 270 supplement"
+  },
+  {
+   "official": "Hon. Alexander L. Pajarillo",
+   "office": "Municipal Mayor, Mercedes (CART Chair)",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "elective (ombudsman_candidates.capacity; CSC OAC-L 270 text)",
+   "tracks": [
+    "ARTA-0747",
+    "ARTA-1210",
+    "ARTA-1891",
+    "BFAR-FISHERIES",
+    "CSC-OACL-270",
+    "DILG-1891-REFERRAL",
+    "DILG-MLGOO-SUPERVISION",
+    "OMB-EXPENDITURE-2.88M",
+    "OMB-SUPP-OACL270",
+    "OP-SPINE",
+    "RTC-LGU-RECOVERY"
+   ],
+   "obligation_ids": [
+    1,
+    2
+   ],
+   "ombudsman_candidate_ids": [
+    1,
+    2,
+    8,
+    9,
+    10
+   ],
+   "ripeness_summary": "building: ra3019_3f 0.5, grave_misconduct 1.0 (legacy held label withdrawn 7 Sep), ra6713_5a 0.667 (CSC), ra3019_3e 0.667, rpc_171 0.667; OAC-L 270 already before OMB; demands 444(b)(1)(x) and 444(b)(3)(vi) draft_held",
+   "pressure_count": 11,
+   "sanctioning_forum": "Office of the Ombudsman"
+  },
+  {
+   "official": "Gemma P. Abla, REA",
+   "office": "Municipal Assessor, Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive",
+   "tracks": [
+    "ARTA-1321",
+    "ARTA-1891",
+    "ASSESSOR-LOT402",
+    "BLGF-ASSESSOR-SUPERVISION",
+    "CSC-OACL-270",
+    "CSC-SMALL-ABLA",
+    "DILG-MLGOO-SUPERVISION",
+    "OMB-SUPP-OACL270",
+    "OP-1321"
+   ],
+   "obligation_ids": [
+    3
+   ],
+   "ombudsman_candidate_ids": [
+    4,
+    13,
+    18,
+    19,
+    28
+   ],
+   "ripeness_summary": "building: grave_misconduct 1.0 (legacy label withdrawn), ra6713_5a 0.667, ra3019_3f 0.5; small-players target 2 \"strongest paper, one gate\" (486 days)",
+   "pressure_count": 9,
+   "sanctioning_forum": "CSC-RO V; Ombudsman for R.A. 3019 s.3(f) companion"
+  },
+  {
+   "official": "Engr. Erwin H. Balane",
+   "office": "Municipal Engineer / Building Official, Mercedes (also CV-26360 defendant)",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive",
+   "tracks": [
+    "ARTA-0690-0792",
+    "ARTA-1378",
+    "CSC-RO5-BALANE-0690",
+    "CSC-RO5-BALANE-1378",
+    "CV26360",
+    "DILG-MLGOO-SUPERVISION",
+    "OMB-SUPP-OACL270",
+    "OP-1378",
+    "OP-SPINE"
+   ],
+   "obligation_ids": [
+    7
+   ],
+   "ombudsman_candidate_ids": [
+    6,
+    7,
+    15,
+    31,
+    32
+   ],
+   "ripeness_summary": "building: ra3019_3f 1.0 (held), ra6713_5a 0.667, grave_misconduct 0.5; CSC-RO V already seized (30 Apr) + 1378 referral; HOLD for Barandon",
+   "pressure_count": 9,
+   "sanctioning_forum": "CSC-RO V"
+  },
+  {
+   "official": "Hon. Princess B. Torralba",
+   "office": "Councilor (SB Member), Mercedes; CV-26360 co-defendant",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "elective",
+   "tracks": [
+    "ARTA-1212",
+    "CV26360",
+    "OMB-1214",
+    "OP-SPINE"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [
+    49
+   ],
+   "ripeness_summary": "building, score 0; before OMB on IC-OC-JUL-26-1214 (R.A. 6713); counsel gate",
+   "pressure_count": 4,
+   "sanctioning_forum": "Office of the Ombudsman"
+  },
+  {
+   "official": "Margarita P. Fulo",
+   "office": "Municipal Accountant, Mercedes (CART member)",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive [?]",
+   "tracks": [
+    "ARTA-1210",
+    "ARTA-1891",
+    "CSC-OACL-270",
+    "OMB-EXPENDITURE-2.88M"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "no ombudsman_candidates row; CART member referred via 1891/OAC-L 270; possible 2024 DV signatory [?]; Palado=Fulo is strong inference only",
+   "pressure_count": 4,
+   "sanctioning_forum": "CSC-RO V (admin) / Ombudsman (s.3(e))"
+  },
+  {
+   "official": "Maximo P. (D.) Magana, Jr., REA",
+   "office": "Provincial Assessor, Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive [?]",
+   "tracks": [
+    "ASSESSOR-LOT402",
+    "BLGF-ASSESSOR-SUPERVISION",
+    "PROVINCIAL-OVERSIGHT"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [
+    5,
+    14,
+    20,
+    21,
+    29
+   ],
+   "ripeness_summary": "ombudsman_candidates \"Provincial Assessor\" rows building/seed (0.33-0.5) but record treats his office as comparator hero; escalation_rung 1 (s.472 ask)",
+   "pressure_count": 3,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Ralph G. Recto",
+   "office": "Executive Secretary, Office of the President",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (cabinet)",
+   "tracks": [
+    "OP-1321",
+    "OP-1378",
+    "OP-SPINE"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; addressee of OP supervisory petitions",
+   "pressure_count": 3,
+   "sanctioning_forum": "n/a"
+  },
+  {
+   "official": "Khristine Mae M. Olaguera",
+   "office": "Secretary to the Sangguniang Bayan, Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive [coterminous vs career NEEDS-COUNSEL]",
+   "tracks": [
+    "CSC-SMALL-OLAGUERA",
+    "DILG-MLGOO-SUPERVISION"
+   ],
+   "obligation_ids": [
+    6
+   ],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "small-players target 1, FILE FIRST (250 days from request; 55 from DILG directive); no ombudsman_candidates row; demand clock withdrawn",
+   "pressure_count": 2,
+   "sanctioning_forum": "CSC-RO V"
+  },
+  {
+   "official": "Tony (Antonio) Teope",
+   "office": "Assistant to the Municipal Mayor, Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "[?] (ombudsman_candidates.capacity = unknown)",
+   "tracks": [
+    "ARTA-1212",
+    "OMB-1214"
+   ],
+   "obligation_ids": [
+    5
+   ],
+   "ombudsman_candidate_ids": [
+    48
+   ],
+   "ripeness_summary": "building, score 0; already before OMB (IC-OC-JUL-26-1214, s.3(i)); live lever = occupancy demand (draft_held)",
+   "pressure_count": 2,
+   "sanctioning_forum": "Office of the Ombudsman"
+  },
+  {
+   "official": "Hon. Jeana T. Yapyuco",
+   "office": "Vice Mayor, Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "elective",
+   "tracks": [
+    "ARTA-1212",
+    "OP-SPINE"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "named in ARTA-1212 only (closure); covered generically by SB rows 11, 12, 23, 24, 36 (seed)",
+   "pressure_count": 2,
+   "sanctioning_forum": "Office of the Ombudsman"
+  },
+  {
+   "official": "Hon. Francisco Noel Y. Ong",
+   "office": "Councilor (SB Member), Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "elective",
+   "tracks": [
+    "ARTA-1212",
+    "OP-SPINE"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "named in ARTA-1212 only (closure); SB rows seed",
+   "pressure_count": 2,
+   "sanctioning_forum": "Office of the Ombudsman"
+  },
+  {
+   "official": "Dante E. Manlapaz",
+   "office": "Provincial Treasurer, Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (DOF) [?]",
+   "tracks": [
+    "BLGF-RPT",
+    "PROVINCIAL-OVERSIGHT"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; duty-holder (escalation_rung 4)",
+   "pressure_count": 2,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Jessie B. Doctolero",
+   "office": "Regional Director, BLGF Regional Office V",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (career) [?]",
+   "tracks": [
+    "BLGF-ASSESSOR-SUPERVISION",
+    "BLGF-RPT"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; declined supervision twice (31 Jul, 24 Aug); escalation_rung 2, 5",
+   "pressure_count": 2,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Ronnel B. Astor",
+   "office": "OIC Assistant Regional Director for Technical Services, DENR Region V",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (career) [?]",
+   "tracks": [
+    "DENR-R5-PLANS",
+    "DENR-TS-OSS-1092"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; duty-holder on two records/correction requests",
+   "pressure_count": 2,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Guillermo A. Molina, Jr.",
+   "office": "Regional Director, MGB Region V",
+   "client_code": "NIBDC-001",
+   "appointive_or_elective": "appointive (career)",
+   "tracks": [
+    "NIBDC-MGB-EP",
+    "NIBDC-MGB5-MB-OPPOSITION"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; permit duty-holder",
+   "pressure_count": 2,
+   "sanctioning_forum": "n/a"
+  },
+  {
+   "official": "Nestor Franz A. Fortuno",
+   "office": "PENR Officer, DENR-PENRO Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "career (ombudsman_candidates)",
+   "tracks": [
+    "ARTA-1319"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [
+    22,
+    25,
+    26,
+    30,
+    33
+   ],
+   "ripeness_summary": "building (0.5-0.667); ARTA-1319 closed 25 Aug with no referral; weak",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC-RO V"
+  },
+  {
+   "official": "Engr. Leonora R. Remoto",
+   "office": "DENR-PENRO Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "career (ombudsman_candidates)",
+   "tracks": [
+    "ARTA-1319"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [
+    27,
+    34,
+    35,
+    38,
+    40
+   ],
+   "ripeness_summary": "building/seed (0.25-0.5); ARTA-1319 closed",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC-RO V"
+  },
+  {
+   "official": "Vencer Krystian M. Guerrero",
+   "office": "MLGOO / LGOO VI, DILG Mercedes",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (national career)",
+   "tracks": [
+    "DILG-MLGOO-SUPERVISION"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "HELD, THIN, do not file; desk posture velvet glove / non-target",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC (DILG-internal)"
+  },
+  {
+   "official": "Melody E. Relucio",
+   "office": "Provincial Director, DILG Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (career) [?]",
+   "tracks": [
+    "DILG-PD-RD"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; supervisory duty-holder (escalation_rung 8, 11)",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Atty. Arnaldo E. Escober, Jr., CESO III",
+   "office": "Regional Director, DILG Region V",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (CESO)",
+   "tracks": [
+    "DILG-PD-RD"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; supervisory duty-holder (escalation_rung 8, 11)",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Consolacion Q. Agcaoili",
+   "office": "Executive Director, BLGF Central Office",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive [?]",
+   "tracks": [
+    "BLGF-RPT"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; letter drafted, not sent",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Governor Padilla",
+   "office": "Provincial Governor, Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "elective",
+   "tracks": [
+    "PROVINCIAL-OVERSIGHT"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; addressee of held provincial demand",
+   "pressure_count": 1,
+   "sanctioning_forum": "Office of the Ombudsman"
+  },
+  {
+   "official": "RD Basallaje (fmbasallaje@coa.gov.ph)",
+   "office": "Regional Director, COA Regional Office V",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive [?]",
+   "tracks": [
+    "COA-R5-AUDIT"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; duty-holder on audit request",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC"
+  },
+  {
+   "official": "Atty. Emmanuel Enriquez Tuy",
+   "office": "Registrar of Deeds, Camarines Norte",
+   "client_code": "MWK-001",
+   "appointive_or_elective": "appointive (LRA) [?]",
+   "tracks": [
+    "RD-LRA-TITLE-HISTORY"
+   ],
+   "obligation_ids": [
+    8
+   ],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; office_obligation 8 draft_held",
+   "pressure_count": 1,
+   "sanctioning_forum": "CSC (LRA administrative supervision)"
+  },
+  {
+   "official": "Rowena T. Chua",
+   "office": "Barangay Captain, Barangay 759, Manila",
+   "client_code": "Paracale-001",
+   "appointive_or_elective": "elective",
+   "tracks": [
+    "PAR-ADMIN-CHUA"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "admin complaint filed 1 Dec 2025 (forum/status unknown)",
+   "pressure_count": 1,
+   "sanctioning_forum": "Sangguniang Panlungsod Manila / Ombudsman [?]"
+  },
+  {
+   "official": "Guillermo A. Molina, Jr.",
+   "office": "Regional Director, MGB Region V (PMRB Camarines Norte chair)",
+   "client_code": "Paracale-001",
+   "appointive_or_elective": "appointive (career)",
+   "tracks": [
+    "PAR-PMRB-MB"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; permit duty-holder",
+   "pressure_count": 1,
+   "sanctioning_forum": "n/a"
+  },
+  {
+   "official": "Director Herradez",
+   "office": "MGB Central Office",
+   "client_code": "Paracale-001",
+   "appointive_or_elective": "appointive [?]",
+   "tracks": [
+    "PAR-MGB-CO-ISSMP"
+   ],
+   "obligation_ids": [],
+   "ombudsman_candidate_ids": [],
+   "ripeness_summary": "none; permit duty-holder",
+   "pressure_count": 1,
+   "sanctioning_forum": "n/a"
+  }
+ ]
+}

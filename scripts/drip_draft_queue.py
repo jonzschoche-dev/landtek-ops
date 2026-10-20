@@ -95,6 +95,28 @@ def lint(cur, text, audience="official", rung=1, cc_override=False, addressee=""
     return out, words
 
 
+STOPW = {"hon", "atty", "engr", "mayor", "mrs", "ms", "mr", "dir", "rd", "jr", "rea", "treasurer", "assessor",
+         "municipal", "provincial", "secretary", "councilor", "vice", "the", "of", "office", "and"}
+
+
+def _surnames(text):
+    toks = [t.lower() for t in re.split(r"[^A-Za-z]+", text or "") if len(t) > 2 and t.lower() not in STOPW]
+    return set(toks)
+
+
+def posture(cur, addressee, client):
+    """X17: is the addressee a respondent/duty-holder in a LIVE adversarial track we brought (complaint, appeal,
+    referral, judicial)? Returns the live track codes. Matched on surname tokens within the same client (A5)."""
+    names = _surnames(addressee)
+    if not names:
+        return []
+    cur.execute("""SELECT DISTINCT t.track_code, p.official FROM track_party p JOIN matter_track t USING (track_code)
+                    WHERE t.client_code=%s AND t.kind IN ('complaint','appeal','referral','judicial')
+                      AND t.true_status !~* '(closed|dismissed|lapsed|withdrawn|resolved|held|draft|not (yet )?filed|planned|proposed|not sent)'
+                      AND p.role IN ('respondent','duty_holder')""", (client,))
+    return sorted({r["track_code"] for r in cur.fetchall() if names & _surnames(r["official"])})
+
+
 def fill(cur, c):
     target = int(cfg(cur, "min_awaiting_comment", "3"))
     cur.execute("SELECT count(*) AS n FROM drip_instrument WHERE status IN ('awaiting_comment','revising')")
@@ -125,6 +147,13 @@ def fill(cur, c):
                                                AND status NOT IN ('done','cancelled'))""",
                         (sp["matter_code"], f"Draft step {sp['seq']} of {sp['ladder']}: {sp['the_ask'][:120]}",
                          f"step_plan:{sp['id']}", f"step_plan:{sp['id']}"))
+            continue
+        live = posture(cur, sp["addressee"], sp["client_code"])
+        if live and "X17-ok:" not in (sp["notes"] or ""):
+            cur.execute("UPDATE step_plan SET state='skipped', notes=coalesce(notes,'')||%s, updated_at=now() WHERE id=%s",
+                        (f" | X17 HELD {sp['ladder']}: addressee is a respondent in live track(s) {live}; route to an alternate"
+                         " custodian or mark 'X17-ok: <why uniquely theirs>' after Jonathan reviews", sp["id"]))
+            wanted.append(f"{sp['ladder']} (X17 posture: {live})")
             continue
         body = open(full).read()
         res, words = lint(cur, body, cc_override="cc per Jonathan" in (sp["notes"] or ""), addressee=sp["addressee"])

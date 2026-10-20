@@ -224,6 +224,24 @@ Jonathan's comment. Tool: `scripts/drip_draft_queue.py`.
   explicit step. Nothing is ever sent by the system.
 - **Every action refills the queue,** so movement is continuous. Counsel-gated ladders never enter the queue.
 
+### X17 POSTURE: never write directly to someone we are prosecuting on that subject (Jonathan, 20 Oct: "I've already attacked her through ARTA")
+Before any letter, `scripts/drip_draft_queue.py` checks `matter_track`/`track_party` (live since 20 Oct): is the
+addressee a respondent or duty-holder in a **live** proceeding we brought (complaint, appeal, referral, judicial;
+filed, not held or drafted)? If so, the step is **held** (`state='skipped'`, note X17). It is then either:
+- **(a) routed to an alternate custodian** (e.g. Abla's tax map → Provincial Assessor Magana, who holds the same maps
+  and has produced records before); or
+- **(b) allowed only if the act is uniquely theirs and outside the pending subject**, after Jonathan reviews it.
+  It is recorded as `X17-ok: <why>` in the step notes.
+
+Live posture on 20 Oct:
+- Mayor Pajarillo: ARTA-0747, ARTA-1891, CSC-OACL-270, DILG referral, OP spine.
+- Treasurer Macale: ARTA-1891, CSC-OACL-270, OP spine.
+- Assessor Abla: ARTA-1891, CSC-OACL-270, OP-1321.
+- Magana, the RD, BLGF, Land Bank and the courts' clerks are clear.
+
+A routine thank-you letter to a respondent contradicts our own pleading (consistency and forum-shopping risk), and
+it reads as weakness.
+
 ### SENDING ACCOUNT AND THREAD (Jonathan, 20 Oct 2026)
 - **The account is the thread's origin.** Every e-mail drip goes from the account where that office's thread already
   lives: **jonzschoche@gmail.com** by default for MWK (agency threads arrive there), or **jonathan@hayuma.org**
