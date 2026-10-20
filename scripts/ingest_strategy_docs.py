@@ -24,6 +24,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS = [
     ("case_work/MWK-001/DRIP_CHARTER.md", "MWK-001", "MWK-001",
      "MWK DRIP CHARTER (ADOPTED 20 Oct 2026): governs every drip; outranks guide/spec/templates (internal)"),
+    ("case_work/MWK-001/BRIEF_MWK-001_2026-10-20.md", "MWK-001", "MWK-001",
+     "MWK-001 matter brief 20 Oct 2026 (Charter step 2): standing by goal, suggested drips, decisions (internal)"),
     ("case_work/MWK-001/DRIP_STEERING_GUIDE_MWK.md", "MWK-001", "MWK-001",
      "MWK DRIP STEERING GUIDE: how every communication to an office is steered (internal)"),
     ("agent_specs/005_drip.md", "MWK-001", "MWK-001",

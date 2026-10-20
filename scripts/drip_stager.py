@@ -34,7 +34,19 @@ from pypdf import PdfReader, PdfWriter  # noqa: E402
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@127.0.0.1:15432/n8n")
 SPA = {"MWK-001": os.path.join(MWK, "SCHEDULE_SERVICE_LGU_2026-10", "source", "A4_SPA_apostilled.pdf")}
-ACCOUNT = {"jonzschoche@gmail.com": "Google", "jonathan@hayuma.org": "jonathan@hayuma.org"}
+SENDERS = {"jonzschoche@gmail.com", "jonathan@hayuma.org"}
+
+
+def mail_account(addr):
+    """The Mail.app account whose addresses include addr, found by address because account names drift
+    (the case account was renamed "Google" -> "Main" on 20 Oct 2026). None if not set up in Mail.app."""
+    if addr not in SENDERS:
+        return None
+    script = ('tell application "Mail"\n repeat with a in accounts\n'
+              f'  if (email addresses of a) contains "{addr}" then return name of a\n'
+              ' end repeat\n return ""\nend tell')
+    p = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=60)
+    return p.stdout.strip() or None
 
 
 def esign(pdf_path):
@@ -152,7 +164,7 @@ def main():
                     WHERE i.status='ready_for_draft' AND i.approval_ref IS NOT NULL ORDER BY i.id""")
     for i in cur.fetchall():
         md = os.path.join(REPO, i["file_path"]) if i["file_path"] and i["file_path"].endswith(".md") else None
-        acct = ACCOUNT.get(i["send_account"] or "")
+        acct = None if i["send_account"] == "paper" else mail_account(i["send_account"] or "")
         paper = (i["send_account"] == "paper")
         problem = None
         if not md or not os.path.isfile(md):
