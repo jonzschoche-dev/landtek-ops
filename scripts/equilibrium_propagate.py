@@ -28,6 +28,10 @@ def _seed_client(cur, seed_type, seed_id):
         cur.execute("SELECT _client_of(matter_code) AS c FROM matter_facts WHERE id=%s", (seed_id,))
     elif seed_type == "matter":
         cur.execute("SELECT _client_of(%s) AS c", (seed_id,))
+    elif seed_type == "obligation":
+        # a drip obligation (office_obligation row) belongs to its matter's client (A5);
+        # matter_code may hold a client code (registry rows use 'MWK-001'), _client_of resolves both
+        cur.execute("SELECT _client_of(matter_code) AS c FROM office_obligation WHERE id=%s", (seed_id,))
     elif seed_type == "chat":
         # a chat node's client = its sender's mapped_client_code (resolve-or-hold if unresolved)
         cur.execute("""SELECT cu.mapped_client_code AS c FROM channel_messages cm
@@ -90,7 +94,13 @@ def propagate(cur, seed_type, seed_id, interaction_ref=None, hops=2, mode="shado
         # A5 resolve-or-hold: no client => cannot propagate safely. Hold, never guess.
         return {"held": True, "reason": "seed has no resolvable client (A5 hold)"}
 
-    ego = _ego(cur, seed_type, seed_id, client, hops)
+    # An obligation is not (yet) a node in the structural graph — it enters through its matter, so its
+    # ego-network is its matter's. The ledger still records seed_type='obligation' + the row id.
+    trav_type, trav_id = seed_type, seed_id
+    if seed_type == "obligation":
+        cur.execute("SELECT matter_code FROM office_obligation WHERE id=%s", (seed_id,))
+        trav_type, trav_id = "matter", cur.fetchone()["matter_code"]
+    ego = _ego(cur, trav_type, trav_id, client, hops)
     ego_fact_ids = [n["node_id"] for n in ego if n["node_type"] == "fact"]
 
     # contradiction check (A65/A78) — any contradiction register row touching an ego fact
@@ -106,7 +116,7 @@ def propagate(cur, seed_type, seed_id, interaction_ref=None, hops=2, mode="shado
                    WHERE _client_of(k.controlling_matter) = %s""", (client,))
     cascades = cur.fetchone()["n"]
 
-    refused = _cross_client_would_reach(cur, seed_type, seed_id, client, hops)
+    refused = _cross_client_would_reach(cur, trav_type, trav_id, client, hops)
 
     detail = {"ego_types": {}, "obligation_extraction": "deferred to emission plane (A68 proposal)"}
     for n in ego:

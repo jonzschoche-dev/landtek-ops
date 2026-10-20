@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import date
 
 import psycopg2
 import psycopg2.extras
@@ -158,6 +159,23 @@ def materialize_one(cur, matter: str) -> dict:
     status = m.get("status")
     forum = m.get("forum")
     next_deadline = m.get("next_deadline")
+    # A past next_deadline is not a deadline — it is an un-redated front (§0.4.1 "an undated goal does
+    # not exist"). Keep the date visible but mark it stale; never invent a replacement.
+    deadline_stale = bool(next_deadline and next_deadline < date.today())
+    # Drip slice: the obligation layer of this matter, so inquiry + pick read one brief (agent_specs/005 v2).
+    try:
+        cur.execute("""SELECT count(*) FILTER (WHERE state NOT IN ('performed','withdrawn','consequence_filed')) AS open,
+                              count(*) FILTER (WHERE state='approved') AS approved_unserved,
+                              count(*) FILTER (WHERE state IN ('served_running','replied_not_performed','partial')) AS running,
+                              min(due_at) FILTER (WHERE state IN ('served_running','replied_not_performed','partial')) AS next_lapse
+                         FROM office_obligation WHERE matter_code=%s""", (matter,))
+        d = cur.fetchone() or {}
+        drip = {"open": int(d.get("open") or 0), "approved_unserved": int(d.get("approved_unserved") or 0),
+                "clocks_running": int(d.get("running") or 0),
+                "next_lapse": d["next_lapse"].isoformat() if d.get("next_lapse") else None}
+    except Exception:
+        cur.connection.rollback()
+        drip = None
     # Prefer verified CTNs in headline; fall back to all if none verified yet
     ctn_for_head = ctns_v or ctns_all[:5]
 
@@ -195,7 +213,8 @@ def materialize_one(cur, matter: str) -> dict:
         "facts": "data" if n_v else "empty",
         "fields": "data" if int(fc["n"] or 0) else "empty",
         "parties": "data" if parties else "empty",
-        "deadlines": "data" if next_deadline else "empty",
+        "deadlines": ("stale" if deadline_stale else "data") if next_deadline else "empty",
+        "drip": drip,
         "ctns": "data" if (ctns_v or ctns_all) else "empty",
         "clarity": clarity_status,
         "needs_human_review": needs_human,

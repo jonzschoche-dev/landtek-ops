@@ -127,6 +127,122 @@ Lapse → stage the lowest pending rung as an `outward_action` (T3). Edition due
 counters advanced. `partial` → same-day "partial ≠ compliance" draft. Calendar sync gives no date to unserved
 rows. **No send path exists** (grep-floor truth test).
 
+### THE SLEEP DOCTRINE as hard gates (Jonathan, 20 Oct 2026: "noncombative, put them to sleep building a case over time"; PROPOSED delta `migrations/DRAFT_drip_v2_delta_sleep.sql`, not applied)
+Trigger: the LGU Schedule packet (compensation, ₱ amounts, the office's own declarations annexed, supervisors cc'd)
+was judged "highly strategic and against the mandate". C2 set the tone; this makes it **structural**, so a
+strategic document can't leave as a routine drip.
+
+**Principle.** The record builds from receipt, silence and the next courteous letter, not from what a letter argues.
+All strategy lives in the internal plane (goals, tracks, pressure, meter, ripeness). The outward plane is dull on
+purpose.
+
+**A routine drip (first ask, editions, R1) is:**
+1. one small, ordinary ask any clerk could answer (a copy, a status, a note that none exists);
+2. neutral identification: who writes, in what capacity, the reference number, the previous letter by its date;
+3. the easy yes (we pay, collect, or accept e-mail or a short note);
+4. a polite reply period stated plainly, with no statute cited;
+5. at most ~250 words and one page. The only annex is the authority (SPA).
+
+**Never in a routine drip** (lint class `strategic_tell` + code checks):
+- peso amounts or rates;
+- posture words: without prejudice, reserved, accrue, compensation, occupy, demand, liability, damages, remedies,
+  unlawful, registered owner;
+- statute citations;
+- any forum named;
+- cc to supervisors or other offices (`supervisor_cc_early`), **unless Jonathan directs it for that item**. Then the
+  cc is "Copy furnished, for information" only, to offices whose mandate touches the ask, with nothing addressed to
+  them in the body. The override is recorded with the item's `approval_ref` (first use: LGU-COMPOUND step 1, cc
+  Provincial Assessor Magana + BLGF RD Doctolero, 20 Oct 2026);
+- adverse annexes: the office's own declarations, comparators, admissions (`adverse_annex_early`);
+- over-length (`routine_too_long`).
+
+**The cost leaves the routine plane.** The cost line moves to `burden_line_from_rung = 2` (from 1). The running cost
+is computed and logged internally every cycle (`loss_line`). It is first stated, as sworn neutral fact, in the R2
+affidavit, and only on go.
+
+**Strategic instruments are later rungs.** Schedules of compensation, damages demands, comparator exhibits and
+supervisor packs wait in `HELD_LATER_RUNG/` until the record makes them inevitable. Each needs its own go.
+
+**The trade-off, stated once.** Compensation for use accrues only from a demand (Art. 1169). Each month the
+Schedule waits is ₱59,521.00 of the LGU stream that can't be claimed later. Jonathan sets when it moves.
+
+### BABY-STEP LADDERS: how sleep still reaches the goals (Jonathan, 20 Oct: "baby step to our legal and financial goals"; PROPOSED `migrations/DRAFT_drip_v2_delta_baby_steps.sql`)
+Sleep is the *form*; the ladder is the *direction*. Every goal is decomposed into the **record elements** it needs
+(a due request with proof of receipt, an answer or a recorded silence, an admission such as "none on file", an
+official receipt, a demand). Each baby step is **one routine ask that earns exactly one element**:
+- 15 working days apart from proven receipt;
+- staggered per office cluster;
+- passing the sleep lint.
+
+**Strategic instruments are the last step of a ladder** (CHECK: never step 1), reached when the earlier elements are on
+record, so the strategic step reads as the obvious next thing and not as an attack. `step_plan` holds the ladders, and
+`v_next_baby_step` feeds the Stage 5 pick, which ranks them on the same money → deadline → leverage order.
+`goal_element` is internal only.
+
+First four ladders (seeded in the draft):
+- **LGU-COMPOUND:**
+  1. a copy of the record on file, or "none" (drafted);
+  2. a courtesy edition;
+  3. openness to an arrangement (no terms);
+  4. *the Schedule* (₱59,521/mo starts; Jonathan's go).
+- **MACALE-RPT:**
+  1. status of the 13 Jul protest decision;
+  2. *pay ₱14,391.50 under protest* (Jonathan's money call; makes the injury actual);
+  3. a refund request; then R1 to the Provincial Treasurer.
+- **ABLA-SERVICE:**
+  1. status of the paid 20 Jun 2025 request, partial release welcome;
+  2. a courtesy edition; then a calm R1 to the Provincial Assessor.
+- **CV6839-COLLECT:**
+  1. certified decision + Entry of Judgment from the OCC;
+  2. Land Bank's statement of the balance. These are plain records requests on the road to ₱5.12M principal plus
+     interest.
+
+### THE REVIEW QUEUE: constant movement (Jonathan, 20 Oct 2026; LIVE: `migrations/DRAFT_drip_v2_delta_review_queue.sql` + `..._baby_steps.sql` applied 20 Oct)
+The drip is never idle. At least `drip_queue_config.min_awaiting_comment` (now **4**) drafts always wait for
+Jonathan's comment. Tool: `scripts/drip_draft_queue.py`.
+- **Fill:** take the next routine step per ladder in `priority_ladders` order (money first). It needs a letter
+  file, the live sleep lint, and `send_account`/`thread_ref`. The step goes in as `awaiting_comment`. A step with no
+  letter yet becomes a `drip_draft_needed` work order for the desk.
+- **One at a time:** `--next` shows Jonathan the single next draft.
+- **Comment → revise:** `--comment` records his words (`drip_comment`) and opens a `drip_revise` work order. After
+  the edit, `--revised` re-lints, bumps the version and puts it back in front of him. Revisions jump the queue.
+- **"Make the draft":** `--ready ID REF` sets `ready_for_draft` with his approval reference and opens a
+  `drip_stage_draft` work order (e-mail draft in the thread's origin account, or the paper set). Staging is its own
+  explicit step. Nothing is ever sent by the system.
+- **Every action refills the queue,** so movement is continuous. Counsel-gated ladders never enter the queue.
+
+### SENDING ACCOUNT AND THREAD (Jonathan, 20 Oct 2026)
+- **The account is the thread's origin.** Every e-mail drip goes from the account where that office's thread already
+  lives: **jonzschoche@gmail.com** by default for MWK (agency threads arrive there), or **jonathan@hayuma.org**
+  where the conversation started there. Never switch accounts mid-thread.
+- **Same thread, always.** If any prior message with that office on that subject exists, the drip is a *reply in
+  that thread* (keep the subject; the Re: line in the letter may be more specific). A new thread only when none
+  exists, and the new thread's account becomes the origin for that office from then on.
+- **Find the thread first.** This is part of X16: the history read records `send_account` and `thread_ref` (the
+  Gmail thread id / message id replied to). A draft without both isn't stageable.
+- **Staging (unchanged).** Drafts only, never sent by Claude. jonzschoche@gmail.com goes through Mac Mail.app account
+  "Google" (osascript `reply … with opening window`, save only). jonathan@hayuma.org goes through the Gmail
+  connector (`create_draft` in the thread). Jonathan reviews and presses Send. A draft is created only when
+  Jonathan says the item is ready.
+
+### HISTORY BEFORE EVERY ASK (Jonathan, 20 Oct: "we are asking for something he has refused to give; the stack should understand where we are")
+Sample 1 re-asked the Mayor for "the document on file" for the compound. He had already answered that (21 May 2025,
+doc 304: a 1953 Deed of Donation, Resolution No. 21, a 1966 tax declaration) and never produced any of them despite
+our 23 and 28 May 2025 requests (doc 343). **X16, ask history (blocking, before drafting):** for this office ×
+subject, read the ledger of prior asks, answers, refusals (with the grounds given), silences and what we already hold.
+- **Never re-ask a refused or answered item in the same form.** The next step must do one of three things:
+  - **(a) Narrow** to the smallest piece they can't reasonably refuse (e.g. the *particulars* of the documents they
+    themselves cited);
+  - **(b) Route** to an alternate custodian (RD, notarial archives, Provincial Assessor, SB Secretary), at our own
+    expense;
+  - **(c) Build on their own words.** Quote their earlier statement neutrally, and ask the next small thing it
+    implies.
+- **Their prior statements are anchors.** A routine letter may cite *their* letter by date and restate what *they*
+  said. That is neutral and sleepy, and it locks the position on record. It never characterizes or contradicts it.
+- **What we already hold** (e.g. the unsigned 1953 copy) is never asked for, and never revealed in a routine drip.
+- **Data:** `step_plan.history_ref` points to the ledger rows (docs/gmail ids) the step was planned from. A step
+  without a history read is not draftable.
+
 ### Default posture: patient record (operator, 2026-10-20) — INTERNAL label "rope-a-dope", never outward (lint C3)
 For every officer and office row, the drip runs the **patient-record doctrine** (`docs/RELATIONSHIP_EQUILIBRIUM.md`
 §7.6) by default:
