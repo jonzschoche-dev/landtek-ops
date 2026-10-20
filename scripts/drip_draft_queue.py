@@ -241,6 +241,18 @@ def main():
             print(f"{r['status']:18} {r['count']}")
         cur.execute("SELECT count(*) AS n FROM work_orders WHERE kind IN ('drip_draft_needed','drip_revise') AND status='queued'")
         print("desk work orders open:", cur.fetchone()["n"])
+        cur.execute("SELECT id, status, ladder, seq, addressee, shown_at IS NOT NULL AS seen FROM v_review_queue")
+        print("\nWaiting for your comment (revisions first):")
+        for r in cur.fetchall():
+            print(f"  #{r['id']}  {r['ladder']} step {r['seq']} → {r['addressee'][:60]}{'  (seen)' if r['seen'] else ''}"
+                  f"{'  [REVISING]' if r['status']=='revising' else ''}")
+        cur.execute("""SELECT i.id, sp.ladder, i.send_account FROM drip_instrument i JOIN step_plan sp ON sp.id=i.step_plan_id
+                        WHERE i.status IN ('ready_for_draft','draft_staged') ORDER BY i.id""")
+        rows = cur.fetchall()
+        if rows:
+            print("\nReady / staged (awaiting your Send):")
+            for r in rows:
+                print(f"  #{r['id']}  {r['ladder']} via {r['send_account']}")
     c.commit()
 
 
