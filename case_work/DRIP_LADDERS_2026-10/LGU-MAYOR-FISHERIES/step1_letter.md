@@ -1,18 +1,20 @@
-___ December 2026
+___ October 2026
 
 **HON. ALEXANDER L. PAJARILLO**
 Municipal Mayor
 Municipality of Mercedes, Camarines Norte
 
-**Re: Construction work at the fisheries building beside the municipal hall: the implementing office**
+**Re: Request for a copy of any building permit, land covered by TCT No. T-32911**
 
 Dear Mayor Pajarillo:
 
-Good day. This is a separate, small question from our letter of [DATE OF LGU-COMPOUND STEP 1 — TO FILL].
+Good day. I write on behalf of Patricia Keesey Zschoche, an heir and co-owner of the land covered by TCT No. T-32911 in Mercedes, as her attorney-in-fact under the Special Power of Attorney dated 18 May 2026 (Annex "A").
 
-On [OBSERVATION DATE — TO FILL], construction work was seen at the fisheries building beside the municipal hall in Poblacion. For the estate's records, may we kindly ask only which office or agency is carrying out the work, and the name of the project.
+May I respectfully ask for a copy of any building permit issued for the construction now in progress on that land? If no permit was issued, a short note saying so would be just as helpful. I would be glad to cover any copying fee and to collect the copy at the Municipal Hall, or a scanned copy by e-mail is perfectly fine.
 
-A short note by e-mail would be perfectly sufficient, and we can also collect a reply at your office. We would be grateful for a reply within fifteen (15) working days, or a note of when it may be ready.
+For your records, Ms. Zschoche has not been asked for, and has not given, consent to construction on the property.
+
+A reply within fifteen (15) working days of receipt would be much appreciated. Replies may be sent to jonzschoche@gmail.com or 0966-698-1448.
 
 Thank you very much for your time and assistance.
 
@@ -21,4 +23,4 @@ Respectfully yours,
 **JONATHAN PAUL ZSCHOCHE**
 Attorney-in-Fact for Patricia Keesey Zschoche
 
-*Enclosure: Special Power of Attorney (apostilled), Annex "A".*
+Annex "A": Special Power of Attorney dated 18 May 2026 (apostilled)

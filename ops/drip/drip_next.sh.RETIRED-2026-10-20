@@ -1,0 +1,9 @@
+#!/bin/bash
+# Triggered Ping Pong: runs Claude on ONE drip brief. Usage: bash ~/landtek/ops/drip/drip_next.sh <BRIEF_FILE_NAME>
+DRIP="$HOME/Library/CloudStorage/GoogleDrive-jonathan@hayuma.org/My Drive/LANDTEK /Drip"
+BRIEF="$DRIP/to-claude/$1"
+[ -f "$BRIEF" ] || { echo "No brief: $BRIEF"; ls "$DRIP/to-claude" | grep '^DRIP_'; exit 1; }
+cd "$HOME/landtek" || exit 1
+PROMPT="You are Claude in LandTek Ping Pong Drip, TRIGGERED mode, ONE drip only. Read the brief at $BRIEF, the Legal entries and the 07:30 tone CHANGE in $DRIP/DRIP_THREAD.md, and the sources the brief cites. Draft exactly the one letter the brief asks for, following its rules. Write it ONLY to the output path named in the brief. Then append one entry to the end of DRIP_THREAD.md: '### <now PHT> — Claude — ANSWER [SHORT]', naming the file and listing every [TO FILL]. Never send anything, never edit another author's entry, and never touch the DB, MASTER_PLAN or specs."
+"$HOME/.local/bin/claude" -p "$PROMPT" --permission-mode acceptEdits --add-dir "$DRIP" < /dev/null
+echo "=== Claude done. Tell Grok: drip ready ==="

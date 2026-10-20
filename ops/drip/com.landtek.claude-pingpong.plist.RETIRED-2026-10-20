@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.landtek.claude-pingpong</string>
+<key>ProgramArguments</key><array><string>/bin/bash</string><string>/Users/jonathanzschoche/landtek/ops/drip/claude_pingpong.sh</string></array>
+<key>StartCalendarInterval</key><array>
+<dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+<dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>0</integer></dict>
+<dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+<dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
+<dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>0</integer></dict>
+</array>
+<key>StandardOutPath</key><string>/Users/jonathanzschoche/landtek/ops/drip/launchd.out</string>
+<key>StandardErrorPath</key><string>/Users/jonathanzschoche/landtek/ops/drip/launchd.err</string>
+</dict></plist>

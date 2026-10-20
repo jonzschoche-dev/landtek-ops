@@ -197,6 +197,19 @@ First four ladders (seeded in the draft):
   2. Land Bank's statement of the balance. These are plain records requests on the road to ₱5.12M principal plus
      interest.
 
+### ONE BRAIN, ONE LOOP (Jonathan, 20 Oct 2026: "using two AIs is not working; we need to trigger from a single input and output")
+**Claude owns the drip end to end**: history read, ladder step, drafting, the legal check against `legal_chunks`/the law
+corpus, the sleep lint, the review queue, and staging on Jonathan's word.
+- **Input:** Jonathan, in the Claude session ("next drip", a comment, "make the draft").
+- **Output:** one draft at a time (`scripts/drip_draft_queue.py --next`), then a staged draft in the thread's origin
+  account or a paper print set.
+- **The Claude↔Grok ping-pong (Drive `Drip/to-claude` / `from-claude`, `DRIP_THREAD.md`, the
+  `com.landtek.claude-pingpong` LaunchAgent) is retired for the drip.** Grok and Legal briefs are no longer an input.
+  Anything they produced before 20 Oct (Drip 01, the tone doctrine C1–C6) has been folded into this spec and the
+  queue.
+- Rule §0.12.4 (one voice per decision) is satisfied by construction: the drip has exactly one brain and one channel
+  to Jonathan.
+
 ### THE REVIEW QUEUE: constant movement (Jonathan, 20 Oct 2026; LIVE: `migrations/DRAFT_drip_v2_delta_review_queue.sql` + `..._baby_steps.sql` applied 20 Oct)
 The drip is never idle. At least `drip_queue_config.min_awaiting_comment` (now **4**) drafts always wait for
 Jonathan's comment. Tool: `scripts/drip_draft_queue.py`.
