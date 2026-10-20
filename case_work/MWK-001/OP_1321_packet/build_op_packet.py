@@ -163,10 +163,13 @@ def render_md(md_path, out_path, footer, letter_mode=False):
         elif text.startswith("**JONATHAN PAUL ZSCHOCHE**"):
             if not (story and isinstance(story[-1], Spacer) and getattr(story[-1], "height", 0) >= 30):
                 story.append(Spacer(1, 40))
-            for part in ["**JONATHAN PAUL ZSCHOCHE**", "Attorney-in-Fact for Patricia Keesey Zschoche",
-                         "Heir, Estate of Mary Worrick Keesey",
-                         "Dasmariñas Street, Barangay 8, Daet, Camarines Norte",
-                         "jonzschoche@gmail.com · 0966-698-1448"]:
+            # The letter's own signature lines win; default is the Drip Charter §2 capacity line
+            # (never "Heir, Estate of ..." — Jonathan, Charter adopted 20 Oct 2026).
+            parts = [b.rstrip() for b in block] if len(block) > 1 else [
+                "**JONATHAN PAUL ZSCHOCHE**", "Attorney-in-Fact for Patricia Keesey Zschoche, a co-owner",
+                "Dasmariñas Street, Barangay 8, Daet, Camarines Norte",
+                "jonzschoche@gmail.com · 0966-698-1448"]
+            for part in parts:
                 story.append(Paragraph(md_to_rl(part), S["sig"]))
             story.append(Spacer(1, 8))
         else:
