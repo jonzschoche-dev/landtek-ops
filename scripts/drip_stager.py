@@ -92,7 +92,31 @@ def build_pdf(md_path, client, paper, today):
     with open(out, "wb") as f:
         w.write(f)
     os.remove(tmp)
+    compact(out)
     return out, re_line, (sal.group(1) if sal else "Good day")
+
+
+def compact(pdf_path, limit=8_000_000):
+    """Stamped annex pages are re-saved uncompressed (a 1.8 MB SPA became ~14 MB, 20 Oct 2026). .gov.ph mail
+    servers silently drop large mail. Letter pages (real text) are copied as-is; scanned annex pages are
+    re-rendered once as JPEG (150 dpi, q75). In-place image rewriting garbled the SPA scan, so it is not used."""
+    import fitz
+    src = fitz.open(pdf_path)
+    out = fitz.open()
+    for i, pg in enumerate(src):
+        if len(pg.get_text().strip()) > 300 or not pg.get_images():
+            out.insert_pdf(src, from_page=i, to_page=i)
+        else:
+            jpg = pg.get_pixmap(dpi=150).tobytes("jpeg", jpg_quality=75)
+            np_ = out.new_page(width=pg.rect.width, height=pg.rect.height)
+            np_.insert_image(np_.rect, stream=jpg)
+    out.save(pdf_path + ".tmp", garbage=4, deflate=True)
+    src.close()
+    out.close()
+    os.replace(pdf_path + ".tmp", pdf_path)
+    size = os.path.getsize(pdf_path)
+    if size > limit:
+        raise RuntimeError(f"{os.path.basename(pdf_path)} is {size/1e6:.1f} MB after compaction (limit {limit/1e6:.0f} MB)")
 
 
 APPLESCRIPT = r'''

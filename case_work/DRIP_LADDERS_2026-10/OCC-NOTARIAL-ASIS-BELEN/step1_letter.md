@@ -1,5 +1,5 @@
 <!-- Drip: OCC-NOTARIAL-ASIS-BELEN step 1 · PAPER, hand delivery at OCC RTC Daet, Notarial Section · CV 26-360 legwork (COUNSEL_PLAN_2026-10-19 §3, 20 Oct item; letter 2 of RD_OCC_REQUESTS_2026-10)
-     Cleaned: Charter capacity line; addressed to the office, 'Dear Clerk of Court' (Jonathan, 20 Oct); purpose paragraph DROPPED (sleep doctrine: "none of the registered owners signed" is a strategic tell; notarial records need no stated purpose); Annex C dropped (entries identified by Doc/Page/Book). Approved by Jonathan 20 Oct ("good"). Print set built (files only, NOT printed). -->
+     Cleaned: Charter capacity line; addressed to the office, 'Dear Clerk of Court' (Jonathan, 20 Oct); purpose paragraph DROPPED (sleep doctrine: "none of the registered owners signed" is a strategic tell; notarial records need no stated purpose); Annex C dropped (entries identified by Doc/Page/Book). Approved by Jonathan 20 Oct ("good"). Print set built (files only, NOT printed). E-mail first (Jonathan): rtc1daeocc@judiciary.gov.ph, e-signed PDF 2.1 MB, saved unsent 20 Oct; then hand delivery with the print set. -->
 Daet, Camarines Norte, ___ October 2026
 
 **THE CLERK OF COURT AND EX-OFFICIO PROVINCIAL SHERIFF**
