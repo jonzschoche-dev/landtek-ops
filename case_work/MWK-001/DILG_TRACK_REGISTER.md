@@ -44,7 +44,9 @@
 | 23 | **01 Sep 2026** | **Olaguera** → MLGOO | Reply: records "being verified and consolidated"; record book complete; street matter "**already acted upon**" | DILG **09-01-26** (K. Allado) | `15` | inside 8303 only |
 | 24 | **01 Sep 2026** | **Mayor** → MLGOO | Reply: CART "no further administrative actions"; SPA on §16 + parens patriae; roads "actively devoted"; "**a valid Deed of Donation**" | DILG **09-01-26** (K. Allado) | `16` | inside 8303 only |
 | 25 | **04 Sep 2026** | **MLGOO** → Zschoche | **Transmittal** of the 1 Sep replies, "for your information, guidance and appropriate reference." **No compliance assessment.** | — | `17` | inside 8303 only |
-| 26 | 10 Sep 2026 (dated) | Zschoche → MLGOO | **Reiteration + Annex A Schedule of Continuing Default** | **NOT SERVED OF RECORD** | `PRINT_SERVICE_2026-09-10/` | not ingested (draft) |
+| 26 | ~~10 Sep 2026~~ | Zschoche → MLGOO | ~~Reiteration, first edition~~ **SUPERSEDED — built, never served** | — | `PRINT_SERVICE_2026-09-10/` | — |
+| 27 | **19 Oct 2026** | Zschoche → MLGOO (cc PD, RD) | **Reiteration, SECOND EDITION** — one-page plain-English letter + **Annex "A": Schedule of Default of the Local Government Code** (duty · directive · LGU answer · **proof in the record** · days). Counts to 19 Oct; 45 days' silence since the 4 Sep transmittal; PD Relucio's 2 Sep "sufficient time"; ask = date certain, else PD **and RD** | **NEVER SENT** (Jonathan, 20 Oct 2026: "the mlgoo never went out"; MLGOO step skipped, escalated to PD Relucio instead, see DRIP_LADDERS_2026-10/DILG-PD-RELUCIO) | `PRINT_SERVICE_2026-10-19/` | — |
+| 28 | **20 Oct 2026** | Zschoche → **PD Relucio** (e-mail, reply in her 7 Sep thread) | Escalation: ask PD to **set a date** for the LGU to perform the MLGOO 25/26 Aug directives; Annex "A" Schedule of Default (corrected 20 Oct: §252 item removed, item 2 dates fixed) | Sent 19:58 PHT; receipt pending | `DRIP_LADDERS_2026-10/DILG-PD-RELUCIO/` | — |
 
 Unplaced: `05b`, an ARTA copy-furnished page (CART respondents; Usec. Abot; Dr. Sanmocte;
 CSC Asst. Comm. Masuda). It is not page 2 of the 4 May NOR, which is marked "Page 1 of 1" with its own cc
