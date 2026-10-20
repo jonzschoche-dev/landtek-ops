@@ -159,10 +159,12 @@ def fill(cur, c):
         res, words = lint(cur, body, cc_override="cc per Jonathan" in (sp["notes"] or ""), addressee=sp["addressee"])
         status = "awaiting_comment" if not res["refuse"] else "refused_lint"
         cur.execute("""INSERT INTO drip_instrument (step_plan_id, kind, audience, client_code, drafted_by, file_path,
-                         body_md, word_count, lint_result, status, send_account, thread_ref, queued_at)
-                       VALUES (%s,%s,'official',%s,'claude',%s,%s,%s,%s,%s,%s,%s,now()) RETURNING id""",
+                         body_md, word_count, lint_result, status, send_account, thread_ref, queued_at,
+                         to_address, cc_addresses, reply_subject, is_test)
+                       VALUES (%s,%s,'official',%s,'claude',%s,%s,%s,%s,%s,%s,%s,now(),%s,%s,%s,%s) RETURNING id""",
                     (sp["id"], sp["step_kind"], sp["client_code"], path, body, words, json.dumps(res), status,
-                     sp.get("send_account"), sp.get("thread_ref")))
+                     sp.get("send_account"), sp.get("thread_ref"), sp.get("to_address"), sp.get("cc_addresses"),
+                     sp.get("reply_subject"), sp["ladder"].startswith("TEST-")))
         iid = cur.fetchone()["id"]
         if status == "awaiting_comment":
             cur.execute("UPDATE step_plan SET state='drafted', updated_at=now() WHERE id=%s", (sp["id"],))
