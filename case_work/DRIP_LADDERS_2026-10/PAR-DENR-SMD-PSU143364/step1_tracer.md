@@ -1,5 +1,5 @@
 <!-- Client: Paracale-001 (Allan V. Inocalla) — NOT MWK. Capacity: "for and in behalf of Allan V. Inocalla (registered owner, OCT P-1616)".
-     Tracer · reply in hayuma.org thread 1a0c8ee6926d431f (Ref. SMD-SCS-INC-26-172) to smd.r5@denr.gov.ph, cc shiraction2@gmail.com.
+     Tracer · reply in hayuma.org thread 1a0c8ee6926d431f (Ref. SMD-SCS-INC-26-172) to smd.r5@denr.gov.ph, cc shiraction2@gmail.com + Kristyle Palma krstylpalma@gmail.com (added 21 Oct per Jonathan; she does the pickup).
      History: 22 Sep SMD letter (enclosures missing); 22 Sep our re-send request; 24 Sep our sister-plans supplement; 24 Sep SMD: no e-payment, personal pickup Window 3 Legazpi Mon-Thu 7-6. Silent since.
      One ask: set ready? total fee? representative may collect? Draft saved unsent in jonathan@hayuma.org Gmail Drafts 21 Oct 2026 (draft r-1418239043895131720). -->
 Dear Sir/Madam,
