@@ -1,6 +1,6 @@
 <!-- Drip: CSC-R5-REFERRALS step 1 · reply in ARTA's 30 Apr 2026 thread (jonzschoche, Main) · to ro05@csc.gov.ph ONLY (ARTA's cc meo_mercedescn@yahoo.com = respondent's office, and ARTA cc's, removed) · quoted original underneath
      Attachment: Annexes_1-3_CSC_R5_referrals.pdf (13 pp, 1.9 MB): "1" Balane letter 5 Feb 2026 (doc 773; face-dated "2025"), "2" ARTA endorsement 30 Apr 2026 pp 1-2 (doc 706), "3" ARTA Resolution 9 Sep 2026, CTN 1378, pp 1-10 (doc 14205)
-     Lifts the 28 Aug CSC hold for this status/receipt question only (Jonathan picked #7, 20 Oct). Address check: endorsement letterhead reads ro05@csc.gov.ph (earlier "ro5@" was an OCR misread). Draft saved unsent 20 Oct 2026. -->
+     Lifts the 28 Aug CSC hold for this status/receipt question only (Jonathan picked #7, 20 Oct). Address check: endorsement letterhead reads ro05@csc.gov.ph (earlier "ro5@" was an OCR misread). SENT 20 Oct 2026 (Sent Mail verified). -->
 Dear Director Bragais,
 
 Magandang araw po!
