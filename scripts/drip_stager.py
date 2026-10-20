@@ -110,7 +110,9 @@ on run argv
       tell r to make new to recipient at end of to recipients with properties {address:toAddr}
     end if
     delay 1
-    set sender of r to (full name of acct) & " <" & (item 1 of (email addresses of acct)) & ">"
+    set em to (get email addresses of acct)
+    set fn to (get full name of acct)
+    set sender of r to fn & " <" & (item 1 of em) & ">"
     if ccList is not "" then
       set AppleScript's text item delimiters to ","
       repeat with c in (text items of ccList)
@@ -121,10 +123,11 @@ on run argv
     set content of r to bodyText
     tell content of r to make new attachment with properties {file name:(POSIX file pdfPath) as alias} at after last paragraph
     delay 2
+    set savedSubj to (get subject of r)
     save r
     delay 3
-    close window 1 saving no
-    return "saved:" & (subject of r)
+    close r saving no
+    return "saved:" & savedSubj
   end tell
 end run
 '''
