@@ -7,3 +7,4 @@
 - Correction carried: earlier letters said "April 1979"; the deed is 14 April 1980.
 - Cadence: sangguniangbayan@mercedes.gov.ph clear (no message in 21 days), checked 21 Oct.
 - Status: e-mail DRAFT saved in jonzschoche (Main) Drafts, reply in the "Road Donation Implementation and Inquiry Mercedes" thread (to the SB 30 Jan 2026 message), to sangguniangbayan@mercedes.gov.ph only, quoted original kept, PDF attached (7 pp, e-signed, dated 21 Oct). Not sent.
+- WITHDRAWN 21 Oct 2026 (Jonathan): "the sb letter is not a drip its a consequential legal stand which we are not here to pump, just need to know what they ruled." E-mail draft removed. Kept on file only; not to be sent without a fresh decision.

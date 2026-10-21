@@ -1,0 +1,1 @@
+- 21 Oct 2026: step 1 revived as a status-only inquiry (what action was taken on the 3 Oct 2025 referral), dated 21 Oct; e-mail draft staged in jonzschoche Drafts, reply in the Road Donation thread to sangguniangbayan@mercedes.gov.ph only. Not sent.
