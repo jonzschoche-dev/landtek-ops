@@ -60,6 +60,8 @@ DOCS = [
  ("45_WITNESSES_IN_THE_COURTS_FORM", "The witnesses in the court's own form: each witness mapped to her ten questions, the article words, and the Considering-that line it earns", os.path.join(ROOT, "WITNESSES_IN_THE_COURTS_FORM_2026-10-19.html"), "html"),
  ("46_DOCUMENTS_ONLY_CASE", "The documents-only case: Art. 1898 proved element by element on paper (their Answer, their Exh. 5, Exh. B/E/F/H), the one gap (pleaded 1980s payment) and three paper moves to close it", os.path.join(ROOT, "DOCUMENTS_ONLY_CASE_2026-10-19.html"), "html"),
  ("47_RED_TEAM_BALANE_DIRECTIVE", "Red team: the directive the Balane household would give Atty. Ramos (our model), with the annex of our standing answers", os.path.join(ROOT, "RED_TEAM_BALANE_DIRECTIVE_2026-10-19.html"), "html"),
+ ("48_STRATEGY_CADENCE_TRAJECTORY_21OCT", "Strategy, cadence and trajectory as of 21 Oct 2026 (after counsel's reply): strategy in one page, dated cadence to judgment, the records-timing decision, their trajectory, open decisions", os.path.join(ROOT, "STRATEGY_CADENCE_TRAJECTORY_2026-10-21.html"), "html"),
+ ("49_TSN_REQUEST_14OCT", "Request to the branch for the transcript (and any recording) of the 14 Oct 2026 hearing, with the checklist for checking it (draft, not sent)", os.path.join(ROOT, "TSN_REQUEST_2026-10", "TSN_REQUEST_14OCT_and_CHECKLIST.html"), "html"),
  ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 

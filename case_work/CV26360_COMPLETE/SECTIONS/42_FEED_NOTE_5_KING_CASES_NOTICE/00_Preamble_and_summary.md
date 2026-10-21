@@ -29,7 +29,7 @@ Thank you for your reply of 21 October. Since Mrs. King is next, here is what he
 
 You already have Mrs. King's own copies of these records: her Verified Answer in Civil Case 8563 with the receipt stamps; the prosecutor's two resolutions; the orders in Criminal Case 20-6030; and her acquittal and the Court of Appeals resolutions. On re-direct she can identify her own Answer and the stamp it carries. If the court records are offered on rebuttal against Princess and Jomil, certified copies may be needed; I can obtain them when you say. The point of law is yours: whether notice to Gloria's attorney-in-fact, or to that side's lawyer, binds Gloria.
 
-**What I need from you before you brief Mrs. King:** (1) whether you want these records used on re-direct if the door opens, or kept for rebuttal only; (2) whether you want certified copies of the court and prosecutor records for rebuttal, and by when.
+**What I need from you before you brief Mrs. King:** (1) whether you want these records used on re-direct if the door opens, or kept for rebuttal only; (2) whether you want certified copies of the court and prosecutor records for rebuttal, and by when; (3) whether your office has ordered the transcript of the 14 October hearing. If not, may your office request it? I will pay the fees and would like a copy to check my testimony.
 
 With respect, 
 Jonathan Paul Zschoche
