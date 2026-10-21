@@ -28,3 +28,4 @@ Attorney-in-Fact for Patricia Keesey Zschoche, a co-owner
 Dasmariñas Street, Barangay VIII, Daet, Camarines Norte  
 jonzschoche@gmail.com · 0966-698-1448
 <!-- FIELD 21 Oct 2026: RECEIVED 3:14 pm by Kizzel A. Lee (rider stop sheet 2). Office e-mail as written: spcnorte@yahoo.com (reading uncertain). Phone N/A. -->
+<!-- STAMPED: SP Secretariat RECEIVED 21 Oct 2026 3:14 (receiving copy p2). -->

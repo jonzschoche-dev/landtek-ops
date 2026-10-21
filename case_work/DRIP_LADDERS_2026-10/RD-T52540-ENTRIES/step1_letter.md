@@ -43,3 +43,4 @@ Dasmariñas Street, Barangay VIII, Daet, Camarines Norte
 
 RECEIVED by the Registry of Deeds, Camarines Norte
 Receiving officer: ____________________  Date: __________  Time: ________  Control no.: __________
+<!-- RECEIVED 21 Oct 2026 by Sarah Jane D. Babol (handwritten on the receiving copy, RIDER_PACKAGE_2026-10-21/RECEIVING_COPIES_stamped_21Oct2026.pdf p1). Paper letter accepted although the counter asked for LTCP Form 0012. 15 working days ~11-12 Nov. -->
