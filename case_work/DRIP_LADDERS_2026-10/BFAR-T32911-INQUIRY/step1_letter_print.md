@@ -13,6 +13,8 @@ Magandang araw po. I write as attorney-in-fact of Patricia Keesey Zschoche, a co
 
 I have noticed works on this land that may relate to fisheries. To help us understand the present situation, may I kindly ask whether your Office has any project, facility or construction on this land, and if so, for copies of the project documents: the project description, the implementing partner, and any agreement or document on the use of the site.
 
+For your reference, I attach the title (Annex "B"), the approved plan (Annex "C"), and the letter of DENR–PENRO Camarines Norte of 26 November 2025 (Annex "D"), which places Lots 401, 403 and 405 of the Mercedes Cadastre within Lot 2-A.
+
 If your Office has no project there, a short note saying so would be just as helpful. I will gladly pay any fee for copies. A reply by e-mail to jonzschoche@gmail.com or a text to 0966-698-1448 is perfectly fine.
 
 Maraming salamat po.

@@ -4,7 +4,7 @@
 
 Lokasyon (itanong sa Provincial Agriculture Office, Capitol): ____________________
 
-Dokumento: Inquiry on any BFAR project on Lot 2-A (TCT No. T-32911), addressed to the BFAR Regional Director through the Provincial Fishery Officer
+Dokumento: Inquiry on any BFAR project on Lot 2-A (TCT No. T-32911), with the title, plan and DENR letter (Annexes B–D), to the BFAR Regional Director through the Provincial Fishery Officer
 
 Sa likod ng page na ito: ORIGINAL (iwan sa opisina) + RECEIVING COPY (pa-stamp, ibalik).
 
