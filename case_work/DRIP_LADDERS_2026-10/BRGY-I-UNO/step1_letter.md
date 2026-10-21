@@ -73,3 +73,4 @@ Parcels declared for taxation in the name of Mary Worrick Keesey or her heirs, a
 
 17. PIN 025-07-001-01-052 · ARP No. 001-00251 · 264 sq m
 
+<!-- FIELD 21 Oct 2026 (rider): REFUSED by a barangay tanod (Jonathan). No receipt, no clock. -->
