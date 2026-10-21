@@ -27,9 +27,9 @@ Thank you for your reply of 21 October. Since Mrs. King is next, here is what he
 
 3. In her affidavit, Q9 says the defendants knew the plaintiffs were the owners. She cannot speak to what they knew; withdrawing those words on direct removes a motion to strike.
 
-The records are already in your office: King's Verified Answer in Civil Case 8563 with the receipt stamps; the prosecutor's two resolutions; the orders in Criminal Case 20-6030; and her acquittal and the Court of Appeals resolutions. They also answer, on rebuttal, the Answer's claim that Princess and Jomil had no notice of any dispute. The point of law is yours: whether notice to Gloria's attorney-in-fact, or to that side's lawyer, binds Gloria.
+You already have Mrs. King's own copies of these records: her Verified Answer in Civil Case 8563 with the receipt stamps; the prosecutor's two resolutions; the orders in Criminal Case 20-6030; and her acquittal and the Court of Appeals resolutions. On re-direct she can identify her own Answer and the stamp it carries. If the court records are offered on rebuttal against Princess and Jomil, certified copies may be needed; I can obtain them when you say. The point of law is yours: whether notice to Gloria's attorney-in-fact, or to that side's lawyer, binds Gloria.
 
-**What I need from you before you brief Mrs. King:** (1) whether you want these records used on re-direct if the door opens, or kept for rebuttal only; (2) whether you want the 9 July 2021 receipt stamp and the 16 September 2020 mailing receipts flagged in your copies before you see her.
+**What I need from you before you brief Mrs. King:** (1) whether you want these records used on re-direct if the door opens, or kept for rebuttal only; (2) whether you want certified copies of the court and prosecutor records for rebuttal, and by when.
 
 With respect, 
 Jonathan Paul Zschoche
