@@ -37,3 +37,4 @@ Dasmariñas Street, Barangay VIII, Daet, Camarines Norte
 1. Lot 2-A, (LRA) Psd-221861, covered by Transfer Certificate of Title No. T-32911 in the name of the Heirs of Mary Worrick Keesey, including the portions shown in the cadastral survey as Lots 401, 402 (402-A and 402-B), 403 and 405, Cad 1186-D.
 
 2. PIN 025-07-005-01-009 · ARP No. 005-00054 · 1,138 sq m (Municipality of Mercedes Real Property Tax Assessment for 2026).
+<!-- FIELD 21 Oct 2026 (rider): RECEIVED, no problem (Jonathan). Reply due ~11-12 Nov. Stamp photo to collect. -->

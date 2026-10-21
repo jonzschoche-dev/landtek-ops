@@ -10,11 +10,11 @@ Purpose: the rider round of 21 Oct 2026 put the same calm records request to fou
 |---|---|---|---|---|
 | I (Uno) | rider | [O] REFUSED by a barangay tanod. Not known if any official was present or if the tanod was instructed | rider's note to collect (tanod name if given, officials present?) | step 2 registered mail, same as San Roque (pending Jonathan's go) |
 | III | rider | [O] RECEIVED 21 Oct | stamp photo / receiver name to collect | reply due ~11–12 Nov (15 working days; depends on 2 Nov holiday) |
-| V | rider | pending report | — | — |
+| V | rider | [O] RECEIVED 21 Oct, no problem | stamp photo / receiver name to collect | reply due ~11–12 Nov |
 | San Roque | rider | [O] REFUSED. Punong Barangay and admin both refused to receive the letter and refused to give their names | rider's note (to be signed) | step 2: registered mail with return card, cc Mayor Pajarillo + MLGOO Guerrero (MLGOO copy as JPEG) |
 
 ## Tally (21 Oct)
-Received 1 (III) · refused 2 (San Roque by Kapitan + admin; Uno by a tanod) · pending 1 (V).
+Received 2 (III, V) · refused 2 (San Roque by Kapitan + admin; Uno by a tanod). No blanket refusal: the two refusals are the two barangays most directly tied to contested ground (San Roque = Lot 2-X-6, the Balane lot's parent; Uno = hall said to sit on estate land + Baliza claims) [I].
 
 ## Field intelligence
 
