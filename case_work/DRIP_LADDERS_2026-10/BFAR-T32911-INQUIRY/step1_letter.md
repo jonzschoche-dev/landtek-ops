@@ -27,3 +27,4 @@ Respectfully yours,
 **JONATHAN PAUL ZSCHOCHE**  
 Attorney-in-Fact for Patricia Keesey Zschoche, a co-owner  
 Dasmariñas Street, Barangay VIII, Daet, Camarines Norte
+<!-- FIELD 21 Oct 2026: RECEIVED (rider stop sheet 3); receiver name illegible. Office e-mail as written: camnorte.ks@bfar.da.gov.ph (reading uncertain). -->
