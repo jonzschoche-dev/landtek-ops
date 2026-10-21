@@ -56,6 +56,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [47_RED_TEAM_BALANE_DIRECTIVE](SECTIONS/47_RED_TEAM_BALANE_DIRECTIVE/README.md) | Red team: the directive the Balane household would give Atty. Ramos (our model), with the annex of our standing answers | 9 sections | `RED_TEAM_BALANE_DIRECTIVE_2026-10-19.html` |
 | [48_STRATEGY_CADENCE_TRAJECTORY_21OCT](SECTIONS/48_STRATEGY_CADENCE_TRAJECTORY_21OCT/README.md) | Strategy, cadence and trajectory as of 21 Oct 2026 (after counsel's reply): strategy in one page, dated cadence to judgment, the records-timing decision, their trajectory, open decisions | 6 sections | `STRATEGY_CADENCE_TRAJECTORY_2026-10-21.html` |
 | [49_TSN_REQUEST_14OCT](SECTIONS/49_TSN_REQUEST_14OCT/README.md) | Request to the branch for the transcript (and any recording) of the 14 Oct 2026 hearing, with the checklist for checking it (draft, not sent) | 2 sections | `TSN_REQUEST_2026-10/TSN_REQUEST_14OCT_and_CHECKLIST.html` |
+| [50_FEED_NOTE_7_SUBPOENA_LIST](SECTIONS/50_FEED_NOTE_7_SUBPOENA_LIST/README.md) | Note 7 to counsel: the records we want subpoenaed, tiered to his timing (before we rest only if certified copies fail; rebuttal; Salvador at his cross) (draft, not sent) | 6 sections | `BARANDON_FEED/07_SUBPOENA_LIST_2026-10-21.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders
