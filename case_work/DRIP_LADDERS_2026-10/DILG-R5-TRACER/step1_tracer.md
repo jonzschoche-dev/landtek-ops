@@ -5,7 +5,7 @@ Magandang araw po! On 22 July 2026 I sent the request below to your e-mail addre
 
 For your updated reference: on 25 August 2026 the MLGOO of Mercedes directed the Secretary to the Sangguniang Bayan to act on these session records within five working days. The reply of 1 September 2026 said only that the records "are being verified and consolidated", and none has been released since.
 
-May I kindly ask for the reference number assigned to my request and its present status? I will gladly resend the attachments of 22 July if they are needed.
+May I kindly ask for the reference number assigned to my request and its present status? The three attachments of 22 July are attached again.
 
 Maraming salamat po sa inyong tulong!
 
