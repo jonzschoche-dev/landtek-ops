@@ -42,4 +42,4 @@ Respectfully yours,
 Attorney-in-Fact for Patricia Keesey Zschoche, a co-owner  
 Dasmariñas Street, Barangay VIII, Daet, Camarines Norte
 
-*Annex "A": Special Power of Attorney of 18 May 2026, apostilled by the California Secretary of State, Apostille No. 44327 of 18 May 2026.*
+*Annex "A": Special Power of Attorney of 12 February 2025, apostilled by the California Secretary of State, Apostille No. 61887 of 13 March 2025.*

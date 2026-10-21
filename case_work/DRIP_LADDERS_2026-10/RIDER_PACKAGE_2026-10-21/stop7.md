@@ -4,16 +4,16 @@
 
 Barangay Hall, Mercedes
 
-Document: Request for barangay records (with Annex B: T-32911 and ARP 005-00054)
+Dokumento: Request for barangay records (with Annex B: T-32911 and ARP 005-00054)
 
-Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
+Sa likod ng page na ito: ORIGINAL (iwan sa opisina) + RECEIVING COPY (pa-stamp, ibalik).
 
-Received by (name): ____________________________
+Tinanggap ni (pangalan): ____________________________
 
-Date and time: ____________________________
+Petsa at oras: ____________________________
 
-Barangay e-mail / Facebook: ____________________
+E-mail / Facebook ng barangay: ____________________
 
-Office phone: ____________________________
+Telepono ng opisina: ____________________________
 
-Photo of stamped copy sent to Jonathan:  [  ]
+Naipadala na ang litrato kay Jonathan:  [  ]

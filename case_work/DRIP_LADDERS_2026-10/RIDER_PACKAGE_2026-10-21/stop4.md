@@ -4,16 +4,16 @@
 
 Hall of Justice, Daet
 
-Document: Request for certified copies of notarial records (Asis, Belen, Subia)
+Dokumento: Request for certified copies of notarial records (Asis, Belen, Subia)
 
-Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
+Sa likod ng page na ito: ORIGINAL (iwan sa opisina) + RECEIVING COPY (pa-stamp, ibalik).
 
-Received by (name): ____________________________
+Tinanggap ni (pangalan): ____________________________
 
-Date and time: ____________________________
+Petsa at oras: ____________________________
 
-Office e-mail: ____________________________ (we have rtc1daeocc@judiciary.gov.ph)
+E-mail ng opisina: ____________________________ (meron na tayo: rtc1daeocc@judiciary.gov.ph)
 
-Office phone: ____________________________
+Telepono ng opisina: ____________________________
 
-Photo of stamped copy sent to Jonathan:  [  ]
+Naipadala na ang litrato kay Jonathan:  [  ]

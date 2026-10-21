@@ -2,18 +2,18 @@
 
 **BFAR PROVINCIAL FISHERY OFFICE, CAMARINES NORTE**
 
-Location: ask at the Provincial Agriculture Office, Capitol: ____________________
+Lokasyon (itanong sa Provincial Agriculture Office, Capitol): ____________________
 
-Document: Inquiry on any BFAR project on Lot 2-A (TCT No. T-32911), addressed to the BFAR Regional Director through the Provincial Fishery Officer
+Dokumento: Inquiry on any BFAR project on Lot 2-A (TCT No. T-32911), addressed to the BFAR Regional Director through the Provincial Fishery Officer
 
-Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
+Sa likod ng page na ito: ORIGINAL (iwan sa opisina) + RECEIVING COPY (pa-stamp, ibalik).
 
-Received by (name): ____________________________
+Tinanggap ni (pangalan): ____________________________
 
-Date and time: ____________________________
+Petsa at oras: ____________________________
 
-Office e-mail: ____________________________
+E-mail ng opisina: ____________________________
 
-Office phone: ____________________________
+Telepono ng opisina: ____________________________
 
-Photo of stamped copy sent to Jonathan:  [  ]
+Naipadala na ang litrato kay Jonathan:  [  ]

@@ -34,6 +34,10 @@ from pypdf import PdfReader, PdfWriter  # noqa: E402
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@127.0.0.1:15432/n8n")
 SPA = {"MWK-001": os.path.join(MWK, "SCHEDULE_SERVICE_LGU_2026-10", "source", "A4_SPA_apostilled.pdf")}
+# The 12 Feb 2025 GENERAL SPA (Apostille No. 61887, 13 Mar 2025; doc 285) — for records requests to offices.
+# The 18 May 2026 SPA names suits against the LGU of Mercedes on its face, so it is NOT annexed to routine
+# records requests (Jonathan, 21 Oct 2026: "lets also use my other general SPA").
+SPA_GENERAL = {"MWK-001": os.path.join(MWK, "SCHEDULE_SERVICE_LGU_2026-10", "source", "A4_SPA_general_2025_apostille61887.pdf")}
 SENDERS = {"jonzschoche@gmail.com", "jonathan@hayuma.org"}
 
 
@@ -68,7 +72,7 @@ def esign(pdf_path):
     raise RuntimeError("no signature block")
 
 
-def build_pdf(md_path, client, paper, today):
+def build_pdf(md_path, client, paper, today, spa="general"):
     text = open(md_path, encoding="utf-8").read()
     dated = re.sub(r"^_+\s+(?:\w+\s+)?20\d\d$", today, text, count=1, flags=re.M)
     if dated != text:
@@ -82,7 +86,8 @@ def build_pdf(md_path, client, paper, today):
     if not paper:
         esign(tmp)
     letter = [normalize(p) for p in PdfReader(tmp).pages if (p.extract_text() or "").strip()]
-    annex = [stamp(normalize(p), "A") for p in PdfReader(SPA[client]).pages] if client in SPA else []
+    spa_map = SPA_GENERAL if spa == "general" else SPA
+    annex = [stamp(normalize(p), "A") for p in PdfReader(spa_map[client]).pages] if client in spa_map else []
     pages = (letter + annex) * (2 if paper else 1)
     w = PdfWriter()
     for p in pages:

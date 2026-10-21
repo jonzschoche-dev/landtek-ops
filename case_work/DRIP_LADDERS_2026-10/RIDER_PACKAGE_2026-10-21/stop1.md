@@ -4,16 +4,16 @@
 
 Phase 1, Beige St., Metropark Village, Brgy. Magang, Daet
 
-Document: Request for certified true copies, TCT No. T-52540, Entry Nos. 2021003235 and 2021003236
+Dokumento: Request for certified true copies, TCT No. T-52540, Entry Nos. 2021003235 and 2021003236
 
-Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
+Sa likod ng page na ito: ORIGINAL (iwan sa opisina) + RECEIVING COPY (pa-stamp, ibalik).
 
-Received by (name): ____________________________
+Tinanggap ni (pangalan): ____________________________
 
-Date and time: ____________________________
+Petsa at oras: ____________________________
 
-Confirm e-mail: rd.daet@lra.gov.ph?  YES / NO / other: ____________________
+Tama ba ang e-mail na rd.daet@lra.gov.ph?  OO / HINDI / iba: ____________________
 
-Office phone: ____________________________
+Telepono ng opisina: ____________________________
 
-Photo of stamped copy sent to Jonathan:  [  ]
+Naipadala na ang litrato kay Jonathan:  [  ]

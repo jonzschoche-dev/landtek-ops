@@ -10,7 +10,7 @@ Hall of Justice, Daet, Camarines Norte · Attention: Notarial Section
 
 Dear Clerk of Court:
 
-Magandang araw po. I write as attorney-in-fact of Patricia Keesey Zschoche, a co-owner named in TCT No. T-52540, acting to protect the property held in common, under the Special Power of Attorney of 18 May 2026 (apostilled, No. 44327) attached as Annex "A". I will present my identification when I collect the copies.
+Magandang araw po. I write as attorney-in-fact of Patricia Keesey Zschoche, a co-owner named in TCT No. T-52540, acting to protect the property held in common, under the Special Power of Attorney of 12 February 2025 (apostilled, No. 61887) attached as Annex "A". I will present my identification when I collect the copies.
 
 I respectfully request certified copies of the following notarial register entries and duplicate originals on file with your Office, and will pay the fees assessed:
 

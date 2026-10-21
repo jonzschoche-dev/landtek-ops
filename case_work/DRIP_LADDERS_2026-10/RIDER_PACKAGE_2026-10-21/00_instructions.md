@@ -1,38 +1,36 @@
-**RIDER ROUNDS — 21 October 2026 — Daet and Mercedes**
+**RIDER ROUNDS — Daet at Mercedes**
 
-**For Jonathan, before the rider leaves**
+**Para kay Jonathan (bago umalis ang rider)**
 
-1. Print this whole package on **8.5 x 13** paper: `lp -d EPSON_L5290_Series_2 -o media=FanFoldGermanLegal <file>`. Never `media=folio` (it shrinks to A4).
+1. I-print sa **8.5 x 13**: `lp -d EPSON_L5290_Series_2 -o media=FanFoldGermanLegal <file>`. Huwag `media=folio`.
 
-2. Behind each STOP page there are **two identical sets**: the ORIGINAL and the RECEIVING COPY.
+2. Sa bawat STOP, may **dalawang magkaparehong set**: ORIGINAL at RECEIVING COPY.
 
-3. On **both** copies at each stop: write the day's date in the date blank, and **sign in ink** above your typed name.
+3. Sa **parehong kopya**: isulat ang petsa sa blangko, at **pumirma (tinta)** sa itaas ng pangalan.
 
-4. Hand the rider the package with the STOP pages in order.
+**Para sa rider — sa bawat opisina**
 
-**For the rider, at every stop**
+1. Ibigay ang **ORIGINAL** sa receiving clerk o secretary ng opisinang nakasulat sa STOP page.
 
-1. Give the **ORIGINAL** to the receiving clerk or secretary of the office named on the STOP page.
+2. Sa **RECEIVING COPY**, magpa-**"received" stamp**, o magpapirma na may **pangalan, petsa at oras**.
 
-2. On the **RECEIVING COPY**, get the office's **received stamp**, or a **signature with printed name, date and time**.
+3. **Kunan ng litrato** ang na-stamp na receiving copy (unang pahina, malinaw) at ipadala agad kay Jonathan.
 
-3. **Photograph** the stamped receiving copy (first page, readable) and send it to Jonathan right away.
+4. **Itanong ang e-mail ng opisina** at isulat sa STOP page. Isulat din ang pangalan ng tumanggap at numero ng telepono ng opisina, kung ibibigay.
 
-4. **Ask for the office's e-mail address** and write it on the STOP page. Also note the name of the person who received, and any office phone number.
+5. Huwag pag-usapan ang lupa, ang kahit sinong tao, o kahit anong kaso. Kung tanungin: "Request po ito para sa records. Nasa sulat po ang detalye."
 
-5. Do not discuss the land, any person, or any case. If asked: "These are requests for records. The details are in the letter."
+6. Kung may bayad o pinababalik ka, isulat lang kung ano ang sinabi at magkano. Huwag magbayad hangga't walang sabi si Jonathan.
 
-6. If an office asks for fees or tells you to come back, write down what they said and the amount; do not pay unless Jonathan says so.
+7. Ibalik kay Jonathan lahat ng receiving copy.
 
-7. Bring back all receiving copies.
+**Ruta**
 
-**Route**
-
-STOP 1 — Registry of Deeds, Camarines Norte (Phase 1, Beige St., Metropark Village, Brgy. Magang, Daet). **Also confirm the Registry's e-mail: is it rd.daet@lra.gov.ph?**
+STOP 1 — Registry of Deeds, Camarines Norte (Phase 1, Beige St., Metropark Village, Brgy. Magang, Daet). **Itanong din: tama ba ang e-mail nila na rd.daet@lra.gov.ph?**
 
 STOP 2 — Provincial Capitol, Daet: Office of the Secretary to the Sangguniang Panlalawigan.
 
-STOP 3 — BFAR Provincial Fishery Office, Camarines Norte. **Ask at the Capitol (Provincial Agriculture Office) where BFAR's provincial office is in Daet**, and deliver there. If it cannot be found, bring the set back.
+STOP 3 — BFAR Provincial Fishery Office, Camarines Norte. **Itanong sa Capitol (Provincial Agriculture Office) kung saan ang BFAR office sa Daet**, doon i-deliver. Kung hindi mahanap, ibalik ang set.
 
 STOP 4 — Hall of Justice, Daet: Office of the Clerk of Court, RTC — Notarial Section.
 
@@ -44,4 +42,4 @@ STOP 7 — Barangay Hall, Barangay V, Poblacion, Mercedes.
 
 STOP 8 — Barangay Hall, Barangay San Roque, Mercedes.
 
-Jonathan: 0966-698-1448
+Salamat po! Kung may tanong, tawagan si Jonathan: 0966-698-1448

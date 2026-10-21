@@ -4,16 +4,16 @@
 
 Provincial Capitol, Daet
 
-Document: Request for certified copy of Provincial Ordinance No. 22-2024
+Dokumento: Request for certified copy of Provincial Ordinance No. 22-2024
 
-Behind this page: ORIGINAL (leave with the office) + RECEIVING COPY (get stamped, bring back).
+Sa likod ng page na ito: ORIGINAL (iwan sa opisina) + RECEIVING COPY (pa-stamp, ibalik).
 
-Received by (name): ____________________________
+Tinanggap ni (pangalan): ____________________________
 
-Date and time: ____________________________
+Petsa at oras: ____________________________
 
-Office e-mail: ____________________________
+E-mail ng opisina: ____________________________
 
-Office phone: ____________________________
+Telepono ng opisina: ____________________________
 
-Photo of stamped copy sent to Jonathan:  [  ]
+Naipadala na ang litrato kay Jonathan:  [  ]
