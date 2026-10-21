@@ -47,3 +47,4 @@ Parcels declared for taxation in the name of Mary Worrick Keesey or her heirs, a
 
 5. PIN 025-07-003-01-057 · ARP No. 003-00169 (TCT No. T-52537, Lot 2-X-4-E) · 152 sq m
 
+<!-- FIELD 21 Oct 2026 (rider): RECEIVED (Jonathan). Reply due ~11-12 Nov. Stamp photo to collect. -->

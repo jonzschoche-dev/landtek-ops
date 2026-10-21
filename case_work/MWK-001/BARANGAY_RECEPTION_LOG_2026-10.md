@@ -8,10 +8,13 @@ Purpose: the rider round of 21 Oct 2026 put the same calm records request to fou
 
 | Barangay | Delivered 21 Oct | Outcome | Proof | Next |
 |---|---|---|---|---|
-| I (Uno) | rider | pending report | — | — |
-| III | rider | pending report | — | — |
+| I (Uno) | rider | [O] REFUSED by a barangay tanod. Not known if any official was present or if the tanod was instructed | rider's note to collect (tanod name if given, officials present?) | step 2 registered mail, same as San Roque (pending Jonathan's go) |
+| III | rider | [O] RECEIVED 21 Oct | stamp photo / receiver name to collect | reply due ~11–12 Nov (15 working days; depends on 2 Nov holiday) |
 | V | rider | pending report | — | — |
 | San Roque | rider | [O] REFUSED. Punong Barangay and admin both refused to receive the letter and refused to give their names | rider's note (to be signed) | step 2: registered mail with return card, cc Mayor Pajarillo + MLGOO Guerrero (MLGOO copy as JPEG) |
+
+## Tally (21 Oct)
+Received 1 (III) · refused 2 (San Roque by Kapitan + admin; Uno by a tanod) · pending 1 (V).
 
 ## Field intelligence
 
