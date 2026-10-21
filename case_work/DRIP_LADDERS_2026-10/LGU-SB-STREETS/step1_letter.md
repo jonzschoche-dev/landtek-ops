@@ -23,3 +23,4 @@ Respectfully yours,
 Attorney-in-Fact for Patricia Keesey Zschoche
 
 *Enclosure: Special Power of Attorney (apostilled), Annex "A".*
+<!-- SUPERSEDED 21 Oct 2026 by ../SB-ROAD-LOTS-COMPLETION (Jonathan: drip the whole SB on completing the road-lot donation). -->

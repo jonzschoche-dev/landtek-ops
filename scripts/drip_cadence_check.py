@@ -10,10 +10,19 @@ Reads drip_event rows (kind 'sent'/'dispatched') whose detail mentions the addre
 """
 import os, sys, json, datetime
 import psycopg2
-DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+# PG_DSN wins; otherwise try the VPS-native address, then the Mac tunnel (ssh -L 15432).
+DSNS = [os.environ["PG_DSN"]] if os.environ.get("PG_DSN") else [
+    "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n", "postgresql://n8n:n8npassword@127.0.0.1:15432/n8n"]
+def connect():
+    for d in DSNS:
+        try:
+            return psycopg2.connect(d, connect_timeout=5)
+        except psycopg2.OperationalError:
+            continue
+    raise SystemExit("drip_cadence_check: database unreachable (VPS address and Mac tunnel both failed)")
 WINDOW_DAYS = 21
 def main(addrs):
-    c = psycopg2.connect(DSN); cur = c.cursor()
+    c = connect(); cur = c.cursor()
     blocked = False
     for a in addrs:
         cur.execute("""SELECT created_at, detail FROM drip_event WHERE kind IN ('sent','dispatched')
