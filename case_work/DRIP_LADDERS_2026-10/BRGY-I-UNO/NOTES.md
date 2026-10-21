@@ -1,0 +1,1 @@
+- 21 Oct: tanod refused; no e-mail or phone found for the barangay (Jonathan). Step 2 = step2_registered_mail.md, cc Mayor Pajarillo + MLGOO Guerrero; 4-copy print set, e-signed version + MLGOO_JPEG/. Rider note: step1_refusal_note.md.
