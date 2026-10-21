@@ -1,5 +1,5 @@
 # Witness pack: the three neighbours (De Leon, King, de los Reyes): one thing each, lines to withdraw, cross, documents for counsel, the jurat commission question
-Source: `WITNESS_PACK_NEIGHBOURS_2026-10-19.html` (modified 2026-10-19). One file per section:
+Source: `WITNESS_PACK_NEIGHBOURS_2026-10-19.html` (modified 2026-10-21). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [Part 1 · Before any neighbour testifies](01_Part_1_Before_any_neighbour_testifies.md)

@@ -1,6 +1,6 @@
 # Civil Case No. 26-360 (Zschoche v. Balane): index of the working documents
 
-Generated 2026-10-19 by `research/split_sections.py`. Every working document is split into one
+Generated 2026-10-21 by `research/split_sections.py`. Every working document is split into one
 Markdown file per section under `SECTIONS/`, so each piece of work can be found on its own. The sources (HTML/MD/PDF)
 remain where they were; edit a source and re-run the script. Nothing here is filed; counsel signs and files.
 
