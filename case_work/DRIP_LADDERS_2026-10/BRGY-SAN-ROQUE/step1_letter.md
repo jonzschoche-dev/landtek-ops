@@ -71,3 +71,6 @@ Parcels declared for taxation in the name of Mary Worrick Keesey or her heirs, a
 
 17. PIN 025-07-001-01-052 · ARP No. 001-00251 · 264 sq m
 
+
+<!-- FIELD 21 Oct 2026 (rider): REFUSED. The Punong Barangay and the barangay admin both refused to accept the letter (Jonathan, in chat). No receipt, so no clock. Still to capture from the rider: names, time, words used. Next: same letter by registered mail with return card (clock runs from the card date), plus a refusal note for the file. drip_event 'field'. -->
+<!-- 21 Oct update (Jonathan): they also refused to give their names. Rider to complete step1_refusal_note.md. Step 2 = step2_registered_mail.md. -->
