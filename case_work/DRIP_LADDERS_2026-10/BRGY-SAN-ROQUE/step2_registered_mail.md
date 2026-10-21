@@ -1,3 +1,4 @@
+<!-- 21 Oct: cc Mayor Pajarillo and MLGOO Guerrero added on Jonathan's instruction. Cadence check: no sends to either logged in the last 21 days (the 19 Oct MLGOO reiteration never went out). Print set = 4 copies: original by registered mail, 2 cc copies, 1 file. -->
 ____ October 2026
 
 **BY REGISTERED MAIL WITH RETURN CARD**
@@ -33,6 +34,10 @@ Respectfully yours,
 **JONATHAN PAUL ZSCHOCHE**  
 Attorney-in-Fact for Patricia Keesey Zschoche, a co-owner  
 Dasmariñas Street, Barangay VIII, Daet, Camarines Norte
+
+cc: Hon. Alexander L. Pajarillo, Municipal Mayor, Mercedes, Camarines Norte
+
+cc: Mr. Vencer Krystian M. Guerrero, MLGOO, DILG Mercedes, Camarines Norte
 
 
 \newpage
