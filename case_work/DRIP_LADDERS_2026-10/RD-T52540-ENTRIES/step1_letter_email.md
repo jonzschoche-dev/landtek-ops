@@ -1,14 +1,14 @@
 Daet, Camarines Norte
 20 October 2026
 
-**ATTY. VICTORIANO D. CAUBANG II**
-Officer-in-Charge, Registry of Deeds for the Province of Camarines Norte
+**ATTY. JOVIC ANGEL REY**
+Register of Deeds, Registry of Deeds for the Province of Camarines Norte
 Phase 1, Beige St., Metropark Village, Brgy. Magang, Daet, Camarines Norte 4600
-rd.daet@lra.gov.ph
+rd.provofcamarinesnorte@lra.gov.ph
 
 **Re: Certified true copies relating to TCT No. T-52540, Entry Nos. 2021003235 and 2021003236 (both of 23 November 2021)**
 
-Dear Atty. Caubang:
+Dear Sir:
 
 Magandang araw po. I write as attorney-in-fact of Patricia Keesey Zschoche, a co-owner named in TCT No. T-52540 and in TCT No. 079-2021002127, acting to protect the property held in common, under the apostilled Special Power of Attorney attached as Annex "A". I will present my identification when I collect the copies.
 
