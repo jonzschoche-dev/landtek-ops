@@ -42,6 +42,18 @@ DOCS = [
      "Matter goals PROPOSED 20 Oct 2026 (not yet set by Jonathan; internal)"),
     ("case_work/MATTER_REFERENCE_2026-10-20.md", "MWK-001", "MWK-001",
      "Matter and track reference: 68 tracks, pressure per official, dereliction meter (internal)"),
+    ("case_work/MWK-001/DRIP_RESULTS_AND_NEXT_MOVES_2026-10-21.md", "MWK-001", "MWK-001",
+     "MWK-001 drip results sought & next moves, 20-21 Oct 2026 (internal tracker)"),
+    ("case_work/MWK-001/BARANGAY_RECEPTION_LOG_2026-10.md", "MWK-001", "MWK-001",
+     "Barangay reception log 21 Oct 2026: III/V received, San Roque/Uno refused; Mayor rumour [O] (internal)"),
+    ("case_work/MWK-001/BALIZA_CLAIM_LOG.md", "MWK-001", "MWK-001",
+     "Miguel Baliza claim log: 1 Oct 2025 letter unanswered, Torralba JA Q21 link, final notice (internal)"),
+    ("case_work/CV26360_COMPLETE/CASE_FILE/PARTIES/TORRALBA_SB_CONDUCT_LOG.md", "MWK-001", "MWK-CV26360",
+     "Councilor Torralba SB conduct log: non-recusal [O], minutes refused, livestream erased; subpoena route (internal)"),
+    ("case_work/MWK-001/DILG_COMMS_REVIEW_PROVINCIAL_REGIONV_2026-10-21.md", "MWK-001", "MWK-001",
+     "DILG communications review, Provincial + Region V, 21 Oct 2026 (internal)"),
+    ("case_work/MWK-001/RIDER_ROUNDS_DOWNSTREAM_2026-10-21.md", "MWK-001", "MWK-001",
+     "Rider rounds 21 Oct 2026: downstream effects assessment (internal)"),
 ]
 
 
