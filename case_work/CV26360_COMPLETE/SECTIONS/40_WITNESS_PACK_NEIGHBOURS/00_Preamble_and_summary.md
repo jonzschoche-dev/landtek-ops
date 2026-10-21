@@ -25,7 +25,7 @@ Tags: [VERIFY] = not yet checked against a document · [ASK HER] = only the witn
 
 - **Patricia:** the court disallowed her in the case-in-chief because her affidavit was not on record at pre-trial; she is not in the Pre-Trial Order. Counsel will move for her to testify on rebuttal by videoconference under A.M. No. 24-11-02-SC. Matches the plan.
 
-- **For King's day:** the certified King-case records (Part 3.5, items 4 to 5c) should reach counsel before his briefing with her.
+- **For King's day:** the King-case records (Part 3.5, items 4 to 5c) are already in counsel's office (Jonathan, 21 Oct).
 
 > 
 
