@@ -126,8 +126,8 @@ def main():
                         continue   # unsupported kind, or the quote is not in the document: dropped
                     lane, base = KINDS[kind]
                     matter = d["matter"] or "MWK-001"
-                    if matter.startswith("MWK-CV26360") and kind not in ("records_request", "office_asks_us", "reply_owed_by_office"):
-                        lane = "counsel"
+                    if matter.startswith("MWK-CV26360"):
+                        lane = "counsel"   # everything in the trial file goes through Barandon (Charter §5, X17)
                     w = weights.get(matter, weights.get("MWK-001", 5))
                     kept += 1
                     if a.dry_run:
