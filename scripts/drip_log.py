@@ -18,6 +18,7 @@ stamped receiving copy, a signed stop sheet, or the office's own e-mail ingested
   drip_log.py refused  --ladder L --at D --note N
   drip_log.py rule     --scope global|office|ladder|instrument|charter [--target T] --said "Jonathan's words" --lesson L --enforced-by E
   drip_log.py reconcile [--since 2026-10-15] [--dry-run]   # nightly: logs office mail + our sends nobody logged
+  drip_log.py link     --ladder L --gmail-id N --note N   # assign one e-mail to its ladder (resolves an AMBIGUOUS item)
   drip_log.py show L                                       # one ladder: events + clock
 """
 import argparse
@@ -252,9 +253,13 @@ def cmd_reconcile(cur, a):
     cur.execute("""SELECT g.id, g.from_addr, g.to_addrs, g.subject, g.received_at, g.labels, e.doc_id
                      FROM gmail_messages g LEFT JOIN email_documents e ON e.message_id = g.message_id AND e.role='body'
                     WHERE g.received_at >= %s ORDER BY g.received_at""", (since,))
+    msgs = cur.fetchall()
+    cur.execute("""SELECT DISTINCT substring(detail::text from 'gmail_messages:([0-9]+)')::int AS gid FROM drip_event
+                    WHERE detail::text LIKE '%%gmail_messages:%%'""")
+    linked = {r["gid"] for r in cur.fetchall() if r["gid"]}
     logged = 0
-    for g in cur.fetchall():
-        if "DRAFT" in (g["labels"] or []):
+    for g in msgs:
+        if "DRAFT" in (g["labels"] or []) or g["id"] in linked:   # already logged or assigned by hand
             continue
         frm = (ADDR.findall(g["from_addr"] or "") or [""])[0].lower()
         when = (g["received_at"] + timedelta(hours=8)).date()
@@ -291,6 +296,11 @@ def cmd_reconcile(cur, a):
                 except SystemExit as e:
                     print(f"  {lad}: {e}")
     return f"reconcile since {since}: {logged} item(s) {'would be ' if a.dry_run else ''}logged"
+
+
+def cmd_link(cur, a):
+    eid = event(cur, "link", ladder=a.ladder, source=f"gmail_messages:{a.gmail_id}", note=a.note)
+    return f"e-mail {a.gmail_id} assigned to {a.ladder} (#{eid}); reconcile will skip it"
 
 
 def cmd_show(cur, ladder):
@@ -341,13 +351,17 @@ def main():
     p = sp.add_parser("reconcile")
     p.add_argument("--since")
     p.add_argument("--dry-run", action="store_true")
+    p = sp.add_parser("link")
+    p.add_argument("--ladder", required=True)
+    p.add_argument("--gmail-id", type=int, required=True)
+    p.add_argument("--note")
     p = sp.add_parser("show")
     p.add_argument("ladder")
     a = ap.parse_args()
     c, cur = conn()
     try:
         out = {"sent": cmd_sent, "drafted": cmd_drafted, "receipt": cmd_receipt, "reply": cmd_reply, "refused": cmd_refused,
-               "rule": cmd_rule, "reconcile": cmd_reconcile}.get(a.cmd)
+               "rule": cmd_rule, "reconcile": cmd_reconcile, "link": cmd_link}.get(a.cmd)
         msg = out(cur, a) if out else cmd_show(cur, a.ladder)
         if a.cmd == "reconcile" and a.dry_run:
             c.rollback()
