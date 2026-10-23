@@ -1,0 +1,57 @@
+{
+  "_about": "Inputs for the drip's NEXT TARGET picker (scripts/drip_board.py). Edit freely: weights are Jonathan's call. matter weight 1-10 = importance; anchors = hard calendar dates; feeds = which ladders must land before which anchor. Dates PHT. Source notes in 'why'. Defaults set 23 Oct 2026 — CONFIRM WITH JONATHAN.",
+  "matters": {
+    "MWK-CV26360": {"weight": 10, "why": "trial running; plaintiff evidence Nov 4/11, Dec 2; formal offer Dec 9 closes the record"},
+    "MWK-CV6839": {"weight": 9, "why": "money: P5.12M unpaid principal + 30 yrs interest; final judgment; execution window to ~2029"},
+    "MWK-GUARDIANSHIP": {"weight": 8, "why": "SP 2680 unlocks the non-participating heir's share"},
+    "MWK-LGU-RECOVERY": {"weight": 6, "why": "LGU-occupied estate land; compensation path"},
+    "MWK-001": {"weight": 5, "why": "estate administration, records, occupants"},
+    "MWK-TCT4497": {"weight": 5, "why": "title chain"},
+    "MWK-DLF-VOID": {"weight": 6, "why": "de la Fuente void transfers; feeds 26-360"},
+    "MWK-ARTA": {"weight": 3, "why": "accountability record; leverage, not a goal"},
+    "Paracale-001": {"weight": 5, "why": "separate client"},
+    "NIBDC-001": {"weight": 4, "why": "separate client"},
+    "LANDTEK-CORP": {"weight": 4, "why": "company formation"}
+  },
+  "ladder_matter": {
+    "RD-T52540-ENTRIES": "MWK-CV26360",
+    "OCC-NOTARIAL-ASIS-BELEN": "MWK-CV26360",
+    "LANDBANK": "MWK-CV6839",
+    "COUNSEL-BARANDON": "MWK-CV26360",
+    "DENR-R5-PLANS": "MWK-001",
+    "DENR-TS-OSS-1092": "MWK-LGU-RECOVERY",
+    "PROV-ASSESSOR-TAXMAP": "MWK-001",
+    "LGU-ABLA-LOT402": "MWK-LGU-RECOVERY",
+    "BFAR-T32911-INQUIRY": "MWK-LGU-RECOVERY",
+    "SP-ORDINANCE-22-2024": "MWK-001",
+    "PROV-TREASURER-21JUL": "MWK-001",
+    "BLGF-R5-RECORDS": "MWK-001",
+    "BRGY-III": "MWK-001",
+    "BRGY-V": "MWK-001",
+    "BRGY-I-UNO": "MWK-001",
+    "BRGY-SAN-ROQUE": "MWK-001",
+    "BALIZA-FINAL-NOTICE": "MWK-001",
+    "CSC-R5-REFERRALS": "MWK-ARTA",
+    "OMB-OACL270-REF": "MWK-ARTA",
+    "ARTA-1378-TRANSMITTAL": "MWK-ARTA",
+    "COA-R5-AUDIT-ACK": "MWK-LGU-RECOVERY",
+    "DILG-PD-RELUCIO": "MWK-LGU-RECOVERY",
+    "DILG-R5-TRACER": "MWK-LGU-RECOVERY",
+    "PROV-PLO-UPDATE": "MWK-LGU-RECOVERY"
+  },
+  "anchors": [
+    {"date": "2026-10-26", "matter": "MWK-LGU-RECOVERY", "what": "DENR TS-OSS-1092 reply due (eFOI ready for 27 Oct)"},
+    {"date": "2026-10-30", "matter": "MWK-CV26360", "what": "JA supplement mark for the 4 Nov witness [witness order: confirm vs Barandon 21 Oct]"},
+    {"date": "2026-11-04", "matter": "MWK-CV26360", "what": "trial setting, plaintiff evidence (1:30 PM, MTC Mercedes)"},
+    {"date": "2026-11-11", "matter": "MWK-CV26360", "what": "trial setting, plaintiff evidence (1:30 PM)"},
+    {"date": "2026-11-11", "matter": "MWK-GUARDIANSHIP", "what": "SP 2680 setting, RTC Br. 41 (morning)"},
+    {"date": "2026-11-27", "matter": "MWK-CV26360", "what": "subpoena / RD / OCC returns must be in hand"},
+    {"date": "2026-12-02", "matter": "MWK-CV26360", "what": "trial setting, plaintiff evidence (1:30 PM)"},
+    {"date": "2026-12-09", "matter": "MWK-CV26360", "what": "plaintiff rests: formal offer of evidence"}
+  ],
+  "feeds": {
+    "RD-T52540-ENTRIES": "2026-11-27",
+    "OCC-NOTARIAL-ASIS-BELEN": "2026-11-27",
+    "COUNSEL-BARANDON": "2026-11-04"
+  }
+}

@@ -122,6 +122,7 @@ def build(cur, today):
                 x["refused"].append((when, (d.get("note") or d.get("result") or d.get("outcome") or "")[:120], r["id"]))
         elif r["kind"] == "drafted":
             x["notes"].append(f"drafted {when}")
+            x["drafted"] = max(x.get("drafted") or when, when)
     # Our own outbound mail addressed TO a ladder's office counts as a send even if nobody logged it
     # (a cc to counsel on another office's request is not a send on counsel's ladder).
     for lad, x in L.items():
@@ -198,15 +199,101 @@ def build(cur, today):
                      "status": status, "last_sent": last_sent, "proof": proof, "due": due,
                      "wd_left": working_days_between(today, due, off) if due and due >= today else None,
                      "last_reply": x["replies"][-1] if x["replies"] else None, "refused": x["refused"],
-                     "unlogged": x.get("unlogged", []), "folder": x.get("folder")})
+                     "unlogged": x.get("unlogged", []), "folder": x.get("folder"),
+                     "matters": sorted(m for m in x["matter"] if m), "drafted": x.get("drafted")})
     return rows, off
+
+
+PRIORITIES = os.path.join(REPO, "case_work", "DRIP_PRIORITIES.json")
+CADENCE_DAYS = 21
+
+
+def load_priorities():
+    try:
+        with open(PRIORITIES) as f:
+            return json.load(f)
+    except Exception:  # noqa: BLE001 — the board must still run without it
+        return {"matters": {}, "ladder_matter": {}, "anchors": [], "feeds": {}}
+
+
+def matter_of(r, pri):
+    if r["ladder"] in pri.get("ladder_matter", {}):
+        return pri["ladder_matter"][r["ladder"]]
+    for m in r.get("matters") or []:
+        if m in pri.get("matters", {}):
+            return m
+        if m.startswith("MWK-ARTA") or m.startswith("MWK-OMB") or m.startswith("MWK-OP"):
+            return "MWK-ARTA"
+    return (r.get("matters") or [r["client"]])[0] if r.get("matters") else r["client"]
+
+
+def pick_targets(rows, today, off, top=7):
+    """Rank what to do next across ALL matters: importance (matter weight) x action urgency + calendar proximity.
+    The drip FOLLOWS: it suggests follow-ups on decided positions, never new legal stands."""
+    pri = load_priorities()
+    weights = {k: v.get("weight", 5) for k, v in pri.get("matters", {}).items()}
+    anchors = sorted([(datetime.strptime(a["date"], "%Y-%m-%d").date(), a["matter"], a["what"])
+                      for a in pri.get("anchors", [])])
+    feeds = {k: datetime.strptime(v, "%Y-%m-%d").date() for k, v in pri.get("feeds", {}).items()}
+    out = []
+
+    def prox(matter):
+        nxt = [a for a in anchors if a[1] == matter and a[0] >= today]
+        if not nxt:
+            return 0, None
+        d = (nxt[0][0] - today).days
+        return (max(0, 30 - d) / 2.0), nxt[0]
+
+    for r in rows:
+        m = matter_of(r, pri)
+        w = weights.get(m, 5)
+        bonus, anc = prox(m)
+        recent = r["last_sent"] and (today - r["last_sent"]).days < CADENCE_DAYS
+        chan = (f"phone or visit (cadence: last e-mail {r['last_sent']:%d %b})" if recent else "e-mail OK")
+        base, what = 0, ""
+        if r["status"] == "ANSWERED: ACT" and r.get("drafted") and r["last_reply"] and r["drafted"] >= r["last_reply"][0]:
+            base, what, chan = 58, f"reply drafted {r['drafted']:%d %b}: review in Drafts and send", "send from jonzschoche Drafts"
+        elif r["status"] == "ANSWERED: ACT":
+            base, what, chan = 60, "act on their reply: " + (r["last_reply"][1][:110] if r["last_reply"] else ""), "reply in their thread"
+        elif r["status"] == "LAPSED":
+            base, what = 55, f"clock lapsed {r['due']:%d %b}: next rung of the ladder"
+        elif r["status"] == "CLOCK RUNNING" and r["ladder"] in feeds and r["due"] and r["due"] > feeds[r["ladder"]] - timedelta(days=5):
+            base, what = 50, (f"due {r['due']:%d %b}, but needed by {feeds[r['ladder']]:%d %b}: call to expedite / confirm fee and pickup")
+            chan = "phone or visit"
+        elif r["status"] == "CLOCK RUNNING" and r["wd_left"] is not None and r["wd_left"] <= 3:
+            base, what = 45, f"due {r['due']:%d %b} ({r['wd_left']} working days): have the silent-case step ready"
+        elif r["status"] == "SENT, NO PROOF" and r["last_sent"] and working_days_between(r["last_sent"], today, off) >= 2:
+            base, what, chan = 30, f"no acknowledgment since {r['last_sent']:%d %b}: confirm receipt", "phone (no new e-mail under cadence)"
+        elif r["status"] == "REFUSED":
+            base, what, chan = 15, "refused in person: registered mail + cover letter; then wait for the return card", "post office"
+        if base:
+            out.append({"score": round(base * w / 10 + bonus, 1), "ladder": r["ladder"], "matter": m, "what": what,
+                        "channel": chan, "anchor": anc})
+    for d, m, what in anchors:
+        days = (d - today).days
+        if 0 <= days <= 14:
+            w = weights.get(m, 5)
+            out.append({"score": round(40 * w / 10 + max(0, 30 - days) / 2.0, 1), "ladder": "(calendar)", "matter": m,
+                        "what": f"{d:%a %d %b}: {what}", "channel": "prepare", "anchor": (d, m, what)})
+    return sorted(out, key=lambda t: -t["score"])[:top]
+
+
+def render_targets(targets):
+    if not targets:
+        return []
+    out = ["", "## Next targets (ranked: importance x urgency + calendar)", "",
+           "Suggested by the drip from DRIP_PRIORITIES.json. The drip follows decided positions; legal stands stay with Jonathan.", "",
+           "| # | Score | Matter | Ladder | Next step | Channel |", "|---|---|---|---|---|---|"]
+    for i, t in enumerate(targets, 1):
+        out.append(f"| {i} | {t['score']} | {t['matter']} | {t['ladder']} | {t['what'].replace('|', '/')} | {t['channel']} |")
+    return out
 
 
 ORDER = ["LAPSED", "ANSWERED: ACT", "REFUSED", "CLOCK RUNNING", "SENT, NO PROOF", "DRAFTED", "PLANNED",
          "FOLDER ONLY", "SKIPPED"]
 
 
-def render(rows, today, client=None):
+def render(rows, today, client=None, targets=None):
     by = defaultdict(list)
     for r in rows:
         by[r["status"]].append(r)
@@ -220,6 +307,7 @@ def render(rows, today, client=None):
     for s in ORDER:
         if by[s]:
             out.append(f"| {s} | {len(by[s])} |")
+    out += render_targets(targets or [])
     unl = [r for r in rows if r["unlogged"]]
     if unl:
         out += ["", "## Office mail not yet logged against its ladder", ""]
@@ -270,8 +358,9 @@ def main():
     today = datetime.strptime(a.today, "%Y-%m-%d").date() if a.today else date.today()
     c = psycopg2.connect(DSN)
     cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    rows, _ = build(cur, today)
-    md = render(rows, today)
+    rows, off = build(cur, today)
+    targets = pick_targets(rows, today, off)
+    md = render(rows, today, targets=targets)
     if a.stdout:
         print(md)
     else:
@@ -279,9 +368,14 @@ def main():
             f.write(md)
         os.makedirs(OUT_DIR, exist_ok=True)
         for client in sorted({r["client"] for r in rows}):
+            crows = [r for r in rows if r["client"] == client]
             with open(os.path.join(OUT_DIR, f"DRIP_BOARD_{client}.md"), "w") as f:
-                f.write(render([r for r in rows if r["client"] == client], today, client))
+                f.write(render(crows, today, client, targets=[t for t in targets if any(r["ladder"] == t["ladder"] for r in crows)
+                                                            or (t["ladder"] == "(calendar)" and client == "MWK-001")]))
         print(summary(rows, today))
+        print("NEXT TARGETS:")
+        for i, t in enumerate(targets, 1):
+            print(f"  {i}. [{t['score']}] {t['matter']} · {t['ladder']} · {t['what'][:100]} · {t['channel']}")
         print(f"board: {os.path.relpath(OUT, REPO)}")
 
 
