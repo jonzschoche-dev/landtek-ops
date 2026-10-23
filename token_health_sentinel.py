@@ -323,9 +323,10 @@ def send_alert(alerts) -> None:
         log(f"tg_send unavailable; logging alert only: {e}")
         tg_send = None
 
-    parts = [f"{a['label']} {a['status']}" for a in alerts]
-    text = ("Token health: " + "; ".join(parts)
-            + ". OAuth tokens: re-mint (scripts/mint_calendar_token.py). API keys: rotate in .env.")
+    fix = {"Gmail (jonzschoche)": "on the Mac run scripts/mint_gmail_backup_token.py",
+           "Calendar": "run scripts/mint_calendar_token.py"}
+    parts = [f"{a['label']} {a['status']}" + (f" ({fix[a['label']]})" if a['label'] in fix else "") for a in alerts]
+    text = ("Token health: " + "; ".join(parts) + ". Other API keys: rotate in .env.")
     log("ALERT → " + text)
     if tg_send is None:
         return
