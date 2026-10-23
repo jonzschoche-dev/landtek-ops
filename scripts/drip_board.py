@@ -131,6 +131,7 @@ def build(cur, today):
                         WHERE lower(substring(g.from_addr from '[A-Za-z0-9._%%+-]+@[A-Za-z0-9.-]+')) = ANY(%s)
                           AND EXISTS (SELECT 1 FROM unnest(coalesce(g.to_addrs,'{}')) t
                                        WHERE lower(substring(t from '[A-Za-z0-9._%%+-]+@[A-Za-z0-9.-]+')) = ANY(%s))
+                          AND NOT ('DRAFT' = ANY(coalesce(g.labels,'{}')))
                           AND g.received_at > now() - interval '120 days'""",
                     (list(OURS), list(x["office"])))
         have = {s[0] for s in x["sent"]}
