@@ -294,6 +294,20 @@ def prospects():
     return jsonify(prospects=rows, counts={r["lane"]: r["n"] for r in counts})
 
 
+@app.route("/api/prospect/<int:i>")
+def prospect_detail(i):
+    p = q("SELECT * FROM drip_prospect WHERE id=%s", (i,), one=True)
+    if not p: abort(404)
+    src_text = None
+    m = re.match(r"(.+\.md):(\d+)$", p["source_ref"] or "")
+    if m:   # a desk file: show the lines around the item
+        path = os.path.join("/root/landtek", m.group(1)); ln = int(m.group(2))
+        if os.path.isfile(path):
+            lines = open(path, errors="ignore").read().splitlines()
+            src_text = "\n".join(f"{n + 1:>4}  {l}" for n, l in enumerate(lines) if ln - 8 <= n + 1 <= ln + 8)
+    return jsonify(json.loads(json.dumps({"prospect": p, "source_text": src_text}, default=str)))
+
+
 @app.route("/api/prospect/<int:i>/action", methods=["POST"])
 def prospect_action(i):
     """promote → a planned ladder · dismiss · lane change. Promotion is Jonathan's call; nothing is sent."""

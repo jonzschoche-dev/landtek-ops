@@ -84,7 +84,7 @@ L.innerHTML='<b>Next targets</b>'+(j.targets||[]).map((t,n)=>`<div onclick="${t.
  B('Open',`openLadder('${jsq(o.ladder)}')`)+B('Reply came',`logOn('${jsq(o.ladder)}','reply')`)+B('Done',`logOn('${jsq(o.ladder)}','performed')`)+B('Log call',`logOn('${jsq(o.ladder)}','call')`)+B('Draft tracer',`ask('Draft a calm tracer for ladder ${jsq(o.ladder)} (due ${dd(o.due_at)})')`)+`</div></div>`).join('');return}
 if(tab=='prospects'){const lane=window._lane||'drip';const j=await (await fetch(`api/prospects?lane=${lane}&q=${encodeURIComponent($('#fq').value)}`)).json();
 L.innerHTML=`<div class="acts" style="padding:6px 10px">`+['drip','legal_desk','counsel','hold'].map(l=>`<button style="${l==lane?'background:var(--ac);color:#000':''}" onclick="window._lane='${l}';load()">${l} (${j.counts[l]||0})</button>`).join('')+`</div>`+
- j.prospects.map(p=>`<div>💡 ${esc(p.title)}<small>${esc(p.matter_code)} · ${esc(p.kind)} · score ${p.score} · ${esc(p.source_ref)}</small><div class="acts">`+
+ j.prospects.map(p=>`<div onclick="openProspect(${p.id})">💡 ${esc(p.title)}<small>${esc(p.matter_code)} · ${esc(p.kind)} · score ${p.score} · ${esc(p.source_ref)}</small><div class="acts">`+B('Open',`openProspect(${p.id})`)+
  (p.lane=='drip'?B('Promote to ladder',`prAct(${p.id},'promote')`)+B('Draft ask',`ask('Draft a calm records request for this prospect (#${p.id}): ${jsq(p.title)}')`):B('Ask bot',`ask('About prospect #${p.id} (${p.lane}): ${jsq(p.title)} — what are the options?')`))+
  B('Lane…',`prAct(${p.id},'lane')`)+B('Dismiss',`prAct(${p.id},'dismiss')`)+`</div></div>`).join('');return}
 const j=await (await fetch(`api/files?src=${tab}&q=${encodeURIComponent($('#fq').value)}`)).json();
@@ -98,7 +98,7 @@ async function doSearch(qq){qq=(qq??$('#sq').value).trim();if(qq.length<2)return
  sec('Matters',j.matters)+j.matters.map(m=>`<div onclick="doSearch('${jsq(m.matter_code)}')">📁 ${esc(m.matter_code)}<small>${esc(m.title)} · ${esc(m.status)} · ${esc((m.next_event||'').slice(0,120))}</small><div class="acts">${B('Dig in',`doSearch('${jsq(m.matter_code)}')`)}${B('Brief',`ask('Brief me on ${jsq(m.matter_code)} with citations.')`)}</div></div>`).join('')+
  sec('Live clocks',j.clocks)+j.clocks.map(o=>`<div onclick="openLadder('${jsq(o.ladder)}')">⏳ ${esc(o.ladder)}<small>${esc(o.office)} · due ${dd(o.due_at)} · ${o.state}</small></div>`).join('')+
  sec('Ladders',j.ladders)+j.ladders.map(l=>`<div onclick="openLadder('${jsq(l.ladder)}')">🪜 ${esc(l.ladder)}<small>${esc(l.matter_code)} · ${esc(l.state)} · ${esc(l.addressee||'')} ${l.due_at?'· due '+dd(l.due_at):''}</small><div class="acts">${B('Open',`openLadder('${jsq(l.ladder)}')`)}${B('Draft next step',`ask('Draft the next drip step for ladder ${jsq(l.ladder)}')`)}</div></div>`).join('')+
- sec('Prospects',j.prospects)+j.prospects.map(p=>`<div>💡 ${esc(p.title)}<small>${esc(p.matter_code)} · ${esc(p.kind)} · ${p.lane} · ${esc(p.source_ref)}</small><div class="acts">${p.lane=='drip'?B('Promote',`prAct(${p.id},'promote')`):''}${B('Lane…',`prAct(${p.id},'lane')`)}${B('Dismiss',`prAct(${p.id},'dismiss')`)}${p.source_ref.startsWith('documents:')?B('Source',`pv('doc',${p.source_ref.split(':')[1]})`):''}</div></div>`).join('')+
+ sec('Prospects',j.prospects)+j.prospects.map(p=>`<div onclick="openProspect(${p.id})">💡 ${esc(p.title)}<small>${esc(p.matter_code)} · ${esc(p.kind)} · ${p.lane} · ${esc(p.source_ref)}</small><div class="acts">${p.lane=='drip'?B('Promote',`prAct(${p.id},'promote')`):''}${B('Lane…',`prAct(${p.id},'lane')`)}${B('Dismiss',`prAct(${p.id},'dismiss')`)}${p.source_ref.startsWith('documents:')?B('Source',`pv('doc',${p.source_ref.split(':')[1]})`):''}</div></div>`).join('')+
  sec('Documents',j.documents)+j.documents.map(f=>`<div onclick="pv('doc',${f.id})">📚 ${esc(f.title)}<small>#${f.id} · ${esc(f.matter_code||'')} · ${esc(f.date||'')}</small></div>`).join('')+
  sec('E-mails',j.emails)+j.emails.map(e=>`<div>✉️ ${esc(e.subject)}<small>${esc(e.from_addr)} · ${dd(e.received_at)}</small></div>`).join('')+
  sec('Drip events',j.events)+j.events.map(e=>`<div onclick="${e.ladder?`openLadder('${jsq(e.ladder)}')`:''}">• ${esc(e.kind)} ${esc(e.ladder||'')}<small>${esc(e.event_date||'')} ${esc(e.detail)}</small></div>`).join('')}
@@ -115,6 +115,17 @@ async function prAct(id,action){let b={action};
  if(action=='lane'){b.lane=prompt('Lane: drip / legal_desk / counsel / hold','legal_desk');if(!b.lane)return}
  if(action=='dismiss'){b.note=prompt('Why dismiss? (optional)','');if(b.note===null)return}
  add('b',esc(`Prospect #${id}: `+await post(`api/prospect/${id}/action`,b)));load()}
+async function openProspect(id){const j=await (await fetch('api/prospect/'+id)).json();const p=j.prospect;if(!p){$('#pv').innerHTML='not found';return}
+ const B=(label,js)=>`<button onclick="${js}">${label}</button>`;const docId=(p.source_ref||'').startsWith('documents:')?p.source_ref.split(':')[1]:null;
+ $('#pv').innerHTML=`<b>💡 Prospect #${p.id}</b><div class="tools">${esc(p.matter_code)} · ${esc(p.kind)} · lane <b style="display:inline;padding:0;color:var(--tx)">${esc(p.lane)}</b> · score ${p.score} · ${esc(p.status)}${p.ladder?' · ladder '+esc(p.ladder):''}</div>
+ <p style="margin:8px 0;font-size:14px">${esc(p.title)}</p>
+ <div class="acts">`+(p.lane=='drip'&&p.status=='new'?B('Promote to ladder',`prAct(${p.id},'promote')`)+B('Draft ask',`ask('Draft a calm records request for prospect #${p.id}: ${jsq(p.title)}')`):'')+
+ B('Ask bot',`ask('About prospect #${p.id} (${p.lane}): ${jsq(p.title)} — what does the record show and what are the options? Cite docs.')`)+B('Lane…',`prAct(${p.id},'lane')`)+B('Dismiss',`prAct(${p.id},'dismiss')`)+
+ (docId?B('Open source doc',`pv('doc',${docId})`):'')+(p.ladder?B('Open ladder',`openLadder('${jsq(p.ladder)}')`):'')+`</div>`+
+ (p.excerpt?`<div class="tools" style="margin-top:8px">Source quote:</div><pre>${esc(p.excerpt)}</pre>`:'')+
+ (p.detail&&p.detail!=p.title?`<div class="tools">Detail:</div><pre>${esc(p.detail)}</pre>`:'')+
+ `<div class="tools">Source: ${esc(p.source_ref)} · first seen ${esc((p.first_seen||'').slice(0,16))}${p.decision_note?' · note: '+esc(p.decision_note):''}</div>`+
+ (j.source_text?`<div class="tools">In the file:</div><pre>${esc(j.source_text)}</pre>`:'')}
 async function openLadder(name){const j=await (await fetch('api/ladder/'+encodeURIComponent(name))).json();const dd=x=>x?new Date(x).toLocaleDateString('en-PH',{day:'2-digit',month:'short',year:'numeric'}):'—';
  const B=(label,js)=>`<button onclick="${js}">${label}</button>`;const n=jsq(name);
  $('#pv').innerHTML=`<div class="lad-h"><b>${esc(name)}</b></div>`+(j.clocks||[]).map(c=>`<div class="tools">⏳ ${c.state} · served ${dd(c.served_at)} · due ${dd(c.due_at)} · proof doc ${c.service_proof_doc_id?`<span class="chip" onclick="pv('doc',${c.service_proof_doc_id})">doc #${c.service_proof_doc_id}</span>`:'—'}</div>`).join('')+
