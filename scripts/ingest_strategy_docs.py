@@ -54,6 +54,10 @@ DOCS = [
      "DILG communications review, Provincial + Region V, 21 Oct 2026 (internal)"),
     ("case_work/MWK-001/RIDER_ROUNDS_DOWNSTREAM_2026-10-21.md", "MWK-001", "MWK-001",
      "Rider rounds 21 Oct 2026: downstream effects assessment (internal)"),
+    ("case_work/DRIP_BOARDS/DRIP_BOARD_MWK-001.md", "MWK-001", "MWK-001",
+     "DRIP BOARD MWK-001 (nightly): every ladder's status, proof of receipt, clock and due date (internal)"),
+    ("case_work/DRIP_BOARDS/DRIP_BOARD_Paracale-001.md", "Paracale-001", "Paracale-001",
+     "DRIP BOARD Paracale-001 (nightly): ladder status, proof of receipt, clocks (internal)"),
 ]
 
 
@@ -82,10 +86,13 @@ def upsert(cur, path, cf, mc, title, text):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--only", help="ingest just this one DOCS path (the nightly drip uses it for the board)")
     a = ap.parse_args()
     c = psycopg2.connect(DSN)
     cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     for path, cf, mc, title in DOCS:
+        if a.only and path != a.only:
+            continue
         full = os.path.join(REPO, path)
         if not os.path.isfile(full):
             print("MISSING", path)

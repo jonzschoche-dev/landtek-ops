@@ -179,3 +179,7 @@ files/
 arta_inbox/
 incoming_coords/
 notifications/
+
+# nightly drip outputs (regenerated; the per-client boards live in the corpus)
+case_work/DRIP_BOARD.md
+case_work/DRIP_BOARDS/

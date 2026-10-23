@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the nightly drip at 00:00 Manila (16:00 UTC). Persistent so a missed night catches up on boot.
+
+[Timer]
+OnCalendar=*-*-* 16:00:00 UTC
+AccuracySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

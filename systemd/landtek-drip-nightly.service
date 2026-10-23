@@ -1,0 +1,11 @@
+[Unit]
+Description=LandTek nightly drip (00:00 Manila): pull jonzschoche office mail, rebuild the drip board for every matter (scripts/drip_board.py), ingest the per-client boards. Sends nothing.
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/root/landtek/.env
+WorkingDirectory=/root/landtek
+ExecStart=/bin/bash /root/landtek/ops/drip/drip_nightly_vps.sh
+StandardOutput=append:/var/log/landtek/drip-nightly.log
+StandardError=append:/var/log/landtek/drip-nightly.log

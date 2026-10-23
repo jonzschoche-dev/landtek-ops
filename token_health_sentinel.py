@@ -64,6 +64,10 @@ REALERT_AFTER = timedelta(hours=6)  # self-suppress: re-alert a persistent fault
 #   required=False → absence is expected-idle (logged only, never alerted)
 OAUTH_TOKENS = [
     ("GMAIL_REFRESH_TOKEN",    "Gmail",    ["https://www.googleapis.com/auth/gmail.readonly"],  True),
+    # jonzschoche@gmail.com — the account every MWK drip goes out from. Died silently ~2026-09-22
+    # (invalid_grant; app in Testing → 7-day tokens) and blinded the drip for a month. Re-mint on the Mac:
+    # scripts/mint_gmail_backup_token.py
+    ("GMAIL_REFRESH_TOKEN_BACKUP", "Gmail (jonzschoche)", ["https://www.googleapis.com/auth/gmail.readonly"], True),
     ("DRIVE_REFRESH_TOKEN",    "Drive",    ["https://www.googleapis.com/auth/drive"],           True),
     ("CALENDAR_REFRESH_TOKEN", "Calendar", ["https://www.googleapis.com/auth/calendar.events"], False),
 ]

@@ -1,10 +1,10 @@
 [Unit]
-Description=LandTek gmail backup-inbox TARGETED poll — ingests case/filing-relevant mail from jonzschoche@gmail.com (the personal inbox no code polled = the ARTA-Resolution root cause). Through the existing classifier; case terms + has:attachment only, so no personal-email flood. account=jonzschoche@gmail.com tagged.
+Description=LandTek gmail backup-inbox TARGETED poll — ingests case/filing-relevant mail from jonzschoche@gmail.com (the personal inbox no code polled = the ARTA-Resolution root cause). Through the existing classifier; case terms + office senders (replies and acknowledgments carry no attachment; the old has:attachment filter hid them), promotions excluded. account=jonzschoche@gmail.com tagged.
 
 [Service]
 Type=oneshot
 WorkingDirectory=/root/landtek
 EnvironmentFile=-/root/landtek/.env
-ExecStart=/usr/bin/python3 /root/landtek/gmail_watcher.py --account backup --query "(ARTA OR PENRO OR assessor OR ombudsman OR manifestation OR resolution OR docket OR Balane OR Keesey OR Zschoche OR Inocalla OR Paracale OR Barandon OR sanggunian OR DILG OR CTN OR Hoppe OR Worrick) has:attachment" --max 40
+ExecStart=/usr/bin/python3 /root/landtek/gmail_watcher.py --account backup --query "(ARTA OR PENRO OR assessor OR ombudsman OR manifestation OR resolution OR docket OR Balane OR Keesey OR Zschoche OR Inocalla OR Paracale OR Barandon OR sanggunian OR DILG OR CTN OR Hoppe OR Worrick OR from:gov.ph OR from:judiciary.gov.ph OR from:lams.region5@gmail.com OR from:dilg5records2019@gmail.com OR from:ablagemma@yahoo.com OR from:omixamjr_anagam@yahoo.com OR from:barandon_lawoffice@yahoo.com OR from:penro.camnorte@yahoo.com) -category:promotions" --max 200
 StandardOutput=append:/var/log/landtek/gmail-backup.log
 StandardError=append:/var/log/landtek/gmail-backup.log
