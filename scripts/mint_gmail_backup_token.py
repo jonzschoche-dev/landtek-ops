@@ -39,8 +39,11 @@ def main():
     client = os.path.join(tmp, "client.json")
     subprocess.run(["scp", "-q", "landtek:/root/landtek/gmail_oauth_client.json", client], check=True)
     flow = InstalledAppFlow.from_client_secrets_file(client, scopes=SCOPES)
-    creds = flow.run_local_server(port=0, prompt="consent", access_type="offline", login_hint=ACCOUNT,
-                                  authorization_prompt_message=f"\nOpening browser — choose {ACCOUNT} and allow.\n")
+    # The OAuth client is a "web" client registered for exactly http://localhost:8765 (no trailing slash).
+    # port=0 (random) or the default trailing slash → redirect_uri_mismatch → Google shows "Access blocked".
+    creds = flow.run_local_server(port=8765, redirect_uri_trailing_slash=False, open_browser=False,
+                                  prompt="consent", access_type="offline", login_hint=ACCOUNT,
+                                  authorization_prompt_message="\nOpen this link, choose " + ACCOUNT + " and allow:\n{url}\n")
     os.remove(client)
     if not creds.refresh_token:
         sys.exit("No refresh token returned — remove the app at myaccount.google.com/permissions and retry.")
@@ -67,7 +70,12 @@ if not done:
 open(p, "w").write("\n".join(out) + "\n"); os.chmod(p, 0o600)
 print("VPS .env updated:", key, "(backup kept)")
 '''
-    subprocess.run(["ssh", "landtek", "python3", "-c", remote, ENV_KEY], input=creds.refresh_token, text=True, check=True)
+    # ssh joins its arguments into ONE remote shell line, so a multi-line `-c` script must be quoted as a
+    # whole (shlex.quote) or the remote shell runs it as bash ("import: command not found"; 23 Oct 2026).
+    # The token itself only ever travels on stdin.
+    import shlex
+    subprocess.run(["ssh", "landtek", "python3 -c " + shlex.quote(remote) + " " + ENV_KEY],
+                   input=creds.refresh_token, text=True, check=True)
     subprocess.run(["ssh", "landtek",
                     "cd /root/landtek && set -a && . ./.env && set +a && "
                     "timeout 120 python3 gmail_watcher.py --account backup --query 'newer_than:2d' --max 3 --dry-run 2>&1 | tail -4"],
