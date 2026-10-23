@@ -76,7 +76,7 @@ def build(cur, today):
     cur.execute("SELECT day FROM drip_nonworking_day")
     off = {r["day"] for r in cur.fetchall()} | set(UNCERTAIN_NONWORKING) | set(STATUTORY)
 
-    L = defaultdict(lambda: {"client": None, "matter": set(), "steps": [], "addrs": set(), "sent": [],
+    L = defaultdict(lambda: {"client": None, "matter": set(), "steps": [], "addrs": set(), "office": set(), "sent": [],
                              "receipts": [], "refused": [], "replies": [], "notes": [], "states": set()})
     cur.execute("SELECT ladder, seq, client_code, matter_code, state, to_address, cc_addresses, the_ask FROM step_plan")
     for r in cur.fetchall():
@@ -87,6 +87,8 @@ def build(cur, today):
         for a in [r["to_address"], *(r["cc_addresses"] or [])]:
             if a:
                 x["addrs"].add(a.lower())
+        if r["to_address"]:
+            x["office"].add(r["to_address"].lower())
     for f in glob.glob(os.path.join(REPO, "case_work", "DRIP_LADDERS_*", "*")):
         if os.path.isdir(f):
             name = os.path.basename(f)
@@ -107,39 +109,46 @@ def build(cur, today):
             x["sent"].append((when, d.get("to") or d.get("channel") or "", r["id"]))
             for k in ("to", "cc"):
                 x["addrs"] |= emails_in(d.get(k, "")) - OURS
+            x["office"] |= emails_in(d.get("to", "")) - OURS
         elif r["kind"] == "receipt":
             x["receipts"].append((when, d.get("received_by") or d.get("proof") or d.get("note", "")[:60], r["id"]))
         elif r["kind"] == "reply":
             x["replies"].append((when, d.get("gist", "")[:140], d.get("next", ""), r["id"]))
             x["addrs"] |= emails_in(d.get("from", "")) - OURS
+            x["office"] |= emails_in(d.get("from", "")) - OURS
         elif r["kind"] == "field":
             txt = json.dumps(d)
             if re.search(r"REFUSED|refused", txt) and not re.search(r"\bRECEIVED\b", txt):
                 x["refused"].append((when, (d.get("note") or d.get("result") or d.get("outcome") or "")[:120], r["id"]))
         elif r["kind"] == "drafted":
             x["notes"].append(f"drafted {when}")
-    # Our own outbound mail to a ladder's addresses counts as a send even if nobody logged it.
+    # Our own outbound mail addressed TO a ladder's office counts as a send even if nobody logged it
+    # (a cc to counsel on another office's request is not a send on counsel's ladder).
     for lad, x in L.items():
-        if not x["addrs"]:
+        if not x["office"]:
             continue
-        cur.execute("""SELECT received_at FROM gmail_messages
-                        WHERE lower(from_addr) = ANY(%s) AND (to_addrs && %s OR cc_addrs && %s)
-                          AND received_at > now() - interval '120 days'""",
-                    (list(OURS), list(x["addrs"]), list(x["addrs"])))
+        cur.execute("""SELECT received_at FROM gmail_messages g
+                        WHERE lower(substring(g.from_addr from '[A-Za-z0-9._%%+-]+@[A-Za-z0-9.-]+')) = ANY(%s)
+                          AND EXISTS (SELECT 1 FROM unnest(coalesce(g.to_addrs,'{}')) t
+                                       WHERE lower(substring(t from '[A-Za-z0-9._%%+-]+@[A-Za-z0-9.-]+')) = ANY(%s))
+                          AND g.received_at > now() - interval '120 days'""",
+                    (list(OURS), list(x["office"])))
         have = {s[0] for s in x["sent"]}
         for g in cur.fetchall():
             gd = (g["received_at"] + timedelta(hours=8)).date()
             if gd not in have:
                 x["sent"].append((gd, "(from mail)", None))
                 have.add(gd)
-    # Office mail after our last send that the drip has not logged yet.
+    # Office mail after our last send that the drip has not logged yet. Only the office the request went TO
+    # counts (a cc'd lawyer's reply is not the office answering); same-day mail is ambiguous, so strictly later.
     for lad, x in L.items():
-        if not x["addrs"] or not x["sent"]:
+        if not x["office"] or not x["sent"]:
             continue
         last = max(s[0] for s in x["sent"])
         cur.execute("""SELECT received_at, from_addr, subject FROM gmail_messages
-                        WHERE lower(from_addr) = ANY(%s) AND received_at >= %s ORDER BY received_at""",
-                    (list(x["addrs"]), datetime.combine(last, datetime.min.time())))
+                        WHERE lower(substring(from_addr from '[A-Za-z0-9._%%+-]+@[A-Za-z0-9.-]+')) = ANY(%s)
+                          AND received_at >= %s ORDER BY received_at""",
+                    (list(x["office"]), datetime.combine(last + timedelta(days=1), datetime.min.time()) - timedelta(hours=8)))
         logged = {r[0] for r in x["replies"]}
         for g in cur.fetchall():
             gd = (g["received_at"] + timedelta(hours=8)).date()   # UTC → PHT
