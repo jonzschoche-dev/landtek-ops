@@ -167,7 +167,7 @@ def build(cur, today):
                       default=None)
         ack = None
         if not receipt and last_sent:
-            acks = [r for r in x["replies"] if r[0] >= last_sent and re.search(r"(?i)acknowledg|received|forward|refer", r[1])]
+            acks = [r for r in x["replies"] if r[0] >= last_sent]   # any office reply proves receipt
             if acks:
                 ack = min(acks)
         if not receipt and not ack and last_sent and x.get("unlogged"):
