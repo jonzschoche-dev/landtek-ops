@@ -1,6 +1,6 @@
 # DRIP FEEDBACK LEDGER (internal, never outward)
 
-*Live, regenerated 20 Oct 2026 16:34 PHT from `drip_feedback`. Read this before drafting, revising or even considering a drip. Jonathan's own words are quoted; the lesson is the rule the stack now follows; 'enforced by' says where.*
+*Live, regenerated 23 Oct 2026 12:39 PHT from `drip_feedback`. Read this before drafting, revising or even considering a drip. Jonathan's own words are quoted; the lesson is the rule the stack now follows; 'enforced by' says where.*
 
 ## The Charter (governs everything below)
 
@@ -10,6 +10,48 @@
 
 ## Rules for every drip
 
+- 23 Oct 2026 08:00 · Jonathan: “I dont think the drip should be creating long term legal positions its job is to follow”  
+  **Lesson:** The drip follows decided positions (records asks, acknowledgments, tracers, status asks, clocks). Legal stands (e.g. Land Bank challenge, SB road-lot completion) are legal-desk papers Jonathan adopts first; only then does the drip carry their follow-ups.  
+  *Enforced by:* memory feedback-drip-follows-not-positions; this ledger
+- 23 Oct 2026 08:00 · Jonathan: “take ownership: five-table consolidation and the single logging step”  
+  **Lesson:** Everything enters the drip through scripts/drip_log.py (sent, drafted, receipt, reply, refused, rule); clocks start only on a corpus proof document; the nightly reconcile logs office mail and our sends nobody logged.  
+  *Enforced by:* scripts/drip_log.py; migrations/drip_core_2026-10-23.sql
+- 23 Oct 2026 08:00 · Jonathan: “the drip needs to scan all matters and suggest the next target based on importance ad calendar”  
+  **Lesson:** Every night the drip ranks next targets across all matters by matter weight x urgency + calendar anchors (DRIP_PRIORITIES.json). NOTE: conflicts with Charter §9 (all matters equal) until Jonathan amends it.  
+  *Enforced by:* drip_board.py pick_targets; landtek-drip-nightly.timer
+- 21 Oct 2026 14:45 · Jonathan: “I think we sent too many emails about that make sure we dont do that again”  
+  **Lesson:** One message per office per 15 working days (~21 days) unless the office has replied since. Corrections and add-on asks WAIT for the reply or go by phone/text. Run scripts/drip_cadence_check.py on every recipient before drafting; BLOCK means do not draft.  
+  *Enforced by:* scripts/drip_cadence_check.py (pre-draft); drip_event 'sent' log
+- 21 Oct 2026 13:15 · Jonathan: “theyve already offered ... your denr letter again seems off”  
+  **Lesson:** Before any tracer, read the office's LATEST reply: if it already offered release/pickup (DENR SMD 24 Sep: 'personally pick up… Window 3'), the next step is COLLECTION, not another letter asking whether it is ready. (Paracale DENR tracer of 21 Oct re-asked readiness.)  
+  *Enforced by:* X16 history read; pre-draft gate HISTORY line
+- 21 Oct 2026 08:00 · Jonathan: “we have evrything in the corpus for 6839 already / we have all these things”  
+  **Lesson:** CV 6839 and SP 2680 records asks are retired: search the corpus before asking any office for what we already hold.  
+  *Enforced by:* drip_card 4 HISTORY; this ledger
+- 21 Oct 2026 08:00 · Jonathan: “then they can throw out my case and I will have to start over”  
+  **Lesson:** No drips to RTC Branch 41 while SP 2680 is pending.  
+  *Enforced by:* this ledger; posture
+- 21 Oct 2026 08:00 · Jonathan: “lets start to engage the barangay captains not individuals barangay records”  
+  **Lesson:** Barangays: ask the Punong Barangay for barangay records, never individuals; deliver by rider; capture stamp, receiver name, time and photo; a refusal goes by registered mail with a Taglish cover letter, cc Mayor and MLGOO (MLGOO copy as JPEG).  
+  *Enforced by:* BRGY-* ladders; BARANGAY_RECEPTION_LOG_2026-10.md
+- 21 Oct 2026 08:00 · Jonathan: “lets use their form and email them”  
+  **Lesson:** When an office has its own request form, use it (RD: LTCP Form 0012 v2.0, official PDF on lra.gov.ph; OCC: SC-OCA Access to Information Request Form).  
+  *Enforced by:* ladder folders RD-T52540-ENTRIES, OCC-NOTARIAL-ASIS-BELEN
+- 21 Oct 2026 08:00 · Jonathan: “I think we sent too many emails about that make sure we dont do that again”  
+  **Lesson:** One touch per office per 15 working days (checked as 21 calendar days); extras go by phone or wait for the office's reply.  
+  *Enforced by:* scripts/drip_cadence_check.py; drip_board picker channel
+- 20 Oct 2026 18:30 · Jonathan: “we send by email first and then hand delivery for the rtc”  
+  **Lesson:** Court/registry records requests go by e-mail first (e-signed PDF + SPA), then hand delivery with the paper set for the receiving stamp. Every e-mailed PDF is compacted (scanned annex pages re-rendered as JPEG) and must be under 8 MB; the 20 Oct RD e-mail went out at 14 MB.  
+  *Enforced by:* drip_stager.compact(); OCC rtc1daeocc@judiciary.gov.ph (Jonathan 20 Oct)
+- 20 Oct 2026 17:54 · Jonathan: “I dont see the july 13 email that accompanys it”  
+  **Lesson:** Replies in a thread must carry the quoted original underneath (never replace the whole body). Check outbound attachment size: >10 MB to a .gov.ph address risks a silent drop; prefer a short PDF + hand delivery.  
+  *Enforced by:* stager/draft builder: quote original; size check
+- 20 Oct 2026 17:12 · Jonathan: “what about the participants that the csc is in charge of overseeing? / reply drafts for the appropriate office is fine”  
+  **Lesson:** Reply-in-thread never means reply-all: strip any respondent (e.g. mercedesmunicipality@gmail.com on CSC/ARTA transmittals) and unrelated offices from To/Cc; one office per draft, one ask each. Read the agency's own letter for what it did NOT cover (OAC-L 270 forwarded everything to OMB on the Mayor's elective status alone; the appointive CART members are CSC jurisdiction).  
+  *Enforced by:* drafting step: recipients rebuilt explicitly; X17
+- 20 Oct 2026 16:48 · Jonathan: “make the draft with some tagalog casual in there”  
+  **Lesson:** Routine drips carry light, polite Tagalog warmth (Magandang araw po, Malaking tulong po ito, Maraming salamat po) inside an English letter; never slang, never in strategic instruments.  
+  *Enforced by:* drip voice (calm_routine); reviewed per draft
 - 20 Oct 2026 16:06 · Jonathan: “theres no counsel theres just us”  
   **Lesson:** Outside court filings that need a signature, LandTek is the legal desk. Verify the law ourselves from the law corpus (legal_chunks, jurisprudence) and decide. Never write 'counsel should confirm'; mark [VERIFY] only where the corpus lacks the text, and close that gap ourselves.  
   *Enforced by:* memory feedback-dont-gate-on-counsel; this ledger
@@ -37,9 +79,15 @@
 - 20 Oct 2026 09:00 · Jonathan: “the drip is not meant to be combative, it's meant to make them go to sleep while the record builds”  
   **Lesson:** Routine drips are calm and plain: one small ask, the easy yes, a polite reply period, the last letter cited by date; no threats, adjectives or forum names.  
   *Enforced by:* 005 §v2 C2 + SLEEP DOCTRINE; lint threat_early, cold_tone, strategic_tell
+- 20 Oct 2026 08:00 · Jonathan: “(lesson from lost quotes and dropped mail) replies must carry the original; never reply-all; keep attachments small”  
+  **Lesson:** Replies go in the office's thread with the quoted original; recipients rebuilt explicitly (never reply-all); attachments under 8 MB from corpus originals (.gov.ph servers drop large mail silently).  
+  *Enforced by:* Mail.app staging scripts; this ledger
 
 ## By office / official
 
+- 21 Oct 2026 07:17 · **RTC Br. 41 Daet** · Jonathan: “then they can throw out my case and I will have to start over”  
+  **Lesson:** No direct drip to RTC Branch 41 (Judge Dating) while SP 2680, Jonathan's own guardianship petition, is pending there. Records it holds (e.g. SP 2156) come through counsel (Barandon subpoena in 26-360) or after 2680 is decided. Generalizes: never send a records ask to a court that is deciding one of the client's own pending petitions.  
+  *Enforced by:* posture check (X17 extended to courts hearing the client's own petitions); step_plan CV26360-BR41-SP2156 skipped
 - 20 Oct 2026 14:25 · **Provincial Assessor Magana** · Jonathan: “provinicial assessor does not hadle improvements”  
   **Lesson:** Custodian map: declarations of improvements are kept by the MUNICIPAL Assessor, not the Provincial. Where the municipal custodian is a respondent (X17), use counsel's subpoena duces tecum, not a drip letter.  
   *Enforced by:* step note; CV 26-360 subpoena request (Municipal Assessor item)
@@ -52,6 +100,15 @@
 
 ## By ladder
 
+- 21 Oct 2026 08:00 · **LGU-SB-STREETS** · Jonathan: “the sb letter is not a drip its a cosequential legal stand which we are not here to pump, just need to know what they ruled”  
+  **Lesson:** To the SB on the road lots: status-only ask (what action was taken on the 3 Oct 2025 referral); no requests to name or register.  
+  *Enforced by:* LGU-SB-STREETS step 1; SB-ROAD-LOTS-COMPLETION withdrawn
+- 21 Oct 2026 07:15 · **SP2680-BOTOR** · Jonathan: “we have all these things this is not a neccesary drip”  
+  **Lesson:** SP 2680 open asks in STATUS (resetting order/time, Gerry's letter, bond, statement of account) are already in Jonathan's hands; STATUS 'Open asks' is stale. Before proposing a counsel drip, ask whether the item is already held instead of trusting a desk STATUS file.  
+  *Enforced by:* X16 history read; SP2680/STATUS.md marked
+- 20 Oct 2026 17:05 · **CV6839-FINALITY** · Jonathan: “we dont need this we have evrything in the corpus for 6839 already”  
+  **Lesson:** CV 6839 needs no records asks: the judgment and writ of execution are already held (docs 723, 802). Before proposing a records ask, search the corpus AND Jonathan's own past statements for the item; the live CV 6839 front is authority to collect (guardianship/Rule 95), not paper.  
+  *Enforced by:* drip_fact cv6839.writ; step_plan CV6839-FINALITY 1-4 skipped; X16 history read
 - 20 Oct 2026 16:15 · **LGU-MACALE-RPT** · Jonathan: “theres more than 13”  
   **Lesson:** Work from the FULL list, never from one statement's subset: the 2026 bill (doc 1616) has 22 ARPs (₱198,646.78 for 2026: advance ₱30,640.08 + Dec 2025 ₱112,496.64 + Apr 2026 ₱41,118.56, balance ₱14,391.50). The corpus schedule has 29 parcels in the heirs' names (ESTATE_DECLARED_PARCELS_2026-09).  
   *Enforced by:* doc 1616; ESTATE_DECLARED_PARCELS_2026-09.md; this ledger

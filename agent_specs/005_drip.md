@@ -11,6 +11,14 @@ drain; this spec owns the name "drip" for correspondence from here on.*
 
 > **GOVERNED BY THE DRIP CHARTER** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan 20 Oct 2026). Where this spec and the Charter differ, the Charter wins. Every draft passes pre-draft gate line 0 CHARTER (`scripts/drip_card.py`). Per-matter protocol: read the file on its merits → one-page brief to Jonathan → record plan, milestones and campaigns built from his comments. No letters launch for a matter before its brief.
 
+## DRIP CORE — five fed tables, one logging step (Jonathan, 23 Oct 2026: "take ownership")
+The drip runs on five tables, and **every** action enters through one command, `scripts/drip_log.py`:
+- `step_plan` (ladders) · `drip_event` (append-only log; ladder via view `drip_event_v`) · `office_obligation` (clocks, `ladder` column) · `drip_feedback` (rules) · `drip_ui_draft` (drafts awaiting Jonathan, Drip UI).
+- `drip_log.py sent | drafted | receipt | reply | refused | rule | reconcile | show`. A ladder row is created on first contact (no folder-only ladders). A clock starts only on a **corpus document** proving receipt: stamped copy, signed stop sheet, or the office's own e-mail ingested by `ingest_email_bodies.py` (HTML-only mail now included). A5 wall enforced on the proof.
+- Clock = 15 **working** days (RA 6713 §5(a)); weekends, statutory holidays and uncertain proclamation days skipped (`drip_board.add_working_days`).
+- Nightly (`landtek-drip-nightly.timer`, 00:00 PHT, VPS): pull jonzschoche mail → e-mail bodies to corpus → `drip_log.py reconcile` (logs office replies and our sends nobody logged; a shared inbox or address is matched by subject, ambiguous items are listed, never guessed) → `drip_board.py` (per-client boards + ranked next targets from `case_work/DRIP_PRIORITIES.json`) → `truth_tests/test_drip_core.py` (fed, not blind, both mail tokens OK, board fresh).
+- The drip **follows** decided positions; it never creates long-term legal positions (memory feedback-drip-follows-not-positions).
+
 ## v2 ALGORITHM: the drip as the stack's fabric (redraft 2026-10-19 · **APPROVED by Jonathan 2026-10-20 07:40 PHT with Grok's CHANGEs** · drip_sweep stays SHADOW)
 
 *Why v2: after five weeks live the engine is sound but starved. It has 8 rows, all MWK-001, and **0 served**,

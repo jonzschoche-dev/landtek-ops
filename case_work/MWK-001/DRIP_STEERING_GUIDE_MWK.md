@@ -22,7 +22,11 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 10. **Truth.** Every fact in a letter must trace to a document (doc or gmail id). Inferences are never stated as fact. When a figure is cited, cite the right source (₱5,124,922.47 = doc 377, not doc 376).
 11. **Feedback ledger first.** Before drafting or considering any drip, read `case_work/MWK-001/DRIP_FEEDBACK_LEDGER.md` (live in the corpus): every past critique from Jonathan, for that office and ladder and in general.
 
-## 2. Live ladders (regenerated 20 Oct 2026 16:34 PHT from `step_plan`)
+## 2. Live ladders (regenerated 23 Oct 2026 12:39 PHT from `step_plan`)
+
+### BFAR-T32911-INQUIRY · MWK-LGU-RECOVERY
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
 
 ### BLGF-REVIEW · MWK-ARTA-1210
 - **1. routine_ask** → RD Jessie B. Doctolero, BLGF RO V: Status of the re-evaluation of our 15 Aug resubmission, which his office acknowledged 17 Aug as referred to the concerned personnel (and the action officer's name)  
@@ -33,6 +37,22 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
   *serves:* Legal: first upward touch, calm; sets up the supervisory review (legal) · *send:* per history · *state:* planned
 - **4. strategic_rung** → ED Agcaoili, BLGF Central Office: The supervisory-review letter (BLGF_CO_SUPERVISORY_REVIEW_rev2.md, held)  
   *serves:* Legal/financial: R1 at the national supervisor (both) · *send:* per history · *state:* planned
+
+### BRGY-III · MWK-001
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
+### BRGY-I-UNO · MWK-001
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* approved
+
+### BRGY-SAN-ROQUE · MWK-001
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* approved
+
+### BRGY-V · MWK-001
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
 
 ### COA-AUDIT-REF · MWK-LGU-RECOVERY
 - **1. routine_ask** → RD Felix M. Basallaje, Jr., COA RO V: The control/reference number under which our 13 Jul e-mail is held, or the date it was received (offer to resend)  
@@ -58,9 +78,13 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 - **5. strategic_rung** → Office of the Ombudsman: Supplemental complaint-affidavit into the OAC-L 270 docket (OMB-SUPP-OACL270)  
   *serves:* Legal: accountability vehicle for the CART counts (legal) · *send:* per history · *state:* planned
 
+### CSC-R5-REFERRALS · MWK-ARTA
+- **1. routine_ask** → CSC Regional Office V: (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
 ### CV26360-BR41-SP2156 · MWK-CV26360
 - **1. routine_ask** → Branch Clerk of Court, RTC Br. 41 Daet: Narrow our 3 Dec 2025 request to ONE item: certified copy of the November 2016 order in SP 2156, all pages  
-  *serves:* Legal: what Cesar swore and what the court found 3 weeks after the deed; notice to the owners (P7 item 5) (legal) · *send:* per history · *state:* planned
+  *serves:* Legal: what Cesar swore and what the court found 3 weeks after the deed; notice to the owners (P7 item 5) (legal) · *send:* per history · *state:* skipped
 - **2. courtesy_edition** → Branch Clerk of Court, RTC Br. 41: Same, by date  
   *serves:* Legal: diligence (legal) · *send:* per history · *state:* planned
 - **3. routine_ask** → Branch Clerk of Court, RTC Br. 41: Certified copy of the October 2016 petition with its annexes and Cesar's testimony/affidavit if any  
@@ -120,13 +144,13 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 
 ### CV6839-FINALITY · MWK-CV6839
 - **1. routine_ask** → Branch Clerk of Court, RTC Br. 40 Daet (Special Agrarian Court): Narrow the 3 Dec 2025 request to ONE item: certified Entry of Judgment / certificate of finality of the 11 Sep 2023 decision as modified 7 Feb 2024; a note if not yet available  
-  *serves:* Financial: fixes the Rule 39 s.6 by-motion execution window (approx. Feb-Mar 2029) on the P5,124,922.47 principal (doc 376/377); Legal: finality on record (financial) · *send:* paper · *state:* drafted
+  *serves:* Financial: fixes the Rule 39 s.6 by-motion execution window (approx. Feb-Mar 2029) on the P5,124,922.47 principal (doc 376/377); Legal: finality on record (financial) · *send:* paper · *state:* skipped
 - **2. courtesy_edition** → Branch Clerk of Court, RTC Br. 40: Same single item, referring to the step-1 letter by its date  
-  *serves:* Legal: unanswered due request on record (feeds the R1 to the Clerk of Court V) (financial) · *send:* per history · *state:* planned
+  *serves:* Legal: unanswered due request on record (feeds the R1 to the Clerk of Court V) (financial) · *send:* per history · *state:* skipped
 - **3. routine_ask** → Branch Clerk of Court, RTC Br. 40: Certified copies of the 11 Sep 2023 decision and the 7 Feb 2024 order  
-  *serves:* Financial: interest computation baseline (12% to 30 Jun 2013, 6% after) on the unpaid principal (financial) · *send:* per history · *state:* planned
+  *serves:* Financial: interest computation baseline (12% to 30 Jun 2013, 6% after) on the unpaid principal (financial) · *send:* per history · *state:* skipped
 - **4. routine_ask** → Atty. Suzette Dacillo, Clerk of Court V, OCC RTC Daet: Status of the 3 Dec 2025 request as to the finality papers (calm, upward)  
-  *serves:* Legal: ripeness for any later escalation; Financial: same entry date (financial) · *send:* per history · *state:* planned
+  *serves:* Legal: ripeness for any later escalation; Financial: same entry date (financial) · *send:* per history · *state:* skipped
 - **5. strategic_rung** → RTC Br. 40 (through counsel): Motion for execution / substitution for the deceased representative of record (Cesar de la Fuente)  
   *serves:* Financial: collection of P5.12M principal + interest (financial) · *send:* per history · *state:* planned
 
@@ -152,6 +176,18 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 - **5. strategic_rung** → Regional Executive Director DENR R5 + LMB RKMD: Elevation pre-stated in the 6 Oct TRANSMITTAL_LOG (REO + rkmd@lmb.gov.ph), citing the receipt  
   *serves:* Legal: R1 at DENR (legal) · *send:* per history · *state:* planned
 
+### DENR-R5-PLANS · MWK-001
+- **1. routine_ask** → DENR R5 Surveys and Mapping Division: (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
+### DENR-TS-OSS-1092 · MWK-LGU-RECOVERY
+- **1. routine_ask** → DENR R5 Surveys and Mapping Division: (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
+### DILG-R5-TRACER · MWK-LGU-RECOVERY
+- **1. routine_ask** → DILG Region V Records: (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
 ### DILG-SUPERVISION · MWK-001
 - **1. routine_ask** → MLGOO Vencer Krystian M. Guerrero: A copy of any further report/submission the Municipality has sent his office on his 25-26 Aug Indorsements since his 4 Sep transmittal, or a note that none has come  
   *serves:* Legal: an official "nothing further received" closes the compliance question on DILG's own file (performed in nothing) for the LGU-RECOVERY and SB-records tracks (legal) · *send:* per history · *state:* planned
@@ -163,6 +199,10 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
   *serves:* Legal: unanswered status ask on his own Indorsements (legal) · *send:* per history · *state:* planned
 - **5. strategic_rung** → PD Relucio and RD Escober: Elevation of the unperformed Indorsements (BRANCH_B_ESCALATION_draft, held)  
   *serves:* Legal: R1/R2 on the DILG supervision track (legal) · *send:* per history · *state:* planned
+
+### LANDBANK · MWK-CV6839
+- **1. routine_ask** → FSSC5@landbank.com: (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* answered
 
 ### LCR-DLF-DEATH · MWK-CV26360
 - **1. routine_ask** → Municipal Civil Registrar (Daet [VERIFY place of registration]): Certified copy (or extract) of the death record of Cesar M. de la Fuente (d. 21 Jun 2017), or a note that it is not registered there  
@@ -182,7 +222,7 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 - **4. routine_ask** → Provincial Assessor Maximo D. Magana Jr.: The provincial record of the 2018 (-00209/-00220) and 2022 (-00054/-00236) revisions on Lot 402  
   *serves:* Legal: alternate custodian (legal) · *send:* per history · *state:* planned
 - **5. strategic_rung** → Per the 5 Oct letter's pre-stated next step (Provincial Assessor supervision; then the accountability forum): Supervisory request with the step 1-4 record  
-  *serves:* Legal (legal) · *send:* per history · *state:* planned
+  *serves:* Legal (legal) · *send:* per history · *state:* served
 
 ### LGU-ABLA-SERVICE · MWK-ARTA-1321  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Assessor Gemma P. Abla, REA: Item 4 of her own 16 Jun 2025 list only: the tax map of section 025-07-005-01, Barangay 5 (Poblacion). Plain copy; we pay page charges on release  
@@ -312,6 +352,10 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 - **3. routine_ask** → National Archives of the Philippines (notarial records): Same entry, if the OCC says older registers went to the Archives (route)  
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 
+### OCC-NOTARIAL-ASIS-BELEN · MWK-CV26360
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
 ### OMB-1214 · MWK-OMB-IC-OC-JUL-26-1214  · ⚠ COUNSEL ROUTE / HELD
 - **1. routine_ask** → Deputy Ombudsman for Luzon, attn OIC CREMEB (Atty. Expedito O. Allado Jr.): Status of IC-OC-JUL-26-1214 and whether the ARTA endorsement received 29 Jul 2026 (1212 Resolution) forms part of it  
   *serves:* Legal: MWK-OMB-1214 / MWK-ARTA-1212 success criteria (legal) · *send:* per history · *state:* planned
@@ -321,6 +365,10 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
   *serves:* Legal (legal) · *send:* per history · *state:* planned
 - **4. strategic_rung** → Deputy Ombudsman for Luzon (via Barandon): Related-case filing into IC-OC-JUL-26-1214 (OMBUDSMAN_OVERSIGHT_GAME_2026-09.md s.2.4, held)  
   *serves:* Legal (legal) · *send:* per history · *state:* planned
+
+### OMB-OACL270-REF · MWK-ARTA
+- **1. routine_ask** → Ombudsman Public Assistance Bureau: (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
 
 ### OP-DOCKET · MWK-ARTA-1321  · ⚠ later steps counsel-routed
 - **1. routine_ask** → Malacañang Records Office (Office of the President): The reference number (or O.P. case number) assigned to the 1321 petition delivered 14 Sep, or a note that it is still being processed  
@@ -342,7 +390,7 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 - **3. routine_ask** → Provincial Assessor Magana: Narrowed improvements ask: for ONE parcel only (the Brgy 5 parcel he researched), whether any improvement is declared on it and in whose name  
   *serves:* Financial: escaped/misdeclared improvements on estate land (assessment lever); Legal: who declared structures on the heirs' parcel (both) · *send:* per history · *state:* planned
 - **4. strategic_rung** → Provincial Assessor Magana: Supervision request: direct the Municipal Assessor on the 20 Jun 2025 paid request (MAGANA_SUPERVISION_REQUEST / JOINT_SUPERVISION_BLGF_MAGANA, held)  
-  *serves:* Legal: R1 rung for the ABLA-SERVICE ladder; ripeness for any later Abla filing (legal) · *send:* per history · *state:* planned
+  *serves:* Legal: R1 rung for the ABLA-SERVICE ladder; ripeness for any later Abla filing (legal) · *send:* per history · *state:* served
 
 ### PROV-PLO-UPDATE · MWK-001
 - **1. routine_ask** → Gov. Ricarte R. Padilla, attn Provincial Legal Officer: The update the PD's 2 Sep letter said the PLO would give directly on the March 2026 letters  
@@ -374,9 +422,13 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 - **5. strategic_rung** → Registrar Tuy: The RD records demand / annotation step (DRAFT_RD_demand_letter_2026-07-18.md; lis pendens or adverse claim at counsel's choice)  
   *serves:* Legal: annotation protecting the chain (legal) · *send:* per history · *state:* planned
 
+### RD-T52540-ENTRIES · MWK-CV26360
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
+
 ### SP2680-HOPPE-LETTER · MWK-GUARDIANSHIP
 - **1. routine_ask** → Branch Clerk of Court, RTC Br. 41 Daet: A certified copy of Mrs. Hoppe's letter in the SP 2680 record, with its receipt date, or a note that none is on file  
-  *serves:* Legal: answer to Scenario B before 11 Nov (carve-out of her 1/3); also feeds the CV 26-360 indispensable-party answer due before 9 Dec (legal) · *send:* per history · *state:* planned
+  *serves:* Legal: answer to Scenario B before 11 Nov (carve-out of her 1/3); also feeds the CV 26-360 indispensable-party answer due before 9 Dec (legal) · *send:* per history · *state:* skipped
 - **2. courtesy_edition** → Branch Clerk of Court, RTC Br. 41: Same, by date  
   *serves:* Legal: diligence (legal) · *send:* per history · *state:* planned
 - **3. strategic_rung** → RTC Br. 41 (through Botor): Counsel's response to the objection (carve-out of Gerry's 1/3; SPA she offered Marcia)  
@@ -384,11 +436,15 @@ The **Drip Charter** (`case_work/MWK-001/DRIP_CHARTER.md`, adopted by Jonathan o
 
 ### SP2680-SETTING · MWK-GUARDIANSHIP
 - **1. routine_ask** → Branch Clerk of Court, RTC Br. 41 Daet: A copy of the order resetting the 19 Oct hearing, or a note of the new date and time  
-  *serves:* Legal: no setting passes unseen (Scenario C); lets counsel manage the 11 Nov clash with the MTC 1:30 PM setting (legal) · *send:* per history · *state:* planned
+  *serves:* Legal: no setting passes unseen (Scenario C); lets counsel manage the 11 Nov clash with the MTC 1:30 PM setting (legal) · *send:* per history · *state:* skipped
 - **2. courtesy_edition** → Branch Clerk of Court, RTC Br. 41: Same, by date  
   *serves:* Legal: diligence on notice (legal) · *send:* per history · *state:* planned
 - **3. strategic_rung** → RTC Br. 41 (through Botor): Counsel's motion/manifestation on the 11 Nov clash with CV 26-360 (or written confirmation of setting)  
   *serves:* Legal: both settings kept (legal) · *send:* per history · *state:* planned
+
+### SP-ORDINANCE-22-2024 · MWK-001
+- **1. routine_ask** → (see ladder folder): (see ladder folder)  
+  *serves:* see ladder folder (legal) · *send:* per history · *state:* served
 
 ## 3. Where the full strategy lives
 - `agent_specs/005_drip.md` §v2: the algorithm (intake, cross-checks X1–X16, state machine, ladder, pick, sleep doctrine, review queue, account/thread).

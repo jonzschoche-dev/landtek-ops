@@ -31,6 +31,10 @@ import psycopg2, psycopg2.extras
 sys.path.insert(0, "/root/landtek")
 from extract_email_attachments import (DSN, load_registries, extract_signals, apply_enrichment, _sig_summary)
 
+BODY_SQL = """coalesce(nullif(trim(g.body_plain), ''),
+                        trim(regexp_replace(regexp_replace(regexp_replace(coalesce(g.body_html, ''),
+                             '<(style|script)[^>]*>.*?</(style|script)>', ' ', 'gi'), '<[^>]+>', ' ', 'g'),
+                             '(&nbsp;|\\s)+', ' ', 'g')))"""
 MIN_BODY = 40           # skip degenerate bodies (bare "Thanks." forwards carry no findable signal)
 ATTACH_REF_RE = re.compile(r"\b(attach|annex|exhibit|enclos|herewith|kindly find)\w*", re.IGNORECASE)
 
@@ -68,7 +72,9 @@ def main():
     regs = load_registries(cur)
 
     where = ["g.case_file IS NOT NULL",
-             "length(trim(coalesce(g.body_plain,''))) >= %s",
+             # HTML-only mail (e.g. DENR SMD acknowledgments) has an empty body_plain; fall back to the
+             # tag-stripped body_html so those replies become findable proof too (23 Oct 2026).
+             "length(" + BODY_SQL + ") >= %s",
              """NOT EXISTS (SELECT 1 FROM email_documents e
                              WHERE e.message_id = g.message_id AND e.role = 'body')""",
              # signal-to-noise: our OWN automated system notifications (digests/calendars) are operational
@@ -85,7 +91,7 @@ def main():
     params.append(args.limit)
 
     cur.execute(f"""
-        SELECT g.id, g.message_id, g.thread_id, g.subject, g.body_plain, g.from_addr, g.from_name,
+        SELECT g.id, g.message_id, g.thread_id, g.subject, {BODY_SQL} AS body_plain, g.from_addr, g.from_name,
                g.to_addrs, g.cc_addrs, g.sent_at, g.received_at, g.case_file, g.has_attachments,
                coalesce(g.account, 'jonathan@hayuma.org') AS account,
                EXISTS (SELECT 1 FROM email_documents ea
