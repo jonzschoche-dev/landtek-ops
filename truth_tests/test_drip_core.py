@@ -106,6 +106,23 @@ def board_rebuilt_nightly(cur):
     print("      [drip core] board rebuilt within 26 h")
 
 
+def interface_never_sends(cur):
+    """The Drip UI and the Gmail staging helper only CREATE DRAFTS: no messages.send / drafts.send / SMTP anywhere."""
+    import re as _re
+    root = "/root/landtek" if os.path.isdir("/root/landtek") else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    bad = []
+    for rel in ("drip_ui/app.py", "scripts/drip_stage_gmail.py"):
+        path = os.path.join(root, rel)
+        if not os.path.exists(path):
+            continue
+        src = open(path).read()
+        if _re.search(r"messages\(\)\.send|drafts\(\)\.send|smtplib|\.sendmail\(", src):
+            bad.append(rel)
+    if bad:
+        raise TruthFailure(f"send path found in {bad}: the interface may only stage drafts (Charter §11.1 never sends)")
+    print("      [drip core] interface and Gmail staging carry no send path")
+
+
 TESTS = [
     ("drip_core.objects_exist", core_objects_exist),
     ("drip_core.every_new_event_names_its_ladder", every_new_event_names_its_ladder),
@@ -114,6 +131,7 @@ TESTS = [
     ("drip_core.drip_is_not_blind", drip_is_not_blind),
     ("drip_core.both_mail_feeds_alive", both_mail_feeds_alive),
     ("drip_core.board_rebuilt_nightly", board_rebuilt_nightly),
+    ("drip_core.interface_never_sends", interface_never_sends),
 ]
 
 

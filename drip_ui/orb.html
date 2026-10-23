@@ -1,0 +1,123 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Drip Orb — Liquid Glass prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:-apple-system,"SF Pro Display",Inter,Segoe UI,sans-serif}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%}
+#ui{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:8px;padding:8px;border-radius:999px;
+ background:rgba(255,255,255,.14);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.25)}
+#ui button{border:0;border-radius:999px;padding:9px 16px;font:600 14px/1 inherit;color:#fff;background:transparent;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+#ui button.on{background:rgba(255,255,255,.32);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+#lbl{position:fixed;left:50%;top:22px;transform:translateX(-50%);color:#fff;font:600 13px inherit;letter-spacing:.08em;text-transform:uppercase;opacity:.85;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+</style></head><body>
+<canvas id="gl"></canvas><div id="lbl">Drip Bot · idle</div>
+<div id="ui"><button data-s="0" class="on">Idle</button><button data-s="1">Listening</button><button data-s="2">Thinking</button><button data-s="3">Speaking</button><button id="mic">🎙 Mic</button></div>
+<script>
+// Self-contained: custom WebGL refraction shader over a painted backdrop (no external deps, works offline).
+const gl=document.getElementById('gl').getContext('webgl',{antialias:true,preserveDrawingBuffer:true});
+const bg=document.createElement('canvas');
+function paintBG(W,H){bg.width=W;bg.height=H;const c=bg.getContext('2d');
+ // vivid wallpaper: layered radial blobs (macOS Tahoe-ish)
+ c.fillStyle='#1b1446';c.fillRect(0,0,W,H);
+ const blobs=[[.15,.2,.55,'#ff5f6d'],[.85,.15,.5,'#ffc371'],[.75,.85,.6,'#2bc0e4'],[.2,.9,.55,'#7f00ff'],[.45,.08,.3,'#00f5a0'],[.95,.55,.4,'#ff2fd0']];
+ c.globalCompositeOperation='screen';
+ for(const[x,y,r,col]of blobs){const g=c.createRadialGradient(x*W,y*H,0,x*W,y*H,r*Math.max(W,H));g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,W,H);}
+ c.globalCompositeOperation='source-over';
+ // stripes for refraction legibility
+ c.globalAlpha=.10;c.fillStyle='#fff';for(let i=-H;i<W;i+=46){c.beginPath();c.moveTo(i,0);c.lineTo(i+18,0);c.lineTo(i+18+H,H);c.lineTo(i+H,H);c.fill();}c.globalAlpha=1;
+ const s=Math.min(W,H)/900;
+ c.fillStyle='#fff';c.font=`800 ${110*s}px -apple-system,Inter,sans-serif`;c.textAlign='center';c.fillText('DRIP',W/2,H*.5+38*s);
+ c.font=`600 ${22*s}px -apple-system,Inter,sans-serif`;c.fillText('LandTek · Drip Desk',W/2,H*.5+80*s);
+ const cards=[['BLGF ack','Re: 4 Sep letter · ready','#ffffff'],['DRIP_02','Botor · reset order','#ffffff'],['Mayor','Daet · awaiting go','#ffffff']];
+ cards.forEach((k,i)=>{const cw=260*s,ch=86*s,x=W*.5-cw*1.6+i*cw*1.1,y=H*.18;
+  c.fillStyle='rgba(255,255,255,.85)';rr(c,x,y,cw,ch,18*s);c.fill();
+  c.fillStyle=['#ff3b30','#ff9500','#34c759'][i];c.beginPath();c.arc(x+26*s,y+ch/2,9*s,0,7);c.fill();
+  c.fillStyle='#111';c.textAlign='left';c.font=`700 ${20*s}px -apple-system,Inter,sans-serif`;c.fillText(k[0],x+46*s,y+36*s);
+  c.fillStyle='#555';c.font=`500 ${15*s}px -apple-system,Inter,sans-serif`;c.fillText(k[1],x+46*s,y+62*s);});
+ c.textAlign='left';c.fillStyle='rgba(255,255,255,.9)';c.font=`500 ${16*s}px ui-monospace,Menlo,monospace`;
+ ['> Go · Edit · Hold','> 15 working days · RA 6713 §5(a)','> cc: krstylepalma@gmail.com'].forEach((t,i)=>c.fillText(t,W*.07,H*.72+i*26*s));
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
+const fs=`precision highp float;
+uniform sampler2D T;uniform vec2 R;uniform float t,st,amp,rad;uniform vec2 M,C;
+float sh(float a,float tt){ // shape radius modulation per state
+ float w=0.;
+ w+=st<.5? .012*sin(a*2.+tt*1.1)+.008*sin(a*3.-tt*.8) : 0.;
+ w+=(st>.5&&st<1.5)? (.02+.06*amp)*sin(a*5.-tt*6.)+.015*sin(a*9.+tt*4.) : 0.;
+ w+=(st>1.5&&st<2.5)? .03*sin(a*3.+tt*2.5)+.02*sin(a*2.-tt*3.7) : 0.;
+ w+=st>2.5? .02*sin(a*2.+tt*2.)+0. : 0.;
+ return w;}
+float sdf(vec2 q){float a=atan(q.y,q.x);float r=rad*(1.+sh(a,t));
+ if(st>2.5){float s=.06*amp+.04*sin(t*9.)*sin(t*3.7); q*=vec2(1.-s,1.+s);} // squash/stretch on syllables
+ return length(q)-r;}
+vec3 bgs(vec2 uv){return texture2D(T,clamp(uv,0.,1.)).rgb;}
+void main(){vec2 f=gl_FragCoord.xy;vec2 uv=f/R;uv.y=1.-uv.y;
+ vec2 q=(f-C)/R.y;float d=sdf(q);
+ vec3 col=bgs(uv);
+ // soft depth shadow below
+ float sd=sdf(q+vec2(0.,.035));col*=1.-.22*smoothstep(.07,-.03,sd)*step(0.,d);
+ if(d<.004){
+  float e=1e-3;vec2 n2=vec2(sdf(q+vec2(e,0))-sdf(q-vec2(e,0)),sdf(q+vec2(0,e))-sdf(q-vec2(0,e)))/(2.*e);
+  float bev=.075*rad/.22; float x=clamp(-d/bev,0.,1.); // 0 at rim -> 1 inside
+  float h=sqrt(1.-(1.-x)*(1.-x)); // squircle bevel height
+  float slope=(1.-x)/max(h,.08);   // steep at rim, flat center
+  vec3 N=normalize(vec3(n2*slope*.9,1.));
+  // refraction: magnify center slightly, strong bend at rim
+  vec2 mag=-q*.12;
+  vec2 off=(mag - N.xy*.16*(1.-h)*1.8);
+  off.y=-off.y; off*=R.y/R;
+  vec3 rc;float disp=.06;
+  // blurred, dispersed taps
+  vec3 acc=vec3(0.);
+  for(int i=0;i<6;i++){float a=float(i)*1.047;vec2 j=vec2(cos(a),sin(a))*.0009;
+   acc.r+=bgs(uv+off*(1.-disp)+j).r;acc.g+=bgs(uv+off+j).g;acc.b+=bgs(uv+off*(1.+disp)+j).b;}
+  rc=acc/6.;
+  if(st>1.5&&st<2.5){ // thinking: swirl what's seen through glass
+   float ang=.6*sin(t*1.7)*h;mat2 m=mat2(cos(ang),-sin(ang),sin(ang),cos(ang));vec2 qq=m*(q*.82);
+   vec2 u2=(C/R)+vec2(qq.x*R.y/R.x,qq.y);u2.y=1.-u2.y; rc=mix(rc,vec3(bgs(u2-vec2(.004,0)).r,bgs(u2).g,bgs(u2+vec2(.004,0)).b),.65);}
+  rc=rc*1.02+.012; // glass lift
+  // pointer-driven specular
+  vec2 L2=normalize(M-C+vec2(1e-4));vec3 L=normalize(vec3(L2,.55));
+  float rim=pow(1.-h,4.);
+  float spec=pow(max(dot(N,L),0.),60.)*.7;
+  float rimL=rim*(.35+.9*max(dot(normalize(n2+1e-5),L2),0.));
+  float rimD=rim*.6*max(dot(normalize(n2+1e-5),-L2),0.);
+  vec3 g=rc+vec3(1.)*(spec+rimL*.9)+vec3(.9,.95,1.)*rimD*.35;
+  g+=vec3(1.)*smoothstep(.0028,0.,abs(d+.0015))*.55*(.4+.6*max(dot(normalize(n2+1e-5),L2),0.)); // crisp hairline
+  float fres=pow(1.-N.z,3.)*.12;g=mix(g,vec3(1.),fres);
+  if(st>.5&&st<1.5){float rp=fract(length(q)/rad*1.5-t*1.2);g+=vec3(.25)*smoothstep(.06,0.,abs(rp-.5))*h*(.3+amp);}
+  col=mix(col,g,smoothstep(.004,-.002,d));
+ }
+ // listening ripples outside
+ if(st>.5&&st<1.5&&d>0.){float r=fract(t*.6);float rr=abs(d-r*.25);col+=vec3(.6)*(1.-r)*smoothstep(.006,0.,rr)*.5;}
+ gl_FragColor=vec4(col,1.);}`;
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+const U=n=>gl.getUniformLocation(pr,n);const tex=gl.createTexture();
+function upTex(){gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bg);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);}
+let W,H,dpr;function resize(){dpr=Math.min(devicePixelRatio,2);W=innerWidth*dpr;H=innerHeight*dpr;gl.canvas.width=W;gl.canvas.height=H;gl.viewport(0,0,W,H);paintBG(W,H);upTex();}
+addEventListener('resize',resize);resize();
+let st=+(new URLSearchParams(location.search).get('s')||0),mouse=[W*.25,H*.85],amp=0,an=null,buf;
+const names=['idle','listening','thinking','speaking'];
+function setS(s){st=s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.toggle('on',+b.dataset.s===s));lbl.textContent='Drip Bot · '+names[s];}
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>setS(+b.dataset.s));setS(st);
+addEventListener('pointermove',e=>{mouse=[e.clientX*dpr,(innerHeight-e.clientY)*dpr]});
+mic.onclick=async()=>{try{const s=await navigator.mediaDevices.getUserMedia({audio:true});const ac=new AudioContext();an=ac.createAnalyser();an.fftSize=512;ac.createMediaStreamSource(s).connect(an);buf=new Uint8Array(an.fftSize);mic.classList.add('on');}catch(e){mic.textContent='Mic blocked'}};
+const t0=performance.now();let FT=new URLSearchParams(location.search).get('t');
+function frame(){const t=FT!=null?+FT:(performance.now()-t0)/1000;let target=0;
+ if(an){an.getByteTimeDomainData(buf);let s=0;for(const v of buf){const x=(v-128)/128;s+=x*x}target=Math.min(1,Math.sqrt(s/buf.length)*6);}
+ else if(st===3)target=Math.max(0,Math.sin(t*11)*Math.sin(t*2.3)+.2)*.8; else if(st===1)target=.3+.2*Math.sin(t*5);
+ amp+=(target-amp)*.2;
+ gl.uniform2f(U('R'),W,H);gl.uniform1f(U('t'),t);gl.uniform1f(U('st'),st);gl.uniform1f(U('amp'),amp);gl.uniform1f(U('rad'),.22);
+ gl.uniform2f(U('M'),mouse[0],mouse[1]);gl.uniform2f(U('C'),W/2,H*.47);gl.uniform1i(U('T'),0);
+ gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(frame);}
+frame();
+</script><script>
+if(location.search.includes('mini')){document.getElementById('ui').style.display='none';document.getElementById('lbl').style.display='none';}
+addEventListener('message',e=>{if(e.data&&typeof e.data.state==='number')setS(e.data.state)});
+</script></body></html>

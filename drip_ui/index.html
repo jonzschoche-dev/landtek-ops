@@ -1,0 +1,90 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Drip · LandTek</title>
+<style>
+:root{--bg:#0d1117;--pn:#161b22;--ln:#2a313c;--tx:#e6edf3;--mu:#8b949e;--ac:#58a6ff;--go:#2ea043;--hold:#d29922}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:grid;grid-template-columns:1fr 380px;grid-template-rows:72px 1fr}
+header{grid-column:1/3;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--ln)}
+header iframe{width:64px;height:64px;border:0;border-radius:50%;overflow:hidden;pointer-events:none}
+header h1{font-size:16px;margin:0}header small{color:var(--mu)}
+#main{display:flex;flex-direction:column;min-height:0;position:relative}
+#thread{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:78%;padding:10px 12px;border-radius:14px;white-space:pre-wrap}.u{align-self:flex-end;background:#1f6feb33}.b{align-self:flex-start;background:var(--pn);border:1px solid var(--ln)}
+.tools{color:var(--mu);font-size:12px;margin-top:4px}.chip{display:inline-block;background:#30363d;border-radius:10px;padding:2px 8px;margin:2px;font-size:12px;cursor:pointer}
+.card{border:1px solid var(--ac);border-radius:10px;padding:10px;margin-top:8px;background:#0d1117}.card pre{white-space:pre-wrap;font:13px/1.4 inherit;margin:6px 0}
+.card button{margin-right:6px}.st{font-weight:600;text-transform:uppercase;font-size:11px}
+#composer{border-top:1px solid var(--ln);padding:10px;display:flex;flex-direction:column;gap:6px}
+#att{display:flex;flex-wrap:wrap}#row{display:flex;gap:6px}textarea{flex:1;resize:none;height:56px;background:var(--pn);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:8px;font:inherit}
+button{background:#21262d;color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;cursor:pointer}button.pri{background:var(--ac);color:#000;border:0}
+button.rec{background:#da3633}
+#drop{position:absolute;inset:0;background:#1f6feb44;border:3px dashed var(--ac);display:none;align-items:center;justify-content:center;font-size:20px}
+aside{border-left:1px solid var(--ln);display:flex;flex-direction:column;min-height:0}
+#tabs{display:flex}#tabs button{flex:1;border-radius:0}#tabs .on{background:var(--pn);border-bottom:2px solid var(--ac)}
+#fq{margin:6px;padding:6px;background:var(--pn);color:var(--tx);border:1px solid var(--ln);border-radius:6px}
+#list{flex:1;overflow:auto;min-height:120px}#list div{padding:6px 10px;border-bottom:1px solid var(--ln);cursor:pointer}#list div:hover{background:var(--pn)}
+#list small{color:var(--mu);display:block}
+#pv{height:45%;border-top:1px solid var(--ln);overflow:auto;padding:8px}#pv iframe,#pv img{width:100%;border:0}#pv iframe{height:100%}#pv pre{white-space:pre-wrap;font-size:12px}
+</style></head><body>
+<header><iframe id="orb" src="orb.html?mini"></iframe><div><h1>Drip Bot</h1><small id="status">idle · nothing leaves without your Go</small></div>
+<div style="flex:1"></div><button id="speak" title="Read replies aloud">🔊 Voice on</button></header>
+<section id="main"><div id="thread"></div>
+<div id="composer"><div id="att"></div><div id="row">
+<button id="pick" title="Attach files">📎</button><input type="file" id="fi" multiple hidden>
+<button id="mic" title="Dictate (fil-PH)">🎙</button>
+<textarea id="tx" placeholder="Utos mo, boss… drop or paste any file here"></textarea><button class="pri" id="send">Send</button></div></div>
+<div id="drop">Drop files to upload to the drip inbox</div></section>
+<aside><div id="tabs"><button data-t="uploads" class="on">Uploads</button><button data-t="corpus">Corpus</button><button data-t="queue">Drip queue</button></div>
+<input id="fq" placeholder="Filter…"><div id="list"></div><div id="pv"><small style="color:var(--mu)">Click a file to preview</small></div></aside>
+<script>
+const $=s=>document.querySelector(s),thread=$('#thread');let pending=[],tab='uploads',voice=true;
+const orb=st=>{$('#orb').contentWindow.postMessage({state:st},'*');$('#status').textContent=['idle','listening…','thinking…','speaking…'][st]+' · nothing leaves without your Go'};
+const esc=s=>(s??'').toString().replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function add(cls,html){const d=document.createElement('div');d.className='m '+cls;d.innerHTML=html;thread.appendChild(d);thread.scrollTop=1e9;return d}
+function cite(t){return esc(t).replace(/\[(doc|upload) #(\d+)\]/g,(m,k,i)=>`<span class="chip" onclick="pv('${k}',${i})">${k} #${i}</span>`)}
+function gateHtml(g){if(!g)return'';return `<div class="tools">Gate ${g.mark} · `+g.lines.map(l=>`${l[1]} ${esc(l[0])}${l[1]!='✅'?': '+esc(l[2]):''}`).join(' · ')+`</div>`}
+function card(d){return `<div class="card" id="d${d.id}"><span class="st">Draft #${d.id} · ${d.state}${d.gmail_draft_id?' · in Gmail Drafts':''}</span><br><b>Ladder:</b> <input class="lad" value="${esc(d.ladder||'')}" placeholder="ladder, e.g. RD-T52540-ENTRIES" style="width:60%"><br><b>To:</b> ${esc(d.to_addr)} ${d.cc?'<b>Cc:</b> '+esc(d.cc):''}<br><b>Subject:</b> ${esc(d.subject)}${gateHtml(d.gate)}<pre contenteditable="true">${esc(d.body)}</pre>
+<button style="background:var(--go)" onclick="dec(${d.id},'go')">Go</button><button onclick="dec(${d.id},'edit')">Save edit</button><button style="background:var(--hold);color:#000" onclick="dec(${d.id},'hold')">Hold</button></div>`}
+async function dec(id,d){const body=$('#d'+id+' pre').innerText,ladder=$('#d'+id+' .lad').value.trim();let note='';
+if(d=='go'&&$('#d'+id+' .tools')&&$('#d'+id+' .tools').textContent.includes('Gate ⛔')){note=prompt('Gate shows ⛔. Type "override" and a reason to stage it anyway (or Cancel):')||'';if(!note)return}
+const r=await fetch(`api/draft/${id}/decide`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision:d,body,ladder,note})});const j=await r.json();
+if(!r.ok){$('#d'+id+' .st').textContent=`Draft #${id} · not staged: ${j.error||r.status}`;if(j.gate)$('#d'+id+' .st').insertAdjacentHTML('afterend',gateHtml(j.gate));return}
+$('#d'+id+' .st').textContent=d=='go'?`Draft #${id} · in your Gmail Drafts (jonzschoche) — review and send from Gmail`:`Draft #${id} · ${j.draft.state}`;}
+async function upload(files){if(!files.length)return;const fd=new FormData();for(const f of files)fd.append('files',f,f.name||'pasted.png');
+$('#status').textContent='uploading '+files.length+' file(s)…';const j=await (await fetch('api/upload',{method:'POST',body:fd})).json();
+for(const f of j.files){pending.push(f.id);$('#att').insertAdjacentHTML('beforeend',`<span class="chip" onclick="pv('upload',${f.id})">📄 ${esc(f.filename)} #${f.id}</span>`)}orb(0);if(tab=='uploads')load()}
+async function send(){const m=$('#tx').value.trim();if(!m&&!pending.length)return;add('u',esc(m)+(pending.length?`<div class="tools">📎 uploads ${pending.join(', ')}</div>`:''));
+$('#tx').value='';const ids=pending;pending=[];$('#att').innerHTML='';orb(2);
+try{const j=await (await fetch('api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m||'(see attached)',upload_ids:ids})})).json();
+const d=add('b',j.error?'⚠ '+esc(j.error):cite(j.reply));if(j.tools?.length)d.insertAdjacentHTML('beforeend',`<div class="tools">🔧 ${j.tools.map(t=>t.tool).join(' → ')}</div>`);
+(j.drafts||[]).forEach(x=>d.insertAdjacentHTML('beforeend',card(x)));if(voice&&j.reply)say(j.reply);else orb(0)}catch(e){add('b','⚠ '+e);orb(0)}}
+function say(t){const u=new SpeechSynthesisUtterance(t.replace(/\[(doc|upload) #\d+\]/g,'').slice(0,600));const vs=speechSynthesis.getVoices();
+u.voice=vs.find(v=>/fil|tl/i.test(v.lang))||vs.find(v=>/en-PH/i.test(v.lang))||null;u.onstart=()=>orb(3);u.onend=()=>orb(0);speechSynthesis.speak(u)}
+$('#speak').onclick=()=>{voice=!voice;$('#speak').textContent=voice?'🔊 Voice on':'🔈 Voice off';speechSynthesis.cancel()};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec;
+$('#mic').onclick=()=>{if(!SR)return alert('Dictation needs Chrome/Edge/Safari');if(rec){rec.stop();return}
+rec=new SR();rec.lang='fil-PH';rec.interimResults=true;rec.continuous=true;const base=$('#tx').value;
+rec.onresult=e=>{$('#tx').value=base+' '+[...e.results].map(r=>r[0].transcript).join('')};rec.onend=()=>{rec=null;$('#mic').classList.remove('rec');orb(0)};
+rec.onerror=e=>{if(e.error=='language-not-supported'){rec.lang='en-PH'}};rec.start();$('#mic').classList.add('rec');orb(1)};
+$('#send').onclick=send;$('#tx').onkeydown=e=>{if(e.key=='Enter'&&!e.shiftKey){e.preventDefault();send()}};
+$('#pick').onclick=()=>$('#fi').click();$('#fi').onchange=e=>{upload([...e.target.files]);e.target.value=''};
+document.addEventListener('paste',e=>{const f=[...e.clipboardData.files];if(f.length){e.preventDefault();upload(f)}});
+let dc=0;addEventListener('dragenter',e=>{e.preventDefault();dc++;$('#drop').style.display='flex'});addEventListener('dragleave',()=>{if(--dc<=0)$('#drop').style.display='none'});
+addEventListener('dragover',e=>e.preventDefault());addEventListener('drop',e=>{e.preventDefault();dc=0;$('#drop').style.display='none';upload([...e.dataTransfer.files])});
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x==b));load()});
+$('#fq').oninput=()=>{clearTimeout(window._t);window._t=setTimeout(load,300)};
+async function load(){const L=$('#list');if(tab=='queue'){const j=await (await fetch('api/queue')).json();
+const dd=x=>x?new Date(x).toLocaleDateString('en-PH',{day:'2-digit',month:'short'}):'—';
+L.innerHTML='<b>Next targets</b>'+(j.targets||[]).map((t,n)=>`<div>🎯 ${n+1}. ${esc(t.ladder)} <small>${esc(t.matter)} · ${esc(t.what)} · ${esc(t.channel)}</small></div>`).join('')+
+'<b>Drafts</b>'+j.drafts.map(d=>`<div onclick='showDraft(${JSON.stringify(d).replace(/'/g,"&#39;")})'>📝 Draft #${d.id} · ${d.state}${d.gate?' · gate '+d.gate.mark:''}<small>${esc(d.ladder||'no ladder')} · ${esc(d.subject)}</small></div>`).join('')+
+'<b>Live clocks (15 working days from proof of receipt)</b>'+j.obligations.map(o=>`<div>⏳ ${esc(o.ladder)}<small>${esc(o.office)} · served ${dd(o.served_at)} · due ${dd(o.due_at)} · ${o.state}</small></div>`).join('');return}
+const j=await (await fetch(`api/files?src=${tab}&q=${encodeURIComponent($('#fq').value)}`)).json();
+L.innerHTML=j.files.map(f=>`<div onclick="pv('${tab=='uploads'?'upload':'doc'}',${f.id})">${tab=='uploads'?'📎':'📚'} ${esc(f.filename)}<small>#${f.id} · ${esc(f.mime||'')} ${f.matter_code?'· '+esc(f.matter_code):''} ${f.date||f.created_at||''}</small></div>`).join('')||'<div>Nothing yet</div>'}
+function showDraft(d){$('#pv').innerHTML=card(d)}
+async function pv(kind,id){const P=$('#pv');if(kind=='doc'){const d=await (await fetch('api/doc/'+id)).json();
+P.innerHTML=`<b>${esc(d.title)}</b> <small>doc #${id} · ${esc(d.matter_code)} · ${esc(d.date)}</small> ${d.drive_link?`<a href="${esc(d.drive_link)}" target="_blank">Drive ↗</a>`:''}<pre>${esc(d.text||d.summary||'(no text)')}</pre>`;return}
+const f=(await (await fetch('api/files?src=uploads')).json()).files.find(x=>x.id==id)||{};const u='api/raw/upload/'+id,m=f.mime||'';
+if(m.startsWith('image/'))P.innerHTML=`<img src="${u}">`;else if(m.startsWith('audio/'))P.innerHTML=`<b>${esc(f.filename)}</b><audio controls src="${u}" style="width:100%"></audio>`;
+else if(m.startsWith('video/'))P.innerHTML=`<video controls src="${u}" style="width:100%"></video>`;else if(m=='application/pdf')P.innerHTML=`<iframe src="${u}"></iframe>`;
+else{const t=await (await fetch('api/upload_text/'+id)).json();P.innerHTML=`<b>${esc(f.filename)}</b> <a href="${u}" download>download</a><pre>${esc(t.text||'(no text preview)')}</pre>`}}
+(async()=>{const j=await (await fetch('api/history')).json();for(const r of j.messages){if(r.role=='user')add('u',esc(r.content)+(r.upload_ids?.length?`<div class="tools">📎 uploads ${r.upload_ids.join(', ')}</div>`:''));else{const d=add('b',cite(r.content));const t=(r.meta?.tools||[]).map(x=>x.tool);if(t.length)d.insertAdjacentHTML('beforeend',`<div class="tools">🔧 ${t.join(' → ')}</div>`);(r.drafts||[]).forEach(x=>d.insertAdjacentHTML('beforeend',card(x)))}}})();
+add('b','Hi boss. Drop any file, ask me for corpus content for a drip, or tell me to draft. Drafts wait for your Go — wala akong pinapadala.');load();
+</script></body></html>

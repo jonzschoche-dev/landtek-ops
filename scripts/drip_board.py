@@ -157,6 +157,12 @@ def build(cur, today):
             if gd not in logged:
                 x.setdefault("unlogged", []).append((gd, g["from_addr"], (g["subject"] or "")[:90]))
 
+    # Clocks come from office_obligation — ONE truth for the board, the clock engine and the Drip UI (23 Oct 2026).
+    cur.execute("""SELECT DISTINCT ON (ladder) ladder, state, served_at, due_at, service_proof, service_proof_doc_id
+                     FROM office_obligation WHERE ladder IS NOT NULL
+                    ORDER BY ladder, served_at DESC NULLS LAST, id DESC""")
+    for r in cur.fetchall():
+        L[r["ladder"]]["clock"] = r
     for lad, x in L.items():
         if not x["client"]:
             x["client"] = next((c for p, c in FOLDER_CLIENT if lad.startswith(p)), "MWK-001")
@@ -178,7 +184,17 @@ def build(cur, today):
                 ack = (first[0], "office e-mail (unlogged): " + first[2], None, None)
         proof = receipt or (ack and (ack[0], "acknowledged by e-mail: " + ack[1][:60], ack[3]))
         due = add_working_days(proof[0], PERIOD, off) if proof else None
-        if x["refused"] and not proof:
+        ck = x.get("clock")
+        if ck and ck["served_at"]:   # the table wins over anything derived from events or mail
+            proof = (ck["served_at"], f"doc #{ck['service_proof_doc_id']}: " + (ck["service_proof"] or "")[:60], None)
+            due = ck["due_at"]
+        if ck and ck["state"] == "performed":
+            status = "DONE"
+        elif ck and ck["state"] in ("lapsed", "consequence_staged", "consequence_filed"):
+            status = "LAPSED"
+        elif ck and ck["state"] in ("replied_not_performed", "partial") and not (x.get("drafted") and x["replies"] and x["drafted"] >= x["replies"][-1][0]):
+            status = "ANSWERED: ACT"
+        elif x["refused"] and not proof:
             status = "REFUSED"
         elif x["replies"] and x["replies"][-1][0] >= (last_sent or date.min) and not re.search(
                 r"(?i)acknowledg|forward|refer|will (look|get back|confer)|back (on )?monday", x["replies"][-1][1]):
@@ -290,7 +306,7 @@ def render_targets(targets):
 
 
 ORDER = ["LAPSED", "ANSWERED: ACT", "REFUSED", "CLOCK RUNNING", "SENT, NO PROOF", "DRAFTED", "PLANNED",
-         "FOLDER ONLY", "SKIPPED"]
+         "FOLDER ONLY", "SKIPPED", "DONE"]
 
 
 def render(rows, today, client=None, targets=None):
@@ -318,7 +334,7 @@ def render(rows, today, client=None, targets=None):
         if not by[s]:
             continue
         out += ["", f"## {s} ({len(by[s])})", ""]
-        if s in ("PLANNED", "FOLDER ONLY", "SKIPPED"):
+        if s in ("PLANNED", "FOLDER ONLY", "SKIPPED", "DONE"):
             for client in sorted({r["client"] for r in by[s]}):
                 names = ", ".join(sorted(r["ladder"] for r in by[s] if r["client"] == client))
                 out.append(f"- {client}: {names}")
