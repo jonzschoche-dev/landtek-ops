@@ -58,6 +58,8 @@ DOCS = [
      "DRIP BOARD MWK-001 (nightly): every ladder's status, proof of receipt, clock and due date (internal)"),
     ("case_work/DRIP_BOARDS/DRIP_BOARD_Paracale-001.md", "Paracale-001", "Paracale-001",
      "DRIP BOARD Paracale-001 (nightly): ladder status, proof of receipt, clocks (internal)"),
+    ("case_work/MWK-001/DRIP_PROTOCOL_REVIEW_2026-10-23.md", "MWK-001", "MWK-001",
+     "Drip protocol review 23 Oct 2026: pipeline as it runs, rules, prompts, interface gaps, conflicts, questions (internal)"),
 ]
 
 
