@@ -107,20 +107,26 @@ def board_rebuilt_nightly(cur):
 
 
 def interface_never_sends(cur):
-    """The Drip UI and the Gmail staging helper only CREATE DRAFTS: no messages.send / drafts.send / SMTP anywhere."""
+    """NOTHING in the drip sends (Jonathan, 23 Oct 2026: "important that the drip never sends anything yet").
+    Every drip file — the Drip UI, scripts/drip_*.py, the Gmail staging helper, ops/drip/*.sh — may only stage
+    drafts: no messages.send / drafts.send / SMTP / sendmail / Telegram send / AppleScript send."""
+    import glob as _glob
     import re as _re
     root = "/root/landtek" if os.path.isdir("/root/landtek") else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    files = ["drip_ui/app.py"] + [os.path.relpath(f, root) for f in
+                                   _glob.glob(os.path.join(root, "scripts", "drip_*.py")) + _glob.glob(os.path.join(root, "ops", "drip", "*.sh"))]
+    rx = _re.compile(r"messages\(\)\.send|drafts\(\)\.send|smtplib|\.sendmail\(|tg_send|send_message\(|"
+                     r"^\s*send\s+\w+\s*$|\bsend (r|msg|theMessage|newMessage)\b", _re.M)
     bad = []
-    for rel in ("drip_ui/app.py", "scripts/drip_stage_gmail.py"):
+    for rel in files:
         path = os.path.join(root, rel)
-        if not os.path.exists(path):
-            continue
-        src = open(path).read()
-        if _re.search(r"messages\(\)\.send|drafts\(\)\.send|smtplib|\.sendmail\(", src):
-            bad.append(rel)
+        if os.path.exists(path):
+            code = "\n".join(l for l in open(path, errors="ignore").read().splitlines() if not l.lstrip().startswith("#"))
+            if rx.search(code):
+                bad.append(rel)
     if bad:
-        raise TruthFailure(f"send path found in {bad}: the interface may only stage drafts (Charter §11.1 never sends)")
-    print("      [drip core] interface and Gmail staging carry no send path")
+        raise TruthFailure(f"send path found in {bad}: the drip may only stage drafts — Jonathan sends (Charter §11.1)")
+    print(f"      [drip core] {len(files)} drip files carry no send path (drafts only)")
 
 
 def prospects_swept(cur):

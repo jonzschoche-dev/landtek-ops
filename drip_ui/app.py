@@ -243,6 +243,46 @@ def argparse_ns(**kw):
     return argparse.Namespace(**kw)
 
 
+@app.route("/api/search")
+def search():
+    """Dig into a matter (Jonathan, 23 Oct 2026): one query over matters, ladders, clocks, prospects, drip events,
+    documents and e-mails. A matter code (e.g. MWK-CV6839) filters everything to that matter."""
+    qq = (request.args.get("q") or "").strip()
+    if len(qq) < 2:
+        return jsonify(error="type at least 2 characters"), 400
+    like = f"%{qq}%"
+    is_matter = bool(re.match(r"(?i)^(MWK|PAR|NIBDC)-[A-Z0-9-]+$", qq))
+    out = {"query": qq, "matter_mode": is_matter}
+    out["matters"] = q("""SELECT matter_code,title,status,current_stage,next_event,lead_counsel FROM matters
+                          WHERE matter_code ILIKE %s OR title ILIKE %s ORDER BY matter_code LIMIT 15""", (like, like))
+    out["ladders"] = q("""SELECT DISTINCT ON (s.ladder) s.ladder, s.matter_code, s.state, s.addressee, l.clock_state, l.due_at, l.last_sent
+                          FROM step_plan s LEFT JOIN drip_ladder_status l ON l.ladder=s.ladder
+                          WHERE s.ladder ILIKE %s OR s.matter_code ILIKE %s OR s.addressee ILIKE %s OR s.the_ask ILIKE %s
+                          ORDER BY s.ladder LIMIT 40""", (like, like, like, like))
+    out["clocks"] = q("""SELECT ladder,office,state,served_at,due_at,matter_code FROM office_obligation
+                         WHERE ladder IS NOT NULL AND (ladder ILIKE %s OR office ILIKE %s OR matter_code ILIKE %s)
+                         ORDER BY due_at NULLS LAST LIMIT 30""", (like, like, like))
+    out["prospects"] = q("""SELECT id,matter_code,kind,title,lane,score,source_ref FROM drip_prospect
+                            WHERE status='new' AND (title ILIKE %s OR detail ILIKE %s OR matter_code ILIKE %s OR office ILIKE %s)
+                            ORDER BY score DESC LIMIT 40""", (like, like, like, like))
+    out["events"] = q("""SELECT id,kind,ladder,event_date,left(detail::text,220) AS detail FROM drip_event_v
+                         WHERE detail::text ILIKE %s OR ladder ILIKE %s ORDER BY id DESC LIMIT 25""", (like, like))
+    if is_matter:
+        out["documents"] = q("""SELECT id, coalesce(document_title,smart_filename,original_filename) AS title, matter_code,
+                                coalesce(doc_date,document_date) AS date FROM documents WHERE matter_code ILIKE %s OR case_file ILIKE %s
+                                ORDER BY coalesce(doc_date_norm, created_at::date) DESC NULLS LAST LIMIT 40""", (qq, qq))
+    else:
+        out["documents"] = q("""SELECT id, coalesce(document_title,smart_filename,original_filename) AS title, matter_code,
+                                coalesce(doc_date,document_date) AS date FROM documents
+                                WHERE coalesce(document_title,smart_filename,original_filename,'') ILIKE %s OR extracted_text ILIKE %s
+                                ORDER BY (coalesce(document_title,'') ILIKE %s) DESC, coalesce(doc_date_norm, created_at::date) DESC NULLS LAST
+                                LIMIT 40""", (like, like, like))
+    out["emails"] = q("""SELECT id, from_addr, subject, received_at FROM gmail_messages
+                         WHERE subject ILIKE %s OR from_addr ILIKE %s OR (%s AND case_file ILIKE %s)
+                         ORDER BY received_at DESC LIMIT 20""", (like, like, is_matter, qq.split('-')[0] + '%'))
+    return jsonify(json.loads(json.dumps(out, default=str)))
+
+
 @app.route("/api/prospects")
 def prospects():
     lane = request.args.get("lane"); kw = request.args.get("q", "")

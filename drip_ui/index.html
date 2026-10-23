@@ -27,7 +27,7 @@ aside{border-left:1px solid var(--ln);display:flex;flex-direction:column;min-hei
 #pv{height:45%;border-top:1px solid var(--ln);overflow:auto;padding:8px}#pv iframe,#pv img{width:100%;border:0}#pv iframe{height:100%}#pv pre{white-space:pre-wrap;font-size:12px}
 </style></head><body>
 <header><iframe id="orb" src="orb.html?mini"></iframe><div><h1>Drip Bot</h1><small id="status">idle · nothing leaves without your Go</small></div>
-<div style="flex:1"></div><button id="speak" title="Read replies aloud">🔊 Voice on</button></header>
+<div style="flex:1;display:flex;justify-content:center"><input id="sq" placeholder="🔎 Search a matter, office, person, title, TCT… (e.g. MWK-CV6839, Abla, T-52540)" style="width:min(520px,90%);padding:8px 12px;border-radius:10px;border:1px solid var(--ln);background:var(--pn);color:var(--tx)"></div><button id="speak" title="Read replies aloud">🔊 Voice on</button></header>
 <section id="main"><div id="thread"></div>
 <div id="composer"><div id="att"></div><div id="row">
 <button id="pick" title="Attach files">📎</button><input type="file" id="fi" multiple hidden>
@@ -73,7 +73,8 @@ let dc=0;addEventListener('dragenter',e=>{e.preventDefault();dc++;$('#drop').sty
 addEventListener('dragover',e=>e.preventDefault());addEventListener('drop',e=>{e.preventDefault();dc=0;$('#drop').style.display='none';upload([...e.dataTransfer.files])});
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x==b));load()});
 $('#fq').oninput=()=>{clearTimeout(window._t);window._t=setTimeout(load,300)};
-async function load(){const L=$('#list');const dd=x=>x?new Date(x).toLocaleDateString('en-PH',{day:'2-digit',month:'short'}):'—';
+$('#sq').onkeydown=e=>{if(e.key=='Enter')doSearch()};
+async function load(){const L=$('#list');if(tab=='search'){return doSearch(window._sq)}const dd=x=>x?new Date(x).toLocaleDateString('en-PH',{day:'2-digit',month:'short'}):'—';
 const B=(label,js)=>`<button onclick="event.stopPropagation();${js}">${label}</button>`;
 if(tab=='queue'){const j=await (await fetch('api/queue')).json();
 L.innerHTML='<b>Next targets</b>'+(j.targets||[]).map((t,n)=>`<div onclick="${t.ladder=='(calendar)'?`ask('Help me prepare: ${jsq(t.what)}')`:`openLadder('${jsq(t.ladder)}')`}">🎯 ${n+1}. ${esc(t.ladder)} <small>${esc(t.matter)} · ${esc(t.what)} · ${esc(t.channel)}</small><div class="acts">`+
@@ -89,6 +90,18 @@ L.innerHTML=`<div class="acts" style="padding:6px 10px">`+['drip','legal_desk','
 const j=await (await fetch(`api/files?src=${tab}&q=${encodeURIComponent($('#fq').value)}`)).json();
 L.innerHTML=j.files.map(f=>`<div onclick="pv('${tab=='uploads'?'upload':'doc'}',${f.id})">${tab=='uploads'?'📎':'📚'} ${esc(f.filename)}<small>#${f.id} · ${esc(f.mime||'')} ${f.matter_code?'· '+esc(f.matter_code):''} ${f.date||f.created_at||''}</small></div>`).join('')||'<div>Nothing yet</div>'}
 function showDraft(d){$('#pv').innerHTML=card(d)}
+async function doSearch(qq){qq=(qq??$('#sq').value).trim();if(qq.length<2)return;window._sq=qq;$('#sq').value=qq;tab='search';document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));
+ const L=$('#list');L.innerHTML='<small style="padding:10px;display:block">searching…</small>';const j=await (await fetch('api/search?q='+encodeURIComponent(qq))).json();
+ if(j.error){L.innerHTML=esc(j.error);return}const dd=x=>x?new Date(x).toLocaleDateString('en-PH',{day:'2-digit',month:'short',year:'2-digit'}):'—';
+ const B=(label,js)=>`<button onclick="event.stopPropagation();${js}">${label}</button>`;const sec=(t,a)=>a&&a.length?`<b>${t} (${a.length})</b>`:'';
+ L.innerHTML=`<div class="acts" style="padding:6px 10px">${B('Brief me on this',`ask('Brief me on ${jsq(qq)}: where it stands, open clocks, prospects, and the next step (cite docs).')`)}</div>`+
+ sec('Matters',j.matters)+j.matters.map(m=>`<div onclick="doSearch('${jsq(m.matter_code)}')">📁 ${esc(m.matter_code)}<small>${esc(m.title)} · ${esc(m.status)} · ${esc((m.next_event||'').slice(0,120))}</small><div class="acts">${B('Dig in',`doSearch('${jsq(m.matter_code)}')`)}${B('Brief',`ask('Brief me on ${jsq(m.matter_code)} with citations.')`)}</div></div>`).join('')+
+ sec('Live clocks',j.clocks)+j.clocks.map(o=>`<div onclick="openLadder('${jsq(o.ladder)}')">⏳ ${esc(o.ladder)}<small>${esc(o.office)} · due ${dd(o.due_at)} · ${o.state}</small></div>`).join('')+
+ sec('Ladders',j.ladders)+j.ladders.map(l=>`<div onclick="openLadder('${jsq(l.ladder)}')">🪜 ${esc(l.ladder)}<small>${esc(l.matter_code)} · ${esc(l.state)} · ${esc(l.addressee||'')} ${l.due_at?'· due '+dd(l.due_at):''}</small><div class="acts">${B('Open',`openLadder('${jsq(l.ladder)}')`)}${B('Draft next step',`ask('Draft the next drip step for ladder ${jsq(l.ladder)}')`)}</div></div>`).join('')+
+ sec('Prospects',j.prospects)+j.prospects.map(p=>`<div>💡 ${esc(p.title)}<small>${esc(p.matter_code)} · ${esc(p.kind)} · ${p.lane} · ${esc(p.source_ref)}</small><div class="acts">${p.lane=='drip'?B('Promote',`prAct(${p.id},'promote')`):''}${B('Lane…',`prAct(${p.id},'lane')`)}${B('Dismiss',`prAct(${p.id},'dismiss')`)}${p.source_ref.startsWith('documents:')?B('Source',`pv('doc',${p.source_ref.split(':')[1]})`):''}</div></div>`).join('')+
+ sec('Documents',j.documents)+j.documents.map(f=>`<div onclick="pv('doc',${f.id})">📚 ${esc(f.title)}<small>#${f.id} · ${esc(f.matter_code||'')} · ${esc(f.date||'')}</small></div>`).join('')+
+ sec('E-mails',j.emails)+j.emails.map(e=>`<div>✉️ ${esc(e.subject)}<small>${esc(e.from_addr)} · ${dd(e.received_at)}</small></div>`).join('')+
+ sec('Drip events',j.events)+j.events.map(e=>`<div onclick="${e.ladder?`openLadder('${jsq(e.ladder)}')`:''}">• ${esc(e.kind)} ${esc(e.ladder||'')}<small>${esc(e.event_date||'')} ${esc(e.detail)}</small></div>`).join('')}
 const jsq=t=>(t??'').toString().replace(/\\/g,'').replace(/'/g,"’").replace(/"/g,'”').replace(/\n/g,' ').slice(0,300);
 function ask(t){$('#tx').value=t;$('#tx').focus()}
 async function post(u,b){const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json();return j.error?'⚠ '+j.error:(j.message||'ok')}
