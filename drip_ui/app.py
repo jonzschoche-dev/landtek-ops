@@ -182,6 +182,108 @@ def decide(i):
                                        "gmail_draft_id": staged})))
     return jsonify(draft=r, staged=staged)
 
+# ---------- actions on everything (Jonathan, 23 Oct 2026: "anything that's on a page should have options") ----------
+def _dl():
+    import drip_log
+    return drip_log
+
+
+@app.route("/api/ladder/<path:name>")
+def ladder_detail(name):
+    ev = q("SELECT id,kind,event_date,detail,created_at FROM drip_event_v WHERE ladder=%s ORDER BY id DESC LIMIT 60", (name,))
+    clock = q("SELECT * FROM office_obligation WHERE ladder=%s ORDER BY id DESC", (name,))
+    steps = q("SELECT seq,state,addressee,the_ask,to_address FROM step_plan WHERE ladder=%s ORDER BY seq", (name,))
+    drafts = q("SELECT id,state,subject,gmail_draft_id FROM drip_ui_draft WHERE ladder=%s ORDER BY id DESC", (name,))
+    return jsonify(ladder=name, events=ev, clocks=clock, steps=steps, drafts=drafts)
+
+
+@app.route("/api/ladder/<path:name>/log", methods=["POST"])
+def ladder_log(name):
+    """Log anything on a ladder from the page: reply · receipt (proof doc) · call · note · refused · performed.
+    Everything goes through scripts/drip_log.py, so the board, clocks and UI stay one truth. Never sends."""
+    b = request.get_json(force=True); act = b.get("action"); dl = _dl(); today = str(datetime.date.today())
+    at = b.get("at") or today
+    c, cur = dl.conn()
+    try:
+        m = dl.matter_for(cur, name)
+        dl.ensure_ladder(cur, name, m)
+        if act == "reply":
+            ns = argparse_ns(ladder=name, at=at, frm=b.get("from") or "(office)", gist=b.get("note") or "reply",
+                             doc=b.get("doc") or None, outcome=b.get("outcome") or "ack", next=None, matter=None, office=None,
+                             note=None, source="drip_ui")
+            msg = dl.cmd_reply(cur, ns)
+        elif act == "receipt":
+            if not b.get("doc"):
+                return jsonify(error="A receipt needs the corpus document that proves it (doc #)."), 400
+            msg = dl.cmd_receipt(cur, argparse_ns(ladder=name, at=at, proof_doc=int(b["doc"]), by=b.get("by"), office=b.get("office"),
+                                                  matter=None, note=b.get("note"), source="drip_ui"))
+        elif act == "performed":
+            cur.execute("UPDATE office_obligation SET state='performed', updated_at=now() WHERE ladder=%s AND state=ANY(%s) RETURNING id",
+                        (name, list(LIVE_CLOCK)))
+            n = len(cur.fetchall()); dl.set_step(cur, name, "done")
+            dl.event(cur, "state_change", ladder=name, at=at, to="performed", note=b.get("note"), source="drip_ui")
+            msg = f"{n} clock(s) closed as performed"
+        elif act in ("call", "note", "refused"):
+            kind = {"call": "field", "note": "field", "refused": "field"}[act]
+            dl.event(cur, kind, ladder=name, at=at, channel="phone" if act == "call" else None,
+                     outcome="REFUSED_TO_RECEIVE" if act == "refused" else None, note=b.get("note"), source="drip_ui")
+            msg = f"{act} logged"
+        else:
+            return jsonify(error="unknown action"), 400
+        c.commit()
+        return jsonify(ok=True, message=msg)
+    except SystemExit as e:
+        c.rollback(); return jsonify(error=str(e)), 400
+    finally:
+        c.close()
+
+
+def argparse_ns(**kw):
+    import argparse
+    return argparse.Namespace(**kw)
+
+
+@app.route("/api/prospects")
+def prospects():
+    lane = request.args.get("lane"); kw = request.args.get("q", "")
+    where, args = ["status='new'"], []
+    if lane: where.append("lane=%s"); args.append(lane)
+    if kw: where.append("(title ILIKE %s OR detail ILIKE %s)"); args += [f"%{kw}%", f"%{kw}%"]
+    rows = q(f"SELECT id,matter_code,kind,title,lane,score,source_ref,office FROM drip_prospect WHERE {' AND '.join(where)} ORDER BY score DESC, id LIMIT 150", tuple(args))
+    counts = q("SELECT lane, count(*) n FROM drip_prospect WHERE status='new' GROUP BY lane")
+    return jsonify(prospects=rows, counts={r["lane"]: r["n"] for r in counts})
+
+
+@app.route("/api/prospect/<int:i>/action", methods=["POST"])
+def prospect_action(i):
+    """promote → a planned ladder · dismiss · lane change. Promotion is Jonathan's call; nothing is sent."""
+    b = request.get_json(force=True); act = b.get("action")
+    p = q("SELECT * FROM drip_prospect WHERE id=%s", (i,), one=True)
+    if not p: abort(404)
+    if act == "dismiss":
+        q("UPDATE drip_prospect SET status='dismissed', decided_at=now(), decision_note=%s WHERE id=%s", (b.get("note"), i))
+        return jsonify(ok=True, message="dismissed")
+    if act == "lane":
+        if b.get("lane") not in ("drip", "legal_desk", "counsel", "hold"): abort(400)
+        q("UPDATE drip_prospect SET lane=%s, decision_note=%s WHERE id=%s", (b["lane"], b.get("note"), i))
+        return jsonify(ok=True, message=f"moved to {b['lane']}")
+    if act == "promote":
+        if p["lane"] != "drip":
+            return jsonify(error=f"This prospect is in the {p['lane']} lane. The drip only carries drip-lane items; move it first if you decide so."), 400
+        ladder = re.sub(r"[^A-Z0-9-]+", "-", (b.get("ladder") or f"PROSPECT-{i}").upper()).strip("-")
+        dl = _dl(); c, cur = dl.conn()
+        try:
+            dl.ensure_ladder(cur, ladder, p["matter_code"] or "MWK-001", p["office"], p["title"][:300])
+            cur.execute("UPDATE step_plan SET state='planned', notes=coalesce(notes,'')||%s WHERE ladder=%s AND seq=1",
+                        (f" | from prospect #{i}: {p['source_ref']}", ladder))
+            dl.event(cur, "planned", ladder=ladder, at=str(datetime.date.today()), prospect_id=i, title=p["title"][:200], source="drip_ui")
+            c.commit()
+        finally:
+            c.close()
+        q("UPDATE drip_prospect SET status='promoted', ladder=%s, decided_at=now(), decision_note=%s WHERE id=%s", (ladder, b.get("note"), i))
+        return jsonify(ok=True, message=f"promoted to ladder {ladder} (planned)", ladder=ladder)
+    abort(400)
+
 # ---------- bot ----------
 SYSTEM = """You are Drip Bot, LandTek's drip assistant for Jonathan (Boss). Reply in short Taglish (mostly English, light Tagalog).
 Rules: you NEVER send anything outward — you have no send tool. You can only create DRAFTS with create_draft; Jonathan decides Go/Edit/Hold. Go puts the letter in his Gmail Drafts; Jonathan sends it himself.

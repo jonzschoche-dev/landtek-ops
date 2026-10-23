@@ -4,6 +4,8 @@
 #   1. pull jonzschoche@gmail.com office mail (the inbox every MWK drip goes out from) into gmail_messages
 #   2. ingest_email_bodies.py: office e-mails become corpus documents (an office's reply = proof of receipt)
 #   3. drip_log.py reconcile: office replies and our sends nobody logged are logged; proofs start clocks
+#   3b. drip_prospect_sweep.py: whole-corpus MWK prospects (to-obtain items, matters, office asks, contradictions,
+#       accountability leads, transferees, deadlines, unasked custodians) → drip_prospect, each with a lane
 #   4. drip_board.py: one board of every ladder across all matters + ranked next targets
 #   5. truth_tests/test_drip_core.py: the drip is fed and not blind (result in the log; never blocks the board)
 #   6. ingest the per-client boards into the corpus (client-separated; the all-clients board stays local)
@@ -16,6 +18,7 @@ echo "=== $(date -u '+%F %T') UTC nightly drip ==="
   || echo "jonzschoche pull FAILED (token? re-mint on the Mac: scripts/mint_gmail_backup_token.py) — board runs on existing data"
 /usr/bin/python3 ingest_email_bodies.py --since "$(date -u -d '4 days ago' +%F)" | tail -4 || echo "email bodies FAILED"
 /usr/bin/python3 scripts/drip_log.py reconcile --since "$(date -u -d '10 days ago' +%F)" || echo "reconcile FAILED"
+/usr/bin/python3 scripts/drip_prospect_sweep.py | head -3 || echo "prospect sweep FAILED"
 /usr/bin/python3 scripts/drip_board.py || echo "board FAILED"
 /usr/bin/python3 truth_tests/test_drip_core.py | grep -E '✓|✗|FAIL' || echo "drip core check FAILED"
 for b in case_work/DRIP_BOARDS/DRIP_BOARD_MWK-001.md case_work/DRIP_BOARDS/DRIP_BOARD_Paracale-001.md; do

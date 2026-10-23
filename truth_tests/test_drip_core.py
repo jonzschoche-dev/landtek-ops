@@ -123,6 +123,21 @@ def interface_never_sends(cur):
     print("      [drip core] interface and Gmail staging carry no send path")
 
 
+def prospects_swept(cur):
+    """The prospect layer is populated and refreshed by the nightly sweep (drip_prospect_sweep.py)."""
+    cur.execute("SELECT count(*) n, max(last_seen) m FROM drip_prospect")
+    r = cur.fetchone()
+    if not r["n"]:
+        raise TruthFailure("drip_prospect is empty — the corpus sweep has not run")
+    m = r["m"] if r["m"].tzinfo else r["m"].replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) - m > timedelta(hours=26):
+        raise TruthFailure(f"prospect sweep last ran {m:%Y-%m-%d %H:%M} UTC — the nightly sweep did not run")
+    cur.execute("""SELECT count(*) n FROM drip_prospect WHERE status='promoted' AND lane <> 'drip'""")
+    if cur.fetchone()["n"]:
+        raise TruthFailure("a non-drip-lane prospect was promoted to a ladder — the drip follows, it never takes a legal position")
+    print(f"      [drip core] {r['n']} prospects, swept within 26 h; only drip-lane items promoted")
+
+
 TESTS = [
     ("drip_core.objects_exist", core_objects_exist),
     ("drip_core.every_new_event_names_its_ladder", every_new_event_names_its_ladder),
@@ -132,6 +147,7 @@ TESTS = [
     ("drip_core.both_mail_feeds_alive", both_mail_feeds_alive),
     ("drip_core.board_rebuilt_nightly", board_rebuilt_nightly),
     ("drip_core.interface_never_sends", interface_never_sends),
+    ("drip_core.prospects_swept", prospects_swept),
 ]
 
 
