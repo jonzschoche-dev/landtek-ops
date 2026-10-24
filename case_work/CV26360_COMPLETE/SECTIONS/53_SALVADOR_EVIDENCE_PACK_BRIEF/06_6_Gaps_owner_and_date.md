@@ -11,7 +11,7 @@
 |---|---|---|---|
 | 1 | Find and scan the 1990s tax papers Von handed over at Mr. Bacolor's office on 11 Oct 2025 (physical originals or photos); note who was present at the meeting | Jonathan | this week |
 | 2 | Export the Messenger thread with Mr. Bacolor about Von, unedited, with dates (HELD; for our file only) | Jonathan | this week |
-| 3 | Rescan from the vault: your 21 June 2025 letter to Salvador bearing his signature of receipt, and the other 21 June 2025 letter (CORR-003, CORR-007, CORR-015 are labels only; no image was stored) | Kristyle | this week |
+| 3 | Rescan the CORR-007 original at full resolution (all pages), and check whether CORR-015 is a separate letter | Kristyle | this week |
 | 4 | Certified ARP GR-2014-HH-07-001-00246 **with its supporting papers**: the letter request, sketch plan, demand letter and SPA submitted on 28 April 2016 (add to the 26 Oct Assessor request already planned) | Jonathan | 26 Oct |
 | 5 | Treasurer: payor named on ORs 0033799 and 0033800 (31 Mar 2016); certified statement of account for PIN 025-07-001-01-004 as of today | Jonathan | 26 Oct |
 | 6 | Registry file (a): who surrendered the T-52540 owner's duplicate in 2021; notary of the Elevado SPA | Jonathan (letter of 20 Oct) | on receipt |

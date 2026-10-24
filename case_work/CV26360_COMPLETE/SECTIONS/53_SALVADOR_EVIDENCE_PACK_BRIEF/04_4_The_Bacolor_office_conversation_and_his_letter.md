@@ -11,7 +11,9 @@
 
 - **What this gives the cross (optional; take the answer, prove nothing):** "In October 2025 you gave Mr. Zschoche tax papers from the 1990s. You gave him no receipt of any Balane payment?" and "In 2025 you proposed that Mr. Zschoche talk with Ferdinand Balane?" The receipts first appear with the defendants' Answer in 2026. If he denies, leave it.
 
-- **Not yet located:** (a) the 1990s tax papers Von handed you on 11 Oct 2025; (b) your letter to him of 21 June 2025 bearing his signature of receipt. Neither is in the corpus or in Drive's searchable text. The vault log of 7 June 2026 (CORR-003, CORR-007, CORR-015) records labels only, with no image. The tax declarations and statements in Tabs 5 and 6 were scanned on 2 January 2025, before the meeting, so they did not come from Von. They are public records and stand on their own.
+- **Recovered: CORR-007** (corpus doc 1002), your letter to Salvador of 21 June 2025, signed by him "Received" (Tab 13). It came back from Kristyle's Telegram photo of 7 June 2026; the stored copy had been lost, so it was re-downloaded from Telegram. The photo is low resolution: rescan the original in the vault before trial. It is the written request, a year before trial, for exactly the papers in subpoena (k). If he still produces nothing, it supports Rule 131 §3(e). The "Received" signature also matches the stylized signature on the Exhibit 5 receipts, which fits S19 to S22; we do not argue handwriting.
+
+- **Not yet located:** the 1990s tax papers Von handed you on 11 Oct 2025 (in the Scanner Pro app on your phone; export to Drive). CORR-015 (logged as a 21 June 2025 letter from him) has no photo; Kristyle's own messages suggest it may be the same letter. Its wrong link to doc 814 has been cleared. The tax declarations and statements in Tabs 5 and 6 were scanned on 2 January 2025, before the meeting, so they did not come from Von. They are public records and stand on their own.
 
 - **What we do not hold in writing:** what he said at the meeting. Your 14 July 2025 email to counsel, which predates the 11 October meeting, describes an admission. His letter answers: "you know I never admit it."
 

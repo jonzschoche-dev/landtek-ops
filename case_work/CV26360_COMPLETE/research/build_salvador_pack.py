@@ -27,10 +27,12 @@ F = {
  "SP": LTC + "Correspondence/DAR Landbank/Scan Jun 17, 2025 at 3.30 PM.pdf",
  "JAG": TB + "C2 - Judicial Affidavit - Gloria H. Balane (EXCLUDED at pre-trial; admission motion pending).pdf",
  "EX6": DL + "Exhibit 6 - Deed of Absolute Sale.pdf",
+ "TRE": BASE + "/src/Treasurer_Responses_2025_doc814.pdf",
+ "C007": BASE + "/src/recovered_tg/CORR-007_inbox25_2026-06-07.jpg",
 }
 LABEL = {"JAS": "Salvador JA", "SAL": "letter 25 Nov 2025", "EX7": "Def. Exh. 7", "EX5": "Def. Exh. 5",
          "TD": "heirs' tax declarations (scan 2 Jan 2025)", "SOA": "Treasurer SOA set (scan 2 Jan 2025)", "D7": "2012 paper",
-         "EXB": "Exh. B", "SP": "SP 2156 docket", "JAG": "Gloria JA (tendered)", "EX6": "Def. Exh. 6"}
+         "EXB": "Exh. B", "SP": "SP 2156 docket", "JAG": "Gloria JA (tendered)", "EX6": "Def. Exh. 6", "TRE": "Treasurer letters (doc 814)", "C007": "CORR-007 photo (Telegram, 7 Jun 2026)"}
 # (tab title, description, [(key, [pages])])  pages 1-based
 TABS = [
  ("His judicial affidavit, sworn 1 April 2026", "S14 to S16 (the 1992 visit to Llamanzares); S19 to S22 (rent and partial payments; Exh. 5); S24 to S25 (amilyar); S29 ('ipinalakad na niya sa iba'); S31 ('Wala po').", [("JAS", [1, 2, 3, 4, 5, 6, 7])]),
@@ -44,7 +46,15 @@ TABS = [
  ("SP 2156, RTC Branch 41: docket", "Petition of Cesar M. de la Fuente, counsel Atty. Elaine Gay R. Belen, filed 20 Oct 2016; order 30 Jan 2017; certificate of finality 13 Mar 2017.", [("SP", [1])]),
  ("CONDITIONAL. Gloria's original judicial affidavit, p. 10", "S53: 'si Atty. Elaine Belen po ang tumulong at nag-follow up sa mga dokumento para sa transfer.' Excluded at pre-trial; use only if admitted.", [("JAG", [10])]),
  ("Deed of Absolute Sale (Def. Exh. 6)", "p. 1: price 'in hand paid'. p. 2: eCARs of 19 Jun 2020 and 18 Nov 2021.", [("EX6", [1, 2])]),
+ ("Municipal Treasurer, letters of 1 September 2025 and 27 June 2025", "27 Jun 2025: 'Upon verification of payment records, there was no record of payment made by individuals or entities for the subject properties other than the payment you have made in years 2023 and 2024.' [VERIFY scope against the certified ledger and ORs 0033799 to 0033800.]", [("TRE", [1, 2])]),
+ ("CORR-007: your letter to Salvador of 21 June 2025, signed by him 'Received'", "Asks for the SPA, all deeds of sale, 'payment receipts or acknowledgments', submissions to the Registry, Assessor or Treasurer, and 'notes, ledgers, or other materials'. Recovered from Kristyle's vault photo (Telegram, 7 Jun 2026); low resolution: rescan the original before trial.", [("C007", [1])]),
 ]
+
+def open_src(key):
+    p = F[key]
+    if p.lower().endswith((".jpg", ".jpeg", ".png")):
+        img = fitz.open(p); return fitz.open("pdf", img.convert_to_pdf())
+    return fitz.open(p)
 
 def show(out, src, pg):
     sp = src[pg]; r = sp.rect; rot = sp.rotation
@@ -68,7 +78,7 @@ for i, (title, desc, parts) in enumerate(TABS, 1):
     dp.insert_text((54, H - 20), f"SALVADOR PACK · Tab {i} · divider · Civil Case No. 26-360 · prepared for counsel", fontsize=7, fontname="helv", color=(.4, .4, .4))
     k = 1; total = sum(len(pp) for _, pp in parts)
     for key, pages in parts:
-        src = fitz.open(F[key])
+        src = open_src(key)
         for pg in pages:
             if not (1 <= pg <= src.page_count): raise SystemExit(f"tab {i}: page {pg} out of range for {key} ({src.page_count})")
             np_ = show(out, src, pg - 1)
