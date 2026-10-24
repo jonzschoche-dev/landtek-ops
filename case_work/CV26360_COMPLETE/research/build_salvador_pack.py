@@ -30,10 +30,11 @@ F = {
  "TRE": BASE + "/src/Treasurer_Responses_2025_doc814.pdf",
  "C007": BASE + "/src/CORR-007_2025-06-21_letter_to_Salvador_2pp.pdf",
  "VON": BASE + "/src/VON_TAX_DOCS_2025-10-11.pdf",
+ "SPA1": BASE + "/src/SPA-001_broad_apostilled_2025-02-12_doc285.pdf",
 }
 LABEL = {"JAS": "Salvador JA", "SAL": "letter 25 Nov 2025", "EX7": "Def. Exh. 7", "EX5": "Def. Exh. 5",
          "TD": "heirs' tax declarations (scan 2 Jan 2025)", "SOA": "Treasurer SOA set (scan 2 Jan 2025)", "D7": "2012 paper",
-         "EXB": "Exh. B", "SP": "SP 2156 docket", "JAG": "Gloria JA (tendered)", "EX6": "Def. Exh. 6", "TRE": "Treasurer letters (doc 814)", "C007": "CORR-007 (Jonathan's scan)", "VON": "Von tax papers (11 Oct 2025)"}
+         "EXB": "Exh. B", "SP": "SP 2156 docket", "JAG": "Gloria JA (tendered)", "EX6": "Def. Exh. 6", "TRE": "Treasurer letters (doc 814)", "C007": "CORR-007 (Jonathan's scan)", "VON": "Von tax papers (11 Oct 2025)", "SPA1": "enclosed SPA, exec 12 Feb 2025, apostille 61887 (doc 285)"}
 # (tab title, description, [(key, [pages])])  pages 1-based
 TABS = [
  ("His judicial affidavit, sworn 1 April 2026", "S14 to S16 (the 1992 visit to Llamanzares); S19 to S22 (rent and partial payments; Exh. 5); S24 to S25 (amilyar); S29 ('ipinalakad na niya sa iba'); S31 ('Wala po').", [("JAS", [1, 2, 3, 4, 5, 6, 7])]),
@@ -48,7 +49,7 @@ TABS = [
  ("CONDITIONAL. Gloria's original judicial affidavit, p. 10", "S53: 'si Atty. Elaine Belen po ang tumulong at nag-follow up sa mga dokumento para sa transfer.' Excluded at pre-trial; use only if admitted.", [("JAG", [10])]),
  ("Deed of Absolute Sale (Def. Exh. 6)", "p. 1: price 'in hand paid'. p. 2: eCARs of 19 Jun 2020 and 18 Nov 2021.", [("EX6", [1, 2])]),
  ("Municipal Treasurer, letters of 1 September 2025 and 27 June 2025", "27 Jun 2025: 'Upon verification of payment records, there was no record of payment made by individuals or entities for the subject properties other than the payment you have made in years 2023 and 2024.' [VERIFY scope against the certified ledger and ORs 0033799 to 0033800.]", [("TRE", [1, 2])]),
- ("CORR-007: your letter to Salvador of 21 June 2025, signed by him 'Received'", "Asks for the SPA, all deeds of sale, 'payment receipts or acknowledgments', submissions to the Registry, Assessor or Treasurer, and 'notes, ledgers, or other materials'. p. 2: a reply asked 'within fifteen (15) days of receipt'; signed on behalf of Patricia Zschoche, 'SPA Holder attached'.", [("C007", [1, 2])]),
+ ("CORR-007: your letter to Salvador of 21 June 2025, signed by him 'Received'", "Asks for the SPA, all deeds of sale, 'payment receipts or acknowledgments', submissions to the Registry, Assessor or Treasurer, and 'notes, ledgers, or other materials'. Received by him on 21 June 2025 (per Jonathan); p. 2: a reply asked 'within fifteen (15) days of receipt' (that is, by 6 July 2025); signed on behalf of Patricia Zschoche, 'SPA Holder attached'. Then the enclosure: Patricia's broad SPA, executed 12 Feb 2025, apostille No. 61887 (13 Mar 2025).", [("C007", [1, 2]), ("SPA1", [1, 2, 3, 4, 5])]),
  ("The tax papers Salvador handed Jonathan on 11 October 2025 (selected pages)", "Treasurer's certifications: 13 Aug 1991 delinquency P309,737.75 (p. 8); clearances of 25 Jan 1993 (p. 6) and 25 May 1993 'upon request of MR. SALVADOR DELA FUENTE' (p. 36); clearances of November 1998 (pp. 29, 46); a 1992 schedule (p. 1). Nothing later than November 1998. Full 48-page scan in Drive.", [("VON", [1, 6, 8, 29, 36, 46])]),
 ]
 
