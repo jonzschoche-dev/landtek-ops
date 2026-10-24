@@ -236,3 +236,38 @@ A rule-first judge writing a decision in an accion reivindicatoria will go down 
 | XI. Disposition | The WHEREFORE in the playbook, §5.4 | — |
 
 **The three words that decide the case on her method:** "**void**" (Art. 1874), "**aware**" (Art. 526), and "**parties**" (Art. 496). Each is on the page of an exhibit already in the record.
+
+---
+
+## 13. The lineup: their articles against ours (updated 24 October 2026)
+
+**New texts read on lawphil 24 Oct 2026:** Arts. 1891, 1892, 1897, 1919, 1930, 1931; PD 1529 §§47, 70. Everything else is as read on 13 Oct.
+
+**Score key:** *Ours, firm* = the words and an exhibit already in the record decide it. *Ours, likely* = the text favors us but a finding of fact is needed. *Contested* = she could go either way. *Concede* = do not fight it.
+
+| # | Battleground | Their article | Our article | The words that decide it | The paper that decides it | Score |
+|---|---|---|---|---|---|---|
+| 1 | Court and action | PD 1529 §48 ("collateral attack") | BP 129 §33(3) (RA 11576) | "direct proceeding" | Caption; ARP 00256 (₱257,670) | Ours, firm |
+| 2 | What the power says | Answer ¶39, "read as a whole" | Arts. 1874, 1878 ¶5, 1877 | The class and "after prior consultation" | Exh. E ¶7 | Ours, firm |
+| 3 | Within the power? | Arts. 1900, 1902 | Art. 1898; PD 1529 §52 | "as written"; "private or secret"; "aware of the limits" | Exh. B (annotated 21 Jun 1996); **Salvador S11, S13: the SPA itself was shown to Gloria**; Def. Exh. 7 (her side pulled the full SPA, Aug 2021) | Ours, firm |
+| 4 | Apparent authority | Art. 1911 ("allowed … as though he had full powers") | Art. 1911 creates liability, not a conveyance; Art. 1898 | "as though he had full powers" against a buyer shown the actual limits | S11, S13; Exh. F (2005); Exh. I / C-1 (2023) | Ours on the sale; contested only as to 1992–2005 conduct |
+| 5 | Void or unenforceable | Art. 1403(1) | Arts. 1898, 1409(7), 1410 | "shall be void"; "cannot be ratified"; "does not prescribe" | The Deed of Confirmation is signed by the agent alone | Ours, likely |
+| 6 | Ratification | Arts. 1910, 1403 (tacit, by benefit: S24 to S25; his tax papers) | Art. 1898 ("the principal does not ratify"); Art. 1409 | "ratifies it expressly or tacitly" | No heir signs anything; his tax papers end Nov 1998; CORR-007 unanswered; **the 2023 adverse claim calls the sale "null and void," an express refusal on the title** | Ours, firm |
+| 7 | Was she in the class? | Answer ¶40 (₱3,000 "in the 1980s" via Violeta); S14 to S15 | Exh. E ¶7; Rule 130 §3; Rule 131 §3(e); in the alternative Arts. 1919(3), 1931 | "contracts to sell executed by … Llamanzares and/or … paid … to the latter" | No Llamanzares paper; Gloria S22 ("Wala pong ibinigay na resibo"); the only "Down payment" is 6 Jan 2005 from his side; his own letter defines the class by Llamanzares papers | Ours, likely (their burden, no paper) |
+| 7a | The Llamanzares power after 17 Mar 1988 (alternative only) | Art. 1930 (agency survives death if in the common interest) | Arts. 1919(3), 1931 | "death … of the principal"; valid only if done "without knowledge of the death" and with buyers in good faith | Mary's 1982 GPA (doc 535; no common-interest clause); BIR to "Est. of Mary Worrick Keesey c/o Mr. Benjamin Llamanzares," 4 Apr 1991 (doc 109) | Ours, likely; do not lead with it (¶7 chose to honor Llamanzares payors) |
+| 8 | Revocation and notice | Arts. 1921, 1922; PD 1529 §64 | PD 1529 §52; the class first | "specified persons"; "shall be registered" | Exh. F, G | Ours if row 7 holds; never argue Art. 1922 both ways |
+| 9 | Good faith, until when | Art. 527; PD 1529 §53 ("innocent holder") | Arts. 526, 528; PD 1529 §51 | "aware"; "from the moment facts exist"; "operative act" | Their Annex "1" (May 2020); King's Answer received 9 Jul 2021; Aug 2021 SPA pull; "my property," 15 Sep 2021 | Ours, likely |
+| 10 | Laches and estoppel ("the owners slept") | Equity; Answer ¶43 | PD 1529 §47 ("No title to registered land … shall be acquired by prescription or adverse possession"); Art. 1410 | "prescription or adverse possession"; "does not prescribe" | 2020 publication; Princess, 19 May 2020 ("May usapin pa yan"); **adverse claim annotated on Gloria's own title, Entry 2023001324, 26 May 2023 (Exh. I, C-1; also on Def. Exh. 1)** | Ours on the law; contested on the 2005–2020 facts (concede those years, argue from 2020) |
+| 11 | "The owners made the loss possible" (fall guy) | Equity only; no article | Art. 1897 (agent "is not personally liable to the party with whom he contracts" unless he binds himself or exceeds his authority without sufficient notice of his powers); Arts. 1891, 1892 | "sufficient notice of his powers" | S11, S13: notice was given by showing the SPA, so Art. 1898 governs; the buyer's recourse is against the agent's side | Ours |
+| 12 | The partition | §48; "regularity" | Arts. 496, 1878 ¶¶12, 15 | "by agreement between the parties" | Entry 2021003236; Def. Exh. 1 p. 2 (plan surveyed 8 Sep 2020) | Ours, firm |
+| 13 | Improvements | Arts. 448, 546, 548 | Arts. 449 to 452, 546 ¶1, 1678 | "in good faith"; "lessee" | Answer ¶¶40, 43 | Ours, likely (follows row 9) |
+| 14 | Fruits and damages | Art. 544 | Arts. 549, 2224, 2225, 2232, 2234, 2208 | "good faith"; the Art. 2234 predicate | Answer ¶27; Exh. J | Ours, likely (needs a compensatory or temperate award first) |
+| 15 | Counterclaim | Arts. 19 to 21, 2219 | Rule 6 §7; Art. 2208 | — | The judgment on title | Ours if the title is won |
+| 16 | Their receipts and missing papers | Exh. 5 offered as a bundle; "the booklets were discarded" | Rule 131 §3(e); Rule 130 §3; Rule 132 §13 (his letter) | "willfully suppressed" | CORR-007 (asked 21 Jun 2025, received; no deed, receipt or ledger produced); subpoena (k) | Ours, if (k) issues |
+| 17 | "The proceeds paid the heirs' taxes" | Art. 1910 (benefit) | — | — | His 1991 to 1998 Treasurer's clearances (Salvador pack Tab 14) | **Concede the 1990s**; attack only the gap after Nov 1998 against Balane money from 2003 |
+
+**Where they have no article at all:** the partition (row 12), the "Full payment" receipt of February 2017 against the deed's "in hand paid" (a fact, not a provision), and the 2020 survey cited by a 2017 agreement.
+
+**Where they are strongest, honestly:** rows 4 and 10, on the owners' silence from 2005 to 2020. The answer is the same in both: a buyer shown the real limits cannot invoke the owners' silence (S11, S13; Art. 1898), and the owners acted on the record from 2020, with the 2023 adverse claim on her own title. Note on PD 1529 §70: an adverse claim is "effective for a period of thirty days," after which it "may be canceled upon filing of a verified petition." No petition to cancel appears on the title. Treat the entry as recorded notice and a refusal to ratify, not as a lien.
+
+**The three words still decide it:** "void" (Art. 1898, with Art. 1874), "aware" (Art. 526) and "parties" (Art. 496). To them add **S11 and S13**: the defense's own witness says the buyer was shown the limits.

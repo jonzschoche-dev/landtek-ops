@@ -1,5 +1,5 @@
 # War of the Statutes
-Source: `WAR_OF_THE_STATUTES_2026-10.md` (modified 2026-10-18). One file per section:
+Source: `WAR_OF_THE_STATUTES_2026-10.md` (modified 2026-10-24). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [*Zschoche v. Balane*, Civil Case No. 26-360, MTC Mercedes — the provisions each side will put in front of Judge Cu, and which words she will key in on](01_Zschoche_v_Balane_Civil_Case_No_26_360_MTC_Mercedes_the_prov.md)
@@ -16,3 +16,4 @@ Source: `WAR_OF_THE_STATUTES_2026-10.md` (modified 2026-10-18). One file per sec
 - [10. The counterclaim: Arts. 19 to 21 and 2219 against Art. 2208 and the result on title](12_10_The_counterclaim_Arts_19_to_21_and_2219_against_Art_2208.md)
 - [11. The procedural provisions she enforces (where cases are lost before the merits)](13_11_The_procedural_provisions_she_enforces_where_cases_are_lo.md)
 - [12. The statute spine of our memorandum, in her order, with the exhibit beside each](14_12_The_statute_spine_of_our_memorandum_in_her_order_with_the.md)
+- [13. The lineup: their articles against ours (updated 24 October 2026)](15_13_The_lineup_their_articles_against_ours_updated_24_October.md)

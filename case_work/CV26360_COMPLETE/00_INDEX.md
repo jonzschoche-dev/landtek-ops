@@ -20,7 +20,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [10_WITNESS_JONATHAN_CROSS_REDIRECT](SECTIONS/10_WITNESS_JONATHAN_CROSS_REDIRECT/README.md) | Jonathan's 14 October cross and re-direct notes | 6 sections | `JONATHAN_14OCT_CROSS_AND_REDIRECT_2026-10.md` |
 | [11_BRING_TO_COURT_BUNDLE](SECTIONS/11_BRING_TO_COURT_BUNDLE/README.md) | Documents outside the record carried to each hearing (cover and tab list) | 4 sections | `BRING_TO_COURT_BUNDLE_2026-10.html` |
 | [12_MASTER_TRIAL_PLAYBOOK](SECTIONS/12_MASTER_TRIAL_PLAYBOOK/README.md) | Master trial playbook (6 parts) | 9 sections | `MASTER_TRIAL_PLAYBOOK_2026-10.md` |
-| [13_WAR_OF_THE_STATUTES](SECTIONS/13_WAR_OF_THE_STATUTES/README.md) | War of the Statutes | 15 sections | `WAR_OF_THE_STATUTES_2026-10.md` |
+| [13_WAR_OF_THE_STATUTES](SECTIONS/13_WAR_OF_THE_STATUTES/README.md) | War of the Statutes | 16 sections | `WAR_OF_THE_STATUTES_2026-10.md` |
 | [14_BAD_FAITH_DOSSIER_SUMMARY](SECTIONS/14_BAD_FAITH_DOSSIER_SUMMARY/README.md) | Bad-faith dossier: itemized summary (Parts 1 to 7; annexes in the PDF) | 9 sections | `BALANE_BAD_FAITH_SUMMARY_2026-10.html` |
 | [15_MEMO_TO_BARANDON_12_OCT](SECTIONS/15_MEMO_TO_BARANDON_12_OCT/README.md) | Memorandum to Atty. Barandon, 12 October 2026 (A1-A10, C1-C14) | 10 sections | `MEMO_TO_BARANDON_2026-10-12.html` |
 | [16_DRAFTS_HELD_RFA](SECTIONS/16_DRAFTS_HELD_RFA/README.md) | Draft request for admission (Rule 26), HELD in reserve, not filed | 1 sections | `MEMO_PACK_2026-10-15/02_REQUEST_FOR_ADMISSION.html` |
