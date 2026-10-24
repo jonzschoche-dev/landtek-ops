@@ -1,4 +1,4 @@
-<!-- Drip: DILG-R5-TRACER · reply on our 22 Jul 2026 request (sent only to aeescober@dilg.gov.ph + PD; not to the Region's official records address) · to dilg5records2019@gmail.com (official, per DILG R5 Records 21 May & 29 Jun) · cc aeescober@dilg.gov.ph, dilgcamarinesnorte2020@gmail.com (info) · SB / LGU addresses REMOVED (respondents) · Jonathan 21 Oct "send the tracer and resend to region 5" -->
+<!-- Drip: DILG-R5-TRACER · reply on our 22 Jul 2026 request (sent only to aeescober@dilg.gov.ph + PD; not to the Region's official records address) · to dilg5records2019@gmail.com (official, per DILG R5 Records 21 May & 29 Jun) · cc aeescober@dilg.gov.ph, dilgcamarinesnorte2020@gmail.com (info) · SB / LGU addresses REMOVED (respondents) · Jonathan 21 Oct "send the tracer and resend to region 5"  · SENT 21 Oct 2026 (Sent Mail verified). -->
 Dear Regional Director Escober,
 
 Magandang araw po! On 22 July 2026 I sent the request below to your e-mail address. I have since learned from your Records Section that the Regional Office's official e-mail is dilg5records2019@gmail.com, so I am resending it here so that it can be properly logged.

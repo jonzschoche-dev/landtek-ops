@@ -328,3 +328,44 @@ The §12 split is unchanged in application: the deliberateness case is complete-
 and stays in the DILG default column. Guerrero is the **victim** of the falsification in
 this frame — which aligns DILG's institutional interest with the heirs'. All criminal
 framing NEEDS-COUNSEL before any filing.
+
+### §12.2 — Threshold check on the DILG lane (19 Oct 2026): §3(e) + Art. 208 + MC 2019-72
+
+Operator asked whether the DILG side has crossed into R.A. 3019 §3(e) (gross inexcusable
+negligence), paired with RPC Art. 208 and DILG MC 2019-72. Verified answer: **not against
+MLGOO Guerrero, and the circular is the wrong issuance.**
+
+1. **§3(e), verbatim (RA 3019, embedded):** *"Causing any undue injury to any party, including
+   the Government, or giving any private party any unwarranted benefits, advantage or preference
+   in the discharge of his official administrative or judicial functions through manifest
+   partiality, evident bad faith or gross inexcusable negligence."* Two elements fail as to
+   Guerrero: (a) **the mental element** — he issued three indorsements within days, withdrew the
+   sub judice carve-out on correction, copied PD and RD, and transmitted the replies; "gross
+   inexcusable negligence" means want of even slight care with conscious indifference, which 45
+   days without a compliance finding does not reach, especially with the Province telling him in
+   writing to allow "sufficient time"; (b) **causation/injury** — the injury (withheld records,
+   blocked street, unproduced instrument) is caused by the LGU, not by his failure to grade the
+   answer. Where §3(e) IS reached is the **Mayor** (manifest partiality / evident bad faith +
+   written motive admission + unwarranted advantage to the LGU), and the cleaner inaction hook for
+   the Assessor and Treasurer is **§3(f)** — *"Neglecting or refusing, after due demand or request,
+   without sufficient justification, to act within a reasonable time on any matter pending before
+   him"* — 486 days and a lapsed §252 period respectively.
+2. **RPC Art. 208, verbatim:** *"…any public officer, or officer of the law, who, in dereliction
+   of the duties of his office, shall **maliciously** refrain from instituting prosecution for the
+   punishment of violators of the law, or shall tolerate the commission of offenses."* It requires
+   (a) a duty to **institute prosecution** and (b) **malice**. An MLGOO has no prosecutorial duty.
+   The officer who does hold that duty here is the **Mayor** under §444(b)(1)(x), who declined it
+   in writing — Art. 208 is a possible alternative count against HIM, never against Guerrero.
+3. **DILG MC 2019-72 — DO NOT CITE.** Verified against public sources: it is the **guidelines on
+   accreditation of CSOs and selection of their representatives to local special bodies** (one
+   DILG regional list ties the same number to a Bantay Korapsyon PMO). It has nothing to do with
+   supervisory review of LGU acts. The correct hooks for review of local acts are statutory —
+   LGC **§25** (general supervision) and **§§56-57** (review of ordinances/resolutions by the
+   Sangguniang Panlalawigan). If an issuance is wanted, it must be pulled and read first.
+
+**Strategic note:** Guerrero's indorsements are the instruments that prove the Mayor's default.
+Charging the author of our best evidence converts him into an adverse party who must defend
+himself, and makes his file contested. Keep him as the record-maker. If the Department's own
+inaction must be moved on, the honest lane is administrative (RA 6713 §5(a) / conduct prejudicial)
+or an escalation naming the **process** — not a §3(e)/208 criminal file against the one officer
+who acted.

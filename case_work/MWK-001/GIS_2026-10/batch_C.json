@@ -1,0 +1,1066 @@
+{
+ "_note": "Batch C. Technical descriptions transcribed by vision from the certified true copies (RD Camarines Norte). Bearings true; distances in meters. tie = from monument to corner 1.",
+ "T-48335": {
+  "lot": "2-X-6-N-1",
+  "plan": "Psd-05-025374",
+  "parent": "2-X-6-N, Psd-051607-014971 (T-47656)",
+  "src_doc": 308,
+  "src_page": "1-2",
+  "stated_area": 432,
+  "monument": "BLLM No. 2, Pls-677-D, Mercedes Public Land Subdivision",
+  "tie": [
+   "N",
+   30,
+   12,
+   "E",
+   363.9
+  ],
+  "courses": [
+   [
+    "N",
+    66,
+    55,
+    "W",
+    1.4
+   ],
+   [
+    "N",
+    67,
+    58,
+    "W",
+    5.15
+   ],
+   [
+    "N",
+    66,
+    34,
+    "W",
+    8.12
+   ],
+   [
+    "N",
+    26,
+    36,
+    "E",
+    29.97
+   ],
+   [
+    "S",
+    60,
+    11,
+    "E",
+    15.06
+   ],
+   [
+    "S",
+    27,
+    26,
+    "W",
+    28.19
+   ]
+  ],
+  "survey": "original survey 10 May 1922; subdivision survey 1 Jun 1998, GE Miguel O. Barcelona, approved 2 Sep 1998",
+  "inside": [
+   "MWK-T-47656"
+  ],
+  "adjoins": [
+   "T-48336 (Lot 2-X-6-N-2): all 6 corners of this ring, placed from its own tie, fall on T-48336 vertices within 0.05 m (same monument BLLM No. 2, Pls-677-D)"
+  ],
+  "bounds": "SE, SW & NW lines 6-1-2-3-4-5 by Lot 2-X-6-N-2; NE line 5-6 by Existing Mun. Road (10.00 m wide) R.O.W.",
+  "reading_notes": "course 2-3 printed 'N. 67 deg. 58'W., 5.15 m.'; ring closes as printed."
+ },
+ "T-49037": {
+  "lot": "2-X-6-R",
+  "plan": "Psd-051607-014971",
+  "parent": "2-X-6 (LRC) Psd-256008 (T-32917)",
+  "src_doc": 120,
+  "src_page": "1-2",
+  "stated_area": 498,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Municipality of Daet, Camarines Norte (as printed; T-52354 uses the same wording and the same tie to the same corner 1)",
+  "tie": [
+   "N",
+   66,
+   53,
+   "E",
+   353.03
+  ],
+  "courses": [
+   [
+    "N",
+    72,
+    54,
+    "W",
+    30.76
+   ],
+   [
+    "N",
+    17,
+    45,
+    "E",
+    24.77
+   ],
+   [
+    "S",
+    65,
+    37,
+    "E",
+    4.22
+   ],
+   [
+    "S",
+    59,
+    19,
+    "E",
+    15.95
+   ],
+   [
+    "S",
+    20,
+    54,
+    "W",
+    15.56
+   ],
+   [
+    "S",
+    72,
+    54,
+    "E",
+    11.86
+   ],
+   [
+    "S",
+    17,
+    22,
+    "W",
+    4.96
+   ]
+  ],
+  "survey": "original survey 10 May 1912; subdivision survey 9-15 Nov 1992, GE Jacinto R. Caceres, approved 29 Oct 1993",
+  "bounds": "SW line 1-2 Daet-Mercedes Provincial Road (30.00 m wide); NW lines 2-3-4 Lot 2-X-6-Q; NE & SE lines 4-5-6-7-1 Lot 2-X-6-S",
+  "note": "CANCELLED by T-51639/51640/51641. Copy is faint typewriter with top-clipped glyphs; 3/5 and 0/6/8 hard to separate.",
+  "tie_reading": "Face tie glyphs are top-clipped on this faint copy (3 and 5 render identically): title reads 'N. 66 deg. 5?'E., ?5?.0? m.'. Used N 66-53 E 353.03, printed clearly on T-52354 (Lot 2-X-6-S, doc 325 p.1) for the SAME corner 1 from the same 'BLLM No. 2, Bo. of Mercedes' (S's lines 1-5 are R's courses 7-4 reversed), and on T-51640 (2-X-6-R-2) for the same corner. The 1998 Psd-05-026614 titles (T-51639/40/41) call their monument 'BLLM No. 1, Pls-677-D', but their ties reproduce T-49037's corners to <=0.03 m, so that label refers to the same point.",
+  "contains": [
+   "T-51639",
+   "T-51640",
+   "T-51641"
+  ],
+  "adjoins": [
+   "T-52354 (2-X-6-S) along lines 4-5-6-7-1: corners coincide within 0.02 m when both are placed from their own ties"
+  ]
+ },
+ "T-51641": {
+  "lot": "2-X-6-R-3",
+  "plan": "Psd-05-026614",
+  "parent": "2-X-6-R, Psd-051607-014971 (T-49037)",
+  "src_doc": 24,
+  "src_page": "1-2",
+  "stated_area": 296,
+  "monument": "BLLM No. 1, Pls-677-D, Mercedes Public Land Subd.",
+  "tie": [
+   "N",
+   61,
+   59,
+   "E",
+   338.62
+  ],
+  "courses": [
+   [
+    "N",
+    17,
+    45,
+    "E",
+    12.76
+   ],
+   [
+    "S",
+    65,
+    37,
+    "E",
+    4.22
+   ],
+   [
+    "S",
+    59,
+    19,
+    "E",
+    15.95
+   ],
+   [
+    "S",
+    20,
+    54,
+    "W",
+    15.56
+   ],
+   [
+    "N",
+    72,
+    56,
+    "W",
+    5.86
+   ],
+   [
+    "S",
+    18,
+    6,
+    "W",
+    4.96
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    3.58
+   ],
+   [
+    "N",
+    18,
+    11,
+    "E",
+    11.89
+   ],
+   [
+    "N",
+    72,
+    11,
+    "W",
+    9.55
+   ]
+  ],
+  "survey": "original survey 10 May 1912; subdivision survey 25 Oct 1998, GE Miguel O. Barcelona, approved 2 Jun 1999",
+  "bounds": "NW, NE lines 1-2-3 Lot 2-X-6-Q; NE & SE lines 3-4-5 Lot 2-X-6-T; SE lines 5-6-7 Lot 2-X-6-R-2; SW line 7-8 Provincial Road (30.00 m ROW); lines 8-9-1 Lot 2-X-6-R-1",
+  "inside": [
+   "T-49037"
+  ]
+ },
+ "T-51640": {
+  "lot": "2-X-6-R-2",
+  "plan": "Psd-05-026614",
+  "parent": "2-X-6-R, Psd-051607-014971 (T-49037)",
+  "src_doc": 313,
+  "src_page": "1-2",
+  "stated_area": 88,
+  "owner": "Pedro L. Valledor",
+  "monument": "BLLM No. 1, Pls-677-D, Mercedes Public Land Subdivision",
+  "tie": [
+   "N",
+   66,
+   53,
+   "E",
+   353.03
+  ],
+  "courses": [
+   [
+    "N",
+    72,
+    54,
+    "W",
+    17.79
+   ],
+   [
+    "N",
+    18,
+    6,
+    "E",
+    4.96
+   ],
+   [
+    "S",
+    72,
+    56,
+    "E",
+    5.86
+   ],
+   [
+    "S",
+    72,
+    54,
+    "E",
+    11.86
+   ],
+   [
+    "S",
+    17,
+    22,
+    "W",
+    4.96
+   ]
+  ],
+  "survey": "original survey 10 May 1912; subdivision survey 25 Oct 1998, GE Miguel O. Barcelona, approved 2 Jun 1999",
+  "bounds": "SW line 1-2 Provincial Road (30.00 m wide ROW); NW & NE lines 2-3-4 Lot 2-X-6-R-3; NE, SE lines 4-5-1 Lot 2-X-6-T",
+  "note": "Copy stamped CANCELLED. Stated area 88 sq m (EIGHTY EIGHT); the T-49037 sale annotation (PE-233454) says 88 sq m.",
+  "inside": [
+   "T-49037"
+  ]
+ },
+ "T-51639": {
+  "lot": "2-X-6-R-1",
+  "plan": "Psd-05-026614",
+  "parent": "2-X-6-R, Psd-051607-014971 (T-49037)",
+  "src_doc": 311,
+  "src_page": "1-2",
+  "stated_area": 114,
+  "owner": "Maria V. Cereza",
+  "monument": "BLLM No. 1, Pls-677-D, Mercedes Public Land Subdivision",
+  "tie": [
+   "N",
+   63,
+   26,
+   "E",
+   330.13
+  ],
+  "tie_reading": "last digit of 330.1? is 3 or 8 on the scan; 330.13 fits T-49037 corner 2 to 0.01 m (330.18 to 0.04 m) \u2014 either is within tolerance.",
+  "courses": [
+   [
+    "N",
+    17,
+    45,
+    "E",
+    12.01
+   ],
+   [
+    "S",
+    72,
+    11,
+    "E",
+    9.55
+   ],
+   [
+    "S",
+    18,
+    11,
+    "W",
+    11.89
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    9.46
+   ]
+  ],
+  "survey": "original survey 10 May 1912; subdivision survey 25 Oct 1998, GE Miguel O. Barcelona, approved 2 Jun 1999",
+  "bounds": "NW line 1-2 Lot 2-X-6-Q; NE, SE lines 2-3-4 Lot 2-X-6-R-3; SW line 4-1 Provincial Road (30.00 m wide)",
+  "note": "T-49037 sale annotation (PE-233451) to Maria V. Cereza says 154 sq m; this title states 114 sq m (ring computes 114).",
+  "inside": [
+   "T-49037"
+  ]
+ },
+ "T-47657": {
+  "lot": "2-X-6-T",
+  "plan": "Psd-051607-014971",
+  "parent": "2-X-6 (LRC) Psd-256008 (T-32917)",
+  "src_doc": 309,
+  "src_page": "1-2",
+  "stated_area": 13124,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Mun. of Daet, Cam. Norte",
+  "tie": [
+   "N",
+   57,
+   27,
+   "E",
+   465.72
+  ],
+  "courses": [
+   [
+    "S",
+    20,
+    16,
+    "W",
+    127.16
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    16.12
+   ],
+   [
+    "N",
+    21,
+    11,
+    "E",
+    26.87
+   ],
+   [
+    "N",
+    65,
+    1,
+    "W",
+    10.68
+   ],
+   [
+    "N",
+    19,
+    24,
+    "E",
+    37.34
+   ],
+   [
+    "N",
+    67,
+    43,
+    "W",
+    9.87
+   ],
+   [
+    "N",
+    20,
+    58,
+    "E",
+    14.92
+   ],
+   [
+    "N",
+    74,
+    55,
+    "W",
+    15.87
+   ],
+   [
+    "N",
+    69,
+    45,
+    "W",
+    22.06
+   ],
+   [
+    "S",
+    22,
+    15,
+    "W",
+    21.52
+   ],
+   [
+    "N",
+    63,
+    9,
+    "W",
+    7.37
+   ],
+   [
+    "N",
+    11,
+    16,
+    "E",
+    2.2
+   ],
+   [
+    "N",
+    66,
+    45,
+    "W",
+    10.46
+   ],
+   [
+    "N",
+    66,
+    43,
+    "W",
+    9.36
+   ],
+   [
+    "S",
+    17,
+    28,
+    "W",
+    10.36
+   ],
+   [
+    "S",
+    66,
+    43,
+    "E",
+    9.36
+   ],
+   [
+    "S",
+    16,
+    45,
+    "W",
+    31.38
+   ],
+   [
+    "S",
+    16,
+    43,
+    "W",
+    23.41
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    49.17
+   ],
+   [
+    "N",
+    18,
+    58,
+    "E",
+    137.89
+   ],
+   [
+    "S",
+    60,
+    11,
+    "E",
+    23.39
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    118.65
+   ]
+  ],
+  "survey": "original survey 10 May 1912; subdivision survey 9-15 Nov 1992, GE Jacinto R. Caceres, approved 29 Oct 1993; corner 22 by Old Point",
+  "bounds": "SE line 1-2 Lot 2-X-6-U (Existing Road); SW line 2-3 Daet-Mercedes Provincial Road (30.00 m wide); lines 3-..-9 Lot 2-X-6-S; lines 9-..-18 Lot 2-X-6-Q; line 18-19 Lot 2-X-6-P; line 19-20 Daet-Mercedes Provincial Road; NW line 20-21 Lot 2-X-6-? (Existing Road-5); NE lines 21-22-1 Existing Mun. Road (10.00 m wide) beyond Pacific Ocean",
+  "reading_notes": "course 6-7 distance re-read at 800 dpi as 9.87 (the 170-dpi render looks like 9.37); 9.87 closes 0.09 m vs 0.59 m.",
+  "alt_reading": "Course 3-4 is printed 'N 21-11 E 26.87' here, but the same boundary is printed 'S 21-00 W 26.87' on T-52354 (2-X-6-S, course 11-12) and 'N 21-00 E 26.87' on T-69404 (2-X-6-T-3, course 3-4). With 21-00 this ring closes 0.007 m, area 13,123.6 (-0.003%). Kept as printed because it already closes (<1 m); the 2-X-6-S corners coincide with this ring within 0.08 m.",
+  "contains": [
+   "T-69404"
+  ]
+ },
+ "_held_T-69404": {
+  "lot": "2-X-6-T-3",
+  "plan": "Psd-05-038661",
+  "parent": "2-X-6-T, Psd-051607-014971 (T-47657) [face types the parent plan as 'Psd-054607-104971' in one place and 'Psd-051607-014971' in another]",
+  "src_doc": 22,
+  "src_page": "1-2",
+  "stated_area": 11890,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Mun. of Daet, Province of Cams. Norte",
+  "tie": [
+   "N",
+   59,
+   54,
+   "E",
+   441.34
+  ],
+  "courses": [
+   [
+    "S",
+    20,
+    16,
+    "W",
+    96.05
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    16.12
+   ],
+   [
+    "N",
+    21,
+    0,
+    "E",
+    26.87
+   ],
+   [
+    "N",
+    65,
+    1,
+    "W",
+    10.68
+   ],
+   [
+    "N",
+    19,
+    43,
+    "W",
+    9.87
+   ],
+   [
+    "N",
+    67,
+    24,
+    "W",
+    37.34
+   ],
+   [
+    "N",
+    20,
+    58,
+    "E",
+    14.92
+   ],
+   [
+    "N",
+    74,
+    55,
+    "W",
+    15.87
+   ],
+   [
+    "N",
+    69,
+    45,
+    "W",
+    22.06
+   ],
+   [
+    "S",
+    22,
+    15,
+    "W",
+    21.52
+   ],
+   [
+    "S",
+    63,
+    9,
+    "W",
+    7.37
+   ],
+   [
+    "N",
+    11,
+    16,
+    "E",
+    2.2
+   ],
+   [
+    "N",
+    66,
+    45,
+    "W",
+    10.46
+   ],
+   [
+    "N",
+    66,
+    43,
+    "W",
+    9.36
+   ],
+   [
+    "N",
+    17,
+    28,
+    "W",
+    10.36
+   ],
+   [
+    "S",
+    66,
+    43,
+    "W",
+    9.36
+   ],
+   [
+    "S",
+    16,
+    45,
+    "W",
+    31.38
+   ],
+   [
+    "S",
+    16,
+    43,
+    "W",
+    23.41
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    49.17
+   ],
+   [
+    "N",
+    18,
+    58,
+    "E",
+    137.89
+   ],
+   [
+    "S",
+    60,
+    11,
+    "E",
+    23.39
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    76.29
+   ],
+   [
+    "S",
+    20,
+    37,
+    "W",
+    21.61
+   ],
+   [
+    "S",
+    67,
+    53,
+    "E",
+    8.02
+   ],
+   [
+    "S",
+    22,
+    45,
+    "W",
+    8.4
+   ],
+   [
+    "S",
+    68,
+    52,
+    "E",
+    34.83
+   ]
+  ],
+  "survey": "survey 6 Jan 1996 - 1 Feb 1997, GE Jose E. Tabara, approved 20 Dec 2006; corners 1 & 23-26 new PS cyl. conc. mons., the rest OLD",
+  "bounds": "SE line 1-2 Lot 12 (Existing Road 8.00 m) Cad-1186-D; SW line 2-3 Daet-Mercedes Provincial Road; lines 3-9 Lot 2-X-6-S; lines 9-18 Lot 2-X-6-Q; line 18-19 Lot 2-X-6-P; line 19-20 Provincial Road; NW line 20-21 Lot 5 (Existing Road 8.00 m); NE lines 21-22-23 Lot 7 (Existing Municipal Road 10.00 m) both Cad-1186-D; lines 23-24-25-26-1 Lot 2-X-6-T-2, Psd-05-038661",
+  "inside": [
+   "T-47657"
+  ],
+  "note": "Entered 20 Jun 2007; transfer from T-47657. Courses 2-21 repeat T-47657's courses 2-21 (same distances) but this copy's typing differs on 7 bearings \u2014 see corrections/ring check.",
+  "proposed_courses": [
+   [
+    "S",
+    20,
+    16,
+    "W",
+    96.05
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    16.12
+   ],
+   [
+    "N",
+    21,
+    0,
+    "E",
+    26.87
+   ],
+   [
+    "N",
+    65,
+    1,
+    "W",
+    10.68
+   ],
+   [
+    "N",
+    19,
+    24,
+    "E",
+    37.34
+   ],
+   [
+    "N",
+    67,
+    43,
+    "W",
+    9.87
+   ],
+   [
+    "N",
+    20,
+    58,
+    "E",
+    14.92
+   ],
+   [
+    "N",
+    74,
+    55,
+    "W",
+    15.87
+   ],
+   [
+    "N",
+    69,
+    45,
+    "W",
+    22.06
+   ],
+   [
+    "S",
+    22,
+    15,
+    "W",
+    21.52
+   ],
+   [
+    "N",
+    63,
+    9,
+    "W",
+    7.37
+   ],
+   [
+    "N",
+    11,
+    16,
+    "E",
+    2.2
+   ],
+   [
+    "N",
+    66,
+    45,
+    "W",
+    10.46
+   ],
+   [
+    "N",
+    66,
+    43,
+    "W",
+    9.36
+   ],
+   [
+    "S",
+    17,
+    28,
+    "W",
+    10.36
+   ],
+   [
+    "S",
+    66,
+    43,
+    "E",
+    9.36
+   ],
+   [
+    "S",
+    16,
+    45,
+    "W",
+    31.38
+   ],
+   [
+    "S",
+    16,
+    43,
+    "W",
+    23.41
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    49.17
+   ],
+   [
+    "N",
+    18,
+    58,
+    "E",
+    137.89
+   ],
+   [
+    "S",
+    60,
+    11,
+    "E",
+    23.39
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    76.29
+   ],
+   [
+    "S",
+    20,
+    37,
+    "W",
+    21.61
+   ],
+   [
+    "S",
+    67,
+    53,
+    "E",
+    8.02
+   ],
+   [
+    "S",
+    22,
+    45,
+    "W",
+    8.4
+   ],
+   [
+    "S",
+    68,
+    52,
+    "E",
+    34.83
+   ]
+  ],
+  "hold_reason": "As printed the ring misses by 58.31 m (area +24%). This copy mistypes 5 of the courses it shares with its parent T-47657 (courses 5, 6, 11, 15, 16: courses 5/6 bearings scrambled (N 19-43 W 9.87 / N 67-24 W 37.34 vs parent N 19-24 E 37.34 / N 67-43 W 9.87); S 63-09 W vs N 63-09 W; N 17-28 W vs S 17-28 W; S 66-43 W vs S 66-43 E). Substituting the parent's certified bearings for those 5 courses (same boundary (lines to Lots 2-X-6-S, -Q, -P and the provincial road; distances identical on both titles; courses 5/6 also printed the parent's way on T-52354 courses 8-9) closes to 0.015 m with area 11,890.6 vs 11,890 (+0.005%), and T-69404's own tie (N 59-54 E 441.34) puts corner 1 on T-47657's line 1-2 exactly 31.11 m (=127.16-96.05) from T-47657 corner 1, within 0.06 m. Held only because the brief allows a SINGLE corroborated fix; this needs 5. (Course 3-4 'N 21-00 E' is kept as printed \u2014 T-52354 prints the same.) proposed_courses is ready to promote if the multi-course correction is accepted.",
+  "corrections_proposed": [
+   {
+    "course": "5-6",
+    "title_reads": "N 19-43 W 9.87",
+    "used": "N 19-24 E 37.34",
+    "why": "T-47657 course 5-6; this copy swaps the bearing/distance pairing of courses 5 and 6"
+   },
+   {
+    "course": "6-7",
+    "title_reads": "N 67-24 W 37.34",
+    "used": "N 67-43 W 9.87",
+    "why": "T-47657 course 6-7 (re-read at 800 dpi as 9.87)"
+   },
+   {
+    "course": "11-12",
+    "title_reads": "S 63-09 W 7.37",
+    "used": "N 63-09 W 7.37",
+    "why": "T-47657 course 11-12, Lot 2-X-6-Q boundary"
+   },
+   {
+    "course": "15-16",
+    "title_reads": "N 17-28 W 10.36",
+    "used": "S 17-28 W 10.36",
+    "why": "T-47657 course 15-16, Lot 2-X-6-Q boundary"
+   },
+   {
+    "course": "16-17",
+    "title_reads": "S 66-43 W 9.36",
+    "used": "S 66-43 E 9.36",
+    "why": "T-47657 course 16-17; also returns the 9.36 m notch that course 14-15 (N 66-43 W 9.36) opens"
+   }
+  ],
+  "plan_reading": "Psd-05-038661 (read at 350 dpi on face and back page; the '8' is slightly broken but consistent in both places)"
+ },
+ "T-52354": {
+  "lot": "2-X-6-S",
+  "plan": "Psd-051607-014971",
+  "parent": "2-X-6 (LRC) Psd-256008 (T-32917)",
+  "src_doc": 325,
+  "src_page": "1-2",
+  "stated_area": 1832,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Mun. of Daet, C. Norte",
+  "tie": [
+   "N",
+   66,
+   53,
+   "E",
+   353.03
+  ],
+  "courses": [
+   [
+    "N",
+    17,
+    22,
+    "E",
+    4.96
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    11.86
+   ],
+   [
+    "N",
+    20,
+    54,
+    "E",
+    15.56
+   ],
+   [
+    "N",
+    59,
+    19,
+    "W",
+    15.95
+   ],
+   [
+    "N",
+    20,
+    20,
+    "E",
+    56.66
+   ],
+   [
+    "S",
+    74,
+    55,
+    "E",
+    15.87
+   ],
+   [
+    "S",
+    20,
+    58,
+    "W",
+    14.92
+   ],
+   [
+    "S",
+    67,
+    43,
+    "E",
+    9.87
+   ],
+   [
+    "S",
+    19,
+    24,
+    "W",
+    37.34
+   ],
+   [
+    "S",
+    65,
+    1,
+    "E",
+    10.68
+   ],
+   [
+    "S",
+    21,
+    0,
+    "W",
+    26.87
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    8.81
+   ]
+  ],
+  "survey": "original survey 10 May 1912; subdivision survey 9-15 Nov 1992, GE Jacinto R. Caceres, approved 29 Oct 1993",
+  "bounds": "SW line 12-1 Daet-Mercedes Provincial Road (30.00 m wide); lines 1-2-3-4-5 Lot 2-X-6-R; NW line 5-6 Lot 2-X-6-Q; NE & SE lines 6-7-8-9-10-11-12 Lot 2-X-6-T, all Psd-051607-014971",
+  "note": "Copy stamped CANCELLED (new title T-57820?, handwritten). Annotation: 2002 sale to Delia R. Macaso. Corner 1 = T-49037 corner 1 (same tie N 66-53 E 353.03); lines 1-5 are T-49037's courses 7,6,5,4 reversed; lines 6-12 are T-47657's courses 9..3 reversed."
+ },
+ "_skipped": {
+  "T-147652": {
+   "src_doc": 34,
+   "drive_file_id": "164ZBaP_ctRyYOJeWQ9DqiKu4mc6fCn1q",
+   "finding": "Doc 34 is NOT a T-147652 title: all 4 pages are a certified true copy of TCT T-47657 (Lot 2-X-6-T, Psd-051607-014971), issued 23 Feb 2023 to Anthony Daniel Gallardo (Ref 2023001021). The 'T-147652' / 'Lot 2-K-6-T of Psd-051677-014971' labels are OCR misreads of 'T-47657' / 'Lot 2-X-6-T of Psd-051607-014971'. Its technical description is identical to doc 309 (re-confirms course 3-4 printed N 21-11 E). Its p.3 annotations: PE-308120-153-33 (20 Jun 2007) Deed of Absolute Sale by Cesar M. dela Fuente to Alberto Victa of 700 sq m (deed dated 21 May 2004), note 'Lot 2-X-6-T-3, with an area of 11,890 sqm belongs to Geraldine K. Hoppe'; PE-308121-153-33 Affidavit of dela Fuente: the 700 sq m is now Lot 2-X-6-T-2 with 1,010 sq m, Psd-05-038661 (partly legible)."
+  }
+ }
+}

@@ -1,0 +1,137 @@
+{
+ "T-4497": {
+  "lot": "2",
+  "plan": "(LRC) Psd-12802",
+  "parent": "Parcel 2, LRC (GLRO) Record No. 10784, Case No. 12",
+  "src_doc": 348,
+  "src_page": "2 (face; doc 348 p.1 is the official receipt)",
+  "alt_src": "docs 39 p.1, 224 p.1, 25 p.2 (same RD face, different CTC printings; all equally faint)",
+  "stated_area": 139132,
+  "monument": "B.L.L.M. No. 2, Barrio of Mercedes, Municipality of Daet, Province of Camarines Norte",
+  "monument_key": "M1",
+  "tie": [
+   "N",
+   86,
+   31,
+   "W",
+   261.63
+  ],
+  "courses": [
+   [
+    "N",
+    76,
+    12,
+    "W",
+    364.65
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    453.46
+   ],
+   [
+    "N",
+    72,
+    8,
+    "W",
+    145.05
+   ],
+   [
+    "N",
+    18,
+    19,
+    "E",
+    240.99
+   ],
+   [
+    "S",
+    49,
+    0,
+    "E",
+    117.0
+   ],
+   [
+    "S",
+    60,
+    11,
+    "E",
+    285.36
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    311.66
+   ],
+   [
+    "S",
+    79,
+    47,
+    "E",
+    253.1
+   ],
+   [
+    "S",
+    10,
+    48,
+    "W",
+    74.63
+   ],
+   [
+    "S",
+    15,
+    27,
+    "W",
+    52.82
+   ]
+  ],
+  "survey": "bearings true; declination 0 deg 58' E; original survey 20 May 1912",
+  "bounds": "NE pts 5-9 Pacific Ocean; SE pts 9-10 and 10-1 property of Rafael(?) Arrastia; SW pts 1-4 Provincial Road (Mercedes-Daet); NW pts 4-5 Lot 1 of the subdivision plan",
+  "contains_any_hint": "all mapped 1975 lots MWK-PSD221861-B..-X and MWK-T-32911 (Lot 2-A)",
+  "corrections": [
+   {
+    "course": "2-3 (course 2)",
+    "title_reads": "N 72-54 W 45?.46 (third digit 3/5 ambiguous on all four copies; doc 348 looks like 455.46)",
+    "used": "N 72-54 W 453.46",
+    "why": "With 455.46 the ring misses by 1.81 m; 453.46 closes to 0.20 m, area 139,113 vs 139,132 (-0.01%). Corroborated by the 1975 Psd-221861 lots (doc 287): the union of all mapped 1975 lots has this road segment at ~453.2 m on N 73 W. Typewriter 3/5 indistinct on this face."
+   },
+   {
+    "course": "tie",
+    "title_reads": "N 86-31 W 2?1.63 (second digit 6/8 ambiguous)",
+    "used": "N 86-31 W 261.63",
+    "why": "Corner 1 = SE road corner = Lot 2-A corner 1, whose certified tie is N 86-31 W 261.63; the union of mapped 1975 lots has this corner at N 86-32 W 261.6 from M1."
+   }
+  ],
+  "low_confidence_reads": "Decimals faint on all copies: course 1 '364.?5' (.65 used), course 6 '285.??' (.36 used - same line/value as T-32917 course 10, S 60-11 E 285.36), course 7 '311.6?' (.66 used), course 9 '74.?3' (.63 used). Course 5 = 117.00 matches T-32917's S 49-00 E 21.10+50.00+45.90 = 117.00 along the same line; course 4 = T-32917's N 18-19 E 240.99; course 3 = T-32917's N 72-08 W 145.05. Residual closure 0.20 m is within these decimal uncertainties.",
+  "notes": "Prior '~235k sqm' enclosure was a misread of the distance column; read across docs 348/39/224/25 the 10-course ring closes and matches 139,132. Registered owner Mary Worrick Keesey (married to Francis Keesey), 1549(?) Dakota, Manila; entered 2 Jun 1964; transfer from T-4493. Memo p.13 (doc 348): 16 Jun 2010 subdivision into 24 lots per LRC Psd-221861 at request of Rogelio Yasis; title partially cancelled, issuing 079-2010000663.",
+  "containment_check": "Ring placed from M1 with the tie: all mapped 1975 lots fall inside except slivers <0.5 m wide along the road (B,C,D,E,K,L,M,N,O,P,2-A: 2-26 sqm each) and ~799 sqm of MWK-PSD221861-X (106,186 sqm) - frame/decimal-level, to be checked by the plotter.",
+  "mother_title": true,
+  "contains": [
+   "MWK-T-32911",
+   "MWK-PSD221861-B",
+   "MWK-PSD221861-C",
+   "MWK-PSD221861-D",
+   "MWK-PSD221861-E",
+   "MWK-PSD221861-F",
+   "MWK-PSD221861-H",
+   "MWK-PSD221861-I",
+   "MWK-PSD221861-J",
+   "MWK-PSD221861-K",
+   "MWK-PSD221861-L",
+   "MWK-PSD221861-M",
+   "MWK-PSD221861-N",
+   "MWK-PSD221861-O",
+   "MWK-PSD221861-P",
+   "MWK-PSD221861-Q",
+   "MWK-PSD221861-R",
+   "MWK-PSD221861-S",
+   "MWK-PSD221861-T",
+   "MWK-PSD221861-U",
+   "MWK-PSD221861-V",
+   "MWK-PSD221861-W"
+  ]
+ }
+}

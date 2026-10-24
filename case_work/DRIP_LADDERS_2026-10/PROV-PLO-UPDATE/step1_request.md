@@ -1,4 +1,4 @@
-<!-- Drip: PROV-PLO-UPDATE · new e-mail to pgcamarinesnorte@gmail.com, Attn: Provincial Legal Officer · basis: PD Relucio's 2 Sep 2026 letter to Gov. Padilla attn PLO asking the Province to "provide him directly with an update on the actions taken on the aforementioned letter-complaints" (13 & 17 Mar, 4 Jun 2026) · attachment: RESPONSE TO FOLLOW-UP REQUEST.pdf (PD 2 Sep, 3 pp) · Jonathan 21 Oct -->
+<!-- Drip: PROV-PLO-UPDATE · new e-mail to pgcamarinesnorte@gmail.com, Attn: Provincial Legal Officer · basis: PD Relucio's 2 Sep 2026 letter to Gov. Padilla attn PLO asking the Province to "provide him directly with an update on the actions taken on the aforementioned letter-complaints" (13 & 17 Mar, 4 Jun 2026) · attachment: RESPONSE TO FOLLOW-UP REQUEST.pdf (PD 2 Sep, 3 pp) · Jonathan 21 Oct  · SENT 21 Oct 2026 (Sent Mail verified). -->
 Attention: The Provincial Legal Officer
 
 Dear Sir/Madam,

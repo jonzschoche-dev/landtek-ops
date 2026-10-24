@@ -1,0 +1,8 @@
+title,lot,plan,stated_sqm,map_status,closure_m,area_check,note,source
+T-38838,2-X-6-I,Psd-051607-014971,32448,PLOTTED,0.10,+0.01%,"course 37-38 printed 164.73; 124.73 used (closes; same course reads 124.73 on T-52540)",doc 23 p.2
+T-52540,2-X-6-I-4-C,Psd-05-026197,28891,PLOTTED,0.04,+0.04%,"course 23-24 printed 48.70; 4.70 used (closes; same course reads 4.70 on T-38838). Contains Balane C-1 and lies inside T-38838",doc 96 pp.2-3
+T-48336,2-X-6-N-2,Psd-05-025374,14817,PLOTTED,0.01,+0.01%,"nests 100% inside parent 2-X-6-N (T-47656)",doc 18 p.2
+T-47655,2-X-6-L,Psd-051607-014971,7186,PLOTTED,0.02,-0.02%,,doc 16 p.2
+T-52536,2-X-6-B,Psd-051607-014971,372,PLOTTED,0.02,-0.12%,"cancelled; now 079-2018001329 (Elsa Iligan). Shares edges with T-38838",doc 46 pp.1-2
+T-46460,2-C,Psd-05-023697,4222,HELD,60.0,-92%,"printed description does not close; needs Psd-05-023697 LDC (DENR item 3)",doc 143 p.2
+T-49062,2-X-4-J,Psd-05-017527,12327,HELD,,,"faded 60-course print; needs fresh LRA e-copy or Psd-05-017527 LDC (DENR item 4)",docs 29/40

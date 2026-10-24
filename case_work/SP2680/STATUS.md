@@ -3,7 +3,7 @@ Owner: Guardianship bot. Updated: 20 Oct 2026, 8:45 AM PHT. Rule (Jonathan, 20 O
 
 ## Live branch
 RESET. The 19 Oct 2026 hearing was cancelled because the judge is sick (per Jonathan, 19 Oct). The next setting is **Wed 11 Nov 2026**. The hearing is in the MORNING (per Jonathan, 19 Oct). The exact time is TBD and no written resetting order has been seen yet.
-CONFLICT: 11 Nov is also a 26-360 plaintiff setting at MTC Mercedes at 1:30 PM.
+No clash (Jonathan, 22 Oct): the RTC hearing is in the morning and the MTC 26-360 setting is in the afternoon. The reset motion is shelved (MOTION_RESET_11NOV_DRAFT.SHELVED.md).
 History: the 8 Sep hearing opened and was continued because the OSG/fiscal wasn't ready to cross-examine Jonathan. The 19 Oct hearing was cancelled for the judge's illness.
 
 ## Positions
@@ -26,7 +26,7 @@ No mail to Botor, the court, the OSG, or the wards without Jonathan's go. Anythi
 The open asks below (resetting order/time, Gerry's letter, bond/surety, Botor statement of account) are **already in hand** per Jonathan: "we have all these things". Not yet ingested to the corpus; treat as HELD by Jonathan, not missing.
 
 ## Open asks (Jonathan)
-1. Get the 11 Nov hearing time and the resetting order, and handle the conflict with the 26-360 1:30 PM setting.
+1. Get the 11 Nov hearing time and the resetting order.
 2. Get a certified copy of Gerry's letter to the court from Botor's office (they receive the digital copies), NOT the OCC.
 3. Get Patricia's support in writing.
 4. Settle the bond amount and get a surety quote.
@@ -38,7 +38,7 @@ The open asks below (resetting order/time, Gerry's letter, bond/surety, Botor st
 ## Scenarios
 - A: The hearing goes ahead with the OSG cross.
 - B: Gerry's letter to the court surfaces and changes the carve-out.
-- C: The time is wrong or there's no order, and the setting passes unseen.
+- C: The time is wrong or there's no order, and the setting passes unseen. (The clash scenario was dropped on 22 Oct.)
 
 ## Refs
 - /workspace/guardianship/BOTOR_EMAIL_REVIEW.md (box)

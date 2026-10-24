@@ -1,0 +1,795 @@
+{
+ "_note": "Batch D. Technical descriptions transcribed by vision from certified true copies (RD Camarines Norte). Bearings true; distances in meters. tie = from monument to corner 1.",
+ "T-32917": {
+  "lot": "2-X-6",
+  "plan": "(LRC) Psd-256008",
+  "parent": "portion of Lot 2-X, (LRC) Psd-221861; LRC Rec. No. 10784",
+  "src_doc": 21,
+  "src_page": "1-2",
+  "stated_area": 85149,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Mp. of Daet",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   61,
+   35,
+   "E",
+   442.07
+  ],
+  "courses": [
+   [
+    "S",
+    20,
+    32,
+    "W",
+    87.61
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    366.9
+   ],
+   [
+    "N",
+    72,
+    8,
+    "W",
+    145.05
+   ],
+   [
+    "N",
+    18,
+    19,
+    "E",
+    240.99
+   ],
+   [
+    "S",
+    49,
+    0,
+    "E",
+    21.1
+   ],
+   [
+    "S",
+    41,
+    0,
+    "W",
+    25.0
+   ],
+   [
+    "S",
+    49,
+    0,
+    "E",
+    50.0
+   ],
+   [
+    "N",
+    41,
+    0,
+    "E",
+    25.0
+   ],
+   [
+    "S",
+    49,
+    0,
+    "E",
+    45.9
+   ],
+   [
+    "S",
+    60,
+    11,
+    "E",
+    285.36
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    142.62
+   ],
+   [
+    "S",
+    18,
+    31,
+    "W",
+    38.51
+   ],
+   [
+    "N",
+    72,
+    23,
+    "W",
+    14.77
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey executed by GE Ernesto L. Velante on 15 Dec 1976",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "contains": [
+   "MWK-T-38838"
+  ],
+  "note": "doc 1140 (JPG photo, Drive 1PkPoq3ESCoRWJrqgJOoM3S-zDEcW2JDJ) is page 1 of 8 of a different CTC of T-32917 (Ref 2022006617, 21 Dec 2022) describing the same Lot 2-X-6; it does NOT describe Lot 2-X-5 (2-X-5 appears only as the adjoiner on lines 13-1 & 1-2)."
+ },
+ "T-23796": {
+  "lot": "2-X-1",
+  "plan": "(LRC) Psd-256008",
+  "parent": "portion of Lot 2-X, (LRC) Psd-221761 [sic, printed; Psd-221861 elsewhere on the same face]; L.R.C. Record No. 10784",
+  "src_doc": 102,
+  "src_page": "1-2",
+  "stated_area": 3056,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Mp. of Daet",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   72,
+   8,
+   "E",
+   603.15
+  ],
+  "courses": [
+   [
+    "S",
+    79,
+    47,
+    "E",
+    45.1
+   ],
+   [
+    "S",
+    11,
+    42,
+    "W",
+    54.24
+   ],
+   [
+    "N",
+    79,
+    36,
+    "W",
+    15.01
+   ],
+   [
+    "N",
+    57,
+    49,
+    "W",
+    19.99
+   ],
+   [
+    "S",
+    13,
+    18,
+    "W",
+    65.61
+   ],
+   [
+    "N",
+    76,
+    12,
+    "W",
+    11.5
+   ],
+   [
+    "N",
+    12,
+    58,
+    "E",
+    16.0
+   ],
+   [
+    "N",
+    13,
+    0,
+    "E",
+    71.39
+   ],
+   [
+    "N",
+    11,
+    41,
+    "E",
+    24.21
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey executed by GE Ernesto L. Velante on 15 Dec 1976",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "note": "certified xerox copy: RD Camarines Norte certification dated 20 Aug 1991 (p.3) at the request of Benjamin Llamanzares; stamped CANCELLED (by T-33365 etc.). Its corner 1 computed from its tie coincides (0.03 m) with T-33365 corner 4 computed from T-33365's tie."
+ },
+ "T-33365": {
+  "lot": "2-X-1-B",
+  "plan": "Psd-05-008861",
+  "parent": "portion of Lot 2-X-1 (LRC) Psd-256008 (T-23796)",
+  "src_doc": 124,
+  "src_page": "1-2",
+  "stated_area": 2871,
+  "monument": "BLLM No. 2, Mercedes, Daet",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   81,
+   2,
+   "E",
+   571.34
+  ],
+  "courses": [
+   [
+    "N",
+    76,
+    14,
+    "W",
+    11.59
+   ],
+   [
+    "N",
+    13,
+    0,
+    "E",
+    71.39
+   ],
+   [
+    "N",
+    11,
+    41,
+    "E",
+    24.21
+   ],
+   [
+    "S",
+    79,
+    47,
+    "E",
+    45.1
+   ],
+   [
+    "S",
+    11,
+    42,
+    "W",
+    54.24
+   ],
+   [
+    "N",
+    79,
+    36,
+    "W",
+    15.01
+   ],
+   [
+    "N",
+    57,
+    49,
+    "W",
+    19.99
+   ],
+   [
+    "S",
+    13,
+    18,
+    "W",
+    49.61
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey 16 Apr 1988 by GE Angel C. Baloe(?) Jr., approved Sept. 1988",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "inside": [
+   "MWK-T-23796"
+  ],
+  "note": "CTC stamped Cancelled (by T-45616). Courses 1-2..3-4 and 4-5..8-1 are the shared lines with T-23796 and T-45616; tie consistent with T-23796."
+ },
+ "T-45616": {
+  "lot": "2",
+  "plan": "Pcs-051607-000932 (consolidation-subdivision)",
+  "parent": "portion of Lot 2-X-1-B, Psd-05-008861 (T-33365); Lots 2-R, 2-Q & 2-M, (LRC) Psd-221861 (T-32912-14 & T-33365 cancelled)",
+  "src_doc": 47,
+  "src_page": "1-2",
+  "stated_area": 4798,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Daet, Cam. Norte",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   71,
+   41,
+   "W",
+   513.13
+  ],
+  "courses": [
+   [
+    "S",
+    79,
+    26,
+    "E",
+    83.42
+   ],
+   [
+    "S",
+    12,
+    51,
+    "W",
+    29.67
+   ],
+   [
+    "S",
+    12,
+    51,
+    "W",
+    10.06
+   ],
+   [
+    "N",
+    78,
+    28,
+    "W",
+    8.3
+   ],
+   [
+    "S",
+    13,
+    15,
+    "W",
+    30.22
+   ],
+   [
+    "N",
+    76,
+    30,
+    "W",
+    4.0
+   ],
+   [
+    "S",
+    7,
+    46,
+    "W",
+    21.89
+   ],
+   [
+    "N",
+    76,
+    12,
+    "W",
+    4.0
+   ],
+   [
+    "N",
+    7,
+    46,
+    "E",
+    21.89
+   ],
+   [
+    "N",
+    74,
+    5,
+    "W",
+    37.78
+   ],
+   [
+    "N",
+    15,
+    18,
+    "E",
+    36.15
+   ],
+   [
+    "N",
+    57,
+    49,
+    "W",
+    19.99
+   ],
+   [
+    "S",
+    13,
+    18,
+    "W",
+    49.61
+   ],
+   [
+    "N",
+    76,
+    14,
+    "W",
+    11.59
+   ],
+   [
+    "N",
+    13,
+    0,
+    "E",
+    71.39
+   ]
+  ],
+  "survey": "original survey 20 May 1912; consolidation-subdivision survey 21 Aug 1992 by GE Jacinto R. Caceres, approved 21 Jan 1994",
+  "inside_any": [
+   "MWK-PSD221861-X",
+   "MWK-PSD221861-M",
+   "MWK-PSD221861-Q",
+   "MWK-PSD221861-R"
+  ],
+  "note": "CTC stamped Cancelled. Tie is printed N 71-41 W 513.13 from 'BLLM No. 2, Bo. of Mercedes' - corner 1 here is the same physical point as T-33365 corner 3, but the two ties do not agree (positions differ ~1,056 m east-west, same northing), so this tie references a different monument than T-33365/T-23796's 'BLLM No. 2' (cf. held T-46460, also tied N 78-49 W). Left to monument_key auto. Third consolidated lot printed as 2-R (Lots 2-R, 2-Q & 2-M). Courses 10-11 (37.78) and 11-12 (N15-18E) are faint but the ring closes to 0.02 m."
+ },
+ "T-52537": {
+  "lot": "2-X-4-E",
+  "plan": "Psd-05-017527",
+  "parent": "portion of Lot 2-X-4 (LRC) Psd-256008 (T-32916)",
+  "src_doc": 274,
+  "src_page": "1-2",
+  "stated_area": 152,
+  "monument": "BLLM No. 2, Mercedes, Daet, CNorte",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   71,
+   12,
+   "E",
+   520.84
+  ],
+  "courses": [
+   [
+    "S",
+    70,
+    9,
+    "E",
+    18.49
+   ],
+   [
+    "S",
+    24,
+    47,
+    "W",
+    12.28
+   ],
+   [
+    "N",
+    66,
+    23,
+    "W",
+    9.21
+   ],
+   [
+    "N",
+    24,
+    43,
+    "E",
+    6.81
+   ],
+   [
+    "N",
+    66,
+    33,
+    "W",
+    9.22
+   ],
+   [
+    "N",
+    25,
+    1,
+    "E",
+    4.28
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey 25-27 Nov 1994 by GE Jacinto R. Caceres, approved 6 Jun 1995",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "inside": [
+   "MWK-T-32916"
+  ],
+  "note": "corner 1 and tie identical to T-52202 corner 1 (N 71-12 E 520.84); line 1-2 is T-52202 line 7-1 reversed; lines 3-4-5-6 are T-52538 lines 6-1, 5-6, 4-5 reversed (coincide within 0.1 m)."
+ },
+ "T-52538": {
+  "lot": "2-X-4-F",
+  "plan": "Psd-05-017527",
+  "parent": "portion of Lot 2-X-4, (LRC) Psd-256008 (T-32916)",
+  "src_doc": 270,
+  "src_page": "1-2",
+  "stated_area": 215,
+  "monument": "BLLM No. 2, Bo of Mercedes, Daet",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   73,
+   26,
+   "E",
+   527.21
+  ],
+  "courses": [
+   [
+    "S",
+    24,
+    49,
+    "W",
+    8.2
+   ],
+   [
+    "N",
+    66,
+    35,
+    "W",
+    18.45
+   ],
+   [
+    "N",
+    24,
+    50,
+    "E",
+    15.05
+   ],
+   [
+    "S",
+    66,
+    33,
+    "E",
+    9.22
+   ],
+   [
+    "S",
+    24,
+    43,
+    "W",
+    6.81
+   ],
+   [
+    "S",
+    66,
+    23,
+    "E",
+    9.21
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey 26-27 Nov 1994 by GE Jacinto R. Caceres, approved 6 Jun 1995",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "inside": [
+   "MWK-T-32916"
+  ],
+  "note": "lot identified from the face: Lot 2-X-4-F, Psd-05-017527 (215 sq m). Course 2-3 distance '18.45' partly overprinted by the registration line but the ring closes to 0.004 m."
+ },
+ "T-52202": {
+  "lot": "2-X-4-D",
+  "plan": "Psd-05-017527",
+  "parent": "portion of Lot 2-X-4 (LRC) Psd-256008 (T-32916)",
+  "src_doc": 267,
+  "src_page": "1-2",
+  "stated_area": 820,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Daet, Cam. Norte",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   71,
+   12,
+   "E",
+   520.84
+  ],
+  "courses": [
+   [
+    "N",
+    24,
+    56,
+    "E",
+    8.42
+   ],
+   [
+    "N",
+    14,
+    44,
+    "E",
+    20.93
+   ],
+   [
+    "N",
+    17,
+    28,
+    "E",
+    14.49
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    20.05
+   ],
+   [
+    "S",
+    20,
+    9,
+    "W",
+    29.01
+   ],
+   [
+    "S",
+    18,
+    36,
+    "W",
+    14.7
+   ],
+   [
+    "N",
+    70,
+    9,
+    "W",
+    18.49
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey 26-27 Nov 1994 by GE Jacinto R. Caceres, approved 6 Jun 1995",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "inside": [
+   "MWK-T-32916"
+  ],
+  "note": "Lot 2-X-4-D (820 sq m); CTC stamped CANCELLED (cancelling TCT no. on stamp not legible at 170 dpi); DOAS to Severino Tenorio Jr. 23 Jul 2000 on memo. Heavy bold typeface makes E/W glyphs ambiguous; letters taken as printed-readable and confirmed by closure 0.007 m. Corner 5 coincides with T-32916 corner 11 (0.04 m)."
+ },
+ "_held_T-32916": {
+  "lot": "2-X-4",
+  "plan": "(LRC) Psd-256008",
+  "parent": "portion of Lot 2-X, (LRC) Psd-221861; LRC Rec. No. 10784",
+  "src_doc": 265,
+  "src_page": "1-2",
+  "stated_area": 14416,
+  "monument": "BLLM No. 2, Bo. of Mercedes, Mp. of Daet",
+  "monument_key": "auto",
+  "tie": [
+   "N",
+   72,
+   19,
+   "E",
+   399.56
+  ],
+  "courses": [
+   [
+    "N",
+    20,
+    3,
+    "E",
+    87.05
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    7.87
+   ],
+   [
+    "N",
+    20,
+    0,
+    "E",
+    38.5
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    33.5
+   ],
+   [
+    "S",
+    20,
+    36,
+    "W",
+    35.79
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    30.0
+   ],
+   [
+    "N",
+    20,
+    0,
+    "E",
+    20.0
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    15.0
+   ],
+   [
+    "N",
+    10,
+    30,
+    "E",
+    16.0
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    24.5
+   ],
+   [
+    "S",
+    20,
+    9,
+    "W",
+    29.91
+   ],
+   [
+    "S",
+    70,
+    9,
+    "E",
+    18.0
+   ],
+   [
+    "N",
+    20,
+    9,
+    "E",
+    4.0
+   ],
+   [
+    "S",
+    71,
+    43,
+    "E",
+    11.09
+   ],
+   [
+    "S",
+    13,
+    23,
+    "W",
+    69.45
+   ],
+   [
+    "N",
+    76,
+    12,
+    "W",
+    12.0
+   ],
+   [
+    "S",
+    15,
+    6,
+    "E",
+    20.0
+   ],
+   [
+    "N",
+    76,
+    12,
+    "W",
+    72.37
+   ],
+   [
+    "N",
+    72,
+    54,
+    "W",
+    62.9
+   ]
+  ],
+  "survey": "original survey 20 May 1912; subdivision survey executed by GE Ernesto L. Velante on 15 Dec 1976 (printed '1876')",
+  "inside_any": [
+   "MWK-PSD221861-X"
+  ],
+  "hold_reason": "printed description (doc 265 p.2, 19 courses, re-read at 300 dpi; doc 286 is the same RD print run, Ref 2025000121, so not independent) misses closure by 10.11 m (almost due east) and computes 14,234 vs 14,416 sq m (-1.26%). Corners 1-11 are corroborated: corner 11 computed from this title's tie lands 0.04 m from corner 5 of T-52202 (Lot 2-X-4-D) computed from that title's own independent tie, so the error is in courses 11-12 through 19-1. ring_tools' only candidate is course 17-18 S15-06E -> S15-06W (closure 0.91 m, area -0.65%), but the scan clearly prints 'E' and no other certified title in hand prints that course (it is shared with Lot 2-X-3, whose title is not in this batch); the exact fix would be S14-45W 19.10 m, which does not match any single-glyph misread. Needs the T-for Lot 2-X-3 title or the (LRC) Psd-256008 lot data computation. Corner 1 can be placed from the tie alone.",
+  "note": "earlier 47.8% failure was on sub-lot work; the Psd-05-017527 sub-lots in this batch (T-52202, T-52537, T-52538) all close and agree with each other and with T-32916 corners 1-11."
+ }
+}

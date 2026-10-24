@@ -117,11 +117,24 @@ stays out pending its photo/date hard gate; nothing demands anything OF Guerrero
 The print-package letters 03/04 (MLGOO variants) remain HELD per the process-level flag —
 serve NONE of them this cycle.
 
-**Status:** FINAL — cleared for service by Jonathan this session. Not served; no clock
-runs until proof of receipt is in hand. Record service by received-stamp/registry card
-only. **Next edition ~25 Sep 2026** on continued non-performance: same schedule, every
-counter advanced, any performed row marked PERFORMED; if default persists through that
-cycle, the letter's own terms support the elevation request to the Provincial Director.
+**Status — UPDATED 19 Oct 2026:** the 10 Sep edition was built, corrected and staged but
+**never served** (39 days idle; the MLGOO desk had reverted to the superseded 7 Sep compel
+draft). Jonathan authorized service on **19 Oct 2026** ("serve the reiteration").
+
+**SECOND EDITION — `PRINT_SERVICE_2026-10-19/` — dated 19 Oct 2026, printed x2, awaiting
+signature + service.** All eight Schedule counts advanced +39 days (54/87 instrument ·
+117 §444(b)(1)(x) · 266 SPA · 515 MWK Street · 168 CART referral · 250/55 records ·
+48 enactment), the two in-body counts corrected to 515 and 250, and the footnote re-based
+to 19 Oct. New material: the 4 Sep transmittal with no compliance assessment (**45 days**
+of silence) and **PD Relucio's 2 Sep letter** allowing the LGU "sufficient time … to submit
+its response regarding the indorsements made by MLGOO Guerrero," which also records that the
+Province referred the complaints back "to the Local Government Unit (LGU) of Mercedes, as the
+matter falls within the jurisdiction of the said LGU." Ask sharpened to a **date certain**,
+with elevation to the Provincial Director **and the Regional Director**.
+
+**NO CLOCK RUNS until the received-stamp is in hand.** Record the stamp date here and in
+`DILG_TRACK_REGISTER.md` row 26. **Next edition ~19 Nov 2026**, counters +31, any performed
+row marked PERFORMED.
 
 *Instruments in case_work/MWK-001/ (DOCX+PDF). Built 2026-09-05; Macale notice dated
 06 Sep; ledger updated 2026-09-08 (Reiteration finalized).*

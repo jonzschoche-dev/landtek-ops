@@ -1,3 +1,5 @@
+> **2026-10-20 17:10 PHT (Grok, Ping Pong Drip): DO NOT FIRE — premise under Legal review.** R.A. 7160 §252(a) entertains a protest only after the disputed tax is paid, and for a municipality outside Metro Manila the protest goes to the provincial treasurer. The disputed ₱14,391.50 is unpaid (¶1 below; `BLGF_RESPONSE_AUDIT_13Jul_vs_31Jul.md` l.10–12), and the 7 Jul protest went to the MT. Claude withdrew the §252 lapse / LBAA clock on 20 Oct (`Drip/from-claude/DRIP_BLGF_ACK_DRAFT.md` §A). Text below unchanged.
+
 # NOTICE OF LAPSE — §252 PROTEST DECISION PERIOD (DRAFT — HELD, fire on/after 6 Sep)
 
 > **STATUS: DRAFT — HELD.** Fire only if no written decision on the 7 Jul 2026 protest

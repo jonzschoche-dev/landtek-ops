@@ -1,0 +1,1 @@
+Good day po, Sir Magana. Jonathan Zschoche po. One quick question when you're back: does your office have the original of the 1953 Deed of Donation from Mary Worrick Keesey to the Municipality of Mercedes, or only a copy? Thank you very much po.

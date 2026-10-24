@@ -1,0 +1,106 @@
+{
+ "T-30618": {
+  "lot": "2-G",
+  "plan": "(LRC) Psd-221861",
+  "parent": "portion of Lot 2, (LRC) Psd-12802, L.R.C. Rec. No. 10784; transfer from T-4497",
+  "src_doc": 111,
+  "src_page": "1-2",
+  "stated_area": 4148,
+  "monument": "BLLM No. 2, Bo. Mercedes, Mp. of Daet",
+  "monument_key": "M1",
+  "tie": [
+   "N",
+   82,
+   11,
+   "W",
+   329.45
+  ],
+  "courses": [
+   [
+    "N",
+    77,
+    35,
+    "W",
+    22.0
+   ],
+   [
+    "N",
+    72,
+    56,
+    "W",
+    13.49
+   ],
+   [
+    "N",
+    75,
+    12,
+    "W",
+    16.33
+   ],
+   [
+    "N",
+    15,
+    37,
+    "E",
+    10.71
+   ],
+   [
+    "N",
+    11,
+    11,
+    "E",
+    29.19
+   ],
+   [
+    "N",
+    15,
+    20,
+    "E",
+    67.12
+   ],
+   [
+    "S",
+    79,
+    47,
+    "E",
+    23.0
+   ],
+   [
+    "S",
+    15,
+    10,
+    "W",
+    52.85
+   ],
+   [
+    "S",
+    75,
+    40,
+    "E",
+    30.27
+   ],
+   [
+    "S",
+    14,
+    46,
+    "W",
+    55.81
+   ]
+  ],
+  "inside_any": [
+   "MWK-T-4497"
+  ],
+  "survey": "bearings true, decl. 0 deg 58' E; original survey 20 May 1912; subdivision survey by GE Ernesto L. Velante, 20-21 May 1975",
+  "bounds": "NE pts 7-8 Pacific Ocean; SE & NE pts 8-10 Lot 2-F; SE pts 10-1 Lot 2-A; SW pts 1-2 Lot 2-B, 2-3 Lot 2-C, 3-4 Lot 2-D; NW pts 4-6 Lot 2-E, 6-7 Lot 2-E",
+  "registered_owners": "Fermin Marquez 510 sqm; Jose Pascual Sr. & Jose Pascual Jr. 3,328 sqm; Eduardo Navarro 310 sqm (entered 2 Jul 1992, transfer from T-4497)",
+  "note": "Subdivision Agreement PE-162181-69-18 (15 Sep 1992): Lot 2-G-1 Marquez 510, 2-G-2 Pascual 3,328, 2-G-3 Navarro 310 (sum 4,148). Bounds letters partly blurred on the face (2-F / 2-A read from context of the 1975 plan).",
+  "corrections": [
+   {
+    "course": "8-9",
+    "title_reads": 32.85,
+    "used": 52.85,
+    "why": "T-30618 prints 32.85 clearly (zoom at 450 dpi), but the ring then misses closure by 20.0 m and area by +14.8%. Adjoining Lot 2-F's certified title T-11795/T-11798 (doc 68) prints the same shared line as N 15-10 E 52.85; with 52.85 the ring closes to 0.04 m and the area matches 4,148 to 0.02%. Typist error on T-30618."
+   }
+  ]
+ }
+}

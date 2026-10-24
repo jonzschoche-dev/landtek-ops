@@ -14,3 +14,10 @@ Attorney-in-Fact for Patricia Keesey Zschoche, a co-owner
 0966-698-1448 | jonzschoche@gmail.com
 
 <!-- 20 Oct 2026 finding: 13 Jul e-mail carried a 19,484,501-byte (61 pp) PDF; Gmail shows it sent whole, no bounce. Probable silent drop at coa.gov.ph (size). Next if "not received": hand delivery at COA R5 Legazpi with receiving stamp. -->
+
+<!-- 23 Oct 2026 CORRECTION (live Gmail check, both accounts): the 13 Jul 2026 audit request was NEVER SENT.
+     Message 19f5a3f0a95ef7f5 is DRAFT (now in Trash), 26,324,034 bytes, over Gmail's 25 MB send limit. No copy in SENT
+     on jonzschoche or hayuma; nothing to coaregion5@gmail.com; doc 2431 (the folio print) carries no receiving stamp.
+     The 20 Oct finding above ("sent whole, no bounce") was wrong. COA's only message from us is the 20 Oct reply
+     (1a158bb5f2403cb9, SENT, to fmbasallaje@ cc abjuliano@, 8 KB), which quotes the 13 Jul text without attachments.
+     So COA holds no request from us yet: nothing to acknowledge, no clock possible. -->

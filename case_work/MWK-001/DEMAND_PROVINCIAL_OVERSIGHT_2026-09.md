@@ -96,14 +96,7 @@ date of the enactment by which the street-naming matter pending since May 2025 "
 been acted upon", and furnish its minutes. If no such enactment exists, she should state that
 in writing.
 
-**4. Fisheries-construction fact-finding on the T-32911 compound.** The Municipality should
-state whether works are proceeding on the compound parcel covered by TCT No. T-32911. It should
-also state which office or entity is building and funding them, under what building permit and
-appropriation, and under what claimed authority as to the land, including how the use fits the
-purpose of whatever instrument is named under item 2. This is a fact-finding request only. It
-is not a demand for compensation or for any determination of a taking date.
-
-**5. Donated road lots.** On 1 September 2026 the Mayor wrote that the roads are "actively
+**4. Donated road lots.** On 1 September 2026 the Mayor wrote that the roads are "actively
 devoted to their intended public road purpose" and that there is "no statutory ground" for
 administrative action. A road covered by a house is not devoted to road purpose. **Direct the
 Mayor (and the Building Official as appropriate) to state in writing, lot by lot among the
@@ -114,7 +107,7 @@ donated road lots:**
   (d) what administrative action under §§17 and 21 (and PD 1096) has been taken or will be
       taken, with dates — or a written justification for taking none.
 
-**6. ARTA CTN SL-2026-0423-1891 / CART.** The Province referred 1891 to the Mayor on 23 June
+**5. ARTA CTN SL-2026-0423-1891 / CART.** The Province referred 1891 to the Mayor on 23 June
 2026 as a matter of LGU jurisdiction. On 1 September 2026 the Mayor wrote that "there are no
 further administrative actions required or appropriate on the part of the LGU at this stage."
 That is a refusal of the duty under Section 444(b)(1)(x) of R.A. 7160 to "cause to be
@@ -126,13 +119,13 @@ proceedings he has instituted, or will institute within a definite period the Pr
 against the municipal officials concerned — or the specific legal justification for
 instituting none, provision by provision.**
 
-**7. Provincial Assessor.** Under Section 472(b)(12), please issue a written directive to the
+**6. Provincial Assessor.** Under Section 472(b)(12), please issue a written directive to the
 Municipal Assessor of Mercedes. It should require her to render the records service paid for on
 20 June 2025 (O.R. No. 7383466; Annex "F"), or to state in writing the specific legal ground
 for each record withheld. Please also complete the verification your Office undertook on
 1 July 2026 (Annex "G"), and assess any lawful fee for payment.
 
-**8. Provincial Treasurer.** Please answer in writing the Formal Protest and Supervisory
+**7. Provincial Treasurer.** Please answer in writing the Formal Protest and Supervisory
 Request of 13 July 2026 (Annex "H") on ARP No. 001-00249, item by item. Under Section 470(d)(6),
 please also direct the Municipal Treasurer to issue her written decision on that protest under
 Section 252, or to certify that none has issued.
@@ -177,9 +170,9 @@ Protest and Supervisory Request of 13 Jul 2026.
 - **Owner:** Provincial. **Revised 27 Sep 2026.** Cut from the 7 Sep expanded petition
   (48,814 bytes; backup `DEMAND_PROVINCIAL_OVERSIGHT_2026-09.md.bak-pre-rev-20260927`) to a
   single demand letter. Nothing sent, nothing emailed, no PDF rendered.
-- **Items 5–6** mirror MLGOO Guerrero reply ¶4–5 (`DILG_MLGOO_GUERRERO_REPLY_2026-09.md`) for
+- **Items 4–5** (formerly 5–6) mirror MLGOO Guerrero reply ¶4–5 (`DILG_MLGOO_GUERRERO_REPLY_2026-09.md`) for
   consistency. They are recast as the Province directing the Mayor, and name no individual.
-- **GATED — item 5:** do not send until the Teope location is confirmed (same gate as the
+- **GATED — item 4 (road lots; formerly 5):** do not send until the Teope location is confirmed (same gate as the
   MLGOO reply).
 - **Send gate:** send only on Chief of Staff go. Do not email.
 - **Exhibit sources:** `DILG_enclosures/source/DILG_CN_RESPONSE_FOLLOWUP_Relucio_2026-09-02_emailed-2026-09-07.pdf`;
@@ -188,6 +181,6 @@ Protest and Supervisory Request of 13 Jul 2026.
 - **Carve-outs held:** no 1953/1996 taking date; no Municipal Hall / hall-parcel compensation
   demand; no syndicate or crime caption or language; the all-heirs SPA item is omitted
   (sub judice, Civil Case 26-360); Guerrero is info-copy only, with no criticism.
-- **Open before service:** item 4 was restored per the 27 Sep brief, although the 7 Sep status
-  note recorded "Fisheries passages CUT (Jonathan, 7 Sep)". Confirm with Jonathan. Name the
+- **Fisheries split out 19 Oct 2026 per Jonathan** into `DEMAND_FISHERIES_CONSTRUCTION_2026-10.md` (own letter, DRAFT—HELD). Items renumbered 1–7. Backup: `DEMAND_PROVINCIAL_OVERSIGHT_2026-09.md.bak-pre-fisheries-split-20261019`.
+- **Open before service:** Name the
   Provincial Legal Officer if known. Have counsel check holiday math on the working-day counts.

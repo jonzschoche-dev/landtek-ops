@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
+<name>Inocalla — Mining blocks, Gracesen plant lot, P-1616 + T-2194</name>
+<Style id="mb82"><LineStyle><color>ff0000ff</color><width>3</width></LineStyle><PolyStyle><color>1a0000ff</color></PolyStyle></Style>
+<Style id="mb5"><LineStyle><color>ff00ffff</color><width>3</width></LineStyle><PolyStyle><color>4000ffff</color></PolyStyle></Style>
+<Style id="raw"><LineStyle><color>ff999999</color><width>1.5</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+<Style id="lot4"><LineStyle><color>ff00ff00</color><width>3</width></LineStyle><PolyStyle><color>5500ff00</color></PolyStyle></Style>
+<Style id="t2194"><LineStyle><color>ff0088ff</color><width>3</width></LineStyle><PolyStyle><color>550088ff</color></PolyStyle></Style>
+<Folder><name>Submitted Minahang Bayan blocks (converted to WGS84 — use with GPS)</name>
+<Placemark><name>MB block 82.9053 ha — Capacuan SSMA (filed Oct 11, 2017)</name><styleUrl>#mb82</styleUrl>
+<description>Amended Sketch Plan, GE Jose T. Abareta, rec'd MGB-V Oct 11 2017; MGB Area Status Jan 4 2018. Plan corners 14°15'00"-14°15'30" N x 122°42'30"-122°43'00" E (30"x30" meridional block, area check 82.91 ha). Shifted Luzon/PRS92 to WGS84 (-0.001443 lat, +0.001364 lon, BLLM No.1 Paracale registry) - datum PENDING VERIFICATION.</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.709697,14.248557,0 122.718031,14.248557,0 122.718031,14.256890,0 122.709697,14.256890,0 122.709697,14.248557,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>MB block 5.1816 ha — Capacuan SSMA (re-amended 2019, resubmitted Jun 9 2026)</name><styleUrl>#mb5</styleUrl>
+<description>Corners 14°15'07.5"-14°15'15" N x 122°42'30"-122°42'37.5" E (7.5"x7.5" block, area check 5.18 ha). Brgy Capacuan Res. 18 s-2021 / 64 s-2024. Carved from T-2194 per NIBDC MOA May 5 2009 - converted position falls fully inside T-2194. Same datum shift; PENDING VERIFICATION.</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.709697,14.250640,0 122.711781,14.250640,0 122.711781,14.252724,0 122.709697,14.252724,0 122.709697,14.250640,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+</Folder>
+<Folder><name>Blocks — corners as written on plan (reference, hidden)</name><visibility>0</visibility>
+<Placemark><name>82.9053 ha as written</name><visibility>0</visibility><styleUrl>#raw</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.708333,14.250000,0 122.716667,14.250000,0 122.716667,14.258333,0 122.708333,14.258333,0 122.708333,14.250000,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>5.1816 ha as written</name><visibility>0</visibility><styleUrl>#raw</styleUrl>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.708333,14.252083,0 122.710417,14.252083,0 122.710417,14.254167,0 122.708333,14.254167,0 122.708333,14.252083,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+</Folder>
+<Folder><name>Titles</name>
+<Placemark><name>Lot 4, Psu-143364 — OCT P-1616 (Allan V. Inocalla)</name><styleUrl>#lot4</styleUrl>
+<description>15.2069 has. Tie N60°01'W 3,508.83 m from BLBM No.1 Batobalani, DENR-confirmed (SMD-SCS-INC-26-172). Closure 0.07 m. Accuracy +/-20-30 m absolute.</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.711924,14.249210,0 122.712017,14.250592,0 122.712577,14.248476,0 122.714503,14.247727,0 122.712449,14.245912,0 122.710968,14.246198,0 122.709553,14.245439,0 122.709333,14.247186,0 122.708962,14.247894,0 122.708599,14.247975,0 122.708093,14.247815,0 122.708028,14.248495,0 122.709930,14.248490,0 122.710740,14.249009,0 122.711930,14.248575,0 122.711924,14.249210,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>T-2194 / H-44920 (Vicente to Senen) — GRACESEN PROCESSING PLANT LOT</name><styleUrl>#t2194</styleUrl>
+<description>13.3690 has. Tie N57°49'W 3,579.00 m from BLBM No.1; closure 0.09 m. Gracesen plant (ECC-RO5-1203-0045) is on this lot per MPDC certification May 20 2014 (ARP GR-2008-FF-08-008-00541); exact plant point not in any document.</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>122.712018,14.250588,0 122.709760,14.250227,0 122.708425,14.250753,0 122.708983,14.251367,0 122.708666,14.251582,0 122.709282,14.253032,0 122.709187,14.253314,0 122.709469,14.254100,0 122.713165,14.252740,0 122.713024,14.252336,0 122.712914,14.252328,0 122.712596,14.252182,0 122.712577,14.251859,0 122.712235,14.251551,0 122.712220,14.251254,0 122.712093,14.250994,0 122.712018,14.250588,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+</Folder>
+</Document></kml>

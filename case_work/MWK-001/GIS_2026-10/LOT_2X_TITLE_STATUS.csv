@@ -1,0 +1,53 @@
+title,lot,plan,stated_sqm,map_status,corrections,note,source_doc
+T-46460,2-C,Psd-05-023697,4222,HELD,0,"printed technical description (doc 143 p.2, 17 courses, re-read at 400 dpi) does not close: misclosure 60 m, computed area 352 vs 4,222; no single misread, quadrant-letter flip set (<=3) or single distance explains it. Needs the Psd-05-023697 lot data computation (DENR R5 request item 3). Corner 1 c",143
+T-11795,2-F,(LRC) Psd-221861,1622,HELD,0,tie N 63-08 W 344.60 lands 10.4 m from the 1975 plan corner; shape exact; face reads T-11798,68
+T-32916,2-X-4,(LRC) Psd-256008,14416,HELD,0,"printed description (doc 265 p.2, 19 courses, re-read at 300 dpi; doc 286 is the same RD print run, Ref 2025000121, so not independent) misses closure by 10.11 m (almost due east) and computes 14,234 vs 14,416 sq m (-1.26%). Corners 1-11 are corroborated: corner 11 computed from this title's tie lan",265
+T-49062,2-X-4-J,Psd-05-017527,12327,HELD,0,"60-course description on a heavily faded print (both corpus copies, docs 29 and 40, are the same RD print run); dozens of ambiguous digits (0/U, 3/5/9, 6/b, 7/(), beyond what closure can recover. Needs a fresh LRA e-copy of TCT T-49062 or the Psd-05-017527 lot data computation (DENR R5 request item ","[29, 40]"
+T-45616,2,Pcs-051607-000932 (consolidation-subdivision),4798,PLOTTED,0,,47
+T-4497,2,(LRC) Psd-12802,139132,PLOTTED,2,"With 455.46 the ring misses by 1.81 m; 453.46 closes to 0.20 m, area 139,113 vs 139,132 (-0.01%). Corroborated by the 1975 Psd-221861 lots (doc 287): the union ; Corner 1 = SE road corner = Lot 2-A corner 1, whose certified tie is N 86-31 W 261.63; the union of mapped 1975 lots has this corner at N ",348
+T-12873,2-E,(LRC) Psd-221861,934,PLOTTED,0,,69
+T-12800,2-K,(LRC) Psd-221861,1866,PLOTTED,2,"Shared line with Lot 2-L: 079-2010000694 and 079-2010000663 (clear electronic CTCs, doc 27) print it as S 76-30 E 5.00 (2-L pts 3-4, bounded by Lot 2-K). The 19; As read (25.50 + 9.00) the ring closes (0.03 m) but area is 1,778 vs 1,866 (-4.7%). After the corroborated 5.00 fix, ring_tools' single fi",112
+079-2010000694,2-L,(LRA) Psd-221861 (approved as a non-subdivision project),223,PLOTTED,0,,27
+079-2010000663,2-L,(LRA) Psd-221861 (approved as a non-subdivision project),223,PLOTTED,0,,27
+T-32912,2-M,(LRC) Psd-221861,1895,PLOTTED,2,"N 79-35 E does not close (7.1 m); S closes to 0.07 m, area +0.10%. Corroborated by T-32914 (Lot 2-R, doc 107 p.2): the shared 2-M/2-R line prints N 79-35 W 19.7; Tie only (no effect on closure/area). With 139.86 the lot plots ~300 m east of its neighbours. Corner 7 of this lot = corner 2 of Lot 2-R ",142
+T-32913,2-Q,(LRC) Psd-221861,1022,PLOTTED,0,,45
+T-32914,2-R,(LRC) Psd-221861,1010,PLOTTED,0,,107
+T-14785,2-W,(LRC) Psd-221861,1250,PLOTTED,0,,289
+T-23796,2-X-1,(LRC) Psd-256008,3056,PLOTTED,0,,102
+T-33365,2-X-1-B,Psd-05-008861,2871,PLOTTED,0,,124
+T-52202,2-X-4-D,Psd-05-017527,820,PLOTTED,0,,267
+T-52537,2-X-4-E,Psd-05-017527,152,PLOTTED,0,,274
+T-52538,2-X-4-F,Psd-05-017527,215,PLOTTED,0,,270
+T-45964,2-X-5,(LRC) Psd-256008,2034,PLOTTED,0,,273
+T-32917,2-X-6,(LRC) Psd-256008,85149,PLOTTED,0,,21
+T-36668,2-X-6-A,Psd-051607-014971,300,PLOTTED,1,"with 306.25, corners 3-4-5 fall within 0.04 m of T-38838 corners 40-39-38 (the shared boundary with 2-X-6-I); 506.25 would put the lot ~133-153 m away from that",319
+T-52536,2-X-6-B,Psd-051607-014971,372,PLOTTED,0,,46
+079-2018001329,2-X-6-B,Psd-051607-014971,372,PLOTTED,0,,322
+T-33350,2-X-6-C,Psd-051607-014971,339,PLOTTED,0,,312
+T-34243,2-X-6-D,Psd-051607-014971,265,PLOTTED,0,,321
+T-46038,2-X-6-E,Psd-051607-014971,803,PLOTTED,0,,324
+T-33686,2-X-6-F,Psd-051607-014971,629,PLOTTED,1,F's corner 1 is T-38838 corner 16 (shared line 8-1 = T-38838 course 16 reversed). Computing that corner from T-38838's own tie + courses gives N 13-50.3 E 298.6,316
+T-33776,2-X-6-H,Psd-051607-014971,1295,PLOTTED,0,,318
+T-38838,2-X-6-I,Psd-051607-014971,32448,PLOTTED,1,"ring does not close with 164.73 (misclosure 40.00 m along this bearing); 124.73 closes to 0.10 m, area within 0.01%; the same course on T-52540's own certified ",23
+T-40718,2-X-6-I-1,Psd-05-019929,121,PLOTTED,0,,67
+T-39630,2-X-6-I-2,Psd-05-019929,347,PLOTTED,0,,42
+T-49060,2-X-6-I-3,Psd-05-019929,953,PLOTTED,0,,241
+T-49061,2-X-6-I-4,Psd-05-019929,31027,PLOTTED,3,"with N the ring misses by 8.1 m. T-50192 (doc 412 p.2, clear print, a child of this lot) prints the same boundary course as S 66-50 E 10.17 (its course 11-12). ; T-50192 (clear print) course 5-6 prints N 70-54 W 6.48 for the same boundary; reading refinement, not a change of a clear digit.; T-50192 ",50
+T-52539,2-X-6-I-4-A,Psd-05-026197,298,PLOTTED,1,"T-50192 (doc 412 p.2, clear print) prints the same shared line as S 18-28 W 11.46; the faded glyph is consistent with 4. Both readings close (<0.2 m), so this i",263
+T-50192,2-X-6-I-4-B,Psd-05-026197,494,PLOTTED,0,,412
+T-52540,2-X-6-I-4-C,Psd-05-026197,28891,PLOTTED,1,"misclosure 43.98 m along this bearing; the same boundary course on T-38838 (doc 23 p.2, course 27-28) reads 4.70; with 4.70 the ring closes and the area matches",96
+079-2021002126,2-X-6-I-4-C-1 (printed '2-X-6-1-4-C-1'),(LRA) Psd-E2020005406,2587,PLOTTED,0,,368
+079-2021002127,2-X-6-I-4-C-2,(LRA) Psd-E2020005406,26304,PLOTTED,0,,"[368, 20]"
+T-33681,2-X-6-K,Psd-051607-014971,86,PLOTTED,3,common line with Lot 2-X-6-L: T-47655's certified copy prints it N 71-30 W 11.31. With 11.51 the ring misses the area by 1.7% (87.5 vs 86); with 11.31 closure 0; T-47655 prints the same common line N 24-30 E 7.71.; with 228.29 corners 2-3-4 land within 0.05 m of T-47655's corners 6-5-4 (the shared b,317
+T-47655,2-X-6-L,Psd-051607-014971,7186,PLOTTED,0,,16
+T-48335,2-X-6-N-1,Psd-05-025374,432,PLOTTED,0,,308
+T-48336,2-X-6-N-2,Psd-05-025374,14817,PLOTTED,0,,18
+T-33415,2-X-6-P,Psd-051607-014971,468,PLOTTED,0,,315
+T-33416,2-X-6-Q,Psd-051607-014971,2411,PLOTTED,2,"ring_tools single candidate: as N17-45W misclosure 47 m; S17-45W closes to 0.02 m, area within 0.02%. The N/S and E/W glyphs at this spot are genuinely ambiguou; line 14-15 is the common boundary with Lot 2-X-6-P; T-33415's certified copy (doc 315 p.2) prints the same line as S 16-43 W 23.41 (P line",314
+T-49037,2-X-6-R,Psd-051607-014971,498,PLOTTED,0,,120
+T-51639,2-X-6-R-1,Psd-05-026614,114,PLOTTED,0,,311
+T-51640,2-X-6-R-2,Psd-05-026614,88,PLOTTED,0,,313
+T-51641,2-X-6-R-3,Psd-05-026614,296,PLOTTED,0,,24
+T-52354,2-X-6-S,Psd-051607-014971,1832,PLOTTED,0,,325
+T-47657,2-X-6-T,Psd-051607-014971,13124,PLOTTED,0,,309
+T-69404,2-X-6-T-3,Psd-05-038661,11890,PLOTTED,5,"T-47657 course 5-6; this copy swaps the bearing/distance pairing of courses 5 and 6; T-47657 course 6-7 (re-read at 800 dpi as 9.87); T-47657 course 11-12, Lot 2-X-6-Q boundary; T-47657 course 15-16, Lot 2-X-6-Q boundary; T-47657 course 16-17; also returns the 9.36 m notch that course 14-15 (N 66-43",22

@@ -7,11 +7,23 @@ Owner: MLGOO bot. Updated: 2026-10-19 21:45 PHT.
 - Decision: **skip the MLGOO; escalate to PD Relucio** with a corrected Schedule of Default (item 8 §252 removed as withdrawn; item 2 referral dates fixed; "offences" → "referrals are of record"). File: `../../DRIP_LADDERS_2026-10/DILG-PD-RELUCIO/`. Ask = PD sets a date certain for the LGU to perform the 25/26 Aug directives.
 - Any future MLGOO/RD edition must use the corrected Schedule, never the 19 Oct pack text.
 
+## COMMUNICATIONS LOG — verified 24 Oct 2026 (three live DILG lanes, all opened 20–21 Oct)
+
+| When | Lane | What | Verified by | Clock |
+|---|---|---|---|---|
+| **20 Oct, 19:58 PHT** | **PD Relucio** | Escalation **SENT** — reply on her own 7 Sep "RESPONSE TO FOLLOW-UP REQUEST" thread to dilgcamarinesnorte2020@gmail.com, attaching `Annex_A_Schedule_of_Default_corrected_20Oct2026.pdf` (3 pp). Ask = **PD sets a date certain** for the LGU to perform the 25/26 Aug directives. | gmail 147514/147515 (case acct, Sent) | **No reply, 4 days.** RA 6713 §5(a) 15-wd mark ≈ **11 Nov** (holiday math NEEDS-VERIFICATION: 1 Nov Sun, 2 Nov special non-working) |
+| **21 Oct, 13:05 PHT** | **RD Escober / DILG R5** | 22 Jul request **RESENT** to the Region's official records address dilg5records2019@gmail.com (cc Escober, PD), asking for the **reference number and present status**. | gmail 147507 | — |
+| **21 Oct, 14:09 PHT** | **RD Escober / DILG R5** | **REPLY RECEIVED** — DILG R5 Records: *"This is to acknowledge receipt of your email. The submitted documents will be forwarded to the appropriate Division/Section or Office for further action."* **No reference number given, though it was expressly asked.** | gmail **147505** | Ack only. **Reference number outstanding 3 days** |
+| **21 Oct, 16:43 PHT** | **MLGOO (Messenger)** | Jonathan sent **7 photos** of the barangay cover letters to the "Dilg Mercedes CN" page (letters cc'd to Mayor Pajarillo and MLGOO Guerrero). | screenshot `proof_messenger_2026-10/2026-10-21_wed_1643…png` | — |
+| **~21 Oct** | **MLGOO (Messenger)** | Jonathan: *"Kapitan of San Roque refuse to receive our letter today. Can you help?"* → **DILG Mercedes CN: "Acknowledge po. Sabihan ko."** A written supervisory undertaking from the MLGOO's own channel. | screenshot `MLGOO_ack_San_Roque_refusal.png` | **Did he "sabihan"? Nothing of record. Open since ~21 Oct** |
+
+**Net:** the DILG track is no longer idle — but every lane is sitting on an acknowledgment, not an answer.
+Relucio has not replied; R5 logged the paper without giving it a number; the MLGOO undertook to speak to San Roque and nothing shows he did.
+
 ## Position
-- MLGOO Vencer Krystian M. Guerrero (LGOO VI) — velvet glove, non-target. Asks = follow-through on his own 25–26 Aug 2026 2nd Indorsements only.
+- MLGOO Vencer Krystian M. Guerrero (LGOO VI) — velvet glove, non-target. Asks = follow-through on his own 25–26 Aug 2026 2nd Indorsements only. **The Messenger channel is live and he answers on it** — cheapest lever we have on him.
 - Info copies: PD Melody E. Relucio; RD Atty. Arnaldo E. Escober, Jr.
-- Last inbound: Guerrero 4 Sep transmittal of LGU 1 Sep replies; Relucio "RESPONSE TO FOLLOW-UP REQUEST" (2 Sep, emailed 7 Sep) — no ack sent.
-- Nothing sent to Guerrero since 4 Sep.
+- **Nothing on paper has ever been served on Guerrero since 4 Sep.** The 10 Sep and 19 Oct Reiterations were both built and both never sent.
 
 ## Live branch A — REITERATION, SECOND EDITION — AUTHORIZED FOR SERVICE 19 Oct 2026 (NOT PRINTED)
 - **File: ../PRINT_SERVICE_2026-10-19/MWK-001_REITERATION_MLGOO_19Oct2026_8.5x13.pdf** — rewritten 19 Oct on Jonathan's instruction: **one-page letter in plain English + Annex "A" (2 pp) carrying the paper-trail proof.** 3 pp folio total.
@@ -26,8 +38,31 @@ Owner: MLGOO bot. Updated: 2026-10-19 21:45 PHT.
 ## DEAD — do not revive
 - ../DILG_MLGOO_GUERRERO_REPLY_2026-09.md (compel pass, 7 Sep) was **superseded on 9 Sep** by Jonathan's reconcile instruction and is marked DO-NOT-SERVE in its own banner. Its four usable assets were merged into the Reiteration. It was wrongly carried as this desk's live branch 10 Sep–19 Oct, which is part of why nothing was served for six weeks. Do not restore it, and do not gate the Reiteration on the fisheries photos (that item was deliberately left out).
 
+## NEXT STEPS — updated 24 Oct 2026 (in order)
+
+1. **PD Relucio — hold until ~11 Nov, then step 2.** She has the corrected Schedule and a single clean ask
+   (a date certain). Do not chase before the §5(a) period runs; chasing early converts a strong record
+   into nagging. **If silence by ~11 Nov:** step 2 is a short reply on the same thread noting the
+   15-working-day lapse and asking the same question once more — then the ladder goes to the RD, and the
+   escalation edition is the digitally notarized one.
+2. **DILG R5 — chase the reference number now.** This is the one ask that is already overdue in substance:
+   they acknowledged on 21 Oct and gave no docket number, which is what makes a request traceable.
+   A two-line reply on the same thread ("may I have the reference number assigned") costs nothing and
+   starts a numbered file at the Region. **Draft on Jonathan's go.**
+3. **MLGOO — convert the Messenger undertaking into paper.** He wrote "Acknowledge po. Sabihan ko." on the
+   San Roque refusal. The follow-up writes itself and stays friendly: thank him, ask what the barangay
+   said, and note that the same four barangays were copied to his office on 21 Oct. This is also the
+   natural carrier for the long-unserved supervision letter (`DRIP_LADDERS_2026-10/DILG-SUPERVISION/step1_letter.md`,
+   final 24 Oct, NOT SENT) — hand-delivered at the field office with our copy stamped RECEIVED.
+4. **Barangay step 2 (San Roque, Uno).** Registered mail with return card, cc Mayor + MLGOO. The refusals
+   are now evidence, not an obstacle — and the MLGOO has already acknowledged one of them in writing.
+5. **Do NOT revive the 19 Oct pack as a letter.** It was never sent and its Schedule has been superseded by
+   the corrected 20 Oct Annex A (item 8 §252 removed as withdrawn; item 2 referral dates fixed;
+   "offences" → "referrals are of record"). The 102-page pack remains useful as the **evidence bundle**
+   behind the small-players filings, not as correspondence.
+
 ## Held, unprepared
-- B: LGU produces fee assessments. C: escalate to PD Relucio.
+- B: LGU produces fee assessments. C: ~~escalate to PD Relucio~~ **DONE 20 Oct — now awaiting her answer.**
 
 ## Holds / lane rules
 - No mail to Guerrero, Relucio, Escober, Mayor, SB without go.

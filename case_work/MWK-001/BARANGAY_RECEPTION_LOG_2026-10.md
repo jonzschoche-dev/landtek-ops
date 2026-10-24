@@ -32,3 +32,12 @@ Note [I]: at V a tanod (the Chief Tanod) received the letter; at Uno a tanod ref
 
 ## Source
 Rider stop sheets returned 21 Oct: RIDER_PACKAGE_2026-10-21/RIDER_STOP_SHEETS_returned_21Oct2026.pdf (pages: RD, SP Secretary, BFAR, Brgy III, Brgy V; no sheets for San Roque or Uno, the refusals). Jonathan 21 Oct: no signed rider notes; the rider's account is relayed by Jonathan.
+
+## 23 Oct 2026 — sent by LBC Express (proof of sending, doc 19603)
+| Barangay | LBC tracking | Sent | LBC delivery date | What went |
+|---|---|---|---|---|
+| Barangay I (Uno) Poblacion — Barangay Hall, c/o Punong Barangay | 127504196980 | 23 Oct, late morning (₱158) | 26 Oct | records letter + cover letter on the refused hand delivery (reiteration) |
+| San Roque — Barangay Hall, c/o Punong Barangay | 127504197004 | 23 Oct, late morning (₱158) | 26 Oct | same |
+- Copies also reached MLGOO Guerrero by Messenger on 21 Oct (doc 19601; his "Acknowledge po. Sabihan ko." doc 19602).
+- NEXT: on/after 26 Oct pull the LBC proof of delivery (who signed, date) for each tracking number; ingest it; that POD is the
+  barangay's proof of receipt (clock from the POD date). A refusal at delivery is itself recorded.

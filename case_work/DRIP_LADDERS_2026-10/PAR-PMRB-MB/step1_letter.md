@@ -1,3 +1,6 @@
+<!-- 24 Oct 2026: signatory filled from the 9 Jun 2026 resubmission itself (doc 4894, signed by Allan Inocalla, CP 0917 155 4782,
+     cc PMRB-Camarines Norte). Still TO FILL: his position in CSSMA (2017 DOLE registration names Sonen/Senen V. Inocalla as
+     president, doc 1600) and the reply e-mail. No MGB/PMRB acknowledgment found in either mailbox since June. NOT SENT. -->
 ___ ________ 2026
 
 **RD GUILLERMO A. MOLINA, JR.**
@@ -19,7 +22,7 @@ Thank you very much for your time and assistance.
 
 Respectfully yours,
 
-**[TO FILL: NAME OF THE CSSMA OFFICER OF RECORD]**
+**ALLAN VILLAFRIA INOCALLA**
 [TO FILL: position], Capacuan Small-Scale Miners Association
 
 *Enclosure: [TO FILL: CSSMA Board resolution and Secretary's Certificate naming the signatory], Annex "A".*

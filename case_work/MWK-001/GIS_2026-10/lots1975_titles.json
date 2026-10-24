@@ -1,0 +1,15 @@
+{
+ "T-11752": {"lot": "2-U", "plan": "(LRC) Psd-221861", "parent": "portion of Lot 2, (LRC) Psd-12802, LRC Rec. No. 10784; transfer from T-4497",
+  "src_doc": 110, "src_page": "1", "stated_area": 1283, "monument": "BLLM No. 2, Bo. of Mercedes, Mp. of Daet", "monument_key": "M1",
+  "tie": ["N", 69, 9, "W", 593.05],
+  "courses": [["S",10,30,"W",16.00],["N",70,9,"W",15.00],["S",20,0,"W",20.00],["N",70,9,"W",30.00],["N",20,36,"E",35.79],["S",70,9,"E",42.00]],
+  "inside_any": ["MWK-PSD221861-U"], "owner": "Daniel T. Bernal, married to Monica Sison, of Lingayen, Pangasinan; entered 16 Jun 1975",
+  "bounds": "NE pts 6-1 Pacific Ocean; SE, SW, SE, SW & NW pts 1-6 Lot 2-X",
+  "note": "lot letter blurred on the face (2-U or 2-W); area 1,283 = plan Lot 2-U"},
+ "T-11753": {"lot": "2-V", "plan": "(LRC) Psd-221861", "parent": "portion of Lot 2, (LRC) Psd-12802, LRC Rec. No. 10784; transfer from T-4497",
+  "src_doc": 93, "src_page": "1", "stated_area": 635, "monument": "BLLM No. 2, Bo. of Mercedes, Mp. of Daet", "monument_key": "M1",
+  "tie": ["N", 69, 16, "W", 668.52],
+  "courses": [["S",20,0,"W",38.50],["N",70,9,"W",16.00],["N",18,51,"E",38.51],["S",70,9,"E",17.00]],
+  "inside_any": ["MWK-PSD221861-V"], "owner": "Teofilo E. Sison, married to Gregoria Vallesteros, of Lingayen, Pangasinan; entered 16 Jun 1975",
+  "bounds": "NE pts 4-1 Pacific Ocean; SE, SW & NW pts 1-4 Lot 2-X"}
+}
