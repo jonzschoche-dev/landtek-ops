@@ -3,7 +3,7 @@ Source: `SALVADOR_PACK_2027-01/00_BRIEF.html` (modified 2026-10-24). One file pe
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [1. What he must carry for them, and the documents-only answer](01_1_What_he_must_carry_for_them_and_the_documents_only_answer.md)
-- [2. The cross, from his own papers (new items only)](02_2_The_cross_from_his_own_papers_new_items_only.md)
+- [2. The cross, from the papers (new items only)](02_2_The_cross_from_the_papers_new_items_only.md)
 - [3. Objections on his direct](03_3_Objections_on_his_direct.md)
 - [4. The Bacolor-office conversation and his letter](04_4_The_Bacolor_office_conversation_and_his_letter.md)
 - [5. Atty. Elaine Gay R. Belen: the thread through the documents](05_5_Atty_Elaine_Gay_R_Belen_the_thread_through_the_documents.md)

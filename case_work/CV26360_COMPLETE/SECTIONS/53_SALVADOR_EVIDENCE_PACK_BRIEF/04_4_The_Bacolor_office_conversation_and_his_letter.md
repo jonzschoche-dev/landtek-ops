@@ -7,14 +7,18 @@
 
 ## 4. The Bacolor-office conversation and his letter
 
-- **What we hold in writing:** (a) his letter of 25 November 2025, signed "VON DELA FUENTE," addressed to "JONATHAN ILDEFONSO MORENO"; (b) the tax papers he handed over (the 33-page heirs' tax declarations and the 8-page set: two Treasurer's statements of 31 July 2019, the 29 February 2012 paper naming him, the 1992 SPA with its consular pages, a title page and a sketch), scanned 2 January 2025 [CONFIRM: these are the papers he gave you, and the date and place of the meeting].
+- **The meeting:** Romeo Bacolor's office, 11 October 2025. Afterwards, on Messenger, you wrote to Mr. Bacolor that Von had given you only "1990 documents pertaining to taxes," with "No receipts of payment pertaining to any sales made to anyone." You also wrote that a second meeting was to see whether you would talk with Ferdinand Balane, a defendant, and that Ferdinand never contacted you. Mr. Bacolor replied that he had no contact with the Balanes but "will remind von" about it.
 
-- **What we do not hold in writing:** what he said at Romeo Bacolor's office. Your 14 July 2025 email to counsel describes it as an admission. His letter answers: "you know I never admit it."
+- **What this gives the cross (optional; take the answer, prove nothing):** "In October 2025 you gave Mr. Zschoche tax papers from the 1990s. You gave him no receipt of any Balane payment?" and "In 2025 you proposed that Mr. Zschoche talk with Ferdinand Balane?" The receipts first appear with the defendants' Answer in 2026. If he denies, leave it.
 
-- **Rule for trial:** the oral conversation is used only if he denies something on cross that he told you, and only through a witness who heard his exact words. That needs time, place and persons present (Rule 132 §13). If Mr. Bacolor was present, he is the only neutral person who could testify. Counsel's call; our default is not to open it.
+- **Not yet located:** (a) the 1990s tax papers Von handed you on 11 Oct 2025; (b) your letter to him of 21 June 2025 bearing his signature of receipt. Neither is in the corpus or in Drive's searchable text. The vault log of 7 June 2026 (CORR-003, CORR-007, CORR-015) records labels only, with no image. The tax declarations and statements in Tabs 5 and 6 were scanned on 2 January 2025, before the meeting, so they did not come from Von. They are public records and stand on their own.
 
-- **What you can do now:** export the Messenger thread with Mr. Bacolor about Von (screenshots with dates) and save it unedited. Do not message Von or Mr. Bacolor about his testimony.
+- **What we do not hold in writing:** what he said at the meeting. Your 14 July 2025 email to counsel, which predates the 11 October meeting, describes an admission. His letter answers: "you know I never admit it."
 
-- **The tax papers are public records.** Certified copies from the Assessor and Treasurer replace our scans at trial and avoid any question of where we got them.
+- **Rule for trial:** the oral conversation is used only if he denies something on cross that he told you, and only through a witness who heard his exact words. That needs time, place and persons present (Rule 132 §13). Counsel's call; our default is not to open it.
+
+- **The Messenger thread is HELD, never offered.** Your messages in it use words we never put before the court ("illegally fraudulently," "syndicate," "bad faith"). If Mr. Bacolor testified, the thread would come out with them. That is a reason not to call him. Save it unedited; do not message Von or Mr. Bacolor about his testimony.
+
+- **Certified copies replace our scans at trial:** the Assessor and Treasurer records in Tabs 5 and 6 are obtained fresh, which avoids any question of where we got them.
 
 - **HELD, never used:** the handwritten draft "So the public may know …" naming Glenn Ordoveza Jr. and Von (unsigned, undated, reads "1995"; Ida-era); your 2025 statements to Atty. Bragais and the NBI request mentioning Atty. Belen. If either surfaces, it is a door into excluded matters.

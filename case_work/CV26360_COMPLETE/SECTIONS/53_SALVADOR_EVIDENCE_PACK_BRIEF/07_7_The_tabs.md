@@ -21,4 +21,4 @@
 | 10 | Gloria's original affidavit, p. 10 (S53) [CONDITIONAL] | Only if admitted |
 | 11 | Deed of Absolute Sale (Def. Exh. 6), pp. 1 to 2 | "In hand paid"; eCARs of 2020 and 2021 |
 
-Sources: tax declarations and statements from the scans of 2 Jan 2025 (Drive: Finance/TAXES Municipal Assessor; corpus docs 30 and 32); letter from Drive (corpus doc 1010); JA corpus doc 407; SP 2156 docket corpus doc 350; Gloria JA corpus doc 1089. Use certified copies at trial.
+Sources: tax declarations and statements from the family-file scans of 2 Jan 2025 (not from Von) (Drive: Finance/TAXES Municipal Assessor; corpus docs 30 and 32); letter from Drive (corpus doc 1010); JA corpus doc 407; SP 2156 docket corpus doc 350; Gloria JA corpus doc 1089. Use certified copies at trial.

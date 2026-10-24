@@ -13,7 +13,7 @@ Defense witness, sponsor of Def. Exh. 5 (the receipts) and the only witness to t
 
 **His impact, in one paragraph.** Salvador is the defense's only bridge between the 1992 SPA and the Balanes. He says the SPA was shown to Gloria (S11, S13), that around 1992 they learned at Ben Llamanzares's house that the Balanes had a deal to buy the land they were renting and had paid a down payment (S14 to S15), and that he issued the receipts in Def. Exh. 5 (S19 to S22). If the court believes S14 to S15, the defense has a class member. If S14 to S15 stays hearsay with no Llamanzares paper, the defense has receipts from 2003 onward, all written by his side, and a 2016 deed. **Everything below is aimed at keeping S14 to S15 without a document, and at using his own papers against S24 to S25.**
 
-**Three new points from his own papers** (details in Part 2):
+**Three new points from the papers** (his letter, and two public records; details in Part 2):
 
 1. His letter of 25 Nov 2025 defines the class himself: buyers holding a "CONTRACT OF SALE issued by Benjamin Llamanzares" or "RECEIPTS OF SALES signed by Benjamin Llamanzares." Def. Exh. 5 contains neither.
 
