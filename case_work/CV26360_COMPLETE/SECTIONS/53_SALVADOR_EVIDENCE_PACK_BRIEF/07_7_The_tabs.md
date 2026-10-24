@@ -22,5 +22,6 @@
 | 11 | Deed of Absolute Sale (Def. Exh. 6), pp. 1 to 2 | "In hand paid"; eCARs of 2020 and 2021 |
 | 12 | Municipal Treasurer's letters of 1 Sep 2025 and 27 Jun 2025 (corpus doc 814) | Cross 6b: no payment record by anyone but Jonathan (2023, 2024) |
 | 13 | CORR-007: your letter of 21 Jun 2025 to Salvador, signed "Received" (recovered photo) | Cross 0; subpoena (k); Rule 131 §3(e) |
+| 14 | The tax papers he handed you on 11 Oct 2025: selected pages (pp. 1, 6, 8, 29, 36, 46); full 48-pp. scan in Drive | Cross 6: nothing after Nov 1998 |
 
 Sources: tax declarations and statements from the family-file scans of 2 Jan 2025 (not from Von) (Drive: Finance/TAXES Municipal Assessor; corpus docs 30 and 32); letter from Drive (corpus doc 1010); JA corpus doc 407; SP 2156 docket corpus doc 350; Gloria JA corpus doc 1089. Use certified copies at trial.

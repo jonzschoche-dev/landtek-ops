@@ -9,7 +9,7 @@
 
 | # | Item | Owner | By |
 |---|---|---|---|
-| 1 | Find and scan the 1990s tax papers Von handed over at Mr. Bacolor's office on 11 Oct 2025 (physical originals or photos); note who was present at the meeting | Jonathan | this week |
+| 1 | Done: Von's tax papers located (Tab 14). Still needed: certified Treasurer ledger for the Barangay 1 declarations, 1993 to 2019, to reconcile his 1998 clearances with the 2019 statement and the 2025 letter | Jonathan | with the 26 Oct request |
 | 2 | Export the Messenger thread with Mr. Bacolor about Von, unedited, with dates (HELD; for our file only) | Jonathan | this week |
 | 3 | Rescan the CORR-007 original at full resolution (all pages), and check whether CORR-015 is a separate letter | Kristyle | this week |
 | 4 | Certified ARP GR-2014-HH-07-001-00246 **with its supporting papers**: the letter request, sketch plan, demand letter and SPA submitted on 28 April 2016 (add to the 26 Oct Assessor request already planned) | Jonathan | 26 Oct |

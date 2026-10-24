@@ -19,6 +19,6 @@ Defense witness, sponsor of Def. Exh. 5 (the receipts) and the only witness to t
 
 2. On 28 April 2016, five months before the deed, the Assessor split off exactly 2,587 sq m "PER LETTER REQUEST, SKETCH PLAN, COPY OF DEMAND LETTER AND SPA ALL SUBMITTED," with back taxes paid under ORs 0033799 to 0033800. The lot remained declared in the heirs' name. (ARP GR-2014-HH-07-001-00246.)
 
-3. The Treasurer's statement of 31 July 2019 for the heirs' remaining land on the same mother lot (PIN 025-07-001-01-004) shows every year from 1994 to 2019 unpaid: ₱794,154.73. S24 to S25 say the collections went to pay the amilyar.
+3. The tax papers he handed you on 11 Oct 2025 (Tab 14) are Treasurer's certifications from 1991 to 1998. One was issued in 1993 "upon request of MR. SALVADOR DELA FUENTE." They show the administration paid back taxes in 1992 to 1998, which supports S24 to S25 for the 1990s. **But they stop in November 1998.** The Balane payments in Exh. 5 run from October 2003 to February 2017. Nothing he produced shows a peso of tax paid from them.
 
 **One warning.** His letter says, "Jonathan you branded me as a BAD GUY you know I never admit it." He has already denied in writing the admission described in the 14 July 2025 email to counsel. Do not build on any oral statement from the Bacolor-office meeting (Part 4).
