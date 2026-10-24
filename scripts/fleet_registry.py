@@ -10,6 +10,8 @@ but uncatalogued is surfaced (state/note), never hidden.
   python3 scripts/fleet_registry.py --sync     # reconcile ground truth -> agent_registry (run on VPS)
   python3 scripts/fleet_registry.py --health    # is each registered agent's heartbeat fresh?
   python3 scripts/fleet_registry.py --report     # the roster, grouped by tier x owner
+  # After --sync on VPS, also: python3 scripts/cos_bridge.py --sync --pulse
+  # (grok_bot + claude_subagent seats + A76 fleet_change ledger; cos_bridge owns those layers)
 """
 from __future__ import annotations
 import os
@@ -21,7 +23,8 @@ from datetime import datetime, timezone
 import psycopg2
 import psycopg2.extras
 
-DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+from _pgdsn import dsn as _pgdsn  # noqa: E402
+DSN = _pgdsn("172.18.0.3:5432")
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 

@@ -183,3 +183,11 @@ notifications/
 # nightly drip outputs (regenerated; the per-client boards live in the corpus)
 case_work/DRIP_BOARD.md
 case_work/DRIP_BOARDS/
+case_work/MWK-001/GIS_2026-10/scans/
+
+# runtime logs / caches (24 Oct 2026)
+ops/drip/*.launchd.err
+ops/drip/*.launchd.out
+ops/drip/launchd.err
+ops/drip/launchd.out
+ops/sp2680_ocr_cache/

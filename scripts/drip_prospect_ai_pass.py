@@ -28,7 +28,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "scripts"))
 from drip_board import load_priorities  # noqa: E402
 
-DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@127.0.0.1:15432/n8n")
+from _pgdsn import dsn as _pgdsn  # noqa: E402
+DSN = _pgdsn("127.0.0.1:15432")
 OLLAMA = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 CHUNK = 6000
 MAX_CHUNKS = 2
@@ -94,6 +95,12 @@ def main():
     weights = {k: v.get("weight", 5) for k, v in load_priorities().get("matters", {}).items()}
     where = ["(d.case_file LIKE 'MWK%%' OR d.matter_code LIKE 'MWK%%')", "length(coalesce(d.extracted_text,'')) >= 200",
              "coalesce(d.ingest_source,'') <> 'strategy_desk'",
+             # court papers and our own drafts: their "asks" are ours or counsel's (triage R2b, 23 Oct 2026)
+             # our own papers: our letters signed as attorney-in-fact, playbooks, dossiers (triage R2c)
+             "coalesce(d.document_title, d.original_filename, '') !~* '^(zschoche_|mwk[-_]|master_|complete_)|playbook|dossier|tracker|steering|work.?product|briefing|red.?team|directive|binder|hearing.?card|strategy'",
+             "NOT (coalesce(d.document_title,'') !~* '^email' AND coalesce(d.extracted_text,'') ~* 'attorney-in-fact (for|of) patricia keesey zschoche' AND coalesce(d.extracted_text,'') !~* 'dear (mr\\.?|sir|mister) (jonathan |paul )*zschoche')",
+             "coalesce(d.doc_role,'') NOT IN ('pleading','order_resolution','prime_evidence')",
+             "coalesce(d.document_title, d.original_filename, '') !~* '(draft|complaint|exhibit|affidavit|petition|motion|manifestation|rejoinder|pleading)'",
              # our own outgoing e-mails: the model would read our asks as the office's demands
              "NOT (coalesce(d.document_title,'') ILIKE 'EMAIL%%' AND left(d.extracted_text, 400) ~* 'From: [^\\n]*(zschoche|hayuma)')",
              "NOT EXISTS (SELECT 1 FROM drip_prospect_scan s WHERE s.doc_id = d.id AND s.error IS NULL)"]
@@ -150,6 +157,9 @@ def main():
         print(f"[{n}/{len(docs)}] doc {d['id']} {d['title'][:60]!r}: {found} found, {kept} kept"
               + (f" ERROR {err}" if err else "") + f" ({time.time() - t0:.0f}s)", flush=True)
     print(f"done: {tot_kept} prospect(s) kept from {len(docs)} document(s)")
+    if not a.dry_run:   # route what we just added (already handled / counsel / our own papers)
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(REPO, "scripts", "drip_prospect_triage.py")])
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ Idempotent via an email_bridge_state cursor (first run anchors at current max â€
 import base64
 import json
 import os
+import re
 import sys
 import urllib.request
 from email.mime.text import MIMEText
@@ -30,9 +31,65 @@ try:  # outward-action chokepoint (deploy_717)
 except Exception:
     outward_guard = None
 
-DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+from _pgdsn import dsn as _pgdsn  # noqa: E402
+DSN = _pgdsn("172.18.0.3:5432")
 ADAPTER = os.environ.get("CHANNEL_EMAIL_URL", "http://localhost:8765/api/channel/email")
-JONATHAN_ADDRS = ("jonzschoche@gmail.com", "jonathan@hayuma.org")
+JONATHAN_ADDRS = ("jonzschoche@gmail.com", "jonathan@hayuma.org", "jonpeezee@hotmail.com")
+
+# Who may reach Leo's client channel (Jonathan, 24 Oct 2026, after 203 bot replies were found queued to offices, a law
+# firm and his own mail): only real client / prospect senders. from_addr is stored with the display name
+# ("Jonathan Zschoche <jonzschoche@gmail.com>"), so the address is parsed out before any comparison â€” the old exact-string
+# NOT IN never matched, and 94 of the 203 replies were addressed to Jonathan himself.
+ADDR_RX = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+GOV_RX = re.compile(r"(?i)(\.gov(\.[a-z]{2})?$|\.gov\.ph$|judiciary|\.mil(\.ph)?$)")
+OFFICE_LOCAL_RX = re.compile(r"(?i)dilg|mlgoo|lgu|municipal|munisipyo|province|provincial|pgo|brgy|barangay|sanggunian|"
+                             r"treasur|assessor|denr|penro|cenro|mgb|emb|coa|region\d|records|mayor|governor|registry|"
+                             r"deeds|landbank|lbp|ombudsman|arta|csc|blgf")
+LAW_RX = re.compile(r"(?i)\blaw\b|law ?office|law ?firm|lawyers?|& ?associates|\batty\b|attorneys?|legal")
+AUTO_RX = re.compile(r"(?i)^(no-?reply|do-?not-?reply|donotreply|mailer-daemon|postmaster|notifications?|newsletter|"
+                     r"alerts?|info|hello|news|marketing|support|billing|vms-no-reply)@")
+
+
+def sender_address(from_addr):
+    """The bare e-mail address inside a From header ("Name <addr>" or "addr"), lower-cased; None if there is none."""
+    m = ADDR_RX.search(from_addr or "")
+    return m.group(0).lower() if m else None
+
+
+def office_addresses(cur):
+    """Addresses that must never reach Leo: every address the drip has written to or heard from (ladder offices), and
+    every person Jonathan has himself written to from his own accounts (family, heirs, partners, counsel, officials on
+    private mailboxes): they are in a conversation with him, not cold prospects. Registered client contacts
+    (channel_users with a mapped client) are let back in."""
+    cur.execute("SELECT detail::text AS t FROM drip_event")
+    found = {a.lower() for r in cur.fetchall() for a in ADDR_RX.findall(r["t"] or "")}
+    cur.execute("""SELECT coalesce(to_addrs::text,'') || ' ' || coalesce(cc_addrs::text,'') AS t FROM gmail_messages
+                    WHERE from_addr ~* 'jonzschoche|hayuma\\.org|jonpeezee'""")
+    found |= {a.lower() for r in cur.fetchall() for a in ADDR_RX.findall(r["t"] or "")}
+    cur.execute("""SELECT channel_user_id FROM channel_users WHERE mapped_client_code IS NOT NULL AND authorized""")
+    clients = {sender_address(r["channel_user_id"]) for r in cur.fetchall()} - {None}
+    return found - set(JONATHAN_ADDRS) - clients
+
+
+def route_decision(from_addr, office_addrs=frozenset()):
+    """(route?, reason). Only real client/prospect senders route; never us, offices, law firms or automated mail."""
+    addr = sender_address(from_addr)
+    if not addr:
+        return False, "no address"
+    local, _, domain = addr.partition("@")
+    if addr in JONATHAN_ADDRS:
+        return False, "our own mail"
+    if GOV_RX.search(domain):
+        return False, "government domain"
+    if addr in office_addrs:
+        return False, "drip-ladder office or existing correspondent"
+    if OFFICE_LOCAL_RX.search(local) or OFFICE_LOCAL_RX.search(domain.split(".")[0]):
+        return False, "office mailbox"
+    if LAW_RX.search(from_addr or "") or "law" in domain:
+        return False, "law firm"
+    if AUTO_RX.search(addr):
+        return False, "automated sender"
+    return True, "client/prospect"
 
 
 def _conn():
@@ -53,13 +110,17 @@ def inbound():
     cur.execute("""SELECT id, message_id, from_addr, subject, left(coalesce(body_plain,''),4000) AS body
                      FROM gmail_messages
                     WHERE id > %s AND coalesce(body_plain,'') <> ''
-                      AND lower(coalesce(from_addr,'')) NOT IN %s
-                    ORDER BY id ASC LIMIT 100""",
-                (cursor, tuple(a.lower() for a in JONATHAN_ADDRS)))
+                    ORDER BY id ASC LIMIT 100""", (cursor,))
     rows = cur.fetchall()
+    offices = office_addresses(cur)
     sent = maxid = 0
+    skipped = {}
     for r in rows:
         maxid = max(maxid, r["id"])
+        ok, why = route_decision(r["from_addr"], offices)
+        if not ok:
+            skipped[why] = skipped.get(why, 0) + 1
+            continue
         payload = {"from": r["from_addr"], "subject": r["subject"] or "",
                    "body": r["body"], "message_id": r["message_id"] or ""}
         try:
@@ -71,7 +132,8 @@ def inbound():
             print(f"  ! {r['from_addr']}: {str(e)[:80]}")
     if maxid:
         cur.execute("UPDATE email_bridge_state SET last_gmail_id=%s, updated_at=now() WHERE id=1", (maxid,))
-    print(f"[email_bridge] inbound: routed {sent}/{len(rows)} new client emails to the channel adapter; cursor->{maxid or cursor}")
+    print(f"[email_bridge] inbound: routed {sent}/{len(rows)} new client emails to the channel adapter; skipped {skipped}; "
+          f"cursor->{maxid or cursor}")
     cur.close(); c.close()
 
 
@@ -90,7 +152,13 @@ def send():
                     WHERE direction='outbound' AND status='pending_gmail_send'
                     ORDER BY id ASC LIMIT 50""")
     rows = cur.fetchall(); done = 0
+    offices = office_addresses(cur)
     for r in rows:
+        ok, why = route_decision(r["channel_user_id"], offices)
+        if not ok:   # same rule as inbound: never a reply to us, an office, a law firm or an automated sender
+            cur.execute("UPDATE channel_messages SET status='held_not_client', metadata=coalesce(metadata,'{}'::jsonb)"
+                        " || jsonb_build_object('held_reason', %s) WHERE id=%s", (why, r["id"]))
+            continue
         try:
             meta = r["metadata"] or {}
             mime = MIMEText(r["text_content"] or "")

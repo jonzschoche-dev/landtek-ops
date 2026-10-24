@@ -32,8 +32,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "scripts"))
 from drip_board import load_priorities  # noqa: E402
 
-DSN = os.environ.get("PG_DSN") or ("postgresql://n8n:n8npassword@172.18.0.3:5432/n8n" if os.path.isdir("/root/landtek")
-                                   else "postgresql://n8n:n8npassword@127.0.0.1:15432/n8n")
+from _pgdsn import dsn as _pgdsn  # noqa: E402
+DSN = _pgdsn("172.18.0.3:5432" if os.path.isdir("/root/landtek") else "127.0.0.1:15432")
 CLIENT = "MWK-001"
 NOT_MWK = re.compile(r"(?i)paracale|nibdc|inocalla|landtek-corp|capacuan|gracesen|vito.cruz|\.bak|archive/")
 TO_OBTAIN = re.compile(r"(?i)\bto[- ]obtain\b")

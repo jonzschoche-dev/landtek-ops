@@ -49,7 +49,8 @@ from datetime import datetime, timezone
 import psycopg2
 import psycopg2.extras
 
-DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
+from _pgdsn import dsn as _pgdsn  # noqa: E402
+DSN = _pgdsn("172.18.0.3:5432")
 ENV_PATH = "/root/landtek/.env"
 OAUTH_CLIENT_PATH = "/root/landtek/gmail_oauth_client.json"
 TZ = "Asia/Manila"
@@ -427,6 +428,13 @@ DEADLINE_SOURCES = [
      "affected_matter_codes", "array", ""),
     ("drip_edition", "next_edition_due", "COALESCE('Obligation drip: '||instrument_ref, 'Drip edition')",
      "matter_code", "scalar", "COALESCE(state,'') NOT IN ('closed','done','lapsed')"),
+    # THE DRIP's live obligation clocks (agent_specs/005): a clock's due_at is set only once the
+    # operator records proof of service, so this surfaces RUNNING clocks — the office owes an act
+    # by due_at. The pulse then fires consequence-prep at T-14 and the brief nudges before it lapses.
+    # Terminal/held states are excluded (a withdrawn/performed/lapsed clock never re-surfaces).
+    ("office_obligation", "due_at", "COALESCE(office||' — '||obligation, obligation, office, 'Obligation clock')",
+     "matter_code", "scalar",
+     "COALESCE(state,'') NOT IN ('withdrawn','performed','closed','done','lapsed','cancelled','draft_held')"),
 ]
 
 
