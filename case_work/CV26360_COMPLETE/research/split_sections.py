@@ -64,6 +64,7 @@ DOCS = [
  ("49_TSN_REQUEST_14OCT", "Request to the branch for the transcript (and any recording) of the 14 Oct 2026 hearing, with the checklist for checking it (draft, not sent)", os.path.join(ROOT, "TSN_REQUEST_2026-10", "TSN_REQUEST_14OCT_and_CHECKLIST.html"), "html"),
  ("50_FEED_NOTE_7_SUBPOENA_LIST", "Note 7 to counsel: the records we want subpoenaed, tiered to his timing (before we rest only if certified copies fail; rebuttal; Salvador at his cross) (draft, not sent)", os.path.join(ROOT, "BARANDON_FEED", "07_SUBPOENA_LIST_2026-10-21.html"), "html"),
  ("51_KING_EVIDENCE_PACK_BRIEF", "Evidence pack for Donata King (Exh. L), 4 Nov 2026: counsel brief (her day, cross answers, re-direct, don't-says, tab index); the bound 102-page pack is KING_PACK_2026-11-04/KING_EVIDENCE_PACK_2026-11-04.pdf", os.path.join(ROOT, "KING_PACK_2026-11-04", "00_BRIEF.html"), "html"),
+ ("52_DELOSREYES_EVIDENCE_PACK_BRIEF", "Evidence pack for Francia Abad de los Reyes (Exh. M), likely 11 Nov 2026: call-or-not decision, cross answers, briefing questions, don't-says, tab index; bound pack DELOSREYES_PACK_2026-11/DELOSREYES_EVIDENCE_PACK_2026-11.pdf", os.path.join(ROOT, "DELOSREYES_PACK_2026-11", "00_BRIEF.html"), "html"),
  ("34_GROK_REVIEW_ROUNDS", "[Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md)", os.path.join(CF, "09_REVIEW", "GROK_INDEX.md"), "md"),
 ]
 

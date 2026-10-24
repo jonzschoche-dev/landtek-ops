@@ -105,6 +105,8 @@ Internal only. Grok logs Claude deploys here so the desks stay in sync. Do not t
 
 | 2026-10-24 13:00 | KING_PACK_2026-11-04/00_BRIEF.html section 3 expanded; pack rebuilt (104 pp) | CV26360 | Briefing questions for counsel to ask King: A (no surprises on cross: Ferrer house location, Nieves de Leon link to Shirley, source of the Bicol Post, contact with plaintiff's side, relationship with the Balanes, status of CC 8563 / any reply / any SC petition); B (facts we lack: the survey and blotter, occupancy year by year, rentals and rates, rent before 2016 first-hand, the 11 Feb 2020 lawyer's letter and signer, papers shown in 2020, when she last saw Gloria in Mercedes); C (papers to bring: ID, received 8563 Answer, barangay certifications, Ferrer kasunduan, 2020 photos/video, letters from the Balane side). Direct stays within her affidavit | — |
 
+| 2026-10-24 14:30 | CV26360_COMPLETE/DELOSREYES_PACK_2026-11/ (00_BRIEF.html; 54-pp pack + email copy); research/build_delosreyes_pack.py; SECTIONS/52_ | CV26360 | De los Reyes (Exh. M) pack: call-or-not decision up front (if not called, JA Rule s.10(b): her affidavit is not considered, so Q2-3/Q4 clause/Q7/Q8/Q9 never reach the court); if called, direct limited to Q1, Q4 fish-drying, Q5, Q6, Q7 first sentence. New exposure found: Juntilla's 2020 robbery/grave-threats complaint named 'Francia de Villa' (PPO joint resolution); 8563 caption 'Francia Delos Santos'; her 2020 affidavit says married, 2021 and 2026 say single. 10 tabs incl. her 2020 affidavit (KJA pp.40-44) and 2021 8563 JA (pp.70-76) as prior statements | — |
+
 ## Grok hunt log (daily, weekdays)
 
 | Run (Asia/Manila) | Window searched | New/changed Claude files | Matter | Grok action |
