@@ -8,7 +8,18 @@ Compared:
 
 against `map_parcels` (73 MWK shapes).
 
-## A. Certified copy in the corpus, NOT mapped yet → can be plotted now
+## Update, same day
+- **T-30618 (Lot 2-G) is now plotted.**
+  - Course 8-9 is printed as 32.85. The adjoining Lot 2-F title T-11795 prints the same shared line as 52.85, and that value closes the ring to 0.04 m and gives the exact area.
+  - Lot 2-G fills the gap between Lots 2-A/B/C/D/E/F with no overlap.
+- **T-11752 is Lot 2-U (Bernal), and T-11753 is Lot 2-V (Sison, not "2-Y").**
+  - Each was read from its own scan; the courses close and land on the plan lot to within 4 cm.
+  - The title numbers are now linked to those lots, along with T-13343 (Lot 2-J) and T-11750 (Lot 2-T).
+- **T-24163 is Lot 2-X-1-A, owned by the Spouses Cruz.** It was carved out of the heirs' Lot 2-X-1 and fronts the provincial road.
+  - It is HELD because the scan is too faint to read the digits; it needs a fresh LRA e-copy.
+  - It is also a sale out of the heirs' land that is not in the sales tables. The seller and the date (about 1988) need the e-copy.
+
+## A. Certified copy in the corpus, NOT mapped yet → can be plotted now (as first found; see update)
 | Title | Lot | Doc | Note |
 |---|---|---|---|
 | **T-30618** | **2-G** (Psd-221861), 4,148 sqm per OCR | 111 | Jose Pascual Jr. Lot 2-G is the one 1975 lot missing from the map. Its bounds name Lots 2-A, 2-C and 2-D. The CDF table gives 3,328 sqm (1978 deed): check against the TD. |
