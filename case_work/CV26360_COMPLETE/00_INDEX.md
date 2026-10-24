@@ -1,6 +1,6 @@
 # Civil Case No. 26-360 (Zschoche v. Balane): index of the working documents
 
-Generated 2026-10-21 by `research/split_sections.py`. Every working document is split into one
+Generated 2026-10-24 by `research/split_sections.py`. Every working document is split into one
 Markdown file per section under `SECTIONS/`, so each piece of work can be found on its own. The sources (HTML/MD/PDF)
 remain where they were; edit a source and re-run the script. Nothing here is filed; counsel signs and files.
 
@@ -57,6 +57,7 @@ remain where they were; edit a source and re-run the script. Nothing here is fil
 | [48_STRATEGY_CADENCE_TRAJECTORY_21OCT](SECTIONS/48_STRATEGY_CADENCE_TRAJECTORY_21OCT/README.md) | Strategy, cadence and trajectory as of 21 Oct 2026 (after counsel's reply): strategy in one page, dated cadence to judgment, the records-timing decision, their trajectory, open decisions | 6 sections | `STRATEGY_CADENCE_TRAJECTORY_2026-10-21.html` |
 | [49_TSN_REQUEST_14OCT](SECTIONS/49_TSN_REQUEST_14OCT/README.md) | Request to the branch for the transcript (and any recording) of the 14 Oct 2026 hearing, with the checklist for checking it (draft, not sent) | 2 sections | `TSN_REQUEST_2026-10/TSN_REQUEST_14OCT_and_CHECKLIST.html` |
 | [50_FEED_NOTE_7_SUBPOENA_LIST](SECTIONS/50_FEED_NOTE_7_SUBPOENA_LIST/README.md) | Note 7 to counsel: the records we want subpoenaed, tiered to his timing (before we rest only if certified copies fail; rebuttal; Salvador at his cross) (draft, not sent) | 6 sections | `BARANDON_FEED/07_SUBPOENA_LIST_2026-10-21.html` |
+| [51_KING_EVIDENCE_PACK_BRIEF](SECTIONS/51_KING_EVIDENCE_PACK_BRIEF/README.md) | Evidence pack for Donata King (Exh. L), 4 Nov 2026: counsel brief (her day, cross answers, re-direct, don't-says, tab index); the bound 102-page pack is KING_PACK_2026-11-04/KING_EVIDENCE_PACK_2026-11-04.pdf | 5 sections | `KING_PACK_2026-11-04/00_BRIEF.html` |
 | [34_GROK_REVIEW_ROUNDS](SECTIONS/34_GROK_REVIEW_ROUNDS/README.md) | [Grok desk] Review rounds T1-T6 and our Phase 1-3 responses (folder; see its GROK_INDEX.md) | 4 sections | `CASE_FILE/09_REVIEW/GROK_INDEX.md` |
 
 ## Data and builders
