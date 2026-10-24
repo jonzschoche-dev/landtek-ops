@@ -103,6 +103,8 @@ Internal only. Grok logs Claude deploys here so the desks stay in sync. Do not t
 
 | 2026-10-24 12:30 | KING_PACK_2026-11-04/00_BRIEF.html (new section 3) + rebuilt pack (103 pp) and email copy; BARANDON_FEED Note 5 (fourth briefing point); Note 7 (barangay row) | CV26360 | Jonathan recalls a survey of the Balane lot that went to the barangay and a blotter; no record found in the King files, corpus or live Drive (three Drive hits were Inocalla matter, left out). Question added for counsel to ask King in the briefing (when, who directed, reported by whom, certification); barangay subpoena item now includes any survey entry. Link: plan PSD-E2020005406 surveyed 8 Sep 2020 'with the full knowledge and consent of the owner(s)' | — |
 
+| 2026-10-24 13:00 | KING_PACK_2026-11-04/00_BRIEF.html section 3 expanded; pack rebuilt (104 pp) | CV26360 | Briefing questions for counsel to ask King: A (no surprises on cross: Ferrer house location, Nieves de Leon link to Shirley, source of the Bicol Post, contact with plaintiff's side, relationship with the Balanes, status of CC 8563 / any reply / any SC petition); B (facts we lack: the survey and blotter, occupancy year by year, rentals and rates, rent before 2016 first-hand, the 11 Feb 2020 lawyer's letter and signer, papers shown in 2020, when she last saw Gloria in Mercedes); C (papers to bring: ID, received 8563 Answer, barangay certifications, Ferrer kasunduan, 2020 photos/video, letters from the Balane side). Direct stays within her affidavit | — |
+
 ## Grok hunt log (daily, weekdays)
 
 | Run (Asia/Manila) | Window searched | New/changed Claude files | Matter | Grok action |
