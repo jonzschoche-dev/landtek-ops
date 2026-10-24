@@ -35,7 +35,7 @@ function paintBG(W,H){bg.width=W;bg.height=H;const c=bg.getContext('2d');
   c.fillStyle='#111';c.textAlign='left';c.font=`700 ${20*s}px -apple-system,Inter,sans-serif`;c.fillText(k[0],x+46*s,y+36*s);
   c.fillStyle='#555';c.font=`500 ${15*s}px -apple-system,Inter,sans-serif`;c.fillText(k[1],x+46*s,y+62*s);});
  c.textAlign='left';c.fillStyle='rgba(255,255,255,.9)';c.font=`500 ${16*s}px ui-monospace,Menlo,monospace`;
- ['> Go · Edit · Hold','> 15 working days · RA 6713 §5(a)','> cc: krstylepalma@gmail.com'].forEach((t,i)=>c.fillText(t,W*.07,H*.72+i*26*s));
+ ['> Go · Edit · Hold','> 15 working days · RA 6713 §5(a)','> cc: krstylpalma@gmail.com'].forEach((t,i)=>c.fillText(t,W*.07,H*.72+i*26*s));
 }
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
 const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
