@@ -75,7 +75,7 @@ def _ollama_ocr(png_b64: str, timeout: int = 300) -> str:
         body = e.read().decode("utf-8", "replace")[:200]
         if e.code == 404:  # model not pulled
             raise LocalTierDown(f"model {MODEL} not found on {OLLAMA_URL} (ollama pull {MODEL}?): {body}")
-        raise
+        raise RuntimeError(f"Ollama HTTP {e.code}: {body}")
     except (TimeoutError, urllib.error.URLError, OSError) as e:
         raise LocalTierDown(f"{OLLAMA_URL} unreachable: {type(e).__name__}: {str(e)[:120]}")
     return out.get("response", "")

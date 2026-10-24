@@ -86,6 +86,9 @@ def run(max_docs=6, docs=None, strip_only=False, matter="MWK-001", rpm=8,
                     print(f"[geometry] {backend} tier unavailable ({str(e)[:80]}) — stopping "
                           f"cleanly at doc {doc_id}; remaining docs drain on the next run.", flush=True)
                     break
+                except Exception as e:  # one bad page (e.g. Ollama HTTP 500) must not kill the whole run (24 Oct 2026)
+                    print(f"  doc {doc_id} ({title_no}): re-OCR failed, skipped: {type(e).__name__}: {str(e)[:160]}", flush=True)
+                    continue
                 if r.get("error"):
                     print(f"  doc {doc_id} ({title_no}): re-OCR error: {r['error']}", flush=True)
                 else:
