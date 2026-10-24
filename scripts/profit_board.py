@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""profit_board.py — the magnate engine's MONEY board (deploy_1111).
+"""profit_board.py — the magnate engine's MONEY board (deploy_1264/1265).
 
-Ranks client property fronts by expected pesos (recurring income + readiness/tier-
-discounted capital), not by readiness urgency alone. Reads v_profit_frontboard, which
-is layered over the running readiness engine (profitability_prep_cycle.py) and uses only
-figures already on property_assets — it fabricates no numbers; assets with no value show
-as VALUE UNKNOWN.
+Ranks fronts by EXPECTED NEAR-TERM CASH (~next 24 months), not readiness urgency:
+  near_term_cash = annual_income*2  +  one_time_cash
+  one_time_cash  = est_value * readiness * tier_factor   (ONLY cash-event fronts: judgment/sale)
+Held/recover land that isn't being sold contributes 0 near-term cash (honest); its est_value is
+shown as the long-run backdrop and used as the tiebreak. Reads v_profit_frontboard, which UNIONs
+property_assets (via the readiness engine) with money_fronts (judgment/collection money the property
+engine can't model). Uses only figures already in the DB — fabricates nothing.
 
-  python3 profit_board.py                 # ranked money board + value-unknown + gaps
+  python3 profit_board.py                 # Keesey-first money board + value-unknown + backdrop
   python3 profit_board.py --client MWK-001
+  python3 profit_board.py --all           # every client
   python3 profit_board.py --limit 20
 """
 from __future__ import annotations
@@ -19,9 +22,7 @@ DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n
 
 
 def _peso(n):
-    if n is None:
-        return "—"
-    return f"₱{float(n):,.0f}"
+    return "—" if n is None else f"₱{float(n):,.0f}"
 
 
 def main():
@@ -29,54 +30,58 @@ def main():
     def val(f):
         return args[args.index(f) + 1] if f in args and args.index(f) + 1 < len(args) else None
     client = val("--client")
-    limit = int(val("--limit") or 15)
+    show_all = "--all" in args
+    limit = int(val("--limit") or 20)
 
     c = psycopg2.connect(DSN); c.autocommit = True
     cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    where = "WHERE money_score IS NOT NULL"
-    params = []
+    cond, params = [], []
     if client:
-        where += " AND client_code = %s"
-        params.append(client)
+        cond.append("client_code = %s"); params.append(client)
+    where = ("WHERE " + " AND ".join(cond)) if cond else ""
+
+    # 1) ranked by near-term cash
     cur.execute(f"""SELECT * FROM v_profit_frontboard {where}
-                    ORDER BY money_score DESC NULLS LAST LIMIT %s""", (*params, limit))
-    ranked = cur.fetchall()
+                    {'AND' if where else 'WHERE'} near_term_cash IS NOT NULL AND near_term_cash > 0
+                    ORDER BY near_term_cash DESC LIMIT %s""", (*params, limit))
+    cash = cur.fetchall()
 
-    print("=" * 96)
-    print("MONEY BOARD — fronts ranked by expected pesos  (money_score = annual income + 8%/yr × realizable capital)")
-    print("=" * 96)
-    print(f"  {'#':>2}  {'money/yr':>13}  {'tier':<12} {'income/mo':>11}  {'est_value':>13}  {'rdy':>4}  asset")
-    print("  " + "-" * 92)
-    for i, r in enumerate(ranked, 1):
-        print(f"  {i:>2}  {_peso(r['money_score']):>13}  {(r['tier'] or '-'):<12} "
-              f"{_peso(r['est_income_monthly']):>11}  {_peso(r['est_value']):>13}  "
-              f"{(r['readiness'] or 0):>4}  {r['asset_code']}")
-        print(f"      └ {(r['label'] or '')[:60]}  [{r['client_code']}]")
-        if r.get("next_prep_action"):
-            print(f"        gating ({r['weakest_axis']}): {r['next_prep_action'][:72]}")
+    scope = client or ("all clients" if show_all else "all clients")
+    print("=" * 98)
+    print(f"MONEY BOARD — fronts by EXPECTED NEAR-TERM CASH (~24 mo)   scope: {scope}")
+    print("  near_term_cash = 2×annual income + one-time cash (judgment/sale × readiness × tier)")
+    print("=" * 98)
+    print(f"  {'#':>2}  {'near-term₱':>13}  {'src':<5} {'tier':<12} {'rdy':>4}  {'est_value':>13}  front")
+    print("  " + "-" * 94)
+    for i, r in enumerate(cash, 1):
+        print(f"  {i:>2}  {_peso(r['near_term_cash']):>13}  {r['source'][:5]:<5} {(r['tier'] or '-'):<12} "
+              f"{(r['readiness'] or 0):>4}  {_peso(r['est_value']):>13}  {r['front_code']}")
+        print(f"      └ {(r['label'] or '')[:62]}  [{r['client_code']}]")
+        if r.get("next_step"):
+            print(f"        next: {r['next_step'][:80]}")
 
-    # VALUE UNKNOWN — honest separation, not zero-ranked
-    uw = "WHERE money_score IS NULL"
-    up = []
-    if client:
-        uw += " AND client_code = %s"; up.append(client)
+    # 2) long-run backdrop: value held but no near-term cash (recover/hold)
+    cur.execute(f"""SELECT front_code, client_code, tier, est_value, readiness, next_step, label
+                    FROM v_profit_frontboard {where}
+                    {'AND' if where else 'WHERE'} COALESCE(near_term_cash,0)=0 AND est_value IS NOT NULL AND est_value>0
+                    ORDER BY est_value DESC LIMIT 8""", params)
+    hold = cur.fetchall()
+    if hold:
+        print("\n  " + "-" * 94)
+        print("  LONG-RUN VALUE (held/recover — real value, no near-term cash until recovered/sold):")
+        for r in hold:
+            print(f"    {_peso(r['est_value']):>13}  {(r['tier'] or '-'):<12} {r['front_code']:<18} "
+                  f"{(r['label'] or '')[:40]}  [{r['client_code']}]")
+
+    # 3) value unknown
     cur.execute(f"""SELECT count(*) AS n, count(*) FILTER (WHERE needs_valuation) AS needs
-                    FROM v_profit_frontboard {uw}""", up)
+                    FROM v_profit_frontboard {where}
+                    {'AND' if where else 'WHERE'} near_term_cash IS NULL""", params)
     u = cur.fetchone()
-    print("\n  " + "-" * 92)
-    print(f"  VALUE UNKNOWN: {u['n']} fronts carry no est_value/income "
-          f"({u['needs']} flagged needs_valuation) — invisible to the money ranking until valued.")
-
-    # The gap the magnate must see: money-judgment fronts the asset engine can't model
-    print("\n" + "=" * 96)
-    print("NOT ON THIS BOARD (money the asset engine cannot see — collection/judgment fronts):")
-    print("  • CV6839 CARP just-compensation (RTC Br40, Land Bank payor) — the guaranteed near-term cash,")
-    print("    modeled as a court matter, not a property_asset → it never enters this ranking.")
-    print("  • Expense reimbursement recovery (advances logged) + LGU expenditure claims.")
-    print("  Next step: model collection/judgment fronts as first-class, valued fronts so they rank here too.")
-    print("=" * 96)
-
+    print("\n  VALUE UNKNOWN: "
+          f"{u['n']} fronts carry no value/income ({u['needs']} need valuation) — not yet rankable.")
+    print("=" * 98)
     cur.close(); c.close()
 
 
