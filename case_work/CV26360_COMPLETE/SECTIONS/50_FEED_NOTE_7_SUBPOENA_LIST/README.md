@@ -1,5 +1,5 @@
 # Note 7 to counsel: the records we want subpoenaed, tiered to his timing (before we rest only if certified copies fail; rebuttal; Salvador at his cross) (draft, not sent)
-Source: `BARANDON_FEED/07_SUBPOENA_LIST_2026-10-21.html` (modified 2026-10-21). One file per section:
+Source: `BARANDON_FEED/07_SUBPOENA_LIST_2026-10-21.html` (modified 2026-10-24). One file per section:
 
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [The list](01_The_list.md)

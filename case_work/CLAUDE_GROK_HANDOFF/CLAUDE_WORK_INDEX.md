@@ -101,6 +101,8 @@ Internal only. Grok logs Claude deploys here so the desks stay in sync. Do not t
 
 | 2026-10-24 11:30 | CV26360_COMPLETE/KING_PACK_2026-11-04/ (00_BRIEF.html; KING_EVIDENCE_PACK_2026-11-04.pdf 102 pp + _email.pdf 14 MB); research/build_king_pack.py; SECTIONS/51_ | CV26360 | King evidence pack for 4 Nov, for counsel: brief (one thing on direct; name fix and Q9 withdrawal; cross answers; three re-direct questions only if cross opens her cases; don'ts) + 14 tabs (Exh L, Q, C; Ferrer 2015; her CC 8563 Answer with the 9 Jul 2021 Aquino stamp; Bicol Post annexes without the 9 Oct notice page (HELD category) and Exh G-1 for the text; PPO 28 Jul and 16 Sep 2020 with RR receipts; 20-6030 warrant and 6 Jan 2021 order; blotter certifications; her 10 Nov 2020 complaint-affidavit; perjury MTC/RTC/CA; Answer Annex 1, p.9, p.13). Every page stamped with tab and source page | — |
 
+| 2026-10-24 12:30 | KING_PACK_2026-11-04/00_BRIEF.html (new section 3) + rebuilt pack (103 pp) and email copy; BARANDON_FEED Note 5 (fourth briefing point); Note 7 (barangay row) | CV26360 | Jonathan recalls a survey of the Balane lot that went to the barangay and a blotter; no record found in the King files, corpus or live Drive (three Drive hits were Inocalla matter, left out). Question added for counsel to ask King in the briefing (when, who directed, reported by whom, certification); barangay subpoena item now includes any survey entry. Link: plan PSD-E2020005406 surveyed 8 Sep 2020 'with the full knowledge and consent of the owner(s)' | — |
+
 ## Grok hunt log (daily, weekdays)
 
 | Run (Asia/Manila) | Window searched | New/changed Claude files | Matter | Grok action |

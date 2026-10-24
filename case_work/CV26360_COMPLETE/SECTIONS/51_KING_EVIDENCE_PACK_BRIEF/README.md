@@ -4,5 +4,6 @@ Source: `KING_PACK_2026-11-04/00_BRIEF.html` (modified 2026-10-24). One file per
 - [Preamble and summary](00_Preamble_and_summary.md)
 - [1. Cross she will face, and the honest answer](01_1_Cross_she_will_face_and_the_honest_answer.md)
 - [2. Re-direct, only if cross opened her cases](02_2_Re_direct_only_if_cross_opened_her_cases.md)
-- [3. Don't-says](03_3_Don_t_says.md)
-- [4. The tabs](04_4_The_tabs.md)
+- [3. One question for counsel to ask her in the briefing](03_3_One_question_for_counsel_to_ask_her_in_the_briefing.md)
+- [4. Don't-says](04_4_Don_t_says.md)
+- [5. The tabs](05_5_The_tabs.md)
