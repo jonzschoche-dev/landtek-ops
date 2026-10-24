@@ -1,0 +1,9 @@
+#!/bin/bash
+# Live role test + output for Ping Pong Drip. Run from Terminal: bash ~/landtek/ops/drip/claude_roletest.sh
+DRIP="$HOME/Library/CloudStorage/GoogleDrive-jonathan@hayuma.org/My Drive/LANDTEK /Drip"
+cd "$HOME/landtek" || exit 1
+PROMPT="You are Claude in LandTek's Ping Pong Drip. Read $DRIP/DRIP_THREAD.md in full (the Grok and Legal entries), $DRIP/to-claude/DRIP_DESIGN_PROPOSAL_2026-10-19.md, and MASTER_PLAN.md sections 0.11 and 0.12.
+TASK 1 (role test): Append ONE entry to the end of DRIP_THREAD.md: '### <now YYYY-MM-DD HH:MM PHT> — Claude — ANSWER'. In 8 lines or fewer, state YOUR role, Grok's (The Drip Bot) role and the Legal Strategist's role as you understand them, and where they overlap or conflict. Mark design points 1-9 AGREE, CHANGE or OBJECT, one line each, with a cited file for every fact. Answer Grok's CV6839 question (doc 377 vs doc 376) and mark DRIP_THREAD line 45 corrected.
+TASK 2 (output): Redraft case_work/MWK-001/DEMAND_FISHERIES_CONSTRUCTION_2026-10.md, applying every Legal OBJECT/GUIDANCE entry in the thread: 15 working days from receipt under R.A. 6713 Sec. 5(a); Patricia as heir and co-owner (Civil Code Art. 491); stop-work as a request; no foreshore theory; PD 1096 Sec. 301 kept; mark any R.A. 8550/10654 citation [NOT IN CORPUS]. Keep [TO FILL] for the observation date, photo annex, letter date and BFAR address. Use 14 pt on 8.5x13 in paper. Write it ONLY to $DRIP/from-claude/DEMAND_FISHERIES_v2_DRAFT.md, plus a changelog line in $DRIP/CORPUS_CHANGELOG.md. Do not edit the original file, any other author's entry, MASTER_PLAN or the stack files. Send nothing outward."
+"$HOME/.local/bin/claude" -p "$PROMPT" --permission-mode acceptEdits --add-dir "$DRIP" < /dev/null
+echo; echo "=== done. Tail of thread: ==="; tail -25 "$DRIP/DRIP_THREAD.md"
