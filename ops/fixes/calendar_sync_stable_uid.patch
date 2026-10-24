@@ -1,0 +1,28 @@
+--- a/scripts/calendar_sync.py
++++ b/scripts/calendar_sync.py
+@@ -411,6 +411,8 @@
+ # resolved via the matters index (matter_code OR case_file handle); UNRESOLVED stays untagged,
+ # never guessed (A5). key_kind 'array' = the key column is text[] (take element 1). Degrade per
+ # source: a missing table/column skips that source, never crashes the gather.
++SNAPSHOT_TABLES = {"surfaced_deadlines"}  # tables rewritten per run: never key on their id
++
+ DEADLINE_SOURCES = [
+     # (table, date_col, label_expr, key_col, key_kind, extra_where)
+     ("surfaced_deadlines", "due_date", "label", "matter_code", "scalar",
+@@ -461,8 +463,15 @@
+             if dk in seen:
+                 continue
+             seen.add(dk)
++            # Stable uid. surfaced_deadlines is re-snapshotted every refresh (new id per as_of),
++            # so the row id is NOT a stable key; key snapshot rows on (matter, date, label).
++            if table in SNAPSHOT_TABLES:
++                _k = hashlib.sha1(f"{(mi.label if mi else k) or '?'}|{d}|{str(lbl_v or '').strip().lower()}".encode()).hexdigest()[:16]
++                _uid = f"{table}:k:{_k}"
++            else:
++                _uid = f"{table}:{rid}"
+             items.append(Item(
+-                uid=f"{table}:{rid}", source=table, source_id=str(rid),
++                uid=_uid, source=table, source_id=str(rid),
+                 title=str(lbl_v or "Deadline")[:200], start=d, end=None, all_day=True,
+                 client=client, matter=(mi.label if mi else k),
+                 owner=(mi.owner if mi else None), kind="deadline", status="scheduled",

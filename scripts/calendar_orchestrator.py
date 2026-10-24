@@ -76,6 +76,20 @@ def already_fired(cur, uid, rule):
     return cur.fetchone() is not None
 
 
+def pulse_title(item):
+    return f"[pulse T-14] Prepare: {item.title[:120]} (due {item_date(item).isoformat()})"
+
+
+def already_ordered(cur, item):
+    """Content-key idempotency. surfaced_deadlines is rebuilt daily with fresh serial ids, so
+    the uid ledger alone let the same deadline re-fire every day (62 orders, ~15 dupes by
+    2026-09-26). Any prior order for the same matter+title+due — in ANY status, so a human
+    cancel sticks — means this item has already fired."""
+    cur.execute("SELECT 1 FROM work_orders WHERE kind='deliverable' AND matter_code=%s AND title=%s LIMIT 1",
+                (item.matter or item.client, pulse_title(item)))
+    return cur.fetchone() is not None
+
+
 def enqueue_deliverable(cur, item, by="calendar_orchestrator"):
     """Mirror supervisor.cmd_enqueue for kind='deliverable' (same shape, same audit),
     without shelling out. The kind's steps end in a human T3 certify — fail-closed.
@@ -85,7 +99,7 @@ def enqueue_deliverable(cur, item, by="calendar_orchestrator"):
     spec = KINDS["deliverable"]
     steps = [dict(s, status="pending", result=None) for s in spec["steps"]]
     d = item_date(item)
-    title = f"[pulse T-14] Prepare: {item.title[:120]} (due {d.isoformat()})"
+    title = pulse_title(item)
     payload = project_pulse_payload(PROFILE_KEY, item, d, RULE)  # A75: typed push payload, handles intact
     note = (f"enqueued by the pulse (calendar_orchestrator {RULE}) · uid={item.uid} "
             f"· due={d.isoformat()} · owner={item.owner or '-'} · profile={PROFILE_KEY}")
@@ -143,7 +157,7 @@ def main():
     fired = skipped = 0
     deferred = []
     for it in items:
-        if already_fired(cur, it.uid, RULE):
+        if already_fired(cur, it.uid, RULE) or already_ordered(cur, it):
             skipped += 1
             continue
         if fired >= args.cap:

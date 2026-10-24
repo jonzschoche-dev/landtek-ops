@@ -4,9 +4,10 @@ gmail.compose scope; there is no send call anywhere in this module.
 
 Used by the Drip UI's Go (Jonathan, 23 Oct 2026: "Go makes a Gmail draft"). Default account: jonzschoche@gmail.com,
 the origin of the MWK threads (Charter channel rule); the draft is a new message — when the letter must sit in an
-existing thread, Jonathan moves it or Claude stages it as a reply from the Mac.
+existing thread, pass thread_id (and in_reply_to, the Message-ID header of the message answered) and the draft is
+staged as a reply in that thread (Charter channel rule: always the same thread).
 
-  stage_draft(to, subject, body, cc=None, attachments=(), account="backup") -> draft id
+  stage_draft(to, subject, body, cc=None, attachments=(), account="backup", thread_id=None, in_reply_to=None) -> draft id
 """
 import base64
 import json
@@ -35,13 +36,16 @@ def _service(account):
     return build("gmail", "v1", credentials=creds, cache_discovery=False)
 
 
-def stage_draft(to, subject, body, cc=None, attachments=(), account="backup"):
+def stage_draft(to, subject, body, cc=None, attachments=(), account="backup", thread_id=None, in_reply_to=None):
     msg = EmailMessage()
     msg["From"] = FROM[account]
     msg["To"] = to
     if cc:
         msg["Cc"] = cc
     msg["Subject"] = subject
+    if in_reply_to:
+        msg["In-Reply-To"] = in_reply_to
+        msg["References"] = in_reply_to
     msg.set_content(body)
     for path in attachments or ():
         if path and os.path.isfile(path):
@@ -50,7 +54,10 @@ def stage_draft(to, subject, body, cc=None, attachments=(), account="backup"):
             with open(path, "rb") as f:
                 msg.add_attachment(f.read(), maintype=main, subtype=sub, filename=os.path.basename(path))
     raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
-    d = _service(account).users().drafts().create(userId="me", body={"message": {"raw": raw}}).execute()
+    message = {"raw": raw}
+    if thread_id:
+        message["threadId"] = thread_id
+    d = _service(account).users().drafts().create(userId="me", body={"message": message}).execute()
     return d["id"]
 
 
