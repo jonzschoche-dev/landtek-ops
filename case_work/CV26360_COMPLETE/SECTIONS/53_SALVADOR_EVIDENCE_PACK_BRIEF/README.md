@@ -8,4 +8,5 @@ Source: `SALVADOR_PACK_2027-01/00_BRIEF.html` (modified 2026-10-24). One file pe
 - [4. The Bacolor-office conversation and his letter](04_4_The_Bacolor_office_conversation_and_his_letter.md)
 - [5. Atty. Elaine Gay R. Belen: the thread through the documents](05_5_Atty_Elaine_Gay_R_Belen_the_thread_through_the_documents.md)
 - [6. Gaps, owner and date](06_6_Gaps_owner_and_date.md)
-- [7. The tabs](07_7_The_tabs.md)
+- [7. Anomalies across his papers (checked against the images, 24 Oct 2026)](07_7_Anomalies_across_his_papers_checked_against_the_images_24.md)
+- [8. The tabs](08_8_The_tabs.md)
