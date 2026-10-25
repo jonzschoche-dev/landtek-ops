@@ -1,0 +1,49 @@
+CHANGELOG claude / harvest / 2026-10-25
+Session 0f96ae41 (Claude Code, Mac desk). Job: retire the old Claude Code sessions into one master record and keep future sessions in sync.
+
+CHANGED
+- scripts/harvest_sessions.py (edited):
+  - prompt now asks for a MATTERS line, whether each decision was carried out, only approved, or interrupted, and one hyphen item per line;
+  - en-dashes are stripped as well as em-dashes;
+  - new --now flag (with --only) harvests a session that was just written, for the SessionEnd hook;
+  - a session resumed after its last harvest is re-harvested, and the older HARVEST file for that session is replaced.
+  Session .jsonl files are read only, never edited, moved or deleted.
+- scripts/consolidate_harvest.py (new): deterministic, no AI. Parses every HARVEST_*.txt into MASTER_HARVEST.md (by matter, deduplicated, each item tagged with its session id), CONFLICTS.md and FILES_INDEX.csv.
+- scripts/harvest_on_session_end.sh (new): SessionEnd hook. Reads session_id from the hook JSON on stdin and runs harvest_sessions.py --only <id8> --now in the background after 10 s.
+- .claude/settings.json (edited): added the SessionEnd hook above, after the existing landtek_git_routine.sh end. Nothing removed. SessionStart already runs landtek_git_routine.sh start and landtek_team_context.sh.
+- scripts/landtek_team_context.sh (edited): also prints the 5 most recent OPEN ITEMS from MASTER_HARVEST.md.
+- case_work/HARVEST/ (generated):
+  - 109 HARVEST_claude_<id8>_<date>.txt files, plus the 2 manual 26-360 files, which were not changed;
+  - MASTER_HARVEST.md;
+  - CONFLICTS.md;
+  - FILES_INDEX.csv (1,049 paths);
+  - _digests/;
+  - _manifest.csv;
+  - _harvest.log.
+
+RUN
+- Full harvest: PID 86511, 08:56:49 to 10:12:59 (76 min). Result: 106 ok, 1 empty (bd634520), 0 failures.
+- 4 sessions were skipped as "active" because the script reads the clock once at batch start. A re-run at 10:13 harvested cd190a23 and 6c5ce50f; ac3272ec is empty.
+- Earlier test: 91c2c24d.
+- Total: 109 sessions harvested, 2 empty, 0 failed.
+- Not harvested: this session (0f96ae41). The SessionEnd hook will do it when this session closes.
+
+DECIDED
+- Harvests are AI summaries, so they are pointers into the record, not the record. MASTER_HARVEST.md says so in its header. Items stay UNVERIFIED wherever the session said so.
+- Each item is filed under one matter: the first match in a fixed priority order (dockets first, then MWK, then LandTek product). Ties go to the session's MATTERS line.
+- CONFLICTS.md checks sessions against the known truths in Jonathan's brief: the 26-360 calendar, 1:30 PM, the SP 2680 11 Nov reset not being a clash, and 1321 filed under LBC 142061372862. It also checks against two points of the record:
+  - Gloria holds TCT 079-2021002126;
+  - 26-360 is before the MTC of Mercedes, per the counsel-facing letters in case_work/MWK-001.
+
+OPEN
+- Nothing committed or pushed. The new and edited scripts, settings.json and case_work/HARVEST are uncommitted, awaiting Jonathan's go.
+- The working tree was already dirty at session start with other sessions' GIS files (MWK-001/GIS_2026-10/*, MWK_T4497.qgz). Not touched.
+- Known limit: harvest_sessions.py reads the clock once at batch start. Low impact because a re-run catches stragglers. Not fixed.
+- The CONFLICTS.md pattern checks are candidates only. Section E holds 594 session-raised doubts that still need a human pass.
+
+CONFLICTS (for Jonathan; full list in case_work/HARVEST/CONFLICTS.md)
+- 26-360 court: per 789c9601, the database shows RTC Branch 64 docket CV-2026-360, but doc 17528 (the 4 Sep order) shows MTC Mercedes Civil Case 26-360. Sessions 57e9bc42, 6c5ce50f, 91c2c24d and manual:26-360-DLF also call it RTC.
+- 26-360 testimony: 6c5ce50f says Jonathan testifies "this week" of 26 Oct 2026 (possibly 28 to 31 Oct). The known calendar's next plaintiff setting is 4 Nov 2026.
+- SP 2680: manual:26-360 lists the 11 Nov "overlap" as an open counsel item. Known truth: not a clash. Same as Grok's 23 Oct finding 3.
+- 26-360 pre-trial date: 13 May 2026 (manual:26-360-DLF) vs 1 Aug 2026 (62b44bec).
+- 14 files that sessions wrote with Write/Edit are no longer at their repo path, including OP_NOTICE_OF_APPEAL_1378_draft.md, the two SCHEDULE_SERVICE_LGU_2026-10 letters, deploy_1111_profit_frontboard.sql and truth_qa_consumer.py. List in CONFLICTS.md section D.

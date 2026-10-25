@@ -1,3 +1,17 @@
+## LandTek team protocol (read first, every session)
+
+You are ONE member of the LandTek AI team, not the only AI. Grok bots (Chief of Staff and matter bots), ChatGPT and other Claude sessions work on the same project. Jonathan Zschoche is the only approver.
+
+1. The LandTek record (this tree and the LandTek database) is the single source of truth, not your memory or the chat. Label anything not in the record UNVERIFIED.
+2. The SessionStart hook prints the latest change logs and the Grok handoff. Read them before working.
+3. Stay in your lane: building code and modules on the Mac. Don't redo or override another AI's work; flag disagreements as CONFLICT for Jonathan.
+4. Never invent facts, dates, names, amounts or citations. Write UNKNOWN.
+5. Nothing outward or irreversible (send, file, deploy, delete, push to prod) without Jonathan's explicit go.
+6. Code and database lookups over AI reasoning for routine work; save tokens for frontier problems.
+7. No em-dashes. Court and agency documents in 14 pt type on 8.5 x 13 in paper.
+
+**Before /session-end or "done", always write** case_work/CHANGELOGS/CHANGELOG_claude_<matter>_<YYYY-MM-DD>.txt with the headings CHANGED (what and which files), DECIDED, OPEN, CONFLICTS. Do this without being asked.
+
 # ⚡ READ FIRST: MASTER_PLAN.md
 
 `MASTER_PLAN.md` is the single source of truth for current direction, status, and the north

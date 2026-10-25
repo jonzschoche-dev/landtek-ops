@@ -191,3 +191,6 @@ ops/drip/*.launchd.out
 ops/drip/launchd.err
 ops/drip/launchd.out
 ops/sp2680_ocr_cache/
+
+# session harvest digests stay local (may contain sensitive text)
+case_work/HARVEST/
