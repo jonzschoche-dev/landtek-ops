@@ -1,0 +1,46 @@
+CHANGELOG claude / LANDTEK-FIELD (squatter field protocol scan) / 2026-10-28
+Session: corpus scan for field-operations guidance on squatters and informal settlers. Read-only on the DB.
+Committed locally (deploy_1297), not pushed. Nothing deployed, printed or sent.
+
+CHANGED
+- New: case_work/LandTek-Corp/FIELD_PROTOCOL_OCCUPANTS_CORPUS_SCAN_2026-10-28.md (14 sources, the 11
+  rules they agree on, field mechanics, 5 conflicts, gaps, suggested protocol skeleton).
+- New: case_work/LandTek-Corp/FIELD_PROTOCOL_OCCUPANTS_v1_DRAFT_2026-10-28.md (the protocol draft: hard
+  rules, roles, tracks A/B/C/H, phases 0-5, door script, form additions, privacy, safety, service, clock,
+  enforcement incl. RA 7279 s28 verbatim duties, anti-tolerance log). RA 7279 s28, Rule 70 s2 and
+  RA 7160 s408(f) were read from legal_chunks.
+- New: case_work/LandTek-Corp/FIELD_PROTOCOL_TITLE_HOLDERS_v1_DRAFT_2026-10-28.md (Track A: why different,
+  ratification risk, groups A1-A5 from transferees_safe (22 rows, current_possession empty for all), hard
+  rules, desk-only fact-finding cards, later routes R1-R5, decisions). Occupant protocol scoped to exclude
+  title holders (skip list + s6.6 unexpected-encounter rule).
+- This changelog.
+
+DECIDED
+- Jonathan: tracks A/B/C/H adopted; Tier 1/2/3 retired.
+- Jonathan: opening posture is velvet-glove fact-finding only ("aggressive moves will be chismis and we
+  will get blocked"). Protocol rewritten: new s1A, soft door script, chismis control s6.5, form items 6/7
+  not asked at the door, softer privacy wording, no demands carried in Phase 1. Memory saved.
+- Jonathan: title holders dealt with differently, separate Track A protocol.
+- Jonathan: Gaulit / T-52537 pilot letter shelved; normal canvass visit; desk checks de la Fuente link.
+- Jonathan: "Kristyle will visit house to house and learn the situation of each occupant" ... "no title
+  holders". Occupants only; title holders on a skip list (occupant protocol s6.6; Track A s3.1). Gaulit
+  (transferee #6) is therefore on the skip list until the desk check shows otherwise.
+- Jonathan: safety (s10) and privacy (s8) rules adopted; then "digitize as much as possible": field app is primary from the
+  first canvass, paper only as dead-phone backup (keyed in + scanned same day).
+- Offers decision (pay-to-stay vs interest-to-buy list) deferred to Phase 3.
+- Still recommended, not decided: A/B/C/H numbering; no lease/sale offers before guardian
+  or majority; Gaulit / T-52537 to Track H pending the de la Fuente check.
+
+OPEN
+- All five section-13 decisions now made except offers (deferred to Phase 3). Protocol still marked DRAFT.
+- Proposed [P] items (safety, privacy, door script, Track H) are not from the record.
+- Not in legal_chunks: UDHA IRR, RA 8368, Rule 39 sec. 10(d), current Summary Procedure rules.
+- Altarejos and Alangdeo jurisprudence are DRAFT and not ingested (need Jonathan's go).
+- Field app deploy needs Jonathan's go + 4 design choices (device, photo storage, host, scope).
+- Door script needs native Tagalog/Bikol translation. Counsel [C] items: KP exemption, privacy basis,
+  RPC threats caution, ratification scope, R4 settlement structure.
+
+CONFLICTS
+- SQUATTER_ENGAGEMENT_RIGHTS_SCHEME.md still offers a lease now; superseded by pay-to-stay (not a lease).
+- Tier 1/2 (scheme) vs Type A/B (survey, app) numbering is inverted.
+- Gaulit / T-52537 is treated as informal (pay-to-stay pilot) but Delfin Gaulit is transferee #6; may be Type A.
