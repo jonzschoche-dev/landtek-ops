@@ -694,13 +694,126 @@ Art. 172 extends the same acts to private individuals, which is why the notarial
    election. The next applicable election date and the resulting cut-off are **UNKNOWN** and must be
    checked before any filing is timed. Do not guess it.
 
-### 16.5 Open, and to be verified before anything is filed
+### 16.5 VERIFIED 29 Oct 2026: the DILG-as-OP-investigator question, answered
 
-- **Whether the DILG also investigates complaints against elective municipal officials as the
-  investigating arm of the Office of the President.** In administrative practice it is often said to do
-  so, and the OP sits on appeal under Sec. 61(b). **UNVERIFIED.** It matters, because if true there is a
-  DILG mandate after all, but one that starts with a verified complaint rather than with a request for
-  supervision. Check the current DILG legal opinions and the relevant jurisprudence before relying on it.
+**Question:** does the DILG also investigate administrative complaints against elective municipal
+officials as the investigating arm of the Office of the President? **Answer: NO, not for this Mayor.**
+The mandate is real, but its coverage does not reach him. Sources read directly this session.
+
+**A.O. No. 23, 17 December 1992** [V, lawphil], as amended by **A.O. No. 159, 25 November 1994** and
+**A.O. No. 66, 1999**, is titled "PRESCRIBING THE RULES AND PROCEDURES ON THE INVESTIGATION OF
+ADMINISTRATIVE DISCIPLINARY CASES AGAINST ELECTIVE LOCAL OFFICIALS OF PROVINCES, HIGHLY URBANIZED
+CITIES, INDEPENDENT COMPONENT CITIES, COMPONENT CITIES, AND **CITIES AND MUNICIPALITIES IN
+METROPOLITAN MANILA**."
+
+Rule 1, Sec. 1 (Coverage) reaches three groups only: provincial governors and provincial board members;
+mayors, vice-mayors and council members of highly urbanized, independent component and component cities;
+and mayors, vice-mayors and council members of **cities and municipalities in Metropolitan Manila**.
+Rule 1, Sec. 2: the **President, who may act through the Executive Secretary**, is the Disciplining
+Authority. Rule 1, Sec. 3: the **Secretary of the Interior and Local Government is the Investigating
+Authority**, and may form an investigating committee within the DILG. A.O. 159 amended only Secs. 2 and
+3 of Rule 1 and **did not touch the coverage** [V]; A.O. 66 restated the Disciplining Authority and
+allowed a Special Investigating Committee in lieu of the DILG Secretary, and **also did not expand
+coverage** [V].
+
+**Mercedes is a municipality of Camarines Norte. It is not a city and it is not in Metropolitan Manila.
+Its Mayor falls outside A.O. 23 entirely.**
+
+**Why the line is drawn there, which is worth understanding and not just memorising:** Metropolitan
+Manila has no province, so Sec. 61(b)'s forum, the sangguniang panlalawigan, does not exist for its
+municipalities. A.O. 23 reaches Metro Manila municipalities because nothing else can. Everywhere else
+the provincial sanggunian exists and Sec. 61(b) governs. There is no gap and no overlap.
+
+**Joson v. Torres**, G.R. No. 131255, 20 May 1998 [V, lawphil], confirms every step:
+
+- Sec. 61(b): "A complaint against any elective official of a municipality shall be filed before the
+  sangguniang panlalawigan"; a complaint against "an elective provincial or city official must be filed
+  with the Office of the President."
+- "The Secretary of the Interior and Local Government is the Investigating Authority," and "the power of
+  the DILG to investigate administrative complaints is based on the alter-ego principle," which "is
+  corollary to the control power of the President."
+- And the sentence that settles it: **"The President remains the Disciplining Authority. What is
+  delegated is the power to investigate, not the power to discipline."**
+
+**Operational consequence for the Mayor:** there is no DILG mandate to investigate him, on the
+President's behalf or on anyone's. Asking the DILG for a finding against him was never going to work,
+by coverage as well as by Sec. 25(a). **Section 16.1 stands, and is now confirmed from two directions.**
+
+### 16.6 THE LEVER THIS SEARCH FOUND: A.O. 23 DOES REACH THE GOVERNOR
+
+Read the coverage again. **Provincial governors and provincial board members are the first group
+A.O. 23 covers.** And Sec. 29 puts the duty to supervise Mercedes on "the province, through the
+governor." Those two facts meet.
+
+So the structure is the exact inverse of how we have been working it:
+
+| Target | Forum with the mandate | Who investigates | Ceiling |
+|---|---|---|---|
+| **The Mayor** (elective, municipal) | **Sangguniang Panlalawigan**, Sec. 61(b), appeal to the OP under Sec. 67(b) | the SP itself | suspension only, see 16.7 |
+| **The Mayor**, alternative | **Office of the Ombudsman**, concurrent | the Ombudsman | see 16.7 |
+| **The Governor**, for failure to supervise under Sec. 29 | **Office of the President**, A.O. 23 Rule 1 Sec. 2 | **the DILG Secretary**, Rule 1 Sec. 3 | OP as Disciplining Authority |
+
+**And the filing route is one we already have open.** A.O. 23, Rule 3, Sec. 3 [V]: the complaint is filed
+with the Records Office, Office of the President, **or, for officials of LGUs outside Metropolitan
+Manila, through the concerned Regional Director of the DILG**, who must transmit it to the DILG Secretary
+within 48 hours and authenticate the supporting documents, the Secretary forwarding to the Office of the
+President within 48 hours.
+
+That is **RD Atty. Arnaldo E. Escober, Jr.**, the same Regional Office we have been writing to since
+July, and the same office whose unseen letter sent the ARTA referral down to the Province. A verified
+complaint lodged there does not get referred downward. By the terms of the issuance it travels **upward,
+on a 48-hour clock, twice.**
+
+**HOLD THIS. DO NOT PULL IT.** Reasons, and they are good ones:
+
+1. The Province has not refused us. PPDC Licarte wrote to the Mayor on 23 June 2026 and the Governor
+   noted it. A complaint against the Governor now would be aimed at the one provincial officer who has
+   acted on paper.
+2. We have not yet read the **Escober letter**, so we do not know what the Region actually instructed.
+   Characterising provincial or regional conduct before reading it would breach this file's own rule.
+3. The Sec. 29 default is not yet documented the way the LGU's defaults are. There is no schedule of
+   provincial default, no directive to the Governor, and no dated non-compliance by him.
+4. It is the biggest escalation available in this matter and it is the one that can least be walked back.
+
+**What it changes today is tone, not action.** The DILG lane is not a dead end after all. It is the
+correct lane, aimed one level up, and the record we are building at the provincial level is the
+predicate for it. Every dated negative from the Province is now evidence in a forum that exists.
+
+### 16.7 What each forum can actually deliver, verified
+
+**Sec. 66 [V]:** (a) "The investigation of the case shall be terminated within ninety (90) days from the
+start thereof. Within thirty (30) days after the end of the investigation, the Office of the President
+or the sanggunian concerned shall render a decision in writing." (b) "The penalty of suspension shall
+not exceed the unexpired term of the respondent **or a period of six (6) months for every
+administrative offense**." (c) removal as a result of an administrative investigation bars candidacy.
+
+**Sec. 67 [V]:** decisions may be appealed within 30 days: (a) to the sangguniang panlalawigan from the
+sangguniang bayan and component-city sanggunian; (b) **to the Office of the President from the
+sangguniang panlalawigan**. "Decisions of the Office of the President shall be final and executory."
+
+**Pablico v. Villapando**, G.R. No. 147870, 31 July 2002 [V]: the last paragraph of Sec. 60 means
+**dismissal of an erring elective local official may be decreed only by a court of law**; the power to
+remove is "lodged exclusively with the courts." The Court struck down Art. 124(b), Rule XIX of the
+implementing rules insofar as it vested removal in the disciplining authority. Followed in G.R. No.
+170626 (2008).
+
+**So the Sangguniang Panlalawigan route tops out at suspension, up to six months per offence. It cannot
+remove him.** Anyone who says otherwise is relying on the IRR provision the Supreme Court voided.
+
+**Hagad v. Gozo-Dadole**, G.R. No. 108072, 12 December 1995 [V]: the Ombudsman **retains** administrative
+disciplinary authority over elective local officials after the Local Government Code, **concurrent** with
+the Office of the President. "There is nothing in the Local Government Code to indicate that it has
+repealed" the Ombudsman Act provisions; the two statutes are to be harmonised, and repeals by
+implication are disfavoured. On suspension: under the Ombudsman Act the Ombudsman may suspend for **up
+to six months** where the evidence of guilt is strong and the charge involves dishonesty, oppression,
+grave misconduct or the like, against **sixty days** under LGC Sec. 63, and the Ombudsman's power was
+not displaced by the shorter period.
+
+**Reading across all of it:** the Ombudsman is the stronger administrative forum, it is already seized of
+this matter through CSC OAC-L Letter No. 270 of 23 June 2026, and its preventive-suspension power is six
+times the Governor's. **That is the forum to feed, and it is already fed.**
+
+### 16.8 Still open after this verification
 - **Clean statutory text.** The corpus copies drop the letter "s". Re-pull Secs. 25, 29, 60, 61, 62, 63
   and Art. 171 from lawphil before any of them is quoted in an outward paper.
 - **Whether the Mayor's 1 September 2026 statements are false, or merely unsupported.** This file has
@@ -709,3 +822,21 @@ Art. 172 extends the same acts to private individuals, which is why the notarial
   with houses that we reported in writing twice, is the one that can be shown **false**, because the
   ground can be photographed and the notices are dated. **That sentence, not the deed sentence, is the
   Sec. 60(c) candidate.**
+
+- **Whether the Office of the Ombudsman may itself DISMISS an elective local official**, as distinct
+  from preventively suspending him. *Pablico* concerns Sec. 60 of the Local Government Code and the
+  disciplining authority under it, not Ombudsman proceedings under R.A. 6770, and *Hagad* holds the two
+  regimes are concurrent rather than one displacing the other. **UNVERIFIED and material**, because it
+  decides whether the Ombudsman route has a higher ceiling than the provincial one. Check R.A. 6770
+  Secs. 15, 21, 24 and 25 and the jurisprudence on the Ombudsman's disciplinary authority over elective
+  officials before relying on it either way.
+- **The Sec. 62(c) and A.O. 23 Rule 5 Sec. 7 pre-election bars.** Both forbid investigation within 90
+  days immediately prior to any local election, and A.O. 23 Rule 6 Sec. 2 adds that a preventive
+  suspension imposed before the window is automatically lifted when it begins [V]. The next applicable
+  election date and the resulting cut-off are **UNKNOWN**. Check before timing any filing.
+- **The Escober letter**, still unread. No characterisation of what the Region instructed until it is in
+  hand. It is the first item in the FOI request.
+- **A verified complaint has a form.** Sec. 61 requires it to be verified, and A.O. 23 Rule 3 requires
+  the Regional Director to authenticate the supporting documents. Neither the Schedule of Default nor
+  any letter in this matter is yet in that form. Converting it is drafting work, not research, and it
+  is **held for Jonathan's decision**, not started.

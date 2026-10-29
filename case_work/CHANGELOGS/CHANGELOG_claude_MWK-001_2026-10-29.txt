@@ -179,3 +179,111 @@ NOT DONE / NOT AUTHORIZED (continued)
   connector returned "requires additional permissions, the user needs to
   reconnect it from connector settings." Jonathan must reconnect it with write
   access. The dates live in DILG_TRACK_REGISTER.md and MLGOO/STATUS.md meanwhile.
+
+================================================================================
+ADDENDUM 2, same day: the DILG-as-OP-investigator question, VERIFIED
+================================================================================
+
+CHANGED
+
+9. case_work/MWK-001/GAME_THEORY_LIABILITY_2026-09.md - sec. 16 extended with
+   16.5 (the verified answer), 16.6 (the lever found), 16.7 (what each forum can
+   deliver) and 16.8 (what remains open). The UNVERIFIED bullet is replaced by
+   the verified finding.
+
+SOURCES READ DIRECTLY (not from memory, not from the corpus, which has none of
+these: a legal_chunks search for "Administrative Order No. 23" / "Investigating
+Authority" returned zero rows)
+
+ - A.O. No. 23, 17 Dec 1992, lawphil: title, Rule 1 secs. 1, 2, 3, Rule 3 sec. 3,
+   Rule 5 sec. 7, Rule 6 sec. 2
+ - A.O. No. 159, 25 Nov 1994, lawphil
+ - A.O. No. 66, 1999 (via the SC E-Library listing and search result)
+ - Joson v. Torres, G.R. No. 131255, 20 May 1998, lawphil
+ - Pablico v. Villapando, G.R. No. 147870, 31 Jul 2002
+ - Hagad v. Gozo-Dadole, G.R. No. 108072, 12 Dec 1995, lawphil
+ - RA 7160 secs. 66, 67 from legal_chunks, citation "RA 7160 ss 60-67"
+
+THE ANSWER
+
+- NO, not for this Mayor. A.O. 23 (as amended by A.O. 159 and A.O. 66) covers
+  only (i) provincial governors and provincial board members, (ii) mayors, vice
+  mayors and council members of highly urbanized, independent component and
+  component cities, and (iii) mayors, vice mayors and council members of cities
+  and municipalities IN METROPOLITAN MANILA. Mercedes is a municipality of
+  Camarines Norte. Its Mayor is outside A.O. 23 entirely.
+- A.O. 159 amended only Rule 1 secs. 2 and 3, not the coverage. A.O. 66 restated
+  the Disciplining Authority and allowed a Special Investigating Committee in lieu
+  of the DILG Secretary. Neither expanded coverage.
+- Why the line sits there: Metro Manila has no province, so sec. 61(b)'s forum
+  (the sangguniang panlalawigan) does not exist for its municipalities. A.O. 23
+  reaches them because nothing else can. No gap, no overlap.
+- Joson v. Torres confirms each step and supplies the governing sentence: "The
+  President remains the Disciplining Authority. What is delegated is the power to
+  investigate, not the power to discipline." The DILG's investigative power rests
+  on the alter-ego principle, corollary to the President's control power.
+- So sec. 16.1 is confirmed from two independent directions: by sec. 25(a)
+  (supervision cannot find facts false) and by coverage (the DILG has no
+  investigative mandate over this Mayor at all).
+
+THE LEVER THE SEARCH FOUND (sec. 16.6) - HELD, NOT PULLED
+
+- A.O. 23's FIRST covered group is provincial governors and provincial board
+  members. And sec. 29 puts the duty to supervise Mercedes on "the province,
+  through the governor." Those two facts meet.
+- So against the GOVERNOR, for failure to supervise under sec. 29: the Office of
+  the President is the Disciplining Authority and THE DILG SECRETARY IS THE
+  INVESTIGATING AUTHORITY. And Rule 3 sec. 3 allows filing for LGUs outside Metro
+  Manila THROUGH THE CONCERNED DILG REGIONAL DIRECTOR, who must transmit to the
+  DILG Secretary within 48 hours and authenticate the documents, the Secretary
+  forwarding to the OP within 48 hours. That is RD Escober, the office we have
+  been writing to since July. Such a complaint travels UPWARD on a 48-hour clock,
+  twice. It cannot be referred downward.
+- HELD for four reasons recorded in the file: (1) the Province has not refused us,
+  PPDC Licarte wrote to the Mayor on 23 Jun and the Governor noted it; (2) the
+  Escober letter is still unread, so provincial and regional conduct must not be
+  characterised; (3) no schedule of provincial default exists, no directive to the
+  Governor, no dated non-compliance by him; (4) it is the least reversible move
+  available in this matter.
+- What it changes TODAY is tone, not action: the DILG lane is the correct lane,
+  aimed one level up, and the provincial record we are building is its predicate.
+
+CEILINGS, VERIFIED (sec. 16.7)
+
+- Sec. 66(a): investigation terminated within 90 days of its start; decision in
+  writing within 30 days after the end of the investigation.
+- Sec. 66(b): suspension shall not exceed the unexpired term or SIX MONTHS FOR
+  EVERY ADMINISTRATIVE OFFENSE. Sec. 66(c): removal bars candidacy.
+- Sec. 67(b): SP decisions appealable to the OP within 30 days; OP decisions final
+  and executory.
+- Pablico v. Villapando: the last paragraph of sec. 60 means dismissal of an
+  erring elective local official may be decreed ONLY BY A COURT OF LAW; removal is
+  "lodged exclusively with the courts"; Art. 124(b) Rule XIX of the IRR is void
+  insofar as it vests removal in the disciplining authority. Followed in G.R. No.
+  170626 (2008). SO THE SANGGUNIANG PANLALAWIGAN ROUTE TOPS OUT AT SUSPENSION, up
+  to six months per offence. It cannot remove him.
+- Hagad v. Gozo-Dadole: the Ombudsman RETAINS administrative disciplinary
+  authority over elective local officials after the LGC, CONCURRENT with the OP;
+  no implied repeal; Ombudsman preventive suspension up to SIX MONTHS against
+  sixty days under LGC sec. 63.
+- Reading across: the Ombudsman is the stronger administrative forum, it is
+  already seized of this matter via CSC OAC-L 270 of 23 Jun 2026, and its
+  suspension power is six times the Governor's. That is the forum to feed, and it
+  is already fed.
+
+OPEN AFTER THIS VERIFICATION
+
+- UNVERIFIED and material: whether the Ombudsman may itself DISMISS an elective
+  local official, as distinct from preventively suspending him. Pablico concerns
+  LGC sec. 60 proceedings, not RA 6770 proceedings, and Hagad holds the regimes
+  concurrent. Check RA 6770 secs. 15, 21, 24, 25 and the jurisprudence before
+  relying on it either way. It decides whether the Ombudsman route has a higher
+  ceiling than the provincial one.
+- UNKNOWN: the next applicable local election date, hence the 90-day pre-election
+  cut-off under LGC sec. 62(c) and A.O. 23 Rule 5 sec. 7. A.O. 23 Rule 6 sec. 2
+  also automatically lifts a preventive suspension when that window opens.
+- The Escober letter remains unread. First item in the FOI request.
+- A verified complaint has a FORM: sec. 61 requires verification and A.O. 23
+  Rule 3 requires the RD to authenticate supporting documents. Nothing in this
+  matter is yet in that form. Converting the Schedule of Default is drafting work,
+  held for Jonathan's decision, not started.
