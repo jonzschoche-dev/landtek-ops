@@ -369,3 +369,221 @@ himself, and makes his file contested. Keep him as the record-maker. If the Depa
 inaction must be moved on, the honest lane is administrative (RA 6713 §5(a) / conduct prejudicial)
 or an escalation naming the **process** — not a §3(e)/208 criminal file against the one officer
 who acted.
+
+---
+
+## §13 — THE PROVINCIAL SUBGAME (PD Relucio's 28 Oct 2026 letter)
+
+**The move.** On 28 Oct 2026 PD Relucio replied to the 20 Oct escalation and the 27 Oct chaser
+(doc 20248, attached to Gmail 150107). Verbatim, she (a) acknowledges both e-mails; (b) reports
+that "we also received the referral of your request from our Regional Director on October 27,
+2026"; (c) states "we will be conducting a conference with our MLGOO to clarify the status of
+your requests from the LGU"; (d) commits "we will immediately apprise you of its status once
+available"; and (e) says "another follow up letter has been sent" to the Provincial Government.
+
+**What she did not do:** set a date certain, which was the only thing asked. And for the third
+time, no reference or control number was given.
+
+### 13.1 Why this is the rational play for her
+
+Her payoff set has two expensive outcomes: ordering an elective Mayor to perform (politically
+costly, and she has twice preferred "sufficient time"), or being recorded as the office that did
+nothing (institutionally costly, now that a dated schedule sits in her file). Between them lies a
+cheap strategy: **visible process without a binding date.** A conference, a follow-up letter and a
+promise to apprise are each an act she can point to; none of them obliges the LGU to do anything by
+any day. This is motion without commitment, and it is exactly what the 2 Sep "sufficient time"
+letter did in a softer form.
+
+**Do not read it cynically in correspondence.** Two of these acts are real supervision — an MLGOO
+conference and a second letter to the Provincial Government are more than the file has ever held.
+The correct posture is to treat them as real and to measure them.
+
+### 13.2 The quiet win
+
+Her letter puts the **Schedule of Default into the provincial record by acknowledgment**, and the
+RD's referral of 27 Oct consolidates the Regional file into the same office. Everything we have
+built is now in one supervisory record, acknowledged in writing, with no dispute about receipt.
+That is worth more than the date we asked for, because it is the predicate for every later step.
+
+### 13.3 The branches, and our pre-committed answer to each
+
+| Branch | What it looks like | Our move |
+|---|---|---|
+| **B1 — Date emerges.** Conference held; LGU given a period | "the LGU has been directed to comply by [date]" | Win. Thank her, calendar the date, and hold the LGU to it. The Province owns enforcement from then on |
+| **B2 — The dodge is adopted.** Conference held; we are apprised that records are "being verified" | the LGU's own answer, now in the Province's mouth | The Province has adopted a non-answer **after a conference**. That is the ripest possible record for the RD/Central escalation, and the notarized edition carries it |
+| **B3 — Silence.** No apprisal, no conference reported | nothing by ~mid-November | **Her own undertaking becomes the default.** One short note quoting her 28 Oct words. No new demand is needed — the promise was hers |
+| **B4 — The Provincial Government answers** her follow-up | PLO or Governor writes | Opens the §29 provincial-executive lane; route to the PROV-PLO-UPDATE ladder, not back through DILG |
+
+### 13.4 The optimal move now, and why it is not another demand
+
+Asking again for a date would be the weakest available move: she has just acted, the §5(a) period
+on the 20 Oct e-mail was **met** (do not claim default there), and a third demand converts a
+cooperating supervisor into a defensive one.
+
+The strong move is to **attach the measurable to her own undertaking**. She said she will hold a
+conference and apprise us. So the reply thanks her, acknowledges receipt as she asked, and asks two
+small, answerable things: **when the conference is expected**, and **the control number** of the file
+now that the Regional referral has been consolidated into it. Neither is a demand on the LGU.
+Both are ordinary records questions — and both create a measurable that is *hers*, so that any
+later lapse is a default on her own promise rather than a refusal of our request. That is a far
+better record than anything a fourth demand could produce.
+
+### 13.5 The structural risk, and the rule it produces
+
+Consolidation cuts both ways. Everything now funnels through the one office that has twice said
+"sufficient time" and once referred the complaint back to the LGU complained of. If the Province
+stalls, we lose the parallel pressure we had when the RD held a separate file.
+
+**Rule: the DILG lane is a record-building lane, not a remedy lane.** The remedy lane is the
+appointive officers — Olaguera, Abla, Macale, Balane — at the CSC and the Ombudsman, which depends
+on no DILG act whatsoever (see `SMALL_PLAYERS_TARGET_SHEET_2026-10.md`). Never let the provincial
+conference become a reason to hold the small-players filings. The two lanes must run in parallel,
+and the DILG record makes the CSC cases stronger, not later.
+
+---
+
+## §14 - HOW TO WIN WITHOUT BEING DEFLECTED (28 Oct 2026)
+
+Jonathan: "how do we win this one without them deflecting?"
+
+### 14.1 Why deflection keeps working
+
+Every forum used so far shares one property: **it owes us no ruling.** ARTA could close on
+Sec. 4(f). The MLGOO could "facilitate the referral." The PD could allow "sufficient time."
+The Province could refer the complaint back to the LGU complained of. The CSC could pass the
+Mayor to the Ombudsman. None of those offices is obliged to decide anything, so deflection is
+free for them and costs us only calendar. No letter fixes that, because the defect is in the
+choice of forum, not in the drafting.
+
+### 14.2 The test for a non-deflectable move
+
+A move cannot be deflected when all four hold:
+
+1. **The duty is ministerial and personal.** No judgment call to hide behind, and it belongs to
+   one named officer rather than to "the LGU."
+2. **The forum has exclusive jurisdiction over that person or that money.** There is nowhere to
+   pass it to.
+3. **The relief needs no third office's cooperation** to be effective.
+4. **Silence itself creates the next right.** Inaction advances us instead of costing us, because
+   a period lapses by operation of law and the next remedy ripens.
+
+Supervision requests fail 1, 2 and 4. That is the whole story of the last fourteen months.
+
+### 14.3 The moves in this matter that pass the test
+
+| Move | Why it cannot be deflected | State |
+|---|---|---|
+| **Action B, mandamus under Rule 65** (`RTC_CONSOLIDATED_ACTION_outline_2026-09.md`) on the ministerial records duties | A court seized of a petition must rule. The duties are ministerial, the fee was paid, and the demand is documented | **Outlined, unfiled.** Counsel for this matter is OPEN |
+| **CSC complaints against the appointive officers** (Olaguera, Abla; Balane via the open referral) | Once docketed the Commission must resolve. It bounced only the Mayor, and only because elective status is jurisdictional, not because it could refuse | Drafts exist; Olaguera needs the refresh pass |
+| **Sec. 252 lapse into the LBAA** | The sixty days run whether or not the Treasurer acts. Silence becomes a denial and the appeal ripens automatically | Lapsed 11 Sep 2026 |
+| **COA on the P2.88M expenditure** | Audit jurisdiction over public funds. COA cannot refer a disallowance question down to the spender | Drafted, held |
+| **Action A, recovery and compensation in the RTC** | The only forum that can deliver money for the Hall parcel. No agency can take it away | Outlined, unfiled, fee-gated |
+
+### 14.4 The reframe that turns the deflections into assets
+
+Mandamus requires proof that there is **no other plain, speedy and adequate remedy.** Fourteen
+months of being passed between ARTA, the MLGOO, the Province and the Region is precisely that
+proof, in writing, from the offices themselves. The deflection ledger is not a record of failure;
+it is the exhaustion exhibit, and it is already assembled in `DILG_TRACK_REGISTER.md`, the
+102-page pack, and the Schedule of Default.
+
+**Consequence for the DILG lane:** keep it alive, cheaply, as the exhaustion and notice exhibit.
+Stop expecting a remedy from it. It is also the Art. 27 and Sec. 3(f) "after due demand" predicate
+against each officer personally.
+
+### 14.5 Anti-deflection drafting rules (for the letters that remain)
+
+1. One officer, one act, one period. Never "the LGU," never a bundle.
+2. Ask for a document whose **absence is itself the answer** (the record book, the enactment
+   number, the permit). A non-existent document cannot be referred anywhere.
+3. Pre-close the referral scripts by stating what is not being asked (no title adjudication, no
+   compensation, no criminal case).
+4. Never ask a question that requires another office's input to answer.
+5. Put the consequence in the statute, not in a threat. A lapsing period does the work.
+
+### 14.6 The honest bottom line
+
+The letters have done their job and cannot do more. What is blocking the win is not legal
+analysis but **resourcing: who signs the court filings and who funds them.** Action B is the
+highest leverage per peso and produces the records as its relief. The CSC complaints and the
+LBAA appeal cost almost nothing and can start immediately. Action A is the only road to the Hall
+parcel money and is fee-gated at roughly P150,000 to P200,000.
+
+Court filings are the one place where counsel is genuinely required. Everything in the
+administrative column can proceed without waiting for that decision.
+
+---
+
+## §15 - GOING ON OFFENSE WITH DILG (28 Oct 2026)
+
+Jonathan: "lets go on offense with DILG." Offense here does not mean a harder letter. It means moving
+from asking the Department for help to **putting the Department's own handling on somebody else's desk,
+on a clock the Department does not control.** Four instruments, in order of bite per peso. None of them
+needs counsel, a filing fee, or anyone's cooperation in Mercedes.
+
+### Rung 1, SENT 29 Oct 2026: the CART Secretariat status letter
+`DRIP_LADDERS_2026-10/DILG-CART-SECRETARIAT/`. Three questions, the third of which has no comfortable
+answer: whether the Department considers that transmittal to the Office of the Mayor completes the
+action on a referral about the committee the Mayor chairs. Gmail draft r692328291490317261, unsent.
+
+### Rung 2, SENT 29 Oct 2026: report the outcome to ARTA
+`DRIP_LADDERS_2026-10/ARTA-REFERRAL-OUTCOME/`. ARTA is the referring authority and the only agency with
+an institutional interest in its own Sec. 17(d) referrals not disappearing. **Its own Notice of Referral
+already says** that "failure to respond promptly to the parties shall be a ground for administrative or
+possible criminal sanctions under R.A. No. 11032 and existing laws and regulations." We never write that
+sentence. We report the route the referral took, attach the 23 June letter, and ask three answerable
+questions. ARTA's instrument does the rest. The DILG side is copied, so nothing is done behind anyone.
+
+### Rung 3, the clock the Department cannot slow: FOI
+**Verified 28 Oct:** E.O. 2 s. 2016, Annex A, Sec. 9(d) requires a response within **fifteen (15)
+working days** of receipt; Sec. 9(e) allows an extension that "in no case" exceeds **twenty (20) working
+days** absent exceptional circumstances, and the requester must be notified with reasons. The Executive
+Branch is covered, so the DILG is covered.
+
+Request the **routing file itself**: the 6 May 2026 memorandum of Asec. Aldana endorsing the referral to
+Region V; the Region V endorsement onward; the control or tracking number; and any action-taken report
+received on CTN SL-2026-0423-1891. This is different in kind from a status inquiry. A status inquiry can
+be answered with a sentence. **An FOI request must be granted or denied, in writing, on a statutory
+clock, and a denial is itself appealable and itself evidence.** Hold it until the rung 1 letter has had
+about ten days, because the courteous ask may produce the same papers for free.
+
+### Rung 4, held: the 8888 ticket, then Sec. 3(f)
+E.O. 6 s. 2016 covers national government agencies and requires concrete and specific action within
+72 hours, with non-compliance a ground for administrative sanction. **Verify the current text and the
+portal's present scope before filing.** After that, R.A. 3019 Sec. 3(f) against the custodian of the
+unacted referral, after due demand. Never aimed at MLGOO Guerrero, who is our witness, and not at PD
+Relucio, who answers everything within the period and cannot be reached under R.A. 6713 Sec. 5(a).
+
+### The one sentence that makes all four work
+
+A complaint about a municipal committee was routed national office, to region, to province, to governor,
+and delivered to the mayor who chairs that committee, addressed to the attention of that committee's own
+focal person, on the advice of the DILG Provincial Director. On the same day, the Civil Service
+Commission sent the identical referral up to the Ombudsman because the official involved is elective.
+**Every instrument above states only that, and asks a question. Not one of them accuses anybody.**
+
+---
+
+## §15.1 - RUNGS 1 AND 2 WENT OUT TOGETHER, 29 OCT 2026
+
+Jonathan sent both the same day [O]. That changes the game in one specific way worth recording.
+
+**Sending them separately would have produced two status answers. Sending them together produces a
+cross-check.** The DILG is asked whether the transmittal to the Mayor completed the action. ARTA is asked
+whether it treats its own referral as closed or still pending with the DILG. Each is copied on the other.
+There are four possible pairs of answers and **three of them are inconsistent on their face**:
+
+| DILG says | ARTA says | What it yields |
+|---|---|---|
+| completed | still pending with DILG | the two agencies contradict each other on the same file, in writing, each holding the other's letter |
+| completed | closed on our side | the Department has stated that a complaint about a committee is completed by sending it to that committee's chairman. That sentence is the exhibit |
+| not completed | either | the file has been mis-routed since June and the Department has its own reason to reopen it |
+| silence | silence | two dated negatives from two agencies on a referral neither will own |
+
+**The rule this produces:** when two agencies have each handled the same file, never ask them
+sequentially. Ask them in parallel, copy each on the other, and ask each only about its own record.
+Consistency then costs them more than an answer does.
+
+**Clock:** reply due **Fri 20 Nov 2026** (15 working days, R.A. 6713 Sec. 5(a); working day 1 Fri 30 Oct;
+Mon 2 Nov 2026 not counted, All Souls' Day, additional special non-working day under Proclamation No. 1006
+of 3 Sep 2025 [V]). Chaser 23 Nov. FOI go/no-go 12 Nov. No third letter to this chain before 20 Nov.
