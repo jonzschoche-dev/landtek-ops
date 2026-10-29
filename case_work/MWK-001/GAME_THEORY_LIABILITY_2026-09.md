@@ -1050,7 +1050,7 @@ inherently fact-bound and cannot be made to fit.
 | 2 | **"We do not opine on questions of fact."** | Even "given that no instrument was produced" is a factual premise. | **Zero factual premises.** Every question answerable from the statute alone. |
 | 3 | **"Opinions are for officials, not private parties."** | We never checked eligibility. | Their own published charter lists clients as "**Local Officials, functionaries and citizens**" [V]. Quote it in the letter and the deflection is spent before it is used. |
 | 4 | **"This is legal advice on a private dispute."** | Q1 was visibly our dispute. | Ask about **the limits of a local government's power and the duties of local offices**, which is governance administration. No adverse party, no claim, no remedy mentioned. |
-| 5 | **"Go to the Provincial Legal Officer."** Sec. 31. | Plausible-sounding and we had no answer. | **Sec. 31 does not apply** [V]: "In the absence of a municipal legal officer, **the municipal government** may secure the opinion of the provincial legal officer ... on any legal question affecting the municipality." It is addressed to the municipal government, not to a citizen, and not to this Department. Note it politely in a footnote-style line. (It is also the section Relucio herself cited to the Acting Governor on 13 and 17 March.) |
+| 5 | **"Go to the Provincial Legal Officer."** Sec. 31. | Plausible-sounding and we had no answer. | **Sec. 31 does not apply** [V]: "In the absence of a municipal legal officer, **the municipal government** may secure the opinion of the provincial legal officer ... on any legal question affecting the municipality." It is addressed to the municipal government, not to a citizen, and not to this Department. **REVISED ON DRAFTING, 29 Oct: do NOT put this in the letter.** Raising a deflection nobody has made plants it. **Held in reserve for the reply.** (It is also the section Relucio herself cited to the Acting Governor on 13 and 17 March.) |
 | 6 | **"Local autonomy; that is within the LGU's discretion."** Doctrine B. | It answers almost anything. | **Make discretion the question.** A question in the form "is duty X ministerial or discretionary?" cannot be deflected with "it is discretionary." |
 | 7 | **"Referred to the appropriate division / forwarded for action."** | The nightmare of the last six months. | Invoke the chartered service **by its exact published name**, and ask for the reference number and the applicable processing time under the Citizen's Charter. A named service with a published clock cannot be converted into an open-ended referral. |
 | 8 | **No reply at all.** | Nothing to measure. | Because it is a chartered service, **R.A. 11032 Sec. 9(b)(1)** requires action "within the prescribed processing time stated in the Citizen's Charter", and **Sec. 21** names liable persons. Non-action becomes a violation of a kind this Department itself administers. |
@@ -1146,3 +1146,31 @@ Three rules follow, and they are not negotiable:
   the Legal and Legislative Liaison Service, but the listings conflict across pages and one of them is
   over a year old. **Do not address a named officer from an unverified listing.** Address the office, and
   confirm the current central e-mail and the Region V legal unit's address before transmitting.
+
+#### 17.9.6 Drafted 29 Oct 2026
+
+`../../DRIP_LADDERS_2026-10/DILG-LEGAL-OPINION/step1_request.md`. Jonathan's instruction: do not name
+Mercedes. **DRAFT, not staged, not sent.**
+
+Two design decisions made at the drafting stage that go beyond 17.9.5 and now govern:
+
+1. **No attachments at all.** The charter invites "relevant documents on the request, if any" and we
+   attach none. Every document imports a fact, and a fact invites "this Office does not rule on questions
+   of fact" or a sub judice check. **A documentless letter is undeflectable on that ground.** This is a
+   choice, not an omission, and it must survive every later edition.
+2. **No Sec. 31 pre-empt**, reversing 17.9.2 row 5. Raising a deflection nobody has made plants it. The
+   only pre-empt kept is eligibility, made by quoting their own charter in the opening line rather than
+   by arguing, because that one decides whether the request is accepted at all.
+
+Two further points:
+
+- **No processing-time number is quoted.** The "5 to 15 Days" standard is Region 1's published charter,
+  not Region V's, which we have not verified. The letter asks them to state the time that applies.
+  **Their answer states their own clock**, which is better than quoting a number and being corrected.
+- **No cc to the Central Office**, although 17.9.5 contemplated one. We have no verified Central address,
+  the key-officials listings conflict and one is over a year old, and their own procedure endorses novel
+  questions upward without being asked. Waiting costs nothing.
+
+**The letter names no local government unit, no official, no party, no property, no title, no forum and
+no other matter, and carries no day counts and no complaint.** That is what makes it safe to assume the
+Mayor will read it.
