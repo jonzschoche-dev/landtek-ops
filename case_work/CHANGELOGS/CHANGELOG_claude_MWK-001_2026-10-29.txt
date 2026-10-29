@@ -83,3 +83,99 @@ NOT DONE / NOT AUTHORIZED
   "send it" is not a print go.
 - No calendar entries created. The dates live in the register and STATUS.md; say the
   word if you want them on the calendar too.
+
+================================================================================
+ADDENDUM, same day
+================================================================================
+
+CHANGED (continued)
+
+5. case_work/DRIP_LADDERS_2026-10/DILG-PD-RELUCIO/step2_reply_to_28Oct.md
+   - NEW. Reply to PD Relucio's 28 Oct 2026 letter (doc 20248), read verbatim,
+     together with our 27 Oct note (gmail 149646). She answered the receipt ask
+     and not the control-number ask, the third time that has gone unanswered.
+   - First version carried only FOUR Schedule items. Jonathan corrected it. The
+     corrected Annex A of 20 Oct has NINE items over four Parts, invoking 14 LGC
+     provisions plus PD 1096 Sec. 301, Civil Code Art. 487, RA 11032 Sec. 17(d)
+     and RA 6713 Sec. 5(a). Ten items on 19 Oct; the Sec. 252 Treasurer item was
+     withdrawn 20 Oct. All nine now in the letter.
+   - All eleven day-count anchors recomputed to 29 Oct 2026 and verified
+     arithmetically. Zero mismatches.
+   - STAGED as a Gmail draft, NOT SENT. id r-2057607761450435144, thread
+     1a07b469116a81e9, In-Reply-To 1a181bc42ee037cc, no cc, attachment
+     Annex_A_Schedule_of_Default_corrected_20Oct2026.pdf (151,150 bytes).
+
+6. case_work/MWK-001/DILG_TRACK_REGISTER.md - new row 35 for the staged reply.
+
+7. case_work/MWK-001/RELUCIO_COMMUNICATION_PROFILE_2026-10.md - sec. 5 gains a
+   SECOND close-out formula found in her 28 Oct letter: "We trust that the
+   foregoing sufficiently clarifies the status of your requests." It reads like a
+   status report, which is why it was nearly missed.
+
+8. case_work/MWK-001/GAME_THEORY_LIABILITY_2026-09.md - new sec. 16 answering
+   Jonathan's question: what mandate the DILG follows when a Mayor signs and
+   transmits something untrue. Every provision pulled verbatim from legal_chunks.
+
+DECIDED (continued)
+
+- Rule: an item leaves the Schedule of Default only marked PERFORMED or marked
+  WITHDRAWN, in writing. Never by omission from the next letter. A running
+  schedule whose count falls invites the argument that the missing items were
+  abandoned, and the two longest-running items (7 Assessor 496 d, 8 Building
+  Official 373 d) are exactly the ones a shorter letter loses.
+- Items 7 and 8 are asked for THROUGH THE MAYOR using Relucio's own 30 Mar 2026
+  doctrine, not by asking her to write to those officers. She cannot refuse her
+  own rule.
+- Item 9 (the Department's own file) is expressly not pressed on her: pressing it
+  invites a fourth referral to the Governor and pulls her into the national lane.
+
+THE MANDATE FINDING (sec. 16, and it reframes the campaign)
+
+- Sec. 25(a): supervision exists "to ensure that their acts are within the scope
+  of their prescribed powers and functions." That is the ceiling. An untrue
+  sentence is not an act outside a power, so NO supervising officer is empowered
+  to find it false. Fourteen months of asking the MLGOO and the PD for a finding
+  asked for a power the Code does not give them.
+- Sec. 25(a) 2nd par. + Sec. 29: for a MUNICIPALITY, supervision runs THROUGH THE
+  PROVINCE, and the duty is on "the province, through the governor." Relucio's
+  referrals to the Governor are statutorily correct, not evasive. Her 13 and
+  17 Mar 2026 letters cite Secs. 29 and 31 by number. We read that as a dodge.
+- The forums that DO reach a signed untruth: (a) Sangguniang Panlalawigan, the
+  only body with original administrative jurisdiction over an elective municipal
+  official, Sec. 61(b), on the Sec. 60(c) ground of "dishonesty, oppression,
+  misconduct in office, gross negligence, or dereliction of duty", decision
+  appealable to the OP, preventive suspension by the GOVERNOR under Sec. 63(a)(2),
+  max 60 days, and a real clock under Sec. 62(a) of 7 + 15 + 10 days;
+  (b) the Ombudsman, already seized via CSC OAC-L 270; (c) the courts under RPC
+  Art. 171(4), whose "legal obligation to disclose the truth" element is supplied
+  by the MLGOO's own 25/26 Aug Indorsements.
+- The Schedule of Default is already the draft of a Sec. 61(b) complaint. What it
+  lacks is a verification, a named respondent, and the Sec. 60 ground pleaded as
+  a ground.
+- The Sec. 60(c) candidate is NOT the deed sentence. "A valid Deed of Donation"
+  with no instrument produced is UNSUPPORTED. "Actively devoted to their intended
+  public road purpose", said of a road lot covered with houses reported in writing
+  twice, is the one that can be shown FALSE.
+
+OPEN (continued)
+
+- UNVERIFIED and material: whether the DILG also investigates complaints against
+  elective municipal officials as the investigating arm of the Office of the
+  President. If true there IS a DILG mandate, but one that begins with a verified
+  complaint, not a request for supervision. Check DILG legal opinions and the
+  jurisprudence before relying on it.
+- Sec. 62(c) bars any investigation within 90 days before any local election. The
+  applicable election date and cut-off are UNKNOWN. Do not guess; check before
+  timing any filing.
+- The corpus copies of the statutes drop the letter "s" as a scanning artefact.
+  Re-pull Secs. 25, 29, 60, 61, 62, 63 and RPC Art. 171 from lawphil before any
+  of them is quoted in an outward paper.
+
+NOT DONE / NOT AUTHORIZED (continued)
+
+- Nothing sent. The Relucio reply is a Gmail draft only.
+- Nothing printed.
+- Calendar entries for 12 and 20 Nov could NOT be created: the Google Calendar
+  connector returned "requires additional permissions, the user needs to
+  reconnect it from connector settings." Jonathan must reconnect it with write
+  access. The dates live in DILG_TRACK_REGISTER.md and MLGOO/STATUS.md meanwhile.

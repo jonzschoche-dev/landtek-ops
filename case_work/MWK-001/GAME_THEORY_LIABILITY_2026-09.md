@@ -587,3 +587,125 @@ Consistency then costs them more than an answer does.
 **Clock:** reply due **Fri 20 Nov 2026** (15 working days, R.A. 6713 Sec. 5(a); working day 1 Fri 30 Oct;
 Mon 2 Nov 2026 not counted, All Souls' Day, additional special non-working day under Proclamation No. 1006
 of 3 Sep 2025 [V]). Chaser 23 Nov. FOI go/no-go 12 Nov. No third letter to this chain before 20 Nov.
+
+---
+
+## §16 - WHAT MANDATE THE DILG ACTUALLY FOLLOWS WHEN A MAYOR SIGNS SOMETHING UNTRUE
+
+*(Added 29 Oct 2026 on Jonathan's question. Every provision below was pulled verbatim from the
+embedded law library this session: `legal_chunks`, citations "RA 7160 (Local Government Code, full)",
+"RA 7160 §§25,29 (general supervision over LGUs)", "RA 7160 §§60-67", "Act 3815 (Revised Penal Code,
+full)". The stored corpus text drops the letter "s" as a scanning artefact; the wording below restores
+it and is otherwise word for word. **Before any of these appear in an outward filing, re-pull the clean
+text from lawphil.**)*
+
+### 16.1 The short answer: supervision has no truth-finding power
+
+**There is no DILG mandate that reaches the truth of a statement.** The Department's mandate over a
+municipality is *supervision*, and supervision is defined by its own statute as a power to keep acts
+inside their legal boundaries, not a power to decide what is true.
+
+**Sec. 25(a) [V]:** "Consistent with the basic policy on local autonomy, the President shall exercise
+general supervision over local government units **to ensure that their acts are within the scope of
+their prescribed powers and functions.**"
+
+That clause is the whole ceiling. An untrue sentence in a letter is not an act outside a prescribed
+power; it is a false assertion of fact. Nothing in the supervision mandate authorises any supervising
+officer to find it false. **This is why fourteen months of asking the MLGOO and the Provincial Director
+has produced no finding: we have been asking officers to exercise a power the Code does not give them.**
+Guerrero can direct and transmit. Relucio can record and refer. Neither can adjudicate.
+
+### 16.2 The structural discovery: for a municipality, supervision runs through the PROVINCE
+
+**Sec. 25(a), second paragraph [V]:** "The President shall exercise supervisory authority directly over
+provinces, highly urbanized cities, and independent component cities; **through the province with
+respect to component cities and municipalities**; and through the city and municipality with respect to
+barangays."
+
+**Sec. 29 [V]:** "**The province, through the governor, shall ensure that every component city and
+municipality** within its territorial jurisdiction **acts within the scope of its prescribed powers and
+functions.**"
+
+**Consequence, and it is uncomfortable.** The officer on whom the Code places the supervisory duty over
+Mercedes is **the Governor**, not the DILG. PD Relucio's habit of referring everything to the Governor,
+logged five times in `RELUCIO_COMMUNICATION_PROFILE` and read there as her "pressure valve", is
+**statutorily correct**. Her 13 March and 17 March 2026 letters to Acting Gov. Ascutia cite Secs. 29
+and 31 by number. She has been telling us where the mandate sits since March and we read it as a dodge.
+
+**This does not mean abandon the DILG lane.** It means being honest about what that lane can produce:
+dated written directives, dated written non-compliance, and technical guidance. That is a *record*, and
+the record is the predicate for the forum that can actually act. It is not itself a remedy.
+
+### 16.3 The mandate that does reach a false signed statement: three forums, none of them the DILG
+
+**(a) The Sangguniang Panlalawigan. The only body with original administrative jurisdiction.**
+
+**Sec. 60 [V]:** "An elective local official may be disciplined, suspended, or removed from office on any
+of the following grounds: ... **(c) Dishonesty, oppression, misconduct in office, gross negligence, or
+dereliction of duty**."
+
+**Sec. 61(b) [V]:** "A complaint against any elective official of **a municipality shall be filed before
+the sangguniang panlalawigan** whose decision may be appealed to the Office of the President."
+
+**Sec. 62(a) [V]:** within 7 days of filing, the sanggunian "shall require the respondent to submit his
+verified answer within fifteen (15) days from receipt thereof, and commence the investigation of the
+case within ten (10) days after receipt of such answer." **Sec. 62(c) [V]:** "no investigation shall be
+held within ninety (90) days immediately prior to any local election."
+
+**Sec. 63(a)(2) [V]:** preventive suspension may be imposed "**by the governor**, if the respondent is an
+elective official of a component city or municipality", where "the evidence of guilt is strong", and no
+single preventive suspension may exceed sixty (60) days.
+
+So: **dishonesty is a named ground, the forum is provincial, the complaint must be verified, and the
+clock it starts is 7 + 15 + 10 days rather than the open-ended silence we have been living in.**
+
+**(b) The Office of the Ombudsman.** Already seized of this matter: CSC **OAC-L Letter No. 270, s. 2026**,
+of 23 June 2026 forwarded the identical ARTA referral there expressly because the official involved is
+elective. That is the same reasoning as Sec. 61(b), reached by a different agency.
+
+**(c) The courts, for falsification.**
+
+**Art. 171, Revised Penal Code [V]:** "The penalty of prision mayor and a fine not to exceed 5,000 pesos
+shall be imposed upon any public officer, employee, or notary who, **taking advantage of his official
+position, shall falsify a document** by committing any of the following acts: ... **4. Making untruthful
+statements in a narration of facts**."
+
+Elements to satisfy, per §12.1 of this file: official position taken advantage of; untruthful statements
+in a narration of facts; **a legal obligation to disclose the truth of the facts narrated**; and
+materiality. The third element is the hard one, and **the MLGOO's Indorsements of 25 and 26 August 2026
+supply it**, because they directed him to state the action taken and to cite the instrument by name.
+Art. 172 extends the same acts to private individuals, which is why the notarial and deed lanes matter.
+
+### 16.4 What this changes, stated plainly
+
+1. **Stop asking the DILG for a finding.** It cannot make one. Ask it only for what it can give:
+   directives, dates, control numbers, and written confirmations that nothing has been received. The
+   `RELUCIO_COMMUNICATION_PROFILE` §7 rule was right for the wrong reason: it is not just that she
+   *will not*, it is that she *may not*.
+2. **The provincial forum has been the destination all along.** The Sangguniang Panlalawigan under
+   Secs. 60(c) and 61(b) is the only body that can hold the Mayor to a signed untruth, with the Governor
+   holding the preventive-suspension power under Sec. 63(a)(2). Everything the DILG lane has produced is
+   the evidence for that filing.
+3. **The Schedule of Default is already the draft of that complaint.** Nine items, each one a duty, a
+   directive, an answer and the documents that test the answer. What it lacks to become a Sec. 61(b)
+   complaint is a verification, a respondent named as respondent, and the Sec. 60 ground pleaded as a
+   ground. **It is closer than it looks.**
+4. **Sec. 62(c) is a timing constraint to calendar.** No investigation within 90 days before any local
+   election. The next applicable election date and the resulting cut-off are **UNKNOWN** and must be
+   checked before any filing is timed. Do not guess it.
+
+### 16.5 Open, and to be verified before anything is filed
+
+- **Whether the DILG also investigates complaints against elective municipal officials as the
+  investigating arm of the Office of the President.** In administrative practice it is often said to do
+  so, and the OP sits on appeal under Sec. 61(b). **UNVERIFIED.** It matters, because if true there is a
+  DILG mandate after all, but one that starts with a verified complaint rather than with a request for
+  supervision. Check the current DILG legal opinions and the relevant jurisprudence before relying on it.
+- **Clean statutory text.** The corpus copies drop the letter "s". Re-pull Secs. 25, 29, 60, 61, 62, 63
+  and Art. 171 from lawphil before any of them is quoted in an outward paper.
+- **Whether the Mayor's 1 September 2026 statements are false, or merely unsupported.** This file has
+  always drawn that line and it must hold: "a valid Deed of Donation" with no instrument produced is
+  **unsupported**. "Actively devoted to their intended public road purpose", said of a road lot covered
+  with houses that we reported in writing twice, is the one that can be shown **false**, because the
+  ground can be photographed and the notices are dated. **That sentence, not the deed sentence, is the
+  Sec. 60(c) candidate.**

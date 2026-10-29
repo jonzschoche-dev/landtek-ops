@@ -65,7 +65,25 @@
           already carries every section number; the letter does not need to lecture her.
 
      HOUSE RULES: no em-dashes. High-school English. No threat anywhere.
-     STATUS: DRAFT. NOT STAGED, NOT SENT. Jonathan's go required to stage as a Gmail draft. -->
+
+     STATUS: **GMAIL DRAFT STAGED 29 Oct 2026, NOT SENT.** Jonathan presses Send himself.
+       draft id    : r-2057607761450435144
+       thread      : 1a07b469116a81e9 (her own thread, verified on the staged draft)
+       In-Reply-To : 1a181bc42ee037cc (her 28 Oct letter) · References the same
+       From        : Jonathan Zschoche <jonzschoche@gmail.com>
+       To          : dilgcamarinesnorte2020@gmail.com · Cc: NONE (verified empty)
+       Subject     : Re: RESPONSE TO FOLLOW-UP REQUEST
+       attachment  : Annex_A_Schedule_of_Default_corrected_20Oct2026.pdf (151,150 bytes)
+       labels      : DRAFT
+     The Schedule is re-attached on purpose: the conference is with the MLGOO, and the MLGOO should
+     have the nine items in front of him rather than a summary of them. One sentence was added to the
+     body to say so ("I attach the same Schedule again for the convenience of your Office and of the
+     MLGOO"). The peso signs in items 5 and 7 are written out as words in the e-mail body, because
+     plain-text e-mail mangles the sign. -->
+
+<!-- IF THE SEND SLIPS PAST 29 OCT 2026: every day count in the body is stated "to 29 October 2026".
+     Either restate that date and advance all eleven counts by the same number of days, or leave the
+     sentence as it is, which remains true but understates. NEVER let a count drift silently. -->
 
 **Thread:** reply to her 28 October 2026 letter, same thread, no cc
 **Subject:** (leave as the thread's) Re: RESPONSE TO FOLLOW-UP REQUEST
