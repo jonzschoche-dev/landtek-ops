@@ -209,6 +209,13 @@ assertion is the evidence and the clock resets from it.
 - **Silence to 20 Nov.** Two dated negatives from two agencies, on a referral neither will own. Chaser 23 Nov,
   then the 8888 rung (verify the current E.O. 6 text and portal scope **before** filing).
 
+> **GAMEPLAY, 29 Oct 2026: `../DILG_GAMEPLAY_2026-10-29.md`.** The board, actor by actor, with the tell
+> to watch and our pre-committed answer to each move; the four composite scenarios; the discipline list
+> of what we do NOT do before 20 Nov; our own two commitments (the 19 Nov Schedule edition and the
+> 20 Nov note to Relucio); and the three signals that would change the strategy.
+> **Two CV 26-360 hearing dates, 4 and 11 Nov, sit inside the reply window.** The DILG lane is built to
+> need no attention until 20 Nov for that reason.
+
 ## NEXT STEPS — updated 29 Oct 2026 (in order)
 
 0a. **THE REFRAME (29 Oct 2026, Jonathan). Read `../GAME_THEORY_LIABILITY_2026-09.md` §17 before

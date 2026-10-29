@@ -403,3 +403,103 @@ OPEN
 NOT DONE / NOT AUTHORIZED (continued)
 
 - Nothing sent. Nothing printed. The Relucio reply remains a staged Gmail draft.
+
+================================================================================
+ADDENDUM 4, same day: legal opinion request drafted + staged, and the gameplay
+================================================================================
+
+CHANGED
+
+12. case_work/DRIP_LADDERS_2026-10/DILG-LEGAL-OPINION/step1_request.md
+    - NEW. Request for Legal Opinion under the Department's own chartered service,
+      three questions of law of general application, naming no LGU (Jonathan's
+      instruction), no official, no party, no property, no forum, no day counts.
+    - STAGED as a Gmail draft, NOT SENT. id r4872773606278474622, new thread
+      1a1855cc7a7186e0, In-Reply-To None verified, to dilg5records2019@gmail.com,
+      no cc, NO attachments, labels DRAFT, body 2,701 characters.
+    - A BANNED-TERM SCAN was run against the staged message body itself (not the
+      drip file): CLEAN on Mercedes, Camarines, T-32911, T-4497, Balane,
+      Pajarillo, Olaguera, Abla, Macale, Guerrero, Relucio, Escober, ARTA,
+      Ombudsman, 26-360, Schedule of Default, Keesey, Municipal Hall, title,
+      parcel, donation. Recorded in the file as a REQUIRED step on every later
+      edition, because the letter's whole protection is that it mentions nobody.
+13. case_work/MWK-001/DILG_TRACK_REGISTER.md - row 36, with a note that it is a
+    different KIND of instrument: rows 1-35 are supervision correspondence with no
+    service standard and therefore no clock, while row 36 invokes a chartered
+    service, so RA 11032 sec. 9(b)(1) puts the Citizen's Charter processing time on
+    it and sec. 21 names liable persons.
+14. case_work/MWK-001/GAME_THEORY_LIABILITY_2026-09.md - sec. 17.9.6 records the
+    drafting-stage decisions, including the REVERSAL of 17.9.2 row 5.
+15. case_work/MWK-001/DILG_GAMEPLAY_2026-10-29.md - NEW. The forecast.
+16. case_work/MWK-001/MLGOO/STATUS.md - pointer to the gameplay above NEXT STEPS.
+
+DRAFTING DECISIONS THAT NOW GOVERN (sec. 17.9.6)
+
+- NO ATTACHMENTS, deliberately. The charter invites relevant documents; we attach
+  none, because every document imports a fact and a fact invites "we do not rule
+  on questions of fact" or a sub judice check.
+- NO sec. 31 pre-empt. REVERSES 17.9.2 row 5. Raising a deflection nobody has made
+  plants it. Held in reserve for the reply. Only the eligibility pre-empt is kept,
+  and it is made by quoting their own charter rather than by arguing.
+- NO processing-time number quoted: "5 to 15 Days" is Region 1's charter, not
+  Region V's. Menu item 2 asks them to state the applicable time, so their answer
+  states their own clock.
+- NO cc to the Central Office although 17.9.5 contemplated one: no verified
+  address, the key-officials listings conflict, one is over a year old, and their
+  own procedure endorses novel questions upward unasked.
+
+THE GAMEPLAY (DILG_GAMEPLAY_2026-10-29.md) - all probabilities labelled as my
+judgment, all dates and counts computed
+
+- THE BOARD: four instruments at four offices with two kinds of clock, where for
+  fourteen months there were two officers in one channel with none.
+- THE CONSTRAINT NOBODY HAD FLAGGED: two CV 26-360 hearing dates, Wed 4 Nov and
+  Wed 11 Nov, fall inside the reply window at working days 3 and 8. The DILG lane
+  must therefore survive to 20 Nov without attention, which is the main reason the
+  plan is to wait.
+- CART Secretariat: ~45% "endorsed to Region V, follow up there", which IS the
+  answer to our question 3; ~30% silence; ~15% substantive with a control number;
+  ~10% "the transmittal completed it", which is the sentence we most want in
+  writing. No comfortable answer exists, as designed.
+- ARTA SL: ~40% acknowledge and note; ~35% silence; ~15% exercises monitoring,
+  the best outcome in the matter; ~10% "closed on our side", which pairs against
+  the DILG answer to make the two agencies contradict each other in writing.
+- Region V / RD: nothing unprompted. Twice asked for a number, twice forwarded
+  downward. Do NOT open a third front there; rows 33 and 36 reach Region V from
+  two different directions already.
+- Relucio: she always replies in 1 to 13 days. ~45% acknowledgment with no control
+  number (her fourth); ~25% real apprisal; ~20% a close-out line, watching for BOTH
+  formulas; ~10% items 7 and 8 taken up through the Mayor, which is what row 35
+  asks. Protect her either way.
+- Region V Legal Unit: the weakest forecast because the channel is new, and said
+  so rather than pretending. ~40% endorse upward as novel; ~30% a regional answer;
+  ~25% silence, WHICH IS DIFFERENT FROM ALL OTHER SILENCE because a chartered
+  service has a published processing time; ~5% refusal on a deflection ground.
+- THE HIGHEST-VALUE ITEM ON THE BOARD is question 1 of row 36. One free document,
+  near-certain answer under sec. 21(b), unlocks Schedule items 3, 5 and 7, roughly
+  1,100 days of default, and arrives as a Department document with a reference
+  number, without the Department judging anyone.
+- Four composite scenarios: A everything quiet ~30% (the single most likely world:
+  do exactly three things, the 19 Nov edition, the 20 Nov Relucio note, the 23 Nov
+  chasers, and nothing else); B acknowledge-and-refer ~35% (FOI on 12 Nov); C the
+  opinion lands ~25% (stop writing, start drafting, and WE apply it, never ask the
+  Department to); D something real ~10% (slow down).
+- DISCIPLINE LIST of seven things not to do before 20 Nov, including no third
+  letter to the chain, no fourth date demand, no new office, do not file against
+  the Governor, do not merge question D, do not print, and never add a name to
+  row 36.
+- OUR OWN COMMITMENTS, which must be honoured or the Schedule loses force: the
+  ~19 Nov Schedule edition promised in the Schedule's own closing, and the 20 Nov
+  note promised to Relucio in row 35. Counts for the 19 Nov edition computed: 85,
+  118, 203, 297, 546, 281, 86, 79, 517, 394, 199. Item 9 reaches exactly 200 days
+  on 20 Nov.
+- THREE SIGNALS THAT WOULD CHANGE THE STRATEGY: any document that makes a finding
+  or sets a date; the Escober letter; and an ADVERSE legal opinion, named openly as
+  the one way this month ends worse than it started.
+
+NOT DONE / NOT AUTHORIZED (continued)
+
+- Nothing sent. Rows 35 and 36 are staged Gmail drafts awaiting Jonathan.
+- Nothing printed.
+- Calendar entries still blocked: the Google Calendar connector requires
+  reconnection with write access.
