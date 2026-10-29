@@ -219,7 +219,11 @@ assertion is the evidence and the clock resets from it.
    and **what is the control number** now that the Regional referral has been consolidated. **No fourth
    demand for a date** — she has just acted, and a demand now converts a cooperating supervisor into a
    defensive one. If she later goes quiet, the default is on her own promise, which is the stronger record.
-   **Draft on Jonathan's go.**
+   **DRAFTED 29 Oct 2026: `../../DRIP_LADDERS_2026-10/DILG-PD-RELUCIO/step2_reply_to_28Oct.md`.**
+   Reply on her own thread (1a07b469116a81e9), no cc, no mention of the 29 Oct national letters, no
+   statute cited, and the stated date (20 Nov) is **our** next action, not a demand on her.
+   **NOT STAGED, NOT SENT.** Also found in her 28 Oct letter: a **second close-out formula**, "We trust
+   that the foregoing sufficiently clarifies the status of your requests" (profile §5 updated).
 2. ~~DILG R5 — chase the reference number~~ **CANCELLED 28 Oct: superseded.** The Region referred the file
    down to the Province on 27 Oct. Chasing R5 separately would now duplicate the same file in two offices.
    The number ask travels with item 1.

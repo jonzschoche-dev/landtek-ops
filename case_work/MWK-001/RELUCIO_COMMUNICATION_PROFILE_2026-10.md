@@ -73,6 +73,12 @@ The record supports **procedurally correct and unwilling to enforce**, rather th
 - **"We hope to have been of assistance to you."** Appears in the 30 Mar and 11 May letters. It is the
   closing she uses when the file is being treated as answered rather than pending. If it appears on the
   conference apprisal, the matter has been closed in her mind.
+- **"We trust that the foregoing sufficiently clarifies the status of your requests."** The 28 Oct 2026
+  variant of the same move [V, doc 20248, read 29 Oct]. **There are therefore two close-out formulas,
+  not one**, and the second is easy to miss because it sounds like a status report. Treat any sentence
+  beginning "We trust that the foregoing" as the file being marked answered. The reply to her 28 Oct
+  letter (`../DRIP_LADDERS_2026-10/DILG-PD-RELUCIO/step2_reply_to_28Oct.md`) answers it with one
+  neutral sentence keeping the matter open by consent rather than by argument.
 - **Referral to the Governor** is her pressure valve. Expect it whenever a question cannot be answered
   with doctrine A or B.
 - **Staff acknowledgment then silence** means the item is logged, not actioned.
