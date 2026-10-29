@@ -840,3 +840,178 @@ times the Governor's. **That is the forum to feed, and it is already fed.**
   the Regional Director to authenticate the supporting documents. Neither the Schedule of Default nor
   any letter in this matter is yet in that form. Converting it is drafting work, not research, and it
   is **held for Jonathan's decision**, not started.
+
+---
+
+## §17 - MAXIMIZING THE DILG: STOP ASKING FOR A VERDICT, ASK FOR WHAT IT MANUFACTURES
+
+*(Added 29 Oct 2026 on Jonathan's reframe: "the subject matter is maximizing the work of the DILG even
+if they cannot dismiss an official. Why are they dismissing the evidence and not commenting?" The
+question is better than the one §16 answered. §16 established what the Department cannot do. This
+section is about everything it can, and why we have not been asking for any of it.)*
+
+### 17.1 Why they are not commenting. Three reasons, and all three are ours to fix
+
+**1. We have been asking the one question the Department is not allowed to answer.** Every letter in
+fourteen months asked, in substance, whether the LGU's answers were true, or asked the Department to
+make the LGU perform. Sec. 25(a) gives a supervising officer exactly one question it may decide:
+whether an act is **"within the scope of their prescribed powers and functions."** A truth question can
+be declined forever, politely, and they have. **The scope question cannot be declined, because the Code
+assigns it to them by name.**
+
+**2. We have never once used a chartered service.** Supervision correspondence has no service standard,
+so there is no clock on it and no violation in ignoring it. That is why the answers come back as
+acknowledgments. **The Department does operate chartered services with published processing times, and
+we have used none of them.** An acknowledgment is the correct output of the channel we chose.
+
+**3. We asked for reasoning where only records exist, and for records where only reasoning exists.**
+Three different outputs, three different channels, and we have been mixing them in one letter:
+
+| What we want | The channel that produces it | What it has that correspondence does not |
+|---|---|---|
+| a document | FOI / records request | a statutory deadline (E.O. 2 s. 2016) |
+| a legal conclusion | **request for a DILG legal opinion** | a Citizen's Charter processing time |
+| a consequence | the Department's assessment instruments | money and a published result |
+
+### 17.2 The reframe, in the exact words to use
+
+**Do not write:** the Mayor's statement that the Municipality holds a valid Deed of Donation is untrue.
+
+**Write:** *Is the Municipality's continued occupation of registered private land, in the absence of any
+produced instrument of acquisition and of any expropriation record, within the scope of its prescribed
+powers and functions under Sections 22(a)(4) and 19 of the Local Government Code?*
+
+The second version cannot be sent to a court, to the Governor or to the LGU, because **Sec. 25(a) makes
+it the supervising officer's own question.** And it does not require anyone to call the Mayor a liar:
+the premise is only that **no instrument has been produced**, which is not in dispute and is admitted by
+the LGU's own answer of 1 September 2026.
+
+**Both answers help us.** If the Department says the occupation is within prescribed powers, it must
+identify the power, and there is none that lets a municipality hold titled private land without an
+instrument or an expropriation. If it says it is not, the supervision mandate is engaged on its own
+terms and the file can no longer be parked. **There is no comfortable third answer, which is the same
+structure that makes the CART Secretariat letter work.**
+
+Apply the same conversion to every item in the Schedule. The question is never "did he lie." It is
+always "was that act within the prescribed power, and if so which one."
+
+### 17.3 Instrument one, and the best one: the request for a DILG legal opinion
+
+**This is a chartered, free service open to private citizens, and we have never used it.** [V, read
+29 Oct 2026 from DILG Region 1's published service standards, with DILG CAR and DILG Caraga describing
+the same service.]
+
+| | |
+|---|---|
+| Service | "Provision of Legal Opinion on local governance administration and related concerns" |
+| Eligible clients | "**Local Officials, functionaries and citizens**" |
+| Requirements | "Original copy of the written request" and "Relevant documents on the request, if any" |
+| Processing time | "**5 - 15 Days**" (5 days simple, 15 days complex) at the Regional Office |
+| Fee | "**No payment required**" |
+| Route | letter-query to the Regional Office, or direct to the Central Office through the Office of the Secretary or the Central Records Section. Novel issues are endorsed from the region to the Central Office, where the **Legal and Legislative Liaison Service, Legal Research, Assistance and Legislative Liaison Division** handles them. DILG publishes issued opinions by LO reference number. |
+
+**Why this is the maximizing move, and not just another letter.**
+
+1. **It is a service, not a courtesy.** A chartered service carries a published processing time, and
+   R.A. 11032 Sec. 9(b)(1) [V] requires that applications or requests "be acted upon by the assigned
+   officer or employee **within the prescribed processing time stated in the Citizen's Charter**", three
+   working days for simple transactions and seven for complex, twenty for highly technical. Sec. 21 [V]
+   makes specified failures violations with named persons liable. **So the clock stops being ours and
+   becomes theirs, published by them.** We never have to argue about what is reasonable.
+2. **It produces reasoning on paper, by reference number, usable everywhere.** A DILG legal opinion
+   saying a municipality may not assert title without an instrument is a document we can put in front
+   of the Sangguniang Panlalawigan, the Ombudsman and the court. It is the Department commenting on the
+   law of our facts without being asked to judge anyone.
+3. **It cannot be referred to the LGU.** Interpreting R.A. 7160 is the Department's own function. The
+   Governor cannot do it, the Mayor certainly cannot, and "local autonomy" has no purchase on it.
+4. **It is free and it is addressed to a unit with no stake in Mercedes.**
+
+**The three questions to ask, each pure law, each with no disputed fact in it:**
+
+- **Q1.** May a municipality assert "legal title" to land registered in private names, and continue to
+  occupy it, without producing any instrument of acquisition or any expropriation record, having regard
+  to Secs. 22(a)(4) and 19?
+- **Q2.** Where one registered co-owner requests a record or a chartered service, may a local office
+  require an authority signed by **all** co-heirs as a condition of service, having regard to Art. 487
+  of the Civil Code and to R.A. 11032 Sec. 21(b) on requirements not listed in the Citizen's Charter?
+- **Q3.** Is the duty of a Secretary to the Sanggunian under Sec. 469(c)(5) to furnish certified copies
+  upon payment of prescribed fees a **ministerial** duty, and does the duty to **assess** that fee arise
+  upon request rather than at the office's convenience?
+
+Each one, answered either way, is worth more than any reply we have received in fourteen months. **Q2 is
+the strongest: it is the all-heirs requirement, it has no legal source, it is still being applied, and
+it is a pure question of law that any DILG legal officer can answer in a paragraph.**
+
+### 17.4 Instrument two: make the MLGOO close his own file
+
+The 4 September 2026 transmittal passed the LGU's replies along "for your information, guidance and
+appropriate reference" and contained **no compliance assessment**. That is the whole gap in the
+supervision lane.
+
+Asking him to assess compliance is **not** asking him to find against the Mayor. It is asking him to
+state whether his own directives of 25 and 26 August were complied with. He issued them, he set their
+terms, and he is the only person who can say whether they were met.
+
+**Argument, not citation, and it must be labelled as such:** a directive issued without any
+determination of compliance is not supervision, it is correspondence. Sec. 25(a) gives the power to
+ensure acts stay within prescribed powers, and an unassessed directive ensures nothing. **No provision
+says in terms that he must assess. Do not pretend one does.** Put it to him as a request to close his
+own file, which is how a careful officer will hear it.
+
+### 17.5 Instrument three, the one with money attached: the Seal of Good Local Governance
+
+**R.A. No. 11292, the Seal of Good Local Governance Act of 2019** [V], institutionalises the SGLG as an
+award, incentive and recognition programme **run by the DILG**. Two features matter:
+
+- **It is "all-in": an LGU must pass every performance area.** A single failed area disqualifies.
+- **A passing municipality receives an incentive fund reported at ₱1.8 million** (₱2.3m cities,
+  ₱4m provinces), and assessment includes document review **and onsite validation**.
+
+Among the performance areas are **Business-friendliness and Competitiveness**, which is where R.A. 11032
+and Citizen's Charter compliance sits, and **Financial Administration**, which is where fee assessment
+and the Full Disclosure Policy sit. **Those are precisely the two areas our documented facts touch.**
+
+**The ask is narrow and the Department cannot pass it anywhere.** Not "disqualify Mercedes", which is
+not ours to ask. Only: *that the documented non-performance be placed before the assessment team for the
+current cycle, for whatever weight the Department determines.* DILG owns the scoring, the criteria and
+the validation. **The LGU cannot answer for it, the Governor cannot answer for it, and the Mayor
+certainly cares about ₱1.8 million and an onsite validation team.**
+
+**UNKNOWN and to be obtained before citing:** the current cycle's Memorandum Circular number, its exact
+performance areas and indicators, its assessment calendar, and the current incentive amounts. The area
+names and counts have changed between cycles (seven areas in 2019, later expanded to ten) and the
+sources conflict across years. **Get the year's MC before putting any of this in a letter.**
+
+### 17.6 Instrument four: convert every non-comment into a written refusal
+
+**A non-comment is worth less to us than a refusal.** Silence can be explained away later as oversight,
+backlog or a file in transit. A written "this Office cannot do X" is permanent, and it is the exhaustion
+exhibit for the Sangguniang Panlalawigan and the Ombudsman.
+
+**Drafting rule from here on: every letter to the Department ends with a numbered menu of specific acts
+that are plainly within its power, and asks which of them the Office will do.** Not "please act." A list.
+Three or four items, each one answerable with a yes, a no or a date. A yes is a commitment with a clock.
+A no is an exhibit. **Only an open-ended ask can be met with an acknowledgment**, and we have been
+writing open-ended asks for fourteen months.
+
+### 17.7 The principle, in one line
+
+**Stop asking the Department for a verdict. Ask it for the three things it is built to manufacture:
+records, opinions and scores.** Each has a published clock, none requires it to call anyone a liar, and
+all three are usable in the forums that can actually punish.
+
+### 17.8 Order of play, cheapest and fastest first
+
+1. **The legal opinion request, Q1 to Q3.** Free, 5 to 15 days by their own charter, citizens eligible,
+   and it is the only instrument that makes the Department comment on the law of our facts. **Do this
+   first.** Filed with DILG Region V, copy to the Central Office through the Office of the Secretary.
+2. **The compliance assessment ask to the MLGOO**, carried on the existing friendly channel, framed as
+   closing his own file.
+3. **The SGLG placement request**, once the current cycle's MC is in hand. Addressed to the Regional
+   Office, which runs the assessment.
+4. **FOI for the routing file**, already calendared for 12 November, which produces the Escober letter.
+5. **The menu rule applies to all of them**, including the two letters already sent on 29 October.
+
+**Nothing in §17 requires anyone to be accused of anything.** That is the point. The Department has been
+able to decline every letter we have written because every letter asked it to judge. None of these four
+does, and all four produce paper.

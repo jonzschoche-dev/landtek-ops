@@ -211,6 +211,16 @@ assertion is the evidence and the clock resets from it.
 
 ## NEXT STEPS — updated 29 Oct 2026 (in order)
 
+0a. **THE REFRAME (29 Oct 2026, Jonathan). Read `../GAME_THEORY_LIABILITY_2026-09.md` §17 before
+   drafting anything else to the DILG.** Every letter for fourteen months asked the Department either to
+   judge the truth of the LGU's answers or to make the LGU perform. Sec. 25(a) lets a supervising officer
+   decide one question only: whether an act is "within the scope of their prescribed powers and
+   functions." A truth question can be declined forever and has been. **From now on the question is
+   always "was that act within the prescribed power, and if so which one", never "did he lie."**
+   And we have never used a chartered service: a request for a **DILG legal opinion** is free, open to
+   citizens, and carries a published processing time of 5 to 15 days [V]. **That is the next instrument,
+   ahead of everything else in this list.** §17.3 holds the three questions to ask.
+
 0. **Rungs 1 and 2 are SENT (29 Oct).** Nothing further goes to the Secretariat, to ARTA, or to Region V
    before **20 Nov 2026**. Three letters in three weeks to the same chain reads as pressure; two letters and
    then silence reads as a record. **Do not open a third front while the window runs.**
