@@ -60,7 +60,23 @@
 
      FORMAT IF PRINTED: 14 pt, 8.5 x 13 in, per house rule. NOT PRINTED. No print authorization exists.
      HOUSE RULES: no em-dashes. High-school English.
-     STATUS: DRAFT. NOT STAGED, NOT SENT. Jonathan's go required to stage as a Gmail draft. -->
+
+     STATUS: **GMAIL DRAFT STAGED 29 Oct 2026, NOT SENT.** Jonathan presses Send himself.
+       draft id    : r4872773606278474622
+       thread      : 1a1855cc7a7186e0 (NEW thread, not a reply to anything; In-Reply-To None, verified)
+       From        : Jonathan Zschoche <jonzschoche@gmail.com>
+       To          : dilg5records2019@gmail.com · Cc: NONE (verified empty)
+       Subject     : Request for Legal Opinion on local governance administration: three questions on
+                     the Citizen's Charter and on Section 469(c)(5) of the Local Government Code
+       attachments : NONE, verified on the staged draft, as designed
+       labels      : DRAFT
+       body        : 2,701 characters
+
+     BANNED-TERM SCAN run against the staged body itself, not against this file: CLEAN on all of
+     Mercedes, Camarines, T-32911, T-4497, Balane, Pajarillo, Olaguera, Abla, Macale, Guerrero, Relucio,
+     Escober, ARTA, Ombudsman, 26-360, Schedule of Default, Keesey, Municipal Hall, title, parcel,
+     donation. **Re-run this scan on every later edition.** The letter's whole protection is that it
+     mentions nobody and nothing. -->
 
 **To:** The Regional Director, Department of the Interior and Local Government, Regional Office No. V,
 Rizal Street, Legazpi City

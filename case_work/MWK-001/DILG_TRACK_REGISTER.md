@@ -149,3 +149,11 @@ block. **Identify before citing.**
   Staged copy restaged, still 3 pages. **Not printed.** If an earlier print was already served, the fix
   goes in the ~25 Sep edition as a stated correction.
 - Binder split into `DILG_TRACK_INSTRUMENTS/00–17` (+`01b`, `05b`); all 27 pages placed, none duplicated.
+
+| 36 | **29 Oct 2026** | Zschoche → **DILG Regional Office No. V, attention the Legal Unit** (new letter, new thread, no cc, no attachments) | **GMAIL DRAFT STAGED, NOT SENT.** Request for Legal Opinion under the Department's own chartered service "Provision of Legal Opinion on local governance administration and related concerns" (clients include citizens, no fee). Three questions of law, of general application: (1) may an office impose a condition not listed in its Citizen's Charter (RA 11032 §21(b)); (2) must a charter fee be assessed within the processing time, or may assessment be deferred under "still being verified"; (3) is the §469(c)(5) duty to furnish certified copies on payment of prescribed fees ministerial, and does the duty to assess arise on the request. Severability clause, without-prejudice line, and a menu close asking for the reference number, the applicable processing time and whether it is resolved regionally or endorsed upward. **Names no LGU, no official, no party, no property, no forum. No day counts. No attachments.** Banned-term scan on the staged body: CLEAN | staged, draft id r4872773606278474622, thread 1a1855cc7a7186e0 | `DRIP_LADDERS_2026-10/DILG-LEGAL-OPINION/step1_request.md` | — |
+
+> **Row 36 is a different kind of instrument from every other row in this register.** Rows 1 to 35 are
+> supervision correspondence, which carries no service standard and therefore no clock. Row 36 invokes a
+> **chartered service**, so R.A. 11032 Sec. 9(b)(1) requires action within the processing time stated in
+> the Citizen's Charter and Sec. 21 names liable persons. The clock on this one is theirs, published by
+> them, and menu item 2 asks them to state it. Doctrine: `../MWK-001/GAME_THEORY_LIABILITY_2026-09.md` §17.
