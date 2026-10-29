@@ -1,0 +1,85 @@
+CHANGELOG - claude (Mac) - MWK-001 / DILG supervision + ARTA referral 1891 - 2026-10-29
+
+CHANGED
+
+1. case_work/DRIP_LADDERS_2026-10/DILG-CART-SECRETARIAT/step1_status_request.md
+   - Status flipped: GMAIL DRAFT STAGED -> SENT BY JONATHAN 29 OCT 2026 [O].
+   - Added a "Clock (SENT 29 Oct 2026)" section with the confirmed holiday math.
+   - Attachment line replaced with the two filenames and byte sizes verified on the
+     draft before send (ARTA_Referral_...04May2026.pdf 492,736 B;
+     PPDC_CamNorte_letter_23Jun2026...pdf 400,499 B).
+
+2. case_work/DRIP_LADDERS_2026-10/ARTA-REFERRAL-OUTCOME/step1_report_back.md
+   - Status flipped: DRAFT, NOT STAGED -> SENT BY JONATHAN 29 OCT 2026, threaded into
+     the original 4 May 2026 NOR conversation (Gmail thread 19df229c9cbf6b37).
+   - Added the same clock table, a "what each possible answer is worth" matrix, and a
+     "do not" block (no land/title/Hall-parcel ask; no separate ARTA docket; 1319 and
+     1321 stay separate from 1891).
+
+3. case_work/MWK-001/DILG_TRACK_REGISTER.md
+   - New rows 33 (DILG CART Secretariat) and 34 (ARTA Southern Luzon), both SENT 29 Oct.
+   - New subsection "Clock set on rows 33 and 34" with the working-day count.
+
+4. case_work/MWK-001/MLGOO/STATUS.md
+   - New dated section "29 OCT 2026 - RUNG 1 IS SENT. THE CLOCK IS RUNNING." with the
+     two-row sent table, the dates to watch, and three pre-committed answers.
+   - Ladder rung 1 marked SENT; rung 2's trigger changed from "after the Sec. 5(a)
+     period" to the fixed date 20 Nov 2026.
+   - NEXT STEPS re-dated to 29 Oct with a new item 0: no third letter to the same
+     chain before 20 Nov. Duplicate "3." numbering fixed; Relucio tripwire given a
+     real date (12 Nov).
+   - Coordination flag updated: both DILG-side letters are sent, and the only CSC fact
+     asserted is OAC-L 270 of 23 Jun 2026; a different reading from the CSC desk is a
+     CONFLICT for Jonathan, not a unilateral correction.
+
+DECIDED
+
+- Clock starts from the send, 29 Oct 2026, with receipt UNKNOWN (e-mail, no stamp).
+  If either office asserts a date of receipt, that assertion becomes the evidence and
+  the clock resets from it rather than being argued.
+- Reply due Fri 20 Nov 2026 (15 working days, R.A. 6713 Sec. 5(a)). Working day 1 is
+  Fri 30 Oct. Mon 2 Nov 2026 is NOT counted: All Souls' Day, additional special
+  non-working day under Proclamation No. 1006 (3 Sep 2025), verified by web check
+  29 Oct 2026. Bonifacio Day (Mon 30 Nov) falls after the window.
+- Chaser on each thread Mon 23 Nov 2026 if silent. No new content in it.
+- FOI go/no-go Thu 12 Nov 2026, same day as the Relucio tripwire so both are decided
+  together.
+- NO third front before 20 Nov. Nothing further to the CART Secretariat, to ARTA, or
+  to Region V while the window runs.
+- Both possible answers to the "did the transmittal complete the action" question are
+  useful, so the question stands as written. Pre-committed responses recorded in
+  STATUS.md so nobody improvises on receipt.
+
+OPEN
+
+- The Escober letter, referenced in the 23 Jun 2026 PPDC letter as the covering
+  instruction from the Regional Director, has still never been seen. Routes: the FOI
+  request for the routing file (first), the Province, the Mayor's office. Until it is
+  read, do not characterise what the RD instructed.
+- The case tracking number for CTN SL-2026-0423-1891 inside the DILG: still never
+  given, first asked 21 May 2026.
+- 8888 rung: verify the current E.O. 6 s. 2016 text and portal scope BEFORE filing.
+- Receipt dates for rows 33 and 34: unknown, and no stamp exists for e-mail.
+- Relucio's promised MLGOO conference: no apprisal yet. Tripwire 12 Nov.
+- Olaguera CSC complaint refresh pass (fold in the 1 Sep answer and the 15 Dec 2025
+  ninety-peso comparator) remains unstarted.
+
+CONFLICTS
+
+- None new. The standing coordination item is the CSC desk working
+  case_work/MWK-ARTA-1891/CSC_OACL_REPLY_2026-10-28/ on the same CTN. Both sent
+  letters state OAC-L Letter No. 270, s. 2026, of 23 Jun 2026 as forwarding the
+  referral to the Ombudsman on elective-official grounds. If that desk reads it
+  differently, it is now a CONFLICT for Jonathan, because the statement is already
+  with two national agencies.
+- Carried over, unresolved (STATUS.md "Tracker (19 Oct)"): the 9 Sep ledger makes the
+  Reiteration the selected Guerrero instrument and marks the held reply DO-NOT-SERVE,
+  while Branch A of STATUS.md may be stale. Needs Jonathan.
+
+NOT DONE / NOT AUTHORIZED
+
+- Nothing was sent by me. Jonathan sent both letters himself.
+- Nothing printed. The standing rule holds: per-job authorization, and "serve it" or
+  "send it" is not a print go.
+- No calendar entries created. The dates live in the register and STATUS.md; say the
+  word if you want them on the calendar too.

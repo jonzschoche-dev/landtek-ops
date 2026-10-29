@@ -53,6 +53,26 @@
 | 32 | **~21 Oct 2026** | **MLGOO → Zschoche (Messenger)** | On the report that San Roque's Punong Barangay refused the letter: **"Acknowledge po. Sabihan ko."** — a written supervisory undertaking. No action of record since | received | `MLGOO/proof_messenger_2026-10/` | screenshot |
 | ~~27~~ | *(old row, kept for continuity)* | Zschoche → MLGOO (cc PD, RD) | **Reiteration, SECOND EDITION** — one-page plain-English letter + **Annex "A": Schedule of Default of the Local Government Code** (duty · directive · LGU answer · **proof in the record** · days). Counts to 19 Oct; 45 days' silence since the 4 Sep transmittal; PD Relucio's 2 Sep "sufficient time"; ask = date certain, else PD **and RD** | **NEVER SENT** (Jonathan, 20 Oct 2026: "the mlgoo never went out"; MLGOO step skipped, escalated to PD Relucio instead, see DRIP_LADDERS_2026-10/DILG-PD-RELUCIO) | `PRINT_SERVICE_2026-10-19/` | — |
 | 28 | **20 Oct 2026** | Zschoche → **PD Relucio** (e-mail, reply in her 7 Sep thread) | Escalation: ask PD to **set a date** for the LGU to perform the MLGOO 25/26 Aug directives; Annex "A" Schedule of Default (corrected 20 Oct: §252 item removed, item 2 dates fixed) | Sent 19:58 PHT; receipt pending | `DRIP_LADDERS_2026-10/DILG-PD-RELUCIO/` | — |
+| 33 | **29 Oct 2026** | Zschoche → **Romar B. Panganiban, DILG CART Secretariat** (NEW e-mail; cc Usec. Romero as CART Chairperson, DILG R5 Records, ARTA SL, ARTA Public Assistance) | **SENT.** Status request on ARTA referral CTN SL-2026-0423-1891: (1) the case tracking number first asked for 21 May and never given; (2) the present disposition inside the Department; (3) **whether transmittal to the Office of the Mayor completes the action**, the Mayor being chairman of the very CART complained of. Attachments: the 4 May 2026 NOR and the 23 Jun 2026 PPDC letter | **SENT by Jonathan 29 Oct 2026**; receipt pending | `DRIP_LADDERS_2026-10/DILG-CART-SECRETARIAT/` | — |
+| 34 | **29 Oct 2026** | Zschoche → **ARTA Southern Luzon Complaints Handling** (reply on the 4 May NOR thread; cc ARTA Public Assistance, Panganiban, Usec. Romero) | **SENT.** Report-back to the referring authority on what became of its own §17(d) referral: the full routing chain, ending with the Province transmitting it to the Mayor of Mercedes. Three asks: note the outcome, say whether ARTA treats the referral as closed or still pending with the Department, and whether ARTA will exercise its monitoring function. Attachment: the 23 Jun 2026 PPDC letter | **SENT by Jonathan 29 Oct 2026**; receipt pending | `DRIP_LADDERS_2026-10/ARTA-REFERRAL-OUTCOME/` | — |
+
+### Clock set on rows 33 and 34 (both sent 29 Oct 2026)
+
+R.A. 6713 Sec. 5(a): **15 working days** to reply. Counting begins the next working day, 30 Oct 2026 (Fri),
+and skips Sat 31 Oct, Sun 1 Nov (All Saints', special non-working) and **Mon 2 Nov 2026 (All Souls',
+additional special non-working day under Proclamation No. 1006, 3 Sep 2025 [V])**.
+
+| | Date |
+|---|---|
+| Sent | **Thu 29 Oct 2026** |
+| Working day 1 | Fri 30 Oct 2026 |
+| Working day 15, reply due | **Fri 20 Nov 2026** |
+| Chaser on the same thread if silent | **Mon 23 Nov 2026** |
+| FOI decision point (rung 3), if no substantive answer by then | **Thu 12 Nov 2026** |
+
+Bonifacio Day, Mon 30 Nov 2026, is a regular holiday and falls after the window, so it does not move the date.
+**Receipt dates are unknown** (e-mail, no stamp). If either office later asserts a different date of receipt,
+that assertion is itself the evidence and the clock is reset from it, not argued about.
 
 Unplaced: `05b`, an ARTA copy-furnished page (CART respondents; Usec. Abot; Dr. Sanmocte;
 CSC Asst. Comm. Masuda). It is not page 2 of the 4 May NOR, which is marked "Page 1 of 1" with its own cc
