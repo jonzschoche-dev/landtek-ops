@@ -287,3 +287,119 @@ OPEN AFTER THIS VERIFICATION
   Rule 3 requires the RD to authenticate supporting documents. Nothing in this
   matter is yet in that form. Converting the Schedule of Default is drafting work,
   held for Jonathan's decision, not started.
+
+================================================================================
+ADDENDUM 3, same day: maximize what the DILG manufactures + the traps in the ask
+================================================================================
+
+CHANGED
+
+10. case_work/MWK-001/GAME_THEORY_LIABILITY_2026-09.md
+    - sec. 17: why the Department is not commenting, and the four instruments it
+      can be made to produce (legal opinion, compliance assessment of the MLGOO's
+      own directives, the SGLG assessment, and the written-refusal rule).
+    - sec. 17.9 (added after Jonathan's warning): the deflection list for a legal
+      opinion ask, the redesigned question set, and the adverse-opinion rule.
+      sec. 17.3's three questions are marked SUPERSEDED in place.
+11. case_work/MWK-001/MLGOO/STATUS.md - next-step 0a points at sec. 17 and at
+    sec. 17.9 as mandatory reading before any further DILG drafting.
+
+SOURCES READ DIRECTLY
+
+ - DILG Region 1 published service standards, "Provision of Legal Opinion":
+   clients "Local Officials, functionaries and citizens"; requirements "Original
+   copy of the written request" and "Relevant documents on the request, if any";
+   processing time "5 - 15 Days" (5 simple, 15 complex); "No payment required".
+   DILG CAR and DILG Caraga describe the same service; Central Office handles
+   novel issues through the Legal and Legislative Liaison Service, Legal Research,
+   Assistance and Legislative Liaison Division, and publishes opinions by LO
+   reference number.
+ - RA 11292 (Seal of Good Local Governance Act of 2019), DILG-run, all-in across
+   performance areas, municipal incentive reported at P1.8m, with onsite
+   validation.
+ - RA 11032 secs. 9(b)(1) and 21(b) from legal_chunks (verbatim).
+ - RA 386 Art. 487 and RA 7160 sec. 31 from legal_chunks (verbatim).
+
+WHY THE DILG IS NOT COMMENTING (sec. 17.1)
+
+ 1. We asked the one question sec. 25(a) does not let a supervising officer
+    answer. Their single assigned question is whether an act is "within the scope
+    of their prescribed powers and functions." A truth question can be declined
+    forever and has been.
+ 2. We never used a chartered service. Supervision correspondence has no service
+    standard, hence no clock and no violation in ignoring it. An acknowledgment is
+    the correct output of the channel we chose.
+ 3. We mixed three products in one letter. Documents come from FOI (statutory
+    deadline). Reasoning comes from a legal opinion request (Citizen's Charter
+    processing time). Consequences come from the assessment instruments (money and
+    a published result).
+
+THE TRAPS, AND WHAT CHANGED BECAUSE OF THEM (sec. 17.9)
+
+- THE VISE: too much fact draws "sub judice" or "we do not opine on questions of
+  fact"; too little draws "the query is hypothetical and academic." The escape is
+  to ask about a provision of general application or about the Department's own
+  supervisory standard, never about our property.
+- Ten deflections mapped with the design answer to each, including: their own
+  charter lists citizens as eligible clients (kills the "officials only" line);
+  sec. 31 is addressed to the MUNICIPAL GOVERNMENT, not to a citizen and not to
+  the Department, so "go to the Provincial Legal Officer" misreads it; and making
+  discretion-versus-ministerial the question itself kills the local-autonomy
+  deflection.
+- DEFLECTION 10, THE ONE THAT IS NOT A DEFLECTION: an adverse opinion. DILG
+  opinions are published by LO number and permanent. An adverse one would be
+  manufactured at our own cost, over our own signature, and quotable against us in
+  every forum for the rest of the matter. A deflection costs nothing; an adverse
+  opinion costs more than silence. Rules adopted: never ask a question whose
+  correct answer is not already near-certain; prefer questions where even the
+  adverse answer is useful; never ask about ownership, title, valuation, taking or
+  compensation.
+- QUESTION SET REBUILT. sec. 17.3's Q1 (may a municipality assert legal title
+  without producing an instrument) is NOT FILED: closest to sub judice, inherently
+  fact-bound, and the highest adverse risk. It survives only as reframed question
+  D, HELD, to be filed alone if ever.
+- The filed set is A, B, C at sec. 17.9.3, none of which mentions land, title, a
+  parcel, a party, or any LGU:
+  A. May a local government office impose, as a condition for acting on a request
+     for a service listed in its Citizen's Charter, a requirement NOT listed in
+     that Charter? (RA 11032 sec. 21(b) answers it in its own words. Near-zero
+     adverse risk. This is the all-heirs SPA, Schedule item 3, 276 days.)
+  B. Where a charter service carries a fee, does assessing the fee form part of
+     the action required within the prescribed processing time, or may an office
+     defer assessment indefinitely while the request is "under verification"?
+     (Schedule items 5 and 7, with no facts in the question.)
+  C. Is the sec. 469(c)(5) duty to furnish certified copies upon payment of
+     prescribed fees MINISTERIAL, and does the duty to assess the fee arise upon
+     the request? (Kills doctrine B for every records item at once.)
+- Art. 487 is deliberately NOT the hook for A. Its text is "Any one of the
+  co-owners may bring an action in ejectment", which is about actions, not records
+  requests. Leaning on it would overclaim. Sec. 21(b) needs no help.
+- Filing design: invoke the service by its exact published name; severability
+  sentence so one deflection cannot kill all questions; menu close asking for the
+  reference number, the applicable processing time, and whether it will be
+  resolved regionally or endorsed upward; a without-prejudice line; and assume the
+  Mayor will read it.
+
+DECIDED, SUBJECT TO JONATHAN
+
+- DO NOT NAME MERCEDES in the first filing. Recommendation only, and the
+  trade-off is recorded at 17.9.5 for him to overrule: naming it makes the opinion
+  directly usable, but invites a sub judice check that finds CV 26-360, invites
+  referral to the LGU for comment, and invites delay.
+
+OPEN
+
+- UNKNOWN: the current SGLG cycle's Memorandum Circular number, performance areas,
+  indicators, calendar and incentive amounts. Area names and counts changed between
+  cycles (7 in 2019, later 10) and sources conflict. Obtain the year's MC before
+  any of it appears in a letter.
+- UNKNOWN: the correct Central Office e-mail for the Legal and Legislative Liaison
+  Service, and the Region V legal unit's address. The DILG key-officials listings
+  conflict across pages and one is over a year old. DO NOT address a named officer
+  from an unverified listing. Address the office; confirm before transmitting.
+- The legal opinion request itself is NOT YET DRAFTED. Design is settled; the
+  letter is the next drafting job on Jonathan's go.
+
+NOT DONE / NOT AUTHORIZED (continued)
+
+- Nothing sent. Nothing printed. The Relucio reply remains a staged Gmail draft.

@@ -926,7 +926,12 @@ the same service.]
    Governor cannot do it, the Mayor certainly cannot, and "local autonomy" has no purchase on it.
 4. **It is free and it is addressed to a unit with no stake in Mercedes.**
 
-**The three questions to ask, each pure law, each with no disputed fact in it:**
+**SUPERSEDED 29 Oct 2026 by §17.9.3. The three questions below were the first draft. Jonathan flagged
+that a legal opinion ask has traps, and he was right: Q1 draws sub judice, invites a question-of-fact
+refusal, and carries real risk of an ADVERSE published opinion. Read §17.9 before drafting. The filed
+set is A, B and C at §17.9.3; Q1 survives only as the reframed, HELD question D.**
+
+**First draft, kept for the record:**
 
 - **Q1.** May a municipality assert "legal title" to land registered in private names, and continue to
   occupy it, without producing any instrument of acquisition or any expropriation record, having regard
@@ -938,9 +943,10 @@ the same service.]
   upon payment of prescribed fees a **ministerial** duty, and does the duty to **assess** that fee arise
   upon request rather than at the office's convenience?
 
-Each one, answered either way, is worth more than any reply we have received in fourteen months. **Q2 is
-the strongest: it is the all-heirs requirement, it has no legal source, it is still being applied, and
-it is a pure question of law that any DILG legal officer can answer in a paragraph.**
+Each one, answered either way, is worth more than any reply we have received in fourteen months. **Q2 was rightly identified as
+the strongest and it survives into the filed set as question A, but rebuilt on R.A. 11032 Sec. 21(b)
+rather than on Art. 487, because Art. 487's text is about actions in ejectment and leaning on it would
+overclaim. See §17.9.3.**
 
 ### 17.4 Instrument two: make the MLGOO close his own file
 
@@ -1015,3 +1021,128 @@ all three are usable in the forums that can actually punish.
 **Nothing in §17 requires anyone to be accused of anything.** That is the point. The Department has been
 able to decline every letter we have written because every letter asked it to judge. None of these four
 does, and all four produce paper.
+
+### 17.9 THE TRAPS IN THE LEGAL OPINION ASK, AND THE DESIGN THAT SURVIVES THEM
+
+*(Added 29 Oct 2026 on Jonathan's warning: "there must be traps in the legal opinion ask as it is
+customary for them to deflect." He is right, and the warning changed the filing. **The three questions
+drafted at §17.3 are superseded by the set at 17.9.3. Do not file §17.3's Q1.**)*
+
+#### 17.9.1 The vise, which is the real trap
+
+Two deflections point in opposite directions and between them they can kill any question:
+
+- **Too much fact** and the answer is *"the matter is sub judice"* or *"this Office does not rule on
+  questions of fact."*
+- **Too little fact** and the answer is *"the query is hypothetical and academic."*
+
+A question written to escape one lands in the other. **The escape is not a wording trick. It is to ask
+about the meaning of a provision of general application, or about the Department's own supervisory
+standard, and never about our property.** Interpretation of R.A. 7160 and its related statutes is the
+service's ordinary work, and its published archive is full of exactly that. Ownership questions are
+inherently fact-bound and cannot be made to fit.
+
+#### 17.9.2 The deflection list, and the answer to each
+
+| # | The deflection | Why it would work on the §17.3 draft | The design that defeats it |
+|---|---|---|---|
+| 1 | **"Sub judice."** | Q1 was about the Hall parcel. Civil Case 26-360 and the guardianship are live. The MLGOO already raised sub judice once, on 24 Aug, and withdrew it on 26 Aug. | **No parcel, no title number, no party, no location, no LGU named.** Plus an express sentence that no question pending before any court or quasi-judicial body is submitted. |
+| 2 | **"We do not opine on questions of fact."** | Even "given that no instrument was produced" is a factual premise. | **Zero factual premises.** Every question answerable from the statute alone. |
+| 3 | **"Opinions are for officials, not private parties."** | We never checked eligibility. | Their own published charter lists clients as "**Local Officials, functionaries and citizens**" [V]. Quote it in the letter and the deflection is spent before it is used. |
+| 4 | **"This is legal advice on a private dispute."** | Q1 was visibly our dispute. | Ask about **the limits of a local government's power and the duties of local offices**, which is governance administration. No adverse party, no claim, no remedy mentioned. |
+| 5 | **"Go to the Provincial Legal Officer."** Sec. 31. | Plausible-sounding and we had no answer. | **Sec. 31 does not apply** [V]: "In the absence of a municipal legal officer, **the municipal government** may secure the opinion of the provincial legal officer ... on any legal question affecting the municipality." It is addressed to the municipal government, not to a citizen, and not to this Department. Note it politely in a footnote-style line. (It is also the section Relucio herself cited to the Acting Governor on 13 and 17 March.) |
+| 6 | **"Local autonomy; that is within the LGU's discretion."** Doctrine B. | It answers almost anything. | **Make discretion the question.** A question in the form "is duty X ministerial or discretionary?" cannot be deflected with "it is discretionary." |
+| 7 | **"Referred to the appropriate division / forwarded for action."** | The nightmare of the last six months. | Invoke the chartered service **by its exact published name**, and ask for the reference number and the applicable processing time under the Citizen's Charter. A named service with a published clock cannot be converted into an open-ended referral. |
+| 8 | **No reply at all.** | Nothing to measure. | Because it is a chartered service, **R.A. 11032 Sec. 9(b)(1)** requires action "within the prescribed processing time stated in the Citizen's Charter", and **Sec. 21** names liable persons. Non-action becomes a violation of a kind this Department itself administers. |
+| 9 | **One deflection kills all the questions.** | Three questions, one letter. | **Severability sentence**: each question is independent, and if any one is thought not susceptible of opinion, the rest are still asked. |
+| 10 | **AN ADVERSE OPINION.** | **The trap nobody listed, and the worst one.** | See 17.9.4. |
+
+#### 17.9.3 The questions to actually file. Superseding §17.3
+
+Ranked by risk of an adverse answer, lowest first. **File A, B and C. Hold D.**
+
+**A. The Citizen's Charter question. The cleanest question in the whole matter.**
+> May a local government office impose, as a condition for acting upon a request for a service listed in
+> its Citizen's Charter, a requirement that is not listed in that Citizen's Charter?
+
+R.A. 11032 Sec. 21(b) answers it in its own words [V]: liability attaches for "**Imposition of additional
+requirements other than those listed in the Citizen's Charter**." **Adverse-answer risk: near zero**,
+because an adverse answer would contradict the text of the statute the Department helps administer. And
+it is the all-heirs power of attorney, item 3 of the Schedule, 276 days old, with no legal source ever
+given. **Note: Art. 487 of the Civil Code is deliberately NOT the hook here.** Its text is "Any one of
+the co-owners may bring an action in ejectment" [V], which is about actions, not about records requests.
+Leaning on it would overclaim and hand them a way in. Sec. 21(b) needs no help.
+
+**B. The deferral question.**
+> Where a service is listed in the Citizen's Charter and a fee is payable for it, does the assessment of
+> that fee form part of the action required within the prescribed processing time, or may an office defer
+> assessing the fee indefinitely while the request is stated to be under verification?
+
+This is item 5, "being verified and consolidated", and item 7, the research fee paid in June 2025, with
+no facts in the question. **Adverse-answer risk: low.** The only adverse route is that verification time
+is itself discretionary, which Sec. 9(b)(1)'s "shall be acted upon ... within the prescribed processing
+time" makes hard to reach.
+
+**C. The ministerial question.**
+> Is the duty of a Secretary to the Sanggunian under Sec. 469(c)(5) of R.A. 7160 to furnish, upon request
+> of any interested party, certified copies of records of public character in his custody upon payment of
+> prescribed fees a **ministerial** duty? And does the duty to prescribe or assess the fee arise upon the
+> request?
+
+**Adverse-answer risk: low.** "Shall furnish, upon request of **any interested party**" is about as
+ministerial as statutory language gets. This is the question that kills doctrine B for every records item
+at once, which is why it is worth the small risk. **And it answers deflection 6 by being deflection 6.**
+
+**D. HELD. The supervisory-standard question, reframed and NOT filed with A to C.**
+> In the exercise of general supervision under Sec. 25(a), what is a local government unit required to
+> produce in order to show that its occupation of land registered in the name of private persons is
+> within the scope of its prescribed powers and functions under Secs. 22(a)(4) and 19?
+
+This is §17.3's Q1, rewritten so that it asks about **the Department's own supervisory standard** rather
+than about anyone's ownership. It is the highest-value question in the matter and still the highest-risk.
+**Hold it until A to C come back**, for three reasons: it is the one question that can still draw a sub
+judice answer; an adverse answer on it would be quoted against us for years; and filing it with A to C
+risks deflection 9 taking all four down together. **If it is ever filed, it goes in its own letter.**
+
+#### 17.9.4 Deflection 10, the one that is not a deflection: an adverse opinion
+
+**A DILG legal opinion is permanent and public.** They are published by LO reference number. If we ask a
+question and the answer favours the LGU, we will have manufactured, at our own cost and over our own
+signature, a document the other side can wave in every forum for the rest of this matter. **A deflection
+costs us nothing. An adverse opinion costs us more than silence ever has.**
+
+Three rules follow, and they are not negotiable:
+
+1. **Never ask a question whose correct legal answer is not already near-certain.** We are not seeking
+   guidance. We are seeking a document that states what we already believe the law to be.
+2. **Prefer questions where even the adverse answer is useful.** A ruling that the all-heirs requirement
+   is permissible would at least have to name its legal source, which fourteen months of asking the LGU
+   has failed to produce. That is why A survives this test and D does not.
+3. **Never ask about ownership, title, valuation, taking or compensation.** Those are for the courts and
+   for Botor's lane, and an opinion against us there would be worse than useless.
+
+#### 17.9.5 Filing design
+
+- **Addressee:** the chartered service, by name, at **DILG Region V**, with a copy to the Central Office
+  through the Office of the Secretary. Novel questions are endorsed upward by their own procedure, so
+  nothing needs to be forced.
+- **DO NOT NAME MERCEDES, and this is a real trade-off Jonathan should decide.** Naming it makes the
+  opinion directly usable and names the LGU in a Department document. It also invites a sub judice check
+  that will find Civil Case 26-360, invites referral to the LGU for comment, and invites delay.
+  **Recommendation: do not name it in the first filing.** Get the clean legal standard, then apply it
+  ourselves in the SP or Ombudsman papers, where we control the application.
+- **Standing, in one line and no more:** a citizen who has requested services listed in a local
+  government's Citizen's Charter. Enough to not be academic. No facts imported.
+- **Menu close** (§17.6): the reference number assigned; the applicable processing time under the
+  Citizen's Charter; and whether the query will be resolved regionally or endorsed to the Central Office.
+  Three items, each answerable with a word.
+- **Without prejudice:** one line that the request is made without prejudice to any position taken in any
+  other proceeding, so nothing in it reads as a concession that the requirements questioned might be
+  valid.
+- **Assume the Mayor will read it.** The Department furnishes copies, and we have asked it to. Nothing
+  about strategy, nothing about any other forum, nothing we would not want him reading. **Which is easy,
+  because questions A to C do not mention him, his Municipality, or any property.**
+- **Contact addresses: UNKNOWN.** The DILG key-officials page shows a Director and a Division Chief for
+  the Legal and Legislative Liaison Service, but the listings conflict across pages and one of them is
+  over a year old. **Do not address a named officer from an unverified listing.** Address the office, and
+  confirm the current central e-mail and the Region V legal unit's address before transmitting.

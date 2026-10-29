@@ -219,7 +219,11 @@ assertion is the evidence and the clock resets from it.
    always "was that act within the prescribed power, and if so which one", never "did he lie."**
    And we have never used a chartered service: a request for a **DILG legal opinion** is free, open to
    citizens, and carries a published processing time of 5 to 15 days [V]. **That is the next instrument,
-   ahead of everything else in this list.** §17.3 holds the three questions to ask.
+   ahead of everything else in this list.** The questions to file are at **§17.9.3 (A, B and C)**, NOT
+   §17.3, which is superseded. **§17.9 is mandatory reading first:** a legal opinion ask has at least ten
+   deflections and one genuine danger, which is that an ADVERSE published opinion would be permanent and
+   quotable against us forever. Hence the rule: never ask a question whose correct answer is not already
+   near-certain. Nothing about land, title, valuation or compensation goes in a legal opinion request.
 
 0. **Rungs 1 and 2 are SENT (29 Oct).** Nothing further goes to the Secretariat, to ARTA, or to Region V
    before **20 Nov 2026**. Three letters in three weeks to the same chain reads as pressure; two letters and
