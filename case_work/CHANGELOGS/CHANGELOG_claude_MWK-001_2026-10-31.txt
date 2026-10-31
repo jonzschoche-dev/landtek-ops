@@ -104,3 +104,100 @@ NOT DONE / NOT AUTHORIZED
   dirty with a large volume of other desks' uncommitted and untracked work. Per the
   P0 rule the dirty state was surfaced to Jonathan and left alone. This changelog and
   the map are new files only.
+
+
+CODEX ADDENDUM / MWK-001 / 2026-10-31 / PRE-INTEGRATION AND SOURCE RECONCILIATION
+
+CHANGED
+- Added section 0 PRE-INTEGRATION to the existing DILG_OFFICER_MANDATE_MAP_2026-10-31.md.
+  Original 174-line text, all ten rows and section 5 sequence preserved byte-for-byte around the insertion.
+  Added source-linked OP procedural audit, cross-docket issue/evidence matrix, independent DILG
+  and conditional Ombudsman tracks, release/reform gates and all-velvet-glove guidance.
+- Appended this entry to the existing daily changelog; earlier entry retained.
+- Corrected the earlier Drive handling: the unrelated empty amendment Doc had been populated
+  and moved into LANDTEK under the original request. Sharing check showed anyone-with-link
+  reader access. Moved ONLY that Doc back to My Drive root; metadata now shows shared=false
+  and owner-only permission. Wider LANDTEK permissions were not changed.
+
+DECIDED
+- User's source clarification identifies this local map, deploy_1311, as the actual artifact.
+- Use the existing local map under MASTER_PLAN.md; do not maintain a parallel live Drive plan.
+- All velvet glove across future communications; precise outcomes, facts and release gates retained.
+- No draft edits, database writes, sends, filings, printing, law changes, commits, staging, push,
+  pull or deployment in this update. Unrelated dirty work remains untouched.
+
+OPEN
+- OP fee/service/admission/consolidation findings remain as qualified in section 0.
+- Verify primary May 6 memorandum using corpus 13978, Annex N-12, stamped scan 1189.
+- Existing November 12/20/23 calendar retained; validate receipt and rule before a statutory consequence.
+- Local deploy_1311 was one commit ahead of cached origin/main when inspected; no remote refresh
+  or synchronization performed. This additive map/changelog update remains unstaged and uncommitted.
+
+CONFLICTS
+- Map row 6 says EO 24-2026 is omitted; current local CART draft/review memo includes EO analysis.
+  Both preserved. Approved release version/scope remains for Jonathan; no EO release authorized.
+- Region I charter used for Region V, DILG power to rule, report-default inference, and prior SP/
+  Ombudsman jurisdiction/sanction/status claims are flagged for primary-source review before reuse.
+- Earlier Drive supplement was a separate artifact, not the missing map. It is being retired as
+  a private reference after the canonical update is verified; it must not be treated as the live plan.
+
+
+FINAL DRIVE OUTCOME / 31 OCTOBER 2026
+- Automatic approval review rejected deleting the existing cloud document body and replacing
+  it with a pointer, citing missing explicit deletion authority and revision safety.
+- Used the non-destructive alternative: retained all historical content and added a prominent
+  RETIRED WORKING COPY notice with the canonical local path. Renamed the file
+  "LandTek DILG - private retired working copy". No parallel live plan is maintained there.
+- Owner-only permission was verified after returning the document to My Drive root.
+- The earlier statement "being retired as a private reference" means this archived copy with
+  a source notice, not deletion of its body or revision history.
+
+
+ADDENDUM 2 / 31 OCTOBER 2026 / SPLIT AND TWO CORRECTIONS
+On Jonathan's instruction: "fix both overstatements and split section 0 into its own file."
+
+CHANGED
+- case_work/MWK-001/DILG_OP_PREINTEGRATION_AUDIT_2026-10-31.md  NEW, 226 lines.
+  The PRE-INTEGRATION section written into the mandate map by another LandTek session on
+  31 Oct is moved here VERBATIM. Nothing was softened or dropped: all seven subsections
+  (0.1 velvet glove, 0.2 OP admissibility audit, 0.3 cross-docket matrix, 0.4 independent
+  DILG and conditional Ombudsman tracks, 0.5 gates G0 to G5, 0.6 reconciliation points,
+  0.7 source index), all 16 S-refs, both L-refs and all 6 gate rows are present and counted.
+  Three edits only, all structural or required by the fixes below: the 0.6 lead-in and the
+  preserved-sequence bullet no longer refer to text sitting below them, and two
+  reconciliation points are marked resolved.
+- case_work/MWK-001/DILG_OFFICER_MANDATE_MAP_2026-10-31.md  371 -> 210 lines.
+  Section 0 is now a short block: a pointer to the audit file, the three qualifications that
+  remain live (EO 24-2026 CONFLICT/HOLD; Region V service standard UNVERIFIED as to Region V;
+  no draft status authorizes Send), and a note that two further qualifications are fixed in
+  place. The ten rows, sections 2 to 5 and the order of play are untouched: measured against
+  deploy_1311 the file is +39/-3 and the only three removed lines are the two corrected
+  passages.
+- FIX 1, section 3. "already seized" is gone. It now records that CSC OAC-L Letter No. 270 of
+  23 Jun 2026 FORWARDED the matter to the Ombudsman, that a forwarding letter is not a
+  docketed case, that the docket, respondents and covered allegations are UNKNOWN, and that
+  open item I3 with the Chief of Staff governs. The phrase is banned in terms.
+- FIX 2, row 7. The day count no longer asserts default. 170 days is stated as elapsed time;
+  the record says we have never been FURNISHED the report, which is not the same as no report
+  having been submitted. The ask was always a question and stays one.
+
+DECIDED
+- Two files, not one. A per-officer operating document carried to a field office cannot also
+  be a procedural audit. Neither is a parallel plan: each is the single home of its subject,
+  and the map links to the audit.
+- The other session's 371-line version is committed verbatim FIRST, as its own commit, so its
+  exact text is in the history before the split touches it.
+
+OPEN
+- Region V charter entry still to be obtained. Row 4's chartered-service claim, its "no payment
+  required" line and its processing time are Region 1's published standards. The staged letter
+  asserts no number, so nothing defective would go out.
+- EO 24-2026 scope: CONFLICT between row 6 and the current local Romero draft. Jonathan's call.
+- Still awaiting his word only: Send on drafts r-2057607761450435144 and r4872773606278474622;
+  print and hand-delivery go for the MLGOO letter; the row 7 decision after row 6 lands.
+- Nothing pushed. deploy_1311 and these two commits are local.
+- 16 Drive bearer URLs now sit in the audit file while the LANDTEK Drive is public by link.
+
+CONFLICTS
+- None with the other session on the merits. Its three qualifications that I accepted are
+  carried into the record; the two it raised against my own text are fixed, not argued.
