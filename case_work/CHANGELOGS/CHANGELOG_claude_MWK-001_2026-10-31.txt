@@ -1,0 +1,106 @@
+CHANGELOG claude / MWK-001 / 2026-10-31
+Session: DILG officer mandate map (Mac desk). Nothing sent, nothing printed, nothing pulled.
+
+CHANGED
+
+1. NEW case_work/MWK-001/DILG_OFFICER_MANDATE_MAP_2026-10-31.md
+   Ten rows, one per DILG officer or office in the chain. Each row: the mandate with
+   its basis, the ONE act that officer is permitted to perform, the ONE document he
+   needs, the ask in yes/no/date form, the drafting owner, the status and the receipt
+   route. Built on Jonathan's instruction "we will have a tailored approach to each
+   officer".
+
+DECIDED
+
+- A single evidence pack to every officer is REJECTED, and Jonathan agreed. Reasons
+  recorded: a mandate is narrow and personal, so one pack hands each recipient a
+  document mostly outside his own authority, which is the condition under which an
+  officer refers instead of acting; volume supplies a lawful non-answer
+  ("voluminous, under evaluation") that cannot be defaulted; a pack addressed to
+  everybody has no owner, so nobody is in default; and shipping is not service,
+  because a clock runs from proof of receipt.
+- RULE ADOPTED: breadth is for proof of notice, depth is for the forum that must
+  rule, and the two are never mixed.
+- RULE ADOPTED: for each hand-delivered item the deliverable is TWO copies, the one
+  left with the office and ours for the receiving stamp. The stamp is the product.
+- The 102-page pack's home is a forum that MUST rule: annexes to a verified
+  Sec. 61(b) complaint before the Sangguniang Panlalawigan, or the Ombudsman, which
+  is already seized via CSC OAC-L 270. Nothing on the officer map requires the pack.
+
+OFFICERS VERIFIED FROM THE RECORD (names and titles, not from memory)
+
+- MLGOO Vencer Krystian M. Guerrero (LGOO VI), Mercedes Field Office
+- PD Melody E. Relucio, CESO V, DILG Camarines Norte
+- RD Atty. Arnaldo E. Escober, Jr., DILG Region V
+- Romar B. Panganiban, DILG CART Secretariat
+- Usec. Omar Alexander V. Romero, CART Chairperson
+- Asec. Ester A. Aldana, CESO II, Vice-Chairperson, DILG CART
+- The Secretary, DILG: name UNKNOWN to this desk, not guessed
+- Region V Legal Unit and the Central Office legal service: no named officer verified
+
+THE GAP THE MAP FOUND (row 7, a decision for Jonathan)
+
+- Asec. Aldana signed the 6 May 2026 memorandum whose operative words, copy
+  furnished to Jonathan, asked Region V "to submit a report on the actions taken to
+  the DILG-CART, through the Secretariat ... on or before 14 May 2026". That is the
+  Department's own document and the Department's own deadline, and it is 170 DAYS
+  OVERDUE as of 31 Oct 2026.
+- One question to her answers it: did the report ever reach the Secretariat? She
+  needs no document from us, no fact of ours is in it, and the answer is either a
+  report we have never seen or a dated admission that none came.
+- NOT DRAFTED. The CART desk's step1b package COPIES her but does not ASK her, and
+  that desk's own memo leaves it open as its item 4 ("Copying Asec. Aldana escalates
+  the optics. Keep or drop."). Rows 5 and 6 belong to the CART desk and I did not
+  draft into them. Flagged for Jonathan rather than changed. My view [J]: asking is
+  worth more than copying, and if adopted it should be one question, one paragraph,
+  no annexes, sent AFTER the Romero letter lands so it does not compete.
+
+NEW FACT FROM ANOTHER DESK, READ NOT WRITTEN
+
+- The CART Secretariat replied at 2:13 PM on 29 Oct 2026, unsigned, from the shared
+  mailbox, on a NEW thread, attaching the Mayor's own letter of 24 Apr 2026. That
+  letter predates the referral (4 May) and the endorsement (6 May), and DILG
+  Camarines Norte had already sent it in full on 12 May. It answered none of our
+  three questions. The 20 Nov reply date and 23 Nov chaser still stand.
+  Source: the CART desk's 2026-10-29_reply_analysis.md. I did not re-verify the
+  Gmail record myself.
+
+DAY COUNTS COMPUTED TO 31 OCT 2026
+
+  Aldana memo deadline 14 May 2026 ....... 170
+  ARTA referral 4 May 2026 ............... 180
+  PPDC transmittal 23 Jun 2026 ........... 130
+  MLGOO 2nd Indorsement 25 Aug 2026 ....... 67
+  MLGOO Supplemental 26 Aug 2026 .......... 66
+  MLGOO transmittal 4 Sep 2026 ............ 57
+
+OPEN
+
+- Row 1 (MLGOO) letter has been drafted since 24 Oct and never sent. Hand delivery
+  with a stamped copy is the recommended next physical act, on Jonathan's go.
+- Rows 2 and 4 are staged Gmail drafts awaiting Send.
+- Row 3 (RD Escober / the Escober letter) HELD until the 12 Nov records request.
+  Until that letter is read, do not characterise what the Regional Director
+  instructed.
+- Row 9 (SGLG) blocked: the current cycle's MC number, performance areas, indicators
+  and calendar are UNKNOWN; area names and counts changed between cycles and the
+  published sources conflict.
+- Row 10 blocked: no verified Central Office legal service address.
+- EO No. 24-2026 is held by the CART desk for the CSC and Ombudsman merits. Any
+  drafting of mine must respect that hold.
+
+CONFLICTS
+
+- None introduced. Row 7 is flagged as a decision for Jonathan because it touches
+  the CART desk's open item 4, not because the desks disagree on any fact.
+- Standing and unresolved, not mine: CLAUDE.md carries Gloria Balane's title as
+  ...127 while the desk memory and the 29 Oct Grok note both give ...126. Nothing in
+  this session depends on either number.
+
+NOT DONE / NOT AUTHORIZED
+
+- Nothing sent. Nothing printed. No print authorization exists for any item.
+- NOT PULLED and NOT COMMITTED: the session-start hook reported the working tree
+  dirty with a large volume of other desks' uncommitted and untracked work. Per the
+  P0 rule the dirty state was surfaced to Jonathan and left alone. This changelog and
+  the map are new files only.
