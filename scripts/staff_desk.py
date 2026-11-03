@@ -177,6 +177,9 @@ MSG = {
     "no_task_file":{"en": "I got your file, but you have no open task to match it to. Jonathan will see it.",
                    "tl": "Natanggap ko ang file mo, pero wala kang open task na pwedeng pagtapatan nito. Makikita ni Jonathan."},
     "morning":    {"en": "Good morning. ", "tl": "Good morning! "},
+    "why":        {"en": "Why task {i}: {w}", "tl": "Bakit kailangan ang task {i}: {w}"},
+    "why_none":   {"en": "The record doesn't say why for task {i}. Jonathan will see your question.",
+                   "tl": "Walang nakasulat sa record kung bakit para sa task {i}. Makikita ni Jonathan ang tanong mo."},
     "new_task":   {"en": "New task. ", "tl": "May bagong task ka. "},
 }
 
@@ -226,6 +229,8 @@ def _next_task_text(cur, m):
     items = _candidates(cur, m["assignee_key"])
     if not items:
         return _say(m, "no_tasks")
+    if items[0][0] == "errand" and m.get("channel"):
+        _set_state(cur, m, focus=items[0][1]["id"])      # "why?" with no number = the task just shown
     more = _say(m, "more", n=len(items) - 1) if len(items) > 1 else ""
     return _line(*items[0], m) + more
 
@@ -248,6 +253,8 @@ DONE = re.compile(r"\b(done|tapos|nagawa|finished|served|naserve|na-serve|nai-se
 SERVE_WORDS = ("served", "naserve", "na-serve", "nai-serve", "delivered")
 HOW = re.compile(r"^\s*(how|paano)\s*#?\s*(\d+)\s*\??\s*$", re.I)
 LIST = re.compile(r"\b(all|lahat|list)\b", re.I)
+WHY = re.compile(r"\b(why|bakit|necessary|kailangan ba|para saan)\b", re.I)
+NUM = re.compile(r"#?\b(\d{1,4})\b")
 
 
 def _handle_staff(cur, m, mid, text):
@@ -270,12 +277,23 @@ def _handle_staff(cur, m, mid, text):
     if text == "[media]" or st.get("pending_media") and DIGIT.match(text):
         return _handle_media(cur, m, mid, text)
 
+    if WHY.search(text):
+        nm = NUM.search(text)
+        eid = int(nm.group(1)) if nm else st.get("focus")
+        e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == eid), None) if eid else None
+        if e:
+            _set_state(cur, m, focus=e["id"])
+            _send(m["channel"], m["channel_user_id"],
+                  _say(m, "why", i=e["id"], w=e["why"]) if e.get("why") else _say(m, "why_none", i=e["id"]))
+            return "why"
+
     hm = HOW.match(text)
     if hm:
         e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == int(hm.group(2))), None)
         if not e:
             _send(m["channel"], m["channel_user_id"], _say(m, "not_open"))
             return "how_bad"
+        _set_state(cur, m, focus=e["id"])
         _send(m["channel"], m["channel_user_id"],
               f"Task {e['id']}: {e['how'] or e['title']} " + _say(m, "send_back", p=_lc(e['proof_needed']) or 'a short note')
               + " " + _say(m, "reply_done", i=e["id"]))
