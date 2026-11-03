@@ -123,16 +123,24 @@ def _open_tasks(cur, assignee):
 
 def _open_errands(cur, assignee, include_waiting=False):
     states = ["open", "done_awaiting_check"] if include_waiting else ["open"]
-    cur.execute("""SELECT e.*, mt.client_code FROM staff_task e LEFT JOIN matters mt ON mt.matter_code = e.matter_code
+    cur.execute("""SELECT e.*, mt.client_code,
+                          EXISTS (SELECT 1 FROM staff_task d WHERE d.id = e.depends_on AND d.state <> 'done') AS dep_open
+                     FROM staff_task e LEFT JOIN matters mt ON mt.matter_code = e.matter_code
                     WHERE e.assignee=%s AND e.state = ANY(%s)
                     ORDER BY e.due_date NULLS LAST, e.seq, e.id""", (assignee, states))
     return cur.fetchall()
 
 
-def _candidates(cur, assignee):
-    """Everything she can act on now, soonest due first: [(kind, row)]."""
-    items = [("serve", t) for t in _open_tasks(cur, assignee)] + [("errand", e) for e in _open_errands(cur, assignee)]
+def _candidates(cur, assignee, skip=None):
+    """Everything she can act on now, soonest due first: [(kind, row)]. `skip` = errand ids she passed on today."""
+    items = [("serve", t) for t in _open_tasks(cur, assignee)] + \
+            [("errand", e) for e in _open_errands(cur, assignee) if e["id"] not in (skip or ())]
     return sorted(items, key=lambda kr: (kr[1]["due_date"] is None, kr[1]["due_date"] or date.max))
+
+
+def _skipped_today(m):
+    sk = ((m or {}).get("state") or {}).get("skipped") or {}
+    return set(sk.get("ids", [])) if sk.get("on") == str(_today_manila()) else set()
 
 
 # ── voice: speak the way the officer asked (stored in their own words at onboarding) ──────────────────────
@@ -177,6 +185,9 @@ MSG = {
     "no_task_file":{"en": "I got your file, but you have no open task to match it to. Jonathan will see it.",
                    "tl": "Natanggap ko ang file mo, pero wala kang open task na pwedeng pagtapatan nito. Makikita ni Jonathan."},
     "morning":    {"en": "Good morning. ", "tl": "Good morning! "},
+    "dep_note":   {"en": " Note: per the source, task {d} comes first.",
+                   "tl": " Paalala: ayon sa source, dapat matapos muna ang task {d} bago ito."},
+    "skipped":    {"en": "OK, skipping task {i} for today. ", "tl": "Sige, laktaw muna ang task {i} ngayon. "},
     "why":        {"en": "Why task {i}: {w}", "tl": "Bakit kailangan ang task {i}: {w}"},
     "why_none":   {"en": "The record doesn't say why for task {i}. Jonathan will see your question.",
                    "tl": "Walang nakasulat sa record kung bakit para sa task {i}. Makikita ni Jonathan ang tanong mo."},
@@ -203,6 +214,7 @@ def _task_line(t):
 
 def _errand_line(e, m=None):
     _, detailed = _voice(m)
+    dep = _say(m, "dep_note", d=e["depends_on"]) if e.get("depends_on") and e.get("dep_open") else ""
     due = e["due_date"].strftime("%a %d %b") if e["due_date"] else _say(m, "no_date")
     head = f"Task {e['id']}: {e['title']}. " + _say(m, "due", d=due)
     if detailed:
@@ -212,8 +224,8 @@ def _errand_line(e, m=None):
         if e.get("proof_needed"):
             parts.append(_say(m, "send_back", p=_lc(e["proof_needed"])))
         parts.append(_say(m, "reply_done", i=e["id"]))
-        return " ".join(parts)
-    return head + " " + _say(m, "reply_how", i=e["id"])
+        return " ".join(parts) + dep
+    return head + " " + _say(m, "reply_how", i=e["id"]) + dep
 
 
 def _lc(t):
@@ -226,7 +238,7 @@ def _line(kind, row, m=None):
 
 
 def _next_task_text(cur, m):
-    items = _candidates(cur, m["assignee_key"])
+    items = _candidates(cur, m["assignee_key"], _skipped_today(m)) or _candidates(cur, m["assignee_key"])
     if not items:
         return _say(m, "no_tasks")
     if items[0][0] == "errand" and m.get("channel"):
@@ -255,6 +267,11 @@ HOW = re.compile(r"^\s*(how|paano)\s*#?\s*(\d+)\s*\??\s*$", re.I)
 LIST = re.compile(r"\b(all|lahat|list)\b", re.I)
 WHY = re.compile(r"\b(why|bakit|necessary|kailangan ba|para saan)\b", re.I)
 NUM = re.compile(r"#?\b(\d{1,4})\b")
+PASS = re.compile(r"\b(pass|skip|laktaw\w*|mamaya na|later|lipat)\b", re.I)
+ORDINALS = {r"first|una|1st|unang": 1, r"second|pangalawa|ikalawa|2nd": 2, r"third|pangatlo|ikatlo|3rd": 3,
+            r"fourth|pang-?apat|ikaapat|4th": 4, r"fifth|panlima|ikalima|5th": 5, r"sixth|pang-?anim|6th": 6,
+            r"seventh|pampito|7th": 7}
+GOTO = re.compile(r"\b(?:task|go to|punta sa)\s*#?(\d{1,4})\b", re.I)
 
 
 def _handle_staff(cur, m, mid, text):
@@ -276,6 +293,27 @@ def _handle_staff(cur, m, mid, text):
 
     if text == "[media]" or st.get("pending_media") and DIGIT.match(text):
         return _handle_media(cur, m, mid, text)
+
+    pm, gm = PASS.search(text), GOTO.search(text)
+    ordinal = next((n for pat, n in ORDINALS.items() if re.search(rf"\b({pat})\b", text, re.I)), None)
+    if pm or gm or (ordinal and re.search(r"\b(task|gawain)\b", text, re.I)):
+        if pm and st.get("focus"):
+            sk = _skipped_today(m) | {st["focus"]}
+            _set_state(cur, m, skipped={"on": str(_today_manila()), "ids": sorted(sk)})
+        target = None
+        if gm:
+            target = next(((k, r) for k, r in _candidates(cur, m["assignee_key"]) if r["id"] == int(gm.group(1))), None)
+        elif ordinal:
+            allitems = _candidates(cur, m["assignee_key"])
+            target = allitems[ordinal - 1] if len(allitems) >= ordinal else None
+        lead = _say(m, "skipped", i=st["focus"]) if pm and st.get("focus") else ""
+        if target:
+            if target[0] == "errand":
+                _set_state(cur, m, focus=target[1]["id"])
+            _send(m["channel"], m["channel_user_id"], lead + _line(*target, m))
+        else:
+            _send(m["channel"], m["channel_user_id"], lead + _next_task_text(cur, m))
+        return "goto" if target else "pass"
 
     if WHY.search(text):
         nm = NUM.search(text)
