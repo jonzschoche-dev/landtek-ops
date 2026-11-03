@@ -112,8 +112,10 @@ def _needs_jonathan(cur):
         for sq in _q(cur, """SELECT q.id, q.assignee, q.question, q.outcome, q.created_at, q.task_id
                                FROM staff_question q WHERE q.outcome <> 'answered'
                                 AND q.created_at > now() - interval '7 days' ORDER BY q.id DESC LIMIT 10"""):
-            rows.append(_row("question", f"{_e(sq['assignee'].capitalize())} asked: \u201c{_e(sq['question'])}\u201d",
-                             f"not in the record ({_e(sq['outcome'].replace('_', ' '))}) · "
+            relay = sq["outcome"] == "relay"
+            rows.append(_row("check" if relay else "question",
+                             f"{_e(sq['assignee'].capitalize())} {'asks you to check' if relay else 'asked'}: \u201c{_e(sq['question'])}\u201d",
+                             ("relayed to you · " if relay else f"not in the record ({_e(sq['outcome'].replace('_', ' '))}) · ") +
                              f"{_e(sq['created_at'].astimezone(MANILA).strftime('%a %d %b %H:%M'))}",
                              f"/ops/now/stask/{sq['task_id']}" if sq["task_id"] else None))
     except Exception:

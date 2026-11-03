@@ -325,6 +325,42 @@ def _answer_from_materials(cur, m, question):
     return send, outcome
 
 
+# ── officer -> Jonathan relay ──────────────────────────────────────────────────────────────────────────
+JONATHAN_TG = "6513067717"
+RELAY = re.compile(r"\b(notify|tell|inform|ask|message|i-?message)\s+(sir\s+)?jonathan\b|\bcheck it\b|\bpaki-?check\b|"
+                   r"\bpakisabi\b|\bsabihin (mo )?(kay|si) (sir )?jonathan\b|\bpatingnan (mo )?kay jonathan\b", re.I)
+
+
+def _relay(cur, m, text):
+    """Pass the officer's request to Jonathan: log it (board) and push one Telegram line (S14-paced)."""
+    st = m.get("state") or {}
+    eid = st.get("focus")
+    e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == eid), None) if eid else None
+    cur.execute("""SELECT text_content FROM channel_messages WHERE channel_id=(SELECT id FROM channels WHERE name=%s)
+                    AND channel_user_id=%s AND direction='inbound' ORDER BY id DESC LIMIT 3""",
+                (m["channel"], m["channel_user_id"]))
+    recent = " / ".join(reversed([r["text_content"] for r in cur.fetchall() if r["text_content"]]))[:300]
+    about = f"task {e['id']} ({e['title']})" if e else "her current work"
+    line = f"{m['name']} asks you to check something on {about}. Her words: \"{recent}\". Reply to her on Messenger."
+    via = "board"
+    if not DRY:
+        try:
+            import tg_send
+            ok, _info = tg_send.send(chat_id=JONATHAN_TG, text=line, source="leo", human_readable=True)
+            via = "telegram" if ok else "board (telegram held by pacing)"
+        except Exception as ex:
+            via = f"board (telegram error {type(ex).__name__})"
+    else:
+        print(f"  [dry-telegram {JONATHAN_TG}] {line}")
+    cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, relayed_via)
+                   VALUES (%s,%s,%s,'relay',%s)""", (m["assignee_key"], e["id"] if e else None, recent or text, via))
+    lang, _ = _voice(m)
+    _send(m["channel"], m["channel_user_id"],
+          "Sige, sinabihan ko na si Jonathan na i-check. Ime-message ka niya." if lang == "tl"
+          else "Done, I've told Jonathan to check. He'll message you.")
+    return f"relay:{via}"
+
+
 # ── case questions (Jonathan, 3 Nov: "cases too") ─────────────────────────────────────────────────────
 # Answered straight from the matters table, never through leo_service.try_purpose_route (on 3 Nov that router
 # returned title lists for court-date questions and MWK rows under other clients). A question gets a case
@@ -505,6 +541,9 @@ def _handle_staff(cur, m, mid, text):
         e = next((x for x in _open_errands(cur, m["assignee_key"]) if x["id"] == eid), None)
         if e and re.search(r"\b(name|confirmation|confirm|note|answer)\b", e.get("proof_needed") or "", re.I):
             return _errand_submitted(cur, m, e, None, text)
+
+    if text and RELAY.search(text):
+        return _relay(cur, m, text)
 
     # case questions: only when exactly one matter is named
     if text and CASE_HINT.search(text) or (text and _find_matters(cur, text)):
