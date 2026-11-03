@@ -7,7 +7,8 @@ kristyle should have her own dashboard."
   /ops/now                 Jonathan: what needs him, office clocks, fronts, Kristyle, the machine.
   /ops/staff/<assignee>    an officer's own page (Jonathan previews it here, behind /ops basic auth).
 
-SQL-only, read-only, no LLM. Every row is a database row; a front with no date or a past date is shown
+SQL-only, no LLM. One write: Jonathan answering an officer's question (/ops/now/question/<id>) turns his
+answer into a live knowledge card + exam question (deploy_1326) and, if he ticks it, sends it to her. Every row is a database row; a front with no date or a past date is shown
 as such, never filled in. Mounted on leo_tools (port 8765) under the existing /ops nginx basic auth.
 """
 from __future__ import annotations
@@ -22,7 +23,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import psycopg2
 import psycopg2.extras
-from flask import Blueprint, abort
+from flask import Blueprint, abort, redirect, request
 
 PG_DSN = os.getenv("LEO_TOOLS_PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 MANILA = timezone(timedelta(hours=8))
@@ -110,14 +111,14 @@ def _needs_jonathan(cur):
                          f"{_e(i['ladder'])} · waiting {age}d", f"/ops/now/letter/{i['id']}"))
     try:   # officer questions the bot could not answer from the record (staff_question, deploy_1323)
         for sq in _q(cur, """SELECT q.id, q.assignee, q.question, q.outcome, q.created_at, q.task_id
-                               FROM staff_question q WHERE q.outcome <> 'answered'
+                               FROM staff_question q WHERE q.outcome <> 'answered' AND q.answered_card_id IS NULL
                                 AND q.created_at > now() - interval '7 days' ORDER BY q.id DESC LIMIT 10"""):
             relay = sq["outcome"] == "relay"
             rows.append(_row("check" if relay else "question",
                              f"{_e(sq['assignee'].capitalize())} {'asks you to check' if relay else 'asked'}: \u201c{_e(sq['question'])}\u201d",
                              ("relayed to you · " if relay else f"not in the record ({_e(sq['outcome'].replace('_', ' '))}) · ") +
                              f"{_e(sq['created_at'].astimezone(MANILA).strftime('%a %d %b %H:%M'))}",
-                             f"/ops/now/stask/{sq['task_id']}" if sq["task_id"] else None))
+                             f"/ops/now/question/{sq['id']}"))
     except Exception:
         cur.connection.rollback()
     for o in _q(cur, """SELECT id, matter_code, office, state, updated_at FROM office_obligation
@@ -163,6 +164,19 @@ def _machine(cur):
     if os.path.exists(rec):
         h = (time.time() - os.path.getmtime(rec)) / 3600
         out.append(("Private Drive copy", f"{h:.0f}h old", "grn" if h <= 30 else "red"))
+    try:   # the field-officer bot's nightly exam (staff_exam, deploy_1326)
+        r = _q(cur, """SELECT run_id, max(run_at) AS at, count(*) FILTER (WHERE passed) AS ok,
+                              count(*) FILTER (WHERE passed IS NOT NULL) AS n FROM staff_exam_run
+                        GROUP BY run_id ORDER BY max(run_at) DESC LIMIT 1""")
+        if r and r[0]["n"]:
+            x = r[0]
+            h = (datetime.now(timezone.utc) - x["at"]).total_seconds() / 3600
+            out.append(("Bot exam", f"{x['ok']}/{x['n']} passed · {h:.0f}h ago",
+                        "grn" if x["ok"] == x["n"] and h <= 30 else ("red" if h > 30 else "amb"), "/ops/now/exam"))
+        else:
+            out.append(("Bot exam", "not run yet" if not r else "skipped (local model offline)", "amb", "/ops/now/exam"))
+    except Exception:
+        cur.connection.rollback()
     du = shutil.disk_usage("/")
     pct = du.used * 100 // du.total
     out.append(("Server disk", f"{pct}% full", "red" if pct >= 90 else ("amb" if pct >= 85 else "grn")))
@@ -217,7 +231,8 @@ def now():
             f'<div class="kpi"><span class="big {"red" if overdue else "grn"}">{overdue}</span><span class="m">offices overdue</span></div>'
             f'<div class="kpi"><span class="big {"red" if stale else "grn"}">{stale}/{len(fronts)}</span><span class="m">fronts with no current date</span></div>'
             f'</div>')
-    mach = "".join(_row(_e(k), f'<span class="{c}">{_e(v)}</span>', "", "/ops/health") for k, v, c in machine)
+    mach = "".join(_row(_e(k), f'<span class="{x[2]}">{_e(x[1])}</span>', "", x[3] if len(x) > 3 else "/ops/health")
+                   for x in machine)
     body = (kpis
             + _section("Needs you", len(needs), "".join(needs), "Nothing is waiting on you.")
             + _section("Office clocks (the drip)", len(clocks), "".join(clocks), "No clocks running.")
@@ -402,3 +417,78 @@ def stask(sid):
                  ("Matter", f'<a href="/ops/matter/{_e(e["matter_code"])}">{_e(e["matter_code"])}</a>'),
                  ("Source", _e(e["source_ref"]))])
     return _detail(f"Task {sid}", _e(e["matter_code"]), [("Summary", facts)])
+
+
+@bp.route("/now/exam")
+def exam():
+    conn = psycopg2.connect(PG_DSN)
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        last = _q(cur, "SELECT run_id FROM staff_exam_run ORDER BY run_at DESC LIMIT 1")
+        rows = _q(cur, """SELECT e.topic, e.focus_seq, e.question, e.note, r.passed, r.handled, r.reply, r.why_failed
+                            FROM staff_exam_run r JOIN staff_exam e ON e.id=r.exam_id WHERE r.run_id=%s
+                           ORDER BY r.passed NULLS FIRST, e.topic, e.id""", (last[0]["run_id"] if last else "",))
+        cards = _q(cur, """SELECT topic, state, count(*) n FROM staff_knowledge GROUP BY topic, state ORDER BY topic, state""")
+    finally:
+        conn.close()
+    res = "".join(_row(f'<span class="{"grn" if r["passed"] else ("amb" if r["passed"] is None else "red")}">'
+                       f'{"pass" if r["passed"] else ("skipped" if r["passed"] is None else "FAIL")}</span>',
+                       f'[{_e(r["topic"])}] {_e(r["question"])}',
+                       _e(f'{r["why_failed"] + " · " if r["why_failed"] else ""}reply: {(r["reply"] or "")[:300]}'))
+                  for r in rows)
+    cs = "".join(_row(_e(c["topic"]), f'{c["n"]} card(s)', _e(c["state"])) for c in cards)
+    return _detail("Bot exam", "real officer questions, graded mechanically every night; a topic's cards go live "
+                   "only when all its questions pass", [("Last run", res or '<div class="empty">Not run yet.</div>'),
+                                                        ("Knowledge cards", cs or '<div class="empty">None.</div>')])
+
+
+@bp.route("/now/question/<int:qid>", methods=["GET", "POST"])
+def question(qid):
+    conn = psycopg2.connect(PG_DSN)
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        q = _one(cur, """SELECT q.*, t.title, t.matter_code, t.seq FROM staff_question q
+                           LEFT JOIN staff_task t ON t.id=q.task_id WHERE q.id=%s""", (qid,))
+        if request.method == "POST" and not q["answered_card_id"]:
+            answer = (request.form.get("answer") or "").strip()
+            if not answer:
+                abort(400)
+            matter = q["matter_code"] or "LANDTEK-OPC-FORMATION"
+            cur.execute("""INSERT INTO staff_knowledge (assignee, matter_code, topic, card_key, fact, source_kind,
+                                   source_ref, checked_on, state, from_question_id)
+                           VALUES (%s,%s,'jonathan',%s,%s,'jonathan_said',%s,%s,'live',%s)
+                           ON CONFLICT (matter_code, topic, card_key) DO UPDATE SET fact=EXCLUDED.fact, updated_at=now()
+                           RETURNING id""",
+                        (q["assignee"], matter, f"q{qid}", f"Asked: {q['question']} Jonathan's answer: {answer}",
+                         f"Jonathan on /ops/now, staff_question:{qid}", _today(), qid))
+            card = cur.fetchone()["id"]
+            cur.execute("""INSERT INTO staff_exam (assignee, matter_code, topic, focus_seq, question, expect, unknown_ok, note)
+                           VALUES (%s,%s,'jonathan',%s,%s,'answer',false,%s)
+                           ON CONFLICT (assignee, focus_seq, question) DO NOTHING""",
+                        (q["assignee"], matter, q["seq"], q["question"], f"from Jonathan's answer, card {card}"))
+            cur.execute("UPDATE staff_question SET answered_card_id=%s WHERE id=%s", (card, qid))
+            sent = ""
+            if request.form.get("send"):
+                cur.execute("SELECT channel, channel_user_id FROM staff_desk_members WHERE assignee_key=%s AND active",
+                            (q["assignee"],))
+                mem = cur.fetchone()
+                if mem and mem["channel"] == "messenger":
+                    from channel_adapters import _messenger_send
+                    sent = "sent" if _messenger_send(mem["channel_user_id"], f"Sagot ni Jonathan: {answer}") else "send failed"
+            conn.commit()
+            return redirect(f"/ops/now/question/{qid}?done={sent or 'saved'}")
+    finally:
+        conn.close()
+    facts = _kv([("Who", _e(q["assignee"])), ("Asked", _e(q["question"])),
+                 ("When", _e(q["created_at"].astimezone(MANILA).strftime("%a %d %b %H:%M"))),
+                 ("Task", f'<a href="/ops/now/stask/{q["task_id"]}">{_e(q["title"])}</a>' if q["task_id"] else "none in focus"),
+                 ("Bot result", _e(q["outcome"])), ("Bot draft", _e(q["answer"] or "")), ("Detail", _e(q["detail"] or ""))])
+    if q["answered_card_id"]:
+        form = (f'<div class="grn">Answered: card {q["answered_card_id"]} is live and the question is in the exam'
+                f'{(" (" + _e(request.args.get("done")) + ")") if request.args.get("done") else ""}.</div>')
+    else:
+        form = ('<form method="post"><textarea name="answer" rows="4" style="width:100%;font:inherit" '
+                'placeholder="Your answer, in plain words. It becomes a live card the bot answers from."></textarea>'
+                '<label style="display:block;margin:8px 0"><input type="checkbox" name="send" checked> '
+                'Also send it to her on Messenger</label><button type="submit">Save answer</button></form>')
+    return _detail(f"Question {qid}", _e(q["assignee"]), [("Summary", facts), ("Your answer", form)])

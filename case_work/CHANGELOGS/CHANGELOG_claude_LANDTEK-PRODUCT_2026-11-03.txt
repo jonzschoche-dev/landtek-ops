@@ -52,3 +52,19 @@ OPEN
 - Messenger 24h rule: bot-started messages (morning brief, approval asks to Jonathan) only deliver within 24h of the person's last message. No --tick timer installed. Approval asks to Jonathan stay queued if undeliverable.
 - Kristyle's general questions (e.g. court dates) get the honest fallback; her read scope across matters is undecided.
 - Old Messenger account #80 left as is (unreachable).
+
+ADDENDUM 2 (evening 3 Nov)
+CHANGED
+- deploy_1323: staff desk answers free questions from the task's source material (local model, token-checked); staff_question log.
+- deploy_1324: "check it / notify Jonathan" relays to Jonathan's Telegram + board. Ollama on the Mac re-bound to 0.0.0.0 (launchctl kickstart) so the VPS reaches it.
+- Case questions answered from the matters table (one named matter only). deploy_1325 (other session): Leo router client-walled.
+- deploy_1326 bot training: staff_knowledge (18 sourced cards: company, receipts, BIR incl. RDO 64-Talisay / no P500 fee / DST about P250, FAO deadline + no bond + signing, SEC fiscal year, LGU permits, Landbank), staff_exam (48 questions incl. Kristyle's own 6), staff_exam_run; scripts/staff_exam.py runs them through the real handler in a rolled-back transaction, graded mechanically, promotes passing topics. First run 42/48; fixed case-branch over-capture (deadline/petition/Landbank), "kailangan ba" read as why, model invention on "what if", missed card (cards-only retry). Second run 48/48; all 18 cards live.
+- leo_tools/now_board.py: Bot exam row + /ops/now/exam; unanswered officer questions open /ops/now/question/<id> where Jonathan's answer becomes a live card + exam question and (optional) is sent to her.
+- truth_tests/test_staff_knowledge.py (routing locks + every card sourced + live cards examined).
+DECIDED (Jonathan)
+- Train the bot with sourced cards + nightly exam + learning from her unanswered questions, not fine-tuning.
+OPEN
+- Card facts from secondary sources (RDO 64 coverage of Daet, EOPT fee, MC 10 penalty, RCC 122 bond) are marked as such; confirm against the primary text when convenient.
+- Case knowledge packs not yet built (next). Nightly exam needs the Mac's Ollama awake; if not, the run is recorded as skipped.
+CONFLICTS
+- None new.

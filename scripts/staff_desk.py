@@ -287,28 +287,47 @@ def _ask_model(question, sources, lang, task=None):
     prompt = ("You help a LandTek field officer with her assigned task. Answer ONLY from SOURCES below. "
               "Copy names, subjects, emails, addresses, numbers and amounts exactly and IN FULL as written in "
               "SOURCES (a 'Re:' subject line runs to the end of that paragraph). Add nothing that SOURCES do not say. "
+              "The question may use other words than SOURCES (bill = invoice, resibo = receipt). "
+              "Never give advice or next steps that SOURCES do not state: if the question asks what to do in a "
+              "situation SOURCES do not cover (what if, paano kung, kung hindi), that is not in SOURCES. "
               "If SOURCES do not contain the answer, reply with exactly NOT_IN_SOURCES and nothing else. "
               f"Answer in {tongue}, at most 4 sentences, no lists, no bullets, no markdown.\n\n"
-              f"{focus}SOURCES:\n{sources[:12000]}\n\nQUESTION: {question}\nANSWER:")
+              f"{focus}SOURCES:\n{sources[:20000]}\n\nQUESTION: {question}\nANSWER:")
     r = requests.post(f"{OLLAMA_URL}/api/generate", timeout=90,
                       json={"model": QA_MODEL, "prompt": prompt, "stream": False,
-                            "options": {"temperature": 0, "num_ctx": 8192}})
+                            "options": {"temperature": 0, "num_ctx": 12288}})
     r.raise_for_status()
     return (r.json().get("response") or "").strip()
 
 
+INCLUDE_DRAFTS = False                               # staff_exam sets True to test draft cards before promotion
+
+
+def _cards(cur, m, matters):
+    """Knowledge cards (deploy_1326) for this officer's matters, as SOURCES text. Live only, unless examining."""
+    states = ["live", "draft"] if INCLUDE_DRAFTS else ["live"]
+    cur.execute("""SELECT topic, fact, source_ref, checked_on FROM staff_knowledge
+                    WHERE state = ANY(%s) AND (assignee IS NULL OR assignee=%s) AND matter_code = ANY(%s)
+                    ORDER BY topic, id""", (states, m["assignee_key"], list(matters)))
+    return "\n\n".join(f"SOURCE: LandTek card [{c['topic']}] (basis: {c['source_ref']}; checked {c['checked_on']})\n{c['fact']}"
+                       for c in cur.fetchall())
+
+
 def _answer_from_materials(cur, m, question):
-    """(text_to_send or None, outcome). Uses the task in focus, else all her open tasks' materials."""
+    """(text_to_send or None, outcome). Knowledge cards first, then the task in focus (else all open tasks)."""
     errands = _open_errands(cur, m["assignee_key"], True)
     focus = (m.get("state") or {}).get("focus")
     pool = [e for e in errands if e["id"] == focus] or errands
-    sources = "\n\n".join(dict.fromkeys(e["materials"] for e in pool if e.get("materials")))
+    cards = _cards(cur, m, {e["matter_code"] for e in errands})
+    sources = "\n\n".join([cards] * bool(cards) + list(dict.fromkeys(e["materials"] for e in pool if e.get("materials"))))
     task_id = pool[0]["id"] if len(pool) == 1 else focus
     if not sources:
         return None, "not_in_sources"
     lang, _ = _voice(m)
     try:
         ans = _ask_model(question, sources, lang, pool[0] if len(pool) == 1 else None)
+        if (not ans or "NOT_IN_SOURCES" in ans) and cards and len(sources) > len(cards):
+            ans = _ask_model(question, cards, lang)      # long papers can drown a short card; ask the cards alone
         ans = re.sub(r"\s*\n\s*[-•*]\s*", "; ", ans).replace("\n", " ").strip()   # never a list on Messenger
     except Exception as ex:
         cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, detail)
@@ -377,8 +396,8 @@ CASE_NAMES = {   # names people actually use for a matter; matched as whole word
     "PAR-VITO-CRUZ": ["vito cruz"], "PAR-CAPACUAN": ["capacuan"], "PAR-GOLDEN-SAND": ["golden sand"],
     "NIBDC-EXPA-000250": ["expa", "exploration permit"], "NIBDC-APSA-000322": ["apsa"],
 }
-CASE_HINT = re.compile(r"\b(case|kaso|hearing|court|korte|trial|status|docket|arta|ombudsman|petition|guardianship|"
-                       r"balane|6839|cv|sp\.? ?proc|next date|deadline)\b", re.I)
+CASE_EXPLICIT = re.compile(r"\b(case|kaso|hearing|court|korte|trial|docket|arta|ombudsman|guardianship|balane|"
+                           r"cv ?\d+|sp\.? ?proc|\d{2}-\d{3})\b", re.I)
 
 
 def _matter_keys(r):
@@ -435,7 +454,8 @@ DONE = re.compile(r"\b(done|tapos|nagawa|finished|served|naserve|na-serve|nai-se
 SERVE_WORDS = ("served", "naserve", "na-serve", "nai-serve", "delivered")
 HOW = re.compile(r"^\s*(how|paano)\s*#?\s*(\d+)\s*\??\s*$", re.I)
 LIST = re.compile(r"\b(all|lahat|list)\b", re.I)
-WHY = re.compile(r"\b(why|bakit|necessary|kailangan ba|para saan)\b", re.I)
+WHY = re.compile(r"\b(why|bakit|para saan)\b", re.I)
+WHY_SHORT = re.compile(r"^\W*(is it |is this )?(necessary|needed|kailangan ba( (ito|yan|talaga))?)\W*$", re.I)   # "Kailangan ba ng cedula?" is not a why
 NUM = re.compile(r"#?\b(\d{1,4})\b")
 PASS = re.compile(r"\b(pass|skip|laktaw\w*|mamaya na|later|lipat)\b", re.I)
 ORDINALS = {r"first|una|1st|unang": 1, r"second|pangalawa|ikalawa|2nd": 2, r"third|pangatlo|ikatlo|3rd": 3,
@@ -485,7 +505,7 @@ def _handle_staff(cur, m, mid, text):
             _send(m["channel"], m["channel_user_id"], lead + _next_task_text(cur, m))
         return "goto" if target else "pass"
 
-    if WHY.search(text):
+    if WHY.search(text) or WHY_SHORT.match(text):
         nm = NUM.search(text)
         eid = int(nm.group(1)) if nm else st.get("focus")
         e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == eid), None) if eid else None
@@ -545,28 +565,39 @@ def _handle_staff(cur, m, mid, text):
     if text and RELAY.search(text):
         return _relay(cur, m, text)
 
-    # case questions: only when exactly one matter is named
-    if text and CASE_HINT.search(text) or (text and _find_matters(cur, text)):
-        hits = _find_matters(cur, text)
+    # Case questions vs task questions (exam, 3 Nov: "FAO deadline", "petition for correction" and "Landbank
+    # branch" were sent to the case branch). An EXPLICIT case question (kaso, hearing, court, a docket) goes to
+    # the case answer; anything else is tried against her task papers first, and only then a single named matter.
+    own = {e["matter_code"] for e in _open_errands(cur, m["assignee_key"], True)}
+    hits = [h for h in _find_matters(cur, text) if h["matter_code"] not in own] if text else []
+
+    def _which():
+        opts = "; ".join(f"{h['matter_code']} ({h['title'][:40]})" for h in hits[:4]) if hits else \
+            "Balane 26-360, guardianship 2680, CV6839, o ARTA 1378"
+        lang, _ = _voice(m)
+        _send(m["channel"], m["channel_user_id"],
+              (f"Aling kaso ang tinutukoy mo? Halimbawa: {opts}." if lang == "tl"
+               else f"Which case do you mean? For example: {opts}."))
+        return "case_which"
+
+    if text and CASE_EXPLICIT.search(text):
         if len(hits) == 1:
             _send(m["channel"], m["channel_user_id"], _case_answer(cur, m, hits[0]))
             return "case_answered"
-        if len(hits) > 1 or CASE_HINT.search(text):
-            opts = "; ".join(f"{h['matter_code']} ({h['title'][:40]})" for h in hits[:4]) if hits else \
-                "Balane 26-360, guardianship 2680, CV6839, o ARTA 1378"
-            lang, _ = _voice(m)
-            _send(m["channel"], m["channel_user_id"],
-                  (f"Aling kaso ang tinutukoy mo? Halimbawa: {opts}." if lang == "tl"
-                   else f"Which case do you mean? For example: {opts}."))
-            return "case_which"
+        return _which()
 
-    # free questions: first from her tasks' own source material (local model, token-checked)
+    # free questions: first from the knowledge cards + her tasks' own source material (local model, token-checked)
     if text and text != "[media]":
         ans, outcome = _answer_from_materials(cur, m, text)
         if ans:
             _send(m["channel"], m["channel_user_id"], ans)
             return "answered_from_materials"
-        if outcome in ("not_in_sources", "rejected_unsupported") and _open_errands(cur, m["assignee_key"], True):
+        if len(hits) == 1:
+            _send(m["channel"], m["channel_user_id"], _case_answer(cur, m, hits[0]))
+            return "case_answered"
+        if len(hits) > 1:
+            return _which()
+        if outcome in ("not_in_sources", "rejected_unsupported") and own:
             _send(m["channel"], m["channel_user_id"], _say(m, "not_found"))
             return f"materials_{outcome}"
 
