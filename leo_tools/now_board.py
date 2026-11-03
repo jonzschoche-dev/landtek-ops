@@ -169,6 +169,11 @@ def _staff_rows(cur, assignee):
                        WHERE t.assignee=%s ORDER BY (t.state='proof_ingested'), t.due_date NULLS LAST, t.id""", (assignee,))
 
 
+def _errand_rows(cur, assignee):
+    return _q(cur, """SELECT * FROM staff_task WHERE assignee=%s
+                       ORDER BY (state IN ('done','cancelled')), due_date NULLS LAST, seq, id""", (assignee,))
+
+
 # ── pages ──────────────────────────────────────────────────────────────────────────────────────────────
 
 @bp.route("/now")
@@ -187,7 +192,8 @@ def now():
         members = _q(cur, "SELECT name, assignee_key, active, voice FROM staff_desk_members ORDER BY name")
         staff_html = ""
         for m in members:
-            ts = [t for t in _staff_rows(cur, m["assignee_key"]) if t["state"] != "proof_ingested"]
+            ts = [t for t in _staff_rows(cur, m["assignee_key"]) if t["state"] != "proof_ingested"] + \
+                 [e for e in _errand_rows(cur, m["assignee_key"]) if e["state"] in ("open", "done_awaiting_check")]
             state = "ON" if m["active"] else "OFF (waiting for your go)"
             staff_html += _row(_e(m["name"]), f'{len(ts)} open task(s) · bot {state}', "her page",
                                f'/ops/staff/{m["assignee_key"]}')
@@ -219,6 +225,7 @@ def staff(assignee):
         if not ms:
             abort(404)
         ts = _staff_rows(cur, assignee)
+        es = _errand_rows(cur, assignee)
     finally:
         conn.close()
     word = {"open": "To do", "served_awaiting_proof": "Served, send the stamped copy photo",
@@ -231,9 +238,20 @@ def staff(assignee):
                             f"{_e(t['addressee'] or 'the office')}, {_e(t['address'])}",
                             f"{_e(word.get(t['state'], t['state']))} · due {_rel(t['due_date'])}",
                             f"/ops/now/task/{t['id']}") for t in lst)
-    body = (_section("Your tasks", len(todo), rows(todo),
+    eword = {"open": "To do", "done_awaiting_check": "Done, Jonathan is checking", "done": "Done",
+             "cancelled": "Cancelled"}
+    etodo = [e for e in es if e["state"] in ("open", "done_awaiting_check")]
+    edone = [e for e in es if e["state"] in ("done", "cancelled")]
+
+    def erows(lst):
+        return "".join(_row(f"Task {e['id']}", _e(e["title"]),
+                            f"{_e(eword.get(e['state'], e['state']))} · due {_rel(e['due_date'])}",
+                            f"/ops/now/stask/{e['id']}") for e in lst)
+    todo_html = erows(etodo) + rows(todo)
+    done_html = erows(edone) + rows(done)
+    body = (_section("Your tasks", len(todo) + len(etodo), todo_html,
                      "No open tasks. Leo will message you on Messenger when there's one.")
-            + _section("Done", len(done), rows(done), "Nothing finished yet."))
+            + _section("Done", len(done) + len(edone), done_html, "Nothing finished yet."))
     name = ms[0]["name"]
     return _page(f"{name}'s tasks", "Send proof photos to Leo on Messenger. This page updates from the same record.", body)
 
@@ -355,3 +373,20 @@ def doc(did):
                  ("Type", _e(d["mime_type"])), ("Original", drive), ("Added", _e(d["created_at"]))])
     return _detail(f"Document {did}", _e(d["t"]),
                    [("Summary", facts), ("Text", f"<pre>{_e(d['txt'] or '(no text yet: OCR pending)')}</pre>")])
+
+
+@bp.route("/now/stask/<int:sid>")
+def stask(sid):
+    conn = psycopg2.connect(PG_DSN)
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        e = _one(cur, "SELECT * FROM staff_task WHERE id=%s", (sid,))
+    finally:
+        conn.close()
+    proof = f'<a href="/ops/now/doc/{e["proof_doc_id"]}">doc {e["proof_doc_id"]}</a>' if e["proof_doc_id"] else "not yet"
+    facts = _kv([("Who", _e(e["assignee"])), ("What", _e(e["title"])), ("How", _e(e["how"])),
+                 ("Send back", _e(e["proof_needed"])), ("Due", _rel(e["due_date"])),
+                 ("Date basis", _e(e["due_basis"])), ("State", _e(e["state"])), ("Proof", proof),
+                 ("Matter", f'<a href="/ops/matter/{_e(e["matter_code"])}">{_e(e["matter_code"])}</a>'),
+                 ("Source", _e(e["source_ref"]))])
+    return _detail(f"Task {sid}", _e(e["matter_code"]), [("Summary", facts)])

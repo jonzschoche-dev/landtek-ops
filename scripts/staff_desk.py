@@ -45,7 +45,6 @@ MEDIA_WAIT_S = 45
 YES = re.compile(r"^\s*(yes|y|oo|opo|sige|go|ok|okay|approve[d]?)\b[\s.!]*$", re.I)
 NO = re.compile(r"^\s*(no|n|hindi|huwag|wag|reject(ed)?|stop)\b[\s.!]*$", re.I)
 TASKS = re.compile(r"\b(task|tasks|gawain|gagawin|trabaho|next|sunod|ano na)\b", re.I)
-SERVED = re.compile(r"\b(served|done|tapos|naserve|na-serve|nai-serve|delivered)\s*#?\s*(\d+)?\b", re.I)
 DIGIT = re.compile(r"^\s*#?(\d{1,6})\s*$")
 GREETING = re.compile(r"^\s*(hi|hello|hey|good (morning|afternoon|evening)|magandang (umaga|hapon|gabi))\W*$", re.I)
 
@@ -102,12 +101,16 @@ def _mark_handled(cur, mid, channel, uid, reason):
 
 
 # ── tasks ──────────────────────────────────────────────────────────────────────────────────────────────
+# Two kinds, one list for the officer:
+#   serve  = drip_service_task: deliver an approved drip letter; proof = the stamped receiving copy ("Serve 12")
+#   errand = staff_task: any other errand from the record (e.g. company registration steps) ("Task 3")
 
 METHOD_WORD = {"hand": "Hand-deliver", "lbc": "Send by LBC", "registered_mail": "Send by registered mail",
                "email": "Email", "efiling": "E-file"}
 
 
 def _open_tasks(cur, assignee):
+    """Open SERVE tasks (drip letters)."""
     cur.execute("""SELECT t.*, i.client_code, s.ladder, s.matter_code, s.addressee
                      FROM drip_service_task t
                      JOIN drip_instrument i ON i.id = t.instrument_id
@@ -117,22 +120,59 @@ def _open_tasks(cur, assignee):
     return cur.fetchall()
 
 
+def _open_errands(cur, assignee, include_waiting=False):
+    states = ["open", "done_awaiting_check"] if include_waiting else ["open"]
+    cur.execute("""SELECT e.*, mt.client_code FROM staff_task e LEFT JOIN matters mt ON mt.matter_code = e.matter_code
+                    WHERE e.assignee=%s AND e.state = ANY(%s)
+                    ORDER BY e.due_date NULLS LAST, e.seq, e.id""", (assignee, states))
+    return cur.fetchall()
+
+
+def _candidates(cur, assignee):
+    """Everything she can act on now, soonest due first: [(kind, row)]."""
+    items = [("serve", t) for t in _open_tasks(cur, assignee)] + [("errand", e) for e in _open_errands(cur, assignee)]
+    return sorted(items, key=lambda kr: (kr[1]["due_date"] is None, kr[1]["due_date"] or date.max))
+
+
 def _task_line(t):
     due = t["due_date"].strftime("%a %d %b") if t["due_date"] else "no date set"
     who = t["addressee"] or "the office"
     if t["state"] == "served_awaiting_proof":
-        return (f"Task {t['id']}: you marked the letter to {who} as served. "
+        return (f"Serve {t['id']}: you marked the letter to {who} as served. "
                 f"Send me a photo of the stamped receiving copy.")
-    return (f"Task {t['id']}: {METHOD_WORD.get(t['method'], t['method'])} the letter to {who} at {t['address']}. "
+    return (f"Serve {t['id']}: {METHOD_WORD.get(t['method'], t['method'])} the letter to {who} at {t['address']}. "
             f"Due {due}. Once it's received, send me a photo of the stamped receiving copy.")
 
 
+def _errand_line(e):
+    due = e["due_date"].strftime("%a %d %b") if e["due_date"] else "no date set"
+    return f"Task {e['id']}: {e['title']}. Due {due}. Reply \"how {e['id']}\" for the steps, \"done {e['id']}\" when finished."
+
+
+def _lc(t):
+    """'The owner's name' -> 'the owner's name' mid-sentence (leave acronyms like 'SEC' alone)."""
+    return (t[0].lower() + t[1:]) if t and len(t) > 1 and not t[1].isupper() else t
+
+
+def _line(kind, row):
+    return _task_line(row) if kind == "serve" else _errand_line(row)
+
+
 def _next_task_text(cur, m):
-    ts = _open_tasks(cur, m["assignee_key"])
-    if not ts:
-        return "No open tasks right now. I'll message you when Jonathan assigns one."
-    more = f" ({len(ts) - 1} more after this.)" if len(ts) > 1 else ""
-    return _task_line(ts[0]) + more
+    items = _candidates(cur, m["assignee_key"])
+    if not items:
+        return "No open tasks right now. I'll message you when there's one."
+    more = f" ({len(items) - 1} more after this; say \"tasks\" for the next.)" if len(items) > 1 else ""
+    return _line(*items[0]) + more
+
+
+def _all_tasks_text(cur, m):
+    items = _candidates(cur, m["assignee_key"])
+    if not items:
+        return "No open tasks right now."
+    return "Your open tasks, soonest first: " + " ".join(
+        f"{'Serve' if k == 'serve' else 'Task'} {r['id']} ({r['due_date'].strftime('%d %b') if r['due_date'] else 'no date'})"
+        for k, r in items) + ". Say \"how N\" for any of them."
 
 
 # ── staff desk ─────────────────────────────────────────────────────────────────────────────────────────
@@ -140,6 +180,10 @@ def _next_task_text(cur, m):
 VOICE_ASK = ("Hi {name}, it's Leo. I'll send you your LandTek tasks here and take your proof photos. "
              "Before we start: how do you want me to talk to you? English, Tagalog, Taglish or Bikol, "
              "short or detailed? Just tell me in your own words.")
+DONE = re.compile(r"\b(done|tapos|nagawa|finished|served|naserve|na-serve|nai-serve|delivered)\s*#?\s*(\d+)?\b", re.I)
+SERVE_WORDS = ("served", "naserve", "na-serve", "nai-serve", "delivered")
+HOW = re.compile(r"^\s*(how|paano)\s*#?\s*(\d+)\s*\??\s*$", re.I)
+LIST = re.compile(r"\b(all|lahat|list)\b", re.I)
 
 
 def _handle_staff(cur, m, mid, text):
@@ -161,29 +205,56 @@ def _handle_staff(cur, m, mid, text):
     if text == "[media]" or st.get("pending_media") and DIGIT.match(text):
         return _handle_media(cur, m, mid, text)
 
-    sm = SERVED.search(text)
-    if sm:
-        ts = _open_tasks(cur, m["assignee_key"])
-        tid = int(sm.group(2)) if sm.group(2) else (ts[0]["id"] if len(ts) == 1 else None)
-        t = next((x for x in ts if x["id"] == tid), None)
-        if not t:
-            _send(m["channel"], m["channel_user_id"], "Which task number? For example: served 12.")
-            return "served_ambiguous"
-        cur.execute("UPDATE drip_service_task SET state='served_awaiting_proof', updated_at=now() WHERE id=%s", (t["id"],))
+    hm = HOW.match(text)
+    if hm:
+        e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == int(hm.group(2))), None)
+        if not e:
+            _send(m["channel"], m["channel_user_id"], "That number isn't one of your open tasks. Say \"tasks\" to see them.")
+            return "how_bad"
         _send(m["channel"], m["channel_user_id"],
-              f"Thanks. Now send me a clear photo of the stamped receiving copy for task {t['id']}.")
-        return "served_marked"
+              f"Task {e['id']}: {e['how'] or e['title']} Send me: {_lc(e['proof_needed']) or 'a short note when done'}.")
+        return "how"
+
+    dm = DONE.search(text)
+    if dm:
+        word, num = dm.group(1).lower(), (int(dm.group(2)) if dm.group(2) else None)
+        serves, errands = _open_tasks(cur, m["assignee_key"]), _open_errands(cur, m["assignee_key"])
+        if num is None and len(serves) + len(errands) == 1:
+            num = (serves or errands)[0]["id"]
+        t = next((x for x in serves if x["id"] == num), None) if word in SERVE_WORDS else None
+        e = None if t else next((x for x in errands if x["id"] == num), None)
+        t = t or (None if e else next((x for x in serves if x["id"] == num), None))
+        if t:
+            cur.execute("UPDATE drip_service_task SET state='served_awaiting_proof', updated_at=now() WHERE id=%s", (t["id"],))
+            _set_state(cur, m, proof_for=f"serve:{t['id']}")
+            _send(m["channel"], m["channel_user_id"],
+                  f"Thanks. Now send me a clear photo of the stamped receiving copy for Serve {t['id']}.")
+            return "served_marked"
+        if e:
+            _set_state(cur, m, proof_for=f"errand:{e['id']}")
+            _send(m["channel"], m["channel_user_id"],
+                  f"Great. Send me {_lc(e['proof_needed']) or 'a photo or short note'} for task {e['id']} and I'll pass it to Jonathan.")
+            return "errand_done_reported"
+        _send(m["channel"], m["channel_user_id"], "Which task number? For example: done 3.")
+        return "done_ambiguous"
 
     if TASKS.search(text):
-        _send(m["channel"], m["channel_user_id"], _next_task_text(cur, m))
+        _send(m["channel"], m["channel_user_id"], _all_tasks_text(cur, m) if LIST.search(text) else _next_task_text(cur, m))
         return "tasks"
 
+    if st.get("proof_for", "").startswith("errand:") and text:
+        # a typed answer IS the proof for errands like "tell Jonathan the owner's name"
+        eid = int(st["proof_for"].split(":")[1])
+        e = next((x for x in _open_errands(cur, m["assignee_key"]) if x["id"] == eid), None)
+        if e:
+            return _errand_submitted(cur, m, e, None, text)
+
     # questions: answer from the record, scoped to the client of her current task; never free-LLM
-    ts = _open_tasks(cur, m["assignee_key"])
-    if ts and text:
+    items = _candidates(cur, m["assignee_key"])
+    if items and text:
         try:
             import leo_service as ls
-            route = ls.try_purpose_route(cur, ts[0]["client_code"], text,
+            route = ls.try_purpose_route(cur, items[0][1]["client_code"], text,
                                          channel=m["channel"], channel_user_id=m["channel_user_id"])
             if route and route.get("text"):
                 _send(m["channel"], m["channel_user_id"], route["text"])
@@ -224,26 +295,52 @@ def _land_for_task(cur, art, task):
     return res.get("doc_id")
 
 
+def _errand_submitted(cur, m, e, doc_id, note):
+    cur.execute("""UPDATE staff_task SET state='done_awaiting_check', proof_doc_id=coalesce(%s, proof_doc_id),
+                          updated_at=now() WHERE id=%s""", (doc_id, e["id"]))
+    _set_state(cur, m, proof_for=None, pending_media=None)
+    what = f"doc {doc_id}" if doc_id else f'her note: "{(note or "")[:200]}"'
+    _queue(cur, "staff_task_done", e["id"], f"staff_task_done:{e['matter_code']}",
+           f"{m['name']} says task {e['id']} is done ({e['title']}). Proof: {what}. Accept it as done? Reply yes or no.",
+           {"doc_id": doc_id, "note": note, "officer": m["name"]})
+    _send(m["channel"], m["channel_user_id"], f"Saved for task {e['id']}. Jonathan will check it. " + _next_task_text(cur, m))
+    ask_next(cur)
+    return "errand_submitted"
+
+
+def _resolve_choice(cur, m, key):
+    """'serve:12' / 'errand:3' / a bare number -> (kind, row) among her open items."""
+    items = _candidates(cur, m["assignee_key"])
+    if isinstance(key, str) and ":" in key:
+        k, i = key.split(":")
+        return next(((kk, r) for kk, r in items if kk == k and r["id"] == int(i)), (None, None))
+    hits = [(kk, r) for kk, r in items if r["id"] == key]
+    return hits[0] if len(hits) == 1 else (None, None)
+
+
 def _handle_media(cur, m, mid, text):
     st = m["state"] or {}
-    ts = _open_tasks(cur, m["assignee_key"])
+    items = _candidates(cur, m["assignee_key"])
     media_mid = st.get("pending_media") if DIGIT.match(text or "") else mid
-    if not ts:
+    if not items:
         _send(m["channel"], m["channel_user_id"],
               "I got your file, but you have no open task to match it to. Jonathan will see it.")
         return "media_no_task"
     if DIGIT.match(text or ""):
-        tid = int(DIGIT.match(text).group(1))
-        task = next((x for x in ts if x["id"] == tid), None)
+        kind, task = _resolve_choice(cur, m, int(DIGIT.match(text).group(1)))
         if not task:
             _send(m["channel"], m["channel_user_id"], "That number isn't one of your open tasks. Which one?")
             return "media_choice_bad"
-    elif len(ts) == 1:
-        task = ts[0]
+    elif st.get("proof_for"):
+        kind, task = _resolve_choice(cur, m, st["proof_for"])
+    elif len(items) == 1:
+        kind, task = items[0]
     else:
+        kind, task = None, None
+    if not task:
         _set_state(cur, m, pending_media=mid)
-        nums = ", ".join(str(t["id"]) for t in ts[:5])
-        _send(m["channel"], m["channel_user_id"], f"Got it. Which task is this proof for? Reply with the number ({nums}).")
+        nums = ", ".join(str(r["id"]) for _, r in items[:6])
+        _send(m["channel"], m["channel_user_id"], f"Got it. Which task is this for? Reply with the number ({nums}).")
         return "media_choice_asked"
 
     arts = _artifacts_for(cur, media_mid)
@@ -252,19 +349,21 @@ def _handle_media(cur, m, mid, text):
         doc_id = _land_for_task(cur, a, task) or doc_id
     _set_state(cur, m, pending_media=None)
     if not doc_id:
-        _send(m["channel"], m["channel_user_id"],
-              "I couldn't save that photo. Please send it again.")
+        _send(m["channel"], m["channel_user_id"], "I couldn't save that photo. Please send it again.")
         return "media_failed"
+    if kind == "errand":
+        return _errand_submitted(cur, m, task, doc_id, None)
     cur.execute("""UPDATE drip_service_task SET proof_doc_id=%s, state='served_awaiting_proof', updated_at=now()
                     WHERE id=%s""", (doc_id, task["id"]))
+    _set_state(cur, m, proof_for=None)
     served_on = str(_today_manila())
     _queue(cur, "service_proof", task["id"], f"service_proof:{task['method']}",
-           f"{m['name']} sent proof for task {task['id']} (letter to {task['addressee'] or 'the office'}, "
+           f"{m['name']} sent proof for Serve {task['id']} (letter to {task['addressee'] or 'the office'}, "
            f"ladder {task['ladder']}): doc {doc_id}, served {served_on}. "
            f"Is it a valid stamped receiving copy, and should the clock start? Reply yes or no.",
            {"doc_id": doc_id, "served": served_on, "officer": m["name"]})
     _send(m["channel"], m["channel_user_id"],
-          f"Saved as proof for task {task['id']}. Jonathan will confirm, then the office's clock starts.")
+          f"Saved as proof for Serve {task['id']}. Jonathan will confirm, then the office's clock starts.")
     ask_next(cur)
     return "proof_submitted"
 
@@ -316,6 +415,15 @@ def _apply_yes(cur, a):
                             WHERE t.id=%s""", (tid,))
             _send(m["channel"], m["channel_user_id"], "New task. " + _task_line(cur.fetchone()))
         return f"Task {tid} assigned."
+    if a["kind"] == "staff_task_done":
+        cur.execute("UPDATE staff_task SET state='done', updated_at=now() WHERE id=%s RETURNING assignee, title",
+                    (a["ref_id"],))
+        r = cur.fetchone()
+        m = _member_by_assignee(cur, r["assignee"]) if r else None
+        if m:
+            _send(m["channel"], m["channel_user_id"], f"Jonathan confirmed task {a['ref_id']}. Thank you. "
+                  + _next_task_text(cur, m))
+        return f"Task {a['ref_id']} marked done."
     if a["kind"] == "service_proof":
         cur.execute("""SELECT t.*, i.client_code, s.ladder, s.matter_code, s.addressee FROM drip_service_task t
                          JOIN drip_instrument i ON i.id=t.instrument_id LEFT JOIN step_plan s ON s.id=i.step_plan_id
@@ -340,6 +448,14 @@ def _apply_yes(cur, a):
 
 
 def _apply_no(cur, a):
+    if a["kind"] == "staff_task_done":
+        cur.execute("""UPDATE staff_task SET state='open', updated_at=now() WHERE id=%s RETURNING assignee""", (a["ref_id"],))
+        r = cur.fetchone()
+        m = _member_by_assignee(cur, r["assignee"]) if r else None
+        if m:
+            _send(m["channel"], m["channel_user_id"],
+                  f"Jonathan says task {a['ref_id']} isn't finished yet. Say \"how {a['ref_id']}\" to see what's needed.")
+        return "Noted, task reopened."
     if a["kind"] == "service_proof":
         cur.execute("""UPDATE drip_service_task SET proof_doc_id=NULL, state='served_awaiting_proof', updated_at=now()
                         WHERE id=%s RETURNING assignee""", (a["ref_id"],))
@@ -417,7 +533,7 @@ def morning_briefs(cur):
                 (_today_manila(),))
     n = 0
     for m in cur.fetchall():
-        if not (m["voice"] or {}).get("raw") or not _open_tasks(cur, m["assignee_key"]):
+        if not (m["voice"] or {}).get("raw") or not _candidates(cur, m["assignee_key"]):
             continue
         if _send(m["channel"], m["channel_user_id"], "Good morning. " + _next_task_text(cur, m)):
             cur.execute("UPDATE staff_desk_members SET last_brief_on=%s WHERE channel=%s AND channel_user_id=%s",
@@ -462,8 +578,10 @@ def readiness(cur, assignee):
     paper = cur.fetchall()
     ready_paper = [r for r in paper if r["status"] in ("approved", "printed")]
     blocked = [r for r in paper if r["status"] not in ("approved", "printed")]
-    ok = bool(tasks or ready_paper)
+    errands = _open_errands(cur, assignee)
+    ok = bool(tasks or ready_paper or errands)
     return {"ready": ok, "open_tasks": [t["id"] for t in tasks],
+            "open_errands": [f"#{e['id']} {e['title']} (due {e['due_date'] or 'no date'})" for e in errands],
             "approved_paper_letters": [f"#{r['id']} {r['ladder']} -> {r['addressee']}" for r in ready_paper],
             "paper_letters_blocked_on_jonathan": [f"#{r['id']} {r['ladder']} ({r['status']})" for r in blocked]}
 
