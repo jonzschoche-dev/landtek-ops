@@ -225,3 +225,10 @@ Jonathan named in round 6.
   July account. "Elle Cece" has never messaged the page. App LEO LANDTEK (1718290972649941) webhook is
   active (page: messages, messaging_postbacks). Fix path: Jonathan adds Elle Cece as app Tester (dev
   mode) -> she accepts -> she messages the page once -> Jonathan confirms it's her -> staff_desk rebind.
+- Kristyle LIVE on Messenger (Elle Cece, PSID 40472896185635007) from 03 Nov 02:10 UTC; Jonathan's
+  "she writing now" taken as confirmation of identity; rebind carried her contact details.
+- Her first minutes taught: voice must be honored (she asked "Taglish and make everything detailed");
+  "why?" must be answerable (added staff_task.why from the email); "pass ... go to the second task"
+  must work (skip/goto/ordinals); dependencies must travel with tasks (Task 1 before BIR).
+- Claude sent her one guess ("pwede mo nang kunin ang TIN") not in the source, then corrected it.
+  Lesson recorded: hand-sent messages get the same no-invention discipline as the bot.

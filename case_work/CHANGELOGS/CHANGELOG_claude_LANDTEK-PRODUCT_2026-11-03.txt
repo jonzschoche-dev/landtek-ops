@@ -35,3 +35,20 @@ OPEN
 CONFLICTS
 - MASTER_PLAN §0.12 rule 4: CoS owns Jonathan decision cards; the staff desk now asks yes/no on Messenger (Jonathan's choice). Needs Jonathan/CoS ruling.
 - Backups: Grok paused landtek-backup.timer and retired the nightly cron on 1 Nov; this session restored the nightly record-only cron on Jonathan's go of 3 Nov. The timer pause is left as Grok set it.
+
+ADDENDUM (later on 3 Nov)
+CHANGED
+- deploy_1317: staff_task (officer errands) + Kristyle's 7 company-registration tasks from Jonathan's 2 Nov email (gmail_messages #152157); staff desk how/done/proof; dashboards list them.
+- deploy_1318: officer voice (Taglish + detailed), rebind to a new Messenger account carrying contact, tighter task command, plain no-answer line.
+- deploy_1320: staff_task.why from the email; staff desk answers why/bakit. deploy_1321: depends_on (Task 2 after Task 1), pass/skip, go to task N / ordinals.
+- DB: drip_instrument #9 and #11 superseded (never sent; covered by DILG schedule items 1 and 8 and Assessor Magana emails), step_plan seq 1 of LGU-COMPOUND / LGU-MAYOR-FISHERIES skipped, two drip_event rows.
+- DB: Kristyle staff_desk_members active=true, rebound to messenger:40472896185635007 (Elle Cece); channel_users #900 approved, contact carried from #80.
+- Messages sent to Kristyle by hand (Claude): an apology + the email's reason for Task 1; Task 2 with an ordering note; a correction of one unsupported line about the TIN.
+- Backups: today's dump was rewritten by the restored 02:00 cron after the manual 00:27 run; Mac pull rerun, receipts and Drive copy now match (all 6 A62 checks green).
+- Memory: hayuma.org = internal, jonzschoche@gmail.com = official outward (Jonathan, 3 Nov).
+DECIDED
+- Supersede Mayor letters #9 and #11. Deploy the officer task list. Switch Kristyle on.
+OPEN
+- Messenger 24h rule: bot-started messages (morning brief, approval asks to Jonathan) only deliver within 24h of the person's last message. No --tick timer installed. Approval asks to Jonathan stay queued if undeliverable.
+- Kristyle's general questions (e.g. court dates) get the honest fallback; her read scope across matters is undecided.
+- Old Messenger account #80 left as is (unreachable).
