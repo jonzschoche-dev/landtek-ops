@@ -206,3 +206,22 @@ First read of the live board: 9 items need Jonathan (letters #9 and #11 waiting 
 22 clocks running with 1 overdue (DENR Surveys), and 26 of 26 fronts with no current date
 (matters.next_deadline past or empty). That last number is the "record not current" problem
 Jonathan named in round 6.
+
+## Round 10 (2026-11-03): first live contact attempt, and what it taught
+
+- Mayor letters #9/#11: never sent (live Gmail checked, all accounts). Both asks already covered
+  (DILG Schedule of Default items 1 and 8; Assessor Magana 23 Oct / 2 Nov). Jonathan: supersede both.
+- Jonathan: "hayuma is an internal email, jonzschoche is the official communications email."
+- Kristyle's real work = Jonathan's 2 Nov email (gmail 152157): loaded as 7 staff_task rows with
+  date bases (deploy_1317). Readiness then passed; Jonathan: deploy, switch her on.
+- Switched on 03 Nov 01:11 UTC. Facebook refused the opening message to Kristyle:
+  "(#100) No matching user found" (subcode 2018001): the page no longer recognizes her July account
+  (likely her tester role on the development-mode app lapsed, or her account changed; UNKNOWN which).
+- Line check to Jonathan's Messenger: "(#10) sent outside of allowed window" (2018278): the page token
+  is valid, but Messenger lets the page write only within 24h of the person's last message.
+- PRODUCT LESSON: Messenger is reply-only for a bot. Anything LandTek starts (morning tasks, approval
+  questions) cannot ride Messenger unless the person wrote in the last 24 hours.
+- Jonathan: "shes got a new messenger elle cece". Explains 2018001: the bot was writing to her old
+  July account. "Elle Cece" has never messaged the page. App LEO LANDTEK (1718290972649941) webhook is
+  active (page: messages, messaging_postbacks). Fix path: Jonathan adds Elle Cece as app Tester (dev
+  mode) -> she accepts -> she messages the page once -> Jonathan confirms it's her -> staff_desk rebind.

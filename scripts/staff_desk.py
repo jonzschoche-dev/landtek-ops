@@ -44,7 +44,8 @@ MEDIA_WAIT_S = 45
 
 YES = re.compile(r"^\s*(yes|y|oo|opo|sige|go|ok|okay|approve[d]?)\b[\s.!]*$", re.I)
 NO = re.compile(r"^\s*(no|n|hindi|huwag|wag|reject(ed)?|stop)\b[\s.!]*$", re.I)
-TASKS = re.compile(r"\b(task|tasks|gawain|gagawin|trabaho|next|sunod|ano na)\b", re.I)
+TASKS = re.compile(r"^\s*(tasks?|task list|next|sunod|susunod|gawain|trabaho|ano na|ano gagawin( ko)?)"
+                   r"(\s+(lahat|all|list))?\s*[?.!]*\s*$", re.I)    # whole short command only, never inside a question
 DIGIT = re.compile(r"^\s*#?(\d{1,6})\s*$")
 GREETING = re.compile(r"^\s*(hi|hello|hey|good (morning|afternoon|evening)|magandang (umaga|hapon|gabi))\W*$", re.I)
 
@@ -134,6 +135,59 @@ def _candidates(cur, assignee):
     return sorted(items, key=lambda kr: (kr[1]["due_date"] is None, kr[1]["due_date"] or date.max))
 
 
+# ── voice: speak the way the officer asked (stored in their own words at onboarding) ──────────────────────
+# Kristyle, 3 Nov 2026: "Taglish and make everything detailed". Deterministic templates, no LLM.
+
+def _voice(m):
+    raw = ((m or {}).get("voice") or {}).get("raw", "").lower()
+    lang = "tl" if any(w in raw for w in ("taglish", "tagalog", "filipino", "bikol", "bicol")) else "en"
+    detailed = any(w in raw for w in ("detail", "detalyado", "mahaba", "long", "full", "everything"))
+    return lang, detailed
+
+
+MSG = {
+    "noted":      {"en": "Got it, noted. ", "tl": "Sige, noted! "},
+    "no_tasks":   {"en": "No open tasks right now. I'll message you when there's one.",
+                   "tl": "Wala kang open na task ngayon. Ime-message kita pag may bago."},
+    "more":       {"en": " ({n} more after this; say \"tasks\" for the next.)",
+                   "tl": " ({n} pa ang kasunod nito; sabihin mo lang \"tasks\" para sa susunod.)"},
+    "list_head":  {"en": "Your open tasks, soonest first: ", "tl": "Mga open tasks mo, pinakamalapit ang due: "},
+    "list_tail":  {"en": ". Say \"how N\" for any of them.", "tl": ". Reply ka ng \"how N\" para sa steps ng kahit alin."},
+    "due":        {"en": "Due {d}.", "tl": "Due: {d}."},
+    "no_date":    {"en": "no date set", "tl": "wala pang date"},
+    "steps":      {"en": "Steps: {how}", "tl": "Steps: {how}"},
+    "send_back":  {"en": "Send me: {p}.", "tl": "Ang i-send mo sa akin: {p}."},
+    "reply_how":  {"en": "Reply \"how {i}\" for the steps, \"done {i}\" when finished.",
+                   "tl": "Reply ka ng \"how {i}\" para sa steps, at \"done {i}\" pag tapos na."},
+    "reply_done": {"en": "Reply \"done {i}\" when finished.", "tl": "Reply ka ng \"done {i}\" pag tapos na."},
+    "not_open":   {"en": "That number isn't one of your open tasks. Say \"tasks\" to see them.",
+                   "tl": "Hindi kasama sa open tasks mo ang number na 'yan. Sabihin mo lang \"tasks\" para makita mo."},
+    "which_num":  {"en": "Which task number? For example: done 3.", "tl": "Anong task number? Halimbawa: done 3."},
+    "send_proof": {"en": "Great. Send me {p} for task {i} and I'll pass it to Jonathan.",
+                   "tl": "Ayos! I-send mo lang sa akin ang {p} para sa task {i}, tapos ipapasa ko kay Jonathan."},
+    "saved":      {"en": "Saved for task {i}. Jonathan will check it. ", "tl": "Na-save ko na para sa task {i}. Iche-check ni Jonathan. "},
+    "confirmed":  {"en": "Jonathan confirmed task {i}. Thank you. ", "tl": "Confirmed na ni Jonathan ang task {i}. Salamat! "},
+    "reopened":   {"en": "Jonathan says task {i} isn't finished yet. Say \"how {i}\" to see what's needed.",
+                   "tl": "Sabi ni Jonathan, hindi pa tapos ang task {i}. Reply ka ng \"how {i}\" para makita ulit kung ano ang kailangan."},
+    "fallback":   {"en": "I can help with your tasks and proof photos for now. Jonathan will see your message.",
+                   "tl": "Sa ngayon, tasks at proof photos lang ang kaya kong asikasuhin. Makikita ni Jonathan ang message mo."},
+    "which_photo":{"en": "Got it. Which task is this for? Reply with the number ({nums}).",
+                   "tl": "Natanggap ko. Para saang task 'to? Reply ka ng number ({nums})."},
+    "photo_fail": {"en": "I couldn't save that photo. Please send it again.", "tl": "Hindi ko na-save ang photo. Pakisend ulit."},
+    "no_task_file":{"en": "I got your file, but you have no open task to match it to. Jonathan will see it.",
+                   "tl": "Natanggap ko ang file mo, pero wala kang open task na pwedeng pagtapatan nito. Makikita ni Jonathan."},
+    "morning":    {"en": "Good morning. ", "tl": "Good morning! "},
+    "new_task":   {"en": "New task. ", "tl": "May bagong task ka. "},
+}
+
+
+def _say(m, key, **kw):
+    lang, _ = _voice(m)
+    if lang == "tl" and isinstance(kw.get("p"), str):
+        kw["p"] = re.sub(r"^(the|a|an)\s+", "", kw["p"], flags=re.I)   # "ang the owner's name" -> "ang owner's name"
+    return MSG[key][lang].format(**kw)
+
+
 def _task_line(t):
     due = t["due_date"].strftime("%a %d %b") if t["due_date"] else "no date set"
     who = t["addressee"] or "the office"
@@ -144,9 +198,19 @@ def _task_line(t):
             f"Due {due}. Once it's received, send me a photo of the stamped receiving copy.")
 
 
-def _errand_line(e):
-    due = e["due_date"].strftime("%a %d %b") if e["due_date"] else "no date set"
-    return f"Task {e['id']}: {e['title']}. Due {due}. Reply \"how {e['id']}\" for the steps, \"done {e['id']}\" when finished."
+def _errand_line(e, m=None):
+    _, detailed = _voice(m)
+    due = e["due_date"].strftime("%a %d %b") if e["due_date"] else _say(m, "no_date")
+    head = f"Task {e['id']}: {e['title']}. " + _say(m, "due", d=due)
+    if detailed:
+        parts = [head]
+        if e.get("how"):
+            parts.append(_say(m, "steps", how=e["how"]))
+        if e.get("proof_needed"):
+            parts.append(_say(m, "send_back", p=_lc(e["proof_needed"])))
+        parts.append(_say(m, "reply_done", i=e["id"]))
+        return " ".join(parts)
+    return head + " " + _say(m, "reply_how", i=e["id"])
 
 
 def _lc(t):
@@ -154,25 +218,25 @@ def _lc(t):
     return (t[0].lower() + t[1:]) if t and len(t) > 1 and not t[1].isupper() else t
 
 
-def _line(kind, row):
-    return _task_line(row) if kind == "serve" else _errand_line(row)
+def _line(kind, row, m=None):
+    return _task_line(row) if kind == "serve" else _errand_line(row, m)
 
 
 def _next_task_text(cur, m):
     items = _candidates(cur, m["assignee_key"])
     if not items:
-        return "No open tasks right now. I'll message you when there's one."
-    more = f" ({len(items) - 1} more after this; say \"tasks\" for the next.)" if len(items) > 1 else ""
-    return _line(*items[0]) + more
+        return _say(m, "no_tasks")
+    more = _say(m, "more", n=len(items) - 1) if len(items) > 1 else ""
+    return _line(*items[0], m) + more
 
 
 def _all_tasks_text(cur, m):
     items = _candidates(cur, m["assignee_key"])
     if not items:
-        return "No open tasks right now."
-    return "Your open tasks, soonest first: " + " ".join(
+        return _say(m, "no_tasks")
+    return _say(m, "list_head") + " ".join(
         f"{'Serve' if k == 'serve' else 'Task'} {r['id']} ({r['due_date'].strftime('%d %b') if r['due_date'] else 'no date'})"
-        for k, r in items) + ". Say \"how N\" for any of them."
+        for k, r in items) + _say(m, "list_tail")
 
 
 # ── staff desk ─────────────────────────────────────────────────────────────────────────────────────────
@@ -195,7 +259,8 @@ def _handle_staff(cur, m, mid, text):
             cur.execute("UPDATE staff_desk_members SET voice=%s, updated_at=now() WHERE channel=%s AND channel_user_id=%s",
                         (json.dumps({"raw": text, "recorded_at": str(_today_manila())}), m["channel"], m["channel_user_id"]))
             _set_state(cur, m, awaiting_voice=None)
-            _send(m["channel"], m["channel_user_id"], "Got it, noted. " + _next_task_text(cur, m))
+            m["voice"] = {"raw": text}
+            _send(m["channel"], m["channel_user_id"], _say(m, "noted") + _next_task_text(cur, m))
             return "voice_recorded"
         if text != "[media]":
             _set_state(cur, m, awaiting_voice=True)
@@ -209,10 +274,11 @@ def _handle_staff(cur, m, mid, text):
     if hm:
         e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == int(hm.group(2))), None)
         if not e:
-            _send(m["channel"], m["channel_user_id"], "That number isn't one of your open tasks. Say \"tasks\" to see them.")
+            _send(m["channel"], m["channel_user_id"], _say(m, "not_open"))
             return "how_bad"
         _send(m["channel"], m["channel_user_id"],
-              f"Task {e['id']}: {e['how'] or e['title']} Send me: {_lc(e['proof_needed']) or 'a short note when done'}.")
+              f"Task {e['id']}: {e['how'] or e['title']} " + _say(m, "send_back", p=_lc(e['proof_needed']) or 'a short note')
+              + " " + _say(m, "reply_done", i=e["id"]))
         return "how"
 
     dm = DONE.search(text)
@@ -233,9 +299,9 @@ def _handle_staff(cur, m, mid, text):
         if e:
             _set_state(cur, m, proof_for=f"errand:{e['id']}")
             _send(m["channel"], m["channel_user_id"],
-                  f"Great. Send me {_lc(e['proof_needed']) or 'a photo or short note'} for task {e['id']} and I'll pass it to Jonathan.")
+                  _say(m, "send_proof", p=_lc(e['proof_needed']) or 'a photo or short note', i=e["id"]))
             return "errand_done_reported"
-        _send(m["channel"], m["channel_user_id"], "Which task number? For example: done 3.")
+        _send(m["channel"], m["channel_user_id"], _say(m, "which_num"))
         return "done_ambiguous"
 
     if TASKS.search(text):
@@ -256,13 +322,13 @@ def _handle_staff(cur, m, mid, text):
             import leo_service as ls
             route = ls.try_purpose_route(cur, items[0][1]["client_code"], text,
                                          channel=m["channel"], channel_user_id=m["channel_user_id"])
-            if route and route.get("text"):
+            closed = (route or {}).get("via") == "stack_closed" or "stack hit" in ((route or {}).get("text") or "").lower()
+            if route and route.get("text") and not closed:     # the record's "no hit" line is jargon; use ours
                 _send(m["channel"], m["channel_user_id"], route["text"])
                 return "answered_from_record"
         except Exception as e:
             print(f"[staff_desk] purpose_route skip: {type(e).__name__}: {e}", flush=True)
-    _send(m["channel"], m["channel_user_id"],
-          "I can help with your tasks and proof photos for now. Jonathan will see your message.")
+    _send(m["channel"], m["channel_user_id"], _say(m, "fallback"))
     return "fallback"
 
 
@@ -303,7 +369,7 @@ def _errand_submitted(cur, m, e, doc_id, note):
     _queue(cur, "staff_task_done", e["id"], f"staff_task_done:{e['matter_code']}",
            f"{m['name']} says task {e['id']} is done ({e['title']}). Proof: {what}. Accept it as done? Reply yes or no.",
            {"doc_id": doc_id, "note": note, "officer": m["name"]})
-    _send(m["channel"], m["channel_user_id"], f"Saved for task {e['id']}. Jonathan will check it. " + _next_task_text(cur, m))
+    _send(m["channel"], m["channel_user_id"], _say(m, "saved", i=e["id"]) + _next_task_text(cur, m))
     ask_next(cur)
     return "errand_submitted"
 
@@ -323,13 +389,12 @@ def _handle_media(cur, m, mid, text):
     items = _candidates(cur, m["assignee_key"])
     media_mid = st.get("pending_media") if DIGIT.match(text or "") else mid
     if not items:
-        _send(m["channel"], m["channel_user_id"],
-              "I got your file, but you have no open task to match it to. Jonathan will see it.")
+        _send(m["channel"], m["channel_user_id"], _say(m, "no_task_file"))
         return "media_no_task"
     if DIGIT.match(text or ""):
         kind, task = _resolve_choice(cur, m, int(DIGIT.match(text).group(1)))
         if not task:
-            _send(m["channel"], m["channel_user_id"], "That number isn't one of your open tasks. Which one?")
+            _send(m["channel"], m["channel_user_id"], _say(m, "not_open"))
             return "media_choice_bad"
     elif st.get("proof_for"):
         kind, task = _resolve_choice(cur, m, st["proof_for"])
@@ -340,7 +405,7 @@ def _handle_media(cur, m, mid, text):
     if not task:
         _set_state(cur, m, pending_media=mid)
         nums = ", ".join(str(r["id"]) for _, r in items[:6])
-        _send(m["channel"], m["channel_user_id"], f"Got it. Which task is this for? Reply with the number ({nums}).")
+        _send(m["channel"], m["channel_user_id"], _say(m, "which_photo", nums=nums))
         return "media_choice_asked"
 
     arts = _artifacts_for(cur, media_mid)
@@ -349,7 +414,7 @@ def _handle_media(cur, m, mid, text):
         doc_id = _land_for_task(cur, a, task) or doc_id
     _set_state(cur, m, pending_media=None)
     if not doc_id:
-        _send(m["channel"], m["channel_user_id"], "I couldn't save that photo. Please send it again.")
+        _send(m["channel"], m["channel_user_id"], _say(m, "photo_fail"))
         return "media_failed"
     if kind == "errand":
         return _errand_submitted(cur, m, task, doc_id, None)
@@ -413,7 +478,7 @@ def _apply_yes(cur, a):
             cur.execute("""SELECT t.*, i.client_code, s.ladder, s.matter_code, s.addressee FROM drip_service_task t
                              JOIN drip_instrument i ON i.id=t.instrument_id LEFT JOIN step_plan s ON s.id=i.step_plan_id
                             WHERE t.id=%s""", (tid,))
-            _send(m["channel"], m["channel_user_id"], "New task. " + _task_line(cur.fetchone()))
+            _send(m["channel"], m["channel_user_id"], _say(m, "new_task") + _task_line(cur.fetchone()))
         return f"Task {tid} assigned."
     if a["kind"] == "staff_task_done":
         cur.execute("UPDATE staff_task SET state='done', updated_at=now() WHERE id=%s RETURNING assignee, title",
@@ -421,8 +486,7 @@ def _apply_yes(cur, a):
         r = cur.fetchone()
         m = _member_by_assignee(cur, r["assignee"]) if r else None
         if m:
-            _send(m["channel"], m["channel_user_id"], f"Jonathan confirmed task {a['ref_id']}. Thank you. "
-                  + _next_task_text(cur, m))
+            _send(m["channel"], m["channel_user_id"], _say(m, "confirmed", i=a["ref_id"]) + _next_task_text(cur, m))
         return f"Task {a['ref_id']} marked done."
     if a["kind"] == "service_proof":
         cur.execute("""SELECT t.*, i.client_code, s.ladder, s.matter_code, s.addressee FROM drip_service_task t
@@ -453,8 +517,7 @@ def _apply_no(cur, a):
         r = cur.fetchone()
         m = _member_by_assignee(cur, r["assignee"]) if r else None
         if m:
-            _send(m["channel"], m["channel_user_id"],
-                  f"Jonathan says task {a['ref_id']} isn't finished yet. Say \"how {a['ref_id']}\" to see what's needed.")
+            _send(m["channel"], m["channel_user_id"], _say(m, "reopened", i=a["ref_id"]))
         return "Noted, task reopened."
     if a["kind"] == "service_proof":
         cur.execute("""UPDATE drip_service_task SET proof_doc_id=NULL, state='served_awaiting_proof', updated_at=now()
@@ -535,7 +598,7 @@ def morning_briefs(cur):
     for m in cur.fetchall():
         if not (m["voice"] or {}).get("raw") or not _candidates(cur, m["assignee_key"]):
             continue
-        if _send(m["channel"], m["channel_user_id"], "Good morning. " + _next_task_text(cur, m)):
+        if _send(m["channel"], m["channel_user_id"], _say(m, "morning") + _next_task_text(cur, m)):
             cur.execute("UPDATE staff_desk_members SET last_brief_on=%s WHERE channel=%s AND channel_user_id=%s",
                         (_today_manila(), m["channel"], m["channel_user_id"]))
             n += 1
@@ -600,6 +663,46 @@ def activate(cur, assignee):
     return rd
 
 
+def rebind(cur, assignee, new_uid, channel="messenger"):
+    """Move an officer to a new account on the same channel (e.g. Kristyle's new Messenger "Elle Cece",
+    2026-11-03). Run only after Jonathan confirms the new account is that person: identity over a channel is
+    never assumed. Keeps her tasks, voice and state; marks the new channel_users row as the same approved role."""
+    cur.execute("SELECT * FROM staff_desk_members WHERE assignee_key=%s AND channel=%s", (assignee, channel))
+    m = cur.fetchone()
+    if not m:
+        raise SystemExit(f"no {channel} member {assignee}")
+    cur.execute("""SELECT cu.* FROM channel_users cu JOIN channels c ON c.id=cu.channel_id
+                    WHERE c.name=%s AND cu.channel_user_id=%s""", (channel, str(new_uid)))
+    cu = cur.fetchone()
+    if not cu:
+        raise SystemExit(f"REFUSED: {channel}:{new_uid} has never messaged the page; have them send one message first.")
+    old = m["channel_user_id"]
+    cur.execute("""UPDATE staff_desk_members SET channel_user_id=%s, updated_at=now()
+                    WHERE assignee_key=%s AND channel=%s""", (str(new_uid), assignee, channel))
+    cur.execute("""SELECT approved_role, entity_id, onboarding_responses, metadata FROM channel_users cu
+                     JOIN channels c ON c.id=cu.channel_id WHERE c.name=%s AND cu.channel_user_id=%s""", (channel, old))
+    prev = cur.fetchone() or {}
+    pr, pm = prev.get("onboarding_responses") or {}, prev.get("metadata") or {}
+    contact = {k: v for k, v in (("email", pr.get("email") or pm.get("email")),
+                                 ("phone", pr.get("phone") or pm.get("phone"))) if v}
+    # carry the contact details too, or the onboarding flow re-asks a known person for them
+    cur.execute("""UPDATE channel_users SET role=coalesce(%s,'filing_assistant'), approved_role=coalesce(%s,'filing_assistant'),
+                          authorized=true, authorized_at=now(), authorized_by='jonathan (staff_desk rebind)',
+                          onboarding_state='approved', onboarding_completed_at=now(), entity_id=coalesce(entity_id,%s),
+                          onboarding_responses = onboarding_responses || %s::jsonb,
+                          metadata = metadata || %s::jsonb
+                    WHERE id=%s""",
+                (prev.get("approved_role"), prev.get("approved_role"), prev.get("entity_id"),
+                 json.dumps({**contact, "staff_contact_completed_at": str(_today_manila()),
+                             "staff_contact_reason": f"carried from {channel}:{old}"}),
+                 json.dumps({**contact, "same_person_as": f"{channel}:{old}", "rebound_on": str(_today_manila())}), cu["id"]))
+    m = _member(cur, channel, new_uid, active_only=False)
+    if m["active"] and not (m["voice"] or {}).get("raw"):
+        _set_state(cur, m, awaiting_voice=True)
+        _send(channel, str(new_uid), VOICE_ASK.format(name=m["name"]))
+    return {"assignee": assignee, "old": old, "new": str(new_uid), "display_name": cu["display_name"]}
+
+
 def status(cur):
     for q, title in [("SELECT channel, channel_user_id, name, assignee_key, active, voice, state, last_brief_on FROM staff_desk_members", "members"),
                      ("SELECT id, instrument_id, assignee, address, due_date, method, proof_doc_id, state FROM drip_service_task WHERE state<>'proof_ingested' ORDER BY id", "open tasks"),
@@ -615,7 +718,8 @@ def status(cur):
 def main():
     global DRY
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", nargs="?", choices=["propose-task", "readiness", "activate"])
+    ap.add_argument("cmd", nargs="?", choices=["propose-task", "readiness", "activate", "rebind"])
+    ap.add_argument("--psid", help="rebind: the new account id on the channel")
     ap.add_argument("--assignee", default="kristyle")
     ap.add_argument("--instrument", type=int)
     ap.add_argument("--address")
@@ -639,6 +743,8 @@ def main():
             tick(cur)
         elif a.cmd == "readiness":
             print(json.dumps(readiness(cur, a.assignee), indent=2))
+        elif a.cmd == "rebind":
+            print(json.dumps(rebind(cur, a.assignee, a.psid), indent=2))
         elif a.cmd == "activate":
             print(json.dumps(activate(cur, a.assignee), indent=2))
         elif a.cmd == "propose-task":
