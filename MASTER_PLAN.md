@@ -188,6 +188,21 @@ LandTek is run by **two operator-facing brains** that must share one truth layer
 
 Charter detail: `agent_specs/006_master_chief_of_staff.md` §13. Bridge: `scripts/cos_bridge.py`. Equilibrium: `docs/RELATIONSHIP_EQUILIBRIUM.md` §5b.
 
+### 0.13 Product direction — from the product interview (operator answers 2026-11-02/03)
+*Verbatim answers: `case_work/PRODUCT_INTERVIEW_2026-11/INTERVIEW_LOG.md`. Where this conflicts with older sections, §0.13 refines, §0.1–0.12 still govern.*
+- **What it is for:** one live record that syncs every stakeholder on a matter, each seeing a permission-filtered slice on the channel they already use. Promise: clear, trustworthy, guided, cheaper, profitable, fewer human errors, faster.
+- **The problem to beat is not capability.** Designs never go live, sessions forget, scope sprawls, things break silently.
+- **The test of "live":** someone other than Jonathan uses it daily without being walked through it.
+- **Live gate (anti-sprawl):** no new feature on a track until its last one is switched ON and used. Built-but-off counts as not done.
+- **Earned autonomy:** every outward act starts on Jonathan's yes/no; each decision is logged by action pattern (`approval_asks`, `v_autonomy_record`); Jonathan promotes a pattern to run alone on its record. Nothing self-promotes.
+- **Readiness before speech:** the bot works out each person's next steps from the record. If it can't, the record is stale and gets fixed; the bot never talks about what it doesn't know.
+- **Never ask a stupid question:** not one the record answers, not one already decided, not one that doesn't change the next action, never in jargon.
+- **Ripple:** one input updates every table it bears on; errands and next steps are derived from the live record, not kept in side lists.
+- **Inference:** free/local first. The stack is the bottleneck, not tokens.
+- **Stages (Claude estimate, not record):** (1) Kristyle daily on Messenger, (2) Jonathan runs his whole day from it (chosen next), (3) a client self-serves, (4) a paying outside client chooses LandTek.
+- **Built so far:** staff desk + Messenger approvals (deploy_1314, Kristyle OFF until readiness passes and Jonathan's go); `/ops/now` board + `/ops/staff/<assignee>` (deploy_1315). First board read: 26/26 active fronts have no current next date.
+- **CONFLICT for Jonathan / CoS:** §0.12 rule 4 gives CoS the Jonathan decision cards; the staff desk now asks Jonathan yes/no on Messenger for service tasks and proofs (Jonathan chose Messenger approvals, 2026-11-03). Decide whether CoS adopts the `approval_asks` queue or the two stay split by kind.
+
 
 ---
 

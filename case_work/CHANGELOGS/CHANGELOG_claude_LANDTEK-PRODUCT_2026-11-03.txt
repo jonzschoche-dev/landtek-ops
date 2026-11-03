@@ -1,0 +1,37 @@
+CHANGELOG claude / LANDTEK-PRODUCT / 2026-11-03
+Session: Claude Code, Mac desk. Product interview + first build (started 2026-11-02).
+
+CHANGED
+- New: case_work/PRODUCT_INTERVIEW_2026-11/INTERVIEW_LOG.md (Jonathan's answers, rounds 1-9, verbatim, with Claude's reads).
+- New: scripts/staff_desk.py (field-officer desk on Messenger: voice onboarding, one task at a time, served, proof photo, readiness gate, activate switch; Jonathan's one-at-a-time yes/no approvals; morning brief; --dry-run).
+- New: migrations/deploy_1314_staff_desk.sql (staff_desk_members, approval_asks, v_autonomy_record; Kristyle seeded active=false). Applied on VPS (idempotent, run twice).
+- Edited: scripts/leo_instant.py (staff_desk.route first, degrade on error); scripts/comms_artifact_sink.py (optional client_hint, used only for unresolved staff identities with an assigned task).
+- Edited: case_theories/_clients.py (LANDTEK-CORP registered, case_file LANDTEK-CORP, prefix LANDTEK-). DB: documents #20784 case_file LANDTEK-OPC-FORMATION -> LANDTEK-CORP (matter_code unchanged).
+- Backups: /root/backup_postgres.sh weekly FULL dump disabled (if false), nightly record-only dump cron restored at 02:00 UTC (backups: /root/backup_postgres.sh.bak_*, /root/landtek/backups/root_crontab.pre_restore_*). Ran once: landtek_backup_2026-11-03.sql.gz (138 MB).
+- Edited: scripts/offbox_backup_pull.sh (Drive leg v3: encrypted copy into Jonathan's private "My Drive/LandTek Backups/VPS/database-encrypted" via the Mac Drive client, keep 7; gdrive-sa leg removed). First run OK, receipts written.
+- Edited: truth_tests/test_survivable_record.py (accepts gdrive:private/ receipts).
+- New: leo_tools/now_board.py (/ops/now board, every row clickable; detail pages for letters, clocks, approvals, tasks, docs; /ops/staff/<assignee>). leo_tools/server.py registers it.
+- Edited: MASTER_PLAN.md §0.13 (product direction from the interview).
+- Commits: deploy_1314 (gate 310/310 green; push also carried deploy_1311-1313 from the other session). deploy_1315 board: see git log.
+
+DECIDED (Jonathan)
+- First product = the drip + the chat bot; first daily user Kristyle on Messenger; Jonathan approves on Messenger too.
+- Earned autonomy; live gate; readiness before speech; no stupid questions; ripple; free/local inference.
+- Next stakeholder after Kristyle = Jonathan fully.
+- Proof photos: Jonathan decides for now.
+- Backups to a private Drive folder; restore the nightly record-only dump without the weekly full.
+- Fix the gate failures before deploying (done), then deploy.
+- Simple dashboard for Jonathan, own dashboard for Kristyle, every item clickable.
+
+OPEN
+- Kristyle OFF: readiness fails until letters #9 and #11 (Mayor, paper) get Jonathan's comments and approval.
+- Kristyle's own link: /ops is behind Jonathan's password; her page needs a token link (new nginx location) on Jonathan's go.
+- Non-letter errands are not in the record (ripple principle says derive them; not built).
+- How Kristyle receives the letter file is not automated.
+- 26/26 active fronts have no current next date (matters.next_deadline past or empty); CV-26360 shows 14 Oct though 4 Nov is listed in its text.
+- landtek-backup.timer (1.4 GB full + code) stays paused (Grok, 1 Nov); /var/backups/landtek holds ~28 GB; VPS disk 94%. B2 over cap. Not touched.
+- Stage-2 questions (morning message, ripple scope, stupid-question list, one brain) not yet answered.
+
+CONFLICTS
+- MASTER_PLAN §0.12 rule 4: CoS owns Jonathan decision cards; the staff desk now asks yes/no on Messenger (Jonathan's choice). Needs Jonathan/CoS ruling.
+- Backups: Grok paused landtek-backup.timer and retired the nightly cron on 1 Nov; this session restored the nightly record-only cron on Jonathan's go of 3 Nov. The timer pause is left as Grok set it.
