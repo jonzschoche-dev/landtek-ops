@@ -70,6 +70,13 @@ except Exception as _e:
     print(f"WARN: ops dashboard not registered: {_e}", file=_sys.stderr)
 
 try:
+    from now_board import bp as _now_board_bp     # /ops/now + /ops/staff/<assignee> (deploy_1315)
+    app.register_blueprint(_now_board_bp)
+except Exception as _e:
+    import sys as _sys
+    print(f"WARN: now board (/ops/now) not registered: {_e}", file=_sys.stderr)
+
+try:
     from ops_console import bp as _console_bp
     app.register_blueprint(_console_bp)
 except Exception as _e:
