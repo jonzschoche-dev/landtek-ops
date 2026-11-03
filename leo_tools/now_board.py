@@ -231,7 +231,7 @@ def now():
             f'<div class="kpi"><span class="big {"red" if overdue else "grn"}">{overdue}</span><span class="m">offices overdue</span></div>'
             f'<div class="kpi"><span class="big {"red" if stale else "grn"}">{stale}/{len(fronts)}</span><span class="m">fronts with no current date</span></div>'
             f'</div>')
-    mach = "".join(_row(_e(k), f'<span class="{x[2]}">{_e(x[1])}</span>', "", x[3] if len(x) > 3 else "/ops/health")
+    mach = "".join(_row(_e(x[0]), f'<span class="{x[2]}">{_e(x[1])}</span>', "", x[3] if len(x) > 3 else "/ops/health")
                    for x in machine)
     body = (kpis
             + _section("Needs you", len(needs), "".join(needs), "Nothing is waiting on you.")
