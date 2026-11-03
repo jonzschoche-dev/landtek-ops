@@ -30,6 +30,10 @@ import psycopg2.extras
 
 DSN = os.environ.get("PG_DSN", "postgresql://n8n:n8npassword@172.18.0.3:5432/n8n")
 
+# Plain language, never operator jargon (Jonathan's rule; the old "No typed stack hit" text, 2026-11-03).
+NO_HIT_TEXT = ("I don't have that in our records yet, so I won't guess. "
+               "I've passed your question to the team to check.")
+
 # Stack layers scrutinized on every factual inquiry (order = audit trail, not priority)
 LAYERS = (
     "role",
@@ -1264,10 +1268,9 @@ def _atoms_for_intent(intent: str, atoms: list, tmsg: str) -> list:
     # general: NEVER volunteer refs the user didn't ask about. The old
     # mro_ref/docket branch here made every unmatched ask (greetings, Tagalog
     # phrasings, follow-ups) answer with Malacañang refs — the 2026-07-17
-    # 'clueless' failure. Title atoms only if the ask was title-shaped;
-    # otherwise empty → caller fail-closes honestly.
-    if by["tct"] or by["oct"]:
-        return (by["tct"] + by["oct"] + by["e_title"])[:4]
+    # 'clueless' failure. A title-shaped ask never reaches here (_intent), so a
+    # leftover title-atom branch answered "next court date?" / "status of the
+    # guardianship?" with "Title 079-…" (2026-11-03). Empty → caller fails closed.
     return []
 
 
@@ -1340,31 +1343,21 @@ def synthesize(message: str, scrutiny: dict, cur=None, client_code: str = "") ->
     else:
         used = _atoms_for_intent(intent, atoms, tmsg)
 
-    # RELEVANCE FAIL-CLOSED: do not claim stack_hit with empty/wrong atoms
-    if not used and intent not in ("general",):
-        return {
-            "text": (
-                "I don’t have a grounded answer that matches this question on the "
-                "title/fact stack (refusing to dump unrelated CTNs). "
-                "Flagging for human review if this is urgent."
-            ),
-            "via": "held_unclear",
-            "atoms_used": [],
-            "pass_to_human": True,
-            "human_pass": {"mode": "hold_no_facts", "score": 55, "intent": intent},
-            "mode": "hold_no_facts",
-        }
+    # RELEVANCE FAIL-CLOSED: do not claim stack_hit with empty/wrong atoms. no_hit=True tells
+    # try_inquiry_stack to return None so the later routes still get a turn (2026-11-03); the miss
+    # is still queued for a person by run_inquiry.
     if not used:
+        hp = {"mode": "hold_no_facts", "score": 55}
+        if intent != "general":
+            hp["intent"] = intent
         return {
-            "text": (
-                "No typed stack hit for that yet. I will not invent. "
-                "Flagging for human review."
-            ),
+            "text": NO_HIT_TEXT,
             "via": "held_unclear",
             "atoms_used": [],
             "pass_to_human": True,
-            "human_pass": {"mode": "hold_no_facts", "score": 55},
+            "human_pass": hp,
             "mode": "hold_no_facts",
+            "no_hit": True,
         }
 
     hard_hit = bool(used and any(
@@ -1806,6 +1799,7 @@ def run_inquiry(
         "preformed": True,
         "pass_to_human": bool(ans.get("pass_to_human")),
         "human_pass": ans.get("human_pass") or {},
+        "no_hit": bool(ans.get("no_hit")),
         "scrutiny_layers": [
             f"{L['layer']}:{L['status']}:{L['hit_count']}" for L in scrutiny["layers"]
         ],
@@ -1929,6 +1923,8 @@ def try_inquiry_stack(cur, client_code: str, message: str, **kwargs) -> Optional
         drain=kwargs.get("drain", False),
         eval_cur=kwargs.get("eval_cur"),
     )
+    if result.get("no_hit"):
+        return None                       # nothing grounded: let the later routes try
     return {
         "text": result["text"],
         "via": result["via"],

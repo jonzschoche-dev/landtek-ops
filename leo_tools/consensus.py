@@ -368,6 +368,24 @@ def _compose_deadlines(cur, matter, client_code, role, params):
 
     seen = set()
 
+    # A5 wall for the non-matters homes (2026-11-03): surfaced_deadlines and calendar_events carry
+    # only a code, no client, and the client-wide ask read them unfiltered, so Paracale / NIBDC /
+    # LANDTEK-CORP were told MWK-001 dates. A row counts for this client only when its code is one
+    # of the client's matters or the client code itself; anything unattributable is dropped and
+    # counted as a gap (the prefix only counts the gap, never shows a row; A57 never silent).
+    own = None
+    unattributed = 0
+    if client_code and not matter:
+        cur.execute("SELECT matter_code FROM matters WHERE client_code = %s", (client_code,))
+        own = {r["matter_code"] for r in cur.fetchall()} | {client_code}
+        stem = client_code.split("-")[0].upper() + "-"
+
+    def _unattributed(code):
+        if not code or not code.upper().startswith(stem):
+            return 0
+        cur.execute("SELECT 1 FROM matters WHERE matter_code = %s", (code,))
+        return 0 if cur.fetchone() else 1
+
     # Home 1 — the structured SoR column
     cur.execute("""SELECT matter_code, next_deadline, current_stage, next_event FROM matters
                    WHERE next_deadline IS NOT NULL
@@ -407,6 +425,9 @@ def _compose_deadlines(cur, matter, client_code, role, params):
                          AND (%s::text IS NULL OR matter_code = %s)
                        ORDER BY matter_code, due_date""", (latest, matter, matter))
         for r in cur.fetchall():
+            if own is not None and r["matter_code"] not in own:
+                unattributed += _unattributed(r["matter_code"])
+                continue
             key = (r["matter_code"], r["due_date"])
             if key in seen:
                 continue
@@ -422,6 +443,9 @@ def _compose_deadlines(cur, matter, client_code, role, params):
                      AND (%s::text IS NULL OR related_case = %s)
                    ORDER BY start_at LIMIT 40""", (matter, matter))
     for r in cur.fetchall():
+        if own is not None and r["related_case"] not in own:
+            unattributed += _unattributed(r["related_case"])
+            continue
         d = r["start_at"].date()
         key = (r["related_case"], d)
         if key in seen:
@@ -445,6 +469,11 @@ def _compose_deadlines(cur, matter, client_code, role, params):
         gaps.append(_gap("needs_date", n=undated,
                          detail=f"{undated} active matter(s) carry no forward date",
                          unblocks="source-cited dates (A68) or explicit dateless classification"))
+
+    if unattributed:
+        gaps.append(_gap("unattributed_dates", n=unattributed,
+                         detail=f"{unattributed} dated item(s) carry no registered matter",
+                         unblocks="file the item under a registered matter_code"))
 
     # NEXT-first (2026-10-03): upcoming dates lead, soonest first; past-dated items follow, still
     # listed and flagged (A57: never silent). Pure date-ascending put months-old overdue items ahead

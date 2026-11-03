@@ -509,11 +509,9 @@ def is_inquiry(message: str) -> bool:
     return False
 
 
-STACK_CLOSED_TEXT = (
-    "I do not have a grounded answer from the corpus stack for that yet "
-    "(title / fact / brief / law layers returned no safe hit). "
-    "I will not invent. Needs human review if this is urgent."
-)
+# Plain language, never operator jargon (2026-11-03; same words as inquiry_stack.NO_HIT_TEXT).
+STACK_CLOSED_TEXT = ("I don't have that in our records yet, so I won't guess. "
+                     "I've passed your question to the team to check.")
 
 
 # field kinds an asked docket/CTN-style identifier may legitimately match (NEVER date/amount —

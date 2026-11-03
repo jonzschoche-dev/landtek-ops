@@ -1,0 +1,22 @@
+CHANGELOG claude / LEO-ROUTER (all clients) / 2026-11-03
+Session: Claude Code, Mac desk, side session started from the LANDTEK-PRODUCT session (Kristyle staff-desk testing).
+
+CHANGED
+- leo_tools/consensus.py (_compose_deadlines): client-wide deadline asks now keep a surfaced_deadlines or calendar_events row only when its code is one of the asked client's matters or the client code itself. Root cause of the cross-client leak: those two homes had no client filter, so Paracale-001, NIBDC-001 and LANDTEK-CORP were told MWK-001 dates ("When is the next hearing in the Balane case?"). Rows with a code that is not a registered matter (e.g. MWK-ARTA) are dropped and counted as an "unattributed_dates" gap, never shown on a prefix guess.
+- scripts/inquiry_stack.py: the "general" intent no longer volunteers title atoms (root cause of "Title 079-2018001329, 079-2021002126." for "ano ang next court date?", "status of the guardianship?", "status of CV6839"; NIBDC got "Title T-3126, T-72669."). A stack no-hit now returns None from try_inquiry_stack so the later routes get a turn (the miss is still queued for a person by run_inquiry). New NO_HIT_TEXT in plain language.
+- scripts/leo_service.py: STACK_CLOSED_TEXT rewritten in plain language: "I don't have that in our records yet, so I won't guess. I've passed your question to the team to check." (old text said "corpus stack", "layers", "human review").
+- New truth_tests/test_leo_router_scoping.py (5 tests). Negative-tested in an isolated VPS copy: old code 5/5 fail (leak, title list, jargon), fixed code 5/5 pass.
+- Not touched: scripts/staff_desk.py (deliberately bypasses this router for case questions).
+
+DECIDED
+- Strict client wall over completeness: a dated item whose code is not a registered matter of the client is dropped (and counted), not attributed by prefix.
+- Same plain no-hit sentence for the stack and the final router gate.
+
+OPEN
+- After the fix, MWK-001 "ano ang next court date?", "What is the status of the guardianship?" and "status of CV6839" get the honest no-hit reply, not an answer. The record likely holds these (matters.next_deadline, matter briefs); routing them to a real answer is a coverage follow-up ("court date" is not in composer _DEADLINE_RE; "status of <matter>" has no owner).
+- "When is the next hearing in the Balane case?" (MWK-001) answers with the matter's next DRIP clock (2026-11-12, OCC-NOTARIAL), which is not a hearing. Hearing vs. any-date is a follow-up.
+- Composer miss/partial render shows "(gap: needs_date x8)", which is operator jargon on a client channel. Follow-up.
+- 4 dated items coded MWK-ARTA (2 surfaced, 2 calendar) carry no registered matter; they are now hidden from client-scoped deadline answers until filed under a registered matter_code. UNVERIFIED which matter they belong to.
+
+CONFLICTS
+- None.
