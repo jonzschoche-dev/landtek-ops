@@ -108,6 +108,16 @@ def _needs_jonathan(cur):
         age = (_today() - i["updated_at"].astimezone(MANILA).date()).days
         rows.append(_row("letter", f"Your comment on letter #{i['id']} to {_e(i['addressee'] or '?')}",
                          f"{_e(i['ladder'])} · waiting {age}d", f"/ops/now/letter/{i['id']}"))
+    try:   # officer questions the bot could not answer from the record (staff_question, deploy_1323)
+        for sq in _q(cur, """SELECT q.id, q.assignee, q.question, q.outcome, q.created_at, q.task_id
+                               FROM staff_question q WHERE q.outcome <> 'answered'
+                                AND q.created_at > now() - interval '7 days' ORDER BY q.id DESC LIMIT 10"""):
+            rows.append(_row("question", f"{_e(sq['assignee'].capitalize())} asked: \u201c{_e(sq['question'])}\u201d",
+                             f"not in the record ({_e(sq['outcome'].replace('_', ' '))}) · "
+                             f"{_e(sq['created_at'].astimezone(MANILA).strftime('%a %d %b %H:%M'))}",
+                             f"/ops/now/stask/{sq['task_id']}" if sq["task_id"] else None))
+    except Exception:
+        cur.connection.rollback()
     for o in _q(cur, """SELECT id, matter_code, office, state, updated_at FROM office_obligation
                          WHERE state IN ('draft_held','held_counsel_route') ORDER BY updated_at"""):
         rows.append(_row("held", f"{_e(o['office'])}", f"{_e(o['matter_code'])} · {_e(o['state'])}",

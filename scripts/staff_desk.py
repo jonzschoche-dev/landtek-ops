@@ -188,6 +188,8 @@ MSG = {
     "dep_note":   {"en": " Note: per the source, task {d} comes first.",
                    "tl": " Paalala: ayon sa source, dapat matapos muna ang task {d} bago ito."},
     "skipped":    {"en": "OK, skipping task {i} for today. ", "tl": "Sige, laktaw muna ang task {i} ngayon. "},
+    "not_found":  {"en": "I can't find that in the papers for your tasks. I've noted your question for Jonathan.",
+                   "tl": "Hindi ko makita 'yan sa mga papel ng tasks mo. Na-note ko ang tanong mo para kay Jonathan."},
     "why":        {"en": "Why task {i}: {w}", "tl": "Bakit kailangan ang task {i}: {w}"},
     "why_none":   {"en": "The record doesn't say why for task {i}. Jonathan will see your question.",
                    "tl": "Walang nakasulat sa record kung bakit para sa task {i}. Makikita ni Jonathan ang tanong mo."},
@@ -254,6 +256,138 @@ def _all_tasks_text(cur, m):
     return _say(m, "list_head") + " ".join(
         f"{'Serve' if k == 'serve' else 'Task'} {r['id']} ({r['due_date'].strftime('%d %b') if r['due_date'] else 'no date'})"
         for k, r in items) + _say(m, "list_tail")
+
+
+# ── grounded answers from a task's own source material ─────────────────────────────────────────────────
+# Kristyle, 3 Nov: "What is the subject for email?" — answerable from the letter attached to Task 1, but no
+# command covered it. Free questions are answered ONLY from staff_task.materials by the local model ($0),
+# then checked mechanically: every email, link and number in the answer must appear in the sources, or the
+# answer is dropped. Every question is logged (staff_question) so the unanswered ones reach Jonathan.
+
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
+QA_MODEL = os.environ.get("STAFF_QA_MODEL", "qwen2.5:14b-instruct")
+_TOKEN = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+|https?://\S+|\b[\w-]+\.(?:gov|com|org|ph)(?:\.ph)?\b|\d[\d,./-]*\d|\d")
+
+
+def _norm(t):
+    return re.sub(r"\s+", " ", (t or "").lower())
+
+
+def _unsupported(answer, sources):
+    """Tokens in the answer (emails, links, domains, numbers) that the sources do not contain."""
+    src = _norm(sources).replace(",", "")
+    return [tok for tok in _TOKEN.findall(answer or "") if _norm(tok).replace(",", "").rstrip(".") not in src]
+
+
+def _ask_model(question, sources, lang, task=None):
+    import requests
+    tongue = "Taglish (natural mix of Tagalog and English)" if lang == "tl" else "plain English"
+    focus = (f"THE TASK SHE IS DOING NOW: {task['title']}. Steps: {task.get('how') or ''}\n"
+             "Read the question as being about this task first.\n") if task else ""
+    prompt = ("You help a LandTek field officer with her assigned task. Answer ONLY from SOURCES below. "
+              "Copy names, subjects, emails, addresses, numbers and amounts exactly and IN FULL as written in "
+              "SOURCES (a 'Re:' subject line runs to the end of that paragraph). Add nothing that SOURCES do not say. "
+              "If SOURCES do not contain the answer, reply with exactly NOT_IN_SOURCES and nothing else. "
+              f"Answer in {tongue}, at most 4 sentences, no lists, no bullets, no markdown.\n\n"
+              f"{focus}SOURCES:\n{sources[:12000]}\n\nQUESTION: {question}\nANSWER:")
+    r = requests.post(f"{OLLAMA_URL}/api/generate", timeout=90,
+                      json={"model": QA_MODEL, "prompt": prompt, "stream": False,
+                            "options": {"temperature": 0, "num_ctx": 8192}})
+    r.raise_for_status()
+    return (r.json().get("response") or "").strip()
+
+
+def _answer_from_materials(cur, m, question):
+    """(text_to_send or None, outcome). Uses the task in focus, else all her open tasks' materials."""
+    errands = _open_errands(cur, m["assignee_key"], True)
+    focus = (m.get("state") or {}).get("focus")
+    pool = [e for e in errands if e["id"] == focus] or errands
+    sources = "\n\n".join(dict.fromkeys(e["materials"] for e in pool if e.get("materials")))
+    task_id = pool[0]["id"] if len(pool) == 1 else focus
+    if not sources:
+        return None, "not_in_sources"
+    lang, _ = _voice(m)
+    try:
+        ans = _ask_model(question, sources, lang, pool[0] if len(pool) == 1 else None)
+        ans = re.sub(r"\s*\n\s*[-•*]\s*", "; ", ans).replace("\n", " ").strip()   # never a list on Messenger
+    except Exception as ex:
+        cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, detail)
+                       VALUES (%s,%s,%s,'error',%s)""", (m["assignee_key"], task_id, question, f"{type(ex).__name__}: {ex}"[:300]))
+        return None, "error"
+    if not ans or "NOT_IN_SOURCES" in ans:
+        outcome, send, detail = "not_in_sources", None, None
+    else:
+        bad = _unsupported(ans, sources)
+        outcome, send, detail = (("rejected_unsupported", None, f"unsupported: {bad}") if bad
+                                 else ("answered", ans, None))
+    cur.execute("""INSERT INTO staff_question (assignee, task_id, question, answer, outcome, detail)
+                   VALUES (%s,%s,%s,%s,%s,%s)""", (m["assignee_key"], task_id, question, ans, outcome, detail))
+    return send, outcome
+
+
+# ── case questions (Jonathan, 3 Nov: "cases too") ─────────────────────────────────────────────────────
+# Answered straight from the matters table, never through leo_service.try_purpose_route (on 3 Nov that router
+# returned title lists for court-date questions and MWK rows under other clients). A question gets a case
+# answer only when it names exactly ONE matter, by docket number or a listed name; two or more -> ask which.
+
+CASE_NAMES = {   # names people actually use for a matter; matched as whole words (docket numbers are automatic)
+    "MWK-CV26360": ["balane", "accion", "reinvindicatoria", "reivindicatoria", "26-360"],
+    "MWK-GUARDIANSHIP": ["guardianship", "guardian"],
+    "MWK-CV6839": ["6839", "just compensation", "landbank", "land bank"],
+    "MWK-ESTATE": ["estate administration"],
+    "MWK-LGU-RECOVERY": ["lgu recovery", "void donation"],
+    "MWK-OP-PETITION": ["supervisory review", "op petition"],
+    "LANDTEK-OPC-FORMATION": ["sec registration", "opc formation", "incorporation"],
+    "PAR-VITO-CRUZ": ["vito cruz"], "PAR-CAPACUAN": ["capacuan"], "PAR-GOLDEN-SAND": ["golden sand"],
+    "NIBDC-EXPA-000250": ["expa", "exploration permit"], "NIBDC-APSA-000322": ["apsa"],
+}
+CASE_HINT = re.compile(r"\b(case|kaso|hearing|court|korte|trial|status|docket|arta|ombudsman|petition|guardianship|"
+                       r"balane|6839|cv|sp\.? ?proc|next date|deadline)\b", re.I)
+
+
+def _matter_keys(r):
+    keys = set(n.lower() for n in CASE_NAMES.get(r["matter_code"], []))
+    for src in [r["matter_code"], r["docket_number"] or ""] + list(r["docket_aliases"] or []):
+        keys |= {k for k in re.findall(r"\d{2}-\d{3}|\d{4,}", src)    # 26-360, 2680, 1378, 88750 ...
+                 if not re.fullmatch(r"(19|20)\d\d", k)}                 # a bare year is never a case key
+    return keys
+
+
+def _find_matters(cur, text):
+    cur.execute("""SELECT matter_code, client_code, title, docket_number, docket_aliases, current_stage, next_event,
+                          next_deadline, lead_counsel, status FROM matters
+                    WHERE coalesce(status,'') NOT ILIKE 'closed%%' AND matter_code NOT LIKE 'AUTO-%%'""")
+    low = text.lower()
+    hits = []
+    for r in cur.fetchall():
+        if any(re.search(rf"(?<![\d-]){re.escape(k)}(?![\d-])" if k[0].isdigit()          # numbers: CV6839 ok
+                         else rf"(?<![\w-]){re.escape(k)}(?![\w-])", low) for k in _matter_keys(r)):
+            hits.append(r)
+    return hits
+
+
+def _case_answer(cur, m, r):
+    lang, _ = _voice(m)
+    stage = (r["current_stage"] or "").replace("_", " ")
+    d = r["next_deadline"]
+    if d and d < _today_manila():
+        when = (f"{d.strftime('%d %b %Y')} (lumipas na; baka hindi pa updated ang record)" if lang == "tl"
+                else f"{d.strftime('%d %b %Y')} (already past; the record may not be updated)")
+    else:
+        when = d.strftime("%a %d %b %Y") if d else ("wala sa record" if lang == "tl" else "none on record")
+    cur.execute("""SELECT count(*) n, min(due_at) FILTER (WHERE due_at >= current_date) nxt FROM office_obligation
+                    WHERE matter_code=%s AND state IN ('served_running','replied_not_performed','partial')""",
+                (r["matter_code"],))
+    ob = cur.fetchone()
+    if lang == "tl":
+        out = f"{r['title']} ({r['matter_code']}). Stage: {stage or 'wala sa record'}. Susunod ayon sa record: {r['next_event'] or 'wala'}. Date sa record: {when}."
+        if ob["n"]:
+            out += f" May {ob['n']} office clock na tumatakbo; ang pinakamalapit na reply ay {ob['nxt'].strftime('%d %b') if ob['nxt'] else '?'}."
+    else:
+        out = f"{r['title']} ({r['matter_code']}). Stage: {stage or 'not on record'}. Next per the record: {r['next_event'] or 'none'}. Date on record: {when}."
+        if ob["n"]:
+            out += f" {ob['n']} office clock(s) running; the nearest reply is due {ob['nxt'].strftime('%d %b') if ob['nxt'] else '?'}."
+    return out
 
 
 # ── staff desk ─────────────────────────────────────────────────────────────────────────────────────────
@@ -364,12 +498,38 @@ def _handle_staff(cur, m, mid, text):
         _send(m["channel"], m["channel_user_id"], _all_tasks_text(cur, m) if LIST.search(text) else _next_task_text(cur, m))
         return "tasks"
 
-    if st.get("proof_for", "").startswith("errand:") and text:
-        # a typed answer IS the proof for errands like "tell Jonathan the owner's name"
+    if st.get("proof_for", "").startswith("errand:") and text and not text.rstrip().endswith("?"):
+        # a typed answer IS the proof only for errands that ask for something typeable ("the owner's name",
+        # "Allan's confirmation"); a document-proof task waits for the photo, and a question is never proof
         eid = int(st["proof_for"].split(":")[1])
         e = next((x for x in _open_errands(cur, m["assignee_key"]) if x["id"] == eid), None)
-        if e:
+        if e and re.search(r"\b(name|confirmation|confirm|note|answer)\b", e.get("proof_needed") or "", re.I):
             return _errand_submitted(cur, m, e, None, text)
+
+    # case questions: only when exactly one matter is named
+    if text and CASE_HINT.search(text) or (text and _find_matters(cur, text)):
+        hits = _find_matters(cur, text)
+        if len(hits) == 1:
+            _send(m["channel"], m["channel_user_id"], _case_answer(cur, m, hits[0]))
+            return "case_answered"
+        if len(hits) > 1 or CASE_HINT.search(text):
+            opts = "; ".join(f"{h['matter_code']} ({h['title'][:40]})" for h in hits[:4]) if hits else \
+                "Balane 26-360, guardianship 2680, CV6839, o ARTA 1378"
+            lang, _ = _voice(m)
+            _send(m["channel"], m["channel_user_id"],
+                  (f"Aling kaso ang tinutukoy mo? Halimbawa: {opts}." if lang == "tl"
+                   else f"Which case do you mean? For example: {opts}."))
+            return "case_which"
+
+    # free questions: first from her tasks' own source material (local model, token-checked)
+    if text and text != "[media]":
+        ans, outcome = _answer_from_materials(cur, m, text)
+        if ans:
+            _send(m["channel"], m["channel_user_id"], ans)
+            return "answered_from_materials"
+        if outcome in ("not_in_sources", "rejected_unsupported") and _open_errands(cur, m["assignee_key"], True):
+            _send(m["channel"], m["channel_user_id"], _say(m, "not_found"))
+            return f"materials_{outcome}"
 
     # questions: answer from the record, scoped to the client of her current task; never free-LLM
     items = _candidates(cur, m["assignee_key"])
