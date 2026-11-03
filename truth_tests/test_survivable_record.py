@@ -179,7 +179,9 @@ def encrypted_cloud_receipt_fresh(cur):
             f"now regressed (A62). Check ~/landtek-backups/pull.log.")
     with open(receipts, errors="ignore") as f:
         last = ([ln.strip() for ln in f if ln.strip()] or [""])[-1]
-    if ".sql.gz.enc" not in last or "gdrive:LANDTEK/" not in last:
+    # v3 (2026-11-03): the Drive leg writes to Jonathan's PRIVATE "LandTek Backups" folder (gdrive:private/...);
+    # gdrive:LANDTEK/ is the retired service-account path into the public-by-link folder, kept readable for history.
+    if ".sql.gz.enc" not in last or not ("gdrive:private/" in last or "gdrive:LANDTEK/" in last):
         raise TruthFailure(f"Malformed encrypted-cloud receipt; cannot prove Drive copy (A62): {last[:120]}")
 
 

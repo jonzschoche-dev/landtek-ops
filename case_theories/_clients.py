@@ -206,6 +206,34 @@ CLIENTS = {
         "next_forcing_function": None,
     },
 
+    # ─── LANDTEK-CORP — the LandTek opco itself (SEC 2026110274328-35, 2 Nov 2026) ─────────
+    # Internal company records (formation, registrations, deal papers). Kept apart from every
+    # client; matters use the LANDTEK- prefix (e.g. LANDTEK-OPC-FORMATION).
+    "LANDTEK-CORP": {
+        "client_id": "LANDTEK-CORP",
+        "label": "LandTek Property Management Solutions OPC",
+        "owner_principal": "LandTek (corporate)",
+
+        "case_file": "LANDTEK-CORP",
+        "matter_prefix": "LANDTEK-",
+
+        "operative_root": None,
+        "ghost_titles": [],
+        "trunk_titles": [],
+
+        "arta_ctn_prefix_to_matter": None,
+        "civil_case_mappings": {},
+
+        "keystone_entities": {},
+        "case_theory_modules": [],
+        "consolidation_groups_count": 0,
+        "memory_rules": [],
+        "chronicle_script": None,
+        "chronicle_keystones_var": None,
+        "truth_test_modules": [],
+        "next_forcing_function": None,
+    },
+
     # ─── OWNER — Jonathan Zschoche's personal/owner-bucket files ─────────
     # Not a legal client in the representation sense; it's the case_file used
     # for Jonathan's own documents (passport, birth records, family research,

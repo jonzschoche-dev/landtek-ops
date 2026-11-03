@@ -45,6 +45,14 @@ def _process(cur, mid):
     if not r:
         return
     ident = (r["channel"], str(r["channel_user_id"]))
+    # Staff desk first: active field officers (tasks, proof photos) and the operator's yes/no on an asked
+    # approval. Inactive members fall through untouched. Degrade, never crash the listener.
+    try:
+        import staff_desk
+        if staff_desk.route(cur, mid, r["channel"], str(r["channel_user_id"]), r["text_content"]):
+            return
+    except Exception as e:
+        print(f"[leo_instant] staff_desk skip on {mid}: {type(e).__name__}: {str(e)[:100]}", flush=True)
     if ident not in ls.TEST_IDENTITIES:
         return                                   # not a wired test/operator identity → ignore
     if ls._channel_mode(cur, r["channel"]) != "headless":

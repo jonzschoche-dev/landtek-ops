@@ -90,7 +90,7 @@ def _ledger(cur, **kw):
 
 
 def land_artifact(channel, channel_user_id, channel_message_id, filename, data, mime=None,
-                  media_ref=None, conn=None):
+                  media_ref=None, conn=None, client_hint=None):
     """Land ONE artifact. Self-contained (opens its own autocommit conn unless one is passed).
     Returns {status, doc_id, client_code, processing_state, reason}. Never raises to the caller."""
     own = conn is None
@@ -101,6 +101,10 @@ def land_artifact(channel, channel_user_id, channel_message_id, filename, data, 
     mime = mime or mimetypes.guess_type(fn)[0] or "application/octet-stream"
     try:
         client, bconf, ident = _resolve_client(cur, channel, channel_user_id)
+        if not client and client_hint:
+            # Staff officers (staff_desk) carry no client of their own: the client comes from the assigned
+            # service task the proof answers, chosen by the caller, never guessed here.
+            client, bconf, ident = client_hint, 1.0, "staff_task"
         if not client:
             # A5: resolve-or-HOLD. Visible, never dropped, never guessed.
             _ledger(cur, channel=channel, uid=str(channel_user_id), msg_id=channel_message_id,
