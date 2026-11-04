@@ -103,13 +103,18 @@ def _is_jonathan_awaiting_reply(cur) -> bool:
     last_out = row.get("last_out")
     if not last_out:
         return False
+    # His replies land in telegram_inbox now; leo_interactions stopped recording them on 8 Jun 2026, which
+    # held every non-override message to him (Kristyle's relays included) until 4 Nov. Either table counts.
     cur.execute(
         """
         SELECT 1 FROM leo_interactions
          WHERE sender_id = %s AND timestamp > %s
+        UNION ALL
+        SELECT 1 FROM telegram_inbox
+         WHERE sender_id::text = %s AND received_at > %s
          LIMIT 1
         """,
-        (JONATHAN_CHAT, last_out),
+        (JONATHAN_CHAT, last_out, JONATHAN_CHAT, last_out),
     )
     return cur.fetchone() is None
 

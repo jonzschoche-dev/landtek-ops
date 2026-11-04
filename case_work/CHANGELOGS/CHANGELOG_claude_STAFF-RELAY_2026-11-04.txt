@@ -1,0 +1,37 @@
+CHANGELOG claude / STAFF-RELAY (LANDTEK-CORP staff desk + Jonathan's Telegram) / 2026-11-04
+Session: Claude Code, Mac desk (side session of the LANDTEK-PRODUCT session). Jonathan: "Leo is supposed to be
+messaging me and Kristyle yet I'm receiving nothing of her communications to Leo"; then "Yes, fix all of it".
+
+FOUND
+- Kristyle's two relays (4 Nov 09:17 and 09:20 Manila, task 2 corporate TIN / BIR 1903: asks Jonathan to request
+  and make the Director's Certificate for OPC and the Verified Request/Petition for Correction) were blocked by
+  tg_send's S14 one-at-a-time hold (outbound_blocks 14665, 14666). She was told "Done, I've told Jonathan" both times.
+- Root cause: tg_send._is_jonathan_awaiting_reply looked for his replies only in leo_interactions, whose last row
+  from him is 8 Jun 2026. His Telegram replies land in telegram_inbox (18 since June, last 3 Nov 17:19 Manila). The
+  hold never opened: in the 7 days to 4 Nov it held 27 messages to him (agent_alert 7, assistant_cadence 6,
+  filing_monitor 6, watchdog 6, leo 2). Only override_pacing sends reached him.
+- "Notify him" (08:18) was not relayed (pattern needed the word Jonathan). "Did you notify him?" / "Where did you
+  message him?" got "not in sources".
+
+CHANGED
+- scripts/tg_send.py: the hold opens on a reply in leo_interactions OR telegram_inbox.
+- scripts/staff_desk.py (_relay, RELAY, new RELAY_STATUS + _relay_status): a staff relay passes the hold
+  (override_pacing=True, Jonathan's go 4 Nov); she is told the truth when the send fails; "notify / tell him" is
+  relayed; "did you notify him?" answers from the last staff_question relay row. Source stays 'leo'
+  (outbound_messages_source_check allows a fixed list).
+- New truth_tests/test_staff_relay_reaches_jonathan.py (4). Isolated VPS copy: old code 4/4 fail, new 4/4 pass;
+  test_staff_knowledge 8/8, test_drip_core 9/9, test_emission_failclose 6/6.
+
+DECIDED
+- Staff relays skip the hold (Jonathan). Everything else keeps the S14 hold, which now opens on his real replies.
+- The two held relays were not re-sent; Jonathan has their content from this session's chat reply.
+
+OPEN
+- scripts/staff_desk.py also carries the LANDTEK-PRODUCT session's uncommitted deploy_1328 hunks (_case_reply,
+  weekday token check, CASE_NAMES 1214). Only tg_send.py is committed in this deploy; staff_desk.py (with both desks'
+  hunks) is live on the VPS by file copy, and it and the new test ship with that session's deploy (asked it).
+  Until then, any deploy's VPS sync (checkout origin/main -- scripts) reverts the live staff_desk.py to origin.
+- 27 held messages to Jonathan from the last week were not replayed.
+
+CONFLICTS
+- None.
