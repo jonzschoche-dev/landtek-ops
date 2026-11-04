@@ -5,7 +5,8 @@ Locks what the first exam of 3 Nov 2026 found, without calling the model (the ga
   1. Task questions that mention "deadline", "petition" or "Landbank" were sent to the case branch.
      Only an explicit case question (kaso, hearing, court, a docket) may go there first.
   2. "Kailangan ba ng cedula?" was read as "why is this task needed".
-  3. Every knowledge card carries a source and a checked date; a card is live only if its topic's exam passed
+  3. 4 Nov: a case answer called Wed 11 Nov 2026 a "Saturday"; a weekday the sources do not state is rejected.
+  4. Every knowledge card carries a source and a checked date; a card is live only if its topic's exam passed
      (or Jonathan answered it himself), so nothing unexamined reaches an officer.
 """
 import os
@@ -44,6 +45,33 @@ def why_is_not_a_needs_question(cur):
             raise TruthFailure(f"{q!r} would not be answered with the task's 'why'")
 
 
+def invented_weekday_is_rejected(cur):
+    src = "A hearing is reported for 11 November 2026; the time is not known."
+    if not SD._unsupported("The hearing is on Saturday, November 11, 2026.", src):
+        raise TruthFailure("an answer naming a weekday the sources do not state was not rejected")
+    if SD._unsupported("The hearing is on 11 November 2026.", src):
+        raise TruthFailure("a plain sourced date was rejected")
+
+
+def named_cases_are_found(cur):
+    for q, code in (("Ano ang Ombudsman case 1214?", "MWK-OMB-IC-OC-JUL-26-1214"),
+                    ("Sino ang abogado sa Balane case?", "MWK-CV26360"),
+                    ("Who is the respondent in ARTA 1378?", "MWK-ARTA-1378")):
+        got = [h["matter_code"] for h in SD._find_matters(cur, q)]
+        if got != [code]:
+            raise TruthFailure(f"{q!r} found {got}, expected [{code}]")
+
+
+def strategy_questions_never_reach_the_model(cur):
+    for q in ("What is our strategy against Balane in the case?", "Ano ang diskarte natin sa kaso?",
+              "Paano tayo mananalo sa Balane case?", "What are their weaknesses?"):
+        if not SD.STRATEGY.search(q):
+            raise TruthFailure(f"strategy question {q!r} would be answered on the officer desk")
+    for q in ("Sino ang abogado sa Balane case?", "Kailan ang hearing?"):
+        if SD.STRATEGY.search(q):
+            raise TruthFailure(f"plain question {q!r} blocked as strategy")
+
+
 def cards_are_sourced(cur):
     cur.execute("""SELECT id FROM staff_knowledge
                     WHERE coalesce(trim(source_ref), '') = '' OR checked_on IS NULL OR coalesce(trim(fact), '') = ''""")
@@ -66,6 +94,9 @@ TESTS = [
     ("staff_knowledge.task_qs_not_case_branch", task_questions_do_not_go_to_case_branch),
     ("staff_knowledge.case_qs_reach_case_branch", explicit_case_questions_go_to_case_branch),
     ("staff_knowledge.needs_question_not_why", why_is_not_a_needs_question),
+    ("staff_knowledge.invented_weekday_rejected", invented_weekday_is_rejected),
+    ("staff_knowledge.named_cases_found", named_cases_are_found),
+    ("staff_knowledge.strategy_blocked", strategy_questions_never_reach_the_model),
     ("staff_knowledge.cards_sourced", cards_are_sourced),
     ("staff_knowledge.live_cards_examined", live_cards_passed_their_exam),
 ]

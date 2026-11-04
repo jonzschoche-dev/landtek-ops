@@ -68,3 +68,17 @@ OPEN
 - Case knowledge packs not yet built (next). Nightly exam needs the Mac's Ollama awake; if not, the run is recorded as skipped.
 CONFLICTS
 - None new.
+
+ADDENDUM 3 (4 Nov)
+CHANGED
+- deploy_1330 case cards: 9 live cards from the record only (Balane 26-360 what + trial schedule per 4 Sep Order; SP-2680 incl. 11 Nov hearing reported, time unknown, no written order; CV6839; ARTA 1378; ARTA 1319 closed; OP petition; Ombudsman 1214; LGU recovery). No strategy: STRATEGY questions never reach the model. Named-case questions answered from that case's cards (_case_reply); not in cards -> "not in my case notes", logged for Jonathan.
+- Model guards: an invented weekday is rejected (the model called Wed 11 Nov a "Saturday"); answers addressed to Jonathan as letters are rejected; echoed greetings stripped.
+- From the staff-relay session's review (LEO_REVIEW_2026-11-04): relay catches "notify him", "send/forward ... to Jonathan"; relay checked before typed proof; "talk to me in English" switches voice; "done with task 1" records done (not goto); "can't finish task 1, give me task 2" goes to Task 2. Carries that session's _relay/RELAY_STATUS/override_pacing change + truth_tests/test_staff_relay_reaches_jonathan.py.
+- Exam: 68 questions (14 case, 6 from her real failed messages); all topics pass on the new code.
+OPEN
+- The local model's Tagalog is weak (odd words, e.g. "inengkanto"); facts are checked, wording is not. Option: a stronger local model.
+- SEC email bounced / ticket question (review item 2) needs Jonathan's answer; it is on the board.
+- Leo's TELEGRAM answers invented "PA-T-4765" and a Balane status (review J1-J2); that is leo_service, not the staff desk. Not fixed here.
+- matters LANDTEK-OPC-FORMATION title still says "LandTek Property Services OPC (single stockholder: Allan Villafria Inocalla)"; the SEC certificate names LandTek Property Management Solutions OPC, Kristyle 100%. Record correction needs Jonathan's go.
+CONFLICTS
+- Record vs memory on ARTA 1321: matters row says awaiting resolution; memory says closed 25 Aug 2026. No card written for 1321.

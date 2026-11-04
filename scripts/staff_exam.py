@@ -30,7 +30,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import staff_desk as sd  # noqa: E402
 
-UNKNOWN = ("materials_not_in_sources", "materials_rejected_unsupported", "fallback")
+UNKNOWN = ("materials_not_in_sources", "materials_rejected_unsupported", "fallback", "case_not_in_notes")
 
 
 def _matches(reply, item):

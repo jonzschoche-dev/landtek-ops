@@ -267,6 +267,9 @@ def _all_tasks_text(cur, m):
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://100.117.118.47:11434")
 QA_MODEL = os.environ.get("STAFF_QA_MODEL", "qwen2.5:14b-instruct")
 _TOKEN = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+|https?://\S+|\b[\w-]+\.(?:gov|com|org|ph)(?:\.ph)?\b|\d[\d,./-]*\d|\d")
+# a weekday the sources do not state is invented (exam 4 Nov: "Saturday, November 11, 2026" for a Wednesday)
+_TOKEN = re.compile(_TOKEN.pattern + r"|\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|"
+                    r"lunes|martes|miyerkules|huwebes|biyernes|sabado|linggo)\b", re.I)
 
 
 def _norm(t):
@@ -279,19 +282,35 @@ def _unsupported(answer, sources):
     return [tok for tok in _TOKEN.findall(answer or "") if _norm(tok).replace(",", "").rstrip(".") not in src]
 
 
+LETTER = re.compile(r"^\W*(dear|hi|hello|good (morning|day))\b[^.\n]{0,30}\bjonathan\b|\b(best regards|sincerely|yours truly|respectfully yours)\b", re.I)
+
+
+def _clean(ans):
+    """Model answers go to the officer only: never a letter to Jonathan (review 4 Nov, cm 3226/3236); no echoed
+    greeting ("Hi Leo," cm 3218); never a list."""
+    ans = re.sub(r"\s*\n\s*[-•*]\s*", "; ", ans or "").replace("\n", " ").strip()
+    if LETTER.search(ans):
+        return "NOT_IN_SOURCES"
+    rest = re.sub(r"^\s*(hi|hello|hey)\s+[\w.]+\s*[,!.]\s*", "", ans, flags=re.I)
+    return rest or ans
+
+
 def _ask_model(question, sources, lang, task=None):
     import requests
-    tongue = "Taglish (natural mix of Tagalog and English)" if lang == "tl" else "plain English"
+    tongue = ("simple everyday Taglish (Tagalog sentences, but keep legal and office terms in English as written in "
+              "SOURCES)" if lang == "tl" else "plain English")
     focus = (f"THE TASK SHE IS DOING NOW: {task['title']}. Steps: {task.get('how') or ''}\n"
              "Read the question as being about this task first.\n") if task else ""
     prompt = ("You help a LandTek field officer with her assigned task. Answer ONLY from SOURCES below. "
               "Copy names, subjects, emails, addresses, numbers and amounts exactly and IN FULL as written in "
               "SOURCES (a 'Re:' subject line runs to the end of that paragraph). Add nothing that SOURCES do not say. "
               "The question may use other words than SOURCES (bill = invoice, resibo = receipt). "
+              "Never name a day of the week unless SOURCES name it. "
               "Never give advice or next steps that SOURCES do not state: if the question asks what to do in a "
               "situation SOURCES do not cover (what if, paano kung, kung hindi), that is not in SOURCES. "
               "If SOURCES do not contain the answer, reply with exactly NOT_IN_SOURCES and nothing else. "
               f"Answer in {tongue}, at most 4 sentences, no lists, no bullets, no markdown.\n\n"
+              f"TODAY is {_today_manila().strftime('%A %d %B %Y')} (Manila).\n"
               f"{focus}SOURCES:\n{sources[:20000]}\n\nQUESTION: {question}\nANSWER:")
     r = requests.post(f"{OLLAMA_URL}/api/generate", timeout=90,
                       json={"model": QA_MODEL, "prompt": prompt, "stream": False,
@@ -328,7 +347,7 @@ def _answer_from_materials(cur, m, question):
         ans = _ask_model(question, sources, lang, pool[0] if len(pool) == 1 else None)
         if (not ans or "NOT_IN_SOURCES" in ans) and cards and len(sources) > len(cards):
             ans = _ask_model(question, cards, lang)      # long papers can drown a short card; ask the cards alone
-        ans = re.sub(r"\s*\n\s*[-•*]\s*", "; ", ans).replace("\n", " ").strip()   # never a list on Messenger
+        ans = _clean(ans)
     except Exception as ex:
         cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, detail)
                        VALUES (%s,%s,%s,'error',%s)""", (m["assignee_key"], task_id, question, f"{type(ex).__name__}: {ex}"[:300]))
@@ -347,7 +366,15 @@ def _answer_from_materials(cur, m, question):
 # ── officer -> Jonathan relay ──────────────────────────────────────────────────────────────────────────
 JONATHAN_TG = "6513067717"
 RELAY = re.compile(r"\b(notify|tell|inform|ask|message|i-?message)\s+(sir\s+)?jonathan\b|\bcheck it\b|\bpaki-?check\b|"
-                   r"\bpakisabi\b|\bsabihin (mo )?(kay|si) (sir )?jonathan\b|\bpatingnan (mo )?kay jonathan\b", re.I)
+                   r"\bpakisabi\b|\bsabihin (mo )?(kay|si) (sir )?jonathan\b|\bpatingnan (mo )?kay jonathan\b|"
+                   r"^\W*(please\s+)?(notify|tell|inform|message)\s+(him|sir)\b|\bsabihin mo (sa kanya|kay sir)\b|"
+                   # review 4 Nov: "Notify him", "Send to Jonathan to request ... documents" got model-written letters
+                   r"\b(notify|inform|message|ask|tell)\s+(him|sir|boss)\b|"
+                   r"\b(send|forward|pass|ipasa|i-?forward|ipadala|request)\b[^.?!]{0,40}?\b(to|kay|sa)\s+(sir\s+)?(jonathan|him|boss)\b",
+                   re.I)
+# "did you notify him?" asks whether the last relay reached him; it is answered from staff_question, never re-sent
+RELAY_STATUS = re.compile(r"\b(did|have) you (notify|tell|told|inform|message)\w*\b|\bwhere did you (message|tell|send)\b|"
+                          r"\b(nasabihan|sinabihan|nasabi|na-?message) mo na\b", re.I)
 
 
 def _relay(cur, m, text):
@@ -365,7 +392,9 @@ def _relay(cur, m, text):
     if not DRY:
         try:
             import tg_send
-            ok, _info = tg_send.send(chat_id=JONATHAN_TG, text=line, source="leo", human_readable=True)
+            # a staff relay is someone waiting on him: it goes through the one-at-a-time hold (Jonathan, 4 Nov)
+            ok, _info = tg_send.send(chat_id=JONATHAN_TG, text=line, source="leo", human_readable=True,
+                                     override_pacing=True)
             via = "telegram" if ok else "board (telegram held by pacing)"
         except Exception as ex:
             via = f"board (telegram error {type(ex).__name__})"
@@ -374,10 +403,39 @@ def _relay(cur, m, text):
     cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, relayed_via)
                    VALUES (%s,%s,%s,'relay',%s)""", (m["assignee_key"], e["id"] if e else None, recent or text, via))
     lang, _ = _voice(m)
-    _send(m["channel"], m["channel_user_id"],
-          "Sige, sinabihan ko na si Jonathan na i-check. Ime-message ka niya." if lang == "tl"
-          else "Done, I've told Jonathan to check. He'll message you.")
+    if via == "telegram":
+        reply = ("Sige, sinabihan ko na si Jonathan sa Telegram na i-check. Ime-message ka niya." if lang == "tl"
+                 else "Done, I've messaged Jonathan on Telegram to check. He'll message you.")
+    else:   # never claim he was told when the message did not go out (4 Nov: she was told "Done" twice, it was held)
+        reply = ("Hindi pa umabot kay Jonathan ang mensahe ko. Nasa listahan na niya ito, pero mas mabilis kung "
+                 "i-message mo rin siya mismo." if lang == "tl"
+                 else "My message to Jonathan didn't go through yet. It's on his list, but it's faster if you "
+                      "message him yourself too.")
+    _send(m["channel"], m["channel_user_id"], reply)
     return f"relay:{via}"
+
+
+def _relay_status(cur, m):
+    """Answer "did you notify him?" from the last relay row: what went out, where, and when."""
+    cur.execute("""SELECT relayed_via, created_at FROM staff_question WHERE assignee=%s AND outcome='relay'
+                    ORDER BY id DESC LIMIT 1""", (m["assignee_key"],))
+    r = cur.fetchone()
+    lang, _ = _voice(m)
+    if not r:
+        msg = ("Wala pa akong naipasa kay Jonathan. Sabihin mo lang \"notify Jonathan\" at ipapasa ko." if lang == "tl"
+               else "I haven't passed anything to Jonathan yet. Say \"notify Jonathan\" and I will.")
+    else:
+        t = r["created_at"].astimezone(MANILA).strftime("%I:%M %p").lstrip("0")
+        if r["relayed_via"] == "telegram":
+            msg = (f"Oo, na-message ko si Jonathan sa Telegram kaninang {t}." if lang == "tl"
+                   else f"Yes, I messaged Jonathan on Telegram at {t}.")
+        else:
+            msg = (f"Hindi umabot sa Telegram ni Jonathan ang mensahe ko kaninang {t}. Nasa listahan niya ito; "
+                   "mas mabilis kung i-message mo rin siya." if lang == "tl"
+                   else f"My {t} message didn't reach Jonathan's Telegram. It's on his list; it's faster if you "
+                        "message him yourself too.")
+    _send(m["channel"], m["channel_user_id"], msg)
+    return "relay_status"
 
 
 # ── case questions (Jonathan, 3 Nov: "cases too") ─────────────────────────────────────────────────────
@@ -392,6 +450,7 @@ CASE_NAMES = {   # names people actually use for a matter; matched as whole word
     "MWK-ESTATE": ["estate administration"],
     "MWK-LGU-RECOVERY": ["lgu recovery", "void donation"],
     "MWK-OP-PETITION": ["supervisory review", "op petition"],
+    "MWK-OMB-IC-OC-JUL-26-1214": ["1214", "torralba"],
     "LANDTEK-OPC-FORMATION": ["sec registration", "opc formation", "incorporation"],
     "PAR-VITO-CRUZ": ["vito cruz"], "PAR-CAPACUAN": ["capacuan"], "PAR-GOLDEN-SAND": ["golden sand"],
     "NIBDC-EXPA-000250": ["expa", "exploration permit"], "NIBDC-APSA-000322": ["apsa"],
@@ -444,13 +503,50 @@ def _case_answer(cur, m, r):
             out += f" {ob['n']} office clock(s) running; the nearest reply is due {ob['nxt'].strftime('%d %b') if ob['nxt'] else '?'}."
     return out
 
+STRATEGY = re.compile(r"\b(strateg\w*|estratehiya|diskarte|plano natin|our plan|game plan|how (do|can|will) we win|"
+                      r"paano (tayo )?mananalo|weakness\w*|kahinaan|leverage|tactic\w*|taktika)\b", re.I)
+
+
+def _case_reply(cur, m, r, question):
+    """Answer a question about ONE named case from that case's knowledge cards (deploy_1330): facts only, no
+    strategy. No card answers it -> say so and log it for Jonathan. A case with no cards yet -> the record line."""
+    cards = _cards(cur, m, {r["matter_code"]})
+    if not cards:
+        _send(m["channel"], m["channel_user_id"], _case_answer(cur, m, r))
+        return "case_answered"
+    lang, _ = _voice(m)
+    if STRATEGY.search(question):      # case strategy stays with Jonathan; the officer desk holds facts only
+        ans, outcome, detail = None, "not_in_sources", f"case {r['matter_code']}; strategy question"
+    else:
+        try:
+            ans = _ask_model(question, cards, lang)
+            ans = _clean(ans)
+            bad = _unsupported(ans, cards) if ans and "NOT_IN_SOURCES" not in ans else []
+            outcome = ("not_in_sources" if not ans or "NOT_IN_SOURCES" in ans
+                       else "rejected_unsupported" if bad else "answered")
+            detail = f"case {r['matter_code']}" + (f"; unsupported: {bad}" if bad else "")
+        except Exception as ex:
+            ans, outcome, detail = None, "error", f"case {r['matter_code']}; {type(ex).__name__}: {ex}"[:300]
+    cur.execute("""INSERT INTO staff_question (assignee, task_id, question, answer, outcome, detail)
+                   VALUES (%s,NULL,%s,%s,%s,%s)""", (m["assignee_key"], question, ans, outcome, detail))
+    if outcome == "answered":
+        _send(m["channel"], m["channel_user_id"], ans)
+        return "case_answered"
+    _send(m["channel"], m["channel_user_id"],
+          (f"Wala 'yan sa case notes ko para sa {r['title']}. Na-note ko ang tanong mo para kay Jonathan." if lang == "tl"
+           else f"That isn't in my case notes for {r['title']}. I've noted your question for Jonathan."))
+    return "case_not_in_notes"
+
 
 # ── staff desk ─────────────────────────────────────────────────────────────────────────────────────────
 
 VOICE_ASK = ("Hi {name}, it's Leo. I'll send you your LandTek tasks here and take your proof photos. "
              "Before we start: how do you want me to talk to you? English, Tagalog, Taglish or Bikol, "
              "short or detailed? Just tell me in your own words.")
-DONE = re.compile(r"\b(done|tapos|nagawa|finished|served|naserve|na-serve|nai-serve|delivered)\s*#?\s*(\d+)?\b", re.I)
+VOICE_SWITCH = re.compile(r"\b(talk|speak|reply|respond|answer|usap|kausapin|mag-?(english|tagalog))\b.{0,25}\b(english|tagalog|taglish|filipino)\b|"
+                          r"^\W*(in\s+)?(english|tagalog|taglish)(\s+(please|na lang|po))?\W*$", re.I)
+NOT_DONE = re.compile(r"\b(not|hindi( pa)?|di pa|can'?t|cannot|couldn'?t|unable|wala pa|ayaw)\b", re.I)
+DONE = re.compile(r"\b(done|tapos|nagawa|finished|served|naserve|na-serve|nai-serve|delivered)\s*(?:na\s+)?(?:with\s+|sa\s+|ang\s+)?(?:the\s+)?(?:task\s*|serve\s*)?#?\s*(\d+)?\b", re.I)
 SERVE_WORDS = ("served", "naserve", "na-serve", "nai-serve", "delivered")
 HOW = re.compile(r"^\s*(how|paano)\s*#?\s*(\d+)\s*\??\s*$", re.I)
 LIST = re.compile(r"\b(all|lahat|list)\b", re.I)
@@ -484,7 +580,24 @@ def _handle_staff(cur, m, mid, text):
     if text == "[media]" or st.get("pending_media") and DIGIT.match(text):
         return _handle_media(cur, m, mid, text)
 
-    pm, gm = PASS.search(text), GOTO.search(text)
+    if VOICE_SWITCH.search(text):
+        lang = re.search(r"english|tagalog|taglish|filipino", text, re.I).group(0).lower()
+        raw = ("English" if lang == "english" else "Taglish") + (" and make everything detailed" if _voice(m)[1] else "")
+        cur.execute("UPDATE staff_desk_members SET voice=%s, updated_at=now() WHERE channel=%s AND channel_user_id=%s",
+                    (json.dumps({"raw": raw, "recorded_at": str(_today_manila()), "changed_from": (m["voice"] or {}).get("raw")}),
+                     m["channel"], m["channel_user_id"]))
+        m["voice"] = {"raw": raw}
+        _send(m["channel"], m["channel_user_id"], "OK, English from now on." if lang == "english"
+              else "Sige, Taglish na tayo simula ngayon.")
+        return "voice_changed"
+
+    # "I'm done with task 1" is a done report, not a "go to task 1" (review 4 Nov); with several task numbers
+    # ("can't finish task 1, give me task 2") the LAST one is where she wants to go.
+    done_report = DONE.search(text) and not NOT_DONE.search(text)
+    gms = list(GOTO.finditer(text))
+    pm, gm = PASS.search(text), (gms[-1] if gms and not done_report else None)
+    if not pm and not gm and re.search(r"\b(give me|next|ibigay|sunod)\b", text, re.I) and NOT_DONE.search(text):
+        pm = True                                                           # "can't finish this, give me the next one"
     ordinal = next((n for pat, n in ORDINALS.items() if re.search(rf"\b({pat})\b", text, re.I)), None)
     if pm or gm or (ordinal and re.search(r"\b(task|gawain)\b", text, re.I)):
         if pm and st.get("focus"):
@@ -528,7 +641,7 @@ def _handle_staff(cur, m, mid, text):
         return "how"
 
     dm = DONE.search(text)
-    if dm:
+    if dm and not NOT_DONE.search(text):
         word, num = dm.group(1).lower(), (int(dm.group(2)) if dm.group(2) else None)
         serves, errands = _open_tasks(cur, m["assignee_key"]), _open_errands(cur, m["assignee_key"])
         if num is None and len(serves) + len(errands) == 1:
@@ -554,6 +667,12 @@ def _handle_staff(cur, m, mid, text):
         _send(m["channel"], m["channel_user_id"], _all_tasks_text(cur, m) if LIST.search(text) else _next_task_text(cur, m))
         return "tasks"
 
+    # a request to pass something to Jonathan is never typed proof (review 4 Nov)
+    if text and RELAY_STATUS.search(text):
+        return _relay_status(cur, m)
+    if text and RELAY.search(text):
+        return _relay(cur, m, text)
+
     if st.get("proof_for", "").startswith("errand:") and text and not text.rstrip().endswith("?"):
         # a typed answer IS the proof only for errands that ask for something typeable ("the owner's name",
         # "Allan's confirmation"); a document-proof task waits for the photo, and a question is never proof
@@ -561,9 +680,6 @@ def _handle_staff(cur, m, mid, text):
         e = next((x for x in _open_errands(cur, m["assignee_key"]) if x["id"] == eid), None)
         if e and re.search(r"\b(name|confirmation|confirm|note|answer)\b", e.get("proof_needed") or "", re.I):
             return _errand_submitted(cur, m, e, None, text)
-
-    if text and RELAY.search(text):
-        return _relay(cur, m, text)
 
     # Case questions vs task questions (exam, 3 Nov: "FAO deadline", "petition for correction" and "Landbank
     # branch" were sent to the case branch). An EXPLICIT case question (kaso, hearing, court, a docket) goes to
@@ -582,8 +698,7 @@ def _handle_staff(cur, m, mid, text):
 
     if text and CASE_EXPLICIT.search(text):
         if len(hits) == 1:
-            _send(m["channel"], m["channel_user_id"], _case_answer(cur, m, hits[0]))
-            return "case_answered"
+            return _case_reply(cur, m, hits[0], text)
         return _which()
 
     # free questions: first from the knowledge cards + her tasks' own source material (local model, token-checked)
@@ -593,8 +708,7 @@ def _handle_staff(cur, m, mid, text):
             _send(m["channel"], m["channel_user_id"], ans)
             return "answered_from_materials"
         if len(hits) == 1:
-            _send(m["channel"], m["channel_user_id"], _case_answer(cur, m, hits[0]))
-            return "case_answered"
+            return _case_reply(cur, m, hits[0], text)
         if len(hits) > 1:
             return _which()
         if outcome in ("not_in_sources", "rejected_unsupported") and own:
