@@ -358,6 +358,10 @@ def generate_reply(cur, channel, channel_user_id, message, client_code, internal
         candidate = _llm(prompt, temp=ms["temperature"], model=ms["model"], seed=ms.get("seed"))
     except Exception as e:
         return {"text": None, "error": f"ollama_unreachable:{type(e).__name__}"}
+    if _free_text_asserts_record(cur, client_code, candidate):
+        print(f"[leo_service] free-model record claim withheld: {candidate[:120]!r}", flush=True)
+        return {"text": FREE_FACT_TEXT, "verdict": "free_fact_withheld", "remediated": True,
+                "via": "free_fact_withheld"}
     try:
         res = gate_mod.gate(cur, candidate)
         text, remediated = candidate, False
@@ -490,6 +494,10 @@ def is_inquiry(message: str) -> bool:
         "can ", "could ", "should ", "would ", "tell me", "show me", "list ",
         "find ", "fetch ", "give me", "get me", "pull ", "explain ", "summarize ",
         "status of", "history of", "history ",
+        # read / quote / examine a document is a record ask, never free-model prose (J1, 4 Nov 2026:
+        # "open and read those two SPAs, quote the exact language" got an invented "PA-T-4765")
+        "open ", "read ", "quote ", "examine ", "review ", "check ", "look up", "look at", "determine ",
+        "analyze ", "analyse ", "compare ", "verify ", "cite ", "retrieve ", "search ",
     )
     if any(t.startswith(s) for s in starters):
         return True
@@ -499,6 +507,7 @@ def is_inquiry(message: str) -> bool:
         "e title", "petition", "appeal", "manifest", "deadline", "originally",
         "came from", "come from", "status of", "who owns", "registered",
         "cancelled", "transfer", "readiness", "op ", " arta", "balane", "title ",
+        "quote", "exact language", " spa", "special power", "deed", "affidavit", "full text", "vault",
     )
     if any(m in t for m in markers):
         return True
@@ -507,6 +516,42 @@ def is_inquiry(message: str) -> bool:
                  message or "", re.I):
         return True
     return False
+
+
+# The free model is for conversation only. A reply that states a record fact (a status, a date, a document,
+# a title, a party of the client's matters) was not read from the record, so it is never sent (J2, 4 Nov
+# 2026: "Not possible" got "the status of the Balane matter is still pending ... relocation survey").
+FREE_FACT_TEXT = "Okay. If you want me to check something, ask me and I'll answer from the records."
+_FREE_FACT_RE = re.compile(
+    r"\bdoc(?:ument)?\s*[:#]\s*\S|\b(?:PA-)?T-?\d{3,}\b|\b\d{3}-\d{6,}\b|\b20\d\d-\d\d-\d\d\b"
+    r"|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b|\b\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|"
+    r"jul|aug|sep|oct|nov|dec)[a-z]*\b|(?:₱|\bphp\s?|\bp)\s?\d[\d,]{2,}"
+    r"|\bI(?: have|'ve)? (?:reviewed|checked|read|looked at|found|confirmed)\b|\baccording to (?:the|our) "
+    r"(?:records?|files?|documents?)\b|\bthe records? show|\bstatus of\b"
+    r"|\b(?:is|are|remains?|was) (?:still |now )?(?:pending|active|stalled|dismissed|granted|denied|filed|"
+    r"scheduled|decided|resolved|approved)\b", re.I)
+_TITLE_STOP = {"case", "civil", "matter", "heirs", "estate", "recovery", "petition", "judicial", "accion",
+               "reinvindicatoria", "chain", "verification", "referral", "notice", "count", "ombudsman", "people",
+               "real", "properties", "estates", "void", "transfer", "just", "compensation", "parallel", "from",
+               "with", "mary", "worrick", "keesey", "administration", "supervisory", "review", "executive",
+               "secretary", "resolution", "mayor", "engineer", "municipal",
+               "jonathan", "paul", "zschoche", "patricia", "ernest", "francis"}   # the client family itself
+
+
+def _free_text_asserts_record(cur, client_code, text):
+    """True when free-model text states something only the record may state."""
+    t = text or ""
+    if _FREE_FACT_RE.search(t):
+        return True
+    if not client_code:
+        return False
+    try:
+        cur.execute("SELECT title FROM matters WHERE client_code = %s AND title IS NOT NULL", (client_code,))
+        names = {w.lower() for r in cur.fetchall() for w in re.findall(r"\b[A-Z][a-z]{3,}\b", r["title"])}
+    except Exception:
+        return False
+    words = {w.lower() for w in re.findall(r"\b[A-Za-z]{4,}\b", t)}
+    return bool((names - _TITLE_STOP) & words)
 
 
 # Plain language, never operator jargon (2026-11-03; same words as inquiry_stack.NO_HIT_TEXT).
@@ -689,12 +734,20 @@ def try_purpose_route(cur, client_code, message, channel=None, channel_user_id=N
     except Exception as e:
         print(f"[leo_service] composer route: {type(e).__name__}: {e}", flush=True)
 
-    # Agentic stack: ALWAYS for inquiries; also try on borderline factual text
+    # Agentic stack: ALWAYS for inquiries; also try on borderline factual text.
+    # notify=False when the asker is the operator: he already has the reply, so the per-miss
+    # "Needs your call" Telegram ping was a duplicate (J4, 4 Nov 2026). The miss is still queued.
     try:
+        notify = True
+        if channel and channel_user_id:
+            try:
+                notify = og.classify(channel, str(channel_user_id)) != "internal"
+            except Exception:
+                notify = True
         import inquiry_stack as ist
         pack = ist.try_inquiry_stack(
             cur, client_code, message, go=not dry_run, force=inquiry,
-            eval_cur=cur if dry_run else None,
+            eval_cur=cur if dry_run else None, notify=notify,
         )
         if pack and pack.get("text"):
             return _emit(

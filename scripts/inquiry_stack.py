@@ -1669,6 +1669,7 @@ def run_inquiry(
     go: bool = False,
     drain: bool = False,
     eval_cur=None,
+    notify: bool = True,
 ) -> dict:
     """eval_cur: run on the CALLER's cursor instead of an own autocommit connection (Improvement Lab
     dry runs — the caller rolls the transaction back, so the run leaves nothing behind)."""
@@ -1746,7 +1747,7 @@ def run_inquiry(
 
     # Human-pass: queue operator review (work_orders if table exists)
     if go and ans.get("pass_to_human"):
-        n_trig += _enqueue_human_review(cur, inquiry_id, message, ans)
+        n_trig += _enqueue_human_review(cur, inquiry_id, message, ans, notify=notify)
 
     drain_notes = []
     if go and drain:
@@ -1809,7 +1810,7 @@ def run_inquiry(
     }
 
 
-def _enqueue_human_review(cur, inquiry_id: int, message: str, ans: dict) -> int:
+def _enqueue_human_review(cur, inquiry_id: int, message: str, ans: dict, notify: bool = True) -> int:
     """Record human-pass + notify operator on Telegram (otherwise queue is silent)."""
     n = 0
     score = (ans.get("human_pass") or {}).get("score")
@@ -1851,7 +1852,11 @@ def _enqueue_human_review(cur, inquiry_id: int, message: str, ans: dict) -> int:
             n += 1
     except Exception:
         pass
-    # Push to operator — plain language, no score jargon / pipe dumps
+    # Push to operator — plain language, no score jargon / pipe dumps. Not when he asked (notify=False:
+    # he already has the reply), and paced like any other message: the old override_pacing sent one
+    # "Needs your call" per miss straight past the S14 hold (J4, 4 Nov 2026).
+    if not notify:
+        return n
     try:
         from tg_send import send as tg_send
         q = re.sub(r"\s+", " ", (message or "").strip())
@@ -1879,7 +1884,7 @@ def _enqueue_human_review(cur, inquiry_id: int, message: str, ans: dict) -> int:
             text=alert,
             source="watchdog",  # allowed outbound_messages source
             recipient_name="Jonathan",
-            override_pacing=True,
+            override_pacing=False,
             override_rate_limit=False,
         )
         if ok:
@@ -1922,6 +1927,7 @@ def try_inquiry_stack(cur, client_code: str, message: str, **kwargs) -> Optional
         go=go,
         drain=kwargs.get("drain", False),
         eval_cur=kwargs.get("eval_cur"),
+        notify=kwargs.get("notify", True),
     )
     if result.get("no_hit"):
         return None                       # nothing grounded: let the later routes try

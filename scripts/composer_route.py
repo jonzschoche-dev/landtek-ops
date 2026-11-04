@@ -89,7 +89,7 @@ def _extract_topic(message: str):
     return topic or None
 
 
-_DOCKET_NUM_RE = re.compile(r"\b(\d{2})\s*-\s*(\d{3})\b|\b(\d{4,5})\b")
+_DOCKET_NUM_RE = re.compile(r"\b(\d{2})\s*-\s*(\d{3})\b|(?<!\d)(\d{4,5})(?!\d)")   # "CV6839" counts too
 _ASK_WORDS = {"when", "what", "where", "which", "who", "whose", "next", "hearing", "hearings",
               "case", "cases", "deadline", "deadlines", "filing", "schedule", "upcoming", "kailan",
               "please", "tell", "show", "give", "court", "trial", "date", "dates", "matter"}
@@ -127,7 +127,67 @@ def _resolve_matters(cur, client_code, msg):
             for h in _q(base + "title ILIKE %s", (client_code, f"%{w}%")):
                 if h not in found:
                     found.append(h)
+    if found:
+        return found[:3]
+    # a lower-case subject word ("status of the guardianship") names a matter only when exactly ONE of this
+    # client's matter titles carries it; two or more is ambiguous and names nothing (J3, 4 Nov 2026)
+    for w in re.findall(r"[a-z][a-z'-]{5,}", msg.lower()):
+        if w in _ASK_WORDS or w in _SUBJECT_STOP:
+            continue
+        hits = _q(base + "title ~* %s", (client_code, rf"\m{re.escape(w)}\M"))
+        if len(hits) == 1 and hits[0] not in found:
+            found.append(hits[0])
     return found[:3]
+
+
+_SUBJECT_STOP = {"status", "update", "updates", "matter", "matters", "latest", "what's", "happening", "please",
+                 "anything", "something", "record", "records", "about", "there", "where", "balita", "kumusta",
+                 "kamusta", "nasaan", "naman", "should", "would", "could", "today", "tomorrow", "against"}
+
+# "What Balane matter?", "status of the guardianship", "status of CV6839": one NAMED matter, asked about in
+# general. Answered from the matters row, never the inquiry stack (which had returned a title list, then
+# nothing; J3, 4 Nov 2026).
+_MATTER_ASK_RE = re.compile(r"\b(status|update|updates|balita|kumusta|kamusta|what|ano|how('?s| is)|"
+                            r"where are we|nasaan)\b", re.I)
+
+
+def _plain(code):
+    return (code or "").replace("_", " ").strip()
+
+
+def _matter_status_text(cur, client_code, mc):
+    """One matter, plain language: what it is, where it stands, the next date on record (a past date is
+    flagged, never presented as upcoming, A57), what comes next. Scoped by client in the query (A5)."""
+    from datetime import date
+    cur.execute("""SELECT title, status, current_stage, COALESCE(forum, court_or_agency) AS forum,
+                          next_deadline, next_event
+                     FROM matters WHERE matter_code = %s AND client_code = %s""", (mc, client_code))
+    r = cur.fetchone()
+    if not r:
+        return None
+    r = r if isinstance(r, dict) else dict(zip(("title", "status", "current_stage", "forum", "next_deadline",
+                                                "next_event"), r))
+    parts = [f"{r['title'] or mc}" + (f" ({r['forum']})" if r["forum"] else "")]
+    st = ", ".join(x for x in (_plain(r["status"]), _plain(r["current_stage"])) if x)
+    if st:
+        parts.append(f"Status on record: {st}")
+    if r["next_deadline"]:
+        d = r["next_deadline"]
+        parts.append(f"Next date on record: {d.strftime('%d %b %Y')}"
+                     + (" (already past; needs updating)" if d < date.today() else ""))
+    else:
+        parts.append("No next date is on record")
+    try:
+        try:
+            import client_ontology as _co
+        except ImportError:
+            from leo_tools import client_ontology as _co
+        step = _co.client_next_step(r["current_stage"], r["next_event"], matter_code=mc)
+        if step and step != _co._NEXTSTEP_GENERIC:
+            parts.append(step)
+    except Exception:
+        pass
+    return ". ".join(p.strip().rstrip(".") for p in parts if p) + "."
 
 
 def try_composer_route(cur, client_code, message, channel=None, channel_user_id=None):
@@ -151,7 +211,7 @@ def try_composer_route(cur, client_code, message, channel=None, channel_user_id=
                     "purpose": "composer_title_inventory"}
         # miss/hold → fall through to the tuned inquiry_stack path (dual path until soak green)
 
-    if _STATUS_RE.search(msg) and not _MATTER_HINT_RE.search(msg):
+    if _STATUS_RE.search(msg) and not _MATTER_HINT_RE.search(msg) and not _resolve_matters(cur, client_code, msg):
         env = compose_answer("client_status", client_code=client_code, caller=caller)
         if env["status"] in ("hit", "partial"):
             return {"text": _render(env, max_lines=3), "via": f"composer:client_status:{env['status']}",
@@ -192,5 +252,12 @@ def try_composer_route(cur, client_code, message, channel=None, channel_user_id=
             return None                      # nothing composed — let the generic stack try
         return {"text": _render(env, max_lines=2), "via": f"composer:facts:{env['status']}",
                 "purpose": "composer_facts"}
+
+    if _MATTER_ASK_RE.search(msg) and not _TITLE_LIST_RE.search(msg):
+        scoped = _resolve_matters(cur, client_code, msg)
+        if len(scoped) == 1:
+            text = _matter_status_text(cur, client_code, scoped[0])
+            if text:
+                return {"text": _clip(text), "via": "composer:matter_status", "purpose": "composer_matter_status"}
 
     return None

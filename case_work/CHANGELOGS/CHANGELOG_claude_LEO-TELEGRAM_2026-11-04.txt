@@ -1,0 +1,41 @@
+CHANGELOG claude / LEO-TELEGRAM (Leo's answers to Jonathan; shared router, all channels) / 2026-11-04
+Session: Claude Code, Mac desk (side session). Scope J1-J4 from side-session-notes LEO_REVIEW_2026-11-04.md;
+Jonathan's go relayed by the LANDTEK-PRODUCT session, his words: "Yes, fix Telegram".
+
+CHANGED
+- scripts/leo_service.py
+  - is_inquiry: read / quote / examine / review / check / verify ... a document, and asks naming a quote, SPA,
+    deed, affidavit, full text or the vault, are record questions (J1). They go to the router, then the honest
+    "I don't have that in our records" reply; never the free model. 3 Nov 17:16 "open and read those two SPAs ..."
+    had produced "Document: PA-T-4765", which is in no documents.extracted_text.
+  - generate_reply: a free-model reply that states a record fact (status, date, document, title number, amount,
+    "I reviewed", or a party name from the client's matter titles) is withheld and replaced with "Okay. If you
+    want me to check something, ask me and I'll answer from the records." (J2; 4 Nov 09:40 "Not possible" had
+    produced an invented Balane status).
+  - try_purpose_route: passes notify=False to the inquiry stack when the asker is internal (Jonathan).
+- scripts/inquiry_stack.py: _enqueue_human_review(notify=...): no "Needs your call" ping when Jonathan asked (he
+  already has the reply); other pings now respect the S14 hold (override_pacing False). The review row is still
+  written (J4).
+- scripts/composer_route.py: a general ask naming ONE matter ("What Balane matter ?", "status of the
+  guardianship", "status of CV6839", "What's the status of the Balane case?") is answered from that client's
+  matters row: title, forum, status, the next date on record (flagged "already past; needs updating" when past),
+  and the plain next step (client_ontology). Party/docket resolution: "CV6839" now resolves; a lower-case subject
+  word names a matter only when exactly one of the client's titles has it. client_status skips when a matter is named.
+- New truth_tests/test_leo_telegram_record_only.py (4). Isolated VPS copy: old code 4/4 fail, new 4/4 pass;
+  16 related files 92/92.
+
+DECIDED
+- The free model may only chat. Any record-shaped claim from it is withheld, even when it cites a doc id.
+- A past next_deadline is shown as past, never as the next date.
+
+OPEN
+- Record staleness surfaced by the new answer: MWK-CV26360 next_deadline 2026-10-14, MWK-GUARDIANSHIP
+  2026-07-27, MWK-CV6839 2026-07-28 are all past. CV26360's next_event lists trial dates Nov 4, Nov 11, Dec 2,
+  Dec 9 2026 (per memory: calendar 14 Oct/4 Nov/11 Nov/2 Dec/9 Dec). The matters rows need re-dating.
+- A real "quote this document" answer (search documents.extracted_text and quote with doc + page) does not exist
+  yet; such asks now get the honest no-record reply.
+- "ano ang next court date?" (no matter named) still gets the no-record reply; "court date" is not in the
+  composer's deadline pattern.
+
+CONFLICTS
+- None. scripts/staff_desk.py not touched (LANDTEK-PRODUCT session's file).
