@@ -120,6 +120,21 @@ def _process(cur, mid):
         print(f"[leo_instant] convergence-diff err: {str(e)[:100]}", flush=True)
 
 
+
+def _followups():
+    """Staff-desk follow-ups: retry a failed relay to Jonathan once after 15 minutes, and follow up open
+    requests with their owner every 24 h. staff_desk.followups() throttles itself to once a minute and runs
+    in its own transaction. Degrade, never crash the listener.
+    REWRITTEN 2026-11-07 (Claude, Mac desk) from the 5 Nov deploy record ("leo_instant keepalive calls
+    staff_desk.followups()") after the original 5 Nov line was overwritten by a deploy sync; the exact
+    original text did not survive. Behaviour matches the record and followups()'s own docstring."""
+    try:
+        import staff_desk
+        staff_desk.followups()
+    except Exception as e:
+        print(f"[leo_instant] staff_desk followups skip: {type(e).__name__}: {str(e)[:100]}", flush=True)
+
+
 def main():
     while True:
         conn = None
@@ -129,7 +144,9 @@ def main():
             cur.execute("LISTEN leo_inbound")
             print("[leo_instant] listening on leo_inbound…", flush=True)
             while True:
-                if select.select([conn], [], [], 60) == ([], [], []):
+                ready = select.select([conn], [], [], 60) != ([], [], [])
+                _followups()                     # staff-desk follow-ups, self-throttled to once a minute
+                if not ready:
                     continue                     # 60s keepalive tick
                 conn.poll()
                 while conn.notifies:

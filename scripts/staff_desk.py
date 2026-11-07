@@ -377,8 +377,25 @@ RELAY_STATUS = re.compile(r"\b(did|have) you (notify|tell|told|inform|message)\w
                           r"\b(nasabihan|sinabihan|nasabi|na-?message) mo na\b", re.I)
 
 
+def _tg_jonathan(line):
+    """One Telegram line to Jonathan. Someone is waiting on him, so pacing AND rate limit are overridden
+    (Jonathan, 5 Nov). Returns (ok, reason): the REAL tg_send reason on failure, never a guessed one."""
+    if DRY:
+        print(f"  [dry-telegram {JONATHAN_TG}] {line}")
+        return True, "dry-run"
+    try:
+        import tg_send
+        ok, info = tg_send.send(chat_id=JONATHAN_TG, text=line, source="leo", human_readable=True,
+                                override_pacing=True, override_rate_limit=True)
+        return bool(ok), (None if ok else (str(info) or "tg_send returned False")[:200])
+    except Exception as ex:
+        return False, f"telegram error {type(ex).__name__}: {str(ex)[:150]}"
+
+
 def _relay(cur, m, text):
-    """Pass the officer's request to Jonathan: log it (board) and push one Telegram line (S14-paced)."""
+    """Pass the officer's request to Jonathan. Every ask is a tracked work order (kind 'decision', owner
+    Jonathan); she hears "I'll ask Jonathan" only once the Telegram send is confirmed; a failed send logs
+    tg_send's real reason and is retried once after 15 minutes by followups()."""
     st = m.get("state") or {}
     eid = st.get("focus")
     e = next((x for x in _open_errands(cur, m["assignee_key"], True) if x["id"] == eid), None) if eid else None
@@ -387,32 +404,33 @@ def _relay(cur, m, text):
                 (m["channel"], m["channel_user_id"]))
     recent = " / ".join(reversed([r["text_content"] for r in cur.fetchall() if r["text_content"]]))[:300]
     about = f"task {e['id']} ({e['title']})" if e else "her current work"
-    line = f"{m['name']} asks you to check something on {about}. Her words: \"{recent}\". Reply to her on Messenger."
-    via = "board"
-    if not DRY:
-        try:
-            import tg_send
-            # a staff relay is someone waiting on him: it goes through the one-at-a-time hold (Jonathan, 4 Nov)
-            ok, _info = tg_send.send(chat_id=JONATHAN_TG, text=line, source="leo", human_readable=True,
-                                     override_pacing=True)
-            via = "telegram" if ok else "board (telegram held by pacing)"
-        except Exception as ex:
-            via = f"board (telegram error {type(ex).__name__})"
-    else:
-        print(f"  [dry-telegram {JONATHAN_TG}] {line}")
-    cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, relayed_via)
-                   VALUES (%s,%s,%s,'relay',%s)""", (m["assignee_key"], e["id"] if e else None, recent or text, via))
+    matter = e["matter_code"] if e else _member_matter(cur, m)
+    cur.execute("""INSERT INTO staff_question (assignee, task_id, question, outcome, relayed_via, matter_code)
+                   VALUES (%s,%s,%s,'relay','pending',%s) RETURNING id""",
+                (m["assignee_key"], e["id"] if e else None, recent or text, matter))
+    sq = cur.fetchone()["id"]
+    wid = _wo_open(cur, "decision", matter, f"{m['name']} asks: {recent or text}", sq, "jonathan")
+    line = (f"{m['name']} asks you to check something on {about} (request #{wid}). Her words: \"{recent or text}\". "
+            "Reply to her on Messenger.")
+    ok, why = _tg_jonathan(line)
+    via = "telegram" if ok else f"board (telegram failed: {why})"
+    cur.execute("UPDATE staff_question SET relayed_via=%s, detail=%s WHERE id=%s", (via, None if ok else why, sq))
+    _wo_step(cur, wid, {"line": line, "sent": ok, "send_reason": why, "retries": 0,
+                        "retry_at": None if ok else (_now() + RETRY_AFTER).isoformat()},
+             note="sent to Jonathan on Telegram" if ok else f"send failed: {why}; retry in 15 min")
     lang, _ = _voice(m)
-    if via == "telegram":
-        reply = ("Sige, sinabihan ko na si Jonathan sa Telegram na i-check. Ime-message ka niya." if lang == "tl"
-                 else "Done, I've messaged Jonathan on Telegram to check. He'll message you.")
+    if ok:
+        reply = (f"Sige, itatanong ko kay Jonathan. Na-message ko na siya sa Telegram (request #{wid}). "
+                 "Sabihin mo lang \"my requests\" para makita ang status." if lang == "tl"
+                 else f"I'll ask Jonathan. I've messaged Jonathan on Telegram (request #{wid}). "
+                      "Say \"my requests\" any time to see where it stands.")
     else:   # never claim he was told when the message did not go out (4 Nov: she was told "Done" twice, it was held)
-        reply = ("Hindi pa umabot kay Jonathan ang mensahe ko. Nasa listahan na niya ito, pero mas mabilis kung "
-                 "i-message mo rin siya mismo." if lang == "tl"
-                 else "My message to Jonathan didn't go through yet. It's on his list, but it's faster if you "
-                      "message him yourself too.")
+        reply = (f"Hindi pa umabot kay Jonathan ang mensahe ko. Naka-track ito bilang request #{wid}; susubukan ko "
+                 "ulit sa loob ng 15 minuto at sasabihan kita kapag umabot na." if lang == "tl"
+                 else f"My message to Jonathan didn't go through yet. It's tracked as request #{wid}; I'll try again "
+                      "in 15 minutes and tell you once it reaches him.")
     _send(m["channel"], m["channel_user_id"], reply)
-    return f"relay:{via}"
+    return f"relay:{'telegram' if ok else 'board'}"
 
 
 def _relay_status(cur, m):
@@ -560,6 +578,227 @@ ORDINALS = {r"first|una|1st|unang": 1, r"second|pangalawa|ikalawa|2nd": 2, r"thi
 GOTO = re.compile(r"\b(?:task|go to|punta sa)\s*#?(\d{1,4})\b", re.I)
 
 
+# ── tracked requests (Jonathan, 5 Nov 2026 t326u): anything she brings must be solved. A question the
+# record cannot answer is never a dead end: it becomes an open work order with an owner, a follow-up cadence
+# and a status she can see ("my requests"); it is closed only when resolved (close-request). ──────────
+REQ_OPEN = ["queued", "in_progress", "awaiting_handoff", "blocked_governance"]
+RETRY_AFTER = timedelta(minutes=15)
+FOLLOW_UP_EVERY = timedelta(hours=24)
+REQUESTS = re.compile(r"^\W*(my |show( me)?( my)? |list( my)? |open |status( of)?( my)? )?"
+                      r"(requests?|inquir(y|ies)|open questions|tanong ko)\W*$", re.I)
+ASKISH = re.compile(r"\?|\b(what|how|where|when|why|who|which|can|could|should|need|please|help|i can'?t|"
+                    r"ano|paano|saan|kailan|bakit|sino|pwede|puwede|paki|hindi ko)\b", re.I)
+
+
+def _now():
+    return datetime.now(timezone.utc)
+
+
+def _member_matter(cur, m):
+    own = [e["matter_code"] for e in _open_errands(cur, m["assignee_key"], True) if e.get("matter_code")]
+    return own[0] if len(set(own)) == 1 else None
+
+
+def _wo_open(cur, kind, matter, title, sq_id, owner, ping=True, extra=None):
+    """The staff desk's single writer for work orders: one open order per staff_question (dedup key
+    target_ref), claimed under an advisory lock. Born awaiting_handoff (owner acts), so supervisor's tick
+    never auto-runs it."""
+    ref = f"staff_question:{sq_id}"
+    cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (ref,))
+    cur.execute("SELECT id FROM work_orders WHERE target_ref=%s AND status = ANY(%s) ORDER BY id LIMIT 1",
+                (ref, REQ_OPEN))
+    r = cur.fetchone()
+    if r:
+        return r["id"]
+    now = _now()
+    step = {"name": "owner resolves", "mode": "handoff", "agent": owner, "tier": "T1", "status": "pending",
+            "result": None, "owner": owner, "ping": ping, "follow_up_every_h": int(FOLLOW_UP_EVERY.total_seconds() // 3600),
+            "next_follow_up_at": (now + FOLLOW_UP_EVERY).isoformat() if ping else None, "follow_ups": 0,
+            "visible_to": "staff"}
+    step.update(extra or {})
+    cur.execute("""INSERT INTO work_orders (kind, matter_code, title, status, steps, current_step, governed,
+                       created_by, target_ref, audit)
+                   VALUES (%s,%s,%s,'awaiting_handoff',%s,0,true,'staff_desk',%s,%s) RETURNING id""",
+                (kind, matter, title[:300], json.dumps([step]), ref,
+                 json.dumps([{"ts": now.isoformat(), "from": None, "to": "awaiting_handoff",
+                              "note": f"opened by staff_desk for {ref}; owner {owner}"}])))
+    return cur.fetchone()["id"]
+
+
+def _wo_step(cur, wid, upd, status=None, note=None):
+    cur.execute("SELECT steps, audit, status FROM work_orders WHERE id=%s", (wid,))
+    r = cur.fetchone()
+    steps = r["steps"] or [{}]
+    steps[0].update(upd)
+    audit = (r["audit"] or []) + [{"ts": _now().isoformat(), "from": r["status"], "to": status or r["status"],
+                                   "note": note or "update"}]
+    cur.execute("UPDATE work_orders SET steps=%s, audit=%s, status=%s, updated_at=now() WHERE id=%s",
+                (json.dumps(steps), json.dumps(audit), status or r["status"], wid))
+
+
+def _open_inquiry(cur, m, question, sq_id=None):
+    """A question the record could not answer -> an open, owned, followed-up work order. Returns (wid, sent)."""
+    if sq_id is None:
+        cur.execute("""SELECT id FROM staff_question WHERE assignee=%s AND question=%s ORDER BY id DESC LIMIT 1""",
+                    (m["assignee_key"], question))
+        r = cur.fetchone()
+        if r:
+            sq_id = r["id"]
+        else:
+            cur.execute("""INSERT INTO staff_question (assignee, question, outcome, matter_code)
+                           VALUES (%s,%s,'not_in_sources',%s) RETURNING id""",
+                        (m["assignee_key"], question, _member_matter(cur, m)))
+            sq_id = cur.fetchone()["id"]
+    matter = _member_matter(cur, m)
+    cur.execute("UPDATE staff_question SET matter_code=coalesce(matter_code,%s) WHERE id=%s", (matter, sq_id))
+    wid = _wo_open(cur, "staff_inquiry", matter, f"{m['name']} asked (not in record): {question}", sq_id, "jonathan")
+    line = (f"{m['name']} asked something the record can't answer (request #{wid}): \"{question[:300]}\". "
+            "Reply to her on Messenger, or give me the answer to file.")
+    ok, why = _tg_jonathan(line)
+    _wo_step(cur, wid, {"line": line, "sent": ok, "send_reason": why, "retries": 0,
+                        "retry_at": None if ok else (_now() + RETRY_AFTER).isoformat()},
+             note="asked Jonathan on Telegram" if ok else f"send failed: {why}; retry in 15 min")
+    return wid, ok
+
+
+def _inquiry_reply(m, wid, sent):
+    lang, _ = _voice(m)
+    if lang == "tl":
+        return (f"Wala pa ito sa mga papel ng tasks mo. Binuksan ko ang request #{wid}"
+                + (" at itinanong ko na kay Jonathan" if sent else "; ipapasa ko kay Jonathan")
+                + ". Susundan ko ito hanggang masagot. Sabihin mo lang \"my requests\" para makita ang status.")
+    return (f"That isn't in the papers for your tasks yet. I've opened request #{wid}"
+            + (" and asked Jonathan" if sent else " and will pass it to Jonathan")
+            + ". I'll keep following up until it's answered. Say \"my requests\" to see where it stands.")
+
+
+def _my_requests(cur, m):
+    cur.execute("""SELECT w.id, w.kind, w.status, w.created_at, w.steps->0 AS st, q.question
+                     FROM work_orders w JOIN staff_question q ON w.target_ref = 'staff_question:' || q.id
+                    WHERE q.assignee=%s AND w.created_by='staff_desk' AND w.status = ANY(%s) ORDER BY w.id""",
+                (m["assignee_key"], REQ_OPEN))
+    rows = cur.fetchall()
+    if not rows:
+        msg = "You have no open requests right now."
+    else:
+        parts = []
+        for r in rows:
+            st = r["st"] or {}
+            d = r["created_at"].astimezone(MANILA).strftime("%d %b")
+            parts.append(f"#{r['id']} ({d}): \"{(r['question'] or '')[:80]}\", waiting on Jonathan"
+                         + ("" if st.get("sent") or not st.get("ping", True) else ", message not through yet")
+                         + (f", followed up {st['follow_ups']}x" if st.get("follow_ups") else ""))
+        msg = "Your open requests: " + "; ".join(parts) + "."
+    _send(m["channel"], m["channel_user_id"], msg)
+    return "my_requests"
+
+
+def _recheck(cur, m, question):
+    """Re-ask the record without logging a new staff_question row (savepoint rolled back)."""
+    cur.execute("SAVEPOINT recheck")
+    try:
+        ans, _o = _answer_from_materials(cur, m, question)
+    except Exception:
+        ans = None
+    cur.execute("ROLLBACK TO SAVEPOINT recheck")
+    return ans
+
+
+def _parse_ts(v):
+    return datetime.fromisoformat(v) if v else None
+
+
+_last_followups = [0.0]
+
+
+def followups(cur=None, now=None, force=False):
+    """Called every keepalive tick by leo_instant (throttled to once a minute) and by --tick.
+    (1) a failed ask is retried ONCE after 15 minutes; on success she is told it reached him;
+    (2) an open request is re-checked against the record and followed up with its owner every 24 h;
+    a request with ping=false (backfilled) is never pinged. Own transaction."""
+    if not force and time.time() - _last_followups[0] < 60:
+        return 0
+    _last_followups[0] = time.time()
+    own = cur is None
+    if own:
+        conn = psycopg2.connect(DSN); conn.autocommit = False
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    now = now or _now()
+    n = 0
+    try:
+        cur.execute("""SELECT w.id, w.steps, q.id AS sq, q.assignee, q.question FROM work_orders w
+                         JOIN staff_question q ON w.target_ref = 'staff_question:' || q.id
+                        WHERE w.created_by='staff_desk' AND w.status = ANY(%s)
+                        ORDER BY w.id FOR UPDATE OF w SKIP LOCKED""", (REQ_OPEN,))
+        for w in cur.fetchall():
+            st = (w["steps"] or [{}])[0]
+            m = _member_by_assignee(cur, w["assignee"])
+            if (not st.get("sent") and st.get("ping", True) and st.get("line") and st.get("retries", 0) < 1
+                    and st.get("retry_at") and now >= _parse_ts(st["retry_at"])):
+                ok, why = _tg_jonathan(st["line"])
+                _wo_step(cur, w["id"], {"retries": st.get("retries", 0) + 1, "sent": ok, "send_reason": why},
+                         note="retry: sent" if ok else f"retry failed: {why}; stays open on his daily list")
+                cur.execute("UPDATE staff_question SET relayed_via=%s, detail=%s WHERE id=%s AND outcome='relay'",
+                            ("telegram (retry)" if ok else f"board (telegram failed twice: {why})", None if ok else why,
+                             w["sq"]))
+                if ok and m:
+                    _send(m["channel"], m["channel_user_id"],
+                          f"Update on request #{w['id']}: it has now reached Jonathan on Telegram.")
+                n += 1
+            elif st.get("ping") and st.get("next_follow_up_at") and now >= _parse_ts(st["next_follow_up_at"]):
+                ans = _recheck(cur, m, w["question"]) if m else None
+                if ans and m:
+                    _send(m["channel"], m["channel_user_id"], f"Update on request #{w['id']}: {ans}")
+                    _wo_step(cur, w["id"], {"status": "done", "result": f"answered from record on re-check: {ans[:300]}"},
+                             status="done", note="resolved from record on re-check")
+                else:
+                    k = st.get("follow_ups", 0) + 1
+                    ok, why = _tg_jonathan(f"Follow-up {k} on request #{w['id']} from {m['name'] if m else w['assignee']}, "
+                                           f"still open: \"{(w['question'] or '')[:200]}\". Reply to her on Messenger, "
+                                           f"or close it: staff_desk.py close-request --id {w['id']} --answer \"...\"")
+                    _wo_step(cur, w["id"], {"follow_ups": k, "last_follow_up_ok": ok, "last_follow_up_reason": why,
+                                            "next_follow_up_at": (now + FOLLOW_UP_EVERY).isoformat()},
+                             note=f"follow-up {k}: record re-checked, no answer; owner pinged ({'ok' if ok else why})")
+                n += 1
+        if own:
+            (conn.rollback() if DRY else conn.commit())
+    finally:
+        if own:
+            cur.close(); conn.close()
+    return n
+
+
+def close_request(cur, wid, answer=None, note=None, send=True):
+    """Close a request ONLY when resolved: the answer goes to her (unless --no-send) and the order is done."""
+    cur.execute("""SELECT w.id, w.status, q.assignee FROM work_orders w JOIN staff_question q
+                     ON w.target_ref='staff_question:'||q.id WHERE w.id=%s AND w.created_by='staff_desk'""", (wid,))
+    r = cur.fetchone()
+    if not r or r["status"] not in REQ_OPEN:
+        return {"closed": False, "why": "not an open staff_desk request"}
+    if not (answer or note):
+        return {"closed": False, "why": "a request closes only with an answer or a resolution note"}
+    m = _member_by_assignee(cur, r["assignee"])
+    if answer and send and m:
+        _send(m["channel"], m["channel_user_id"], f"Answer to request #{wid}: {answer}")
+    _wo_step(cur, wid, {"status": "done", "result": answer or note}, status="done",
+             note=f"resolved: {(answer or note)[:200]}")
+    return {"closed": True, "id": wid}
+
+
+def open_backfill(cur, sq_ids, ping=False):
+    """Open tracked requests for existing unanswered staff_question rows. ping=False: nobody is messaged."""
+    out = []
+    for sq in sq_ids:
+        cur.execute("SELECT id, assignee, question, matter_code FROM staff_question WHERE id=%s", (sq,))
+        q = cur.fetchone()
+        if not q:
+            continue
+        wid = _wo_open(cur, "staff_inquiry", q["matter_code"], f"{q['assignee']} asked (not in record): {q['question']}",
+                       sq, "jonathan", ping=ping, extra={"sent": False, "backfilled": True})
+        out.append({"staff_question": sq, "work_order": wid})
+    return out
+
+
 def _handle_staff(cur, m, mid, text):
     text = (text or "").strip()
     st = m["state"] or {}
@@ -663,6 +902,9 @@ def _handle_staff(cur, m, mid, text):
         _send(m["channel"], m["channel_user_id"], _say(m, "which_num"))
         return "done_ambiguous"
 
+    if REQUESTS.match(text):
+        return _my_requests(cur, m)
+
     if TASKS.search(text):
         _send(m["channel"], m["channel_user_id"], _all_tasks_text(cur, m) if LIST.search(text) else _next_task_text(cur, m))
         return "tasks"
@@ -712,8 +954,9 @@ def _handle_staff(cur, m, mid, text):
         if len(hits) > 1:
             return _which()
         if outcome in ("not_in_sources", "rejected_unsupported") and own:
-            _send(m["channel"], m["channel_user_id"], _say(m, "not_found"))
-            return f"materials_{outcome}"
+            wid, sent = _open_inquiry(cur, m, text)
+            _send(m["channel"], m["channel_user_id"], _inquiry_reply(m, wid, sent))
+            return f"materials_{outcome}:request_{wid}"
 
     # questions: answer from the record, scoped to the client of her current task; never free-LLM
     items = _candidates(cur, m["assignee_key"])
@@ -728,6 +971,10 @@ def _handle_staff(cur, m, mid, text):
                 return "answered_from_record"
         except Exception as e:
             print(f"[staff_desk] purpose_route skip: {type(e).__name__}: {e}", flush=True)
+    if text and text != "[media]" and ASKISH.search(text):
+        wid, sent = _open_inquiry(cur, m, text)
+        _send(m["channel"], m["channel_user_id"], _inquiry_reply(m, wid, sent))
+        return f"fallback:request_{wid}"
     _send(m["channel"], m["channel_user_id"], _say(m, "fallback"))
     return "fallback"
 
@@ -1009,7 +1256,8 @@ def tick(cur):
     p = _auto_propose(cur)
     a = ask_next(cur)
     b = morning_briefs(cur)
-    print(f"[staff_desk] tick: proposed={p} asked={a} briefs={b}")
+    f = followups(cur, force=True)
+    print(f"[staff_desk] tick: proposed={p} asked={a} briefs={b} followups={f}")
 
 
 # ── entry point from leo_instant ───────────────────────────────────────────────────────────────────────
@@ -1118,7 +1366,12 @@ def status(cur):
 def main():
     global DRY
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", nargs="?", choices=["propose-task", "readiness", "activate", "rebind"])
+    ap.add_argument("cmd", nargs="?", choices=["propose-task", "readiness", "activate", "rebind", "close-request", "open-requests"])
+    ap.add_argument("--id", type=int, help="close-request: the work order id")
+    ap.add_argument("--answer", help="close-request: the answer sent to her")
+    ap.add_argument("--note", help="close-request: resolution note when no answer is sent")
+    ap.add_argument("--no-send", action="store_true")
+    ap.add_argument("--sq", help="open-requests: comma list of staff_question ids (never pings)")
     ap.add_argument("--psid", help="rebind: the new account id on the channel")
     ap.add_argument("--assignee", default="kristyle")
     ap.add_argument("--instrument", type=int)
@@ -1147,6 +1400,10 @@ def main():
             print(json.dumps(rebind(cur, a.assignee, a.psid), indent=2))
         elif a.cmd == "activate":
             print(json.dumps(activate(cur, a.assignee), indent=2))
+        elif a.cmd == "close-request":
+            print(json.dumps(close_request(cur, a.id, a.answer, a.note, send=not a.no_send)))
+        elif a.cmd == "open-requests":
+            print(json.dumps(open_backfill(cur, [int(x) for x in a.sq.split(",")], ping=False)))
         elif a.cmd == "propose-task":
             print("queued approval", propose_task(cur, a.instrument, a.address, a.due, a.method))
         elif a.probe is not None:
