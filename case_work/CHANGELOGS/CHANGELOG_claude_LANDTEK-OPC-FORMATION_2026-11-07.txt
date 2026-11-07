@@ -1,0 +1,66 @@
+CHANGELOG claude / LANDTEK-OPC-FORMATION / 2026-11-07
+Session: Claude Code, Mac desk. Leo's staff desk (Kristyle) record fixes after the 7 Nov ORUS rewind.
+
+CHANGED
+- Production DB, record fix 1, on Jonathan's go ("committ"). Authored by Grok (LandTek Product), reviewed by Claude in
+  four rounds, dry-run as written and an apply+undo round trip first. Applied 2026-11-07 01:34:45 UTC.
+  * staff_knowledge cards 4 (company/corporate_tin), 11 (bir/steps), 15 (sec_fy/how) set to superseded, old text kept
+    with a pointer line. New live cards 95 (bir/orus_1903_submitted) and 96 (sec_fy/forwarded_to_bicol), source_kind
+    field_report, cited to Kristyle's own Messenger reports.
+  * staff_task 1 retitled "Fiscal year correction: waiting for SEC.", task 2 "BIR registration (Form 1903): waiting for
+    BIR."; how/proof_needed rewritten to the waiting state; materials reduced to a status note; task 2 depends_on cleared.
+    Prior title/how/materials/proof_needed/depends_on saved to the NEW table staff_task_revision (revision 1 each).
+  * staff_exam 13, 28, 29 updated; 193 "Yes waiting." added; 3, 16, 17, 18, 19, 27 retired (historical steps).
+  * staff_knowledge checks extended: state adds superseded, source_kind adds field_report.
+- Production DB, record fix 2 (Claude, correction id rf-2026-11-07-b), on Jonathan's go ("ok"). Applied 01:45:08 UTC.
+  * Card 96 and task 1 status note: the SEC Bicol fact now cites channel_messages 3332 only. gmail_messages 152685 does
+    not mention Bicol; it is SEC CRMD's 4 Nov reply ("file through an iMessage ticket") and is now cited only for that.
+  * Card 95 and task 2 (how, proof_needed, materials): "No corporate TIN or Form 2303 is recorded yet" replaces "have not
+    been issued" (her reports establish waiting, not non-issuance).
+  * Exams 28 and 193 also forbid the rewind phrases Leo actually sent her (channel_messages 3232, 3339, 3349).
+  * NEW table staff_record_fix_log: before/after snapshots per row, keyed by correction id, kept for audit.
+- Files: migrations/2026-11-07_staff_record_fix_1_APPLIED.sql (exact file that ran), _1_UNDO.sql (Grok's undo plus a
+  guard that refuses unless rows match the post-fix-1 fingerprint 173a8325ab832f07614eb664cbc99065; revision rows now
+  kept), _2.sql, _2_UNDO.sql (restores logged before-values, refuses on any drift, marks the log undone).
+
+VERIFIED
+- Fix 1 dry-run executed fully; counts matched the guard. Apply then undo in one transaction returned the fingerprint of
+  every affected row (all formation cards, tasks 1-2, all Kristyle exams, constraint defs) to the original
+  e4be5ea5b0504cc0cb551c291029b439.
+- Fix 2 rehearsal, one transaction rolled back: applied (6 rows changed); re-apply refused; fix-1 undo refused while fix 2
+  applied; fix-2 undo restored 173a8325... exactly; second fix-2 undo refused; fix-1 undo then restored e4be5ea5...;
+  fix-2 undo refused after a simulated later edit to card 95.
+- Live after both: zero live formation cards or task 1/2 fields carrying the Business Hub route or "have not been issued".
+- The six cited channel_messages (3332, 3342, 3344, 3348, 3350, 3356) are all from Kristyle's Messenger account
+  (channel_user 40472896185635007) and say what the cards claim.
+
+DECIDED
+- Jonathan approved fix 1 and fix 2 and recording them in git.
+- Grok's Slice 1 local prototype is a second memory store. Next integration adds stage columns/versions on the existing
+  staff_task and an events table in the same database; do not port the package (Grok, ChatGPT and Claude agree).
+- The gate decides what is true; Kristyle hears it in field phrasing, not an internal state readout (Grok accepted).
+
+OPEN
+- Leo not yet exercised against the new records with the live model. Before running scripts/staff_exam.py, confirm it
+  cannot send Messenger messages (it calls the live handler).
+- ORUS proof is not in Postgres. ARN O26L064AYBZ95C exists only in CHANGELOG_claude_LANDTEK-OPC-FORMATION_2026-11-02.txt
+  (lines 137-141). Needs an ORUS capture or the ORUS acknowledgment email.
+- landtekopc@gmail.com is not ingested (gmail_messages accounts: jonathan@hayuma.org, jonzschoche@gmail.com). Needs
+  Jonathan's OAuth, read-only scope.
+- Real-thread replay (channel_messages 3110-3367) through Grok's gate with Mac Ollama waits on Grok committing its
+  package to the repo in its own folder.
+- Exams are substring tests and cannot prove contextual behaviour; "Yes waiting." has no preceding turns (ChatGPT).
+- 7 of 8 work orders from Kristyle still awaiting_handoff: 2340-2344, 2372, 2415.
+- Mac scripts/staff_desk.py (md5 fcc6e411...) is older than the VPS copy (bf9547f1...). Pull before editing.
+- Kristyle is split across channel_users 3, 80, 900; krstylpalma@gmail.com is unlinked; 4 of 465 channel_users have an
+  entity_id.
+- Untracked scripts/comms_review_pack.py from the 16 Sep part of this session (outward-comms review pack renderer, never
+  delivered). Keep or delete: Jonathan's call.
+
+CONFLICTS
+- Grok reported Slice 1 as deployed in one message and as local-only in its own report. Verified local-only: VPS
+  staff_desk.py checksum unchanged, no new tables until fix 1.
+- Fix 1 cited gmail_messages 152685 for the Bicol forwarding; it does not support that. Caught by ChatGPT, missed by Grok
+  and Claude (existence was checked, content was not). Corrected in fix 2.
+- ChatGPT reviewed the third draft of fix 1, not the committed fourth. Its guard finding was already fixed; its undo
+  exactness concern is proven moot for this data by the fingerprint test; its drift concern is now guarded in both undos.
